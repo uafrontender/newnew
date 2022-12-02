@@ -17,7 +17,7 @@ import {
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
-const DARK_IMAGES_ANIMATED: any = {
+const DARK_IMAGES_ANIMATED: Record<string, () => string> = {
   auction: assets.creation.darkAcAnimated,
   crowdfunding: assets.creation.darkCfAnimated,
   'multiple-choice': assets.creation.darkMcAnimated,
@@ -29,7 +29,7 @@ const DARK_IMAGES_STATIC: any = {
   'multiple-choice': assets.creation.darkMcStatic,
 };
 
-const LIGHT_IMAGES_ANIMATED: any = {
+const LIGHT_IMAGES_ANIMATED: Record<string, () => string> = {
   auction: assets.creation.lightAcAnimated,
   crowdfunding: assets.creation.lightCfAnimated,
   'multiple-choice': assets.creation.lightMcAnimated,
@@ -114,11 +114,11 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
               src={
                 isMobile || isTablet || mouseEntered
                   ? theme.name === 'light'
-                    ? LIGHT_IMAGES_ANIMATED[itemKey]
-                    : DARK_IMAGES_ANIMATED[itemKey]
+                    ? LIGHT_IMAGES_ANIMATED[itemKey]()
+                    : DARK_IMAGES_ANIMATED[itemKey]()
                   : theme.name === 'light'
-                  ? LIGHT_IMAGES_STATIC[itemKey]
-                  : DARK_IMAGES_STATIC[itemKey]
+                  ? LIGHT_IMAGES_STATIC[itemKey]()
+                  : DARK_IMAGES_STATIC[itemKey]()
               }
               alt='Post type'
               width={isMobile ? 80 : 120}

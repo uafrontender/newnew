@@ -42,13 +42,13 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { I18nNamespaces } from '../../../../@types/i18next';
 
-const DARK_IMAGES = {
+const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.creation.darkAcAnimated,
   cf: assets.creation.darkCfAnimated,
   mc: assets.creation.darkMcAnimated,
 };
 
-const LIGHT_IMAGES = {
+const LIGHT_IMAGES: Record<string, () => string> = {
   ac: assets.creation.lightAcAnimated,
   cf: assets.creation.lightCfAnimated,
   mc: assets.creation.lightMcAnimated,
@@ -398,8 +398,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           imageSrc={
             postType
               ? theme.name === 'light'
-                ? LIGHT_IMAGES[postType]
-                : DARK_IMAGES[postType]
+                ? LIGHT_IMAGES[postType]()
+                : DARK_IMAGES[postType]()
               : undefined
           }
           handleButtonClick={handleSeeNewFailedBox}

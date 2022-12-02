@@ -164,8 +164,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                 <DecisionEndedBox
                   imgSrc={
                     theme.name === 'light'
-                      ? assets.creation.lightAcAnimated
-                      : assets.creation.darkAcAnimated
+                      ? assets.creation.lightAcAnimated()
+                      : assets.creation.darkAcAnimated()
                   }
                 >
                   {t('acPostSuccess.heroText')}

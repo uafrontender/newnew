@@ -10,13 +10,13 @@ import preventParentClick from '../../../../utils/preventParentClick';
 import Button from '../../../atoms/Button';
 import assets from '../../../../constants/assets';
 
-const DARK_IMAGES: any = {
+const DARK_IMAGES: Record<string, () => string> = {
   AC: assets.creation.darkAcAnimated,
   CF: assets.creation.darkCfAnimated,
   MC: assets.creation.darkMcAnimated,
 };
 
-const LIGHT_IMAGES: any = {
+const LIGHT_IMAGES: Record<string, () => string> = {
   AC: assets.creation.lightAcAnimated,
   CF: assets.creation.lightCfAnimated,
   MC: assets.creation.lightMcAnimated,
@@ -44,8 +44,8 @@ const HeroPopup: React.FC<IHeroPopup> = ({
             <img
               src={
                 theme.name === 'light'
-                  ? LIGHT_IMAGES[postType]
-                  : DARK_IMAGES[postType]
+                  ? LIGHT_IMAGES[postType]()
+                  : DARK_IMAGES[postType]()
               }
               alt='Post type'
               width={150}

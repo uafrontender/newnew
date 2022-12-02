@@ -31,13 +31,13 @@ import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { TPostType } from '../../../../utils/switchPostType';
 
-const DARK_IMAGES = {
+const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.creation.darkAcAnimated,
   cf: assets.creation.darkCfAnimated,
   mc: assets.creation.darkMcAnimated,
 };
 
-const LIGHT_IMAGES = {
+const LIGHT_IMAGES: Record<string, () => string> = {
   ac: assets.creation.lightAcAnimated,
   cf: assets.creation.lightCfAnimated,
   mc: assets.creation.lightMcAnimated,
@@ -304,7 +304,7 @@ const PostTopInfoModeration: React.FunctionComponent<
             <SText variant={3}>
               {t('acPostModeration.postTopInfo.selectWinner.body')}
             </SText>
-            <STrophyImg src={assets.decision.lightHourglassAnimated} />
+            <STrophyImg src={assets.decision.lightHourglassAnimated()} />
           </SSelectWinnerOption>
         ) : null}
       </SWrapper>
@@ -321,8 +321,8 @@ const PostTopInfoModeration: React.FunctionComponent<
           imageSrc={
             postType
               ? theme.name === 'light'
-                ? LIGHT_IMAGES[postType]
-                : DARK_IMAGES[postType]
+                ? LIGHT_IMAGES[postType]()
+                : DARK_IMAGES[postType]()
               : undefined
           }
           buttonCaption={t('postFailedBoxModeration.buttonText', {

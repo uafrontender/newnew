@@ -17,20 +17,21 @@ import assets from '../../../../constants/assets';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 
-const DARK_IMAGES = {
+const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.creation.darkMcAnimated,
   // TODO: light votes version? why not animated?
-  mc: assets.decision.votes,
+  // mc: assets.creation.darkAcAnimated,
+  mc: () => assets.decision.votes,
   cf: assets.creation.darkCfAnimated,
 };
 
-const LIGHT_IMAGES = {
+const LIGHT_IMAGES: Record<string, () => string> = {
   ac: assets.creation.lightMcAnimated,
   // TODO: light votes version? why not animated?
-  mc: assets.decision.votes,
+  // mc: assets.creation.lightAcAnimated,
+  mc: () => assets.decision.votes,
   cf: assets.creation.lightCfAnimated,
 };
-
 interface IPostViewProcessingAnnouncement {
   variant: 'decision' | 'moderation';
 }
@@ -111,9 +112,9 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
             src={
               theme.name === 'light'
                 ? /* @ts-ignore */
-                  LIGHT_IMAGES[typeOfPost]
+                  LIGHT_IMAGES[typeOfPost]()
                 : /* @ts-ignore */
-                  DARK_IMAGES[typeOfPost]
+                  DARK_IMAGES[typeOfPost]()
             }
           />
           <SText variant={2} weight={600}>

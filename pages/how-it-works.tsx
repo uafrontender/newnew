@@ -48,8 +48,8 @@ export const HowItWorks = () => {
             <source
               src={
                 theme.name === 'light'
-                  ? assets.info.lightQuestionMarkAnimated
-                  : assets.info.darkQuestionMarkAnimated
+                  ? assets.info.lightQuestionMarkVideo
+                  : assets.info.darkQuestionMarkVideo
               }
               type='video/mp4'
             />
@@ -60,8 +60,8 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightAcAnimated
-                  : assets.creation.darkAcAnimated
+                  ? assets.creation.lightAcAnimated()
+                  : assets.creation.darkAcAnimated()
               }
               alt='bids'
               // Quick fix for animated image alignment
@@ -84,8 +84,8 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightMcAnimated
-                  : assets.creation.darkMcAnimated
+                  ? assets.creation.lightMcAnimated()
+                  : assets.creation.darkMcAnimated()
               }
               alt='superpolls'
               // Quick fix for animated image alignment
@@ -108,8 +108,8 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightCfAnimated
-                  : assets.creation.darkCfAnimated
+                  ? assets.creation.lightCfAnimated()
+                  : assets.creation.darkCfAnimated()
               }
               alt='goals'
               // Quick fix for animated image alignment

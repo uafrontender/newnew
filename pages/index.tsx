@@ -38,6 +38,7 @@ import usePagination, {
   PaginatedResponse,
   Paging,
 } from '../utils/hooks/usePagination';
+import isSafari from '../utils/isSafari';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -330,8 +331,8 @@ const Home: NextPage<IHome> = ({
                   <STutorialCard
                     image={
                       theme.name === 'dark'
-                        ? assets.common.darkAnimatedLogo
-                        : assets.common.lightAnimatedLogo
+                        ? assets.common.darkLogoAnimated()
+                        : assets.common.lightLogoAnimated()
                     }
                     title={t('tutorial.recent-activity.title')}
                     caption={t('tutorial.recent-activity.caption')}
@@ -353,8 +354,8 @@ const Home: NextPage<IHome> = ({
         caption={t('tutorial.mc.caption')}
         iconSrc={
           theme.name === 'light'
-            ? assets.test.newMCOptimal
-            : assets.test.newMCOptimal
+            ? assets.landing.lightMcAnimated()
+            : assets.landing.darkMcAnimated()
         }
         posts={staticSuperpolls}
         isStatic
@@ -369,8 +370,8 @@ const Home: NextPage<IHome> = ({
         caption={t('tutorial.ac.caption')}
         iconSrc={
           theme.name === 'light'
-            ? assets.creation.lightAcAnimated
-            : assets.creation.darkAcAnimated
+            ? assets.landing.lightAcAnimated()
+            : assets.landing.darkAcAnimated()
         }
         posts={staticBids}
         isStatic

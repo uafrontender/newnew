@@ -79,8 +79,8 @@ const SmsNotificationModal: React.FC<ISmsNotificationModal> = React.memo(
             <Logo
               src={
                 theme.name === 'light'
-                  ? assets.common.lightAnimatedLogo
-                  : assets.common.darkAnimatedLogo
+                  ? assets.common.lightLogoAnimated()
+                  : assets.common.darkLogoAnimated()
               }
               alt='NewNew logo'
             />
