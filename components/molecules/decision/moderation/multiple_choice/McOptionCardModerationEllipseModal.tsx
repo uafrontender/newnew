@@ -14,10 +14,13 @@ interface IMcOptionCardModerationEllipseModal {
   onClose: () => void;
   isBySubscriber: boolean;
   optionId: number;
+  isUserBlocked: boolean;
+
   canDeleteOptionInitial: boolean;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
   handleOpenRemoveOptionModal: () => void;
+  handleUnblockUser: () => void;
 }
 
 const McOptionCardModerationEllipseModal: React.FunctionComponent<
@@ -28,10 +31,12 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<
   onClose,
   isBySubscriber,
   optionId,
+  isUserBlocked,
   canDeleteOptionInitial,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
   handleOpenRemoveOptionModal,
+  handleUnblockUser,
 }) => {
   const { t } = useTranslation('common');
 
@@ -84,11 +89,15 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<
       {isBySubscriber && (
         <EllipseModalButton
           onClick={() => {
+            if (isUserBlocked) {
+              handleUnblockUser();
+              return;
+            }
             handleOpenBlockUserModal();
             onClose();
           }}
         >
-          {t('ellipse.blockUser')}
+          {!isUserBlocked ? t('ellipse.blockUser') : t('ellipse.unblockUser')}
         </EllipseModalButton>
       )}
       <EllipseModalButton
