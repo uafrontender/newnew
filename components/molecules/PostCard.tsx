@@ -1043,7 +1043,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '200px'};
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '100%'};
 
     transition: transform ease 0.5s;
 
