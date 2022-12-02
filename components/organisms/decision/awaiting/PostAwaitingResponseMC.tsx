@@ -191,29 +191,33 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <a href={`/${post.creator?.username}`}>
-                        <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                      </a>
-                      <a href={`/${post.creator?.username}`}>
-                        <SWantsToKnow>
-                          <Trans
-                            t={t}
-                            i18nKey='mcPostAwaiting.wantsToKnow'
-                            // @ts-ignore
-                            components={[
-                              post.creator?.options?.isVerified ? (
-                                <SInlineSVG
-                                  svg={VerificationCheckmark}
-                                  width='16px'
-                                  height='16px'
-                                  fill='none'
-                                />
-                              ) : null,
-                              { creator: getDisplayname(post.creator) },
-                            ]}
-                          />
-                        </SWantsToKnow>
-                      </a>
+                      <Link href={`/${post.creator?.username}`}>
+                        <a href={`/${post.creator?.username}`}>
+                          <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                        </a>
+                      </Link>
+                      <Link href={`/${post.creator?.username}`}>
+                        <a href={`/${post.creator?.username}`}>
+                          <SWantsToKnow>
+                            <Trans
+                              t={t}
+                              i18nKey='mcPostAwaiting.wantsToKnow'
+                              // @ts-ignore
+                              components={[
+                                post.creator?.options?.isVerified ? (
+                                  <SInlineSVG
+                                    svg={VerificationCheckmark}
+                                    width='16px'
+                                    height='16px'
+                                    fill='none'
+                                  />
+                                ) : null,
+                                { creator: getDisplayname(post.creator) },
+                              ]}
+                            />
+                          </SWantsToKnow>
+                        </a>
+                      </Link>
                     </SCreator>
                     <STotal>
                       {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}

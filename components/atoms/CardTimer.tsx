@@ -38,8 +38,16 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
       if (parsedSeconds.days !== '0') {
         return `
           ${`${parsedSeconds.days}${t('timer.daysLeft')}`}
-          ${`${parsedSeconds.hours}${t('timer.hoursLeft')}`}
-          ${`${parsedSeconds.minutes}${t('timer.minutesLeft')}`}
+          ${
+            parsedSeconds.hours !== '0'
+              ? `${parsedSeconds.hours}${t('timer.hoursLeft')}`
+              : ''
+          }
+          ${
+            parsedSeconds.minutes !== '0'
+              ? `${parsedSeconds.minutes}${t('timer.minutesLeft')}`
+              : ''
+          }
         `;
       }
 

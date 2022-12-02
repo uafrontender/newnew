@@ -71,11 +71,17 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                   <SPostEnded>
                     {parsed.days !== '00' &&
                       `${parsed.days}${tPostCard('timer.daysLeft')}`}{' '}
-                    {`${parsed.hours}${tPostCard('timer.hoursLeft')} ${
-                      parsed.minutes
-                    }${tPostCard('timer.minutesLeft')} ${
-                      parsed.seconds
-                    }${tPostCard('timer.secondsLeft')} `}
+                    {`${
+                      parsed.hours !== '00' ||
+                      (parsed.days !== '00' && parsed.hours === '00')
+                        ? `${parsed.hours}${tPostCard('timer.hoursLeft')}`
+                        : ''
+                    } ${parsed.minutes}${tPostCard('timer.minutesLeft')}
+                    ${
+                      parsed.days === '00'
+                        ? `${parsed.seconds}${tPostCard('timer.secondsLeft')}`
+                        : ''
+                    }`}
                   </SPostEnded>
                 ) : (
                   <SPostEnded>
