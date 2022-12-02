@@ -408,6 +408,10 @@ const PostPage: NextPage<IPostPage> = ({
     }
     if (commentContentFromUrl) {
       handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+
+      router.replace(`/post/${postUuid}`, undefined, {
+        shallow: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
@@ -539,7 +543,7 @@ const PostPage: NextPage<IPostPage> = ({
         x: isMobile && !isServerSide ? 500 : 0,
         opacity: 0,
         transition: {
-          duration: isMobile ? 0.3 : 0.3,
+          duration: isMobile ? 0.3 : 0,
         },
       }}
       animate={{

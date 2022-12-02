@@ -35,6 +35,8 @@ import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
+import { markUser } from '../../../../../api/endpoints/user';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -68,6 +70,32 @@ const McOptionCardModeration: React.FunctionComponent<
     resizeMode
   );
   const { showErrorToastPredefined } = useErrorToasts();
+
+  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+
+  const isUserBlocked = useMemo(
+    () => usersIBlocked.includes(option.creator?.uuid ?? ''),
+    [option.creator?.uuid, usersIBlocked]
+  );
+
+  const handleUnblockUser = useCallback(
+    async (uuid: string) => {
+      if (!uuid) throw new Error('No uuid provided');
+      try {
+        const payload = new newnewapi.MarkUserRequest({
+          markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+          userUuid: uuid,
+        });
+        const res = await markUser(payload);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        unblockUser(uuid);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [unblockUser]
+  );
 
   const supporterCountSubstracted = useMemo(() => {
     if (option.supporterCount === 0) {
@@ -161,6 +189,7 @@ const McOptionCardModeration: React.FunctionComponent<
             </SOptionInfo>
             <SBiddersInfo variant={3}>
               <RenderSupportersInfo
+                isBlue={!!isWinner}
                 isCreatorsBid
                 isSuggestedByMe={false}
                 isSupportedByMe={false}
@@ -235,6 +264,7 @@ const McOptionCardModeration: React.FunctionComponent<
               isBySubscriber={!isCreatorsBid}
               canDeleteOptionInitial={canBeDeleted && !isWinner}
               optionId={option.id as number}
+              isUserBlocked={isUserBlocked}
               handleClose={() => {
                 setIsEllipseMenuOpen(false);
                 handleUnsetScrollBlocked?.();
@@ -242,6 +272,9 @@ const McOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+              handleUnblockUser={() =>
+                handleUnblockUser(option.creator?.uuid ?? '')
+              }
               anchorElement={ellipseMenuButton.current}
             />
           )}
@@ -261,11 +294,15 @@ const McOptionCardModeration: React.FunctionComponent<
           zIndex={16}
           onClose={() => setIsEllipseMenuOpen(false)}
           isBySubscriber={!isCreatorsBid}
+          isUserBlocked={isUserBlocked}
           canDeleteOptionInitial={canBeDeleted && !isWinner}
           optionId={option.id as number}
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          handleUnblockUser={() =>
+            handleUnblockUser(option.creator?.uuid ?? '')
+          }
         />
       )}
       {/* Confirm block user modal */}

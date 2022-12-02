@@ -135,6 +135,7 @@
     "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
     "floatingUploadResponseButton": "Make a response video",
     "setThumbnail": "Set a thumbnail",
+    "changeThumbnail": "Change thumbnail",
     "responseUploadedNonProcessed": "Success! Your response will be available once the video was processed",
     "uploadResponseForm": {
       "fileUpload": {
