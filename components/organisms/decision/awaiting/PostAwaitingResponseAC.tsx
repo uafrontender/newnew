@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -148,29 +149,33 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             />
             <SCreatorInfoDiv>
               <SCreator>
-                <a href={`/${post.creator?.username}`}>
-                  <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                </a>
-                <a href={`/${post.creator?.username}`}>
-                  <SWantsToKnow>
-                    <Trans
-                      t={t}
-                      i18nKey='acPostAwaiting.wantsToKnow'
-                      // @ts-ignore
-                      components={[
-                        post.creator?.options?.isVerified ? (
-                          <SInlineSVG
-                            svg={VerificationCheckmark}
-                            width='16px'
-                            height='16px'
-                            fill='none'
-                          />
-                        ) : null,
-                        { creator: getDisplayname(post.creator) },
-                      ]}
-                    />
-                  </SWantsToKnow>
-                </a>
+                <Link href={`/${post.creator?.username}`}>
+                  <a href={`/${post.creator?.username}`}>
+                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                  </a>
+                </Link>
+                <Link href={`/${post.creator?.username}`}>
+                  <a href={`/${post.creator?.username}`}>
+                    <SWantsToKnow>
+                      <Trans
+                        t={t}
+                        i18nKey='acPostAwaiting.wantsToKnow'
+                        // @ts-ignore
+                        components={[
+                          post.creator?.options?.isVerified ? (
+                            <SInlineSVG
+                              svg={VerificationCheckmark}
+                              width='16px'
+                              height='16px'
+                              fill='none'
+                            />
+                          ) : null,
+                          { creator: getDisplayname(post.creator) },
+                        ]}
+                      />
+                    </SWantsToKnow>
+                  </a>
+                </Link>
               </SCreator>
               {post.totalAmount?.usdCents && (
                 <STotal>

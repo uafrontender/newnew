@@ -3,7 +3,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -27,7 +27,6 @@ export const PostList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
 }) => {
-  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -40,16 +39,9 @@ export const PostList: React.FC<IList> = ({
   const skeletonNumber =
     (isMobile && 1) || (isTablet && 3) || (isSmallDesktops && 4) || 5; // calculations how menu skeletons to display
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      router.push(`/post/${switchPostType(item)[0].postUuid}`);
-    };
-
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
-      >
+  const renderItem = (item: any, index: number) => (
+    <Link href={`/post/${switchPostType(item)[0].postUuid}`}>
+      <SItemWrapper key={switchPostType(item)[0].postUuid}>
         <PostCard
           item={item}
           index={index + 1}
@@ -57,8 +49,8 @@ export const PostList: React.FC<IList> = ({
           height={isMobile ? '564px' : '336px'}
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   return (
     <>
