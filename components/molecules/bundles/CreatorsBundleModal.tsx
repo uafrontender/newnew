@@ -118,9 +118,11 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 </BulletLine>
                 <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
               </SBundleInfo>
-              <BuyButton onClick={onBuyMore}>
-                {t('modal.creatorsBundle.buyButton')}
-              </BuyButton>
+              {creatorBundle.creator?.options?.isOfferingBundles && (
+                <BuyButton onClick={onBuyMore}>
+                  {t('modal.creatorsBundle.buyButton')}
+                </BuyButton>
+              )}
             </Content>
           </SModalPaper>
         </Modal>
