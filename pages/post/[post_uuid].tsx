@@ -408,6 +408,10 @@ const PostPage: NextPage<IPostPage> = ({
     }
     if (commentContentFromUrl) {
       handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+
+      router.replace(`/post/${postUuid}`, undefined, {
+        shallow: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
