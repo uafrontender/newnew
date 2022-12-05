@@ -63,7 +63,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
 
       const handleCopyLink = useCallback(() => {
         if (window) {
-          const url = `${window.location.origin}/post/${postUuid}`;
+          const url = `${window.location.origin}/p/${postUuid}`;
           Mixpanel.track('Copied Link Post Modal', {
             _stage: 'Post',
             _postUuid: postUuid,
@@ -97,7 +97,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           if (!user.loggedIn && user._persist?.rehydrated) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-                `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
+                `${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`
               )}`
             );
             return;

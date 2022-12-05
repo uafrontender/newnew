@@ -80,7 +80,7 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
 
     const handlerCopy = useCallback(() => {
       if (window) {
-        const url = `${window.location.origin}/post/${postId}`;
+        const url = `${window.location.origin}/p/${postId}`;
         Mixpanel.track('Copied Link Post', {
           _stage: 'Post',
           _postUuid: postId,

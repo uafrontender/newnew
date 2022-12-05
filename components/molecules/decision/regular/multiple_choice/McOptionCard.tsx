@@ -296,7 +296,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const setupIntent = useStripeSetupIntent({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
   });
 
   const handlePayWithCard = useCallback(
@@ -684,7 +684,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
-            redirectUrl={`post/${postId}`}
+            redirectUrl={`p/${postId}`}
             bottomCaption={
               (!appConstants.minHoldAmount?.usdCents ||
                 paymentWithFeeInCents >
