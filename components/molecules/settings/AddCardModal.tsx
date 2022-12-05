@@ -160,7 +160,7 @@ interface IAddCardModal {
 const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   const { t } = useTranslation('page-Profile');
 
-  const [stipeSecret, setStripeSecret] = useState('');
+  const [stripeSecret, setStripeSecret] = useState('');
   const [isStripeSecretLoading, setIsStripeSecretLoading] = useState(false);
 
   const { loggedIn } = useAppSelector((state) => state.user);
@@ -240,7 +240,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
               />
             </SLoader>
           )}
-          <StripeElements stipeSecret={stipeSecret}>
+          <StripeElements stipeSecret={stripeSecret}>
             <AddCardForm onCancel={closeModal} onSuccess={onCardSuccess} />
           </StripeElements>
         </SModalPaper>
