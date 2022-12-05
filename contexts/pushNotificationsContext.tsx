@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 
@@ -71,7 +72,12 @@ const PushNotificationsContextProvider: React.FC<
 
   const [inSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
-  // const [hasWebPush, setHasWebPush] = useState(false);
+
+  const isSafariBrowser = useRef(
+    isSafari() &&
+      (window as any).safari &&
+      'pushNotification' in (window as any).safari
+  );
 
   // Get config
   useEffect(() => {
@@ -83,7 +89,6 @@ const PushNotificationsContextProvider: React.FC<
         const response = await webPushConfig(payload);
 
         setPublicKey(response.data?.publicKey || '');
-        // setHasWebPush(response.data?.hasWebPush || false);
       } catch (err) {
         console.error(err);
       } finally {
@@ -99,11 +104,7 @@ const PushNotificationsContextProvider: React.FC<
     permission: PermissionType;
     deviceToken?: string;
   } = useCallback(() => {
-    if (
-      isSafari() &&
-      (window as any).safari &&
-      'pushNotification' in (window as any).safari
-    ) {
+    if (isSafariBrowser.current) {
       const permissionData = (window as any).safari.pushNotification.permission(
         process.env.NEXT_PUBLIC_WEB_PUSH_ID
       );
@@ -114,7 +115,7 @@ const PushNotificationsContextProvider: React.FC<
     return { permission: Notification.permission };
   }, []);
 
-  // register and unregister
+  // register subscription on BE
   const register = useCallback(
     async (subscriptionData: {
       expiration?: string;
@@ -135,6 +136,7 @@ const PushNotificationsContextProvider: React.FC<
     []
   );
 
+  // unregister subscription on BE
   const unregister = useCallback(async (endpoint: string) => {
     const payload = new newnewapi.UnRegisterForWebPushRequest({
       endpoint,
@@ -143,102 +145,103 @@ const PushNotificationsContextProvider: React.FC<
     await webPushUnRegister(payload);
   }, []);
 
-  // Check push notification subscription
+  // check subscription existing on BE
+  const fetchCheckSubscription = useCallback(async (token: string) => {
+    try {
+      const res = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/web_push/safari/check?token=${token}&access_token=${cookiesInstance.get(
+          'accessToken'
+        )}`
+      );
+
+      const response = await res.json();
+
+      return !(Object.keys(response).length === 0);
+    } catch (err) {
+      return false;
+    }
+  }, []);
+
+  // Check push notification subscription existing
   const checkSubscriptionSafari = useCallback(async () => {
     const permissionData = getPermissionData();
 
-    if (permissionData.permission === 'granted') {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
-            permissionData.deviceToken
-          }&access_token=${cookiesInstance.get('accessToken')}`
-        );
+    if (permissionData.permission === 'granted' && permissionData.deviceToken) {
+      const isSubscriptionExists = await fetchCheckSubscription(
+        permissionData.deviceToken
+      );
 
-        const response = await res.json();
-
-        setIsSubscribed(!(Object.keys(response).length === 0));
-        return !!response.endpoint;
-      } catch (err) {
-        setIsSubscribed(false);
-        return false;
-      }
+      return isSubscriptionExists;
     }
 
     return false;
-  }, [getPermissionData]);
+  }, [getPermissionData, fetchCheckSubscription]);
 
   const checkSubscriptionNonSafari = useCallback(async () => {
     try {
       const swReg = await navigator.serviceWorker.register('/sw.js');
 
       if (!swReg) {
-        setIsSubscribed(false);
-        return false;
+        throw new Error('No active service worker');
       }
 
       const permissionData = getPermissionData();
 
-      if (permissionData.permission === 'granted') {
-        const subscription = await swReg.pushManager.getSubscription();
-
-        if (subscription) {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari/check?token=${
-              subscription.endpoint
-            }&access_token=${cookiesInstance.get('accessToken')}`
-          );
-
-          const response = await res.json();
-
-          console.log(response, 'response');
-
-          // renew subscription if it has been updated
-          if (Object.keys(response).length === 0) {
-            const sub = subscription.toJSON();
-            if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
-              throw new Error('Something goes wrong');
-            }
-
-            await register({
-              expiration: `${sub.expirationTime}`,
-              endpoint: sub.endpoint,
-              p256dh: sub.keys.p256dh,
-              auth: sub.keys.auth,
-            });
-
-            setIsSubscribed(true);
-            return true;
-          }
-
-          setIsSubscribed(true);
-          return true;
-        }
-
-        setIsSubscribed(false);
+      if (permissionData.permission !== 'granted') {
         return false;
       }
 
-      return false;
+      const subscription = await swReg.pushManager.getSubscription();
+
+      if (!subscription) {
+        return false;
+      }
+
+      const isSubscriptionExists = await fetchCheckSubscription(
+        subscription.endpoint
+      );
+
+      if (isSubscriptionExists) {
+        return true;
+      }
+
+      // renew subscription if it has been updated
+      const sub = subscription.toJSON();
+      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+        throw new Error('Something goes wrong');
+      }
+
+      await register({
+        expiration: `${sub.expirationTime}`,
+        endpoint: sub.endpoint,
+        p256dh: sub.keys.p256dh,
+        auth: sub.keys.auth,
+      });
+
+      return true;
     } catch (err) {
       console.error(err);
       return false;
     }
-  }, [getPermissionData, register]);
+  }, [getPermissionData, register, fetchCheckSubscription]);
+
+  const checkSubscription = useCallback(async () => {
+    let isSubscribed = false;
+
+    if (isSafariBrowser.current) {
+      isSubscribed = await checkSubscriptionSafari();
+    } else {
+      isSubscribed = await checkSubscriptionNonSafari();
+    }
+
+    setIsSubscribed(isSubscribed);
+  }, [checkSubscriptionSafari, checkSubscriptionNonSafari]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      if (
-        isSafari() &&
-        (window as any).safari &&
-        'pushNotification' in (window as any).safari
-      ) {
-        checkSubscriptionSafari();
-      } else {
-        checkSubscriptionNonSafari();
-      }
-    }
-  }, [checkSubscriptionSafari, checkSubscriptionNonSafari]);
+    checkSubscription();
+  }, [checkSubscription]);
 
   // Permission Modal
   const openPermissionRequestModal = useCallback(() => {
@@ -359,6 +362,7 @@ const PushNotificationsContextProvider: React.FC<
             throw response.error;
           }
 
+          onSuccess?.();
           setIsSubscribed(true);
         }
       } catch (err) {
@@ -375,36 +379,41 @@ const PushNotificationsContextProvider: React.FC<
 
         const notificationPermission = await Notification.requestPermission();
 
-        if (notificationPermission === 'granted') {
-          const oldSubscription = await swReg.pushManager.getSubscription();
-          if (oldSubscription) {
-            await oldSubscription.unsubscribe();
-          }
-
-          const subscription = await swReg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: publicKey,
-          });
-
-          const sub = subscription?.toJSON();
-
-          if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
-            throw new Error('Something goes wrong');
-          }
-          const response = await register({
-            expiration: `${sub.expirationTime}`,
-            endpoint: sub.endpoint,
-            p256dh: sub.keys.p256dh,
-            auth: sub.keys.auth,
-          });
-
-          if (response.error) {
-            throw response.error;
-          }
-
-          onSuccess?.();
-          setIsSubscribed(true);
+        if (notificationPermission !== 'granted') {
+          return;
         }
+
+        // remove old subscription if exist
+        const oldSubscription = await swReg.pushManager.getSubscription();
+        if (oldSubscription) {
+          await oldSubscription.unsubscribe();
+        }
+
+        // subscribe
+        const subscription = await swReg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: publicKey,
+        });
+
+        const sub = subscription?.toJSON();
+
+        if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+          throw new Error('Something goes wrong');
+        }
+
+        const response = await register({
+          expiration: `${sub.expirationTime}`,
+          endpoint: sub.endpoint,
+          p256dh: sub.keys.p256dh,
+          auth: sub.keys.auth,
+        });
+
+        if (response.error) {
+          throw response.error;
+        }
+
+        onSuccess?.();
+        setIsSubscribed(true);
       } catch (err) {
         console.error(err);
       }
@@ -414,11 +423,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const subscribe = useCallback(
     async (onSuccess?: () => void) => {
-      if (
-        isSafari() &&
-        (window as any).safari &&
-        'pushNotification' in (window as any).safari
-      ) {
+      if (isSafariBrowser.current) {
         await subscribeSafari(onSuccess);
       } else {
         await subscribeNonSafari(onSuccess);
@@ -470,11 +475,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [unregister]);
 
   const unsubscribe = useCallback(async () => {
-    if (
-      isSafari() &&
-      (window as any).safari &&
-      'pushNotification' in (window as any).safari
-    ) {
+    if (isSafariBrowser.current) {
       await unsubscribeSafari();
     } else {
       await unsubscribeNonSafari();
@@ -494,7 +495,7 @@ const PushNotificationsContextProvider: React.FC<
       const sub = subscription?.toJSON();
 
       if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth || !sub.endpoint) {
-        throw new Error('No active subscription');
+        return;
       }
 
       await unregister(sub.endpoint);
@@ -506,11 +507,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [unregister]);
 
   const pauseNotification = useCallback(() => {
-    if (
-      isSafari() &&
-      (window as any).safari &&
-      'pushNotification' in (window as any).safari
-    ) {
+    if (isSafariBrowser.current) {
       unsubscribeSafari();
     } else {
       pauseNotificationNonSafari();
@@ -545,59 +542,49 @@ const PushNotificationsContextProvider: React.FC<
     }
   }, [register, getPermissionData, checkSubscriptionSafari]);
 
-  const resumePushNotificationNonSafari = useCallback(
-    async (onSuccess?: () => void) => {
-      try {
-        const swReg = await navigator.serviceWorker.register('/sw.js');
+  const resumePushNotificationNonSafari = useCallback(async () => {
+    try {
+      const swReg = await navigator.serviceWorker.register('/sw.js');
 
-        if (!swReg) {
-          throw new Error('No active service worker');
-        }
-
-        const permissionData = getPermissionData();
-
-        if (permissionData.permission !== 'granted') {
-          return;
-        }
-
-        const subscription = await swReg.pushManager.getSubscription();
-
-        if (!subscription) {
-          return;
-        }
-
-        const sub = subscription?.toJSON();
-
-        if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
-          throw new Error('Something goes wrong');
-        }
-
-        const response = await register({
-          expiration: `${sub.expirationTime}`,
-          endpoint: sub.endpoint,
-          p256dh: sub.keys.p256dh,
-          auth: sub.keys.auth,
-        });
-
-        if (response.error) {
-          throw response.error;
-        }
-
-        onSuccess?.();
-        setIsSubscribed(true);
-      } catch (err) {
-        console.error(err);
+      if (!swReg) {
+        throw new Error('No active service worker');
       }
-    },
-    [getPermissionData, register]
-  );
+
+      const permissionData = getPermissionData();
+
+      if (permissionData.permission !== 'granted') {
+        return;
+      }
+
+      const subscription = await swReg.pushManager.getSubscription();
+
+      if (!subscription) {
+        return;
+      }
+
+      const sub = subscription?.toJSON();
+
+      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth) {
+        throw new Error('Something goes wrong');
+      }
+
+      const response = await register({
+        expiration: `${sub.expirationTime}`,
+        endpoint: sub.endpoint,
+        p256dh: sub.keys.p256dh,
+        auth: sub.keys.auth,
+      });
+
+      if (response.error) {
+        throw response.error;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [getPermissionData, register]);
 
   const resumePushNotification = useCallback(() => {
-    if (
-      isSafari() &&
-      (window as any).safari &&
-      'pushNotification' in (window as any).safari
-    ) {
+    if (isSafariBrowser.current) {
       resumePushNotificationSafari();
     } else {
       resumePushNotificationNonSafari();
