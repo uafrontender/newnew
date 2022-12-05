@@ -69,7 +69,6 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        console.log(res.data.creatorBundles);
 
         setBundles(res.data.creatorBundles);
 

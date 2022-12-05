@@ -177,6 +177,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                   options: {
                     ...user.creatorData?.options,
                     ...res.data,
+                    hasSoldBundles: false,
                   },
                 })
               );

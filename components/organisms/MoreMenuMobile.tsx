@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -21,6 +22,7 @@ import ShareMenu from './ShareMenu';
 import { useAppSelector } from '../../redux-store/store';
 import { useBundles } from '../../contexts/bundlesContext';
 import { getMyBundleEarnings } from '../../api/endpoints/bundles';
+import { loadStateLS, saveStateLS } from '../../utils/localStorage';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -67,11 +69,17 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.totalBundleEarnings?.usdCents) setHasSoldBundles(true);
+        saveStateLS('creatorHasSoldBundles', true);
       } catch (err) {
         console.error(err);
       }
     }
-    fetchMyBundlesEarnings();
+    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
+    if (!localHasSoldBundles) {
+      user.userData?.options?.creatorStatus === 2 && fetchMyBundlesEarnings();
+    } else {
+      setHasSoldBundles(true);
+    }
   });
 
   return (
