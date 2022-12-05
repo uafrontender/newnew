@@ -55,7 +55,7 @@ for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
   const importedLocale = require(`date-fns/locale/${localeName}/index.js`);
   registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
 }
-const minDate = new Date(new Date().setFullYear(1900));
+const minDate = new Date(1900, 0);
 
 const signs: IAstrologySigns = {
   Cake: CakeIcon,
@@ -118,7 +118,7 @@ const SettingsBirthDateInput: React.FunctionComponent<
     });
   const years: TDropdownSelectItem<number>[] = useMemo(() => {
     const workingArr = [];
-    for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
+    for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {
       workingArr.push({
         name: i.toString(),
         value: i,
