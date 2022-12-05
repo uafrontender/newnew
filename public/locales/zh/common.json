@@ -224,7 +224,9 @@
     "numbers-of-bids-most-first": "最先"
   },
   "toastErrors": {
-    "generic": "發生錯誤，請稍後再試"
+    "generic": "發生錯誤，請稍後再試",
+    "serverError_NEED_TRANSLATION": "A server-side error occurred, please try again later",
+    "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later"
   },
   "smsNotifications": {
     "title": "你的號碼是多少？",

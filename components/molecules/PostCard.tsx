@@ -224,7 +224,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/post/${postParsed.postUuid}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postParsed.postUuid}`
           )}`
         );
         return;
@@ -418,7 +418,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, []);
 
     useEffect(() => {
-      router.prefetch(`/post/${switchPostType(item)[0].postUuid}`);
+      router.prefetch(`/p/${switchPostType(item)[0].postUuid}`);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
