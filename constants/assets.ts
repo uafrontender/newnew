@@ -201,35 +201,11 @@ const assets = {
     },
   },
   signup: {
-    darkIntoAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`;
-    },
-    darkOutroAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`;
-    },
+    darkIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`,
+    darkOutroAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`,
     darkStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-dark.png`,
-    lightIntoAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`;
-    },
-    lightOutroAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`;
-    },
+    lightIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`,
+    lightOutroAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`,
     lightStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-light.png`,
   },
   subscription: {
