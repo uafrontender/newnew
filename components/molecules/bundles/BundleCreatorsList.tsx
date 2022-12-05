@@ -69,7 +69,7 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
       >
         {/* TODO: add no results message (otherwise there is an empty space) */}
         <CreatorsList
-          loading={loading}
+          loading={loading && initialLoadDone}
           collection={creators}
           onBuyBundleClicked={onBundleClicked}
         />

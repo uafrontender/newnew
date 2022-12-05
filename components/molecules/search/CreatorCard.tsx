@@ -240,6 +240,7 @@ const SBackground = styled.div`
   left: 10px;
   right: 10px;
   top: 10px;
+  object-fit: cover;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   overflow: hidden;
 `;
