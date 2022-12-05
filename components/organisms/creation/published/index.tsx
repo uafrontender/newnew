@@ -78,7 +78,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;
@@ -112,7 +112,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       if (postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;

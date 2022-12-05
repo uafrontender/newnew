@@ -40,7 +40,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
         ) {
           toast.success('Your video has been processed', {
             onClick: () => {
-              router.push(`/post/${decoded.postUuid}`);
+              router.push(`/p/${decoded.postUuid}`);
             },
           });
         }
@@ -51,7 +51,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
         ) {
           toast.success('Your response has been processed', {
             onClick: () => {
-              router.push(`/post/${decoded.postUuid}`);
+              router.push(`/p/${decoded.postUuid}`);
             },
           });
         }
@@ -64,7 +64,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
       ) {
         showErrorToastCustom('An error occurred when processing your video', {
           onClick: () => {
-            router.push(`/post/${decoded.postUuid}`);
+            router.push(`/p/${decoded.postUuid}`);
           },
         });
       }

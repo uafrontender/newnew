@@ -123,10 +123,10 @@ export const NotificationsList: React.FC<IFunction> = ({
         return `/direct-messages/${target.userProfile.userUsername}`;
 
       if (target.postResponse && target?.postResponse.postUuid)
-        return `/post/${target.postResponse.postUuid}`;
+        return `/p/${target.postResponse.postUuid}`;
 
       if (target.postAnnounce && target?.postAnnounce.postUuid)
-        return `/post/${target.postAnnounce.postUuid}`;
+        return `/p/${target.postAnnounce.postUuid}`;
     }
     return '/direct-messages';
   };
