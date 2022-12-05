@@ -615,7 +615,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         >
           <SChatItem
             onClick={handleItemClick}
-            className={isActiveChat(chat) ? 'active' : ''}
+            className={isActiveChat(chat) && !isMobileOrTablet ? 'active' : ''}
           >
             {avatar}
             <SChatItemContent>
@@ -651,6 +651,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       sortChats,
       hasSeparator,
       updateTimer,
+      isMobileOrTablet,
     ]
   );
 
