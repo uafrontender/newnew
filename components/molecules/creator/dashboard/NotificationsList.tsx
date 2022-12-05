@@ -18,6 +18,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
   markAllAsRead,
+  markAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
@@ -93,6 +94,22 @@ export const NotificationsList: React.FC<IFunction> = ({
       const res = await markAllAsRead(payload);
 
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      setUnreadNotifications(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const markNotificationAsRead = useCallback(async (notificationId: number) => {
+    try {
+      const payload = new newnewapi.MarkAsReadRequest({
+        notificationIds: [notificationId],
+      });
+      const res = await markAsRead(payload);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
       setUnreadNotifications(null);
     } catch (err) {
       console.error(err);
@@ -181,7 +198,12 @@ export const NotificationsList: React.FC<IFunction> = ({
       return (
         <Link href={getUrl(item.target)} key={item.id as number}>
           <a>
-            <SNotificationItem key={`notification-item-${item.id}`}>
+            <SNotificationItem
+              key={`notification-item-${item.id}`}
+              onClick={() => {
+                markNotificationAsRead(item.id as number);
+              }}
+            >
               {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
                 <SNotificationItemAvatar
                   withClick
@@ -224,6 +246,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       unreadNotifications,
       user.userData?.userUuid,
       getEnrichedNotificationMessage,
+      markNotificationAsRead,
     ]
   );
 
