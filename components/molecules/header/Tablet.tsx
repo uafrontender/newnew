@@ -22,9 +22,11 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-interface ITablet {}
+interface ITablet {
+  hasSoldBundles: boolean;
+}
 
-export const Tablet: React.FC<ITablet> = React.memo(() => {
+export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useGetChats();
@@ -81,8 +83,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 </Link>
               </SItemWithMargin>
             )}
-            {(user.userData?.options?.isCreator ||
-              (bundles && bundles?.length > 0)) && (
+            {(hasSoldBundles || (bundles && bundles.length > 0)) && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{

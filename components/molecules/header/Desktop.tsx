@@ -18,7 +18,11 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-export const Desktop: React.FC = React.memo(() => {
+interface IDesktop {
+  hasSoldBundles: boolean;
+}
+
+export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
@@ -70,8 +74,7 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {(user.userData?.options?.isCreator ||
-              (bundles && bundles?.length > 0)) && (
+            {(hasSoldBundles || (bundles && bundles.length > 0)) && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{

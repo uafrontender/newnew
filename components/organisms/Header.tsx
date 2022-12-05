@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import { useEffectOnce } from 'react-use';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -11,6 +13,7 @@ import Container from '../atoms/Grid/Container';
 
 import { useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
+import { getMyBundleEarnings } from '../../api/endpoints/bundles';
 
 interface IHeader {
   visible: boolean;
@@ -19,6 +22,31 @@ interface IHeader {
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet', 'laptop'].includes(resizeMode);
+  const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
+  const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
+
+  useEffectOnce(() => {
+    // if creator did not sell any bundle we should
+    // hide navigation link to direct messages
+    async function fetchMyBundlesEarnings() {
+      try {
+        const payload = new newnewapi.GetMyBundleEarningsRequest();
+        const res = await getMyBundleEarnings(payload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data.totalBundleEarnings?.usdCents) setHasSoldBundles(true);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchMyBundlesEarnings();
+  });
 
   const hasMounted = useHasMounted();
 
@@ -36,13 +64,9 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
         <Container noMaxContent>
           <Row>
             <Col>
-              {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-                resizeMode
-              ) && <Mobile />}
-              {['tablet', 'laptop'].includes(resizeMode) && <Tablet />}
-              {['laptopM', 'laptopL', 'desktop'].includes(resizeMode) && (
-                <Desktop />
-              )}
+              {isMobile && <Mobile />}
+              {isTablet && <Tablet hasSoldBundles={hasSoldBundles} />}
+              {isDesktop && <Desktop hasSoldBundles={hasSoldBundles} />}
             </Col>
           </Row>
         </Container>
