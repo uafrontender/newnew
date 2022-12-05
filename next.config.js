@@ -55,6 +55,15 @@ const moduleExports = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/post/:path*',
+        destination: '/p/:path*',
+        permanent: true
+      },
+    ]
+  },
 };
 
 const sentryWebpackPluginOptions = {
