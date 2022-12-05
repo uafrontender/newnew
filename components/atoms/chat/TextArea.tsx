@@ -61,6 +61,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     <SWrapper>
       <SContent error={!!error}>
         <STextArea
+          maxRows={4}
           value={value}
           onChange={handleChange}
           placeholder={placeholder}
