@@ -61,6 +61,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
+      console.log(res.data?.notifications);
 
       setUnreadNotifications((curr) => {
         const arr = curr ? [...curr] : [];
