@@ -3,6 +3,8 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { useEffectOnce } from 'react-use';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../atoms/Text';
 import InlineSvg from '../atoms/InlineSVG';
@@ -18,6 +20,7 @@ import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifi
 import ShareMenu from './ShareMenu';
 import { useAppSelector } from '../../redux-store/store';
 import { useBundles } from '../../contexts/bundlesContext';
+import { getMyBundleEarnings } from '../../api/endpoints/bundles';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -50,6 +53,26 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
     setShareMenuOpen(false);
     handleClose();
   };
+
+  const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
+
+  useEffectOnce(() => {
+    // if creator did not sell any bundle we should
+    // hide navigation link to direct messages
+    async function fetchMyBundlesEarnings() {
+      try {
+        const payload = new newnewapi.GetMyBundleEarningsRequest();
+        const res = await getMyBundleEarnings(payload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data.totalBundleEarnings?.usdCents) setHasSoldBundles(true);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchMyBundlesEarnings();
+  });
 
   return (
     <AnimatePresence>
@@ -111,7 +134,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
               </SButton>
               {/* If there are bundles, notifications are moved to more menu */}
               {/* TODO: Refactor the menu to make it work with the collection, auto split navigation items */}
-              {bundles && bundles.length > 0 && (
+              {(hasSoldBundles || (bundles && bundles.length > 0)) && (
                 <SButton
                   onClick={() =>
                     router.route.includes('direct-messages')
