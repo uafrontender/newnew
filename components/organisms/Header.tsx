@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -14,6 +15,7 @@ import Container from '../atoms/Grid/Container';
 import { useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { getMyBundleEarnings } from '../../api/endpoints/bundles';
+import { loadStateLS, saveStateLS } from '../../utils/localStorage';
 
 interface IHeader {
   visible: boolean;
@@ -29,6 +31,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
   const isTablet = ['tablet', 'laptop'].includes(resizeMode);
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
   const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
+  const user = useAppSelector((state) => state.user);
 
   useEffectOnce(() => {
     // if creator did not sell any bundle we should
@@ -41,11 +44,17 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.totalBundleEarnings?.usdCents) setHasSoldBundles(true);
+        saveStateLS('creatorHasSoldBundles', true);
       } catch (err) {
         console.error(err);
       }
     }
-    fetchMyBundlesEarnings();
+    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
+    if (!localHasSoldBundles) {
+      user.userData?.options?.creatorStatus === 2 && fetchMyBundlesEarnings();
+    } else {
+      setHasSoldBundles(true);
+    }
   });
 
   const hasMounted = useHasMounted();
