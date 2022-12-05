@@ -464,6 +464,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         <SBottomTextarea>
           <STextArea>
             <TextArea
+              isDashboard
               maxlength={500}
               value={messageText}
               onChange={handleChange}
@@ -527,6 +528,7 @@ const SBottomPart = styled.div`
 
 const STextArea = styled.div`
   flex: 1;
+  border-radius: 16px;
 `;
 
 const SInlineSVG = styled(InlineSVG)`
