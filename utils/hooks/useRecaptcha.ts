@@ -3,21 +3,26 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 import { IReCaptchaRes } from '../../components/interfaces/reCaptcha';
+import { ErrorToastPredefinedMessage } from './useErrorToasts';
 
-// first executes reCaptcha v3 if the score is lower that minSuccessScore, reCaptca v2 is shown
+// first executes reCaptcha v3 if the score is lower that minSuccessScore, reCaptcha v2 is shown
 const useRecaptcha = (
-  callback: () => Promise<void>,
-  minSuccessScore: number,
-  minDoubleCheckScore: number,
-  recaptchaV2Ref: RefObject<ReCAPTCHA>
+  callback: (...args: any) => any,
+  recaptchaV2Ref: RefObject<ReCAPTCHA>,
+  options?: {
+    minSuccessScore?: number;
+    minDoubleCheckScore?: number;
+  }
 ) => {
   const { executeRecaptcha: executeGoogleRecaptchaV3 } = useGoogleReCaptcha();
+  const { minSuccessScore = 0.5, minDoubleCheckScore = 0.1 } = options || {};
 
   const [isRecaptchaV2Required, setIsRecaptchaV2Required] =
     useState<boolean>(false);
   const [recaptchaTokenV2, setRecaptchaTokenV2] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] =
+    useState<ErrorToastPredefinedMessage.RecaptchaError | null>(null);
 
   const onChangeRecaptchaV2 = useCallback(
     (recaptchaToken: string | null) => {
@@ -108,14 +113,12 @@ const useRecaptcha = (
   }, [executeGoogleRecaptchaV3]);
 
   const submitWithRecaptchaProtection = useCallback(
-    async (e: React.ChangeEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
+    async (...callbackArgs: any) => {
       setIsSubmitting(true);
 
       // skip reCaptcha for tests
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'test') {
-        await callback();
+        await callback(...callbackArgs);
         setIsSubmitting(false);
         return;
       }
@@ -127,9 +130,9 @@ const useRecaptcha = (
         );
 
         if (isReCaptchaV2Passed) {
-          await callback();
+          await callback(...callbackArgs);
         } else {
-          setErrorMessage('Recaptcha failed');
+          setErrorMessage(ErrorToastPredefinedMessage.RecaptchaError);
         }
 
         setIsSubmitting(false);
@@ -140,7 +143,7 @@ const useRecaptcha = (
       const { isPassed, score, error, errorCodes } = await executeRecaptchaV3();
 
       if (isPassed && score && score >= minSuccessScore) {
-        await callback();
+        await callback(...callbackArgs);
         setIsSubmitting(false);
         return;
       }
@@ -165,7 +168,7 @@ const useRecaptcha = (
 
       // show error without showing reCaptcha v2 if score for v3 is lower that minDoubleCheckScore
       if (error) {
-        setErrorMessage('Recaptcha failed');
+        setErrorMessage(ErrorToastPredefinedMessage.RecaptchaError);
         setIsSubmitting(false);
       }
     },

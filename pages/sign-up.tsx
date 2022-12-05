@@ -49,7 +49,7 @@ const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
     const handlerHistory = () => {
       const postId = window?.history?.state?.postId;
       if (postId && window?.history?.state?.fromPost) {
-        router.push(`/post/${postId}`);
+        router.push(`/p/${postId}`);
       }
     };
 

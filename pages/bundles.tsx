@@ -5,6 +5,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useEffectOnce } from 'react-use';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -14,7 +15,10 @@ import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
-import Bundles from '../components/organisms/bundles/Bundles';
+
+const Bundles = dynamic(
+  () => import('../components/organisms/bundles/Bundles')
+);
 
 interface IBundlesPage {
   stripeSetupIntentClientSecretFromRedirect?: string;

@@ -237,7 +237,8 @@
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
       "back": "Close",
-      "stripeConnecting": "Connecting..."
+      "stripeConnecting": "Connecting...",
+      "requireInformation": "Stripe requires info"
     }
   },
   "noNotifications": "Any new notifications you receive\nwill appear here"

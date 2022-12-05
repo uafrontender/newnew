@@ -172,7 +172,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <SItemWrapper name={`cards-section-${category}-${0}`}>
               {tutorialCard}
             </SItemWrapper>
-            <Link href={`/post/${switchPostType(item)[0].postUuid}`}>
+            <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
               <SItemWrapper
                 name={`cards-section-${category}-${
                   tutorialCard !== undefined ? index + 1 : index
@@ -199,7 +199,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
 
       return (
-        <Link href={`/post/${switchPostType(item)[0].postUuid}`}>
+        <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
           <SItemWrapper
             key={switchPostType(item)[0].postUuid}
             name={`cards-section-${category}-${

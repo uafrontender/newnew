@@ -70,10 +70,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
       }
 
       if (target.postResponse && target?.postResponse.postUuid)
-        setUrl(`/post/${target.postResponse.postUuid}`);
+        setUrl(`/p/${target.postResponse.postUuid}`);
 
       if (target.postAnnounce && target?.postAnnounce.postUuid)
-        setUrl(`/post/${target.postAnnounce.postUuid}`);
+        setUrl(`/p/${target.postAnnounce.postUuid}`);
     }
   }, [url, target]);
 

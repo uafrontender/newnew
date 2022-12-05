@@ -40,7 +40,7 @@ export const PostList: React.FC<IList> = ({
     (isMobile && 1) || (isTablet && 3) || (isSmallDesktops && 4) || 5; // calculations how menu skeletons to display
 
   const renderItem = (item: any, index: number) => (
-    <Link href={`/post/${switchPostType(item)[0].postUuid}`}>
+    <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
       <SItemWrapper key={switchPostType(item)[0].postUuid}>
         <PostCard
           item={item}
