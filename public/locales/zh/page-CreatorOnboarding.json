@@ -156,7 +156,8 @@
       "submit": "提交",
       "requestSetupLink": "與Stripe綁定",
       "stripeConnectedLink": "Stripe已綁定！",
-      "stripeConnecting": "連接中......"
+      "stripeConnecting": "連接中......",
+      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
     }
   },
   "subRateSection": {
