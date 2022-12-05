@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -38,7 +39,10 @@ export const YourToDos = () => {
       {
         id: 'add-cash-out-method',
         title: t('dashboard.toDos.addCashOutMethod'),
-        completed: user.creatorData?.options?.stripeConnectStatus === 2,
+        completed:
+          user.creatorData?.options?.stripeConnectStatus ===
+          newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+            .CONNECTED_ALL_GOOD,
       },
     ],
     [t, user.creatorData, user.userData]
