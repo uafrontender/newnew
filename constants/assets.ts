@@ -167,7 +167,7 @@ const assets = {
     ],
     darkMcAnimated: () => {
       if (isSafari()) {
-        // TODO: change url
+        // TODO: change asset
         return `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`;
       }
 
@@ -176,7 +176,7 @@ const assets = {
     },
     lightMcAnimated: () => {
       if (isSafari()) {
-        // TODO: change url
+        // TODO: change asset
         return `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`;
       }
 
