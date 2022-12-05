@@ -224,7 +224,9 @@
     "numbers-of-bids-most-first": "El mayor número de ofertas primero"
   },
   "toastErrors": {
-    "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
+    "generic": "Se ha producido un error, inténtalo de nuevo más tarde",
+    "serverError_NEED_TRANSLATION": "A server-side error occurred, please try again later",
+    "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later"
   },
   "smsNotifications": {
     "title": "¿Cuál es tu número telefónico?",
