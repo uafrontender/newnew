@@ -59,7 +59,7 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
         <SSetCoverImageLabel>
           <SCoverPreview alt='cover' src={customCoverImageUrl} />
           <SDeleteButton
-            view='transparent'
+            view='quaternary'
             onClick={() => handleUnsetCustomCoverImageUrl()}
           >
             {t('postVideoCoverImageEdit.uploadCoverImage.deleteBtn')}
@@ -129,6 +129,12 @@ const SUploadButton = styled(Button)``;
 
 const SDeleteButton = styled(Button)`
   background: transparent;
+
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
+    background: transparent;
+  }
 `;
 
 const SImageInput = styled.input`

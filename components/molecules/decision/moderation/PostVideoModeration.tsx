@@ -242,6 +242,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           <PostVideoAnnouncementTab
             postId={postId}
             announcement={announcement}
+            hasCoverImage={!!currentCoverUrl}
             isMuted={isMuted}
             isSetThumbnailButtonIconOnly={isSetThumbnailButtonIconOnly}
             ellipseButtonRef={ellipseButtonRef}
