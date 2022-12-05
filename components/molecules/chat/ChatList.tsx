@@ -170,7 +170,7 @@ const ChatList: React.FC<IFunctionProps> = ({
             return arr;
           });
           // if I am not creator get only rooms with creators I am subscriber to
-          if (user.userData?.options?.isOfferingBundles) {
+          if (user.userData?.options?.creatorStatus === 2) {
             if (displayAllRooms) setDisplayAllRooms(false);
 
             setChatRoomsCreators((curr) => {
@@ -235,7 +235,8 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms.length > 0) {
-        setUpdatedChat(res.data.rooms[0]);
+        if (!res.data.rooms[0].visavis?.isVisavisBlocked)
+          setUpdatedChat(res.data.rooms[0]);
       }
     } catch (err) {
       console.error(err);
