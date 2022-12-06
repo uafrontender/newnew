@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import CreatorsList from '../../organisms/search/CreatorsList';
+import NoResults from '../../atoms/search/NoResults';
 
 // TODO: use PaginatedData (but it requires a server side sorting)
 interface IBundleCreatorsList {
@@ -53,27 +54,33 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
 
   return (
     <SContainer className={className}>
-      <SContent
-        ref={(e) => {
-          if (e) {
-            searchContainerRef.current = e;
-          }
-        }}
-        onScroll={(e: any) => {
-          const scrollable = e.target.scrollHeight > e.target.clientHeight;
-          const scrolledToTheBottom =
-            e.target.scrollTop >= e.target.scrollHeight - e.target.clientHeight;
-          setScrolledToBottom(!scrollable || scrolledToTheBottom);
-          setShadeVisible(scrollable && (!scrolledToTheBottom || hasMore));
-        }}
-      >
-        {/* TODO: add no results message (otherwise there is an empty space) */}
-        <CreatorsList
-          loading={loading && initialLoadDone}
-          collection={creators}
-          onBuyBundleClicked={onBundleClicked}
-        />
-      </SContent>
+      {creators.length === 0 && !hasMore ? (
+        <NoResults />
+      ) : (
+        <SContent
+          ref={(e) => {
+            if (e) {
+              searchContainerRef.current = e;
+            }
+          }}
+          onScroll={(e: any) => {
+            const scrollable = e.target.scrollHeight > e.target.clientHeight;
+            const scrolledToTheBottom =
+              e.target.scrollTop >=
+              e.target.scrollHeight - e.target.clientHeight;
+            setScrolledToBottom(!scrollable || scrolledToTheBottom);
+            setShadeVisible(scrollable && (!scrolledToTheBottom || hasMore));
+          }}
+        >
+          {/* TODO: add no results message (otherwise there is an empty space) */}
+
+          <CreatorsList
+            loading={loading && initialLoadDone}
+            collection={creators}
+            onBuyBundleClicked={onBundleClicked}
+          />
+        </SContent>
+      )}
       <SBottomShade visible={shadeVisible} />
     </SContainer>
   );
@@ -84,6 +91,9 @@ export default BundleCreatorsList;
 const SContainer = styled.div`
   position: relative;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const SContent = styled.div`
