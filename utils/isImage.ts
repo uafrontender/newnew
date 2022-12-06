@@ -8,6 +8,8 @@ const imgExtenstions = [
   '.JPEG',
   '.webp',
   '.WEBP',
+  '.gif',
+  '.GIF',
 ];
 
 const isImage = (name: string) => {

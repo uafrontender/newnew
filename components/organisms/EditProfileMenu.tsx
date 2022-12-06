@@ -382,7 +382,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
 
-  const handleSetBackgroundPictureInEdit = (files: FileList | null) => {
+  const handleSetBackgroundPictureInEdit = async (files: FileList | null) => {
     if (files?.length === 1) {
       const file = files[0];
 
@@ -402,7 +402,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           img.src = properlySizedImage.url;
 
           // eslint-disable-next-line func-names
-          img.addEventListener('load', function () {
+          img.addEventListener('load', async function () {
             // eslint-disable-next-line react/no-this-in-sfc
             if (this.width < this.height * 2.5) {
               setCoverImageInitialObjectFit('horizontal-cover');
@@ -418,7 +418,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
             setCropCoverImage({ x: 0, y: 0 });
             setCoverUrlInEdit(properlySizedImage.url);
-            setCoverUrlInEditAnimated(isAnimatedImage(file.name));
+
+            const isAnimated = await isAnimatedImage(file);
+            setCoverUrlInEditAnimated(isAnimated);
           });
         }
       });
