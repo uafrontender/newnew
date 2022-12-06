@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-nested-ternary */
 // Temp disabled until backend is in place
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
@@ -85,6 +85,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
   const [submitError, setSubmitError] = useState<
     keyof I18nNamespaces['page-SignUp']['error'] | ''
   >('');
+
+  const [textWidth, setTextWidth] = useState<number | undefined>();
+
+  const handleTextWidthChange = useCallback((newTextWidth: number) => {
+    setTextWidth((curr) => Math.max(curr || 0, newTextWidth));
+  }, []);
 
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
@@ -188,6 +194,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={GoogleIcon}
               hoverBgColor={theme.colorsThemed.social.google.hover}
               pressedBgColor={theme.colorsThemed.social.google.pressed}
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
               onClick={() =>
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/google${redirectUrlParam}`
@@ -204,6 +212,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
               onClick={() => {
                 Mixpanel.track('Sign In With Apple Clicked', {
                   _stage: 'Sign Up',
@@ -223,6 +233,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
               onClick={() => {
                 Mixpanel.track('Sign In With Facebook Clicked', {
                   _stage: 'Sign Up',
@@ -239,6 +251,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
               onClick={() => {
                 Mixpanel.track('Sign In With Twitter Clicked', {
                   _stage: 'Sign Up',
