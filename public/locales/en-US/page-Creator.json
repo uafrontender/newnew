@@ -25,7 +25,7 @@
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {
-        "amount": "Your Stripe earning are",
+        "amount": "Your Stripe earnings are",
         "amountSecondLine": "Manage your balance on Stripe.",
         "stripeButton": "Take me to Stripe",
         "date": "will automatically be sent on {{date}}.",

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
@@ -16,6 +17,7 @@ interface ITextArea {
   maxlength?: number;
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
+  isDashboard?: boolean;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
@@ -23,7 +25,15 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const { id = '', maxlength, value, error, onChange, placeholder } = props;
+  const {
+    id = '',
+    maxlength,
+    value,
+    error,
+    onChange,
+    placeholder,
+    isDashboard,
+  } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
 
@@ -59,8 +69,9 @@ export const TextArea: React.FC<ITextArea> = (props) => {
 
   return (
     <SWrapper>
-      <SContent error={!!error}>
+      <SContent error={!!error} isDashboard={isDashboard}>
         <STextArea
+          maxRows={8}
           value={value}
           onChange={handleChange}
           placeholder={placeholder}
@@ -96,15 +107,18 @@ const SWrapper = styled.div`
 
 interface ISContent {
   error: boolean;
+  isDashboard?: boolean;
 }
 
 const SContent = styled.div<ISContent>`
   padding: 10.5px 18.5px 10.5px 18.5px;
   position: relative;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colors.white
-      : props.theme.colorsThemed.background.tertiary};
+  background: ${({ theme, isDashboard }) =>
+    !isDashboard
+      ? theme.name === 'light'
+        ? theme.colors.white
+        : theme.colorsThemed.background.tertiary
+      : theme.colorsThemed.background.tertiary};
   border-radius: 16px;
 
   border-width: 1.5px;

@@ -1,6 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';
@@ -30,6 +36,8 @@ import { IChatData } from '../../interfaces/ichat';
 import { useGetChats } from '../../../contexts/chatContext';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../utils/isBrowser';
 
 const ChatName = dynamic(() => import('../../atoms/chat/ChatName'));
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
@@ -90,6 +98,8 @@ const ChatList: React.FC<IFunctionProps> = ({
   const [prevSearchText, setPrevSearchText] = useState<string>('');
   const [searchedRoomsLoading, setSearchedRoomsLoading] =
     useState<boolean>(false);
+
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
 
   const tabTypes = useMemo(
     () => [
@@ -170,7 +180,7 @@ const ChatList: React.FC<IFunctionProps> = ({
             return arr;
           });
           // if I am not creator get only rooms with creators I am subscriber to
-          if (user.userData?.options?.isOfferingBundles) {
+          if (user.userData?.options?.creatorStatus === 2) {
             if (displayAllRooms) setDisplayAllRooms(false);
 
             setChatRoomsCreators((curr) => {
@@ -235,7 +245,8 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms.length > 0) {
-        setUpdatedChat(res.data.rooms[0]);
+        if (!res.data.rooms[0].visavis?.isVisavisBlocked)
+          setUpdatedChat(res.data.rooms[0]);
       }
     } catch (err) {
       console.error(err);
@@ -538,6 +549,18 @@ const ChatList: React.FC<IFunctionProps> = ({
     ]
   );
 
+  // to update time ago of last message
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 60 * 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
+
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom, index: number) => {
       const handleItemClick = async () => {
@@ -592,7 +615,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         >
           <SChatItem
             onClick={handleItemClick}
-            className={isActiveChat(chat) ? 'active' : ''}
+            className={isActiveChat(chat) && !isMobileOrTablet ? 'active' : ''}
           >
             {avatar}
             <SChatItemContent>
@@ -627,6 +650,8 @@ const ChatList: React.FC<IFunctionProps> = ({
       activeChatIndex,
       sortChats,
       hasSeparator,
+      updateTimer,
+      isMobileOrTablet,
     ]
   );
 
