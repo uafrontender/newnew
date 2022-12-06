@@ -76,17 +76,15 @@ const findIndex = (buffer: Uint8Array, codes: number[]) => {
   return -1;
 }
 
-const isAnimatedImage = async (file: File) => {
-  let isAnimated = false;
-
+const isAnimatedImageWithMeta = async (file: File) => {
   const buff = await file.arrayBuffer();
 
   const meta = getImageMeta(new Uint8Array(buff));
   console.log(meta)
 
-  isAnimated = !!meta?.animated
+  if (!meta) return undefined;
 
-  return isAnimated;
+  return meta;
 };
 
-export default isAnimatedImage;
+export default isAnimatedImageWithMeta;
