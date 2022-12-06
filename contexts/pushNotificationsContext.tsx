@@ -18,6 +18,7 @@ import { cookiesInstance } from '../api/apiConfigs';
 import { useAppSelector } from '../redux-store/store';
 import isSafari from '../utils/isSafari';
 import isIOS from '../utils/isIOS';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 const WEB_PUSH_PROMPT_KEY =
   'isUserPromptedWithPushNotificationsPermissionModal';
@@ -72,6 +73,8 @@ const PushNotificationsContextProvider: React.FC<
 
   const [inSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
+
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const isSafariBrowser = useRef(
     isSafari() &&
@@ -361,11 +364,12 @@ const PushNotificationsContextProvider: React.FC<
         if (err.message === 'Push notification prompting has been disabled.') {
           openPushNotificationAlert();
         } else {
+          showErrorToastPredefined();
           console.error(err);
         }
       }
     },
-    [publicKey, openPushNotificationAlert]
+    [publicKey, openPushNotificationAlert, showErrorToastPredefined]
   );
 
   const subscribeSafari = useCallback(
@@ -383,9 +387,15 @@ const PushNotificationsContextProvider: React.FC<
         }
       } catch (err) {
         console.error(err);
+        showErrorToastPredefined();
       }
     },
-    [requestPermissionSafari, getPermissionData, registerSubscriptionSafari]
+    [
+      requestPermissionSafari,
+      getPermissionData,
+      registerSubscriptionSafari,
+      showErrorToastPredefined,
+    ]
   );
 
   const subscribeNonSafari = useCallback(
@@ -418,9 +428,10 @@ const PushNotificationsContextProvider: React.FC<
         setIsSubscribed(true);
       } catch (err) {
         console.error(err);
+        showErrorToastPredefined();
       }
     },
-    [publicKey, registerSubscriptionNonSafari]
+    [publicKey, registerSubscriptionNonSafari, showErrorToastPredefined]
   );
 
   const subscribe = useCallback(
@@ -448,8 +459,9 @@ const PushNotificationsContextProvider: React.FC<
       setIsSubscribed(false);
     } catch (err) {
       console.error(err);
+      showErrorToastPredefined();
     }
-  }, [unregister, getPermissionData]);
+  }, [unregister, getPermissionData, showErrorToastPredefined]);
 
   const unsubscribeNonSafari = useCallback(async () => {
     try {
@@ -473,8 +485,9 @@ const PushNotificationsContextProvider: React.FC<
       setIsSubscribed(false);
     } catch (err) {
       console.error(err);
+      showErrorToastPredefined();
     }
-  }, [unregister]);
+  }, [unregister, showErrorToastPredefined]);
 
   const unsubscribe = useCallback(async () => {
     if (isSafariBrowser.current) {
