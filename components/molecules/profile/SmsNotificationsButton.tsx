@@ -43,11 +43,17 @@ interface ISmsNotificationsButton {
 const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   subscription,
 }) => {
-  const { t } = useTranslation('page-Profile');
+  const { t } = useTranslation();
+  const { t: tProfile } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const socketConnection = useContext(SocketContext);
   const currentUser = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const [subscribedToSmsNotifications, setSubscribedToSmsNotifications] =
     useState(false);
@@ -91,7 +97,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           ) {
             throw new Error(
               res.error?.message ??
-                t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+                t(
+                  getSmsNotificationSubscriptionErrorMessage(
+                    res.data?.status
+                  ) as any
+                )
             );
           }
 
@@ -116,7 +126,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           ) {
             throw new Error(
               res.error?.message ??
-                t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+                t(
+                  getSmsNotificationSubscriptionErrorMessage(
+                    res.data?.status
+                  ) as any
+                )
             );
           }
         }
@@ -189,7 +203,11 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         ) {
           throw new Error(
             res.error?.message ??
-              t(getSmsNotificationSubscriptionErrorMessage(res.data?.status))
+              t(
+                getSmsNotificationSubscriptionErrorMessage(
+                  res.data?.status
+                ) as any
+              )
           );
         }
       } catch (err: any) {
@@ -328,50 +346,52 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
   return (
     <>
-      <SMobileIconButton
-        active={subscribedToSmsNotifications}
-        onClick={handleSmsNotificationButtonClicked}
-      >
-        <InlineSvg
-          svg={
+      {isMobile ? (
+        <SMobileIconButton
+          active={subscribedToSmsNotifications}
+          onClick={handleSmsNotificationButtonClicked}
+        >
+          <InlineSvg
+            svg={
+              subscribedToSmsNotifications
+                ? NotificationsIconFilled
+                : NotificationsIconOutlined
+            }
+            fill={
+              subscribedToSmsNotifications
+                ? theme.colors.white
+                : theme.colorsThemed.text.primary
+            }
+            width='24px'
+            height='24px'
+          />
+        </SMobileIconButton>
+      ) : (
+        <SIconButtonWithText
+          active={subscribedToSmsNotifications}
+          onClick={handleSmsNotificationButtonClicked}
+        >
+          <InlineSvg
+            svg={
+              subscribedToSmsNotifications
+                ? NotificationsIconFilled
+                : NotificationsIconOutlined
+            }
+            fill={
+              subscribedToSmsNotifications
+                ? theme.colors.white
+                : theme.colorsThemed.text.primary
+            }
+            width='24px'
+            height='24px'
+          />
+          {tProfile(
             subscribedToSmsNotifications
-              ? NotificationsIconFilled
-              : NotificationsIconOutlined
-          }
-          fill={
-            subscribedToSmsNotifications
-              ? theme.colors.white
-              : theme.colorsThemed.text.primary
-          }
-          width='24px'
-          height='24px'
-        />
-      </SMobileIconButton>
-      {/* Tablet and Desktop */}
-      <SIconButtonWithText
-        active={subscribedToSmsNotifications}
-        onClick={handleSmsNotificationButtonClicked}
-      >
-        <InlineSvg
-          svg={
-            subscribedToSmsNotifications
-              ? NotificationsIconFilled
-              : NotificationsIconOutlined
-          }
-          fill={
-            subscribedToSmsNotifications
-              ? theme.colors.white
-              : theme.colorsThemed.text.primary
-          }
-          width='24px'
-          height='24px'
-        />
-        {t(
-          subscribedToSmsNotifications
-            ? 'profileLayout.buttons.disableSmsNotifications'
-            : 'profileLayout.buttons.enableSmsNotifications'
-        )}
-      </SIconButtonWithText>
+              ? 'profileLayout.buttons.disableSmsNotifications'
+              : 'profileLayout.buttons.enableSmsNotifications'
+          )}
+        </SIconButtonWithText>
+      )}
       <SmsNotificationModal
         show={smsNotificationModalOpen}
         subscription={subscription}
@@ -409,6 +429,7 @@ const SIconButton = styled.div<{
 `;
 
 const SMobileIconButton = styled(SIconButton)`
+  // Fix for blinking due to resize initial value
   ${({ theme }) => theme.media.tablet} {
     display: none;
   }
@@ -422,6 +443,7 @@ const SIconButtonWithText = styled(SIconButton)`
   line-height: 24px;
   display: none;
 
+  // Fix for blinking due to resize initial value
   ${({ theme }) => theme.media.tablet} {
     display: flex;
   }

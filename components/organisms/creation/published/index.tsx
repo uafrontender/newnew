@@ -23,6 +23,8 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import { I18nNamespaces } from '../../../../@types/i18next';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -76,7 +78,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;
@@ -110,7 +112,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       if (postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;
@@ -206,7 +208,11 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(
+              `published.socials.${
+                item.key as keyof I18nNamespaces['page-Creation']['published']['socials']
+              }`
+            )}
       </SItemTitle>
     </SItem>
   );
@@ -231,6 +237,8 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const displayName = getDisplayname(user.userData);
+
   return (
     <>
       <SContent>
@@ -251,9 +259,9 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
           <SUserTitleContainer>
             <SUserTitle variant={3} weight={600}>
-              {user.userData?.nickname && user.userData?.nickname?.length > 8
-                ? `${user.userData?.nickname?.substring(0, 8)}...`
-                : user.userData?.nickname}
+              {displayName && displayName.length > 8
+                ? `${displayName.substring(0, 8)}...`
+                : displayName}
             </SUserTitle>
             {user.userData?.options?.isVerified && (
               <InlineSvg

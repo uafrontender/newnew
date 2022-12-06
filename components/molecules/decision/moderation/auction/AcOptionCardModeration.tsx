@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
@@ -34,6 +34,8 @@ import ChevronDown from '../../../../../public/images/svg/icons/outlined/Chevron
 import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
 import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
+import { markUser } from '../../../../../api/endpoints/user';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -64,6 +66,32 @@ const AcOptionCardModeration: React.FunctionComponent<
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
+  );
+
+  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+
+  const isUserBlocked = useMemo(
+    () => usersIBlocked.includes(option.creator?.uuid ?? ''),
+    [option.creator?.uuid, usersIBlocked]
+  );
+
+  const handleUnblockUser = useCallback(
+    async (uuid: string) => {
+      if (!uuid) throw new Error('No uuid provided');
+      try {
+        const payload = new newnewapi.MarkUserRequest({
+          markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+          userUuid: uuid,
+        });
+        const res = await markUser(payload);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        unblockUser(uuid);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [unblockUser]
   );
 
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -296,6 +324,7 @@ const AcOptionCardModeration: React.FunctionComponent<
             <AcOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
               optionId={option.id as number}
+              isUserBlocked={isUserBlocked}
               canDeleteOptionInitial={!isWinner}
               handleClose={() => {
                 setIsEllipseMenuOpen(false);
@@ -304,6 +333,9 @@ const AcOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+              handleUnblockUser={() =>
+                handleUnblockUser(option.creator?.uuid ?? '')
+              }
               anchorElement={ellipseButtonRef.current as HTMLElement}
             />
           )}
@@ -344,7 +376,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                     cursor: 'pointer',
                   }}
                 >
-                  {option.creator?.nickname ?? option.creator?.username}
+                  {getDisplayname(option.creator)}
                 </SSpanBiddersHighlighted>
               </Link>
             ) : (
@@ -352,7 +384,7 @@ const AcOptionCardModeration: React.FunctionComponent<
                 className='spanHighlighted'
                 onClick={(e) => e.stopPropagation()}
               >
-                {option.creator?.nickname ?? option.creator?.username}
+                {getDisplayname(option.creator)}
               </SSpanBiddersHighlighted>
             )}
             {option.supporterCount > 1 ? (
@@ -384,11 +416,15 @@ const AcOptionCardModeration: React.FunctionComponent<
           isOpen={isEllipseMenuOpen}
           zIndex={16}
           optionId={option.id as number}
+          isUserBlocked={isUserBlocked}
           canDeleteOptionInitial={!isWinner}
           onClose={() => setIsEllipseMenuOpen(false)}
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          handleUnblockUser={() =>
+            handleUnblockUser(option.creator?.uuid ?? '')
+          }
         />
       )}
       {option.creator && (

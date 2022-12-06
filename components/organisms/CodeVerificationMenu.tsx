@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -25,11 +25,14 @@ import Headline from '../atoms/Headline';
 import GoBackButton from '../molecules/GoBackButton';
 import VerificationCodeInput from '../atoms/VerificationCodeInput';
 import VerificationCodeResend from '../atoms/VerificationCodeResend';
+import ReCaptcha2 from '../atoms/ReCaptchaV2';
 import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 // Utils
 import AnimatedPresence from '../atoms/AnimatedPresence';
 import { Mixpanel } from '../../utils/mixpanel';
+import useRecaptcha from '../../utils/hooks/useRecaptcha';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 export interface ICodeVerificationMenu {
@@ -56,6 +59,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // useCookies
   const [, setCookie] = useCookies();
@@ -64,8 +68,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Code input
-  const [isSignInWithEmailLoading, setIsSignInWithEmailLoading] =
-    useState(false);
   const [submitError, setSubmitError] = useState<string>('');
 
   // Resend code
@@ -77,9 +79,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   // Timer
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
 
-  const onCodeComplete = useCallback(
+  const handleSignIn = useCallback(
     async (completeCode: string) => {
-      if (!signupEmailInput) return;
       try {
         Mixpanel.track('Verify email submitted', {
           _stage: 'Sign Up',
@@ -87,8 +88,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           _verificationCode: completeCode,
         });
         setSubmitError('');
-
-        setIsSignInWithEmailLoading(true);
 
         const signInRequest = new newnewapi.EmailSignInRequest({
           emailAddress: signupEmailInput,
@@ -144,7 +143,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         dispatch(setUserLoggedIn(true));
         dispatch(setSignupEmailInput(''));
 
-        setIsSignInWithEmailLoading(false);
         setIsSuccess(true);
 
         resumePushNotification();
@@ -159,12 +157,10 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           router.push('/');
         }
       } catch (err: any) {
-        setIsSignInWithEmailLoading(false);
         setSubmitError(err?.message ?? 'generic_error');
       }
     },
     [
-      setIsSignInWithEmailLoading,
       setSubmitError,
       setCookie,
       resumePushNotification,
@@ -174,6 +170,22 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       redirectUserTo,
     ]
   );
+
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection: signInWithRecaptchaProtection,
+    isSubmitting: isSignInWithEmailLoading,
+    errorMessage: recaptchaErrorMessage,
+  } = useRecaptcha(handleSignIn, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      showErrorToastPredefined(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
   const handleResendCode = async () => {
     setIsResendCodeLoading(true);
@@ -207,6 +219,15 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     setSubmitError('');
     setCodeInitial(new Array(6).join('.').split('.'));
   };
+
+  const onCodeComplete = useCallback(
+    (args: any) => {
+      if (!signupEmailInput) return;
+
+      signInWithRecaptchaProtection(args);
+    },
+    [signInWithRecaptchaProtection, signupEmailInput]
+  );
 
   return (
     <>
@@ -256,7 +277,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           id='verification-input'
           initialValue={codeInitial}
           length={6}
-          disabled={isSignInWithEmailLoading || isResendCodeLoading}
+          disabled={
+            isSignInWithEmailLoading || isResendCodeLoading || isSuccess
+          }
           error={submitError ? true : undefined}
           onComplete={onCodeComplete}
         />
@@ -277,6 +300,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
         ) : null}
+        {isRecaptchaV2Required && <ReCaptcha2 onChange={onChangeRecaptchaV2} />}
       </SCodeVerificationMenu>
     </>
   );

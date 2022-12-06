@@ -9,6 +9,7 @@ import { usePushNotifications } from '../../../contexts/pushNotificationsContext
 import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
+import getDisplayname from '../../../utils/getDisplayname';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -153,7 +154,9 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         handlePayWithCard={handlePayWithCard}
       >
         <ModalTitle>
-          {t('modal.buyBundle.payment.header', { creator: creator.username })}
+          {t('modal.buyBundle.payment.header', {
+            creator: getDisplayname(creator),
+          })}
         </ModalTitle>
         <SVotesNumber>
           <Trans

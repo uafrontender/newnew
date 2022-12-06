@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
@@ -9,19 +9,20 @@ import dynamic from 'next/dynamic';
 import { toNumber } from 'lodash';
 import { useUpdateEffect } from 'react-use';
 
-import { SUserAvatar, SVerificationSVG } from '../../../atoms/chat/styles';
+import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { getMyRooms, markRoomAsRead } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import { IChatData } from '../../../interfaces/ichat';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import ChatName from '../../../atoms/chat/ChatName';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
 
 const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
 
@@ -33,7 +34,6 @@ interface IFunctionProps {
 const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
 
@@ -53,6 +53,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const [prevSearchText, setPrevSearchText] = useState<string>('');
   const [searchedRoomsLoading, setSearchedRoomsLoading] =
     useState<boolean>(false);
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -199,6 +200,18 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
     }
   }
 
+  // to update time ago of last message
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 60 * 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
+
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
@@ -215,9 +228,6 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
           <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.user?.nickname
-        ? chat.visavis?.user?.nickname
-        : chat.visavis?.user?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -234,9 +244,6 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             />
           </SMyAvatarMassupdate>
         );
-        chatName = t('announcement.title', {
-          username: user.userData?.nickname || user.userData?.username,
-        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -259,16 +266,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
           <SChatItem onClick={handleItemClick}>
             {avatar}
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chatName}
-                {chat.visavis?.user?.options?.isVerified && (
-                  <SVerificationSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                  />
-                )}
-              </SChatItemText>
+              <ChatName chat={chat} />
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
               </SChatItemLastMessage>
@@ -288,7 +286,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchedRooms, chatRooms, updatedChat]
+    [searchedRooms, chatRooms, updatedChat, updateTimer]
   );
 
   return (
@@ -334,12 +332,6 @@ const SChatItemCenter = styled.div`
   display: flex;
   padding: 2px 12px;
   flex-direction: column;
-`;
-
-const SChatItemText = styled(Text)`
-  margin-bottom: 4px;
-  display: inline-flex;
-  align-items: center;
 `;
 
 const SChatItemLastMessage = styled(Text)`

@@ -30,6 +30,7 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 // import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import assets from '../constants/assets';
+import { I18nNamespaces } from '../@types/i18next';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -385,18 +386,44 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   return (
     <>
       <Head>
-        <title>{t(`meta.${router?.query?.category || 'ac'}.title`)}</title>
+        <title>
+          {t(
+            `meta.${
+              (router?.query
+                ?.category as keyof I18nNamespaces['page-SeeMore']['meta']) ||
+              'ac'
+            }.title`
+          )}
+        </title>
         <meta
           name='description'
-          content={t(`meta.${router?.query?.category || 'ac'}.description`)}
+          content={t(
+            `meta.${
+              (router?.query
+                ?.category as keyof I18nNamespaces['page-SeeMore']['meta']) ||
+              'ac'
+            }.description`
+          )}
         />
         <meta
           property='og:title'
-          content={t(`meta.${router?.query?.category || 'ac'}.title`)}
+          content={t(
+            `meta.${
+              (router?.query
+                ?.category as keyof I18nNamespaces['page-SeeMore']['meta']) ||
+              'ac'
+            }.title`
+          )}
         />
         <meta
           property='og:description'
-          content={t(`meta.${router?.query?.category || 'ac'}.description`)}
+          content={t(
+            `meta.${
+              (router?.query
+                ?.category as keyof I18nNamespaces['page-SeeMore']['meta']) ||
+              'ac'
+            }.description`
+          )}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>

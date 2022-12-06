@@ -25,9 +25,9 @@
       "insights": "深入瞭解",
       "insightsTablet": "轉至深入瞭解",
       "cashOut": {
-        "amount_NEED_TRANSLATION": "Your Stripe earning are",
-        "amountSecondLine_NEED_TRANSLATION": "Manage your balance on Stripe.",
-        "stripeButton_NEED_TRANSLATION": "Take me to Stripe",
+        "amount": "你的Stripe收入為",
+        "amountSecondLine": "在Stripe上管理你的餘額。",
+        "stripeButton": "轉至Stripe",
         "date": "將於{{date}}自動發送,",
         "submit": "瞭解更多",
         "noPayouts": "沒有任何即將支付的款項"
@@ -96,8 +96,8 @@
     },
     "aboutBundles": {
       "title": "Superpoll Bundles",
-      "text_NEED_TRANSLATION": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
-      "button_NEED_TRANSLATION": "Tell me more!"
+      "text": "賺取更多，樂趣更多！\nSuperpoll Bundle讓大家共贏！",
+      "button": "瞭解更多！"
     }
   },
   "earnings": {
@@ -108,48 +108,48 @@
   },
   "myBundles": {
     "meta": {
-      "title_NEED_TRANSLATION": "My Bundles",
-      "description_NEED_TRANSLATION": "View your NewNew Bundles"
+      "title": "我的Bundle",
+      "description": "查看你的NewNewBundle"
     },
-    "title_NEED_TRANSLATION": "My Bundles",
-    "buttonTurnOn_NEED_TRANSLATION": "Turn on bundles",
-    "buttonTurnOff_NEED_TRANSLATION": "Turn off bundles",
-    "earnings_NEED_TRANSLATION": {
-      "title_NEED_TRANSLATION": "Bundles Earnings",
-      "payPeriod_NEED_TRANSLATION": "this pay period",
-      "unitName_NEED_TRANSLATION": "bundle",
-      "earned_NEED_TRANSLATION": "earned",
-      "noSoldYet_NEED_TRANSLATION": "No bundles sold yet",
-      "sold_NEED_TRANSLATION": "sold"
+    "title": "我的Bundle",
+    "buttonTurnOn": "開啟Bundle",
+    "buttonTurnOff": "關掉Bundle",
+    "earnings": {
+      "title": "Bundle收入",
+      "payPeriod": "當前支付期",
+      "unitName": "bundle",
+      "earned": "收入",
+      "noSoldYet": "還沒有賣出Bundle",
+      "sold": "已售出"
     },
     "bundlesSet": {
-      "title_NEED_TRANSLATION": "Superpoll Bundles",
-      "subTitle_NEED_TRANSLATION": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
-      "votes_NEED_TRANSLATION": "votes",
-      "description_NEED_TRANSLATION": "plus people get {{duration}} months of:",
-      "descriptionSingular_NEED_TRANSLATION": "plus people get 1 month of:",
-      "firstOption_NEED_TRANSLATION": "adding custom options to your Superpolls",
-      "secondOption_NEED_TRANSLATION": "sending you private chats",
-      "perBundle_NEED_TRANSLATION": "per bundle"
+      "title": "Superpoll Bundle",
+      "subTitle": "提供Superpoll Bundle來增加收入，還能拉近與觀眾距離。",
+      "votes": "票數",
+      "description": "此外，大家可獲{{duration}}個月的：",
+      "descriptionSingular": "此外，大家可獲1個月的：",
+      "firstOption": "在自己的Superpoll中添加定制選項",
+      "secondOption": "私人聊天發送中",
+      "perBundle": "每個Bundle"
     },
     "modals": {
       "turnon": {
-        "title_NEED_TRANSLATION": "Turn On bundles",
-        "text_NEED_TRANSLATION": "Are you sure you want to activate bundles?"
+        "title": "開啟Bundle",
+        "text": "確定要啟動Bundle嗎？"
       },
       "turnoff": {
-        "title_NEED_TRANSLATION": "Turn Off bundles",
-        "text_NEED_TRANSLATION": "Are you sure you want to deactivate bundles?"
+        "title": "關閉Bundle",
+        "text": "確定要停用Bundle嗎？"
       },
       "activated": {
-        "title_NEED_TRANSLATION": "Congratulations!",
-        "text_NEED_TRANSLATION": "You are successfully activated bundles"
+        "title": "恭喜！",
+        "text": "你已成功啟動Bundle。"
       },
       "deactivated": {
-        "title_NEED_TRANSLATION": "So sad!",
-        "text_NEED_TRANSLATION": "But you can activate bundles at any time"
+        "title": "好傷心啊！",
+        "text": "但你可以隨時啟動Bundle"
       },
-      "button_NEED_TRANSLATION": "Sounds good!"
+      "button": "不錯！"
     }
   },
   "getPaid": {
@@ -185,7 +185,7 @@
     "noMessagesFirstLine": "沒有訊息......",
     "typing": "正在輸入......",
     "toolbar": {
-      "searchPlaceholder_NEED_TRANSLATION": "Search for users"
+      "searchPlaceholder": "搜索用戶"
     },
     "modal": {
       "newMessage": {
@@ -215,7 +215,10 @@
     "members": "成員"
   },
   "announcement": {
-    "title": "{{username}}的公告"
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "",
+    "afterName": "的公告"
   },
   "stripe": {
     "meta": {
@@ -234,7 +237,8 @@
       "requestSetupLink": "與Stripe綁定",
       "stripeConnectedLink": "Stripe已綁定！",
       "back": "關閉",
-      "stripeConnecting": "連接中......"
+      "stripeConnecting": "連接中......",
+      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
     }
   },
   "noNotifications": "你收到的任何新通知\n都會出現在這裡"

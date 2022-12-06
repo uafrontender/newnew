@@ -13,6 +13,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -41,6 +42,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
+import { I18nNamespaces } from '../../../../@types/i18next';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -257,46 +259,51 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SBidsAmount>
         ) : null}
         <SCreatorCard>
-          <a
-            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
-              creator.username
-            }`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on creator avatar', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SAvatarArea>
-              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
-            </SAvatarArea>
-          </a>
-          <a
-            href={`${router.locale !== 'en-US' ? `/${router.locale}` : ''}/${
-              creator.username
-            }`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on creator username', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SUsername className='username'>
-              {creator.nickname ?? `@${creator.username}`}{' '}
-              {creator.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                  fill='none'
+          <Link href={`/${creator.username}`}>
+            <a
+              href={`/${creator.username}`}
+              onClickCapture={() => {
+                Mixpanel.track('Click on creator avatar', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SAvatarArea>
+                <img
+                  src={creator.avatarUrl ?? ''}
+                  alt={creator.username ?? ''}
                 />
-              )}
-            </SUsername>
-          </a>
+              </SAvatarArea>
+            </a>
+          </Link>
+          <Link href={`/${creator.username}`}>
+            <a
+              href={`/${creator.username}`}
+              onClickCapture={() => {
+                Mixpanel.track('Click on creator username', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SUserInfo>
+                <SUsername className='username'>
+                  {getDisplayname(creator)}
+                </SUsername>
+                {creator.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='20px'
+                    height='20px'
+                    fill='none'
+                  />
+                )}
+              </SUserInfo>
+            </a>
+          </Link>
         </SCreatorCard>
         <SActionsDiv>
           <SShareButton
@@ -350,7 +357,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
-              postType={postType as string}
+              postType={postType as TPostType}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
@@ -361,7 +368,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
-              postType={postType as string}
+              postType={postType as TPostType}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
               isOpen={ellipseMenuOpen}
@@ -391,9 +398,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`postFailedBox.reason.${failureReason}`, {
-            creator: getDisplayname(creator),
-          })}
+          body={t(
+            `postFailedBox.reason.${
+              failureReason as keyof I18nNamespaces['page-Post']['postFailedBox']['reason']
+            }`,
+            {
+              creator: getDisplayname(creator),
+            }
+          )}
           buttonCaption={tCommon('button.takeMeHome')}
           imageSrc={
             postType
@@ -524,10 +536,16 @@ const SAvatarArea = styled.div`
   }
 `;
 
-const SUsername = styled.div`
+const SUserInfo = styled.div`
   grid-area: username;
   display: flex;
+  flex-direction: row;
   align-items: center;
+`;
+
+const SUsername = styled.div`
+  display: inline;
+  flex-shrink: 1;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;

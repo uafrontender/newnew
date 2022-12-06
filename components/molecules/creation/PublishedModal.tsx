@@ -24,6 +24,7 @@ import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -107,7 +108,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;
@@ -142,7 +143,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
         Mixpanel.track('See My Post Click');
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;
@@ -217,10 +218,12 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(`published.socials.${item.key}` as any)}
       </SItemTitle>
     </SItem>
   );
+
+  const displayName = getDisplayname(user.userData);
 
   return (
     <Modal show={open} onClose={handleClose}>
@@ -246,9 +249,9 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
             <SUserTitleContainer>
               <SUserTitle variant={3} weight={600}>
-                {user.userData?.nickname && user.userData?.nickname?.length > 8
-                  ? `${user.userData?.nickname?.substring(0, 8)}...`
-                  : user.userData?.nickname}
+                {displayName && displayName.length > 8
+                  ? `${displayName.substring(0, 8)}...`
+                  : displayName}
               </SUserTitle>
               {user.userData?.options?.isVerified && (
                 <InlineSvg

@@ -76,7 +76,11 @@
     "searchPlaceholder": "Search"
   },
   "announcement": {
-    "title": "{{username}}'s announcement",
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "'s",
+    "afterName": "announcement",
+
     "topMessageStart": "Only",
     "topMessageEnd": "can send messages"
   },

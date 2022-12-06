@@ -14,14 +14,14 @@ import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
 
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../../utils/mixpanel';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   postCreator: newnewapi.User;
   handleReportOpen: () => void;
@@ -67,7 +67,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
 
       const handleCopyLink = useCallback(() => {
         if (window) {
-          const url = `${window.location.origin}/post/${postUuid}`;
+          const url = `${window.location.origin}/p/${postUuid}`;
           Mixpanel.track('Copied Link Post Modal', {
             _stage: 'Post',
             _postUuid: postUuid,
@@ -101,7 +101,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           if (!user.loggedIn && user._persist?.rehydrated) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-                `${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`
+                `${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`
               )}`
             );
             return;

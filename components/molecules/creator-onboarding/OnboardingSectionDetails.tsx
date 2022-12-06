@@ -837,7 +837,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                 'detailsSection.form.username.frequencyCaption'
               )}
               errorCaption={t(
-                `detailsSection.form.username.errors.${usernameError}`
+                `detailsSection.form.username.errors.${usernameError}` as any
               )}
               placeholder={t('detailsSection.form.username.placeholder')}
               isValid={usernameError === ''}
@@ -851,7 +851,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
               disabled={loadingModalOpen}
               placeholder={t('detailsSection.form.nickname.placeholder')}
               errorCaption={t(
-                `detailsSection.form.nickname.errors.${nicknameError}`
+                `detailsSection.form.nickname.errors.${nicknameError}` as any
               )}
               isValid={nicknameError === ''}
               onChange={handleUpdateNickname}

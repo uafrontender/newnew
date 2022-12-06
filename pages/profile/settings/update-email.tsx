@@ -1,11 +1,5 @@
 /* eslint-disable camelcase */
-import React, {
-  ReactElement,
-  useEffect,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import React, { ReactElement, useEffect, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
@@ -23,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { setMyEmail } from '../../../api/endpoints/user';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const EditEmailLoadingModal = dynamic(
   () => import('../../../components/molecules/settings/EditEmailLoadingModal')
@@ -47,7 +42,6 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const isSubmitted = useRef(false);
 
   useUpdateEffect(() => {
     if (!loggedIn && _persist?.rehydrated) {
@@ -74,54 +68,64 @@ const UdpateEmail: NextPage<IUdpateEmail> = ({ email_address, token }) => {
     router.prefetch('/profile/settings');
   }, [router]);
 
-  const handleSetMyEmail = useCallback(async () => {
-    try {
-      setIsLoading(true);
+  const handleSetMyEmail = useCallback(
+    async (controller: AbortController) => {
+      try {
+        setIsLoading(true);
 
-      const setMyEmailPayload = new newnewapi.SetMyEmailRequest({
-        emailAddress: emailAddress as string,
-        token: tokenValue as string,
-      });
+        const setMyEmailPayload = new newnewapi.SetMyEmailRequest({
+          emailAddress: emailAddress as string,
+          token: tokenValue as string,
+        });
 
-      const { data, error } = await setMyEmail(setMyEmailPayload);
+        const { data, error } = await setMyEmail(
+          setMyEmailPayload,
+          controller.signal
+        );
 
-      if (
-        data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
-      ) {
-        setErrorMessage(tVerifyEmail('error.invalidCode'));
-        throw new Error('Invalid code');
+        if (data?.status === newnewapi.ConfirmMyEmailResponse.Status.SUCCESS) {
+          dispatch(
+            setUserData({
+              email: data?.me?.email,
+            })
+          );
+          router.replace(
+            '/profile/settings?editEmail=true&step=3',
+            '/profile/settings/edit-email'
+          );
+        }
+
+        if (
+          data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
+        ) {
+          setErrorMessage(tVerifyEmail('error.invalidCode'));
+          throw new Error('Invalid code');
+        }
+
+        if (error && (error as any)?.code !== 20) {
+          setErrorMessage(error?.message ?? 'Request failed');
+
+          throw new Error(error?.message ?? 'Request failed');
+        }
+      } catch (err) {
+        console.error(err);
+        setIsLoading(false);
       }
-
-      if (
-        data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS ||
-        error
-      ) {
-        setErrorMessage(error?.message ?? 'Request failed');
-
-        throw new Error(error?.message ?? 'Request failed');
-      }
-
-      dispatch(
-        setUserData({
-          email: data?.me?.email,
-        })
-      );
-      router.replace(
-        '/profile/settings?editEmail=true&step=3',
-        '/profile/settings/edit-email'
-      );
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [emailAddress, dispatch, tokenValue, tVerifyEmail, router]);
+    },
+    [emailAddress, dispatch, tokenValue, tVerifyEmail, router]
+  );
 
   useEffect(() => {
-    if (tokenValue && emailAddress && !isSubmitted.current && !isLoading) {
-      handleSetMyEmail();
+    const controller = new AbortController();
+
+    if (tokenValue && emailAddress) {
+      handleSetMyEmail(controller);
     }
-  }, [tokenValue, emailAddress, handleSetMyEmail, isSubmitted, isLoading]);
+
+    return () => {
+      controller.abort();
+    };
+  }, [tokenValue, emailAddress, handleSetMyEmail]);
 
   if (!isBrowser()) {
     return <div />;
@@ -159,11 +163,12 @@ export default UdpateEmail;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-VerifyEmail',
-    'page-Profile',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-VerifyEmail', 'page-Profile'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { email_address, token } = context.query;
 

@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable react/no-array-index-key */
 import React, {
   useCallback,
   useContext,
@@ -6,6 +7,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  Fragment,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -44,7 +46,7 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
@@ -222,7 +224,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/post/${postParsed.postUuid}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postParsed.postUuid}`
           )}`
         );
         return;
@@ -305,37 +307,14 @@ export const PostCard: React.FC<ICard> = React.memo(
           fetch(decoded.thumbnailUrl)
             .then((res) => res.blob())
             .then((blobFromFetch) => {
-              const reader = new FileReader();
+              const url = URL.createObjectURL(blobFromFetch);
 
-              reader.onloadend = () => {
-                if (!reader.result) return;
-
-                const byteCharacters = atob(
-                  reader.result.slice(
-                    (reader.result as string).indexOf(',') + 1
-                  ) as string
-                );
-
-                const byteNumbers = new Array(byteCharacters.length);
-
-                // eslint-disable-next-line no-plusplus
-                for (let i = 0; i < byteCharacters.length; i++) {
-                  byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'video/mp4' });
-                const url = URL.createObjectURL(blob);
-
-                setThumbnailUrl(url);
-              };
-
-              reader.readAsDataURL(blobFromFetch);
+              setThumbnailUrl(url);
             })
             .catch((err) => {
               console.error(err);
             });
-        }, 5000);
+        }, 10000);
       };
 
       const handlerSocketPostCoverImageUpdated = (data: any) => {
@@ -439,7 +418,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, []);
 
     useEffect(() => {
-      router.prefetch(`/post/${switchPostType(item)[0].postUuid}`);
+      router.prefetch(`/p/${switchPostType(item)[0].postUuid}`);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -449,12 +428,12 @@ export const PostCard: React.FC<ICard> = React.memo(
     function getTitleContent(title: string) {
       return (
         <>
-          {getChunks(title).map((chunk) => {
+          {getChunks(title).map((chunk, chunkIndex) => {
             if (chunk.type === 'hashtag') {
-              return <SHashtag>#{chunk.text}</SHashtag>;
+              return <SHashtag key={chunkIndex}>#{chunk.text}</SHashtag>;
             }
 
-            return chunk.text;
+            return <Fragment key={chunkIndex}>{chunk.text}</Fragment>;
           })}
         </>
       );
@@ -528,7 +507,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
-                    postType={typeOfPost as string}
+                    postType={typeOfPost as TPostType}
                     isVisible={isEllipseMenuOpen}
                     postCreator={postParsed.creator as newnewapi.User}
                     handleReportOpen={handleReportOpen}
@@ -569,7 +548,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               isOpen={isEllipseMenuOpen}
               zIndex={11}
               postUuid={postParsed.postUuid}
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
               onClose={handleEllipseMenuClose}
@@ -631,7 +610,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               {!isMobile && (
                 <PostCardEllipseMenu
                   postUuid={postParsed.postUuid}
-                  postType={typeOfPost as string}
+                  postType={typeOfPost as TPostType}
                   isVisible={isEllipseMenuOpen}
                   postCreator={postParsed.creator as newnewapi.User}
                   handleReportOpen={handleReportOpen}
@@ -668,7 +647,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                   handleUserClick(postParsed.creator?.username!!);
                 }}
               >
-                {postParsed.creator?.nickname}
+                {getDisplayname(postParsed.creator)}
               </SUsername>
               {postParsed.creator?.options?.isVerified && (
                 <SInlineSVG
@@ -758,7 +737,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             isOpen={isEllipseMenuOpen}
             zIndex={11}
             postUuid={postParsed.postUuid}
-            postType={typeOfPost as string}
+            postType={typeOfPost as TPostType}
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
             onClose={handleEllipseMenuClose}
@@ -1064,7 +1043,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '200px'};
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '100%'};
 
     transition: transform ease 0.5s;
 

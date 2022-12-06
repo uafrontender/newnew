@@ -56,6 +56,7 @@ import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
 import validateInputText from '../../utils/validateMessageText';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import { I18nNamespaces } from '../../@types/i18next';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -244,7 +245,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       try {
         const payload = new newnewapi.ValidateTextRequest({
           kind,
-          text,
+          text: text.trim(),
         });
 
         const res = await validateText(payload);
@@ -266,6 +267,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             });
           }
         } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
+          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.bioError = errorSwitch(res.data?.status!!);
+              return errorsWorking;
+            });
+          } else {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.bioError = '';
+              return errorsWorking;
+            });
+          }
+        } else if (kind === newnewapi.ValidateTextRequest.Kind.CREATOR_BIO) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
             setFormErrors((errors) => {
               const errorsWorking = { ...errors };
@@ -313,8 +328,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       key: T,
       value: ModalMenuUserData[T]
     ) => {
-      setIsDataValid(false);
-
       const workingData: ModalMenuUserData = { ...dataInEdit };
       workingData[key] = value;
 
@@ -341,7 +354,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
-          newnewapi.ValidateTextRequest.Kind.USER_BIO,
+          user.userData?.options?.isCreator
+            ? newnewapi.ValidateTextRequest.Kind.CREATOR_BIO
+            : newnewapi.ValidateTextRequest.Kind.USER_BIO,
           value as ModalMenuUserData['bio']
         );
       }
@@ -349,10 +364,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     [
       dataInEdit,
       user.userData?.username,
-      setDataInEdit,
+      user.userData?.options?.isCreator,
       validateTextViaAPIDebounced,
       validateUsernameViaAPIDebounced,
-      setIsDataValid,
     ]
   );
 
@@ -752,7 +766,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           (genderP) => genderP.value !== newnewapi.User.GenderPronouns.UNKNOWN
         )
         .map((genderP) => ({
-          name: t(`genderPronouns.${genderP.name}`),
+          name: t(
+            `genderPronouns.${
+              genderP.name as keyof I18nNamespaces['page-Profile']['genderPronouns']
+            }`
+          ),
           value: genderP.value,
         })),
     [t]
@@ -816,7 +834,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   disabled={isLoading}
                   placeholder={t('editProfileMenu.inputs.nickname.placeholder')}
                   errorCaption={t(
-                    `editProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
+                    `editProfileMenu.inputs.nickname.errors.${
+                      formErrors.nicknameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['nickname']['errors']
+                    }`
                   )}
                   isValid={!formErrors.nicknameError}
                   onChange={(e) =>
@@ -853,7 +873,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     />
                   }
                   errorCaption={t(
-                    `editProfileMenu.inputs.username.errors.${formErrors.usernameError}`
+                    `editProfileMenu.inputs.username.errors.${
+                      formErrors.usernameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['username']['errors']
+                    }`
                   )}
                   placeholder={t('editProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
@@ -889,7 +911,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   disabled={isLoading}
                   placeholder={t('editProfileMenu.inputs.bio.placeholder')}
                   errorCaption={t(
-                    `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
+                    `editProfileMenu.inputs.bio.errors.${
+                      formErrors.bioError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['bio']['errors']
+                    }`
                   )}
                   isValid={!formErrors.bioError}
                   onChange={(e) =>

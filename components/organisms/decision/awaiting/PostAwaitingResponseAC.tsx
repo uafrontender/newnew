@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
@@ -16,6 +17,7 @@ import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSucce
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -54,7 +56,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
           ? dhms.hours === '1'
             ? 'acPostAwaiting.hero.expires.hours_singular'
             : 'acPostAwaiting.hero.expires.hours'
-          : ''
+          : ('' as any)
       )}`;
 
       if (dhms.days === '0') {
@@ -114,7 +116,9 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
@@ -139,35 +143,39 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             <WaitingForResponseBox
               title={t('acPostAwaiting.hero.title')}
               body={t('acPostAwaiting.hero.body', {
-                creator: post.creator?.nickname,
+                creator: getDisplayname(post.creator),
                 time: waitingTime,
               })}
             />
             <SCreatorInfoDiv>
               <SCreator>
-                <a href={`/${post.creator?.username}`}>
-                  <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                </a>
-                <a href={`/${post.creator?.username}`}>
-                  <SWantsToKnow>
-                    <Trans
-                      t={t}
-                      i18nKey='acPostAwaiting.wantsToKnow'
-                      // @ts-ignore
-                      components={[
-                        post.creator?.options?.isVerified ? (
-                          <SInlineSVG
-                            svg={VerificationCheckmark}
-                            width='16px'
-                            height='16px'
-                            fill='none'
-                          />
-                        ) : null,
-                        { creator: post.creator?.nickname },
-                      ]}
-                    />
-                  </SWantsToKnow>
-                </a>
+                <Link href={`/${post.creator?.username}`}>
+                  <a href={`/${post.creator?.username}`}>
+                    <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                  </a>
+                </Link>
+                <Link href={`/${post.creator?.username}`}>
+                  <a href={`/${post.creator?.username}`}>
+                    <SWantsToKnow>
+                      <Trans
+                        t={t}
+                        i18nKey='acPostAwaiting.wantsToKnow'
+                        // @ts-ignore
+                        components={[
+                          post.creator?.options?.isVerified ? (
+                            <SInlineSVG
+                              svg={VerificationCheckmark}
+                              width='16px'
+                              height='16px'
+                              fill='none'
+                            />
+                          ) : null,
+                          { creator: getDisplayname(post.creator) },
+                        ]}
+                      />
+                    </SWantsToKnow>
+                  </a>
+                </Link>
               </SCreator>
               {post.totalAmount?.usdCents && (
                 <STotal>

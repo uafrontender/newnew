@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import Headline from '../../atoms/Headline';
 import PostCard from '../../molecules/PostCard';
@@ -34,7 +34,6 @@ const PostTypeSection = ({
   isStatic,
   padding,
 }: IPostTypeSectionProps) => {
-  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL'].includes(resizeMode);
@@ -42,16 +41,9 @@ const PostTypeSection = ({
     resizeMode
   );
 
-  const renderPosts = (post: newnewapi.Post, index: number) => {
-    const handleOpenPost = () => {
-      router.push(`/post/${switchPostType(post)[0].postUuid}`);
-    };
-    return (
-      <SItemWrapper
-        key={switchPostType(post)[0].postUuid}
-        index={index}
-        onClick={handleOpenPost}
-      >
+  const renderPosts = (post: newnewapi.Post, index: number) => (
+    <Link href={`/p/${switchPostType(post)[0].postUuid}`}>
+      <SItemWrapper key={switchPostType(post)[0].postUuid} index={index}>
         <PostCard
           item={post}
           index={index}
@@ -59,8 +51,8 @@ const PostTypeSection = ({
           maxWidthTablet='100%'
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   const renderStaticPosts = (post: TStaticPost, index: number) => (
     <SItemWrapper index={index} key={post.title}>

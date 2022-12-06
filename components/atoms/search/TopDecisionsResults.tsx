@@ -3,8 +3,11 @@
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import getDisplayname from '../../../utils/getDisplayname';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
@@ -15,6 +18,19 @@ interface IFunction {
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
+  const { t: tPostCard } = useTranslation('component-PostCard');
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
+
   const renderItem = useCallback(
     (post: newnewapi.IPost) => {
       const postType = Object.keys(post)[0];
@@ -28,6 +44,8 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       const timestampSeconds = new Date(
         (data.expiresAt?.seconds as number) * 1000
       ).getTime();
+
+      const hasEnded = Date.now() > timestampSeconds;
 
       const parsed = secondsToDHMS(
         (timestampSeconds - Date.now()) / 1000,
@@ -46,7 +64,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       }
 
       return (
-        <Link href={`/post/${data.postUuid}`} key={data.postUuid}>
+        <Link href={`/p/${data.postUuid}`} key={data.postUuid}>
           <a>
             <SPost>
               <SLeftSide>
@@ -57,26 +75,44 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                   {data.title && (
                     <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
                   )}
-                  <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
+                  <SCreatorUsername>
+                    {getDisplayname(data.creator)}
+                  </SCreatorUsername>
                 </SPostData>
               </SLeftSide>
               <SPostDetails>
-                <SPostType>{postTypeConverted}</SPostType>
-                <SPostEnded>
-                  {parsed.days !== '00' && `${parsed.days}d`}{' '}
-                  {(parsed.hours !== '00' ||
-                    (parsed.days !== '00' && parsed.hours === '00')) &&
-                    `${parsed.hours}h`}{' '}
-                  {`${parsed.minutes}m `}
-                  {parsed.days === '00' && `${parsed.seconds}s`}
-                </SPostEnded>
+                {!hasEnded ? (
+                  <SPostEnded>
+                    {parsed.days !== '00' &&
+                      `${parsed.days}${tPostCard('timer.daysLeft')}`}{' '}
+                    {`${
+                      parsed.hours !== '00' ||
+                      (parsed.days !== '00' && parsed.hours === '00')
+                        ? `${parsed.hours}${tPostCard('timer.hoursLeft')}`
+                        : ''
+                    } ${parsed.minutes}${tPostCard('timer.minutesLeft')}
+                    ${
+                      parsed.days === '00'
+                        ? `${parsed.seconds}${tPostCard('timer.secondsLeft')}`
+                        : ''
+                    }`}
+                  </SPostEnded>
+                ) : (
+                  <SPostEnded>
+                    {tPostCard('timer.endedOn')}
+                    {new Date(
+                      (data.expiresAt?.seconds as number) * 1000
+                    ).toLocaleDateString()}
+                  </SPostEnded>
+                )}
               </SPostDetails>
             </SPost>
           </a>
         </Link>
       );
     },
-    [t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t, tPostCard, updateTimer]
   );
 
   return (

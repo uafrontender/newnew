@@ -18,6 +18,8 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import assets from '../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import switchPostType from '../../utils/switchPostType';
 
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
@@ -105,6 +107,15 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     ]
   );
 
+  const handleRemovePostFromState = (postUuid: string) => {
+    handleSetPosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
   useEffect(() => {
     if (inView && !isLoading) {
       if (pageToken) {
@@ -140,6 +151,9 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
               wrapperStyle={{
                 left: 0,
               }}
+              handleRemovePostFromState={(uuid: string) =>
+                handleRemovePostFromState(uuid)
+              }
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
@@ -178,14 +192,19 @@ export async function getServerSideProps(
   context: GetServerSidePropsContext
 ): Promise<any> {
   try {
-    const translationContext = await serverSideTranslations(context.locale!!, [
-      'common',
-      'page-Profile',
-      'component-PostCard',
-      'page-Post',
-      'modal-PaymentModal',
-      'modal-ResponseSuccessModal',
-    ]);
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Profile',
+        'component-PostCard',
+        'page-Post',
+        'modal-PaymentModal',
+        'modal-ResponseSuccessModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
+    );
 
     // const { req } = context;
     // // Try to fetch only if actual SSR needed

@@ -1,11 +1,5 @@
 /* eslint-disable camelcase */
-import React, {
-  ReactElement,
-  useEffect,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import React, { ReactElement, useEffect, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
@@ -22,6 +16,7 @@ import assets from '../../../constants/assets';
 import { useAppSelector } from '../../../redux-store/store';
 import { confirmMyEmail } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const EditEmailLoadingModal = dynamic(
   () => import('../../../components/molecules/settings/EditEmailLoadingModal')
@@ -44,7 +39,6 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const isSubmitted = useRef(false);
 
   useUpdateEffect(() => {
     if (!loggedIn && _persist?.rehydrated) {
@@ -71,49 +65,57 @@ const ConfirmEmail: NextPage<IConfirmEmail> = ({ email_address, token }) => {
     router.prefetch('/profile/settings');
   }, [router]);
 
-  const handleConfirmMyEmail = useCallback(async () => {
-    try {
-      setIsLoading(true);
+  const handleConfirmMyEmail = useCallback(
+    async (controller: AbortController) => {
+      try {
+        setIsLoading(true);
 
-      const confirmMyEmailPayload = new newnewapi.ConfirmMyEmailRequest({
-        token: tokenValue as string,
-      });
+        const confirmMyEmailPayload = new newnewapi.ConfirmMyEmailRequest({
+          token: tokenValue as string,
+        });
 
-      const { data, error } = await confirmMyEmail(confirmMyEmailPayload);
+        const { data, error } = await confirmMyEmail(
+          confirmMyEmailPayload,
+          controller.signal
+        );
 
-      if (
-        data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
-      ) {
-        setErrorMessage(tVerifyEmail('error.invalidCode'));
-        throw new Error('Invalid code');
+        if (data?.status === newnewapi.ConfirmMyEmailResponse.Status.SUCCESS) {
+          router.replace(
+            '/profile/settings?editEmail=true&step=1',
+            '/profile/settings/edit-email'
+          );
+        }
+
+        if (
+          data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
+        ) {
+          setErrorMessage(tVerifyEmail('error.invalidCode'));
+          throw new Error('Invalid code');
+        }
+
+        if (error && (error as any)?.code !== 20) {
+          setErrorMessage(error?.message ?? 'Request failed');
+          throw new Error(error?.message ?? 'Request failed');
+        }
+      } catch (err: any) {
+        console.error(err);
+        setIsLoading(false);
       }
-
-      if (
-        data?.status !== newnewapi.ConfirmMyEmailResponse.Status.SUCCESS ||
-        error
-      ) {
-        setErrorMessage(error?.message ?? 'Request failed');
-        throw new Error(error?.message ?? 'Request failed');
-      }
-
-      router.replace(
-        '/profile/settings?editEmail=true&step=1',
-        '/profile/settings/edit-email'
-      );
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      isSubmitted.current = true;
-      setIsLoading(false);
-    }
-  }, [tVerifyEmail, tokenValue, router]);
+    },
+    [tVerifyEmail, tokenValue, router]
+  );
 
   useEffect(() => {
-    if (tokenValue && emailAddress && !isSubmitted.current && !isLoading) {
-      setIsLoading(true);
-      handleConfirmMyEmail();
+    const controller = new AbortController();
+
+    if (tokenValue && emailAddress) {
+      handleConfirmMyEmail(controller);
     }
-  }, [tokenValue, emailAddress, handleConfirmMyEmail, isSubmitted, isLoading]);
+
+    return () => {
+      controller.abort();
+    };
+  }, [tokenValue, emailAddress, handleConfirmMyEmail]);
 
   if (!isBrowser()) {
     return <div />;
@@ -151,11 +153,12 @@ export default ConfirmEmail;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-VerifyEmail',
-    'page-Profile',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-VerifyEmail', 'page-Profile'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { email_address, token } = context.query;
 

@@ -41,6 +41,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -151,7 +152,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
   const [triedLoading, setTriedLoading] = useState(false);
 
-  // const currLocation = `/post/${post.postUuid}`;
+  // const currLocation = `/p/${post.postUuid}`;
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -602,7 +603,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       const parsedHash = hash.substring(1);
 
       if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
+        setTimeout(() => {
+          document.getElementById('comments')?.scrollIntoView();
+        }, 100);
       }
     };
 
@@ -743,9 +746,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             postId={post.postUuid}
             postStatus={postStatus}
             postText={post.title}
-            postCreatorName={
-              (post.creator?.nickname as string) ?? post.creator?.username
-            }
+            postCreatorName={getDisplayname(post.creator)}
             postDeadline={moment(
               (post.responseUploadDeadline?.seconds as number) * 1000
             )
@@ -766,9 +767,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               postId={post.postUuid}
               postStatus={postStatus}
               postText={post.title}
-              postCreator={
-                (post.creator?.nickname as string) ?? post.creator?.username
-              }
+              postCreator={getDisplayname(post.creator)}
               postDeadline={moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
@@ -805,8 +804,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             }}
           >
             {t('paymentSuccessModal.ac', {
-              postCreator:
-                (post.creator?.nickname as string) ?? post.creator?.username,
+              postCreator: getDisplayname(post.creator),
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )

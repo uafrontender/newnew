@@ -3,9 +3,10 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostConfirmDeleteModal {
-  postType: string;
+  postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
   handleConfirmDelete: () => void;

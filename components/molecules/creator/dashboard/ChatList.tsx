@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -8,20 +8,21 @@ import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { useUpdateEffect } from 'react-use';
 import moment from 'moment';
-import { SUserAvatar, SVerificationSVG } from '../../../atoms/chat/styles';
+import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
 import Lottie from '../../../atoms/Lottie';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import ChatName from '../../../atoms/chat/ChatName';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
 
 const EmptyInbox = dynamic(() => import('../../../atoms/chat/EmptyInbox'));
 const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
@@ -34,7 +35,6 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
 
@@ -56,9 +56,16 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
     null
   );
 
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
+
+  // TODO: caused issues, rework to use usePagination hook
+  // TODO: add scrollable container to load more when scrolled to bottom (callback)
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
-      if (loadingRooms) return;
+      if (loadingRooms) {
+        return;
+      }
+
       try {
         if (!pageToken) setChatRooms([]);
         setLoadingRooms(true);
@@ -185,13 +192,31 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
         searchRoom(searchText);
       }
     }
-    if (searchedRooms && !searchText) setSearchedRooms(null);
+
+    if (searchedRooms && !searchText) {
+      setSearchedRooms(null);
+    }
   }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
+
+  // to update time ago of last message
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 60 * 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
+      if (chat.visavis?.isVisavisBlocked) return null;
       const handleItemClick = async () => {
-        if (searchedRooms) setSearchedRooms(null);
+        if (searchedRooms) {
+          setSearchedRooms(null);
+        }
 
         router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
         return null;
@@ -202,9 +227,6 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
           <UserAvatar avatarUrl={chat.visavis?.user?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.user?.nickname
-        ? chat.visavis?.user?.nickname
-        : chat.visavis?.user?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -221,15 +243,6 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
             />
           </SMyAvatarMassupdate>
         );
-        chatName = t('announcement.title', {
-          username: user.userData?.nickname || user.userData?.username,
-        });
-      }
-      if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = t('announcement.title', {
-          username:
-            chat.visavis?.user?.nickname || chat.visavis?.user?.username,
-        });
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -252,17 +265,7 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
           <SChatItem onClick={handleItemClick}>
             {avatar}
             <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {chatName}
-                {chat.visavis?.user?.options?.isVerified && (
-                  <SVerificationSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                    fill='none'
-                  />
-                )}
-              </SChatItemText>
+              <ChatName chat={chat} />
               <SChatItemLastMessage variant={3} weight={600}>
                 {lastMsg}
               </SChatItemLastMessage>
@@ -282,11 +285,12 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchedRooms, chatRooms, updatedChat, router, t]
+    [searchedRooms, chatRooms, updatedChat, router, t, updateTimer]
   );
+
   return (
     <>
-      {loadingRooms ? (
+      {loadingRooms && (!chatRooms || chatRooms.length === 0) ? (
         <SLoader>
           <Lottie
             width={64}
@@ -313,10 +317,10 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
               ) : (
                 <NoResults text={searchText} />
               )}
+              {chatRoomsNextPageToken && !searchedRooms && (
+                <SRef ref={scrollRef}>Loading...</SRef>
+              )}
             </SSectionContent>
-            {chatRoomsNextPageToken && !searchedRooms && (
-              <SRef ref={scrollRef}>Loading...</SRef>
-            )}
           </>
         )
       )}
@@ -379,12 +383,7 @@ const SChatItemCenter = styled.div`
   display: flex;
   padding: 2px 12px;
   flex-direction: column;
-`;
-
-const SChatItemText = styled(Text)`
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
+  overflow: hidden;
 `;
 
 const SChatItemLastMessage = styled(Text)`
@@ -426,7 +425,8 @@ const SUnreadCount = styled.span`
 `;
 const SRef = styled.span`
   text-indent: -9999px;
-  height: 0;
+  height: 1px;
+  flex-shrink: 0;
   overflow: hidden;
 `;
 const SInlineSVG = styled(InlineSVG)`

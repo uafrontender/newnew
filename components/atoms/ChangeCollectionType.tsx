@@ -51,7 +51,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
     return (
       <SCheckBox
         key={`change-collection-type-${item.key}`}
-        label={t(`collection.title.${item.key}`)}
+        label={t(`collection.title.${item.key}` as any)}
         selected={isSelected}
         handleChange={!disabled ? handleItemClick : () => {}}
       />
@@ -68,7 +68,9 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
   return (
     <SContainer ref={ref}>
       <SWrapper onClick={handleChangeCollectionTypeClick}>
-        <Headline variant={4}>{t(`collection.title.${selected}`)}</Headline>
+        <Headline variant={4}>
+          {t(`collection.title.${selected}` as any)}
+        </Headline>
         <SInlineSVG
           svg={arrowDown}
           fill={theme.colorsThemed.text.primary}

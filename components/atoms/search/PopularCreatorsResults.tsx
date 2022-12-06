@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 import InlineSvg from '../InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -28,7 +29,9 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
                 </SUserAvatar>
                 <SPostData>
                   <CreatorData>
-                    <SCreatorUsername>{creator.nickname}</SCreatorUsername>
+                    <SCreatorUsername>
+                      {getDisplayname(creator)}
+                    </SCreatorUsername>
                     {creator.options?.isVerified && (
                       <SInlineSVG
                         svg={VerificationCheckmark}

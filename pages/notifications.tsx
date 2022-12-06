@@ -1,12 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { ReactElement, useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -23,7 +16,6 @@ import General from '../components/templates/General';
 import {
   getMyNotifications,
   markAllAsRead,
-  markAsRead,
 } from '../api/endpoints/notification';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../contexts/notificationsContext';
@@ -34,6 +26,7 @@ import usePagination, {
   PaginatedResponse,
   Paging,
 } from '../utils/hooks/usePagination';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -48,14 +41,11 @@ export const Notifications = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
-  const [newNotifications, setNewNotifications] = useState<
-    newnewapi.INotification[]
-  >([]);
-  const [unreadNotificationIds, setUnreadNotificationIds] = useState<number[]>(
-    []
-  );
+  // TODO: return a list of new notifications once WS message can be used
+  // const [newNotifications, setNewNotifications] = useState<
+  //   newnewapi.INotification[]
+  // >([]);
 
-  const localUnreadNotificationCount = useRef<number | undefined>(undefined);
   const { unreadNotificationCount, fetchNotificationCount } =
     useNotifications();
 
@@ -73,16 +63,6 @@ export const Notifications = () => {
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
-      setUnreadNotificationIds((curr) => {
-        const arr = curr.slice();
-        res.data?.notifications.forEach((item) => {
-          if (!item.isRead) {
-            arr.push(item.id as number);
-          }
-        });
-        return arr;
-      });
-
       return {
         nextData: res.data.notifications,
         nextPageToken: res.data.paging?.nextPageToken,
@@ -99,89 +79,16 @@ export const Notifications = () => {
     loadMore,
   } = usePagination(loadData, 6);
 
-  const fetchNewNotification = useCallback(async () => {
-    const payload = new newnewapi.GetMyNotificationsRequest({
-      paging: {
-        limit: 1,
-      },
-    });
-
-    const res = await getMyNotifications(payload);
-
-    if (!res.data || res.error) {
-      throw new Error(res.error?.message ?? 'Request failed');
-    }
-
-    setUnreadNotificationIds((curr) => {
-      const arr = curr.slice();
-      if (res.data?.notifications[0].id)
-        arr.push(res.data.notifications[0].id as number);
-      return arr;
-    });
-
-    setNewNotifications((curr) => {
-      const arr = curr.slice();
-      res.data?.notifications.forEach((item) => {
-        if (!item.isRead) {
-          arr.push(item);
-        }
-      });
-      return arr;
-    });
-  }, []);
-
-  const markNotificationsAsRead = useCallback(async () => {
-    try {
-      const payload = new newnewapi.MarkAsReadRequest({
-        notificationIds: unreadNotificationIds,
-      });
-
-      const res = await markAsRead(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      setUnreadNotificationIds([]);
-      fetchNotificationCount();
-    } catch (err) {
-      console.error(err);
-    }
-  }, [unreadNotificationIds, fetchNotificationCount]);
-
   const handleMarkAllAsRead = useCallback(async () => {
     try {
       const payload = new newnewapi.EmptyRequest({});
       await markAllAsRead(payload);
 
       fetchNotificationCount();
-      setUnreadNotificationIds([]);
     } catch (err) {
       console.error(err);
     }
   }, [fetchNotificationCount]);
-
-  useEffect(() => {
-    if (unreadNotificationIds.length > 0) {
-      markNotificationsAsRead();
-    }
-  }, [unreadNotificationIds, markNotificationsAsRead]);
-
-  useEffect(() => {
-    if (localUnreadNotificationCount.current === undefined) {
-      localUnreadNotificationCount.current = unreadNotificationCount;
-      return;
-    }
-
-    if (!initialLoadDone) {
-      return;
-    }
-
-    // TODO: What if there are 2 new notifications?
-    if (unreadNotificationCount > localUnreadNotificationCount.current) {
-      fetchNewNotification();
-    } else {
-      localUnreadNotificationCount.current = unreadNotificationCount;
-    }
-  }, [initialLoadDone, unreadNotificationCount, fetchNewNotification]);
 
   useEffect(() => {
     if (inView && !loading && hasMore) {
@@ -195,17 +102,10 @@ export const Notifications = () => {
     }
   }, [user.loggedIn, user._persist?.rehydrated, router]);
 
-  const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
-    const allNotifications = [...newNotifications, ...notifications];
-    const notificationsWithStatus = allNotifications.map((notification) => {
-      const isRead = !unreadNotificationIds.includes(notification.id as number);
-      return {
-        ...notification,
-        isRead,
-      };
-    });
-    return notificationsWithStatus;
-  }, [notifications, newNotifications, unreadNotificationIds]);
+  // TODO: return a list of new notifications once WS message can be used
+  // const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
+  //   return  [...newNotifications, ...notifications];
+  // }, [notifications, newNotifications]);
 
   const renderNotification = useCallback(
     (item: newnewapi.INotification) => (
@@ -233,8 +133,8 @@ export const Notifications = () => {
           )}
         </SHeadingWrapper>
 
-        {displayedNotifications.length > 0 ? (
-          displayedNotifications?.map(renderNotification)
+        {notifications.length > 0 ? (
+          notifications?.map(renderNotification)
         ) : !hasMore ? (
           <NoResults />
         ) : !initialLoadDone ? (
@@ -274,10 +174,12 @@ export const Notifications = () => {
 export default Notifications;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Notifications',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Notifications'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {
@@ -298,8 +200,12 @@ const SGeneral = styled(General)`
 `;
 
 const SContent = styled.div`
-  max-width: 600px;
   margin: 0 auto;
+  max-width: 704px;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 608px;
+  }
 `;
 
 const SHeadingWrapper = styled.div`

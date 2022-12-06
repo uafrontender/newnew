@@ -72,6 +72,7 @@ import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -155,7 +156,7 @@ export const CreationSecondStepContent: React.FC<
   const [titleError, setTitleError] = useState('');
 
   const [isTutorialVisible, setIsTutorialVisible] = useState(false);
-  const [tutorialType, setTutorialType] = useState('AC');
+  const [tutorialType, setTutorialType] = useState<'AC' | 'MC' | 'CF'>('AC');
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -677,7 +678,9 @@ export const CreationSecondStepContent: React.FC<
       <>
         <SItemWrapper>
           {/* TODO: move to locales */}
-          <SInputLabel htmlFor='title'>Title</SInputLabel>
+          <SInputLabel htmlFor='title'>
+            {t('secondStep.input.label')}
+          </SInputLabel>
           <RichTextArea
             id='title'
             value={post?.title}
@@ -815,7 +818,7 @@ export const CreationSecondStepContent: React.FC<
                   options={expireOptions}
                   onChange={handleItemChange}
                   formattedValue={t(
-                    `secondStep.field.expiresAt.options.${post.expiresAt}`
+                    `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
                   formattedDescription={formatExpiresAt().format(
                     'DD MMM [at] hh:mm A'
@@ -829,7 +832,7 @@ export const CreationSecondStepContent: React.FC<
                   value={post.startsAt}
                   onChange={handleItemChange}
                   formattedValue={t(
-                    `secondStep.field.startsAt.modal.type.${post.startsAt?.type}`
+                    `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
                   formattedDescription={formatStartsAt().format(
                     'DD MMM [at] hh:mm A'
@@ -850,7 +853,7 @@ export const CreationSecondStepContent: React.FC<
                 maxItems={5}
                 onChange={handleItemChange}
                 formattedValue={t(
-                  `secondStep.field.expiresAt.options.${post.expiresAt}`
+                  `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
                 formattedDescription={formatExpiresAt().format(
                   'DD MMM [at] hh:mm A'
@@ -1206,6 +1209,7 @@ export const CreationSecondStepContent: React.FC<
                 </TabletFieldWrapper>
               </SItemWrapper>
             )}
+
             {isMobile ? (
               <SButtonWrapper>
                 <SButtonContent>
@@ -1267,7 +1271,7 @@ export const CreationSecondStepContent: React.FC<
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            {user.userData?.nickname}
+                            {getDisplayname(user.userData)}
                           </SUserTitle>
                           {user.userData?.options?.isVerified && (
                             <SInlineSvg

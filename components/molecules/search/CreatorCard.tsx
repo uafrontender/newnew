@@ -21,6 +21,7 @@ import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { useBundles } from '../../../contexts/bundlesContext';
 import { formatNumber } from '../../../utils/format';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -146,7 +147,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SUserAvatar>
       </SUserAvatarContainer>
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
-        <SDisplayName>{creator.nickname}</SDisplayName>
+        <SDisplayName>{getDisplayname(creator)}</SDisplayName>
         {creator.options?.isVerified && (
           <SInlineSVG
             svg={VerificationCheckmark}
@@ -205,9 +206,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          creator.nickname ? creator.nickname || `@${creator.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(creator)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
@@ -241,6 +240,7 @@ const SBackground = styled.div`
   left: 10px;
   right: 10px;
   top: 10px;
+  object-fit: cover;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   overflow: hidden;
 `;

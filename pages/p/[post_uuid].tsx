@@ -45,6 +45,7 @@ import { NextPageWithLayout } from '../_app';
 import GeneralLayout from '../../components/templates/General';
 import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 interface IPostPage {
   postUuid: string;
@@ -366,7 +367,7 @@ const PostPage: NextPage<IPostPage> = ({
         _stage: 'Post',
         _postUuid: newPostParsed.postUuid,
       });
-      router.push(`/post/${newPostParsed.postUuid}`);
+      router.push(`/p/${newPostParsed.postUuid}`);
     },
     [router]
   );
@@ -416,6 +417,10 @@ const PostPage: NextPage<IPostPage> = ({
     }
     if (commentContentFromUrl) {
       handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+
+      router.replace(`/p/${postUuid}`, undefined, {
+        shallow: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
@@ -547,7 +552,7 @@ const PostPage: NextPage<IPostPage> = ({
         x: isMobile && !isServerSide ? 500 : 0,
         opacity: 0,
         transition: {
-          duration: isMobile ? 0.3 : 0.3,
+          duration: isMobile ? 0.3 : 0,
         },
       }}
       animate={{
@@ -588,15 +593,15 @@ const PostPage: NextPage<IPostPage> = ({
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
       >
         <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
+          <title>{typeOfPost ? t(`meta.${typeOfPost}.title`) : ''}</title>
           <meta
             name='description'
-            content={t(`meta.${typeOfPost}.description`)}
+            content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}
           />
           <meta property='og:title' content={postParsed?.title} />
           <meta
             property='og:url'
-            content={`${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`}
+            content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`}
           />
           <meta
             property='og:image'
@@ -677,13 +682,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     comment_content,
     save_card,
   } = context.query;
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Post',
-    'modal-ResponseSuccessModal',
-    'component-PostCard',
-    'modal-PaymentModal',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    [
+      'common',
+      'page-Post',
+      'modal-ResponseSuccessModal',
+      'component-PostCard',
+      'modal-PaymentModal',
+    ],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   if (!post_uuid || Array.isArray(post_uuid)) {
     return {

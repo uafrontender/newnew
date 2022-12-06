@@ -62,7 +62,7 @@
     "dashboard": "Panel",
     "createOnNewnew": "Crear ahora",
     "cancel": "Cancelar",
-    "takeMeHome_NEED_TRANSLATION": "Take me home"
+    "takeMeHome": "Regresar a la página de inicio"
   },
   "footer": {
     "topTitle": "NewNew",
@@ -152,12 +152,12 @@
       }
     },
     "buyBundleSuccess": {
-      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes unlocked",
+      "votes": "<0>{{amount}}</0> votos desbloqueados",
       "for": "para <0>{{creator}}</0>",
       "access": "Quedan {{amount}} {{unit}} de:",
-      "customOptions_NEED_TRANSLATION": "adding custom superpoll options",
+      "customOptions": "añadir opciones personalizadas a la superpoll",
       "chat": "chat privado 1 a 1",
-      "button_NEED_TRANSLATION": "Sounds good!",
+      "button": "¡Suena bien!",
       "unit": {
         "month": "mes",
         "months": "meses"
@@ -224,7 +224,9 @@
     "numbers-of-bids-most-first": "El mayor número de ofertas primero"
   },
   "toastErrors": {
-    "generic": "Se ha producido un error, inténtalo de nuevo más tarde"
+    "generic": "Se ha producido un error, inténtalo de nuevo más tarde",
+    "serverError_NEED_TRANSLATION": "A server-side error occurred, please try again later",
+    "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later"
   },
   "smsNotifications": {
     "title": "¿Cuál es tu número telefónico?",

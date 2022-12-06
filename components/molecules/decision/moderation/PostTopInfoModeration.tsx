@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
@@ -29,6 +30,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
+import { TPostType } from '../../../../utils/switchPostType';
 
 const DARK_IMAGES = {
   ac: assets.creation.darkAcAnimated,
@@ -177,46 +179,49 @@ const PostTopInfoModeration: React.FunctionComponent<
           </SBidsAmount>
         ) : null}
         <SCreatorCard>
-          <a
-            href={`${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/profile/my-posts`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on own avatar', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SAvatarArea>
-              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
-            </SAvatarArea>
-          </a>
-          <a
-            href={`${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/profile/my-posts`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on own username', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SUsername className='username'>
-              {t('me')}
-              {creator.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                  fill='none'
+          <Link href='/profile/my-posts'>
+            <a
+              href='/profile/my-posts'
+              onClickCapture={() => {
+                Mixpanel.track('Click on own avatar', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SAvatarArea>
+                <img
+                  src={creator.avatarUrl ?? ''}
+                  alt={creator.username ?? ''}
                 />
-              )}
-            </SUsername>
-          </a>
+              </SAvatarArea>
+            </a>
+          </Link>
+          <Link href='/profile/my-posts'>
+            <a
+              href='/profile/my-posts'
+              onClickCapture={() => {
+                Mixpanel.track('Click on own username', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SUsername className='username'>
+                {t('me')}
+                {creator.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
+              </SUsername>
+            </a>
+          </Link>
         </SCreatorCard>
         <SActionsDiv>
           <SShareButton
@@ -270,7 +275,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenuModeration
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               isVisible={ellipseMenuOpen}
               canDeletePost={postStatus !== 'succeeded'}
               handleClose={handleEllipseMenuClose}
@@ -280,7 +285,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModalModeration
-              postType={typeOfPost as string}
+              postType={typeOfPost as TPostType}
               zIndex={11}
               canDeletePost={postStatus !== 'succeeded'}
               isOpen={ellipseMenuOpen}
@@ -312,7 +317,11 @@ const PostTopInfoModeration: React.FunctionComponent<
           title={t('postFailedBoxModeration.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`postFailedBoxModeration.reason.${failureReason}`)}
+          body={
+            failureReason
+              ? t(`postFailedBoxModeration.reason.${failureReason}`)
+              : ''
+          }
           imageSrc={
             postType
               ? theme.name === 'light'
@@ -342,7 +351,7 @@ const PostTopInfoModeration: React.FunctionComponent<
       )}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
-        postType={typeOfPost as string}
+        postType={typeOfPost as TPostType}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
         handleConfirmDelete={handleDeletePost}

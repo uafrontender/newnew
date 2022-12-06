@@ -14,6 +14,7 @@ import {
 } from '../../atoms/chat/styles';
 
 import BuyBundleModal from '../bundles/BuyBundleModal';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ISubscriptionExpired {
   user: newnewapi.IUser;
@@ -33,14 +34,14 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
               <SBottomActionTitle>
                 {t('subscriptionExpired.title')}
               </SBottomActionTitle>
-              {myRole === 1 && (
+              {myRole === 1 && user.options?.isOfferingBundles && (
                 <SBottomActionMessage>
-                  {t('subscriptionExpired.message')} {user.username}
+                  {t('subscriptionExpired.message')} {getDisplayname(user)}
                 </SBottomActionMessage>
               )}
             </SBottomActionText>
           </SBottomActionLeft>
-          {myRole === 1 && (
+          {myRole === 1 && user.options?.isOfferingBundles && (
             <SBottomActionButton
               withDim
               withShrink

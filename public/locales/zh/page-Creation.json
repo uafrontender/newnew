@@ -32,6 +32,7 @@
       "description-crowdfunding": "利用眾籌為你的生活Goal提供資金並賺取收入"
     },
     "input": {
+      "label": "頭銜",
       "placeholder": "例如，我應該在哪裡做我的第一個紋身 \uD83D\uDE4A"
     },
     "fileUpload": {

@@ -35,9 +35,9 @@ const CreatorOnboardingLayout: React.FunctionComponent<
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const SideTextSwitch = () => {
+  const SideTextSwitch = (): 'stripeSection' | 'detailsSection' => {
     if (router.pathname.includes('creator-onboarding-stripe')) {
-      return 'titleSetUpStripe';
+      return 'stripeSection';
     }
     // if (router.pathname.includes('creator-onboarding-subrate')) {
     //   return 'subRateSection';

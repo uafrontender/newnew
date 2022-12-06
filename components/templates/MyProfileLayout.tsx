@@ -37,6 +37,7 @@ import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../utils/getDisplayname';
 
 type TPageType =
   | 'activelyBidding'
@@ -578,7 +579,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         <SUserData>
           <SUsernameWrapper>
             <SUsername variant={4}>
-              {user.userData?.nickname}
+              {getDisplayname(user.userData)}
               {user.userData?.options?.isVerified && (
                 <SInlineSVG
                   svg={VerificationCheckmark}
@@ -593,7 +594,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 {t(
                   `genderPronouns.${
                     getGenderPronouns(user.userData?.genderPronouns!!).name
-                  }`
+                  }` as any
                 )}
               </SGenderPronouns>
             )}

@@ -60,7 +60,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
           ? dhms.hours === '1'
             ? 'mcPostAwaiting.hero.expires.hours_singular'
             : 'mcPostAwaiting.hero.expires.hours'
-          : ''
+          : ('' as any)
       )}`;
 
       if (dhms.days === '0') {
@@ -130,7 +130,9 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
@@ -182,36 +184,40 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                 <WaitingForResponseBox
                   title={t('mcPostAwaiting.hero.title')}
                   body={t('mcPostAwaiting.hero.body', {
-                    creator: post.creator?.nickname,
+                    creator: getDisplayname(post.creator),
                     time: waitingTime,
                   })}
                 />
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <a href={`/${post.creator?.username}`}>
-                        <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                      </a>
-                      <a href={`/${post.creator?.username}`}>
-                        <SWantsToKnow>
-                          <Trans
-                            t={t}
-                            i18nKey='mcPostAwaiting.wantsToKnow'
-                            // @ts-ignore
-                            components={[
-                              post.creator?.options?.isVerified ? (
-                                <SInlineSVG
-                                  svg={VerificationCheckmark}
-                                  width='16px'
-                                  height='16px'
-                                  fill='none'
-                                />
-                              ) : null,
-                              { creator: post.creator?.nickname },
-                            ]}
-                          />
-                        </SWantsToKnow>
-                      </a>
+                      <Link href={`/${post.creator?.username}`}>
+                        <a href={`/${post.creator?.username}`}>
+                          <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                        </a>
+                      </Link>
+                      <Link href={`/${post.creator?.username}`}>
+                        <a href={`/${post.creator?.username}`}>
+                          <SWantsToKnow>
+                            <Trans
+                              t={t}
+                              i18nKey='mcPostAwaiting.wantsToKnow'
+                              // @ts-ignore
+                              components={[
+                                post.creator?.options?.isVerified ? (
+                                  <SInlineSVG
+                                    svg={VerificationCheckmark}
+                                    width='16px'
+                                    height='16px'
+                                    fill='none'
+                                  />
+                                ) : null,
+                                { creator: getDisplayname(post.creator) },
+                              ]}
+                            />
+                          </SWantsToKnow>
+                        </a>
+                      </Link>
                     </SCreator>
                     <STotal>
                       {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}

@@ -63,10 +63,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   };
 
   useEffect(() => {
-    let timeout: any;
-
     const handleScroll = (e: Event) => {
-      clearTimeout(timeout);
       const containerWidth =
         containerRef.current?.getBoundingClientRect().width;
       const containerScrollWidth = containerRef.current?.scrollWidth;
@@ -77,11 +74,9 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         containerScrollWidth &&
         currentScrollLeft !== undefined
       ) {
-        timeout = setTimeout(() => {
-          const currentIndex = Math.floor(currentScrollLeft / containerWidth);
+        const currentIndex = Math.floor(currentScrollLeft / containerWidth);
 
-          setCurrentVideo(currentIndex);
-        }, 350);
+        setCurrentVideo(currentIndex);
       }
     };
 
@@ -91,7 +86,6 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
     return () => {
       containerRef.current?.removeEventListener('scroll', handleScroll);
-      clearTimeout(timeout);
     };
   }, [videosLength]);
 
@@ -269,6 +263,7 @@ const SDotsContainer = styled.div<{
   gap: 4px;
 
   transition: 0.1s linear;
+  transition: bottom 0s linear;
 
   ${({ theme }) => theme.media.tablet} {
     bottom: 45px;

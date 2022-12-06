@@ -26,9 +26,6 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-// import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
-// import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-// import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
@@ -48,6 +45,7 @@ import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import getDisplayname from '../../utils/getDisplayname';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -92,8 +90,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
   );
-
-  // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
   const { bundles } = useBundles();
@@ -465,7 +461,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Favorites and more options buttons */}
           <SBackButton
             onClick={() => {
-              router.push('/');
+              router.back();
             }}
           />
           {/* <SFavoritesButton
@@ -538,7 +534,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
-                {user.nickname}
+                {getDisplayname(user)}
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -553,7 +549,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   {t(
                     `genderPronouns.${
                       getGenderPronouns(user.genderPronouns!!).name
-                    }`
+                    }` as any
                   )}
                 </SGenderPronouns>
               )}
@@ -653,9 +649,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          user.nickname ? user.nickname || `@${user.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(user)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />

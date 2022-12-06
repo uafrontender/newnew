@@ -103,10 +103,10 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
         <SWrapper>
           <SContent>
             <STitle variant={1} weight={700}>
-              {t(`first-step-${itemKey}-title`)}
+              {t(`first-step-${itemKey}-title` as any)}
             </STitle>
             <SDescription variant={2} weight={600}>
-              {t(`first-step-${itemKey}-sub-title`)}
+              {t(`first-step-${itemKey}-sub-title` as any)}
             </SDescription>
           </SContent>
           <SImageWrapper>
@@ -147,8 +147,11 @@ const SWrapper = styled.div`
   justify-content: center;
   background-color: ${(props) => props.theme.colorsThemed.background.secondary};
 
-  :hover {
-    background-color: ${(props) => props.theme.colorsThemed.background.quinary};
+  @media (hover: hover) {
+    :hover {
+      background-color: ${(props) =>
+        props.theme.colorsThemed.background.quinary};
+    }
   }
 
   ${(props) => props.theme.media.tablet} {

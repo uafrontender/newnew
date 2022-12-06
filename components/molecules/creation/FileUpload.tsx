@@ -2,7 +2,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -87,7 +86,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   handleCancelVideoUpload,
 }) => {
   const { t } = useTranslation('page-Creation');
-  const { showErrorToastCustom } = useErrorToasts();
+  const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -96,8 +95,6 @@ const FileUpload: React.FC<IFileUpload> = ({
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-
-  const { showErrorToastPredefined } = useErrorToasts();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
@@ -225,7 +222,7 @@ const FileUpload: React.FC<IFileUpload> = ({
         }
       }
     },
-    [id, onChange, showErrorToastCustom, t]
+    [id, showErrorToastCustom, onChange, t]
   );
 
   const handleRetryVideoUpload = useCallback(() => {

@@ -7,20 +7,20 @@ import React, {
 } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import {
   PaymentElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import OptionCard from './OptionCard';
 import Input from '../../atoms/Input';
 import CheckMark from '../CheckMark';
+import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 import { formatNumber } from '../../../utils/format';
 import { useCards } from '../../../contexts/cardsContext';
@@ -56,9 +56,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   bottomCaption,
   handlePayWithCard,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
-  const { showErrorToastCustom } = useErrorToasts();
+  const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
   const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 
@@ -127,7 +126,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           });
 
           if (errorKey) {
-            throw new Error(t(errorKey));
+            throw new Error(t(errorKey as any));
           }
         }
 
@@ -163,11 +162,11 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
+  } = useRecaptcha(handleSubmit, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
-      showErrorToastCustom(recaptchaErrorMessage);
+      showErrorToastPredefined(recaptchaErrorMessage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
@@ -191,7 +190,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         if (userData?.options?.isWhiteListed) {
           handleSubmit();
         } else {
-          submitWithRecaptchaProtection(e);
+          submitWithRecaptchaProtection();
         }
       }}
     >
@@ -257,15 +256,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       )}
 
       {isRecaptchaV2Required && (
-        <SRecaptchaWrapper>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            size='normal'
-            theme={theme.name === 'dark' ? 'dark' : 'light'}
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
-            onChange={onChangeRecaptchaV2}
-          />
-        </SRecaptchaWrapper>
+        <SReCaptchaV2 onChange={onChangeRecaptchaV2} ref={recaptchaRef} />
       )}
 
       <SPayButtonDiv>
@@ -360,8 +351,9 @@ const SEmailInput = styled(Input)`
   }
 `;
 
-const SRecaptchaWrapper = styled.div`
+const SReCaptchaV2 = styled(ReCaptchaV2)`
   margin-top: 20px;
+  z-index: 20;
 `;
 
 const SPayButtonDiv = styled.div`

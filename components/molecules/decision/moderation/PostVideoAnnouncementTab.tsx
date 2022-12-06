@@ -23,6 +23,7 @@ const PostBitmovinPlayer = dynamic(
 interface IPostVideoAnnouncementTab {
   postId: string;
   announcement: newnewapi.IVideoUrls;
+  hasCoverImage: boolean;
   isMuted: boolean;
   isSetThumbnailButtonIconOnly: boolean;
   ellipseButtonRef: any;
@@ -36,6 +37,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
 > = ({
   postId,
   announcement,
+  hasCoverImage,
   isMuted,
   isSetThumbnailButtonIconOnly,
   ellipseButtonRef,
@@ -109,7 +111,9 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
               : {}),
           }}
         >
-          {t('postVideo.setThumbnail')}
+          {hasCoverImage
+            ? t('postVideo.changeThumbnail')
+            : t('postVideo.setThumbnail')}
         </SSetThumbnailButton>
       )}
       <PostVideoSoundButton
@@ -135,6 +139,8 @@ const SSetThumbnailButtonIconOnly = styled(Button)`
 
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
+  transition: bottom 0s linear;
+
   ${({ theme }) => theme.media.tablet} {
     right: initial;
     left: 16px;
@@ -159,6 +165,8 @@ const SSetThumbnailButton = styled(Button)`
 
   padding: 8px;
   height: 36px;
+
+  transition: bottom 0s linear;
 
   border-radius: ${({ theme }) => theme.borderRadius.small};
 

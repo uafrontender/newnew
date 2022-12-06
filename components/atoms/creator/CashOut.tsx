@@ -79,7 +79,7 @@ const CashOut: React.FC<ICashOut> = ({
           width='48px'
           height='48px'
         />
-        <SDescriptionWrapper>
+        <div>
           {nextCashOutAmount && nextCashOutAmount.usdCents ? (
             <SStripeBlock>
               <SStripeBlockText variant={2} weight={600}>
@@ -94,7 +94,7 @@ const CashOut: React.FC<ICashOut> = ({
               <SButtons>
                 {stripeLink?.link && (
                   <a href={stripeLink.link} target='_blank'>
-                    <SButton view='primaryGrad'>
+                    <SButton view='common'>
                       {t('dashboard.earnings.cashOut.stripeButton')}
                     </SButton>
                   </a>
@@ -112,19 +112,19 @@ const CashOut: React.FC<ICashOut> = ({
             </SDescription>
           )}
           {nextCashOutDate && (
-            <SDescription variant={3} weight={600}>
+            <SDescriptionAutoPayout variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
                 date: moment((nextCashOutDate.seconds as number) * 1000).format(
                   'MMM DD YYYY'
                 ),
               })}
-            </SDescription>
+            </SDescriptionAutoPayout>
           )}
-        </SDescriptionWrapper>
+        </div>
       </SCashOutTopBlock>
       {!stripeLink ? (
         <a href='https://creatorpayouts.newnew.co/' target='_blank'>
-          <SButton view='primaryGrad'>
+          <SButton view='common'>
             {t('dashboard.earnings.cashOut.submit')}
           </SButton>
         </a>
@@ -175,32 +175,20 @@ const SCashOutTopBlock = styled.div`
   flex-direction: row;
 `;
 
-const SDescriptionWrapper = styled.div`
-  div {
-    /* display: inline; */
-  }
-`;
-
 const SDescription = styled(Text)`
   color: rgba(255, 255, 255, 0.7);
-  /* margin-top: 8px; */
+`;
+
+const SDescriptionAutoPayout = styled(Text)`
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 14px;
+  margin-left: 20px;
 `;
 
 const SButton = styled(Button)`
   width: 100%;
-  color: ${(props) => props.theme.colors.black};
   padding: 16px 20px;
   margin-top: 16px;
-  background: ${(props) => props.theme.colors.white};
-
-  &:after {
-    display: none;
-  }
-
-  &:focus:enabled,
-  &:hover:enabled {
-    background: ${(props) => props.theme.colors.white};
-  }
 
   ${(props) => props.theme.media.tablet} {
     width: unset;

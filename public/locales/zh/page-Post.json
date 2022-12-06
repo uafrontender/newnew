@@ -34,7 +34,7 @@
     "minutes": "分",
     "seconds": "秒",
     "ended_on": "結束於",
-    "end_date_NEED_TRANSLATION": "End date:"
+    "end_date": "結束日期:"
   },
   "expiresResponse": {
     "days": "天",
@@ -54,13 +54,13 @@
   },
   "paymentSuccessModal": {
     "title": {
-      "ac_NEED_TRANSLATION": "Bid is in!",
-      "mc_NEED_TRANSLATION": "Votes are in!",
-      "mc-single_NEED_TRANSLATION": "Vote is in!",
+      "ac": "出價成功！",
+      "mc": "投票成功！",
+      "mc-single": "投票成功！",
       "cf": "你選擇支持這個Goal！"
     },
     "doneButton": "聽起來不錯！",
-    "ac_NEED_TRANSLATION": "{{postCreator}} will pick their favorite one once the Bid is over.",
+    "ac": "{{postCreator}}將在競標結束後挑選他們最喜歡的一個。",
     "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
     "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
   },
@@ -422,11 +422,11 @@
           "voteButton": "投票"
         }
       },
-      "confirmCustomOptionModal_NEED_TRANSLATION": {
-        "title": "Add your custom option",
-        "line_1": "Ready to add your free custom option to this post?",
-        "line_2": "Once you do, you won't be able to add another one.",
-        "useFreeVoteButton": "Add custom option"
+      "confirmCustomOptionModal": {
+        "title": "添加自訂選項",
+        "line_1": "添加自訂選項",
+        "line_2": "一旦添加，就不能再次添加其他的了。",
+        "useFreeVoteButton": "添加自訂選項"
       },
       "useBundleVotesModal": {
         "votesAvailable": "還有<0>{{amount}}</0> 票",
@@ -445,8 +445,8 @@
         "placeABidButton": "添加我的選項",
         "offersBundles": "{{creator}} 提供Superpoll Bundle",
         "viewBundles": "查看Bundle",
-        "getMoreBundles_NEED_TRANSLATION": "Get another Superpoll Bundle",
-        "getBundles_NEED_TRANSLATION": "Get it"
+        "getMoreBundles": "獲得另一個Superpoll Bundle",
+        "getBundles": "獲取"
       }
     },
     "winnerTab": {

@@ -26,11 +26,12 @@ import {
   setColorMode,
   TColorMode,
 } from '../../redux-store/slices/uiStateSlice';
+import { I18nNamespaces } from '../../@types/i18next';
 
 interface IFooter {}
 
 type TItem = {
-  key: string;
+  key: keyof I18nNamespaces['common']['footer'];
   url: string;
   iconSrc?: string;
   email?: boolean;
@@ -78,7 +79,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
       iconSrc: twitterIcon,
     }, */
     {
-      key: 'email',
+      key: 'email' as any,
       url: 'hi@newnew.co',
       // external: true,
       email: true,

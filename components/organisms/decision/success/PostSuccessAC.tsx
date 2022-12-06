@@ -102,6 +102,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     useEffect(() => {
       const handleCommentsInitialHash = () => {
         const { hash } = window.location;
+        console.log(hash);
+
         if (!hash) {
           return;
         }
@@ -109,7 +111,9 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {
-          document.getElementById('comments')?.scrollIntoView();
+          setTimeout(() => {
+            document.getElementById('comments')?.scrollIntoView();
+          }, 100);
         }
       };
 
@@ -169,29 +173,33 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <a href={`/${post.creator?.username}`}>
-                        <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                      </a>
-                      <a href={`/${post.creator?.username}`}>
-                        <SWantsToKnow>
-                          <Trans
-                            t={t}
-                            i18nKey='acPostSuccess.wantsToKnow'
-                            // @ts-ignore
-                            components={[
-                              post.creator?.options?.isVerified ? (
-                                <SInlineSVG
-                                  svg={VerificationCheckmark}
-                                  width='16px'
-                                  height='16px'
-                                  fill='none'
-                                />
-                              ) : null,
-                              { creator: post.creator?.nickname },
-                            ]}
-                          />
-                        </SWantsToKnow>
-                      </a>
+                      <Link href={`/${post.creator?.username}`}>
+                        <a href={`/${post.creator?.username}`}>
+                          <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
+                        </a>
+                      </Link>
+                      <Link href={`/${post.creator?.username}`}>
+                        <a href={`/${post.creator?.username}`}>
+                          <SWantsToKnow>
+                            <Trans
+                              t={t}
+                              i18nKey='acPostSuccess.wantsToKnow'
+                              // @ts-ignore
+                              components={[
+                                post.creator?.options?.isVerified ? (
+                                  <SInlineSVG
+                                    svg={VerificationCheckmark}
+                                    width='16px'
+                                    height='16px'
+                                    fill='none'
+                                  />
+                                ) : null,
+                                { creator: getDisplayname(post.creator) },
+                              ]}
+                            />
+                          </SWantsToKnow>
+                        </a>
+                      </Link>
                     </SCreator>
                     {post.totalAmount?.usdCents &&
                     post.totalAmount?.usdCents > 0 ? (

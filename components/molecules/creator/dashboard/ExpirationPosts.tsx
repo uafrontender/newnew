@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
@@ -46,29 +44,24 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
   useEffect(() => {
     if (expirationPosts) {
-      // eslint-disable-next-line no-param-reassign
-      if (expirationPosts.length > 3) expirationPosts.length = 3;
       setPosts(expirationPosts);
     }
   }, [expirationPosts]);
 
   const getAmountValue = (
-    postType: string,
     data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
   ) => {
     let centsQty = 0;
 
-    if (postType === 'multipleChoice') {
-      const localData = data as newnewapi.MultipleChoice;
-      if (localData.votePrice?.usdCents) {
-        centsQty = localData.totalVotes * localData.votePrice.usdCents;
-      }
-    } else {
-      const localData = data as newnewapi.Crowdfunding | newnewapi.Auction;
-      if (localData.totalAmount?.usdCents) {
-        centsQty = localData.totalAmount.usdCents;
-      }
+    const localData = data as
+      | newnewapi.MultipleChoice
+      | newnewapi.Crowdfunding
+      | newnewapi.Auction;
+
+    if (localData.totalAmount?.usdCents) {
+      centsQty = localData.totalAmount.usdCents;
     }
+
     return `$${formatNumber(centsQty / 100 ?? 0, false)}`;
   };
 
@@ -89,7 +82,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         | newnewapi.MultipleChoice;
       const handleShareClick = () => {
         if (window) {
-          const url = `${window.location.origin}/post/${data.postUuid}`;
+          const url = `${window.location.origin}/p/${data.postUuid}`;
           copyPostUrlToClipboard(url)
             .then(() => {
               setIsCopiedUrlIndex(index);
@@ -103,7 +96,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         }
       };
 
-      const money = getAmountValue(postType, data);
+      const money = getAmountValue(data);
 
       return (
         <SListItemWrapper key={data.postUuid}>
@@ -140,7 +133,9 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
                 <SListBodyItem width='100px' align='flex-start'>
                   <SListBodyItemText variant={3} weight={600}>
-                    {t(`dashboard.expirationPosts.postTypes.${postType}`)}
+                    {t(
+                      `dashboard.expirationPosts.postTypes.${postType}` as any
+                    )}
                   </SListBodyItemText>
                 </SListBodyItem>
 
@@ -151,7 +146,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 </SListBodyItem>
 
                 <SListBodyItem width='150px' align='center'>
-                  <Link href={`/post/${data.postUuid}`}>
+                  <Link href={`/p/${data.postUuid}`}>
                     <a>
                       <SListDecideButton view='primary'>
                         {t('dashboard.expirationPosts.decide.desktop')}
@@ -198,7 +193,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                     />
                   )}
                 </SListShareButton>
-                <Link href={`/post/${data.postUuid}`}>
+                <Link href={`/p/${data.postUuid}`}>
                   <a>
                     <SListDecideButton view='primary'>
                       {t('dashboard.expirationPosts.decide.mobile')}

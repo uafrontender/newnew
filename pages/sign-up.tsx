@@ -13,6 +13,8 @@ import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
 import SignupMenu from '../components/organisms/SignupMenu';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { I18nNamespaces } from '../@types/i18next';
 
 // Sign up reasons
 export const signupReasons = [
@@ -47,7 +49,7 @@ const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
     const handlerHistory = () => {
       const postId = window?.history?.state?.postId;
       if (postId && window?.history?.state?.fromPost) {
-        router.push(`/post/${postId}`);
+        router.push(`/p/${postId}`);
       }
     };
 
@@ -61,18 +63,44 @@ const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
   return (
     <>
       <Head>
-        <title>{t(`meta.title${goal ? `-${goal}` : ''}`)}</title>
+        <title>
+          {t(
+            `meta.${
+              `title${
+                goal ? `-${goal}` : ''
+              }` as keyof I18nNamespaces['page-SignUp']['meta']
+            }`
+          )}
+        </title>
         <meta
           name='description'
-          content={t(`meta.description${goal ? `-${goal}` : ''}`)}
+          content={t(
+            `meta.${
+              `description${
+                goal ? `-${goal}` : ''
+              }` as keyof I18nNamespaces['page-SignUp']['meta']
+            }`
+          )}
         />
         <meta
           property='og:title'
-          content={t(`meta.title${goal ? `-${goal}` : ''}`)}
+          content={t(
+            `meta.${
+              `title${
+                goal ? `-${goal}` : ''
+              }` as keyof I18nNamespaces['page-SignUp']['meta']
+            }`
+          )}
         />
         <meta
           property='og:description'
-          content={t(`meta.description${goal ? `-${goal}` : ''}`)}
+          content={t(
+            `meta.${
+              `description${
+                goal ? `-${goal}` : ''
+              }` as keyof I18nNamespaces['page-SignUp']['meta']
+            }`
+          )}
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -111,11 +139,12 @@ export default Signup;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { to, reason, redirect } = context.query;
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-SignUp',
-    'page-VerifyEmail',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-SignUp', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';
   const goal = to && !Array.isArray(to) ? to : '';

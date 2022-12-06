@@ -198,6 +198,9 @@
         "title": "My cards",
         "myPaymentMethods": "My payment methods",
         "hint": "You’ll need a card on file to participate in posts",
+        "adding": "Adding a new card...",
+        "ooops": "Ooops!",
+        "success": "Congratulations!",
         "button": {
           "addNewCard": "Add a new card",
           "addCard": "Add card"

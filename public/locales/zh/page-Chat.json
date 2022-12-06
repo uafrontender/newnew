@@ -5,7 +5,7 @@
   "chat": {
     "today": "今天",
     "placeholder": "輸入訊息...",
-    "welcomeMessage_NEED_TRANSLATION": "You can now message",
+    "welcomeMessage": "你現在可以發訊息",
     "noMessagesFirstLine": "還沒有訊息...",
     "noMessagesSecondLine": "發送訊息，開始對話,",
     "typing": "正在輸入......"
@@ -21,13 +21,13 @@
     "buttonText": "解除屏蔽"
   },
   "subscriptionExpired": {
-    "title_NEED_TRANSLATION": "Private Messaging is expired",
-    "message_NEED_TRANSLATION": "Buy a new Superpoll bundle to message",
-    "buttonText_NEED_TRANSLATION": "Buy a bundle"
+    "title": "私人訊息已過期",
+    "message": "購買新的Superpoll Bundle並發送訊息",
+    "buttonText": "購買Bundle"
   },
   "messagingDisabled": {
     "title": "訊息傳遞已關閉",
-    "message_NEED_TRANSLATION": " temporarily turned off their private messages. Check back soon!"
+    "message": "暫時關閉了他們的私人訊息。請稍後回來查看！"
   },
   "accountDeleted": {
     "title": "帳戶已刪除",
@@ -35,7 +35,7 @@
     "buttonText": "刪除聊天"
   },
   "toolbar": {
-    "searchPlaceholder_NEED_TRANSLATION": "Search for users"
+    "searchPlaceholder": "搜索用戶"
   },
   "modal": {
     "blockUser": {
@@ -76,13 +76,16 @@
     "searchPlaceholder": "搜索"
   },
   "announcement": {
-    "title": "{{username}}的公告",
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "",
+    "afterName": "的公告",
     "topMessageStart": "只有",
     "topMessageEnd": "可以發送訊息"
   },
   "userTypes": {
     "all": "所有的",
-    "subscribers_NEED_TRANSLATION": "Bundle Owners",
+    "subscribers": "Bundle所有者",
     "subscribing": "創作者"
   },
   "dates": {

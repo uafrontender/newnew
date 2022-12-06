@@ -26,6 +26,7 @@ import iconBundlesFilled from '../../public/images/svg/icons/filled/Bundles.svg'
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 import { Mixpanel } from '../../utils/mixpanel';
+import { I18nNamespaces } from '../../@types/i18next';
 
 const icons: any = {
   outlined: {
@@ -51,7 +52,7 @@ const icons: any = {
 };
 
 export type TBottomNavigationItem = {
-  key: string;
+  key: keyof I18nNamespaces['common']['mobileBottomNavigation'];
   url: string;
   counter?: number;
   actionHandler?: () => void;

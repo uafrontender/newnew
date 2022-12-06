@@ -16,6 +16,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import assets from '../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
@@ -179,14 +180,19 @@ export async function getServerSideProps(
   context: GetServerSidePropsContext
 ): Promise<any> {
   try {
-    const translationContext = await serverSideTranslations(context.locale!!, [
-      'common',
-      'page-Profile',
-      'component-PostCard',
-      'page-Post',
-      'modal-PaymentModal',
-      'modal-ResponseSuccessModal',
-    ]);
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Profile',
+        'component-PostCard',
+        'page-Post',
+        'modal-PaymentModal',
+        'modal-ResponseSuccessModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
+    );
 
     // const { req } = context;
     // // Try to fetch only if actual SSR needed

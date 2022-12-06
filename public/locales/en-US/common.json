@@ -225,7 +225,8 @@
   },
   "toastErrors": {
     "generic": "An error occurred, please try again later",
-    "server-error": "A server-side error occurred, please try again later"
+    "serverError": "A server-side error occurred, please try again later",
+    "recaptchaError": "Recaptcha failed, please try again later"
   },
   "smsNotifications": {
     "title": "What's your number?",

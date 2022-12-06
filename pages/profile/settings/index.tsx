@@ -51,6 +51,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
@@ -489,11 +490,12 @@ const SBlockOption = styled.a`
 export async function getServerSideProps(context: {
   locale: string;
 }): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'common',
-    'page-Profile',
-    'page-VerifyEmail',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale,
+    ['common', 'page-Profile', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   // @ts-ignore
   if (!context?.req?.cookies?.accessToken) {
