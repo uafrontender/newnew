@@ -177,7 +177,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SButton>
       )}
       <SBackground>
-        <Image src={creator.coverUrl ?? ''} layout='fill' />
+        <SImage src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
       {/* Modals */}
       {isMobile && (
@@ -240,9 +240,12 @@ const SBackground = styled.div`
   left: 10px;
   right: 10px;
   top: 10px;
-  object-fit: cover;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   overflow: hidden;
+`;
+
+const SImage = styled(Image)`
+  object-fit: cover;
 `;
 
 const SUserAvatarContainer = styled.div`
