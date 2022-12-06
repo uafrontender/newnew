@@ -152,6 +152,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
     async function syncUserData() {
       try {
+        await setUserTimezone();
+
         const payload = new newnewapi.EmptyRequest({});
 
         const { data } = await getMe(payload);
@@ -425,8 +427,6 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
-      // TODO: timezone in Me can be not updated
-      setUserTimezone();
       syncUserData();
     } else {
       if (!localUserTutorialsProgress) {
