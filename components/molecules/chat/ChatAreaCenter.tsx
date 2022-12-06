@@ -97,7 +97,11 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (decoded) {
         setNewMessage(decoded.newMessage);
-        if (updateLastMessage && chatRoom)
+        if (
+          updateLastMessage &&
+          chatRoom &&
+          !chatRoom.visavis?.isVisavisBlocked
+        )
           updateLastMessage({ roomId: chatRoom.id });
       }
     };
