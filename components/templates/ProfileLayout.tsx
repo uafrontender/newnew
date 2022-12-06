@@ -26,9 +26,6 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-// import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
-// import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-// import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
@@ -93,8 +90,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
   );
-
-  // const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
   const { bundles } = useBundles();
