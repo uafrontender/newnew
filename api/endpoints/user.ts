@@ -425,3 +425,19 @@ export const webPushConfig = (
     payload,
     signal ?? undefined
   );
+
+export const setMyTimezone = (
+  payload: newnewapi.SetMyTimeZoneRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.SetMyTimeZoneRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.SetMyTimeZoneRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_USER}/set_my_timezone`,
+    'post',
+    payload,
+    signal ?? undefined
+  );

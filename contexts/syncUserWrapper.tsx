@@ -12,6 +12,7 @@ import {
   getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
+  setMyTimezone,
 } from '../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
@@ -122,6 +123,28 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   ]);
 
   useEffect(() => {
+    const setUserTimezone = async () => {
+      try {
+        const payload = new newnewapi.SetMyTimeZoneRequest({
+          name: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+
+        await setMyTimezone(payload);
+      } catch (err) {
+        console.error(err);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(
+            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+          );
+        }
+      }
+    };
+
     async function syncUserData() {
       try {
         const payload = new newnewapi.EmptyRequest({});
@@ -397,6 +420,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
+      // TODO: timezone in Me can be not updated
+      setUserTimezone();
       syncUserData();
     } else {
       if (!localUserTutorialsProgress) {
