@@ -111,8 +111,8 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
             className='hourglass-img'
             src={
               theme.name === 'light'
-                ? assets.decision.lightHourglassAnimated
-                : assets.decision.darkHourglassAnimated
+                ? assets.decision.lightHourglassAnimated()
+                : assets.decision.darkHourglassAnimated()
             }
             alt='video is processed'
           />
