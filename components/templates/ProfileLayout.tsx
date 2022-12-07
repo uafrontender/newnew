@@ -129,10 +129,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
     [usersIBlocked, user.uuid]
+  );
+
+  const isBlocked = useMemo(
+    () =>
+      usersIBlocked.includes(user.uuid) || usersBlockedMe.includes(user.uuid),
+    [usersIBlocked, user.uuid, usersBlockedMe]
   );
 
   const unblockUserAsync = async (uuid: string) => {
@@ -489,7 +495,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SFavoritesButton> */}
 
           <SSideButtons>
-            {user.options?.isCreator ? (
+            {user.options?.isCreator && !isBlocked ? (
               <SmsNotificationsButton subscription={subscription} />
             ) : (
               <div />
@@ -616,11 +622,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0 ? (
+          {tabs.length > 0 && !isUserBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
           ) : null}
         </SProfileLayout>
-        {renderChildren()}
+        {!isUserBlocked && renderChildren()}
       </SGeneral>
       {/* Modals */}
       {isMobile && (

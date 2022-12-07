@@ -3,12 +3,13 @@
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 import InlineSvg from '../InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -16,10 +17,16 @@ interface IFunction {
 
 const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
   const { t } = useTranslation('common');
-  return (
-    <SContainer>
-      <SBlockTitle>{t('search.popularCreators')}</SBlockTitle>
-      {creators.map((creator) => (
+  const { usersIBlocked, usersBlockedMe } = useGetBlockedUsers();
+
+  const renderItem = useCallback(
+    (creator: newnewapi.IUser) => {
+      const isBlocked =
+        usersIBlocked.includes(creator.uuid ?? '') ||
+        usersBlockedMe.includes(creator.uuid ?? '');
+
+      if (isBlocked) return null;
+      return (
         <Link href={`/${creator.username}`} key={creator.uuid}>
           <a>
             <SPost>
@@ -47,7 +54,15 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
             </SPost>
           </a>
         </Link>
-      ))}
+      );
+    },
+    [usersIBlocked, usersBlockedMe, t]
+  );
+
+  return (
+    <SContainer>
+      <SBlockTitle>{t('search.popularCreators')}</SBlockTitle>
+      {creators.map(renderItem)}
     </SContainer>
   );
 };
