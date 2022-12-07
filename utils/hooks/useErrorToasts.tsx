@@ -7,6 +7,7 @@ import { toast, ToastOptions } from 'react-toastify';
 export enum ErrorToastPredefinedMessage {
   ServerError = 'serverError',
   RecaptchaError = 'recaptchaError',
+  UnsupportedImageFormatError = 'usupportedImageFormatError',
 }
 
 interface IUseErrorToasts {
