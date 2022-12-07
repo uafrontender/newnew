@@ -376,19 +376,19 @@ const PRE_FETCH_LINKS_DARK = (
     />
     <link
       rel='prefetch'
-      href={assets.signup.darkInto}
+      href={assets.signup.darkIntoAnimated}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.signup.darkOutro}
+      href={assets.signup.darkOutroAnimated}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.decision.darkHourglassAnimated}
+      href={assets.decision.darkHourglassAnimated()}
       as='image'
     />
     <link
@@ -407,19 +407,15 @@ const PRE_FETCH_LINKS_DARK = (
       href={assets.home.darkMobileLandingStatic}
       as='image'
     />
-    <link
-      rel='prefetch'
-      href={assets.info.darkQuestionMarkAnimated}
-      as='image'
-    />
+    <link rel='prefetch' href={assets.info.darkQuestionMarkVideo} as='image' />
     <link rel='prefetch' href={assets.info.darkQuestionMarkStatic} as='image' />
     {/* Creation screen */}
-    <link rel='prefetch' href={assets.creation.darkAcAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.darkMcAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.darkCfAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.darkAcStatic} as='image' />
-    <link rel='prefetch' href={assets.creation.darkMcStatic} as='image' />
-    <link rel='prefetch' href={assets.creation.darkCfStatic} as='image' />
+    <link rel='prefetch' href={assets.common.ac.darkAcAnimated()} as='image' />
+    <link rel='prefetch' href={assets.common.mc.darkMcAnimated()} as='image' />
+    {/* <link rel='prefetch' href={assets.creation.darkCfAnimated()} as='image' /> */}
+    <link rel='prefetch' href={assets.common.ac.darkAcStatic} as='image' />
+    <link rel='prefetch' href={assets.common.mc.darkMcStatic} as='image' />
+    {/* <link rel='prefetch' href={assets.creation.darkCfStatic} as='image' /> */}
   </>
 );
 
@@ -433,19 +429,19 @@ const PRE_FETCH_LINKS_LIGHT = (
     />
     <link
       rel='prefetch'
-      href={assets.signup.lightInto}
+      href={assets.signup.lightIntoAnimated}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.signup.lightOutro}
+      href={assets.signup.lightOutroAnimated}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.decision.lightHourglassAnimated}
+      href={assets.decision.lightHourglassAnimated()}
       as='image'
     />
     <link
@@ -464,22 +460,18 @@ const PRE_FETCH_LINKS_LIGHT = (
       href={assets.home.lightMobileLandingStatic}
       as='image'
     />
-    <link
-      rel='prefetch'
-      href={assets.info.lightQuestionMarkAnimated}
-      as='image'
-    />
+    <link rel='prefetch' href={assets.info.lightQuestionMarkVideo} as='image' />
     <link
       rel='prefetch'
       href={assets.info.lightQuestionMarkStatic}
       as='image'
     />
     {/* Creation screen */}
-    <link rel='prefetch' href={assets.creation.lightAcAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.lightMcAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.lightCfAnimated} as='image' />
-    <link rel='prefetch' href={assets.creation.lightAcStatic} as='image' />
-    <link rel='prefetch' href={assets.creation.lightMcStatic} as='image' />
-    <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' />
+    <link rel='prefetch' href={assets.common.ac.lightAcAnimated()} as='image' />
+    <link rel='prefetch' href={assets.common.mc.lightMcAnimated()} as='image' />
+    {/* <link rel='prefetch' href={assets.creation.lightCfAnimated()} as='image' /> */}
+    <link rel='prefetch' href={assets.common.ac.lightAcStatic} as='image' />
+    <link rel='prefetch' href={assets.common.mc.lightMcStatic} as='image' />
+    {/* <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' /> */}
   </>
 );
