@@ -170,8 +170,8 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                   type='mc'
                   imgSrc={
                     theme.name === 'light'
-                      ? assets.creation.lightMcAnimated
-                      : assets.creation.darkMcAnimated
+                      ? assets.common.mc.lightMcAnimated()
+                      : assets.common.mc.darkMcAnimated()
                   }
                 >
                   {t('mcPostSuccess.heroText')}

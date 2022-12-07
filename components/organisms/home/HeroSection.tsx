@@ -123,8 +123,8 @@ export const HeroSection = React.memo(() => {
             }
             videoSrcList={
               theme.name === 'light'
-                ? assets.landing.lightMobileLandingAnimated
-                : assets.landing.darkMobileLandingAnimated
+                ? assets.landing.lightMobileLandingVideo
+                : assets.landing.darkMobileLandingVideo
             }
           />
         ) : (
@@ -136,8 +136,8 @@ export const HeroSection = React.memo(() => {
             }
             videoSrcList={
               theme.name === 'light'
-                ? assets.landing.lightDesktopLandingAnimated
-                : assets.landing.darkDesktopLandingAnimated
+                ? assets.landing.lightDesktopLandingVideo
+                : assets.landing.darkDesktopLandingVideo
             }
           />
         )}

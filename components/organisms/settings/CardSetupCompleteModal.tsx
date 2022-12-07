@@ -170,8 +170,8 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
               <SLogo
                 src={
                   theme.name === 'light'
-                    ? assets.common.lightAnimatedLogo
-                    : assets.common.darkAnimatedLogo
+                    ? assets.common.lightLogoAnimated()
+                    : assets.common.darkLogoAnimated()
                 }
                 alt='NewNew logo'
               />
