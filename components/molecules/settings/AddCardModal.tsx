@@ -90,6 +90,13 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
 
+  useEffect(() => {
+    // fix recaptcha challenge overlay issue
+    if (isRecaptchaV2Required) {
+      document.body.style.top = '0';
+    }
+  }, [isRecaptchaV2Required]);
+
   useEffect(
     () => () => {
       setErrorMessage('');
