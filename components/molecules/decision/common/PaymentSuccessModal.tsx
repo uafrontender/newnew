@@ -39,8 +39,8 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
             <SImg
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightAcStatic
-                  : assets.creation.darkAcStatic
+                  ? assets.common.ac.lightAcStatic
+                  : assets.common.ac.darkAcStatic
               }
               alt='Post type'
               postType={postType}

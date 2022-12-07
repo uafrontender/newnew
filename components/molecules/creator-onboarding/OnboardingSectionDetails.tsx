@@ -43,7 +43,9 @@ import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import resizeImage from '../../../utils/resizeImage';
 import isSafari from '../../../utils/isSafari';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../utils/hooks/useErrorToasts';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -397,7 +399,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
     if (files?.length === 1) {
       const file = files[0];
 
-      if (!isImage(file.name)) return;
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
       // if ((file.size / (1024 * 1024)) > 3) return;
 
       // Read uploaded file as data URL

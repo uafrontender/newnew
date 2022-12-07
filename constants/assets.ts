@@ -1,20 +1,27 @@
+import isSafari from '../utils/isSafari';
+
 const APP_ASSETS_DOMAIN = 'd2ttpqwdet9svd.cloudfront.net';
 const APP_ASSETS_ORIGIN = `https://${APP_ASSETS_DOMAIN}`;
 
 const assets = {
+  // TODO: unused, remove
   creation: {
-    darkAcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static.png`,
-    darkAcAnimated: `${APP_ASSETS_ORIGIN}/creation/AC.webp`,
-    lightAcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static-light.png`,
-    lightAcAnimated: `${APP_ASSETS_ORIGIN}/creation/AC-light.webp`,
     darkCfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static.png`,
-    darkCfAnimated: `${APP_ASSETS_ORIGIN}/creation/CF.webp`,
+    darkCfAnimated: () => {
+      if (isSafari()) {
+        // Change asset
+        return `${APP_ASSETS_ORIGIN}/creation/CF.webp`;
+      }
+      return `${APP_ASSETS_ORIGIN}/creation/CF.webp`;
+    },
     lightCfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static-light.png`,
-    lightCfAnimated: `${APP_ASSETS_ORIGIN}/creation/CF-light.webp`,
-    darkMcStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static.png`,
-    darkMcAnimated: `${APP_ASSETS_ORIGIN}/creation/MC.webp`,
-    lightMcStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static-light.png`,
-    lightMcAnimated: `${APP_ASSETS_ORIGIN}/creation/MC-light.webp`,
+    lightCfAnimated: () => {
+      if (isSafari()) {
+        // Change asset
+        return `${APP_ASSETS_ORIGIN}/creation/CF-light.webp`;
+      }
+      return `${APP_ASSETS_ORIGIN}/creation/CF-light.webp`;
+    },
   },
   decision: {
     gold: `${APP_ASSETS_ORIGIN}/decision/gold.png`,
@@ -22,25 +29,37 @@ const assets = {
     paymentSuccess: `${APP_ASSETS_ORIGIN}/decision/payment-success.png`,
     trophy: `${APP_ASSETS_ORIGIN}/decision/trophy.png`,
     votes: `${APP_ASSETS_ORIGIN}/decision/votes.png`,
-    darkHourglassAnimated: `${APP_ASSETS_ORIGIN}/decision/hourglass-dark.webp`,
+    darkHourglassAnimated: () => {
+      if (isSafari()) {
+        // Change asset
+        return `${APP_ASSETS_ORIGIN}/decision/darkHourglassAnimated.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/decision/hourglass-dark.webp`;
+    },
     darkHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-static-dark.png`,
-    lightHourglassAnimated: `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webp`,
+    lightHourglassAnimated: () => {
+      if (isSafari()) {
+        // Change asset
+        return `${APP_ASSETS_ORIGIN}/decision/lightHourglassAnimated.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webp`;
+    },
     lightHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-static-light.png`,
   },
   info: {
     lightQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-light.png`,
-    lightQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-light.mp4`,
+    lightQuestionMarkVideo: `${APP_ASSETS_ORIGIN}/info/question-mark-light.mp4`,
     darkQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-dark.png`,
-    darkQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-dark.mp4`,
+    darkQuestionMarkVideo: `${APP_ASSETS_ORIGIN}/info/question-mark-dark.mp4`,
   },
   home: {
-    darkLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Dark.mp4`,
+    darkLandingVideo: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Dark.mp4`,
     darkLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Hold-Frame-Dark.webp`,
-    darkMobileLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Dark.mp4`,
+    darkMobileLandingVideo: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Dark.mp4`,
     darkMobileLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Dark-Hold-Frame.webp`,
-    lightLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Light.mp4`,
+    lightLandingVideo: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Light.mp4`,
     lightLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Hold-Frame-Light.webp`,
-    lightMobileLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light.mp4`,
+    lightMobileLandingVideo: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light.mp4`,
     lightMobileLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light-Hold-Frame.webp`,
 
     mcExampleThumb1: `${APP_ASSETS_ORIGIN}/home/mc-example-thumb-1.png`,
@@ -81,7 +100,7 @@ const assets = {
   },
   landing: {
     darkDesktopLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark.png`,
-    darkDesktopLandingAnimated: [
+    darkDesktopLandingVideo: [
       `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-1.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-2.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-desktop-dark-3.mp4`,
@@ -90,7 +109,7 @@ const assets = {
     ],
 
     lightDesktopLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light.png`,
-    lightDesktopLandingAnimated: [
+    lightDesktopLandingVideo: [
       `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-1.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-2.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-desktop-light-3.mp4`,
@@ -99,7 +118,7 @@ const assets = {
     ],
 
     darkMobileLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark.png`,
-    darkMobileLandingAnimated: [
+    darkMobileLandingVideo: [
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-1.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-2.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-dark-3.mp4`,
@@ -108,7 +127,7 @@ const assets = {
     ],
 
     lightMobileLandingStatic: `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light.png`,
-    lightMobileLandingAnimated: [
+    lightMobileLandingVideo: [
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-1.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-2.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-3.mp4`,
@@ -117,11 +136,11 @@ const assets = {
     ],
   },
   signup: {
-    darkInto: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`,
-    darkOutro: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`,
+    darkIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`,
+    darkOutroAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`,
     darkStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-dark.png`,
-    lightInto: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`,
-    lightOutro: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`,
+    lightIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`,
+    lightOutroAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`,
     lightStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-light.png`,
   },
   subscription: {
@@ -153,11 +172,56 @@ const assets = {
     common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
   },
   common: {
-    lightAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`,
-    darkAnimatedLogo: `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`,
+    // TODO: update webps and Static pngs
+    lightLogoAnimated: () => {
+      if (isSafari()) {
+        // Change asset
+        return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`;
+    },
+    darkLogoAnimated: () => {
+      if (isSafari()) {
+        // Change asset
+        return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`;
+    },
     darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
     goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
     vote: `${APP_ASSETS_ORIGIN}/common/vote.png`,
+    ac: {
+      darkAcStatic: `${APP_ASSETS_ORIGIN}/common/ac/darkAcStatic.png`,
+      darkAcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/ac/darkAcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/ac/darkAcAnimated.webp`;
+      },
+      lightAcStatic: `${APP_ASSETS_ORIGIN}/common/ac/lightAcStatic.png`,
+      lightAcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/ac/lightAcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/ac/lightAcAnimated.webp`;
+      },
+    },
+    mc: {
+      darkMcStatic: `${APP_ASSETS_ORIGIN}/common/mc/darkMcStatic.png`,
+      darkMcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/mc/darkMcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/mc/darkMcAnimated.webp`;
+      },
+      lightMcStatic: `${APP_ASSETS_ORIGIN}/common/mc/lightMcStatic.png`,
+      lightMcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/mc/lightMcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/mc/lightMcAnimated.webp`;
+      },
+    },
   },
   cards: {
     background: [
@@ -176,6 +240,9 @@ const assets = {
   // TODO: remove as unused
   bundles: {
     votesBackground: `${APP_ASSETS_ORIGIN}/bundles/votes-background.png`,
+  },
+  test: {
+    newMCSmallest: `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`,
   },
 };
 

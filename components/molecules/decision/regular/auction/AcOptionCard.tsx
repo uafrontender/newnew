@@ -758,8 +758,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 <SPaymentModalHeadingPostSymbolImg
                   src={
                     theme.name === 'light'
-                      ? assets.creation.lightAcStatic
-                      : assets.creation.darkAcStatic
+                      ? assets.common.ac.lightAcStatic
+                      : assets.common.ac.darkAcStatic
                   }
                 />
               </SPaymentModalHeadingPostSymbol>

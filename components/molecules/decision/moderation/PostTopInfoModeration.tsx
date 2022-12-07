@@ -32,16 +32,16 @@ import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { TPostType } from '../../../../utils/switchPostType';
 
-const DARK_IMAGES = {
-  ac: assets.creation.darkAcAnimated,
+const DARK_IMAGES: Record<string, () => string> = {
+  ac: assets.common.ac.darkAcAnimated,
   cf: assets.creation.darkCfAnimated,
-  mc: assets.creation.darkMcAnimated,
+  mc: assets.common.mc.darkMcAnimated,
 };
 
-const LIGHT_IMAGES = {
-  ac: assets.creation.lightAcAnimated,
+const LIGHT_IMAGES: Record<string, () => string> = {
+  ac: assets.common.ac.lightAcAnimated,
   cf: assets.creation.lightCfAnimated,
-  mc: assets.creation.lightMcAnimated,
+  mc: assets.common.mc.lightMcAnimated,
 };
 
 interface IPostTopInfoModeration {
@@ -308,7 +308,7 @@ const PostTopInfoModeration: React.FunctionComponent<
             <SText variant={3}>
               {t('acPostModeration.postTopInfo.selectWinner.body')}
             </SText>
-            <STrophyImg src={assets.decision.lightHourglassAnimated} />
+            <STrophyImg src={assets.decision.lightHourglassAnimated()} />
           </SSelectWinnerOption>
         ) : null}
       </SWrapper>
@@ -325,8 +325,8 @@ const PostTopInfoModeration: React.FunctionComponent<
           imageSrc={
             postType
               ? theme.name === 'light'
-                ? LIGHT_IMAGES[postType]
-                : DARK_IMAGES[postType]
+                ? LIGHT_IMAGES[postType]()
+                : DARK_IMAGES[postType]()
               : undefined
           }
           buttonCaption={t('postFailedBoxModeration.buttonText', {
