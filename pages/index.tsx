@@ -300,9 +300,10 @@ const Home: NextPage<IHome> = ({
     () =>
       collectionRA.some((post) => {
         const renderedPost = switchPostType(post)[0];
-        const uuid = renderedPost.creator?.uuid;
-        if (!uuid) return false;
-        if (usersIBlocked.includes(uuid) || usersBlockedMe.includes(uuid)) {
+        if (
+          usersIBlocked.includes(renderedPost.creator?.uuid ?? '') ||
+          usersBlockedMe.includes(renderedPost.creator?.uuid ?? '')
+        ) {
           return true;
         }
         return false;
