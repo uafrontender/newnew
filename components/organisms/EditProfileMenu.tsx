@@ -55,7 +55,9 @@ import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
 import validateInputText from '../../utils/validateMessageText';
-import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
@@ -376,18 +378,27 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
   const [coverUrlInEditAnimated, setCoverUrlInEditAnimated] = useState(false);
+  const [coverUrlInEditAnimatedExtension, setCoverUrlInEditAnimatedExtension] =
+    useState('');
+  const [coverUrlInEditAnimatedMimeType, setCoverUrlInEditAnimatedMimeType] =
+    useState('');
   const [coverImageInitialObjectFit, setCoverImageInitialObjectFit] =
     useState<CropperObjectFit>('horizontal-cover');
   const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
 
-  const handleSetBackgroundPictureInEdit = (files: FileList | null) => {
+  const handleSetBackgroundPictureInEdit = async (files: FileList | null) => {
     if (files?.length === 1) {
       const file = files[0];
 
       // Return if file is not an image
-      if (!isImage(file.name)) return;
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
       // Return if original image is larger than 10 Mb
       // if ((file.size / (1024 * 1024)) > 10) return;
 
@@ -402,7 +413,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           img.src = properlySizedImage.url;
 
           // eslint-disable-next-line func-names
-          img.addEventListener('load', function () {
+          img.addEventListener('load', async function () {
             // eslint-disable-next-line react/no-this-in-sfc
             if (this.width < this.height * 2.5) {
               setCoverImageInitialObjectFit('horizontal-cover');
@@ -418,7 +429,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
             setCropCoverImage({ x: 0, y: 0 });
             setCoverUrlInEdit(properlySizedImage.url);
-            setCoverUrlInEditAnimated(isAnimatedImage(file.name));
+
+            const imageMeta = await isAnimatedImage(file);
+
+            if (imageMeta && imageMeta.animated) {
+              setCoverUrlInEditAnimated(imageMeta.animated);
+              setCoverUrlInEditAnimatedExtension(imageMeta.ext);
+              setCoverUrlInEditAnimatedMimeType(imageMeta.mime);
+            } else {
+              setCoverUrlInEditAnimated(false);
+              setCoverUrlInEditAnimatedExtension('');
+              setCoverUrlInEditAnimatedMimeType('');
+            }
           });
         }
       });
@@ -455,7 +477,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               0,
               'coverImage.jpeg'
             )
-          : await urlToFile(coverUrlInEdit, 'coverImage.webp', 'image/webp');
+          : await urlToFile(
+              coverUrlInEdit,
+              `coverImage.${coverUrlInEditAnimatedExtension}`,
+              coverUrlInEditAnimatedMimeType
+            );
 
         // API request would be here
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
@@ -551,6 +577,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleClose,
     coverUrlInEditAnimated,
     croppedAreaCoverImage,
+    coverUrlInEditAnimatedExtension,
+    coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
   ]);
 
@@ -575,7 +603,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (files?.length === 1) {
       const file = files[0];
 
-      if (!isImage(file.name)) return;
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
       // if ((file.size / (1024 * 1024)) > 3) return;
 
       // Read uploaded file as data URL
