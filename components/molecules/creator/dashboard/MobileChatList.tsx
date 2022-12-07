@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
@@ -21,6 +21,8 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import { IChatData } from '../../../interfaces/ichat';
 import ChatName from '../../../atoms/chat/ChatName';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
 
 const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
 
@@ -51,6 +53,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const [prevSearchText, setPrevSearchText] = useState<string>('');
   const [searchedRoomsLoading, setSearchedRoomsLoading] =
     useState<boolean>(false);
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -197,6 +200,18 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
     }
   }
 
+  // to update time ago of last message
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 60 * 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
+
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
@@ -271,7 +286,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchedRooms, chatRooms, updatedChat]
+    [searchedRooms, chatRooms, updatedChat, updateTimer]
   );
 
   return (

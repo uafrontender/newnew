@@ -1209,6 +1209,7 @@ export const CreationSecondStepContent: React.FC<
                 </TabletFieldWrapper>
               </SItemWrapper>
             )}
+
             {isMobile ? (
               <SButtonWrapper>
                 <SButtonContent>

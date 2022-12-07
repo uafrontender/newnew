@@ -147,7 +147,11 @@ const OnboardingSectionAbout: React.FunctionComponent<
       );
 
       // redirect user to dashboard if Stripe is already connected
-      if (user.creatorData?.options?.stripeConnectStatus === 2) {
+      if (
+        user.creatorData?.options?.stripeConnectStatus ===
+        newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+          .CONNECTED_ALL_GOOD
+      ) {
         router.push('/creator/dashboard');
       } else {
         router.push('/creator-onboarding-stripe');
