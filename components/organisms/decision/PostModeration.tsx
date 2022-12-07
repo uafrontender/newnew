@@ -22,16 +22,16 @@ const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
 );
 
-const DARK_IMAGES = {
-  ac: assets.creation.darkAcAnimated,
+const DARK_IMAGES: Record<string, () => string> = {
+  ac: assets.common.ac.darkAcAnimated,
   cf: assets.creation.darkCfAnimated,
-  mc: assets.creation.darkMcAnimated,
+  mc: assets.common.mc.darkMcAnimated,
 };
 
-const LIGHT_IMAGES = {
-  ac: assets.creation.lightAcAnimated,
+const LIGHT_IMAGES: Record<string, () => string> = {
+  ac: assets.common.ac.lightAcAnimated,
   cf: assets.creation.lightCfAnimated,
-  mc: assets.creation.lightMcAnimated,
+  mc: assets.common.mc.lightMcAnimated,
 };
 
 interface IPostModeration {}
@@ -116,8 +116,8 @@ const PostModeration: React.FunctionComponent<IPostModeration> = () => {
                 }
                 imageSrc={
                   theme.name === 'light'
-                    ? LIGHT_IMAGES[typeOfPost]
-                    : DARK_IMAGES[typeOfPost]
+                    ? LIGHT_IMAGES[typeOfPost]()
+                    : DARK_IMAGES[typeOfPost]()
                 }
                 buttonCaption={t('postDeletedByMe.buttonText')}
                 handleButtonClick={() => {

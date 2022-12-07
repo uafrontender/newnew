@@ -17,28 +17,28 @@ import {
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
-const DARK_IMAGES_ANIMATED: any = {
-  auction: assets.creation.darkAcAnimated,
+const DARK_IMAGES_ANIMATED: Record<string, () => string> = {
+  auction: assets.common.ac.darkAcAnimated,
   crowdfunding: assets.creation.darkCfAnimated,
-  'multiple-choice': assets.creation.darkMcAnimated,
+  'multiple-choice': assets.common.mc.darkMcAnimated,
 };
 
 const DARK_IMAGES_STATIC: any = {
-  auction: assets.creation.darkAcStatic,
+  auction: assets.common.ac.darkAcStatic,
   crowdfunding: assets.creation.darkCfStatic,
-  'multiple-choice': assets.creation.darkMcStatic,
+  'multiple-choice': assets.common.mc.darkMcStatic,
 };
 
-const LIGHT_IMAGES_ANIMATED: any = {
-  auction: assets.creation.lightAcAnimated,
+const LIGHT_IMAGES_ANIMATED: Record<string, () => string> = {
+  auction: assets.common.ac.lightAcAnimated,
   crowdfunding: assets.creation.lightCfAnimated,
-  'multiple-choice': assets.creation.lightMcAnimated,
+  'multiple-choice': assets.common.mc.lightMcAnimated,
 };
 
 const LIGHT_IMAGES_STATIC: any = {
-  auction: assets.creation.lightAcStatic,
+  auction: assets.common.ac.lightAcStatic,
   crowdfunding: assets.creation.lightCfStatic,
-  'multiple-choice': assets.creation.lightMcStatic,
+  'multiple-choice': assets.common.mc.lightMcStatic,
 };
 
 interface IListItem {
@@ -114,8 +114,8 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
               src={
                 isMobile || isTablet || mouseEntered
                   ? theme.name === 'light'
-                    ? LIGHT_IMAGES_ANIMATED[itemKey]
-                    : DARK_IMAGES_ANIMATED[itemKey]
+                    ? LIGHT_IMAGES_ANIMATED[itemKey]()
+                    : DARK_IMAGES_ANIMATED[itemKey]()
                   : theme.name === 'light'
                   ? LIGHT_IMAGES_STATIC[itemKey]
                   : DARK_IMAGES_STATIC[itemKey]
