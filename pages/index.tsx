@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -18,13 +24,13 @@ import Text from '../components/atoms/Text';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 import { useAppSelector } from '../redux-store/store';
-import {
-  fetchPostByUUID,
-  fetchForYouPosts,
-  fetchCuratedPosts,
-  fetchBiggestPosts,
-} from '../api/endpoints/post';
-import { fetchLiveAuctions } from '../api/endpoints/auction';
+// import {
+//   fetchPostByUUID,
+//   fetchForYouPosts,
+//   fetchCuratedPosts,
+//   fetchBiggestPosts,
+// } from '../api/endpoints/post';
+// import { fetchLiveAuctions } from '../api/endpoints/auction';
 // import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import switchPostType from '../utils/switchPostType';
@@ -38,7 +44,8 @@ import usePagination, {
   PaginatedResponse,
   Paging,
 } from '../utils/hooks/usePagination';
-import isSafari from '../utils/isSafari';
+import { useGetBlockedUsers } from '../contexts/blockedUsersContext';
+// import isSafari from '../utils/isSafari';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -288,6 +295,21 @@ const Home: NextPage<IHome> = ({
     loadMore,
   } = usePagination<newnewapi.IPost>(fetchRAPosts, 6);
 
+  const { usersIBlocked, usersBlockedMe } = useGetBlockedUsers();
+  const isBlocked = useMemo(
+    () =>
+      collectionRA.some((post) => {
+        const renderedPost = switchPostType(post)[0];
+        const uuid = renderedPost.creator?.uuid;
+        if (!uuid) return false;
+        if (usersIBlocked.includes(uuid) || usersBlockedMe.includes(uuid)) {
+          return true;
+        }
+        return false;
+      }),
+    [usersIBlocked, usersBlockedMe, collectionRA]
+  );
+
   return (
     <>
       <Head>
@@ -308,7 +330,7 @@ const Home: NextPage<IHome> = ({
         </>
       )}
 
-      {user.loggedIn && (
+      {user.loggedIn && !isBlocked && (
         <>
           {user.userData?.options?.isCreator && collectionRA?.length > 0 && (
             <SHeading>
@@ -415,27 +437,27 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-const SCardsSection = styled(CardsSection)`
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 12px;
-  }
+// const SCardsSection = styled(CardsSection)`
+//   ${({ theme }) => theme.media.laptop} {
+//     margin-top: 12px;
+//   }
 
-  &:last-child {
-    padding-bottom: 40px;
-  }
+//   &:last-child {
+//     padding-bottom: 40px;
+//   }
 
-  ${({ theme }) => theme.media.tablet} {
-    &:last-child {
-      padding-bottom: 60px;
-    }
-  }
+//   ${({ theme }) => theme.media.tablet} {
+//     &:last-child {
+//       padding-bottom: 60px;
+//     }
+//   }
 
-  ${({ theme }) => theme.media.laptop} {
-    &:last-child {
-      padding-bottom: 80px;
-    }
-  }
-`;
+//   ${({ theme }) => theme.media.laptop} {
+//     &:last-child {
+//       padding-bottom: 80px;
+//     }
+//   }
+// `;
 
 const SHeading = styled.div`
   margin-top: 40px;

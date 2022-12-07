@@ -45,6 +45,7 @@ import GeneralLayout from '../../components/templates/General';
 import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 
 interface IPostPage {
   postUuid: string;
@@ -238,6 +239,22 @@ const PostPage: NextPage<IPostPage> = ({
       user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
+
+  const { usersIBlocked, usersBlockedMe } = useGetBlockedUsers();
+
+  useEffect(() => {
+    if (user.loggedIn && postParsed?.creator?.uuid) {
+      const uuid = postParsed?.creator?.uuid;
+      if (usersIBlocked.includes(uuid) || usersBlockedMe.includes(uuid))
+        router.push('/');
+    }
+  }, [
+    postParsed?.creator?.uuid,
+    user.loggedIn,
+    router,
+    usersIBlocked,
+    usersBlockedMe,
+  ]);
 
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
     useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
