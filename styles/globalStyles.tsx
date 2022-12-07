@@ -15,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
   /* Smooth theme transitions */
   html.theming,
   html.theming * {
-    transition: all 0.15s linear !important;
+    transition: all 0.3s linear !important;
   }
 
   *, *:before, *:after {
