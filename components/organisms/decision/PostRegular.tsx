@@ -24,15 +24,15 @@ const PostFailedBox = dynamic(
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
 const DARK_IMAGES: Record<string, () => string> = {
-  ac: assets.creation.darkAcAnimated,
+  ac: assets.common.ac.darkAcAnimated,
   cf: assets.creation.darkCfAnimated,
-  mc: assets.creation.darkMcAnimated,
+  mc: assets.common.mc.darkMcAnimated,
 };
 
 const LIGHT_IMAGES: Record<string, () => string> = {
-  ac: assets.creation.lightAcAnimated,
+  ac: assets.common.ac.lightAcAnimated,
   cf: assets.creation.lightCfAnimated,
-  mc: assets.creation.lightMcAnimated,
+  mc: assets.common.mc.lightMcAnimated,
 };
 
 interface IPostRegular {}

@@ -60,8 +60,8 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightAcAnimated()
-                  : assets.creation.darkAcAnimated()
+                  ? assets.common.ac.lightAcAnimated()
+                  : assets.common.ac.darkAcAnimated()
               }
               alt='bids'
               // Quick fix for animated image alignment
@@ -84,8 +84,8 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightMcAnimated()
-                  : assets.creation.darkMcAnimated()
+                  ? assets.common.mc.lightMcAnimated()
+                  : assets.common.mc.darkMcAnimated()
               }
               alt='superpolls'
               // Quick fix for animated image alignment

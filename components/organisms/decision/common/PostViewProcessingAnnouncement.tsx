@@ -18,17 +18,17 @@ import assets from '../../../../constants/assets';
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 
 const DARK_IMAGES: Record<string, () => string> = {
-  ac: assets.creation.darkMcAnimated,
+  ac: assets.common.mc.darkMcAnimated,
   // TODO: light votes version? why not animated?
-  // mc: assets.creation.darkAcAnimated,
+  // mc: assets.common.ac.darkAcAnimated,
   mc: () => assets.decision.votes,
   cf: assets.creation.darkCfAnimated,
 };
 
 const LIGHT_IMAGES: Record<string, () => string> = {
-  ac: assets.creation.lightMcAnimated,
+  ac: assets.common.mc.lightMcAnimated,
   // TODO: light votes version? why not animated?
-  // mc: assets.creation.lightAcAnimated,
+  // mc: assets.common.ac.lightAcAnimated,
   mc: () => assets.decision.votes,
   cf: assets.creation.lightCfAnimated,
 };

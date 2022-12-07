@@ -18,27 +18,27 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 const DARK_IMAGES_ANIMATED: Record<string, () => string> = {
-  auction: assets.creation.darkAcAnimated,
+  auction: assets.common.ac.darkAcAnimated,
   crowdfunding: assets.creation.darkCfAnimated,
-  'multiple-choice': assets.creation.darkMcAnimated,
+  'multiple-choice': assets.common.mc.darkMcAnimated,
 };
 
 const DARK_IMAGES_STATIC: any = {
-  auction: assets.creation.darkAcStatic,
+  auction: assets.common.ac.darkAcStatic,
   crowdfunding: assets.creation.darkCfStatic,
-  'multiple-choice': assets.creation.darkMcStatic,
+  'multiple-choice': assets.common.mc.darkMcStatic,
 };
 
 const LIGHT_IMAGES_ANIMATED: Record<string, () => string> = {
-  auction: assets.creation.lightAcAnimated,
+  auction: assets.common.ac.lightAcAnimated,
   crowdfunding: assets.creation.lightCfAnimated,
-  'multiple-choice': assets.creation.lightMcAnimated,
+  'multiple-choice': assets.common.mc.lightMcAnimated,
 };
 
 const LIGHT_IMAGES_STATIC: any = {
-  auction: assets.creation.lightAcStatic,
+  auction: assets.common.ac.lightAcStatic,
   crowdfunding: assets.creation.lightCfStatic,
-  'multiple-choice': assets.creation.lightMcStatic,
+  'multiple-choice': assets.common.mc.lightMcStatic,
 };
 
 interface IListItem {

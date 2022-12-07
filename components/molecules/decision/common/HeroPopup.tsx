@@ -11,15 +11,15 @@ import Button from '../../../atoms/Button';
 import assets from '../../../../constants/assets';
 
 const DARK_IMAGES: Record<string, () => string> = {
-  AC: assets.creation.darkAcAnimated,
+  AC: assets.common.ac.darkAcAnimated,
   CF: assets.creation.darkCfAnimated,
-  MC: assets.creation.darkMcAnimated,
+  MC: assets.common.mc.darkMcAnimated,
 };
 
 const LIGHT_IMAGES: Record<string, () => string> = {
-  AC: assets.creation.lightAcAnimated,
+  AC: assets.common.ac.lightAcAnimated,
   CF: assets.creation.lightCfAnimated,
-  MC: assets.creation.lightMcAnimated,
+  MC: assets.common.mc.lightMcAnimated,
 };
 
 interface IHeroPopup {

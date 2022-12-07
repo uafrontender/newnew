@@ -4,23 +4,8 @@ const APP_ASSETS_DOMAIN = 'd2ttpqwdet9svd.cloudfront.net';
 const APP_ASSETS_ORIGIN = `https://${APP_ASSETS_DOMAIN}`;
 
 const assets = {
+  // TODO: unused, remove
   creation: {
-    darkAcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static.png`,
-    darkAcAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/creation/AC.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/creation/AC.webp`;
-    },
-    lightAcStatic: `${APP_ASSETS_ORIGIN}/creation/AC-static-light.png`,
-    lightAcAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/creation/AC-light.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/creation/AC-light.webp`;
-    },
     darkCfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static.png`,
     darkCfAnimated: () => {
       if (isSafari()) {
@@ -36,22 +21,6 @@ const assets = {
         return `${APP_ASSETS_ORIGIN}/creation/CF-light.webp`;
       }
       return `${APP_ASSETS_ORIGIN}/creation/CF-light.webp`;
-    },
-    darkMcStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static.png`,
-    darkMcAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/creation/MC.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/creation/MC.webp`;
-    },
-    lightMcStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static-light.png`,
-    lightMcAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/creation/MC-light.webp`;
-      }
-      return `${APP_ASSETS_ORIGIN}/creation/MC-light.webp`;
     },
   },
   decision: {
@@ -165,40 +134,6 @@ const assets = {
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-4.mp4`,
       `${APP_ASSETS_ORIGIN}/landing/landing-mobile-light-5.mp4`,
     ],
-    darkMcAnimated: () => {
-      if (isSafari()) {
-        // TODO: change asset
-        return `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`;
-      }
-
-      // TODO: change url
-      return `${APP_ASSETS_ORIGIN}/creation/MC-light.webp`;
-    },
-    lightMcAnimated: () => {
-      if (isSafari()) {
-        // TODO: change asset
-        return `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`;
-      }
-
-      // TODO: change url
-      return `${APP_ASSETS_ORIGIN}/creation/MC-light.webp`;
-    },
-    darkAcAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/creation/AC.webp`;
-      }
-      // TODO: change url
-      return `${APP_ASSETS_ORIGIN}/creation/AC.webp`;
-    },
-    lightAcAnimated: () => {
-      if (isSafari()) {
-        // Change asset
-        return `${APP_ASSETS_ORIGIN}/creation/AC-light.webp`;
-      }
-      // TODO: change url
-      return `${APP_ASSETS_ORIGIN}/creation/AC-light.webp`;
-    },
   },
   signup: {
     darkIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`,
@@ -254,6 +189,38 @@ const assets = {
     darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
     goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
     vote: `${APP_ASSETS_ORIGIN}/common/vote.png`,
+    ac: {
+      darkAcStatic: `${APP_ASSETS_ORIGIN}/common/ac/darkAcStatic.png`,
+      darkAcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/ac/darkAcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/ac/darkAcAnimated.webp`;
+      },
+      lightAcStatic: `${APP_ASSETS_ORIGIN}/common/ac/lightAcStatic.png`,
+      lightAcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/ac/lightAcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/ac/lightAcAnimated.webp`;
+      },
+    },
+    mc: {
+      darkMcStatic: `${APP_ASSETS_ORIGIN}/common/mc/darkMcStatic.png`,
+      darkMcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/mc/darkMcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/mc/darkMcAnimated.webp`;
+      },
+      lightMcStatic: `${APP_ASSETS_ORIGIN}/common/mc/lightMcStatic.png`,
+      lightMcAnimated: () => {
+        if (isSafari()) {
+          return `${APP_ASSETS_ORIGIN}/common/mc/lightMcAnimated.png`;
+        }
+        return `${APP_ASSETS_ORIGIN}/common/mc/lightMcAnimated.webp`;
+      },
+    },
   },
   cards: {
     background: [

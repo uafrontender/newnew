@@ -354,8 +354,8 @@ const Home: NextPage<IHome> = ({
         caption={t('tutorial.mc.caption')}
         iconSrc={
           theme.name === 'light'
-            ? assets.landing.lightMcAnimated()
-            : assets.landing.darkMcAnimated()
+            ? assets.common.mc.lightMcAnimated()
+            : assets.common.mc.darkMcAnimated()
         }
         posts={staticSuperpolls}
         isStatic
@@ -370,8 +370,8 @@ const Home: NextPage<IHome> = ({
         caption={t('tutorial.ac.caption')}
         iconSrc={
           theme.name === 'light'
-            ? assets.landing.lightAcAnimated()
-            : assets.landing.darkAcAnimated()
+            ? assets.common.ac.lightAcAnimated()
+            : assets.common.ac.darkAcAnimated()
         }
         posts={staticBids}
         isStatic
