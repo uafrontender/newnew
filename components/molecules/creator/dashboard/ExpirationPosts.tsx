@@ -44,8 +44,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
   useEffect(() => {
     if (expirationPosts) {
-      // eslint-disable-next-line no-param-reassign
-      if (expirationPosts.length > 3) expirationPosts.length = 3;
       setPosts(expirationPosts);
     }
   }, [expirationPosts]);

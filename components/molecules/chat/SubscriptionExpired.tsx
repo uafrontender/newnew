@@ -34,14 +34,14 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
               <SBottomActionTitle>
                 {t('subscriptionExpired.title')}
               </SBottomActionTitle>
-              {myRole === 1 && (
+              {myRole === 1 && user.options?.isOfferingBundles && (
                 <SBottomActionMessage>
                   {t('subscriptionExpired.message')} {getDisplayname(user)}
                 </SBottomActionMessage>
               )}
             </SBottomActionText>
           </SBottomActionLeft>
-          {myRole === 1 && (
+          {myRole === 1 && user.options?.isOfferingBundles && (
             <SBottomActionButton
               withDim
               withShrink

@@ -240,11 +240,6 @@ const SToolbar = styled.div<ISToolbar>`
 `;
 
 const SContent = styled.div`
-  /*
-  height: 100%;
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
-  padding: 0 0 24px;
-  width: 100vw; */
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   z-index: 18;
   left: 0;
