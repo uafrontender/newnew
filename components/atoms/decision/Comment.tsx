@@ -114,6 +114,8 @@ const Comment: React.FC<IComment> = ({
 
   const moreButtonRef: any = useRef<HTMLButtonElement>();
 
+  if (comment.isDeleted) return null;
+
   return (
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>

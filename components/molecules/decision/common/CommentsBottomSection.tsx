@@ -250,19 +250,7 @@ const CommentsBottomSection: React.FunctionComponent<
         const workingArr = [...curr];
 
         if (!comment.parentId || comment.parentId === 0) {
-          const commentIdx = workingArr.findIndex((c) => c.id === comment.id);
-          if (commentIdx === -1) return workingArr;
-          workingArr[commentIdx].isDeleted = true;
-          workingArr[commentIdx].content!!.text = '';
-
-          if (
-            workingArr[commentIdx].replies &&
-            workingArr[commentIdx].replies!!.length > 0
-          ) {
-            workingArr[commentIdx].replies = [];
-          }
-
-          return workingArr;
+          return workingArr.filter((c) => c.id !== comment.id);
         }
 
         const parentIdx = workingArr.findIndex(
@@ -271,14 +259,11 @@ const CommentsBottomSection: React.FunctionComponent<
 
         if (parentIdx === -1) return workingArr;
 
-        const commentIdx = workingArr[parentIdx].replies?.findIndex(
-          (c) => c.id === comment.id
-        );
-
-        if (commentIdx === -1) return workingArr;
-
-        workingArr[parentIdx].replies!![commentIdx!!].isDeleted = true;
-        workingArr[parentIdx].replies!![commentIdx!!].content!!.text = '';
+        if (workingArr[parentIdx].replies) {
+          workingArr[parentIdx].replies = workingArr[parentIdx].replies?.filter(
+            (c) => c.id !== comment.id
+          );
+        }
 
         return workingArr;
       });
