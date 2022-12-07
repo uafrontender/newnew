@@ -32,7 +32,7 @@ const assets = {
     darkHourglassAnimated: () => {
       if (isSafari()) {
         // Change asset
-        return `${APP_ASSETS_ORIGIN}/decision/hourglass-dark.webp`;
+        return `${APP_ASSETS_ORIGIN}/decision/darkHourglassAnimated.png`;
       }
       return `${APP_ASSETS_ORIGIN}/decision/hourglass-dark.webp`;
     },
@@ -40,7 +40,7 @@ const assets = {
     lightHourglassAnimated: () => {
       if (isSafari()) {
         // Change asset
-        return `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webp`;
+        return `${APP_ASSETS_ORIGIN}/decision/lightHourglassAnimated.png`;
       }
       return `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webp`;
     },
@@ -175,16 +175,16 @@ const assets = {
     lightLogoAnimated: () => {
       if (isSafari()) {
         // Change asset
-        return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`;
+        return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.png`;
       }
-      return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`;
+      return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`;
     },
     darkLogoAnimated: () => {
       if (isSafari()) {
         // Change asset
-        return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`;
+        return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.png`;
       }
-      return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`;
+      return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`;
     },
     darkAc: `${APP_ASSETS_ORIGIN}/common/dark-ac.png`,
     goldBig: `${APP_ASSETS_ORIGIN}/common/gold-big.png`,
