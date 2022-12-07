@@ -226,7 +226,8 @@
   "toastErrors": {
     "generic": "發生錯誤，請稍後再試",
     "serverError_NEED_TRANSLATION": "A server-side error occurred, please try again later",
-    "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later"
+    "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later",
+    "usupportedImageFormatError_NEED_TRANSLATION": "Image format not supported, please try another image"
   },
   "smsNotifications": {
     "title": "你的號碼是多少？",
