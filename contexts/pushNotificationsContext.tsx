@@ -286,9 +286,9 @@ const PushNotificationsContextProvider: React.FC<
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
     if (
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
+      !isIOS() &&
       getPermissionData().permission === 'default' &&
-      user.loggedIn &&
-      !isIOS()
+      user.loggedIn
     ) {
       localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
       openPermissionRequestModal();
@@ -302,8 +302,8 @@ const PushNotificationsContextProvider: React.FC<
     const shouldShowModal =
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       user.loggedIn &&
-      getPermissionData().permission === 'default' &&
-      !isIOS();
+      !isIOS() &&
+      getPermissionData().permission === 'default';
 
     if (shouldShowModal) {
       timeoutId = setTimeout(
@@ -527,6 +527,10 @@ const PushNotificationsContextProvider: React.FC<
   }, [unregister]);
 
   const pauseNotification = useCallback(() => {
+    if (isIOS()) {
+      return;
+    }
+
     if (isSafariBrowser.current) {
       unsubscribeSafari();
     } else {
@@ -581,6 +585,10 @@ const PushNotificationsContextProvider: React.FC<
   }, [getPermissionData, registerSubscriptionNonSafari]);
 
   const resumePushNotification = useCallback(() => {
+    if (isIOS()) {
+      return;
+    }
+
     if (isSafariBrowser.current) {
       resumePushNotificationSafari();
     } else {
