@@ -172,6 +172,7 @@ const assets = {
     common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
   },
   common: {
+    // TODO: update webps and Static pngs
     lightLogoAnimated: () => {
       if (isSafari()) {
         // Change asset

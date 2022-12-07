@@ -117,8 +117,8 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
                     ? LIGHT_IMAGES_ANIMATED[itemKey]()
                     : DARK_IMAGES_ANIMATED[itemKey]()
                   : theme.name === 'light'
-                  ? LIGHT_IMAGES_STATIC[itemKey]()
-                  : DARK_IMAGES_STATIC[itemKey]()
+                  ? LIGHT_IMAGES_STATIC[itemKey]
+                  : DARK_IMAGES_STATIC[itemKey]
               }
               alt='Post type'
               width={isMobile ? 80 : 120}
