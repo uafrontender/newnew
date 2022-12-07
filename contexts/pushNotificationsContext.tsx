@@ -257,6 +257,10 @@ const PushNotificationsContextProvider: React.FC<
   const checkSubscription = useCallback(async () => {
     let isSubscribed = false;
 
+    if (isIOS()) {
+      return;
+    }
+
     if (isSafariBrowser.current) {
       isSubscribed = await checkSubscriptionSafari();
     } else {
@@ -298,7 +302,8 @@ const PushNotificationsContextProvider: React.FC<
     const shouldShowModal =
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       user.loggedIn &&
-      getPermissionData().permission === 'default';
+      getPermissionData().permission === 'default' &&
+      !isIOS();
 
     if (shouldShowModal) {
       timeoutId = setTimeout(
