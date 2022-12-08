@@ -622,11 +622,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0 && !isUserBlocked ? (
+          {tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
           ) : null}
         </SProfileLayout>
-        {!isUserBlocked && renderChildren()}
+        {!isBlocked && renderChildren()}
       </SGeneral>
       {/* Modals */}
       {isMobile && (
