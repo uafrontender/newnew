@@ -5,12 +5,10 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import getDisplayname from '../../../utils/getDisplayname';
 import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-import switchPostType from '../../../utils/switchPostType';
 import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
 
@@ -33,22 +31,18 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
     return () => clearInterval(interval.current);
   }, [isPageVisible]);
 
-  const { usersIBlocked, usersBlockedMe } = useGetBlockedUsers();
-
   const renderItem = useCallback(
     (post: newnewapi.IPost) => {
-      const renderedPost = switchPostType(post)[0];
-      const isBlocked =
-        usersIBlocked.includes(renderedPost.creator?.uuid ?? '') ||
-        usersBlockedMe.includes(renderedPost.creator?.uuid ?? '');
-      if (isBlocked) return null;
-
       const postType = Object.keys(post)[0];
+      const data = Object.values(post)[0] as
+        | newnewapi.Auction
+        | newnewapi.Crowdfunding
+        | newnewapi.MultipleChoice;
 
       let postTypeConverted = '';
 
       const timestampSeconds = new Date(
-        (renderedPost.expiresAt?.seconds as number) * 1000
+        (data.expiresAt?.seconds as number) * 1000
       ).getTime();
 
       const hasEnded = Date.now() > timestampSeconds;
@@ -70,21 +64,19 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       }
 
       return (
-        <Link href={`/p/${renderedPost.postUuid}`} key={renderedPost.postUuid}>
+        <Link href={`/p/${data.postUuid}`} key={data.postUuid}>
           <a>
             <SPost>
               <SLeftSide>
                 <SUserAvatar>
-                  <UserAvatar
-                    avatarUrl={renderedPost.creator?.avatarUrl ?? ''}
-                  />
+                  <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
                 </SUserAvatar>
                 <SPostData>
-                  {renderedPost.title && (
-                    <SPostTitle>{textTrim(renderedPost.title, 28)}</SPostTitle>
+                  {data.title && (
+                    <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
                   )}
                   <SCreatorUsername>
-                    {getDisplayname(renderedPost.creator)}
+                    {getDisplayname(data.creator)}
                   </SCreatorUsername>
                 </SPostData>
               </SLeftSide>
@@ -109,7 +101,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                   <SPostEnded>
                     {tPostCard('timer.endedOn')}
                     {new Date(
-                      (renderedPost.expiresAt?.seconds as number) * 1000
+                      (data.expiresAt?.seconds as number) * 1000
                     ).toLocaleDateString()}
                   </SPostEnded>
                 )}
@@ -120,7 +112,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t, tPostCard, updateTimer, usersIBlocked, usersBlockedMe]
+    [t, tPostCard, updateTimer]
   );
 
   return (
