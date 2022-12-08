@@ -300,7 +300,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
         ) : null}
-        {isRecaptchaV2Required && <ReCaptcha2 onChange={onChangeRecaptchaV2} />}
+        {isRecaptchaV2Required && (
+          <ReCaptcha2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
+        )}
       </SCodeVerificationMenu>
     </>
   );

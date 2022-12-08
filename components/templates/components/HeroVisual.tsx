@@ -74,8 +74,8 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
           <SImage
             src={
               theme.name === 'dark'
-                ? assets.signup.darkOutro
-                : assets.signup.lightOutro
+                ? assets.signup.darkOutroAnimated
+                : assets.signup.lightOutroAnimated
             }
           />
         </SImageWrapper>
@@ -105,8 +105,8 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
           }}
           src={
             theme.name === 'dark'
-              ? assets.signup.darkInto
-              : assets.signup.lightInto
+              ? assets.signup.darkIntoAnimated
+              : assets.signup.lightIntoAnimated
           }
           onLoad={onIntroLoaded}
         />
@@ -132,8 +132,8 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
         <SImage
           src={
             theme.name === 'dark'
-              ? assets.signup.darkOutro
-              : assets.signup.lightOutro
+              ? assets.signup.darkOutroAnimated
+              : assets.signup.lightOutroAnimated
           }
         />
       </SImageWrapper>

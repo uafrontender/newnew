@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -18,6 +18,7 @@ import HighlightedButton from '../../atoms/bundles/HighlightedButton';
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -35,6 +36,16 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
       (creatorBundle.bundle!.accessExpiresAt!.seconds as number) * 1000 -
       Date.now();
     const formattedTimeLeft = formatTimeLeft(timeLeft);
+
+    const { usersIBlocked, usersBlockedMe } = useGetBlockedUsers();
+    const { creator } = creatorBundle;
+
+    const isBlocked = useMemo(
+      () =>
+        usersIBlocked.includes(creator?.uuid ?? '') ||
+        usersBlockedMe.includes(creator?.uuid ?? ''),
+      [creator?.uuid, usersIBlocked, usersBlockedMe]
+    );
 
     return (
       <>
@@ -118,11 +129,12 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 </BulletLine>
                 <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
               </SBundleInfo>
-              {creatorBundle.creator?.options?.isOfferingBundles && (
-                <BuyButton onClick={onBuyMore}>
-                  {t('modal.creatorsBundle.buyButton')}
-                </BuyButton>
-              )}
+              {creatorBundle.creator?.options?.isOfferingBundles &&
+                !isBlocked && (
+                  <BuyButton onClick={onBuyMore}>
+                    {t('modal.creatorsBundle.buyButton')}
+                  </BuyButton>
+                )}
             </Content>
           </SModalPaper>
         </Modal>

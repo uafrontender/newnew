@@ -12,7 +12,7 @@ import {
   getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
-  setMyTimezone,
+  setMyTimeZone,
 } from '../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
@@ -128,13 +128,23 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   ]);
 
   useEffect(() => {
-    const setUserTimezone = async () => {
+    const setUserTimeZone = async () => {
       try {
         const payload = new newnewapi.SetMyTimeZoneRequest({
           name: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
-        await setMyTimezone(payload);
+        const response = await setMyTimeZone(payload);
+
+        if (response.error) {
+          throw new Error('Cannot set time zone');
+        }
+
+        dispatch(
+          setUserData({
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          })
+        );
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
@@ -152,8 +162,6 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
     async function syncUserData() {
       try {
-        await setUserTimezone();
-
         const payload = new newnewapi.EmptyRequest({});
 
         const { data } = await getMe(payload);
@@ -427,6 +435,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
+      setUserTimeZone();
       syncUserData();
     } else {
       if (!localUserTutorialsProgress) {

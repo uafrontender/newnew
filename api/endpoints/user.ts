@@ -362,7 +362,7 @@ export const deleteMyAccount = (
     signal ?? undefined
   );
 
-export const setMyTimezone = (
+export const setMyTimeZone = (
   payload: newnewapi.SetMyTimeZoneRequest,
   signal?: RequestInit['signal']
 ) =>

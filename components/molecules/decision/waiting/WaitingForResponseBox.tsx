@@ -10,29 +10,30 @@ interface IWaitingForResponseBox {
   body: string;
 }
 
-const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> =
-  ({ title, body }) => {
-    const theme = useTheme();
+const WaitingForResponseBox: React.FunctionComponent<
+  IWaitingForResponseBox
+> = ({ title, body }) => {
+  const theme = useTheme();
 
-    return (
-      <SBox>
-        <STextWrapper>
-          <SHeadline variant={2}>{title}</SHeadline>
-          <SText variant={6}>{body}</SText>
-        </STextWrapper>
-        <SImageContainer>
-          <img
-            src={
-              theme.name === 'dark'
-                ? assets.decision.darkHourglassAnimated
-                : assets.decision.lightHourglassAnimated
-            }
-            alt='post'
-          />
-        </SImageContainer>
-      </SBox>
-    );
-  };
+  return (
+    <SBox>
+      <STextWrapper>
+        <SHeadline variant={2}>{title}</SHeadline>
+        <SText variant={6}>{body}</SText>
+      </STextWrapper>
+      <SImageContainer>
+        <img
+          src={
+            theme.name === 'dark'
+              ? assets.decision.darkHourglassAnimated()
+              : assets.decision.lightHourglassAnimated()
+          }
+          alt='post'
+        />
+      </SImageContainer>
+    </SBox>
+  );
+};
 
 export default WaitingForResponseBox;
 

@@ -491,8 +491,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 <SPaymentModalHeadingPostSymbolImg
                   src={
                     theme.name === 'light'
-                      ? assets.creation.lightAcStatic
-                      : assets.creation.darkAcStatic
+                      ? assets.common.ac.lightAcStatic
+                      : assets.common.ac.darkAcStatic
                   }
                 />
               </SPaymentModalHeadingPostSymbol>

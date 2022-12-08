@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useRef, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
-import { useRouter } from 'next/router';
 
 import GlobalStyle from './globalStyles';
 
@@ -19,7 +18,6 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   initialTheme,
   children,
 }) => {
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const { colorMode } = useAppSelector((state) => state.ui);
   const colorModeMemo = useRef('');
@@ -37,20 +35,22 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   }, []);
 
   useEffect(() => {
-    // Change theme when routing to a new page
-    const handleRouteChange = (url: string) => {
+    let timeout: any;
+    const handleSwitchTheme = () => {
       dispatch(setColorMode('auto'));
       setAutoThemeMatched(true);
     };
 
     if (!autoThemeMatched) {
-      router.events.on('routeChangeComplete', handleRouteChange);
+      timeout = setTimeout(() => {
+        handleSwitchTheme();
+      }, 1500);
     } else {
-      router.events.off('routeChangeComplete', handleRouteChange);
+      clearTimeout(timeout);
     }
 
     return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
+      clearTimeout(timeout);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

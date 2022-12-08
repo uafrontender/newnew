@@ -2,6 +2,9 @@
 import { useTranslation } from 'next-i18next';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../utils/hooks/useErrorToasts';
 import isImage from '../../../utils/isImage';
 import resizeImage from '../../../utils/resizeImage';
 import Button from '../../atoms/Button';
@@ -19,6 +22,7 @@ const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
   handleDeleteFile,
 }) => {
   const { t } = useTranslation('page-Creation');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -28,7 +32,12 @@ const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
     if (files?.length === 1) {
       const file = files[0];
 
-      if (!isImage(file.name)) return;
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
       // if ((file.size / (1024 * 1024)) > 3) return;
 
       // Read uploaded file as data URL
