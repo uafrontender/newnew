@@ -26,7 +26,9 @@ import {
 } from '../api/endpoints/post';
 import waitResourceIsAvailable from '../utils/checkResourceAvailable';
 import { usePostInnerState } from './postInnerContext';
-import useErrorToasts from '../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../utils/hooks/useErrorToasts';
 
 interface IPostModerationResponsesContext {
   // Tabs
@@ -348,6 +350,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       if (error.message === 'Upload failed') {
         setResponseFileUploadError(true);
         showErrorToastCustom(error?.message);
+      } else if (error.message === 'Processing limit reached') {
+        setResponseFileUploadError(true);
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
       } else {
         console.log('Upload aborted');
       }
@@ -441,9 +448,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         setResponseFileProcessingLoading(false);
         setResponseFileProcessingProgress(0);
       }
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
+    } catch (err: any) {
+      if (err.message === 'Processing limit reached') {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
+      } else {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      }
     } finally {
       setCoreResponseUploading(false);
     }
@@ -469,9 +482,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         handleUpdatePostStatus('PROCESSING_RESPONSE');
         setUploadedResponseVideoUrl('');
       }
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
+    } catch (err: any) {
+      if (err.message === 'Processing limit reached') {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
+      } else {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      }
     }
   }, [
     postId,
