@@ -35,6 +35,7 @@ import switchPostStatus, {
 import { useAppSelector } from '../../redux-store/store';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
+import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../contexts/commentFromUrlContext';
@@ -120,6 +121,22 @@ const PostPage: NextPage<IPostPage> = ({
         : [undefined, undefined],
     [post, postFromAjax]
   );
+  const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
+  useEffect(() => {
+    if (setup_intent_client_secret || save_card) {
+      syncedHistoryReplaceState(
+        {},
+        `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${postUuid}`
+      );
+    }
+  }, [
+    router.locale,
+    setup_intent_client_secret,
+    save_card,
+    syncedHistoryReplaceState,
+    postUuid,
+  ]);
 
   useEffect(() => {
     async function fetchPost() {

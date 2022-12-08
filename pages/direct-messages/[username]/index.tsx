@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { ReactElement, useCallback, useState } from 'react';
+import React, { ReactElement, useCallback, useState, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -14,6 +14,7 @@ import Content from '../../../components/organisms/Chat';
 import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 interface IChat {
   username: string;
@@ -48,6 +49,25 @@ const Chat: NextPage<IChat> = ({
     setSetupIntentClientSecretFromRedirect('');
     setCardFromRedirect(false);
   }, []);
+
+  const { syncedHistoryReplaceState } = useSynchronizedHistory();
+
+  useEffect(() => {
+    if (setup_intent_client_secret || save_card) {
+      syncedHistoryReplaceState(
+        {},
+        `${
+          router.locale !== 'en-US' ? `/${router.locale}` : ''
+        }/direct-messages/${username}`
+      );
+    }
+  }, [
+    router.locale,
+    setup_intent_client_secret,
+    save_card,
+    syncedHistoryReplaceState,
+    username,
+  ]);
 
   return (
     <>
