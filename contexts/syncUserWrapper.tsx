@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
+import { useCookies } from 'react-cookie';
 import React, {
   useCallback,
   useContext,
@@ -34,6 +35,7 @@ interface ISyncUserWrapper {
 const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   children,
 }) => {
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const socketConnection = useContext(SocketContext);
@@ -129,9 +131,10 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
   useEffect(() => {
     const setUserTimeZone = async () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       try {
         const payload = new newnewapi.SetMyTimeZoneRequest({
-          name: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          name: timezone,
         });
 
         const response = await setMyTimeZone(payload);
@@ -142,9 +145,14 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
         dispatch(
           setUserData({
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timeZone: timezone,
           })
         );
+        setCookie('timezone', timezone, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
@@ -158,6 +166,16 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           );
         }
       }
+    };
+
+    const setUserTimezoneCookieOnly = () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setCookie('timezone', timezone, {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      });
     };
 
     async function syncUserData() {
@@ -450,6 +468,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         );
       }
       dispatch(setUserTutorialsProgressSynced(true));
+      setUserTimezoneCookieOnly();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
@@ -475,6 +494,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   return <>{children}</>;
