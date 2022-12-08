@@ -1,11 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  ReactElement,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -28,7 +22,6 @@ import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -172,23 +165,14 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
     };
 
-    const { usersIBlocked, usersBlockedMe } = useGetBlockedUsers();
-    const isBlocked = useCallback(
-      (id: string) => usersIBlocked.includes(id) || usersBlockedMe.includes(id),
-      [usersIBlocked, usersBlockedMe]
-    );
-
     const renderItem = (item: any, index: number) => {
-      const renderedPost = switchPostType(item)[0];
-      const uuid = renderedPost.creator?.uuid;
-      if (uuid && isBlocked(uuid)) return null;
       if (tutorialCard !== undefined && index === 0) {
         return (
-          <React.Fragment key={renderedPost.postUuid}>
+          <React.Fragment key={switchPostType(item)[0].postUuid}>
             <SItemWrapper name={`cards-section-${category}-${0}`}>
               {tutorialCard}
             </SItemWrapper>
-            <Link href={`/p/${renderedPost.postUuid}`}>
+            <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
               <SItemWrapper
                 name={`cards-section-${category}-${
                   tutorialCard !== undefined ? index + 1 : index
@@ -215,9 +199,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
 
       return (
-        <Link href={`/p/${renderedPost.postUuid}`}>
+        <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
           <SItemWrapper
-            key={renderedPost.postUuid}
+            key={switchPostType(item)[0].postUuid}
             name={`cards-section-${category}-${
               tutorialCard !== undefined ? index + 1 : index
             }`}
