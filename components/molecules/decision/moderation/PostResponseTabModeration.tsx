@@ -222,11 +222,7 @@ const PostResponseTabModeration: React.FunctionComponent<
             <Text variant={2} weight={600}>
               {t('postResponseTabModeration.succeeded.youMade')}
             </Text>
-            {earnedAmount?.usdCents && !earnedAmountLoading && (
-              <SAmountHeadline variant={1}>
-                ${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}
-              </SAmountHeadline>
-            )}
+            <SAmountHeadline variant={1}>{amountSwitch()}</SAmountHeadline>
             {postType === 'ac' && winningOptionAc && (
               <>
                 <SText variant={2} weight={600}>
