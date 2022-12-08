@@ -31,8 +31,8 @@ const PushNotificationsSuccessModal: React.FC<
               <SLogo
                 src={
                   theme.name === 'light'
-                    ? assets.common.lightAnimatedLogo
-                    : assets.common.darkAnimatedLogo
+                    ? assets.common.lightLogoAnimated()
+                    : assets.common.darkLogoAnimated()
                 }
                 alt='NewNew'
               />
