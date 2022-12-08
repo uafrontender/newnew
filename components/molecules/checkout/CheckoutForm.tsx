@@ -182,6 +182,13 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     []
   );
 
+  useEffect(() => {
+    // fix recaptcha challenge overlay issue
+    if (isRecaptchaV2Required) {
+      document.body.style.top = '0';
+    }
+  }, [isRecaptchaV2Required]);
+
   return (
     <SForm
       id='checkout-form'
