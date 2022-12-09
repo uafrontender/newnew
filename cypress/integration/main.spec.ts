@@ -289,7 +289,7 @@ context('Main flow', () => {
       storage.restart();
       cy.log(localStorage.getItem('remainingAcSteps'));
       cy.reload();
-      cy.wait(4000);
+      cy.wait(2000);
 
       const attemptSeed = Math.floor(Math.random() * 100);
       USER_EMAIL = `test-user-${testSeed}${attemptSeed}0@newnew.co`;
@@ -383,7 +383,7 @@ context('Main flow', () => {
       storage.restart();
       cy.log(localStorage.getItem('remainingAcSteps'));
       cy.reload();
-      cy.wait(4000);
+      cy.wait(2000);
 
       const attemptSeed = Math.floor(Math.random() * 100);
       USER_EMAIL = `test-user-${testSeed}${attemptSeed}0@newnew.co`;
@@ -410,9 +410,6 @@ context('Main flow', () => {
 
       cy.url().should('include', '/bundles');
 
-      // TODO: fix test below
-      // wait and reload the page as WS is broken
-      cy.wait(5000);
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollId}`);
       cy.url().should('include', '/p/');
 
@@ -433,6 +430,7 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollId}`);
       cy.url().should('include', '/p/');
 
+      cy.get('#bundles');
       cy.get('#add-option-button').click();
       cy.get('#add-option-input').type(CUSTOM_OPTION);
       cy.get('#add-option-submit').click();
@@ -519,7 +517,8 @@ context('Main flow', () => {
         .should('not.have.css', 'cursor', 'wait')
         .click();
 
-      cy.wait(4000);
+      // Wait for stripe elements to load
+      cy.wait(2000);
       enterCardInfo(
         USER_CARD_NUMBER,
         USER_CARD_EXPIRY,
@@ -605,7 +604,8 @@ context('Main flow', () => {
       cy.get('#buy-bundle-button').click();
       cy.get('#buy-bundle-1-button').click();
 
-      cy.wait(4000);
+      // Wait for stripe elements to load
+      cy.wait(2000);
       enterCardInfo(
         USER_CARD_NUMBER,
         USER_CARD_EXPIRY,
@@ -618,11 +618,6 @@ context('Main flow', () => {
       cy.get('#bundleSuccess', {
         timeout: 15000,
       }).click();
-
-      // TODO: remove step below
-      // wait and reload the page as WS is broken
-      cy.wait(5000);
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollId}`);
 
       cy.get('#support-button-0').click();
       cy.get('#vote-option-bundle').click();
@@ -641,6 +636,7 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollId}`);
       cy.url().should('include', '/p/');
 
+      cy.get('#bundles');
       cy.get('#add-option-button').click();
       cy.get('#add-option-input').type(CUSTOM_OPTION);
       cy.get('#add-option-submit').click();
@@ -725,7 +721,8 @@ context('Main flow', () => {
       cy.get('#cards').click();
       cy.get('#add-new-card').click();
 
-      cy.wait(4000);
+      // Wait for stripe elements to load
+      cy.wait(2000);
       enterCardInfo(
         USER_CARD_NUMBER,
         USER_CARD_EXPIRY,
@@ -735,13 +732,7 @@ context('Main flow', () => {
 
       cy.get('#submit-card').click();
 
-      // cy.get('#add-card-success', { timeout: 60000 }).click();
-      // TODO: Re-enable part of the test above when WS updates work in test
-      // Avoid WS update (temp)
-      cy.wait(20000);
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/profile/settings`);
-      cy.get('#cards').click();
-      cy.contains('8210');
+      cy.get('#add-card-success', { timeout: 30000 }).click();
     });
 
     it('can enter a post page and contribute to a superpoll', () => {
@@ -773,11 +764,6 @@ context('Main flow', () => {
       cy.get('#bundleSuccess', {
         timeout: 15000,
       }).click();
-
-      // TODO: remove step below
-      // wait and reload the page as WS is broken
-      cy.wait(5000);
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollId}`);
 
       cy.get('#support-button-supported').click();
       cy.get('#vote-option-bundle').click();

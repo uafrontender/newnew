@@ -62,3 +62,7 @@ the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=
 from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Tests
+
+We use cypress tests that run locally and on CI pipeline. to run tests use `npm run cypress` command. After a test you can find a video of it running in `cypress/video` folder. In order to see test running in browser use `npm run cypress:open` command.
