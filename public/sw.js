@@ -7,7 +7,8 @@ self.addEventListener('push', (event) => {
     body: message.text,
     badge: './favicon.png',
     icon: './favicon.png',
-    requireInteraction: true,
+    tag: 'newnew',
+    renotify: true,
     data: {
       message,
     },
