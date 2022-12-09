@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-function useDraggableScroll<T extends HTMLElement>() {
+function useHorizontalDraggableScroll<T extends HTMLElement>() {
   const scrollContainerRef = useRef<T>(null);
   const [clientX, setClientX] = useState(0);
   const [scrollX, setScrollX] = useState(0);
@@ -48,4 +48,4 @@ function useDraggableScroll<T extends HTMLElement>() {
   };
 }
 
-export default useDraggableScroll;
+export default useHorizontalDraggableScroll;

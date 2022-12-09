@@ -15,7 +15,7 @@ import logoAnimation from '../../../public/animations/mobile_logo.json';
 import assets from '../../../constants/assets';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
-import useDraggableScroll from '../../../utils/hooks/useDraggableScroll';
+import useHorizontalDraggableScroll from '../../../utils/hooks/useHorizontalDraggableScroll';
 
 interface ISettingsCards {}
 
@@ -80,7 +80,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   }, [cards?.length]);
 
   const { scrollContainerRef, onMouseDown, onMouseMove, onMouseUp } =
-    useDraggableScroll<HTMLUListElement>();
+    useHorizontalDraggableScroll<HTMLUListElement>();
 
   return (
     <SSettingsContainer>
