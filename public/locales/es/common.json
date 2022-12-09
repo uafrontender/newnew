@@ -227,7 +227,8 @@
     "generic": "Se ha producido un error, inténtalo de nuevo más tarde",
     "serverError_NEED_TRANSLATION": "A server-side error occurred, please try again later",
     "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later",
-    "usupportedImageFormatError_NEED_TRANSLATION": "Image format not supported, please try another image"
+    "usupportedImageFormatError_NEED_TRANSLATION": "Image format not supported, please try another image",
+    "processingLimitReachedError_NEED_TRANSLATION": "Please wait until you can upload more videos"
   },
   "smsNotifications": {
     "title": "¿Cuál es tu número telefónico?",
