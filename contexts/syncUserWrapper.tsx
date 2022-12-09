@@ -131,7 +131,14 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
   useEffect(() => {
     const setUserTimeZone = async () => {
+      const timezoneInRedux = user.userData?.timeZone;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      if (timezoneInRedux && timezoneInRedux === timezone) {
+        // No need to make the request
+        return;
+      }
+
       try {
         const payload = new newnewapi.SetMyTimeZoneRequest({
           name: timezone,
