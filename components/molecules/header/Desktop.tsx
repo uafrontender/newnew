@@ -124,6 +124,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                 <Link href='/bundles'>
                   <a>
                     <SButton
+                      id='bundles'
                       view='quaternary'
                       onClick={() => {
                         Mixpanel.track('Navigation Item Clicked', {
