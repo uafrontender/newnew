@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 
 import GlobalStyle from './globalStyles';
@@ -11,11 +11,13 @@ import { setColorMode } from '../redux-store/slices/uiStateSlice';
 
 interface IGlobalTheme {
   initialTheme: string;
+  themeFromCookie?: 'light' | 'dark';
   children: React.ReactNode;
 }
 
 const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   initialTheme,
+  themeFromCookie,
   children,
 }) => {
   const dispatch = useAppDispatch();
@@ -26,6 +28,20 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
 
   const [autoThemeMatched, setAutoThemeMatched] = useState(
     initialTheme !== 'auto'
+  );
+
+  const themeProp = useMemo(
+    () =>
+      !autoThemeMatched && (initialTheme === 'auto' || colorMode === 'auto')
+        ? themeFromCookie
+          ? themeFromCookie === 'light'
+            ? lightTheme
+            : darkTheme
+          : darkTheme
+        : getColorMode(!mounted ? initialTheme : colorMode) === 'light'
+        ? lightTheme
+        : darkTheme,
+    [autoThemeMatched, colorMode, initialTheme, mounted, themeFromCookie]
   );
 
   useEffect(() => {
@@ -63,15 +79,7 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   }, [colorMode]);
 
   return (
-    <ThemeProvider
-      theme={
-        !autoThemeMatched && (initialTheme === 'auto' || colorMode === 'auto')
-          ? darkTheme
-          : getColorMode(!mounted ? initialTheme : colorMode) === 'light'
-          ? lightTheme
-          : darkTheme
-      }
-    >
+    <ThemeProvider theme={themeProp}>
       <GlobalStyle />
       {children}
     </ThemeProvider>
