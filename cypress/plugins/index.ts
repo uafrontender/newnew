@@ -24,6 +24,19 @@ module.exports = (on, config) => {
     config.env[envKey] = process.env[envKey];
   });
 
+  /* on('before:browser:launch', (browser = {}, launchOptions) => {
+    launchOptions.args = launchOptions.args.map((arg) => {
+      if (arg.startsWith('--proxy-bypass-list')) {
+        // Allows test in headless mode use WS servers
+        return `--proxy-bypass-list=<-loopback>,${process.env['NEXT_PUBLIC_SOCKET_URL']}*`;
+      }
+
+      return arg;
+    });
+
+    return launchOptions;
+  }); */
+
   config.env.i18n = i18nGeneralConfig.i18n;
 
   on('task', {
