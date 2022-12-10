@@ -8,6 +8,7 @@ import React, {
   useCallback,
   useContext,
   useRef,
+  useMemo,
 } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -84,9 +85,6 @@ const ChatArea: React.FC<IChatData> = ({
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
-  const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
-  const [isMessagingDisabled, setIsMessagingDisabled] =
-    useState<boolean>(false);
   const [isSubscriptionExpired, setIsSubscriptionExpired] =
     useState<boolean>(false);
 
@@ -120,31 +118,15 @@ const ChatArea: React.FC<IChatData> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
 
-  useEffect(() => {
-    if (usersIBlocked.length > 0 && chatRoom) {
-      const isBlocked = usersIBlocked.find(
-        (i) => i === chatRoom?.visavis?.user?.uuid
-      );
-      if (isBlocked) {
-        setIsVisavisBlocked(true);
-      } else {
-        if (isVisavisBlocked) setIsVisavisBlocked(false);
-      }
-    } else {
-      if (isVisavisBlocked) setIsVisavisBlocked(false);
-    }
-  }, [usersIBlocked, chatRoom, isVisavisBlocked]);
+  const isVisavisBlocked = useMemo(
+    () => usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersIBlocked]
+  );
 
-  useEffect(() => {
-    if (usersBlockedMe.length > 0 && chatRoom) {
-      const isBlocked = usersBlockedMe.find(
-        (i) => i === chatRoom?.visavis?.user?.uuid
-      );
-      if (isBlocked) {
-        setIsMessagingDisabled(true);
-      }
-    }
-  }, [usersBlockedMe, chatRoom]);
+  const isMessagingDisabled = useMemo(
+    () => usersBlockedMe.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersBlockedMe]
+  );
 
   const handleOpenEllipseMenu = useCallback(() => {
     setEllipseMenuOpen(true);
