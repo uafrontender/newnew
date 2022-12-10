@@ -9,6 +9,7 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { getMyBlockedUsers } from '../api/endpoints/user';
+import { SocketContext } from './socketContext';
 
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
@@ -29,6 +30,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
+  const socketConnection = useContext(SocketContext);
 
   const blockUser = (uuid: string) => {
     setUsersIBlocked((curr) => [...curr, uuid]);
@@ -68,6 +70,28 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     }
     fetchBlockedUsers();
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    const socketHandlerUserBlockStatusChanged = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.BlockStatusChanged.decode(arr);
+      if (!decoded) return;
+      if (decoded.isBlocked) {
+        setUsersBlockedMe((curr) => [...curr, decoded.userUuid]);
+      } else {
+        setUsersBlockedMe((curr) =>
+          curr.filter((uuid) => uuid !== decoded.userUuid)
+        );
+      }
+    };
+    if (socketConnection) {
+      socketConnection?.on(
+        'BlockStatusChanged',
+        socketHandlerUserBlockStatusChanged
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   return (
     <BlockedUsersContext.Provider value={contextValue}>
