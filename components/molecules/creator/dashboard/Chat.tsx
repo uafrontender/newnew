@@ -1,12 +1,15 @@
+/* eslint-disable no-nested-ternary */
 import React, {
   useState,
   useEffect,
   useCallback,
   useContext,
   useRef,
+  useMemo,
 } from 'react';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -36,6 +39,14 @@ import {
 import isBrowser from '../../../../utils/isBrowser';
 import getDisplayname from '../../../../utils/getDisplayname';
 import validateInputText from '../../../../utils/validateMessageText';
+import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
+
+const AccountDeleted = dynamic(() => import('../../chat/AccountDeleted'));
+const MessagingDisabled = dynamic(() => import('../../chat/MessagingDisabled'));
+const BlockedUser = dynamic(() => import('../../chat/BlockedUser'));
+const SubscriptionExpired = dynamic(
+  () => import('../../chat/SubscriptionExpired')
+);
 
 interface IChat {
   roomID: string;
@@ -55,6 +66,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     'mobileL',
     'tablet',
   ].includes(ui.resizeMode);
+  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -72,6 +84,9 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
 
   const [chatRoom, setChatRoom] = useState<newnewapi.ChatRoom | undefined>();
   const [chatRoomLoading, setChatRoomLoading] = useState<boolean>(false);
+  const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
+  const [isSubscriptionExpired, setIsSubscriptionExpired] =
+    useState<boolean>(false);
 
   const getChatMessages = useCallback(
     async (pageToken?: string) => {
@@ -164,6 +179,9 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     if (!chatRoom) {
       fetchChatRoom();
     }
+    if (!chatRoom?.visavis?.isSubscriptionActive)
+      setIsSubscriptionExpired(true);
+
     if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0)
       markChatAsRead();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -390,6 +408,40 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageText, chatRoom?.visavis?.user?.username]);
 
+  const isVisavisBlocked = useMemo(() => {
+    console.log(usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''));
+
+    return usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? '');
+  }, [chatRoom?.visavis?.user?.uuid, usersIBlocked]);
+
+  const isMessagingDisabled = useMemo(
+    () => usersBlockedMe.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersBlockedMe]
+  );
+
+  const isTextareaHidden = useMemo(
+    () =>
+      isMessagingDisabled ||
+      isVisavisBlocked ||
+      isSubscriptionExpired ||
+      chatRoom?.visavis?.user?.options?.isTombstone ||
+      !chatRoom,
+    [isVisavisBlocked, isSubscriptionExpired, isMessagingDisabled, chatRoom]
+  );
+
+  const onUserBlock = useCallback(() => {
+    if (!isVisavisBlocked) {
+      if (!confirmBlockUser) setConfirmBlockUser(true);
+    } else {
+      unblockUser(chatRoom?.visavis?.user?.uuid);
+    }
+  }, [
+    isVisavisBlocked,
+    confirmBlockUser,
+    chatRoom?.visavis?.user?.uuid,
+    unblockUser,
+  ]);
+
   return (
     <SContainer>
       <STopPart>
@@ -461,34 +513,61 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        <SBottomTextarea>
-          <STextArea>
-            <TextArea
-              isDashboard
-              maxlength={500}
-              value={messageText}
-              onChange={handleChange}
-              placeholder={t('chat.placeholder')}
+        {(isVisavisBlocked === true || confirmBlockUser) &&
+          chatRoom &&
+          chatRoom.visavis && (
+            <BlockedUser
+              confirmBlockUser={confirmBlockUser}
+              isBlocked={isVisavisBlocked}
+              user={chatRoom.visavis}
+              onUserBlock={onUserBlock}
+              closeModal={() => setConfirmBlockUser(false)}
             />
-          </STextArea>
-          <SButton
-            withShadow
-            view={messageTextValid ? 'primaryGrad' : 'secondary'}
-            onClick={handleSubmit}
-            disabled={!messageTextValid}
-          >
-            <SInlineSVG
-              svg={sendIcon}
-              fill={
-                messageTextValid
-                  ? theme.colors.white
-                  : theme.colorsThemed.text.primary
-              }
-              width='24px'
-              height='24px'
+          )}
+
+        {chatRoom?.visavis?.user?.options?.isTombstone ? (
+          <AccountDeleted />
+        ) : chatRoom && chatRoom.visavis ? (
+          isMessagingDisabled ? (
+            <MessagingDisabled user={chatRoom.visavis.user!!} />
+          ) : isSubscriptionExpired && chatRoom.visavis?.user?.uuid ? (
+            <SubscriptionExpired
+              user={chatRoom.visavis.user!!}
+              myRole={chatRoom.myRole!!}
             />
-          </SButton>
-        </SBottomTextarea>
+          ) : null
+        ) : null}
+
+        {!isTextareaHidden && (
+          <SBottomTextarea>
+            <STextArea>
+              <TextArea
+                isDashboard
+                maxlength={500}
+                value={messageText}
+                onChange={handleChange}
+                placeholder={t('chat.placeholder')}
+              />
+            </STextArea>
+            <SButton
+              withShadow
+              view={messageTextValid ? 'primaryGrad' : 'secondary'}
+              onClick={handleSubmit}
+              disabled={!messageTextValid}
+            >
+              <SInlineSVG
+                svg={sendIcon}
+                fill={
+                  messageTextValid
+                    ? theme.colors.white
+                    : theme.colorsThemed.text.primary
+                }
+                width='24px'
+                height='24px'
+              />
+            </SButton>
+          </SBottomTextarea>
+        )}
       </SBottomPart>
     </SContainer>
   );

@@ -5,17 +5,19 @@ import React, {
   useContext,
   useMemo,
   useState,
+  useCallback,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
-import { getMyBlockedUsers } from '../api/endpoints/user';
+import { getMyBlockedUsers, markUser } from '../api/endpoints/user';
 import { SocketContext } from './socketContext';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
   usersIBlocked: [] as string[],
   blockUser: (uuid: string) => {},
-  unblockUser: (uuid: string) => {},
+  unblockUser: (uuid: string | null | undefined) => {},
   usersBlockedLoading: false,
 });
 
@@ -31,14 +33,28 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
   const socketConnection = useContext(SocketContext);
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const blockUser = (uuid: string) => {
     setUsersIBlocked((curr) => [...curr, uuid]);
   };
 
-  const unblockUser = (uuid: string) => {
-    setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
-  };
+  const unblockUser = useCallback(async (uuid: string | null | undefined) => {
+    try {
+      if (!uuid) throw new Error('No uuid provided');
+      const payload = new newnewapi.MarkUserRequest({
+        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+        userUuid: uuid,
+      });
+      const res = await markUser(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
+    } catch (err) {
+      console.error(err);
+      showErrorToastPredefined(undefined);
+    }
+  }, []);
 
   const contextValue = useMemo(
     () => ({
