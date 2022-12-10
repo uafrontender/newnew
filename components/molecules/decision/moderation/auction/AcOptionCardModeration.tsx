@@ -35,7 +35,6 @@ import VerificationCheckmark from '../../../../../public/images/svg/icons/filled
 import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
-import { markUser } from '../../../../../api/endpoints/user';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -73,25 +72,6 @@ const AcOptionCardModeration: React.FunctionComponent<
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(option.creator?.uuid ?? ''),
     [option.creator?.uuid, usersIBlocked]
-  );
-
-  const handleUnblockUser = useCallback(
-    async (uuid: string) => {
-      if (!uuid) throw new Error('No uuid provided');
-      try {
-        const payload = new newnewapi.MarkUserRequest({
-          markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-          userUuid: uuid,
-        });
-        const res = await markUser(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        unblockUser(uuid);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [unblockUser]
   );
 
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -333,9 +313,7 @@ const AcOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-              handleUnblockUser={() =>
-                handleUnblockUser(option.creator?.uuid ?? '')
-              }
+              handleUnblockUser={() => unblockUser(option.creator?.uuid)}
               anchorElement={ellipseButtonRef.current as HTMLElement}
             />
           )}
@@ -422,9 +400,7 @@ const AcOptionCardModeration: React.FunctionComponent<
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-          handleUnblockUser={() =>
-            handleUnblockUser(option.creator?.uuid ?? '')
-          }
+          handleUnblockUser={() => unblockUser(option.creator?.uuid)}
         />
       )}
       {option.creator && (

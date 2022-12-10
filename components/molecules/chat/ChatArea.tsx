@@ -20,7 +20,6 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 /* API */
-import { markUser } from '../../../api/endpoints/user';
 import { reportUser } from '../../../api/endpoints/report';
 import { sendMessage } from '../../../api/endpoints/chat';
 
@@ -136,29 +135,18 @@ const ChatArea: React.FC<IChatData> = ({
     setEllipseMenuOpen(false);
   }, []);
 
-  const unblockUserRequest = useCallback(async () => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: 4,
-        userUuid: chatRoom?.visavis?.user?.uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      if (chatRoom?.visavis?.user?.uuid)
-        unblockUser(chatRoom.visavis.user?.uuid);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [chatRoom, unblockUser]);
-
   const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) setConfirmBlockUser(true);
     } else {
-      unblockUserRequest();
+      unblockUser(chatRoom?.visavis?.user?.uuid);
     }
-  }, [isVisavisBlocked, confirmBlockUser, unblockUserRequest]);
+  }, [
+    isVisavisBlocked,
+    confirmBlockUser,
+    chatRoom?.visavis?.user?.uuid,
+    unblockUser,
+  ]);
 
   const onUserReport = useCallback(() => {
     setConfirmReportUser(true);
@@ -225,30 +213,49 @@ const ChatArea: React.FC<IChatData> = ({
     }
   };
 
-  const isTextareaVisible = useCallback(() => {
-    if (
+  const isTextareaHidden = useMemo(
+    () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
       isSubscriptionExpired ||
       chatRoom?.visavis?.user?.options?.isTombstone ||
-      !chatRoom
-    ) {
-      return false;
-    }
+      !chatRoom ||
+      (isAnnouncement && !isMyAnnouncement),
+    [
+      isVisavisBlocked,
+      isSubscriptionExpired,
+      isMessagingDisabled,
+      isAnnouncement,
+      isMyAnnouncement,
+      chatRoom,
+    ]
+  );
 
-    if (isAnnouncement && !isMyAnnouncement) {
-      return false;
-    }
+  // const isTextareaVisible = useCallback(() => {
+  //   if (
+  //     isMessagingDisabled ||
+  //     isVisavisBlocked ||
+  //     isSubscriptionExpired ||
+  //     chatRoom?.visavis?.user?.options?.isTombstone ||
+  //     !chatRoom ||
+  //     (isAnnouncement && !isMyAnnouncement)
+  //   ) {
+  //     return false;
+  //   }
 
-    return true;
-  }, [
-    isVisavisBlocked,
-    isSubscriptionExpired,
-    isMessagingDisabled,
-    isAnnouncement,
-    isMyAnnouncement,
-    chatRoom,
-  ]);
+  //   // if (isAnnouncement && !isMyAnnouncement) {
+  //   //   return false;
+  //   // }
+
+  //   return true;
+  // }, [
+  //   isVisavisBlocked,
+  //   isSubscriptionExpired,
+  //   isMessagingDisabled,
+  //   isAnnouncement,
+  //   isMyAnnouncement,
+  //   chatRoom,
+  // ]);
 
   const moreButtonRef: any = useRef();
 
@@ -325,7 +332,6 @@ const ChatArea: React.FC<IChatData> = ({
               user={chatRoom.visavis}
               onUserBlock={onUserBlock}
               closeModal={() => setConfirmBlockUser(false)}
-              // isAnnouncement={isAnnouncement}
             />
           )}
 
@@ -342,7 +348,7 @@ const ChatArea: React.FC<IChatData> = ({
           ) : null
         ) : null}
 
-        {isTextareaVisible() && (
+        {!isTextareaHidden && (
           <SBottomTextarea>
             <STextArea>
               <TextArea

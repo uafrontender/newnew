@@ -27,7 +27,6 @@ import {
 import {
   getUserByUsername,
   logout,
-  markUser,
   updateMe,
 } from '../../../api/endpoints/user';
 
@@ -90,22 +89,6 @@ const MyProfileSettingsIndex = () => {
   const [blockedUsers, setBlockedUsers] = useState<
     Omit<newnewapi.User, 'toJSON'>[]
   >([]);
-
-  const unblockUserAsync = async (uuid: string) => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-        userUuid: uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(uuid);
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-    }
-  };
 
   // Logout loading
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
@@ -270,7 +253,7 @@ const MyProfileSettingsIndex = () => {
           blockedUsers={blockedUsers}
           handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
           handleToggleAccountPrivate={handleToggleAccountPrivate}
-          handleUnblockUser={unblockUserAsync}
+          handleUnblockUser={unblockUser}
           handleSetActive={() => {}}
         />
       ),
