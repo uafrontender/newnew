@@ -1,6 +1,8 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -12,14 +14,15 @@ import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAcc
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import { getUserByUsername } from '../../../api/endpoints/user';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
   isAccountPrivate: boolean;
-  blockedUsers: Omit<newnewapi.User, 'toJSON'>[];
   handleToggleSpendingHidden: () => void;
   handleToggleAccountPrivate: () => void;
-  handleUnblockUser: (uuid: string) => void;
   // Allows handling visuals for active/inactive state
   handleSetActive: () => void;
 };
@@ -27,16 +30,47 @@ type TPrivacySection = {
 const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   isSpendingHidden,
   isAccountPrivate,
-  blockedUsers,
   handleToggleSpendingHidden,
   handleToggleAccountPrivate,
-  handleUnblockUser,
   handleSetActive,
 }) => {
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] =
     useState(false);
+  // Blocked users
+  const { usersIBlocked: usersIBlockedIds, changeUserBlockedStatus } =
+    useGetBlockedUsers();
+  const [blockedUsers, setBlockedUsers] = useState<
+    Omit<newnewapi.User, 'toJSON'>[]
+  >([]);
+
+  useEffect(() => {
+    async function fetchUsersIBlocked() {
+      try {
+        const users: newnewapi.User[] = [];
+        for (let i = 0; i < usersIBlockedIds.length; i++) {
+          const payload = new newnewapi.GetUserRequest({
+            uuid: usersIBlockedIds[i],
+          });
+          const res = await getUserByUsername(payload);
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+          if (res.data) {
+            users.push(res.data);
+          }
+        }
+        setBlockedUsers(users);
+      } catch (err) {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      }
+    }
+
+    fetchUsersIBlocked();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usersIBlockedIds]);
 
   return (
     <SWrapper onMouseEnter={() => handleSetActive()}>
@@ -105,7 +139,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 
               <SUsername variant={2}>{`@${user.username}`}</SUsername>
               <SUnblockButton
-                onClick={() => handleUnblockUser(user.uuid)}
+                onClick={() => changeUserBlockedStatus(user.uuid, false)}
                 view='secondary'
               >
                 {t('Settings.sections.privacy.blockedUsers.button.unblock')}

@@ -67,7 +67,7 @@ const AcOptionCardModeration: React.FunctionComponent<
     resizeMode
   );
 
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, changeUserBlockedStatus } = useGetBlockedUsers();
 
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(option.creator?.uuid ?? ''),
@@ -313,7 +313,9 @@ const AcOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-              handleUnblockUser={() => unblockUser(option.creator?.uuid)}
+              handleUnblockUser={() =>
+                changeUserBlockedStatus(option.creator?.uuid, false)
+              }
               anchorElement={ellipseButtonRef.current as HTMLElement}
             />
           )}
@@ -400,7 +402,9 @@ const AcOptionCardModeration: React.FunctionComponent<
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-          handleUnblockUser={() => unblockUser(option.creator?.uuid)}
+          handleUnblockUser={() =>
+            changeUserBlockedStatus(option.creator?.uuid, false)
+          }
         />
       )}
       {option.creator && (

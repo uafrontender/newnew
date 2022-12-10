@@ -126,7 +126,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
+    useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
     [usersIBlocked, user.uuid]
@@ -507,7 +508,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleClickBlock={() => {
                 if (isUserBlocked) {
-                  unblockUser(user.uuid);
+                  changeUserBlockedStatus(user.uuid, false);
                 } else {
                   setBlockUserModalOpen(true);
                 }
@@ -619,7 +620,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           onClose={() => setIsEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUser(user.uuid);
+              changeUserBlockedStatus(user.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }

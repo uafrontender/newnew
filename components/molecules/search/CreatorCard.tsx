@@ -48,7 +48,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, changeUserBlockedStatus } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
     [usersIBlocked, creator.uuid]
@@ -116,7 +116,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUser(creator.uuid);
+              changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
@@ -173,7 +173,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           onClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUser(creator.uuid);
+              changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
