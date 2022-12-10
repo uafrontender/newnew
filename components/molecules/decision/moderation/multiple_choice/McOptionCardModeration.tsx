@@ -10,7 +10,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { toast } from 'react-toastify';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
@@ -70,7 +69,7 @@ const McOptionCardModeration: React.FunctionComponent<
   );
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, changeUserBlockedStatus } = useGetBlockedUsers();
 
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(option.creator?.uuid ?? ''),
@@ -252,7 +251,9 @@ const McOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-              handleUnblockUser={() => unblockUser(option.creator?.uuid)}
+              handleUnblockUser={() =>
+                changeUserBlockedStatus(option.creator?.uuid, false)
+              }
               anchorElement={ellipseMenuButton.current}
             />
           )}
@@ -278,7 +279,9 @@ const McOptionCardModeration: React.FunctionComponent<
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-          handleUnblockUser={() => unblockUser(option.creator?.uuid)}
+          handleUnblockUser={() =>
+            changeUserBlockedStatus(option.creator?.uuid, false)
+          }
         />
       )}
       {/* Confirm block user modal */}

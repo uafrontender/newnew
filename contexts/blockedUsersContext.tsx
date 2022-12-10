@@ -16,9 +16,11 @@ import useErrorToasts from '../utils/hooks/useErrorToasts';
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
   usersIBlocked: [] as string[],
-  blockUser: (uuid: string) => {},
-  unblockUser: (uuid: string | null | undefined) => {},
   usersBlockedLoading: false,
+  changeUserBlockedStatus: (
+    uuid: string | null | undefined,
+    block: boolean
+  ) => {},
 });
 
 interface IBlockedUsersProvider {
@@ -35,37 +37,39 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const socketConnection = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const blockUser = (uuid: string) => {
-    setUsersIBlocked((curr) => [...curr, uuid]);
-  };
-
-  const unblockUser = useCallback(async (uuid: string | null | undefined) => {
-    try {
-      if (!uuid) throw new Error('No uuid provided');
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-        userUuid: uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-    }
-  }, []);
+  const changeUserBlockedStatus = useCallback(
+    async (uuid: string | null | undefined, block: boolean) => {
+      try {
+        if (!uuid) throw new Error('No uuid provided');
+        const payload = new newnewapi.MarkUserRequest({
+          markAs: block
+            ? newnewapi.MarkUserRequest.MarkAs.BLOCKED
+            : newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+          userUuid: uuid,
+        });
+        const res = await markUser(payload);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        block
+          ? setUsersIBlocked((curr) => [...curr, uuid])
+          : setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
+      } catch (err) {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      }
+    },
+    []
+  );
 
   const contextValue = useMemo(
     () => ({
       usersBlockedMe,
       usersIBlocked,
       usersBlockedLoading,
-      blockUser,
-      unblockUser,
+      changeUserBlockedStatus,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [usersBlockedMe, usersIBlocked, blockUser, unblockUser]
+    [usersBlockedMe, usersIBlocked, changeUserBlockedStatus]
   );
 
   useEffect(() => {

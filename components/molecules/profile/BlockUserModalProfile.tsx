@@ -3,13 +3,11 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 
-import { markUser } from '../../../api/endpoints/user';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import getDisplayname from '../../../utils/getDisplayname';
 import preventParentClick from '../../../utils/preventParentClick';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 interface IBlockUserModalProfile {
   user: newnewapi.IUser;
@@ -23,28 +21,11 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   closeModal,
 }) => {
   const { t } = useTranslation('page-Profile');
-  const { showErrorToastPredefined } = useErrorToasts();
 
-  const { blockUser } = useGetBlockedUsers();
-
-  async function blockUserRequest() {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: 3,
-        userUuid: user.uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      if (user.uuid) blockUser(user.uuid);
-      closeModal();
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-    }
-  }
+  const { changeUserBlockedStatus } = useGetBlockedUsers();
   const handleConfirmClick = () => {
-    blockUserRequest();
+    changeUserBlockedStatus(user.uuid, true);
+    closeModal();
   };
   return (
     <Modal show={confirmBlockUser} onClose={closeModal}>

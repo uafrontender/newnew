@@ -66,7 +66,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     'mobileL',
     'tablet',
   ].includes(ui.resizeMode);
-  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
+    useGetBlockedUsers();
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -433,13 +434,13 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) setConfirmBlockUser(true);
     } else {
-      unblockUser(chatRoom?.visavis?.user?.uuid);
+      changeUserBlockedStatus(chatRoom?.visavis?.user?.uuid, false);
     }
   }, [
     isVisavisBlocked,
     confirmBlockUser,
     chatRoom?.visavis?.user?.uuid,
-    unblockUser,
+    changeUserBlockedStatus,
   ]);
 
   return (

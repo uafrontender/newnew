@@ -1,5 +1,3 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
 /* eslint-disable react/jsx-no-target-blank */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -24,11 +22,7 @@ import {
 } from '../../../redux-store/slices/userStateSlice';
 
 // API
-import {
-  getUserByUsername,
-  logout,
-  updateMe,
-} from '../../../api/endpoints/user';
+import { logout, updateMe } from '../../../api/endpoints/user';
 
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
@@ -46,7 +40,6 @@ import SettingsNotificationsSection from '../../../components/organisms/settings
 import SettingsCardsSection from '../../../components/organisms/settings/SettingsCards';
 import TransactionsSection from '../../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../../components/organisms/settings/PrivacySection';
-import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
@@ -84,12 +77,6 @@ const MyProfileSettingsIndex = () => {
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  // Blocked users
-  const { usersIBlocked: usersIBlockedIds, unblockUser } = useGetBlockedUsers();
-  const [blockedUsers, setBlockedUsers] = useState<
-    Omit<newnewapi.User, 'toJSON'>[]
-  >([]);
-
   // Logout loading
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
 
@@ -103,9 +90,7 @@ const MyProfileSettingsIndex = () => {
   const handleLogout = useCallback(async () => {
     try {
       setIsLogoutLoading(true);
-
       const payload = new newnewapi.EmptyRequest({});
-
       const res = await logout(payload);
 
       if (!res.data || res.error)
@@ -250,10 +235,8 @@ const MyProfileSettingsIndex = () => {
         <PrivacySection
           isSpendingHidden={spendingHidden}
           isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
-          blockedUsers={blockedUsers}
           handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
           handleToggleAccountPrivate={handleToggleAccountPrivate}
-          handleUnblockUser={unblockUser}
           handleSetActive={() => {}}
         />
       ),
@@ -272,34 +255,6 @@ const MyProfileSettingsIndex = () => {
     fetchMyTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    async function fetchUsersIBlocked() {
-      try {
-        const users: newnewapi.User[] = [];
-
-        for (let i = 0; i < usersIBlockedIds.length; i++) {
-          const payload = new newnewapi.GetUserRequest({
-            uuid: usersIBlockedIds[i],
-          });
-
-          const res = await getUserByUsername(payload);
-
-          if (res.data) {
-            users.push(res.data);
-          }
-        }
-
-        setBlockedUsers(() => users);
-      } catch (err) {
-        console.error(err);
-        showErrorToastPredefined(undefined);
-      }
-    }
-
-    fetchUsersIBlocked();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usersIBlockedIds]);
 
   return (
     <div>

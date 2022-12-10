@@ -73,7 +73,8 @@ const ChatArea: React.FC<IChatData> = ({
     resizeMode
   );
 
-  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
+    useGetBlockedUsers();
 
   const [messageText, setMessageText] = useState<string>('');
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -139,13 +140,13 @@ const ChatArea: React.FC<IChatData> = ({
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) setConfirmBlockUser(true);
     } else {
-      unblockUser(chatRoom?.visavis?.user?.uuid);
+      changeUserBlockedStatus(chatRoom?.visavis?.user?.uuid, false);
     }
   }, [
     isVisavisBlocked,
     confirmBlockUser,
     chatRoom?.visavis?.user?.uuid,
-    unblockUser,
+    changeUserBlockedStatus,
   ]);
 
   const onUserReport = useCallback(() => {

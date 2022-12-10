@@ -3,8 +3,6 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 
-import { markUser } from '../../../api/endpoints/user';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 import Modal from '../../organisms/Modal';
@@ -27,29 +25,13 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
   isAnnouncement,
 }) => {
   const { t } = useTranslation('page-Chat');
-  const { showErrorToastPredefined } = useErrorToasts();
 
-  const { blockUser } = useGetBlockedUsers();
+  const { changeUserBlockedStatus } = useGetBlockedUsers();
 
-  async function blockUserRequest() {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: 3,
-        userUuid: user.user?.uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      if (user.user?.uuid) blockUser(user.user?.uuid);
-      onUserBlock?.();
-      closeModal();
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-    }
-  }
   const handleConfirmClick = () => {
-    blockUserRequest();
+    changeUserBlockedStatus(user.user?.uuid, true);
+    onUserBlock?.();
+    closeModal();
   };
   return (
     <Modal show={confirmBlockUser} onClose={closeModal} additionalz={1000}>
