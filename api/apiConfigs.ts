@@ -93,6 +93,9 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
     ) {
       resolve(response.arrayBuffer());
     }
+    if (response.status === 452) {
+      reject(new Error('Processing limit reached'));
+    }
     if (response.status >= 401 && response.status < 404) {
       reject(new Error('Access token invalid'));
     }
