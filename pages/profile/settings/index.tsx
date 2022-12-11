@@ -341,13 +341,10 @@ export default MyProfileSettingsIndex;
 
 const SMain = styled.main`
   position: relative;
-
-  padding: 0px 16px;
-
+  padding: 0 16px;
   ${({ theme }) => theme.media.tablet} {
-    padding: 0px 0px;
+    padding: 0;
   }
-
   ${({ theme }) => theme.media.laptop} {
     width: 736px;
     margin-left: auto;
@@ -357,7 +354,6 @@ const SMain = styled.main`
 
 const SGoBackButton = styled(GoBackButton)`
   margin-bottom: 30px;
-
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
   }
@@ -376,7 +372,6 @@ const SBottomLinksDiv = styled.div`
   display: flex;
   justify-content: center;
   gap: 40px;
-
   margin-top: 24px;
 `;
 
@@ -387,7 +382,6 @@ const SBlockOptionButton = styled.button`
   font-weight: 600;
   line-height: 24px;
   margin-bottom: 12px;
-
   background: transparent;
   border: none;
 

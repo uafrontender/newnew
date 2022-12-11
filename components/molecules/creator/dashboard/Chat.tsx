@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, {
   useState,
   useEffect,
@@ -179,9 +178,9 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   useEffect(() => {
     if (!chatRoom) {
       fetchChatRoom();
-    }
-    if (!chatRoom?.visavis?.isSubscriptionActive)
+    } else if (!chatRoom?.visavis?.isSubscriptionActive) {
       setIsSubscriptionExpired(true);
+    }
 
     if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0)
       markChatAsRead();
@@ -409,11 +408,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageText, chatRoom?.visavis?.user?.username]);
 
-  const isVisavisBlocked = useMemo(() => {
-    console.log(usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''));
-
-    return usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? '');
-  }, [chatRoom?.visavis?.user?.uuid, usersIBlocked]);
+  const isVisavisBlocked = useMemo(
+    () => usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersIBlocked]
+  );
 
   const isMessagingDisabled = useMemo(
     () => usersBlockedMe.includes(chatRoom?.visavis?.user?.uuid ?? ''),
@@ -441,6 +439,32 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     confirmBlockUser,
     chatRoom?.visavis?.user?.uuid,
     changeUserBlockedStatus,
+  ]);
+
+  const whatComponentToDisplay = useCallback(() => {
+    if (chatRoom?.visavis?.user?.options?.isTombstone)
+      return <AccountDeleted />;
+
+    if (isMessagingDisabled && chatRoom?.visavis?.user)
+      return <MessagingDisabled user={chatRoom.visavis.user} />;
+
+    if (
+      isSubscriptionExpired &&
+      chatRoom?.visavis?.user?.uuid &&
+      chatRoom.myRole
+    )
+      return (
+        <SubscriptionExpired
+          user={chatRoom.visavis.user}
+          myRole={chatRoom.myRole}
+        />
+      );
+    return null;
+  }, [
+    isMessagingDisabled,
+    chatRoom?.visavis?.user,
+    isSubscriptionExpired,
+    chatRoom?.myRole,
   ]);
 
   return (
@@ -525,21 +549,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
               closeModal={() => setConfirmBlockUser(false)}
             />
           )}
-
-        {chatRoom?.visavis?.user?.options?.isTombstone ? (
-          <AccountDeleted />
-        ) : chatRoom && chatRoom.visavis ? (
-          isMessagingDisabled ? (
-            <MessagingDisabled user={chatRoom.visavis.user!!} />
-          ) : isSubscriptionExpired && chatRoom.visavis?.user?.uuid ? (
-            <SubscriptionExpired
-              user={chatRoom.visavis.user!!}
-              myRole={chatRoom.myRole!!}
-            />
-          ) : null
-        ) : null}
-
-        {!isTextareaHidden && (
+        {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>
               <TextArea
@@ -568,6 +578,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
               />
             </SButton>
           </SBottomTextarea>
+        ) : (
+          whatComponentToDisplay()
         )}
       </SBottomPart>
     </SContainer>

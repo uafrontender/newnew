@@ -1,7 +1,5 @@
 /* eslint-disable consistent-return */
-/* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable no-nested-ternary */
 import React, {
   useState,
   useEffect,
@@ -232,33 +230,33 @@ const ChatArea: React.FC<IChatData> = ({
     ]
   );
 
-  // const isTextareaVisible = useCallback(() => {
-  //   if (
-  //     isMessagingDisabled ||
-  //     isVisavisBlocked ||
-  //     isSubscriptionExpired ||
-  //     chatRoom?.visavis?.user?.options?.isTombstone ||
-  //     !chatRoom ||
-  //     (isAnnouncement && !isMyAnnouncement)
-  //   ) {
-  //     return false;
-  //   }
-
-  //   // if (isAnnouncement && !isMyAnnouncement) {
-  //   //   return false;
-  //   // }
-
-  //   return true;
-  // }, [
-  //   isVisavisBlocked,
-  //   isSubscriptionExpired,
-  //   isMessagingDisabled,
-  //   isAnnouncement,
-  //   isMyAnnouncement,
-  //   chatRoom,
-  // ]);
-
   const moreButtonRef: any = useRef();
+
+  const whatComponentToDisplay = useCallback(() => {
+    if (chatRoom?.visavis?.user?.options?.isTombstone)
+      return <AccountDeleted />;
+
+    if (isMessagingDisabled && chatRoom?.visavis?.user)
+      return <MessagingDisabled user={chatRoom.visavis.user} />;
+
+    if (
+      isSubscriptionExpired &&
+      chatRoom?.visavis?.user?.uuid &&
+      chatRoom.myRole
+    )
+      return (
+        <SubscriptionExpired
+          user={chatRoom.visavis.user}
+          myRole={chatRoom.myRole}
+        />
+      );
+    return null;
+  }, [
+    isMessagingDisabled,
+    chatRoom?.visavis?.user,
+    isSubscriptionExpired,
+    chatRoom?.myRole,
+  ]);
 
   return (
     <SContainer>
@@ -325,8 +323,7 @@ const ChatArea: React.FC<IChatData> = ({
       />
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
-          chatRoom &&
-          chatRoom.visavis && (
+          chatRoom?.visavis && (
             <BlockedUser
               confirmBlockUser={confirmBlockUser}
               isBlocked={isVisavisBlocked}
@@ -335,21 +332,7 @@ const ChatArea: React.FC<IChatData> = ({
               closeModal={() => setConfirmBlockUser(false)}
             />
           )}
-
-        {chatRoom?.visavis?.user?.options?.isTombstone ? (
-          <AccountDeleted />
-        ) : chatRoom && chatRoom.visavis ? (
-          isMessagingDisabled ? (
-            <MessagingDisabled user={chatRoom.visavis.user!!} />
-          ) : isSubscriptionExpired && chatRoom.visavis?.user?.uuid ? (
-            <SubscriptionExpired
-              user={chatRoom.visavis.user!!}
-              myRole={chatRoom.myRole!!}
-            />
-          ) : null
-        ) : null}
-
-        {!isTextareaHidden && (
+        {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>
               <TextArea
@@ -377,6 +360,8 @@ const ChatArea: React.FC<IChatData> = ({
               />
             </SButton>
           </SBottomTextarea>
+        ) : (
+          whatComponentToDisplay()
         )}
       </SBottomPart>
       {chatRoom?.visavis && (
