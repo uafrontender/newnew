@@ -44,7 +44,9 @@ import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 
@@ -318,7 +320,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         setShowModal(true);
       }
     } catch (err: any) {
-      showErrorToastCustom(err);
+      if (err.message === 'Processing limit reached') {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
+      } else {
+        showErrorToastCustom(err);
+      }
     }
   }, [
     customCoverImageUrl,
@@ -338,6 +346,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     userData?.options?.isOfferingBundles,
     crowdfunding.targetBackerCount,
     router,
+    showErrorToastPredefined,
     showErrorToastCustom,
   ]);
 

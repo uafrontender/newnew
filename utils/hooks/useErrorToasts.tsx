@@ -8,6 +8,7 @@ export enum ErrorToastPredefinedMessage {
   ServerError = 'serverError',
   RecaptchaError = 'recaptchaError',
   UnsupportedImageFormatError = 'usupportedImageFormatError',
+  ProcessingLimitReachedError = 'processingLimitReachedError',
 }
 
 interface IUseErrorToasts {

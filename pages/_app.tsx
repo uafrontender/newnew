@@ -18,7 +18,7 @@ import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
 
@@ -76,10 +76,11 @@ interface IMyApp extends AppProps {
   Component: NextPageWithLayout;
   uaString: string;
   colorMode: string;
+  themeFromCookie?: 'light' | 'dark';
 }
 
 const MyApp = (props: IMyApp): ReactElement => {
-  const { Component, pageProps, uaString, colorMode } = props;
+  const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
   const store = useStore();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
@@ -234,7 +235,10 @@ const MyApp = (props: IMyApp): ReactElement => {
                                   <ChatsProvider>
                                     <OverlayModeProvider>
                                       <ResizeMode>
-                                        <GlobalTheme initialTheme={colorMode}>
+                                        <GlobalTheme
+                                          initialTheme={colorMode}
+                                          themeFromCookie={themeFromCookie}
+                                        >
                                           <>
                                             <ToastContainer containerId='toast-container' />
                                             <VideoProcessingWrapper>
@@ -286,6 +290,20 @@ const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
 
 MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   const appProps = await App.getInitialProps(appContext);
+
+  if (appContext.ctx?.req.cookies?.timezone) {
+    const timezoneFromClient = appContext.ctx?.req.cookies?.timezone;
+    const hoursClient = moment().tz(timezoneFromClient).hours();
+
+    const isDayTime = hoursClient > 7 && hoursClient < 18;
+
+    return {
+      ...appProps,
+      colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
+      uaString: appContext.ctx?.req?.headers?.['user-agent'],
+      themeFromCookie: isDayTime ? 'light' : 'dark',
+    };
+  }
 
   return {
     ...appProps,
