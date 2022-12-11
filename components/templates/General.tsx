@@ -30,6 +30,7 @@ import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
+import { loadStateLS } from '../../utils/localStorage';
 
 interface IGeneral {
   className?: string;
@@ -175,8 +176,9 @@ export const General: React.FC<IGeneral> = (props) => {
     setMobileChatOpened(false);
   };
 
-  const chatButtonVisible =
-    isMobile && withChat && user.userData?.options?.isOfferingBundles;
+  const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
+
+  const chatButtonVisible = isMobile && withChat && localHasSoldBundles;
 
   const mobileNavigationVisible =
     isMobile && scrollDirection !== 'down' && !noMobieNavigation;

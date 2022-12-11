@@ -50,6 +50,8 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         const res = await markUser(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+        console.log(usersIBlocked, uuid);
+
         block
           ? setUsersIBlocked((curr) => [...curr, uuid])
           : setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
@@ -68,8 +70,12 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       usersBlockedLoading,
       changeUserBlockedStatus,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [usersBlockedMe, usersIBlocked, changeUserBlockedStatus]
+    [
+      usersBlockedMe,
+      usersIBlocked,
+      changeUserBlockedStatus,
+      usersBlockedLoading,
+    ]
   );
 
   useEffect(() => {
@@ -96,13 +102,12 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.BlockStatusChanged.decode(arr);
       if (!decoded) return;
-      if (decoded.isBlocked) {
-        setUsersBlockedMe((curr) => [...curr, decoded.userUuid]);
-      } else {
-        setUsersBlockedMe((curr) =>
-          curr.filter((uuid) => uuid !== decoded.userUuid)
-        );
-      }
+
+      decoded.isBlocked
+        ? setUsersBlockedMe((curr) => [...curr, decoded.userUuid])
+        : setUsersBlockedMe((curr) =>
+            curr.filter((uuid) => uuid !== decoded.userUuid)
+          );
     };
     if (socketConnection) {
       socketConnection?.on(
