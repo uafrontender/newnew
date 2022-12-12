@@ -21,24 +21,22 @@ const useScrollRestoration = () => {
       window.history.scrollRestoration = 'manual';
     }
 
-    router.beforePopState(({url}) => {
+    router.beforePopState(({url, as}) => {
       isBack.current = true;
 
-      console.log(scrollPositions.current[url])
       if (scrollPositions.current[url]?.numberOfPostCards) {
-        console.log('hey there')
         sessionStorage.setItem('cardsLimit', (scrollPositions.current[url]?.numberOfPostCards as number).toString())
+      } else if (scrollPositions.current[as]?.numberOfPostCards) {
+        sessionStorage.setItem('cardsLimit', (scrollPositions.current[as]?.numberOfPostCards as number).toString())
       }
       return true;
     });
 
     const onRouteChangeStart = () => {
-      console.log(router);
       const url = router.asPath || router.pathname;
       const numberOfPostCards =
         document?.getElementsByClassName('postcard-identifier')?.length ??
         undefined;
-      console.log(numberOfPostCards);
       scrollPositions.current[url] = {
         offsetTop: window.scrollY,
         ...(numberOfPostCards
@@ -47,18 +45,8 @@ const useScrollRestoration = () => {
             }
           : {}),
       };
-      console.log(scrollPositions.current);
 
-      if (numberOfPostCards) {
-        console.log('hello')
-        console.log(window.history)
-        // window.history.
-        // router.replace({
-        //   pathname: `${router.asPath}&posts_limit=${numberOfPostCards}`
-        // }, undefined, {
-        //   shallow: true,
-        // })
-      }
+      console.log(scrollPositions.current)
     };
 
     const onRouteChangeComplete = (
@@ -80,7 +68,6 @@ const useScrollRestoration = () => {
           const target = scrollPositions.current[url]?.offsetTop ?? 0;
           const current = window.scrollY;
           if (target > current && scrollRestorationAttemptsAmount.current < 8) {
-            console.log('hey');
             scrollRestorationAttemptsAmount.current += 1;
             setIsRestoringScroll(true);
             onRouteChangeComplete(url, true);

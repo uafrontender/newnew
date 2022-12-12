@@ -69,9 +69,6 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
 
         const cardsLimit = sessionStorage?.getItem('cardsLimit');
 
-        console.log('CARDS LIMIT');
-        console.log(cardsLimit);
-
         const payload = new newnewapi.GetRelatedToMePostsRequest({
           relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
           filter: postsFilter,
@@ -91,8 +88,6 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
             : {}),
         });
 
-        console.log(payload);
-
         const postsResponse = await getMyPosts(payload);
 
         if (cardsLimit) {
@@ -100,8 +95,6 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
         }
 
         if (postsResponse.data && postsResponse.data.posts) {
-          console.log(postsResponse);
-
           handleSetPosts((curr) => [
             ...curr,
             ...(postsResponse.data?.posts as newnewapi.Post[]),
