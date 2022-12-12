@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 import React, {
   createContext,
@@ -5,17 +6,22 @@ import React, {
   useContext,
   useMemo,
   useState,
+  useCallback,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
-import { getMyBlockedUsers } from '../api/endpoints/user';
+import { getMyBlockedUsers, markUser } from '../api/endpoints/user';
+import { SocketContext } from './socketContext';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
   usersIBlocked: [] as string[],
-  blockUser: (uuid: string) => {},
-  unblockUser: (uuid: string) => {},
   usersBlockedLoading: false,
+  changeUserBlockedStatus: (
+    uuid: string | null | undefined,
+    block: boolean
+  ) => {},
 });
 
 interface IBlockedUsersProvider {
@@ -29,25 +35,48 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
+  const socketConnection = useContext(SocketContext);
+  const { showErrorToastPredefined } = useErrorToasts();
 
-  const blockUser = (uuid: string) => {
-    setUsersIBlocked((curr) => [...curr, uuid]);
-  };
+  const changeUserBlockedStatus = useCallback(
+    async (uuid: string | null | undefined, block: boolean) => {
+      try {
+        if (!uuid) throw new Error('No uuid provided');
+        const payload = new newnewapi.MarkUserRequest({
+          markAs: block
+            ? newnewapi.MarkUserRequest.MarkAs.BLOCKED
+            : newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+          userUuid: uuid,
+        });
+        const res = await markUser(payload);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-  const unblockUser = (uuid: string) => {
-    setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
-  };
+        block
+          ? setUsersIBlocked((curr) => [...curr, uuid])
+          : setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
+      } catch (err) {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const contextValue = useMemo(
     () => ({
       usersBlockedMe,
       usersIBlocked,
       usersBlockedLoading,
-      blockUser,
-      unblockUser,
+      changeUserBlockedStatus,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [usersBlockedMe, usersIBlocked, blockUser, unblockUser]
+    [
+      usersBlockedMe,
+      usersIBlocked,
+      changeUserBlockedStatus,
+      usersBlockedLoading,
+    ]
   );
 
   useEffect(() => {
@@ -68,6 +97,27 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     }
     fetchBlockedUsers();
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    const socketHandlerUserBlockStatusChanged = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.BlockStatusChanged.decode(arr);
+      if (!decoded) return;
+
+      decoded.isBlocked
+        ? setUsersBlockedMe((curr) => [...curr, decoded.userUuid])
+        : setUsersBlockedMe((curr) =>
+            curr.filter((uuid) => uuid !== decoded.userUuid)
+          );
+    };
+    if (socketConnection) {
+      socketConnection?.on(
+        'BlockStatusChanged',
+        socketHandlerUserBlockStatusChanged
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   return (
     <BlockedUsersContext.Provider value={contextValue}>

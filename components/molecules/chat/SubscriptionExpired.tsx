@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import {
   SBottomAction,
@@ -13,8 +14,9 @@ import {
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
 
-import BuyBundleModal from '../bundles/BuyBundleModal';
 import getDisplayname from '../../../utils/getDisplayname';
+
+const BuyBundleModal = dynamic(() => import('../bundles/BuyBundleModal'));
 
 interface ISubscriptionExpired {
   user: newnewapi.IUser;
