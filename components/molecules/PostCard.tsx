@@ -445,6 +445,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           ref={(el) => {
             wrapperRef.current = el!!;
           }}
+          className='postcard-identifier'
           onMouseEnter={() => handleSetHovered()}
           onTouchStart={() => handleSetHovered()}
           onMouseLeave={() => handleSetUnhovered()}
@@ -563,6 +564,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         ref={(el) => {
           wrapperRef.current = el!!;
         }}
+        className='postcard-identifier'
         onMouseEnter={() => handleSetHovered()}
         onTouchStart={() => handleSetHovered()}
         onMouseLeave={() => handleSetUnhovered()}

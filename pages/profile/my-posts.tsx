@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -65,11 +66,23 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
       try {
         setIsLoading(true);
         setTriedLoading(true);
+
+        const cardsLimit = sessionStorage?.getItem('cardsLimit');
+
+        console.log('CARDS LIMIT');
+        console.log(cardsLimit);
+
         const payload = new newnewapi.GetRelatedToMePostsRequest({
           relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
           filter: postsFilter,
           paging: {
-            ...(token ? { pageToken: token } : {}),
+            ...(token
+              ? { pageToken: token }
+              : cardsLimit && needCount
+              ? {
+                  limit: parseInt(cardsLimit),
+                }
+              : {}),
           },
           ...(needCount
             ? {
@@ -77,9 +90,18 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
               }
             : {}),
         });
+
+        console.log(payload);
+
         const postsResponse = await getMyPosts(payload);
 
+        if (cardsLimit) {
+          sessionStorage.removeItem('cardsLimit');
+        }
+
         if (postsResponse.data && postsResponse.data.posts) {
+          console.log(postsResponse);
+
           handleSetPosts((curr) => [
             ...curr,
             ...(postsResponse.data?.posts as newnewapi.Post[]),
