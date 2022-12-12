@@ -34,3 +34,9 @@ Cypress.Commands.add('getIframeElementOf', (container, element) => {
     .find(element)
     .then(cy.wrap);
 });
+
+Cypress.Commands.add('safeGet', (elementSelector, options) => {
+  return cy.get(elementSelector, options).should(($el) => {
+    expect(Cypress.dom.isDetached($el)).to.eq(false);
+  });
+});
