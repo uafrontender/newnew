@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 import React, {
   createContext,
@@ -50,7 +51,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         const res = await markUser(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        console.log(usersIBlocked, uuid);
 
         block
           ? setUsersIBlocked((curr) => [...curr, uuid])
@@ -60,6 +60,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         showErrorToastPredefined(undefined);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
