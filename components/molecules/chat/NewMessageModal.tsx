@@ -130,7 +130,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!myAnnouncement) getMyAnnouncement();
