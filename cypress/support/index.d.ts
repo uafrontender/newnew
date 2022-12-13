@@ -7,6 +7,6 @@ declare namespace Cypress {
      * @example cy.dataCy('greeting')
      */
     getIframeElementOf(container: string, element: string): Chainable<Element>;
-    safeGet(elementSelector: string, options?: any): Chainable<Element>;
+    dGet(elementSelector: string, options?: any): Chainable<Element>;
   }
 }
