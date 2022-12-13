@@ -3,7 +3,7 @@ module.exports = {
   // SUPPORTED_LANGUAGES: ['en-US', 'es-MX', 'fr'],
   SUPPORTED_LANGUAGES:
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
-      ? ['en-US', 'es' /*, 'zh'*/]
+      ? ['en-US', 'es', 'zh']
       : ['en-US', 'es', 'zh'],
   DEFAULT_CURRENCY: 'usd',
   SUPPORTED_CURRENCIES: ['usd', 'eur'],
