@@ -15,7 +15,11 @@ const LanguageWrapper: React.FunctionComponent<ILanguageWrapper> = ({
   const { replace, locale, asPath, pathname } = useRouter();
 
   useEffect(() => {
-    if (cookies.preferredLocale && cookies.preferredLocale !== locale) {
+    if (
+      cookies.preferredLocale &&
+      cookies.preferredLocale !== locale &&
+      i18n?.changeLanguage
+    ) {
       replace(pathname, asPath, {
         locale: cookies.preferredLocale,
         shallow: true,
