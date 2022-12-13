@@ -99,6 +99,8 @@ const Notification: React.FC<newnewapi.INotification> = ({
     return () => {};
   }, [inView, isUnread, markNotificationAsRead]);
 
+  const title = getDisplayname(content?.relatedUser);
+
   return (
     <Link href={url}>
       <a>
@@ -136,19 +138,24 @@ const Notification: React.FC<newnewapi.INotification> = ({
               </SIconHolder>
             </SAvatarHolder>
           )}
-          <SText>
-            <STitle ref={ref}>
-              {getDisplayname(content?.relatedUser)}
-              {content?.relatedUser?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                />
-              )}{' '}
-              {isUnread && <SBullet />}
-            </STitle>
-            <p>{content?.message}</p>
+          <SText ref={ref}>
+            {title && (
+              <STitle>
+                {title}
+                {content?.relatedUser?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                  />
+                )}{' '}
+                {isUnread && <SBullet />}
+              </STitle>
+            )}
+            <SContent>
+              <p>{content?.message}</p>
+              {!title && isUnread && <SBullet />}
+            </SContent>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
             </SDate>
@@ -198,6 +205,7 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SBullet = styled.div`
+  flex-shrink: 0;
   width: 8px;
   height: 8px;
   background: #e8354d;
@@ -224,6 +232,17 @@ const STitle = styled.div`
   }
 `;
 
+const SContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 12px;
+  }
+`;
+
 const SText = styled.div`
   padding: 0 20px 12px 0;
   font-size: 14px;
@@ -236,12 +255,6 @@ const SText = styled.div`
   ${({ theme }) => theme.media.tablet} {
     border-bottom: 0;
     padding-bottom: 0;
-  }
-  p {
-    margin-bottom: 0;
-    ${({ theme }) => theme.media.tablet} {
-      margin-bottom: 12px;
-    }
   }
 `;
 
