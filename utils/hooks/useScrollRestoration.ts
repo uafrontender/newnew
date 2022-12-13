@@ -45,21 +45,17 @@ const useScrollRestoration = () => {
             }
           : {}),
       };
-
-      console.log(scrollPositions.current)
     };
 
     const onRouteChangeComplete = (
       url: keyof IScrollPositions,
       recursion?: boolean
     ) => {
-      console.log(url)
-      console.log(scrollPositions.current[url])
       if (
         (isBack.current && scrollPositions.current[url]?.offsetTop) ||
         recursion
       ) {
-        console.log(`Should scroll to: ${scrollPositions.current[url]?.offsetTop}`);
+        // console.log(`Should scroll to: ${scrollPositions.current[url]?.offsetTop}`);
         setTimeout(() => {
           window.scroll({
             top: scrollPositions.current[url]?.offsetTop,

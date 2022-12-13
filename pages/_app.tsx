@@ -350,9 +350,9 @@ const SScrollRestorationAnimationContainer = styled.div`
   justify-content: center;
   align-items: center;
 
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background-color: ${({ theme }) => theme.colorsThemed.background.backgroundT};
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  background-color: ${({ theme }) => theme.colorsThemed.background.overlaydim};
 
   ::before {
     top: 0;
