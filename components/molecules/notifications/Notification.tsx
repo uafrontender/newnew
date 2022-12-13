@@ -4,6 +4,7 @@ import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'react-i18next';
 
 import UserAvatar from '../UserAvatar';
 import { InlineSvg } from '../../atoms/InlineSVG';
@@ -35,6 +36,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
   target,
   isRead,
 }) => {
+  const { t } = useTranslation('page-Notifications');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -99,8 +101,6 @@ const Notification: React.FC<newnewapi.INotification> = ({
     return () => {};
   }, [inView, isUnread, markNotificationAsRead]);
 
-  const title = getDisplayname(content?.relatedUser);
-
   return (
     <Link href={url}>
       <a>
@@ -138,28 +138,22 @@ const Notification: React.FC<newnewapi.INotification> = ({
               </SIconHolder>
             </SAvatarHolder>
           )}
-          <SText ref={ref}>
-            {title && (
-              <STitle>
-                {title}
-                {content?.relatedUser?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                  />
-                )}{' '}
-                {isUnread && <SBullet />}
-              </STitle>
-            )}
-            <SContent>
-              <p>{content?.message}</p>
-              {!title && isUnread && <SBullet />}
-            </SContent>
+          <SInfo ref={ref}>
+            <STitle>
+              {getDisplayname(content?.relatedUser) || t('title.newMessage')}
+              {content?.relatedUser?.isVerified && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                />
+              )}
+            </STitle>
+            <SContent>{content?.message}</SContent>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
             </SDate>
-          </SText>
+          </SInfo>
           {content?.relatedPost &&
             content?.relatedPost.thumbnailImageUrl &&
             !isMobile && (
@@ -167,6 +161,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
                 avatarUrl={content?.relatedPost.thumbnailImageUrl}
               />
             )}
+          <SStatus>{isUnread && <SBullet />}</SStatus>
         </SWrapper>
       </a>
     </Link>
@@ -196,29 +191,40 @@ const SUserAvatar = styled(UserAvatar)`
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
+
   ${({ theme }) => theme.media.tablet} {
-    width: 72px;
-    height: 72px;
-    min-width: 72px;
-    min-height: 72px;
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    min-height: 78px;
   }
 `;
 
-const SBullet = styled.div`
-  flex-shrink: 0;
-  width: 8px;
-  height: 8px;
-  background: #e8354d;
-  border-radius: 50%;
-  margin-left: 8px;
-`;
-
 const SAvatarHolder = styled.div`
+  position: relative;
   flex-shrink: 0;
   margin-right: 12px;
-  position: relative;
+
   ${({ theme }) => theme.media.tablet} {
     margin-right: 24px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+`;
+
+const SInfo = styled.div`
+  padding: 0 24px 12px 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  width: 100%;
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
+
+  ${({ theme }) => theme.media.tablet} {
+    border-bottom: 0;
+    padding-bottom: 0;
   }
 `;
 
@@ -232,10 +238,7 @@ const STitle = styled.div`
   }
 `;
 
-const SContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+const SContent = styled.p`
   margin-bottom: 0;
 
   ${({ theme }) => theme.media.tablet} {
@@ -243,35 +246,48 @@ const SContent = styled.div`
   }
 `;
 
-const SText = styled.div`
-  padding: 0 20px 12px 0;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 600;
-  width: 100%;
+const SDate = styled.div`
+  font-size: 12px;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SPostThumbnail = styled(UserAvatar)`
+  width: 78px;
+  height: 78px;
+  min-width: 78px;
+  min-height: 78px;
+  flex-shrink: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-radius: 16px;
+  cursor: pointer;
+`;
+
+const SStatus = styled.div`
+  display: flex;
+  align-items: center;
   border-bottom: 1px solid
     ${(props) => props.theme.colorsThemed.background.outlines1};
+  padding-bottom: 12px;
+
   ${({ theme }) => theme.media.tablet} {
     border-bottom: 0;
     padding-bottom: 0;
   }
 `;
 
-const SPostThumbnail = styled(UserAvatar)`
-  width: 72px;
-  height: 72px;
-  min-width: 72px;
-  min-height: 72px;
+const SBullet = styled.div`
   flex-shrink: 0;
-  margin-left: auto;
-  border-radius: 20px;
-  cursor: pointer;
-`;
+  width: 10px;
+  height: 10px;
+  background: #e8354d;
+  border-radius: 50%;
+  margin-left: 10px;
+  margin-right: 8px;
 
-const SDate = styled.div`
-  font-size: 12px;
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  ${({ theme }) => theme.media.tablet} {
+    margin-left: 20px;
+  }
 `;
 
 const SIcon = styled.span`
@@ -313,10 +329,11 @@ const SIconHolder = styled.div`
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
+
   ${({ theme }) => theme.media.tablet} {
-    width: 72px;
-    height: 72px;
-    min-width: 72px;
-    min-height: 72px;
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    min-height: 78px;
   }
 `;
