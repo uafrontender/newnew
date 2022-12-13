@@ -15,7 +15,6 @@ import { Mixpanel } from '../utils/mixpanel';
 import { buyCreatorsBundle } from '../api/endpoints/bundles';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
-import Bundles from '../components/organisms/bundles/Bundles';
 
 const Bundles = dynamic(
   () => import('../components/organisms/bundles/Bundles')
