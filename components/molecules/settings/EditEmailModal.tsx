@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter } from 'next/router';
 
 import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
@@ -11,7 +10,6 @@ import EditEmailStepThree from './EditEmailStepThree';
 import EditEmailSuccess from './EditEmailSuccess';
 
 import { useAppSelector } from '../../../redux-store/store';
-import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 interface IEditEmailModal {
   show: boolean;
@@ -28,22 +26,6 @@ enum Steps {
 
 const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const router = useRouter();
-  const { syncedHistoryReplaceState } = useSynchronizedHistory();
-
-  useEffect(() => {
-    if (show) {
-      syncedHistoryReplaceState(
-        { editEmail: false },
-        '/profile/settings/edit-email'
-      );
-    }
-  }, [syncedHistoryReplaceState, show]);
-
-  const {
-    query: { step: initialStep },
-    isReady,
-  } = router;
 
   const [newEmail, setNewEmail] = useState('');
 
@@ -55,17 +37,13 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
     'tablet',
   ].includes(resizeMode);
 
-  const [step, setStep] = useState<number | null>(null);
+  const [step, setStep] = useState<number | null>(Steps.verifyEmail);
 
   useEffect(() => {
-    if (isReady && show) {
-      if (initialStep) {
-        setStep(+initialStep);
-      } else {
-        setStep(0);
-      }
+    if (show && !step) {
+      setStep(Steps.verifyEmail);
     }
-  }, [isReady, initialStep, show]);
+  }, [show, step]);
 
   useEffect(() => {
     if (!show) {
@@ -103,29 +81,24 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
     >
       {show && (
         <SModalPaper isCloseButton onClose={onClose} isMobileFullScreen>
-          {(step === Steps.verifyEmail || step === Steps.newEmail) &&
-            (!initialStep || initialStep === Steps.verifyEmail.toString()) && (
-              <AnimationContent
-                initial={step === Steps.newEmail ? MInitialDisappear : false}
-                animate={step === Steps.newEmail ? MAnimationDisappear : false}
-              >
-                <AnimatePresence>
-                  <SContent>
-                    <EditEmailStepOne onComplete={completeStepOne} />
-                  </SContent>
-                </AnimatePresence>
-              </AnimationContent>
-            )}
+          {(step === Steps.verifyEmail || step === Steps.newEmail) && (
+            <AnimationContent
+              initial={step === Steps.newEmail ? MInitialDisappear : false}
+              animate={step === Steps.newEmail ? MAnimationDisappear : false}
+            >
+              <AnimatePresence>
+                <SContent>
+                  <EditEmailStepOne onComplete={completeStepOne} />
+                </SContent>
+              </AnimatePresence>
+            </AnimationContent>
+          )}
 
           {(step === Steps.newEmail || step === Steps.verifyNewEmail) && (
             <AnimationContent
               initial={
                 // eslint-disable-next-line no-nested-ternary
-                initialStep === Steps.newEmail.toString()
-                  ? false
-                  : step === Steps.newEmail
-                  ? MInitialAppear
-                  : MInitialDisappear
+                step === Steps.newEmail ? MInitialAppear : MInitialDisappear
               }
               animate={
                 step === Steps.newEmail ? MAnimationAppear : MAnimationDisappear
@@ -139,38 +112,33 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
             </AnimationContent>
           )}
 
-          {(step === Steps.verifyNewEmail || step === Steps.success) &&
-            (!initialStep || initialStep !== Steps.success.toString()) && (
-              <AnimationContent
-                initial={
-                  step === Steps.verifyNewEmail
-                    ? MInitialAppear
-                    : MInitialDisappear
-                }
-                animate={
-                  step === Steps.verifyNewEmail
-                    ? MAnimationAppear
-                    : MAnimationDisappear
-                }
-              >
-                <AnimatePresence>
-                  <SContent>
-                    <EditEmailStepThree
-                      onComplete={completeStepThree}
-                      newEmail={newEmail}
-                    />
-                  </SContent>
-                </AnimatePresence>
-              </AnimationContent>
-            )}
+          {(step === Steps.verifyNewEmail || step === Steps.success) && (
+            <AnimationContent
+              initial={
+                step === Steps.verifyNewEmail
+                  ? MInitialAppear
+                  : MInitialDisappear
+              }
+              animate={
+                step === Steps.verifyNewEmail
+                  ? MAnimationAppear
+                  : MAnimationDisappear
+              }
+            >
+              <AnimatePresence>
+                <SContent>
+                  <EditEmailStepThree
+                    onComplete={completeStepThree}
+                    newEmail={newEmail}
+                  />
+                </SContent>
+              </AnimatePresence>
+            </AnimationContent>
+          )}
 
           {step === Steps.success && (
             <AnimationContent
-              initial={
-                initialStep === Steps.success.toString()
-                  ? false
-                  : MInitialAppear
-              }
+              initial={MInitialAppear}
               animate={MAnimationAppear}
               $centered
             >
