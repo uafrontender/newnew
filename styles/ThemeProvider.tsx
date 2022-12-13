@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
-import { useRouter } from 'next/router';
 
 import GlobalStyle from './globalStyles';
 
@@ -12,14 +11,15 @@ import { setColorMode } from '../redux-store/slices/uiStateSlice';
 
 interface IGlobalTheme {
   initialTheme: string;
+  themeFromCookie?: 'light' | 'dark';
   children: React.ReactNode;
 }
 
 const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   initialTheme,
+  themeFromCookie,
   children,
 }) => {
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const { colorMode } = useAppSelector((state) => state.ui);
   const colorModeMemo = useRef('');
@@ -30,6 +30,20 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
     initialTheme !== 'auto'
   );
 
+  const themeProp = useMemo(
+    () =>
+      !autoThemeMatched && (initialTheme === 'auto' || colorMode === 'auto')
+        ? themeFromCookie
+          ? themeFromCookie === 'light'
+            ? lightTheme
+            : darkTheme
+          : darkTheme
+        : getColorMode(!mounted ? initialTheme : colorMode) === 'light'
+        ? lightTheme
+        : darkTheme,
+    [autoThemeMatched, colorMode, initialTheme, mounted, themeFromCookie]
+  );
+
   useEffect(() => {
     colorModeMemo.current = colorMode;
     setMounted(true);
@@ -37,20 +51,22 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   }, []);
 
   useEffect(() => {
-    // Change theme when routing to a new page
-    const handleRouteChange = (url: string) => {
+    let timeout: any;
+    const handleSwitchTheme = () => {
       dispatch(setColorMode('auto'));
       setAutoThemeMatched(true);
     };
 
     if (!autoThemeMatched) {
-      router.events.on('routeChangeComplete', handleRouteChange);
+      timeout = setTimeout(() => {
+        handleSwitchTheme();
+      }, 1500);
     } else {
-      router.events.off('routeChangeComplete', handleRouteChange);
+      clearTimeout(timeout);
     }
 
     return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
+      clearTimeout(timeout);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,15 +79,7 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   }, [colorMode]);
 
   return (
-    <ThemeProvider
-      theme={
-        !autoThemeMatched && (initialTheme === 'auto' || colorMode === 'auto')
-          ? darkTheme
-          : getColorMode(!mounted ? initialTheme : colorMode) === 'light'
-          ? lightTheme
-          : darkTheme
-      }
-    >
+    <ThemeProvider theme={themeProp}>
       <GlobalStyle />
       {children}
     </ThemeProvider>

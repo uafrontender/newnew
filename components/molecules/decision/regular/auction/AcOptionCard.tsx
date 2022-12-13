@@ -271,7 +271,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
   });
 
   const handlePayWithCard = useCallback(
@@ -728,7 +728,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
-          redirectUrl={`post/${postId}`}
+          redirectUrl={`p/${postId}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           bottomCaption={
@@ -758,8 +758,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 <SPaymentModalHeadingPostSymbolImg
                   src={
                     theme.name === 'light'
-                      ? assets.creation.lightAcStatic
-                      : assets.creation.darkAcStatic
+                      ? assets.common.ac.lightAcStatic
+                      : assets.common.ac.darkAcStatic
                   }
                 />
               </SPaymentModalHeadingPostSymbol>

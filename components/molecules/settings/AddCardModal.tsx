@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import {
   useStripe,
   useElements,
@@ -8,7 +8,6 @@ import {
 } from '@stripe/react-stripe-js';
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
@@ -25,6 +24,7 @@ import Lottie from '../../atoms/Lottie';
 import CardSetupCompleteModal from '../../organisms/settings/CardSetupCompleteModal';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 interface IAddCardForm {
   onCancel: () => void;
@@ -32,9 +32,8 @@ interface IAddCardForm {
 }
 
 const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
-  const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { showErrorToastCustom } = useErrorToasts();
+  const { showErrorToastPredefined } = useErrorToasts();
   const { t: tCommon } = useTranslation('common');
 
   const stripe = useStripe();
@@ -82,14 +81,21 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     submitWithRecaptchaProtection,
     isSubmitting,
     errorMessage: recaptchaErrorMessage,
-  } = useRecaptcha(handleSubmit, 0.5, 0.1, recaptchaRef);
+  } = useRecaptcha(handleSubmit, recaptchaRef);
 
   useEffect(() => {
     if (recaptchaErrorMessage) {
-      showErrorToastCustom(recaptchaErrorMessage);
+      showErrorToastPredefined(recaptchaErrorMessage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
+
+  useEffect(() => {
+    // fix recaptcha challenge overlay issue
+    if (isRecaptchaV2Required) {
+      document.body.style.top = '0';
+    }
+  }, [isRecaptchaV2Required]);
 
   useEffect(
     () => () => {
@@ -100,7 +106,12 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
   );
 
   return (
-    <SForm onSubmit={submitWithRecaptchaProtection}>
+    <SForm
+      onSubmit={(e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        submitWithRecaptchaProtection();
+      }}
+    >
       <PaymentElement
         id='stripePayment'
         onReady={() => {
@@ -117,15 +128,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
         }}
       />
       {isRecaptchaV2Required && (
-        <SRecaptchaWrapper>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            size='normal'
-            theme={theme.name === 'dark' ? 'dark' : 'light'}
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY ?? ''}
-            onChange={onChangeRecaptchaV2}
-          />
-        </SRecaptchaWrapper>
+        <SReCaptchaV2 onChange={onChangeRecaptchaV2} ref={recaptchaRef} />
       )}
 
       {errorMessage && (
@@ -164,7 +167,7 @@ interface IAddCardModal {
 const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   const { t } = useTranslation('page-Profile');
 
-  const [stipeSecret, setStripeSecret] = useState('');
+  const [stripeSecret, setStripeSecret] = useState('');
   const [isStripeSecretLoading, setIsStripeSecretLoading] = useState(false);
 
   const { loggedIn } = useAppSelector((state) => state.user);
@@ -244,7 +247,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
               />
             </SLoader>
           )}
-          <StripeElements stipeSecret={stipeSecret}>
+          <StripeElements stipeSecret={stripeSecret}>
             <AddCardForm onCancel={closeModal} onSuccess={onCardSuccess} />
           </StripeElements>
         </SModalPaper>
@@ -277,7 +280,7 @@ const SModalPaper = styled(ModalPaper)`
   }
 `;
 
-const SRecaptchaWrapper = styled.div`
+const SReCaptchaV2 = styled(ReCaptchaV2)`
   margin-top: 20px;
 `;
 

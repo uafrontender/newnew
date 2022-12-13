@@ -10,16 +10,16 @@ import preventParentClick from '../../../utils/preventParentClick';
 import Button from '../../atoms/Button';
 import assets from '../../../constants/assets';
 
-const DARK_IMAGES: any = {
-  AC: assets.creation.darkAcAnimated,
+const DARK_IMAGES: Record<string, () => string> = {
+  AC: assets.common.ac.darkAcAnimated,
   CF: assets.creation.darkCfAnimated,
-  MC: assets.creation.darkMcAnimated,
+  MC: assets.common.mc.darkMcAnimated,
 };
 
-const LIGHT_IMAGES: any = {
-  AC: assets.creation.lightAcAnimated,
+const LIGHT_IMAGES: Record<string, () => string> = {
+  AC: assets.common.ac.lightAcAnimated,
   CF: assets.creation.lightCfAnimated,
-  MC: assets.creation.lightMcAnimated,
+  MC: assets.common.mc.lightMcAnimated,
 };
 
 interface IHeroPopup {
@@ -44,8 +44,8 @@ const HeroPopup: React.FC<IHeroPopup> = ({
             <img
               src={
                 theme.name === 'light'
-                  ? LIGHT_IMAGES[postType]
-                  : DARK_IMAGES[postType]
+                  ? LIGHT_IMAGES[postType]()
+                  : DARK_IMAGES[postType]()
               }
               alt='Post type'
               width={150}

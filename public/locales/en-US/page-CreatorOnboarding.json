@@ -156,7 +156,8 @@
       "submit": "Submit",
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
-      "stripeConnecting": "Connecting..."
+      "stripeConnecting": "Connecting...",
+      "requireInformation": "Stripe requires info"
     }
   }
 }

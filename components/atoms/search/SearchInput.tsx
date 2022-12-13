@@ -77,8 +77,9 @@ const SearchInput: React.FC = React.memo(() => {
       const clearedQuery = encodeURIComponent(query);
       if (resultsPosts.length === 0 && resultsCreators.length > 0) {
         router.push(`/search?query=${clearedQuery}&tab=creators`);
+      } else {
+        router.push(`/search?query=${clearedQuery}&tab=posts`);
       }
-      router.push(`/search?query=${clearedQuery}&tab=posts`);
     }
   };
 

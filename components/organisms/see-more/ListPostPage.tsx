@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 
@@ -33,18 +33,9 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
       resizeMode
     );
 
-    const router = useRouter();
-
-    const renderItem = (item: any, index: number) => {
-      const handleItemClick = () => {
-        router.push(`/post/${switchPostType(item)[0].postUuid}`);
-      };
-
-      return (
-        <SItemWrapper
-          key={switchPostType(item)[0].postUuid}
-          onClick={handleItemClick}
-        >
+    const renderItem = (item: any, index: number) => (
+      <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+        <SItemWrapper key={switchPostType(item)[0].postUuid}>
           <PostCard
             item={item}
             index={index + 1}
@@ -53,8 +44,8 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
             maxWidthTablet='none'
           />
         </SItemWrapper>
-      );
-    };
+      </Link>
+    );
 
     return (
       <SListPostPageWrapper

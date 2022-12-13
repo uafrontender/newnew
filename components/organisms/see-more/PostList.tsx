@@ -4,7 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -22,6 +22,7 @@ interface IList {
   wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
+  handleRemovePostFromState?: (uuid: string) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -31,33 +32,28 @@ export const PostList: React.FC<IList> = ({
   wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
+  handleRemovePostFromState,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const router = useRouter();
-
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      router.push(`/post/${switchPostType(item)[0].postUuid}`);
-    };
-
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
-      >
+  const renderItem = (item: any, index: number) => (
+    <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+      <SItemWrapper key={switchPostType(item)[0].postUuid}>
         <PostCard
           item={item}
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
+          }
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   return (
     <SListWrapper

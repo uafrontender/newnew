@@ -38,7 +38,7 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
 
   const [canDeleteOption, setCanDeleteOption] = useState(false);
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
-    useState(false);
+    useState(isMyOption);
 
   useEffect(() => {
     async function fetchCanDelete() {
@@ -67,6 +67,10 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
           }
         }
 
+        if (!canDelete && isMyOption) {
+          handleClose();
+        }
+
         setCanDeleteOption(canDelete);
       } catch (err) {
         console.error(err);
@@ -77,9 +81,10 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
     if (isVisible && isMyOption) {
       fetchCanDelete();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, isMyOption, optionType, optionId, optionCreatorUuid]);
 
-  if (!isVisible) return null;
+  if (!isVisible || (isMyOption && isCanDeleteOptionLoading)) return null;
 
   return (
     <>
