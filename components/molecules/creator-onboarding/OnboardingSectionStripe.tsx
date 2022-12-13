@@ -19,6 +19,33 @@ import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 
+const getStripeButtonTextKey = (
+  stripeConnectStatus:
+    | newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+    | undefined
+    | null
+) => {
+  switch (stripeConnectStatus) {
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .PROCESSING: {
+      return 'stripeSection.button.stripeConnecting';
+    }
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .CONNECTED_ALL_GOOD: {
+      return 'stripeSection.button.stripeConnectedLink';
+    }
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .CONNECTED_NEEDS_ATTENTION: {
+      return 'stripeSection.button.requireInformation';
+    }
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .NOT_CONNECTED:
+    default: {
+      return 'stripeSection.button.requestSetupLink';
+    }
+  }
+};
+
 const OnboardingSectionStripe: React.FunctionComponent = () => {
   const router = useRouter();
   const theme = useTheme();
@@ -32,26 +59,46 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
 
   const { showErrorToastPredefined } = useErrorToasts();
 
+  const { stripeConnectStatus } = user.creatorData?.options || {};
+
   const [stripeProcessing, setStripeProcessing] = useState(false);
   const [isConnectedToStripe, setIsConnectedToStripe] = useState(false);
+  const [stripeNeedAttention, setStripeNeedAttention] = useState(false);
 
   useEffect(() => {
-    if (user.creatorData?.options.stripeConnectStatus === 4) {
-      setStripeProcessing(true);
-    } else {
-      setStripeProcessing(false);
-    }
-  }, [user.creatorData?.options.stripeConnectStatus]);
+    switch (stripeConnectStatus) {
+      case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+        .PROCESSING: {
+        setStripeProcessing(true);
+        setIsConnectedToStripe(false);
+        setStripeNeedAttention(false);
+        break;
+      }
+      case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+        .CONNECTED_ALL_GOOD: {
+        setStripeProcessing(false);
+        setIsConnectedToStripe(true);
+        setStripeNeedAttention(false);
 
-  useEffect(() => {
-    if (user.creatorData?.options.isCreatorConnectedToStripe) {
-      setIsConnectedToStripe(true);
-    } else {
-      setIsConnectedToStripe(false);
-    }
-  }, [user.creatorData?.options.isCreatorConnectedToStripe]);
+        break;
+      }
+      case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+        .CONNECTED_NEEDS_ATTENTION: {
+        setStripeProcessing(false);
+        setIsConnectedToStripe(false);
+        setStripeNeedAttention(true);
 
-  const handleRedirectToStripesetup = async () => {
+        break;
+      }
+      default: {
+        setStripeProcessing(false);
+        setIsConnectedToStripe(false);
+        setStripeNeedAttention(false);
+      }
+    }
+  }, [stripeConnectStatus]);
+
+  const handleRedirectToStripeSetup = async () => {
     try {
       const locationUrl = window.location.href;
       const payload = new newnewapi.SetupStripeCreatorAccountRequest({
@@ -85,39 +132,30 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
         <li>{t('stripeSection.bullets.3')}</li>
       </SUl>
       <SButton
-        view='primaryGrad'
+        view={stripeNeedAttention ? 'danger' : 'primaryGrad'}
         isConnectedToStripe={isConnectedToStripe || stripeProcessing}
         style={{
-          ...(isConnectedToStripe && !stripeProcessing
+          ...(isConnectedToStripe
             ? {
                 background: theme.colorsThemed.accent.success,
+                cursor: 'default',
               }
             : {}),
         }}
         onClick={() => {
-          if (!isConnectedToStripe && !stripeProcessing) {
-            handleRedirectToStripesetup();
+          if (isConnectedToStripe || stripeProcessing) {
+            return;
           }
+
+          handleRedirectToStripeSetup();
         }}
       >
         <InlineSvg
-          svg={
-            !isConnectedToStripe || stripeProcessing
-              ? StripeLogoS
-              : VerificationPassedInverted
-          }
+          svg={isConnectedToStripe ? VerificationPassedInverted : StripeLogoS}
           width='24px'
           height='24px'
         />
-        {stripeProcessing && (
-          <span>{t('stripeSection.button.stripeConnecting')}</span>
-        )}
-        {isConnectedToStripe && !stripeProcessing && (
-          <span>{t('stripeSection.button.stripeConnectedLink')}</span>
-        )}
-        {!isConnectedToStripe && !stripeProcessing && (
-          <span>{t('stripeSection.button.requestSetupLink')}</span>
-        )}
+        <span>{t(getStripeButtonTextKey(stripeConnectStatus))}</span>
       </SButton>
       <SControlsDiv>
         {!isMobile && (
@@ -226,8 +264,8 @@ const SButton = styled(Button)<{
   isConnectedToStripe: boolean;
 }>`
   margin-bottom: 24px;
-
   width: 100%;
+  cursor: pointer;
 
   ${({ theme }) => theme.media.tablet} {
     width: 256px;
@@ -248,7 +286,6 @@ const SButton = styled(Button)<{
           &:after {
             display: none;
           }
-          cursor: default;
         `
       : ''};
 `;

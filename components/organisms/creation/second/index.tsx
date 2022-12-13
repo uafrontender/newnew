@@ -71,7 +71,9 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
-import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
@@ -531,6 +533,11 @@ export const CreationSecondStepContent: React.FC<
         if (error.message === 'Upload failed') {
           dispatch(setCreationFileUploadError(true));
           showErrorToastPredefined(undefined);
+        } else if (error.message === 'Processing limit reached') {
+          dispatch(setCreationFileUploadError(true));
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.ProcessingLimitReachedError
+          );
         } else {
           console.log('Upload aborted');
         }
@@ -1209,6 +1216,7 @@ export const CreationSecondStepContent: React.FC<
                 </TabletFieldWrapper>
               </SItemWrapper>
             )}
+
             {isMobile ? (
               <SButtonWrapper>
                 <SButtonContent>

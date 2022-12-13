@@ -108,7 +108,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;
@@ -143,7 +143,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
         Mixpanel.track('See My Post Click');
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;

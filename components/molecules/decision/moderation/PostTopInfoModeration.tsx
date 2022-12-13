@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
@@ -31,16 +32,16 @@ import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { TPostType } from '../../../../utils/switchPostType';
 
-const DARK_IMAGES = {
-  ac: assets.creation.darkAcAnimated,
+const DARK_IMAGES: Record<string, () => string> = {
+  ac: assets.common.ac.darkAcAnimated,
   cf: assets.creation.darkCfAnimated,
-  mc: assets.creation.darkMcAnimated,
+  mc: assets.common.mc.darkMcAnimated,
 };
 
-const LIGHT_IMAGES = {
-  ac: assets.creation.lightAcAnimated,
+const LIGHT_IMAGES: Record<string, () => string> = {
+  ac: assets.common.ac.lightAcAnimated,
   cf: assets.creation.lightCfAnimated,
-  mc: assets.creation.lightMcAnimated,
+  mc: assets.common.mc.lightMcAnimated,
 };
 
 interface IPostTopInfoModeration {
@@ -178,46 +179,49 @@ const PostTopInfoModeration: React.FunctionComponent<
           </SBidsAmount>
         ) : null}
         <SCreatorCard>
-          <a
-            href={`${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/profile/my-posts`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on own avatar', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SAvatarArea>
-              <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
-            </SAvatarArea>
-          </a>
-          <a
-            href={`${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/profile/my-posts`}
-            onClickCapture={() => {
-              Mixpanel.track('Click on own username', {
-                _stage: 'Post',
-                _postUuid: postId,
-                _component: 'PostTopInfo',
-              });
-            }}
-          >
-            <SUsername className='username'>
-              {t('me')}
-              {creator.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                  fill='none'
+          <Link href='/profile/my-posts'>
+            <a
+              href='/profile/my-posts'
+              onClickCapture={() => {
+                Mixpanel.track('Click on own avatar', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SAvatarArea>
+                <img
+                  src={creator.avatarUrl ?? ''}
+                  alt={creator.username ?? ''}
                 />
-              )}
-            </SUsername>
-          </a>
+              </SAvatarArea>
+            </a>
+          </Link>
+          <Link href='/profile/my-posts'>
+            <a
+              href='/profile/my-posts'
+              onClickCapture={() => {
+                Mixpanel.track('Click on own username', {
+                  _stage: 'Post',
+                  _postUuid: postId,
+                  _component: 'PostTopInfo',
+                });
+              }}
+            >
+              <SUsername className='username'>
+                {t('me')}
+                {creator.options?.isVerified && (
+                  <SInlineSVG
+                    svg={VerificationCheckmark}
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
+              </SUsername>
+            </a>
+          </Link>
         </SCreatorCard>
         <SActionsDiv>
           <SShareButton
@@ -304,7 +308,7 @@ const PostTopInfoModeration: React.FunctionComponent<
             <SText variant={3}>
               {t('acPostModeration.postTopInfo.selectWinner.body')}
             </SText>
-            <STrophyImg src={assets.decision.lightHourglassAnimated} />
+            <STrophyImg src={assets.decision.lightHourglassAnimated()} />
           </SSelectWinnerOption>
         ) : null}
       </SWrapper>
@@ -321,8 +325,8 @@ const PostTopInfoModeration: React.FunctionComponent<
           imageSrc={
             postType
               ? theme.name === 'light'
-                ? LIGHT_IMAGES[postType]
-                : DARK_IMAGES[postType]
+                ? LIGHT_IMAGES[postType]()
+                : DARK_IMAGES[postType]()
               : undefined
           }
           buttonCaption={t('postFailedBoxModeration.buttonText', {

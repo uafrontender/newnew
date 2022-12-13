@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -21,6 +21,8 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import ChatName from '../../../atoms/chat/ChatName';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
 
 const EmptyInbox = dynamic(() => import('../../../atoms/chat/EmptyInbox'));
 const NoResults = dynamic(() => import('../../../atoms/chat/NoResults'));
@@ -53,6 +55,8 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
   const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(
     null
   );
+
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
 
   // TODO: caused issues, rework to use usePagination hook
   // TODO: add scrollable container to load more when scrolled to bottom (callback)
@@ -194,6 +198,18 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
     }
   }, [searchText, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
+  // to update time ago of last message
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 60 * 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
+
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
@@ -268,7 +284,7 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchedRooms, chatRooms, updatedChat, router, t]
+    [searchedRooms, chatRooms, updatedChat, router, t, updateTimer]
   );
 
   return (

@@ -358,7 +358,7 @@ const PostPage: NextPage<IPostPage> = ({
         _stage: 'Post',
         _postUuid: newPostParsed.postUuid,
       });
-      router.push(`/post/${newPostParsed.postUuid}`);
+      router.push(`/p/${newPostParsed.postUuid}`);
     },
     [router]
   );
@@ -408,6 +408,10 @@ const PostPage: NextPage<IPostPage> = ({
     }
     if (commentContentFromUrl) {
       handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+
+      router.replace(`/p/${postUuid}`, undefined, {
+        shallow: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
@@ -539,7 +543,7 @@ const PostPage: NextPage<IPostPage> = ({
         x: isMobile && !isServerSide ? 500 : 0,
         opacity: 0,
         transition: {
-          duration: isMobile ? 0.3 : 0.3,
+          duration: isMobile ? 0.3 : 0,
         },
       }}
       animate={{
@@ -588,7 +592,7 @@ const PostPage: NextPage<IPostPage> = ({
           <meta property='og:title' content={postParsed?.title} />
           <meta
             property='og:url'
-            content={`${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`}
+            content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`}
           />
           <meta
             property='og:image'

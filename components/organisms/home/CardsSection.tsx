@@ -5,6 +5,7 @@ import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Button from '../../atoms/Button';
@@ -165,52 +166,61 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     };
 
     const renderItem = (item: any, index: number) => {
-      const handleItemClick = () => {
-        if (!isDragging) {
-          router.push(`/post/${switchPostType(item)[0].postUuid}`);
-        }
-      };
-
       if (tutorialCard !== undefined && index === 0) {
         return (
           <React.Fragment key={switchPostType(item)[0].postUuid}>
             <SItemWrapper name={`cards-section-${category}-${0}`}>
               {tutorialCard}
             </SItemWrapper>
-            <SItemWrapper
-              name={`cards-section-${category}-${
-                tutorialCard !== undefined ? index + 1 : index
-              }`}
-              onClick={handleItemClick}
-            >
-              <PostCard
-                item={item}
-                index={tutorialCard !== undefined ? index + 1 : index}
-                width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
-                height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
-                maxWidthTablet='224px'
-              />
-            </SItemWrapper>
+            <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+              <SItemWrapper
+                name={`cards-section-${category}-${
+                  tutorialCard !== undefined ? index + 1 : index
+                }`}
+                // onClick={handleItemClick}
+                onClick={(e) => {
+                  if (isDragging) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
+              >
+                <PostCard
+                  item={item}
+                  index={tutorialCard !== undefined ? index + 1 : index}
+                  width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+                  height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+                  maxWidthTablet='224px'
+                />
+              </SItemWrapper>
+            </Link>
           </React.Fragment>
         );
       }
 
       return (
-        <SItemWrapper
-          key={switchPostType(item)[0].postUuid}
-          name={`cards-section-${category}-${
-            tutorialCard !== undefined ? index + 1 : index
-          }`}
-          onClick={handleItemClick}
-        >
-          <PostCard
-            item={item}
-            index={tutorialCard !== undefined ? index + 1 : index}
-            width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
-            height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
-            maxWidthTablet='224px'
-          />
-        </SItemWrapper>
+        <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+          <SItemWrapper
+            key={switchPostType(item)[0].postUuid}
+            name={`cards-section-${category}-${
+              tutorialCard !== undefined ? index + 1 : index
+            }`}
+            onClick={(e) => {
+              if (isDragging) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
+          >
+            <PostCard
+              item={item}
+              index={tutorialCard !== undefined ? index + 1 : index}
+              width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
+              height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+              maxWidthTablet='224px'
+            />
+          </SItemWrapper>
+        </Link>
       );
     };
 

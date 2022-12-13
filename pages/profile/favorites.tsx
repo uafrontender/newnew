@@ -19,6 +19,7 @@ import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import assets from '../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import switchPostType from '../../utils/switchPostType';
 
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
@@ -106,6 +107,15 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     ]
   );
 
+  const handleRemovePostFromState = (postUuid: string) => {
+    handleSetPosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
   useEffect(() => {
     if (inView && !isLoading) {
       if (pageToken) {
@@ -116,8 +126,19 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
     } else if (!triedLoading && posts?.length === 0) {
       loadPosts(undefined, true);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
+
+  // Clear up the state on page unmount
+  useEffect(
+    () => () => {
+      handleUpdatePageToken(undefined);
+      handleSetPosts([]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   return (
     <div>
@@ -141,6 +162,9 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
               wrapperStyle={{
                 left: 0,
               }}
+              handleRemovePostFromState={(uuid: string) =>
+                handleRemovePostFromState(uuid)
+              }
             />
           )}
           {posts && posts.length === 0 && !isLoading && (

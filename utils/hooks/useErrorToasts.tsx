@@ -5,7 +5,10 @@ import { toast, ToastOptions } from 'react-toastify';
 
 // eslint-disable-next-line no-shadow
 export enum ErrorToastPredefinedMessage {
-  ServerError = 'server-error',
+  ServerError = 'serverError',
+  RecaptchaError = 'recaptchaError',
+  UnsupportedImageFormatError = 'usupportedImageFormatError',
+  ProcessingLimitReachedError = 'processingLimitReachedError',
 }
 
 interface IUseErrorToasts {

@@ -22,11 +22,13 @@ const NewMessage: React.FC<IFunctionProps> = ({ openChat }) => {
   return (
     <>
       <NewMessageButton handleClick={openModal} />
-      <NewMessageModal
-        openChat={openChat}
-        showModal={showModal}
-        closeModal={closeModal}
-      />
+      {showModal && (
+        <NewMessageModal
+          openChat={openChat}
+          showModal={showModal}
+          closeModal={closeModal}
+        />
+      )}
     </>
   );
 };

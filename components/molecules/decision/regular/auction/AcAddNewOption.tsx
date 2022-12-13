@@ -213,7 +213,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
   });
 
   const handlePayWithCard = useCallback(
@@ -460,7 +460,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
-          redirectUrl={`post/${postId}`}
+          redirectUrl={`p/${postId}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           setupIntent={setupIntent}
@@ -488,8 +488,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 <SPaymentModalHeadingPostSymbolImg
                   src={
                     theme.name === 'light'
-                      ? assets.creation.lightAcStatic
-                      : assets.creation.darkAcStatic
+                      ? assets.common.ac.lightAcStatic
+                      : assets.common.ac.darkAcStatic
                   }
                 />
               </SPaymentModalHeadingPostSymbol>

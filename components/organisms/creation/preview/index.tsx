@@ -20,6 +20,7 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
+import ReCaptchaV2 from '../../../atoms/ReCaptchaV2';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
@@ -43,8 +44,11 @@ import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../../../@types/i18next';
+import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -63,7 +67,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const playerRef: any = useRef(null);
-  const [loading, setLoading] = useState(false);
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const [showModal, setShowModal] = useState(false);
   const {
     post,
@@ -136,13 +141,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           CREATION_OPTION_MAX
         )
     ) === -1;
-
-  const disabled =
-    loading ||
-    !titleIsValid ||
-    !post.title ||
-    !post.announcementVideoUrl ||
-    !optionsAreValid;
 
   const formatStartsAt: () => any = useCallback(() => {
     const time = moment(
@@ -218,9 +216,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   }, [dispatch, router]);
 
   const handleSubmit = useCallback(async () => {
-    if (loading) return;
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
-    setLoading(true);
     try {
       let hasCoverImage = false;
 
@@ -316,7 +312,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       }
 
       dispatch(setPostData(data));
-      setLoading(false);
 
       if (isMobile) {
         router.push(`/creation/${tab}/published`);
@@ -325,11 +320,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         setShowModal(true);
       }
     } catch (err: any) {
-      showErrorToastCustom(err);
-      setLoading(false);
+      if (err.message === 'Processing limit reached') {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
+      } else {
+        showErrorToastCustom(err);
+      }
     }
   }, [
-    loading,
     customCoverImageUrl,
     post.title,
     post.options,
@@ -347,8 +346,32 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     userData?.options?.isOfferingBundles,
     crowdfunding.targetBackerCount,
     router,
+    showErrorToastPredefined,
     showErrorToastCustom,
   ]);
+
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection: handleSubmitWithRecaptchaProtection,
+    errorMessage: recaptchaErrorMessage,
+    isSubmitting,
+  } = useRecaptcha(handleSubmit, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      showErrorToastPredefined(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage, showErrorToastPredefined]);
+
+  const disabled =
+    isSubmitting ||
+    !titleIsValid ||
+    !post.title ||
+    !post.announcementVideoUrl ||
+    !optionsAreValid;
 
   const settings: any = useMemo(
     () =>
@@ -505,10 +528,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </SPlayerWrapper>
         </SContent>
         <SButtonWrapper>
+          {isRecaptchaV2Required && (
+            <SReCaptchaV2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
+          )}
           <SButtonContent>
             <SButton
               view='primaryGrad'
-              loading={loading}
+              loading={isSubmitting}
               onClick={handleSubmit}
               disabled={disabled}
             >
@@ -552,20 +578,30 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
           )}
           <SSettings>{settings.map(renderSetting)}</SSettings>
-          <SButtonsWrapper>
-            <Button view='secondary' onClick={handleClose} disabled={loading}>
-              {t('preview.button.edit')}
-            </Button>
-            <Button
-              id='publish'
-              view='primaryGrad'
-              loading={loading}
-              onClick={handleSubmit}
-              disabled={disabled}
-            >
-              {t('preview.button.submit')}
-            </Button>
-          </SButtonsWrapper>
+
+          <SButtonsContainer>
+            {isRecaptchaV2Required && (
+              <SReCaptchaV2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
+            )}
+            <SButtonsWrapper>
+              <Button
+                view='secondary'
+                onClick={handleClose}
+                disabled={isSubmitting}
+              >
+                {t('preview.button.edit')}
+              </Button>
+              <Button
+                id='publish'
+                view='primaryGrad'
+                loading={isSubmitting}
+                onClick={handleSubmitWithRecaptchaProtection}
+                disabled={disabled}
+              >
+                {t('preview.button.submit')}
+              </Button>
+            </SButtonsWrapper>
+          </SButtonsContainer>
         </SRightPart>
       </STabletContent>
     </>
@@ -657,6 +693,7 @@ const SButtonWrapper = styled.div`
   bottom: 0;
   z-index: 5;
   display: flex;
+  flex-direction: column;
   padding: 24px 16px;
   position: fixed;
   background: ${(props) => props.theme.gradients.creationSubmit};
@@ -734,10 +771,14 @@ const SPlayerWrapper = styled.div`
   margin-top: 42px;
 `;
 
+const SButtonsContainer = styled.div`
+  position: relative;
+  margin-top: 26px;
+`;
+
 const SButtonsWrapper = styled.div`
   width: 100%;
   display: flex;
-  margin-top: 26px;
   align-items: center;
   justify-content: space-between;
 `;
@@ -757,4 +798,14 @@ const SInlineSVG = styled(InlineSVG)`
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
+`;
+
+const SReCaptchaV2 = styled(ReCaptchaV2)`
+  margin-bottom: 10px;
+  position: relative;
+  left: calc((100% - 304px) / 2);
+
+  ${({ theme }) => theme.media.tablet} {
+    left: 0;
+  }
 `;

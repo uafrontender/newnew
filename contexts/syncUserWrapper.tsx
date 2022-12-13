@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
+import { useCookies } from 'react-cookie';
 import React, {
   useCallback,
   useContext,
@@ -12,6 +13,7 @@ import {
   getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
+  setMyTimeZone,
 } from '../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
@@ -33,6 +35,7 @@ interface ISyncUserWrapper {
 const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   children,
 }) => {
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const socketConnection = useContext(SocketContext);
@@ -127,6 +130,61 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   ]);
 
   useEffect(() => {
+    const setUserTimeZone = async () => {
+      const timezoneInRedux = user.userData?.timeZone;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      if (timezoneInRedux && timezoneInRedux === timezone) {
+        // No need to make the request
+        return;
+      }
+
+      try {
+        const payload = new newnewapi.SetMyTimeZoneRequest({
+          name: timezone,
+        });
+
+        const response = await setMyTimeZone(payload);
+
+        if (response.error) {
+          throw new Error('Cannot set time zone');
+        }
+
+        dispatch(
+          setUserData({
+            timeZone: timezone,
+          })
+        );
+        setCookie('timezone', timezone, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
+      } catch (err) {
+        console.error(err);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(
+            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+          );
+        }
+      }
+    };
+
+    const setUserTimezoneCookieOnly = () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setCookie('timezone', timezone, {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      });
+    };
+
     async function syncUserData() {
       try {
         const payload = new newnewapi.EmptyRequest({});
@@ -402,6 +460,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
+      setUserTimeZone();
       syncUserData();
     } else {
       if (!localUserTutorialsProgress) {
@@ -416,6 +475,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         );
       }
       dispatch(setUserTutorialsProgressSynced(true));
+      setUserTimezoneCookieOnly();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
@@ -441,6 +501,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   return <>{children}</>;

@@ -158,7 +158,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
               `/sign-up?reason=comment&redirect=${encodeURIComponent(
                 `${process.env.NEXT_PUBLIC_APP_URL}/${
                   router.locale !== 'en-US' ? `${router.locale}/` : ''
-                }post/${postUuid}?comment_content=${commentText}#comments`
+                }p/${postUuid}?comment_content=${commentText}#comments`
               )}`
             );
           }

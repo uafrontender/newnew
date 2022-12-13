@@ -31,6 +31,7 @@ import { formatNumber } from '../../../../../utils/format';
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
 import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
+import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
 
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
@@ -295,7 +296,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const setupIntent = useStripeSetupIntent({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/post/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
   });
 
   const handlePayWithCard = useCallback(
@@ -512,6 +513,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <SOptionInfo variant={3}>{option.text}</SOptionInfo>
             <SBiddersInfo variant={3}>
               <RenderSupportersInfo
+                isBlue={isBlue}
                 isCreatorsBid={isCreatorsBid}
                 isSuggestedByMe={isSuggestedByMe}
                 isSupportedByMe={!!option.isSupportedByMe}
@@ -682,7 +684,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
-            redirectUrl={`post/${postId}`}
+            redirectUrl={`p/${postId}`}
             bottomCaption={
               (!appConstants.minHoldAmount?.usdCents ||
                 paymentWithFeeInCents >
@@ -765,6 +767,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               <SOptionInfo variant={3}>{option.text}</SOptionInfo>
               <SBiddersInfo variant={3}>
                 <RenderSupportersInfo
+                  isBlue={isBlue}
                   isCreatorsBid={isCreatorsBid}
                   isSuggestedByMe={isSuggestedByMe}
                   isSupportedByMe={!!option.isSupportedByMe}
@@ -886,6 +889,7 @@ McOptionCard.defaultProps = {
 export default McOptionCard;
 
 export const RenderSupportersInfo: React.FunctionComponent<{
+  isBlue: boolean;
   isCreatorsBid: boolean;
   isSuggestedByMe: boolean;
   isSupportedByMe: boolean;
@@ -903,6 +907,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isFirstVoterVerified?: boolean;
   isWhitelistSupporterVerified?: boolean;
 }> = ({
+  isBlue,
   isCreatorsBid,
   isSupportedByMe,
   isSuggestedByMe,
@@ -940,7 +945,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   {whiteListedSupporter}
                   {isWhitelistSupporterVerified && (
                     <SInlineSvgVerificationIcon
-                      svg={VerificationCheckmark}
+                      svg={
+                        !isBlue
+                          ? VerificationCheckmark
+                          : VerificationCheckmarkInverted
+                      }
                       width='14px'
                       height='14px'
                       fill='none'
@@ -960,7 +969,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   {firstVoter}
                   {isFirstVoterVerified && (
                     <SInlineSvgVerificationIcon
-                      svg={VerificationCheckmark}
+                      svg={
+                        !isBlue
+                          ? VerificationCheckmark
+                          : VerificationCheckmarkInverted
+                      }
                       width='14px'
                       height='14px'
                       fill='none'
@@ -1044,7 +1057,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {optionCreator}
               {isOptionCreatorVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmark}
+                  svg={
+                    !isBlue
+                      ? VerificationCheckmark
+                      : VerificationCheckmarkInverted
+                  }
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1066,7 +1083,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {whiteListedSupporter}
               {isWhitelistSupporterVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmark}
+                  svg={
+                    !isBlue
+                      ? VerificationCheckmark
+                      : VerificationCheckmarkInverted
+                  }
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1110,7 +1131,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {optionCreator}
               {isOptionCreatorVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmark}
+                  svg={
+                    !isBlue
+                      ? VerificationCheckmark
+                      : VerificationCheckmarkInverted
+                  }
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1132,7 +1157,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               {whiteListedSupporter}
               {isWhitelistSupporterVerified && (
                 <SInlineSvgVerificationIcon
-                  svg={VerificationCheckmark}
+                  svg={
+                    !isBlue
+                      ? VerificationCheckmark
+                      : VerificationCheckmarkInverted
+                  }
                   width='14px'
                   height='14px'
                   fill='none'
@@ -1228,7 +1257,7 @@ const SContainer = styled(motion.div)<{
 
   background-color: ${({ theme, $isBlue }) =>
     $isBlue
-      ? theme.colorsThemed.accent.yellow
+      ? theme.colorsThemed.accent.blue
       : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -1265,16 +1294,16 @@ const SBidDetails = styled.div<{
     isBlue
       ? css`
           div {
-            color: ${({ theme }) => theme.colors.dark};
+            color: #ffffff;
           }
 
           .spanRegular {
-            color: ${({ theme }) => theme.colors.dark};
+            color: #ffffff;
 
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: ${({ theme }) => theme.colors.dark};
+            color: #ffffff;
           }
         `
       : null}
@@ -1289,7 +1318,7 @@ const SBidDetails = styled.div<{
 
     background-color: ${({ theme, isBlue }) =>
       isBlue
-        ? theme.colorsThemed.accent.yellow
+        ? theme.colorsThemed.accent.blue
         : theme.colorsThemed.background.tertiary};
 
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -1391,8 +1420,8 @@ const SSupportButton = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          color: #ffffff;
-          background: ${({ theme }) => theme.colors.dark};
+          color: ${({ theme }) => theme.colors.dark};
+          background: #ffffff;
         `
       : null}
 `;
@@ -1433,9 +1462,7 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          border-left: ${({ theme }) => theme.colors.dark} 1px solid;
-          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-          color: ${({ theme }) => theme.colors.dark};
+          border-left: #ffffff 1px solid;
         `
       : null}
 
@@ -1461,19 +1488,18 @@ const SSelectVotesModalCard = styled.div<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+          background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
           div {
-            color: ${({ theme }) => theme.colors.dark};
+            color: #ffffff;
           }
 
           .spanRegular {
-            color: ${({ theme }) => theme.colors.dark};
-
+            color: #ffffff;
             opacity: 0.6;
           }
           .spanHighlighted {
-            color: ${({ theme }) => theme.colors.dark};
+            color: #ffffff;
           }
         `
       : null}

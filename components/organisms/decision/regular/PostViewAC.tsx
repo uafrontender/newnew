@@ -149,7 +149,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
   const [triedLoading, setTriedLoading] = useState(false);
 
-  // const currLocation = `/post/${post.postUuid}`;
+  // const currLocation = `/p/${post.postUuid}`;
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));

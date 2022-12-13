@@ -79,7 +79,7 @@ const CashOut: React.FC<ICashOut> = ({
           width='48px'
           height='48px'
         />
-        <SDescriptionWrapper>
+        <div>
           {nextCashOutAmount && nextCashOutAmount.usdCents ? (
             <SStripeBlock>
               <SStripeBlockText variant={2} weight={600}>
@@ -112,15 +112,15 @@ const CashOut: React.FC<ICashOut> = ({
             </SDescription>
           )}
           {nextCashOutDate && (
-            <SDescription variant={3} weight={600}>
+            <SDescriptionAutoPayout variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
                 date: moment((nextCashOutDate.seconds as number) * 1000).format(
                   'MMM DD YYYY'
                 ),
               })}
-            </SDescription>
+            </SDescriptionAutoPayout>
           )}
-        </SDescriptionWrapper>
+        </div>
       </SCashOutTopBlock>
       {!stripeLink ? (
         <a href='https://creatorpayouts.newnew.co/' target='_blank'>
@@ -175,15 +175,14 @@ const SCashOutTopBlock = styled.div`
   flex-direction: row;
 `;
 
-const SDescriptionWrapper = styled.div`
-  div {
-    /* display: inline; */
-  }
-`;
-
 const SDescription = styled(Text)`
   color: rgba(255, 255, 255, 0.7);
-  /* margin-top: 8px; */
+`;
+
+const SDescriptionAutoPayout = styled(Text)`
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 14px;
+  margin-left: 20px;
 `;
 
 const SButton = styled(Button)`

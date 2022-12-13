@@ -3,9 +3,11 @@
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import getDisplayname from '../../../utils/getDisplayname';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
@@ -17,6 +19,18 @@ interface IFunction {
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
   const { t: tPostCard } = useTranslation('component-PostCard');
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 1000);
+    }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
+
   const renderItem = useCallback(
     (post: newnewapi.IPost) => {
       const postType = Object.keys(post)[0];
@@ -50,7 +64,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       }
 
       return (
-        <Link href={`/post/${data.postUuid}`} key={data.postUuid}>
+        <Link href={`/p/${data.postUuid}`} key={data.postUuid}>
           <a>
             <SPost>
               <SLeftSide>
@@ -71,11 +85,17 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                   <SPostEnded>
                     {parsed.days !== '00' &&
                       `${parsed.days}${tPostCard('timer.daysLeft')}`}{' '}
-                    {`${parsed.hours}${tPostCard('timer.hoursLeft')} ${
-                      parsed.minutes
-                    }${tPostCard('timer.minutesLeft')} ${
-                      parsed.seconds
-                    }${tPostCard('timer.secondsLeft')} `}
+                    {`${
+                      parsed.hours !== '00' ||
+                      (parsed.days !== '00' && parsed.hours === '00')
+                        ? `${parsed.hours}${tPostCard('timer.hoursLeft')}`
+                        : ''
+                    } ${parsed.minutes}${tPostCard('timer.minutesLeft')}
+                    ${
+                      parsed.days === '00'
+                        ? `${parsed.seconds}${tPostCard('timer.secondsLeft')}`
+                        : ''
+                    }`}
                   </SPostEnded>
                 ) : (
                   <SPostEnded>
@@ -91,7 +111,8 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
         </Link>
       );
     },
-    [t, tPostCard]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t, tPostCard, updateTimer]
   );
 
   return (
