@@ -347,9 +347,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     };
 
     const handleOnVotingTimeExpired = () => {
-      if (options && options.some((o) => o.supporterCount > 0)) {
-        handleUpdatePostStatus('WAITING_FOR_DECISION');
-      } else {
+      if (!options || options.every((o) => o.supporterCount === 0)) {
         handleUpdatePostStatus('FAILED');
       }
     };
