@@ -321,7 +321,13 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         console.error(err);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [options, winningOption, post.postUuid]);
+
+    useEffect(() => {
+      if (postStatus === 'waiting_for_response') {
+        fetchPostLatestData();
+      }
+    }, [postStatus, fetchPostLatestData]);
 
     const handleOnResponseTimeExpired = () => {
       handleUpdatePostStatus('FAILED');
@@ -329,7 +335,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     const handleOnVotingTimeExpired = async () => {
       if (options.some((o) => o.supporterCount > 0)) {
-        handleUpdatePostStatus('WAITING_FOR_RESPONSE');
         await fetchPostLatestData();
       } else {
         handleUpdatePostStatus('FAILED');
