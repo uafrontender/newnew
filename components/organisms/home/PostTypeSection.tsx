@@ -42,7 +42,10 @@ const PostTypeSection = ({
   );
 
   const renderPosts = (post: newnewapi.Post, index: number) => (
-    <Link href={`/p/${switchPostType(post)[0].postUuid}`}>
+    <Link
+      href={`/p/${switchPostType(post)[0].postUuid}`}
+      key={switchPostType(post)[0].postUuid}
+    >
       <SItemWrapper key={switchPostType(post)[0].postUuid} index={index}>
         <PostCard
           item={post}

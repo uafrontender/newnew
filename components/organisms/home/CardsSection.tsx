@@ -199,7 +199,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
 
       return (
-        <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+        <Link
+          href={`/p/${switchPostType(item)[0].postUuid}`}
+          key={switchPostType(item)[0].postUuid}
+        >
           <SItemWrapper
             key={switchPostType(item)[0].postUuid}
             name={`cards-section-${category}-${

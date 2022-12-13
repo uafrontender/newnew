@@ -34,7 +34,10 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
     );
 
     const renderItem = (item: any, index: number) => (
-      <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+      <Link
+        href={`/p/${switchPostType(item)[0].postUuid}`}
+        key={switchPostType(item)[0].postUuid}
+      >
         <SItemWrapper key={switchPostType(item)[0].postUuid}>
           <PostCard
             item={item}
