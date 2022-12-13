@@ -446,19 +446,25 @@ const PRE_FETCH_LINKS_DARK = (
   <>
     <link
       rel='prefetch'
-      href={assets.signup.darkStatic}
+      href={assets.signup.darkIntroStatic}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.signup.darkIntoAnimated}
+      href={assets.signup.darkIntoAnimated()}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.signup.darkOutroAnimated}
+      href={assets.signup.darkIntroStatic}
+      as='image'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={assets.signup.darkOutroAnimated()}
       as='image'
       media='(min-width: 760px)'
     />
@@ -499,19 +505,25 @@ const PRE_FETCH_LINKS_LIGHT = (
   <>
     <link
       rel='prefetch'
-      href={assets.signup.lightStatic}
+      href={assets.signup.lightIntroStatic}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.signup.lightIntoAnimated}
+      href={assets.signup.lightIntoAnimated()}
       as='image'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={assets.signup.lightOutroAnimated}
+      href={assets.signup.lightIntroStatic}
+      as='image'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={assets.signup.lightOutroAnimated()}
       as='image'
       media='(min-width: 760px)'
     />
