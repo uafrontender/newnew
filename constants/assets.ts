@@ -25,26 +25,23 @@ const assets = {
   },
   decision: {
     gold: `${APP_ASSETS_ORIGIN}/decision/gold.png`,
-    hourglass: `${APP_ASSETS_ORIGIN}/decision/hourglass.png`,
     paymentSuccess: `${APP_ASSETS_ORIGIN}/decision/payment-success.png`,
     trophy: `${APP_ASSETS_ORIGIN}/decision/trophy.png`,
     votes: `${APP_ASSETS_ORIGIN}/decision/votes.png`,
     darkHourglassAnimated: () => {
       if (isSafari()) {
-        // Change asset
         return `${APP_ASSETS_ORIGIN}/decision/darkHourglassAnimated.png`;
       }
-      return `${APP_ASSETS_ORIGIN}/decision/hourglass-dark.webp`;
+      return `${APP_ASSETS_ORIGIN}/decision/darkHourglassAnimated.webp`;
     },
-    darkHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-static-dark.png`,
+    darkHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/darkHourglassStatic.png`,
     lightHourglassAnimated: () => {
       if (isSafari()) {
-        // Change asset
         return `${APP_ASSETS_ORIGIN}/decision/lightHourglassAnimated.png`;
       }
-      return `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webp`;
+      return `${APP_ASSETS_ORIGIN}/decision/lightHourglassAnimated.webp`;
     },
-    lightHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-static-light.png`,
+    lightHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/lightHourglassStatic.png`,
   },
   info: {
     lightQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-light.png`,
@@ -136,12 +133,34 @@ const assets = {
     ],
   },
   signup: {
-    darkIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`,
-    darkOutroAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`,
-    darkStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-dark.png`,
-    lightIntoAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`,
-    lightOutroAnimated: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`,
-    lightStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-light.png`,
+    darkIntoAnimated: () => {
+      if (isSafari()) {
+        // TODO: Change assets
+        return `${APP_ASSETS_ORIGIN}/signup/darkIntroAnimated.png`;
+      }
+      // TODO: Change assets
+      return `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`;
+    },
+    darkOutroAnimated: () => {
+      if (isSafari()) {
+        return `${APP_ASSETS_ORIGIN}/darkOutroAnimated.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`;
+    },
+    darkIntroStatic: `${APP_ASSETS_ORIGIN}/signup/darkIntroStatic.png`,
+    lightIntoAnimated: () => {
+      if (isSafari()) {
+        return `${APP_ASSETS_ORIGIN}/signup/lightIntoAnimated.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`;
+    },
+    lightOutroAnimated: () => {
+      if (isSafari()) {
+        return `${APP_ASSETS_ORIGIN}/signup/lightOutroAnimated.png`;
+      }
+      return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`;
+    },
+    lightIntroStatic: `${APP_ASSETS_ORIGIN}/signup/lightIntoStatic.png`,
   },
   subscription: {
     subDm: `${APP_ASSETS_ORIGIN}/subscription/sub-DM.webp`,
@@ -172,17 +191,14 @@ const assets = {
     common: `${APP_ASSETS_ORIGIN}/open-graph-image/common.png`,
   },
   common: {
-    // TODO: update webps and Static pngs
     lightLogoAnimated: () => {
       if (isSafari()) {
-        // Change asset
         return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.png`;
       }
       return `${APP_ASSETS_ORIGIN}/common/lightAnimatedLogo.webp`;
     },
     darkLogoAnimated: () => {
       if (isSafari()) {
-        // Change asset
         return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.png`;
       }
       return `${APP_ASSETS_ORIGIN}/common/darkAnimatedLogo.webp`;
@@ -236,13 +252,6 @@ const assets = {
     regular: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Regular.otf`,
     medium: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-Medium.otf`,
     semiBold: `${APP_ASSETS_ORIGIN}/fonts/Radomir-Tinkov-Gilroy-SemiBold.otf`,
-  },
-  // TODO: remove as unused
-  bundles: {
-    votesBackground: `${APP_ASSETS_ORIGIN}/bundles/votes-background.png`,
-  },
-  test: {
-    newMCSmallest: `${APP_ASSETS_ORIGIN}/test/new-mc-smallest.png`,
   },
 };
 

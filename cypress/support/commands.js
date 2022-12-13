@@ -35,8 +35,9 @@ Cypress.Commands.add('getIframeElementOf', (container, element) => {
     .then(cy.wrap);
 });
 
-Cypress.Commands.add('safeGet', (elementSelector, options) => {
-  return cy.get(elementSelector, options).should(($el) => {
-    expect(Cypress.dom.isDetached($el)).to.eq(false);
-  });
+Cypress.Commands.add('dGet', (elementSelector, options) => {
+  // Delay emulates a user searching for an element
+  // Could prevent Detached some minor detached from DOM issue
+  cy.wait(300);
+  return cy.get(elementSelector, options);
 });
