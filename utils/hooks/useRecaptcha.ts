@@ -107,7 +107,7 @@ const useRecaptcha = (
 
       return {
         isPassed: false,
-        error: err.message,
+        error: err?.message,
       };
     }
   }, [executeGoogleRecaptchaV3]);

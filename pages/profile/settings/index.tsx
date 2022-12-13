@@ -48,7 +48,6 @@ import SettingsCardsSection from '../../../components/organisms/settings/Setting
 import TransactionsSection from '../../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../../components/organisms/settings/PrivacySection';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
@@ -56,7 +55,6 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { pauseNotification } = usePushNotifications();
 
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -125,8 +123,6 @@ const MyProfileSettingsIndex = () => {
 
       const payload = new newnewapi.EmptyRequest({});
 
-      await pauseNotification();
-
       const res = await logout(payload);
 
       if (!res.data || res.error)
@@ -156,7 +152,7 @@ const MyProfileSettingsIndex = () => {
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie, pauseNotification]);
+  }, [dispatch, setIsLogoutLoading, removeCookie]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 

@@ -84,7 +84,7 @@ const PushNotificationsContextProvider: React.FC<
 
   // Get config
   useEffect(() => {
-    const getWebConfig = async () => {
+    const getWebConfig = async (isSecondTry?: boolean) => {
       try {
         setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
@@ -94,6 +94,9 @@ const PushNotificationsContextProvider: React.FC<
         setPublicKey(response.data?.publicKey || '');
       } catch (err) {
         console.error(err);
+        if (!isSecondTry) {
+          getWebConfig(true);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -455,11 +458,9 @@ const PushNotificationsContextProvider: React.FC<
     try {
       const permissionData = getPermissionData();
 
-      if (!permissionData.deviceToken) {
-        throw new Error('No active subscription');
+      if (permissionData.deviceToken) {
+        await unregister(permissionData.deviceToken);
       }
-
-      await unregister(permissionData.deviceToken);
 
       setIsSubscribed(false);
     } catch (err) {
@@ -644,6 +645,20 @@ const PushNotificationsContextProvider: React.FC<
       resumePushNotification,
     ]
   );
+
+  const isUserWasLoggedIn = useRef(user.loggedIn);
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      isUserWasLoggedIn.current = true;
+    }
+  }, [user.loggedIn]);
+
+  useEffect(() => {
+    if (!user.loggedIn && isUserWasLoggedIn.current) {
+      pauseNotification();
+    }
+  }, [user.loggedIn, pauseNotification]);
 
   return (
     <PushNotificationsContext.Provider value={contextValue}>
