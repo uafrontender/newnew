@@ -28,7 +28,6 @@ const disallow = [
   '/verify-email',
   '/verify-new-email',
   '/404',
-  '/zh/*',
 ];
 
 module.exports = {
