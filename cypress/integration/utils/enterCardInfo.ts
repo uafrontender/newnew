@@ -21,6 +21,9 @@ function enterCardInfo(
   cy.getIframeElementOf('#stripePayment', '#Field-postalCodeInput').type(
     postalCode
   );
+
+  // Wait for Stripe Elements to check the data
+  cy.wait(1000);
 }
 
 export default enterCardInfo;
