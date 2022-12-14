@@ -10,7 +10,7 @@ self.addEventListener('push', (event) => {
       body: message.text,
       badge: './favicon.png',
       icon: './favicon.png',
-      tag: 'newnew',
+      tag: message.url,
       renotify: true,
       data: {
         message,
