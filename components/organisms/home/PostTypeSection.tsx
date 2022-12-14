@@ -46,7 +46,7 @@ const PostTypeSection = ({
       href={`/p/${switchPostType(post)[0].postUuid}`}
       key={switchPostType(post)[0].postUuid}
     >
-      <SItemWrapper key={switchPostType(post)[0].postUuid} index={index}>
+      <SItemWrapper index={index}>
         <PostCard
           item={post}
           index={index}

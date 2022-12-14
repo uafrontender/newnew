@@ -204,7 +204,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
           key={switchPostType(item)[0].postUuid}
         >
           <SItemWrapper
-            key={switchPostType(item)[0].postUuid}
             name={`cards-section-${category}-${
               tutorialCard !== undefined ? index + 1 : index
             }`}

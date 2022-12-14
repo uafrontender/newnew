@@ -44,7 +44,7 @@ export const PostList: React.FC<IList> = ({
       href={`/p/${switchPostType(item)[0].postUuid}`}
       key={switchPostType(item)[0].postUuid}
     >
-      <SItemWrapper key={switchPostType(item)[0].postUuid}>
+      <SItemWrapper>
         <PostCard
           item={item}
           index={index + 1}

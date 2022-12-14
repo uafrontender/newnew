@@ -112,7 +112,6 @@ export const TopSection: React.FC<ITopSection> = React.memo(
         key={switchPostType(item)[0].postUuid}
       >
         <SItemWrapper
-          key={switchPostType(item)[0].postUuid}
           name={`top-section-${index}`}
           onClick={(e) => {
             if (isDragging) {
