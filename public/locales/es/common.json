@@ -258,5 +258,12 @@
       "dark": "Oscuro",
       "auto": "Automático"
     }
+  },
+  "timer": {
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Terminó el "
   }
 }

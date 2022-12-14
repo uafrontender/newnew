@@ -18,7 +18,6 @@ interface IFunction {
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
-  const { t: tPostCard } = useTranslation('component-PostCard');
   const [updateTimer, setUpdateTimer] = useState<boolean>(false);
   const interval = useRef<number>();
   const isPageVisible = usePageVisibility();
@@ -84,22 +83,22 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                 {!hasEnded ? (
                   <SPostEnded>
                     {parsed.days !== '00' &&
-                      `${parsed.days}${tPostCard('timer.daysLeft')}`}{' '}
+                      `${parsed.days}${t('timer.daysLeft')}`}{' '}
                     {`${
                       parsed.hours !== '00' ||
                       (parsed.days !== '00' && parsed.hours === '00')
-                        ? `${parsed.hours}${tPostCard('timer.hoursLeft')}`
+                        ? `${parsed.hours}${t('timer.hoursLeft')}`
                         : ''
-                    } ${parsed.minutes}${tPostCard('timer.minutesLeft')}
+                    } ${parsed.minutes}${t('timer.minutesLeft')}
                     ${
                       parsed.days === '00'
-                        ? `${parsed.seconds}${tPostCard('timer.secondsLeft')}`
+                        ? `${parsed.seconds}${t('timer.secondsLeft')}`
                         : ''
                     }`}
                   </SPostEnded>
                 ) : (
                   <SPostEnded>
-                    {tPostCard('timer.endedOn')}
+                    {t('timer.endedOn')}
                     {new Date(
                       (data.expiresAt?.seconds as number) * 1000
                     ).toLocaleDateString()}
@@ -112,7 +111,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t, tPostCard, updateTimer]
+    [t, updateTimer]
   );
 
   return (
