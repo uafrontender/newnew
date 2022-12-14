@@ -143,7 +143,7 @@ const assets = {
     },
     darkOutroAnimated: () => {
       if (isSafari()) {
-        return `${APP_ASSETS_ORIGIN}/darkOutroAnimated.png`;
+        return `${APP_ASSETS_ORIGIN}/signup/darkOutroAnimated.png`;
       }
       return `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`;
     },
