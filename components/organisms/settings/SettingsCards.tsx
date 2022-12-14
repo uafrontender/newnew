@@ -15,6 +15,7 @@ import logoAnimation from '../../../public/animations/mobile_logo.json';
 import assets from '../../../constants/assets';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
+import useHorizontalDraggableScroll from '../../../utils/hooks/useHorizontalDraggableScroll';
 
 interface ISettingsCards {}
 
@@ -77,6 +78,9 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
     return obj;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards?.length]);
+
+  const { scrollContainerRef, onMouseDown, onMouseMove, onMouseUp } =
+    useHorizontalDraggableScroll<HTMLUListElement>();
 
   return (
     <SSettingsContainer>
@@ -150,7 +154,13 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         )}
 
         {!!cards?.length && (
-          <SCardList>
+          <SCardList
+            ref={scrollContainerRef}
+            onMouseUp={onMouseUp}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseUp}
+          >
             {cardsWithFirstPrimary?.map((card, index) => (
               <SCardListItem key={card.cardUuid}>
                 <Card

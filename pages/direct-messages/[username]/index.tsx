@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { ReactElement, useCallback, useState } from 'react';
+import React, { ReactElement } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -17,15 +17,9 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
 interface IChat {
   username: string;
-  setup_intent_client_secret?: string;
-  save_card?: boolean;
 }
 
-const Chat: NextPage<IChat> = ({
-  username,
-  setup_intent_client_secret,
-  save_card,
-}) => {
+const Chat: NextPage<IChat> = ({ username }) => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -37,31 +31,12 @@ const Chat: NextPage<IChat> = ({
     }
   }, [user.loggedIn, user._persist?.rehydrated, router]);
 
-  const [
-    setupIntentClientSecretFromRedirect,
-    setSetupIntentClientSecretFromRedirect,
-  ] = useState(setup_intent_client_secret);
-
-  const [saveCardFromRedirect, setCardFromRedirect] = useState(save_card);
-
-  const resetStripeSetupIntent = useCallback(() => {
-    setSetupIntentClientSecretFromRedirect('');
-    setCardFromRedirect(false);
-  }, []);
-
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <Content
-        username={username}
-        setupIntentClientSecretFromRedirect={
-          setupIntentClientSecretFromRedirect
-        }
-        saveCardFromRedirect={saveCardFromRedirect}
-        resetStripeSetupIntent={resetStripeSetupIntent}
-      />
+      <Content username={username} />
     </>
   );
 };
@@ -73,7 +48,7 @@ export default Chat;
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { username, setup_intent_client_secret, save_card } = context.query;
+  const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-Chat', 'modal-PaymentModal', 'page-SubscribeToUser'],
@@ -98,16 +73,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       username,
       ...translationContext,
-      ...(setup_intent_client_secret
-        ? {
-            setup_intent_client_secret,
-          }
-        : {}),
-      ...(save_card
-        ? {
-            save_card: save_card === 'true',
-          }
-        : {}),
     },
   };
 };
