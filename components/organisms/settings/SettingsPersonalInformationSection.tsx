@@ -3,7 +3,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -27,181 +27,181 @@ type TSettingsPersonalInformationSection = {
   currentDate?: Date;
   // Layout
   isMobile: boolean;
-  // Allows handling visuals for active/inactive state
-  handleSetActive: () => void;
 };
-const SettingsPersonalInformationSection: React.FunctionComponent<
-  TSettingsPersonalInformationSection
-> = ({ currentEmail, currentDate, isMobile, handleSetActive }) => {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { t } = useTranslation('page-Profile');
-  const { showErrorToastPredefined } = useErrorToasts();
+const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPersonalInformationSection> =
+  React.memo(({ currentEmail, currentDate, isMobile }) => {
+    const dispatch = useAppDispatch();
+    const router = useRouter();
+    const { t } = useTranslation('page-Profile');
+    const { showErrorToastPredefined } = useErrorToasts();
 
-  const user = useAppSelector((state) => state.user);
-  const { editEmail } = router.query;
+    const user = useAppSelector((state) => state.user);
+    const { editEmail } = router.query;
 
-  const [dateInEdit, setDateInEdit] = useState(currentDate ?? undefined);
-  const [dateError, setDateError] = useState('');
-  const [wasDateModified, setWasDateModified] = useState(false);
+    const [dateInEdit, setDateInEdit] = useState(currentDate ?? undefined);
+    const [dateError, setDateError] = useState('');
+    const [wasDateModified, setWasDateModified] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-  const handleDateInput = (value: Date) => {
-    if (value === null) {
-      setDateInEdit(undefined);
-      return;
-    }
-    setDateInEdit(
-      new Date(value.getFullYear(), value.getMonth(), value.getDate())
-    );
-  };
+    const handleResetSubmitError = useCallback(() => {
+      setDateError('');
+    }, []);
 
-  const handleResetModifications = () => {
-    setDateInEdit(currentDate ?? undefined);
-    setDateError('');
-  };
+    const handleDateInput = useCallback((value: Date) => {
+      if (value === null) {
+        setDateInEdit(undefined);
+        return;
+      }
+      setDateInEdit(
+        new Date(value.getFullYear(), value.getMonth(), value.getDate())
+      );
+    }, []);
 
-  const handleSaveModifications = async () => {
-    try {
-      setIsLoading(true);
+    const handleResetModifications = () => {
+      setDateInEdit(currentDate ?? undefined);
+      setDateError('');
+    };
 
-      if (
-        wasDateModified &&
-        dateInEdit &&
-        dateInEdit.getMonth() &&
-        dateInEdit.getFullYear() &&
-        dateInEdit.getDate()
-      ) {
-        const updateDatePayload = new newnewapi.UpdateMeRequest({
-          dateOfBirth: {
-            year: dateInEdit.getFullYear(),
-            month: dateInEdit.getMonth() + 1,
-            day: dateInEdit.getDate(),
-          },
-        });
+    const handleSaveModifications = async () => {
+      try {
+        setIsLoading(true);
 
-        const updateDateResponse = await updateMe(updateDatePayload);
-
-        if (!updateDateResponse.data || updateDateResponse.error) {
-          throw new Error('Date update error');
-        }
-
-        dispatch(
-          setUserData({
-            options: {
-              ...user.userData?.options,
-              birthDateUpdatesLeft:
-                updateDateResponse.data.me?.options?.birthDateUpdatesLeft,
-            },
+        if (
+          wasDateModified &&
+          dateInEdit &&
+          dateInEdit.getMonth() &&
+          dateInEdit.getFullYear() &&
+          dateInEdit.getDate()
+        ) {
+          const updateDatePayload = new newnewapi.UpdateMeRequest({
             dateOfBirth: {
-              day: updateDateResponse.data.me?.dateOfBirth?.day,
-              month: updateDateResponse.data.me?.dateOfBirth?.month,
-              year: updateDateResponse.data.me?.dateOfBirth?.year,
+              year: dateInEdit.getFullYear(),
+              month: dateInEdit.getMonth() + 1,
+              day: dateInEdit.getDate(),
             },
-          })
-        );
+          });
+
+          const updateDateResponse = await updateMe(updateDatePayload);
+
+          if (!updateDateResponse.data || updateDateResponse.error) {
+            throw new Error('Date update error');
+          }
+
+          dispatch(
+            setUserData({
+              options: {
+                ...user.userData?.options,
+                birthDateUpdatesLeft:
+                  updateDateResponse.data.me?.options?.birthDateUpdatesLeft,
+              },
+              dateOfBirth: {
+                day: updateDateResponse.data.me?.dateOfBirth?.day,
+                month: updateDateResponse.data.me?.dateOfBirth?.month,
+                year: updateDateResponse.data.me?.dateOfBirth?.year,
+              },
+            })
+          );
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsLoading(false);
+        // TODO: fix error handling, there are other errors!
+        if ((err as Error).message === 'Date update error') {
+          setDateError('tooYoung');
+        } else {
+          showErrorToastPredefined(undefined);
+        }
       }
-      setIsLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsLoading(false);
-      // TODO: fix error handling, there are other errors!
-      if ((err as Error).message === 'Date update error') {
-        setDateError('tooYoung');
+    };
+
+    useEffect(() => {
+      if (dateInEdit?.getTime() !== currentDate?.getTime()) {
+        setWasDateModified(true);
       } else {
-        showErrorToastPredefined(undefined);
+        setWasDateModified(false);
       }
-    }
-  };
+    }, [dateInEdit, currentDate]);
 
-  useEffect(() => {
-    if (dateInEdit?.getTime() !== currentDate?.getTime()) {
-      setWasDateModified(true);
-    } else {
-      setWasDateModified(false);
-    }
-  }, [dateInEdit, currentDate]);
-
-  return (
-    <SWrapper>
-      <SInputsWrapper>
-        <SettingsEmail
-          value={currentEmail}
-          labelCaption={t(
-            'Settings.sections.personalInformation.emailInput.label'
-          )}
-          placeholder={t(
-            'Settings.sections.personalInformation.emailInput.placeholder'
-          )}
-          onEditButtonClick={() => {
-            router.push(
-              '/profile/settings?editEmail=true',
-              '/profile/settings/edit-email'
-            );
-          }}
-        />
-        <EditEmailModal
-          show={!!editEmail}
-          onClose={() => {
-            router.replace('/profile/settings');
-          }}
-        />
-        <SettingsBirthDateInput
-          value={dateInEdit}
-          maxDate={maxDate}
-          locale={router.locale}
-          disabled={
-            !user.userData?.options?.birthDateUpdatesLeft ||
-            user.userData.options.birthDateUpdatesLeft <= 0
-          }
-          submitError={
-            dateError
-              ? t(
-                  `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any
-                )
-              : undefined
-          }
-          handleResetSubmitError={() => setDateError('')}
-          labelCaption={t(
-            'Settings.sections.personalInformation.birthDateInput.label'
-          )}
-          bottomCaption={t(
-            'Settings.sections.personalInformation.birthDateInput.captions.cannotChange'
-          )}
-          onChange={handleDateInput}
-          handleSetActive={() => handleSetActive()}
-        />
-      </SInputsWrapper>
-      <AnimatePresence>
-        {wasDateModified ? (
-          <SControlsWrapper
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <Button
-              view='primaryGrad'
-              onClick={() => handleSaveModifications()}
-              disabled={isLoading}
+    return (
+      <SWrapper>
+        <SInputsWrapper>
+          <SettingsEmail
+            value={currentEmail}
+            labelCaption={t(
+              'Settings.sections.personalInformation.emailInput.label'
+            )}
+            placeholder={t(
+              'Settings.sections.personalInformation.emailInput.placeholder'
+            )}
+            onEditButtonClick={() => {
+              router.push(
+                '/profile/settings?editEmail=true',
+                '/profile/settings/edit-email'
+              );
+            }}
+          />
+          <EditEmailModal
+            show={!!editEmail}
+            onClose={() => {
+              router.replace('/profile/settings');
+            }}
+          />
+          <SettingsBirthDateInput
+            value={dateInEdit}
+            maxDate={maxDate}
+            locale={router.locale}
+            disabled={
+              !user.userData?.options?.birthDateUpdatesLeft ||
+              user.userData.options.birthDateUpdatesLeft <= 0
+            }
+            submitError={
+              dateError
+                ? t(
+                    `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any
+                  )
+                : undefined
+            }
+            handleResetSubmitError={handleResetSubmitError}
+            labelCaption={t(
+              'Settings.sections.personalInformation.birthDateInput.label'
+            )}
+            bottomCaption={t(
+              'Settings.sections.personalInformation.birthDateInput.captions.cannotChange'
+            )}
+            onChange={handleDateInput}
+          />
+        </SInputsWrapper>
+        <AnimatePresence>
+          {wasDateModified ? (
+            <SControlsWrapper
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
             >
-              {t('Settings.sections.personalInformation.button.save')}
-            </Button>
-            <Button
-              view='secondary'
-              style={{
-                ...(isMobile ? { order: -1 } : {}),
-              }}
-              onClick={() => handleResetModifications()}
-            >
-              {t('Settings.sections.personalInformation.button.cancel')}
-            </Button>
-          </SControlsWrapper>
-        ) : null}
-      </AnimatePresence>
-    </SWrapper>
-  );
-};
+              <Button
+                view='primaryGrad'
+                onClick={() => handleSaveModifications()}
+                disabled={isLoading}
+              >
+                {t('Settings.sections.personalInformation.button.save')}
+              </Button>
+              <Button
+                view='secondary'
+                style={{
+                  ...(isMobile ? { order: -1 } : {}),
+                }}
+                onClick={() => handleResetModifications()}
+              >
+                {t('Settings.sections.personalInformation.button.cancel')}
+              </Button>
+            </SControlsWrapper>
+          ) : null}
+        </AnimatePresence>
+      </SWrapper>
+    );
+  });
 
 SettingsPersonalInformationSection.defaultProps = {
   currentEmail: undefined,
