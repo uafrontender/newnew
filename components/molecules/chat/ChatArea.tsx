@@ -182,8 +182,6 @@ const ChatArea: React.FC<IChatData> = ({
   }, [chatRoom?.id, messageTextValid, messageText]);
 
   const handleSubmit = useCallback(() => {
-    console.log('1');
-
     if (!sendingMessage) submitMessage();
   }, [sendingMessage, submitMessage]);
 
@@ -200,7 +198,6 @@ const ChatArea: React.FC<IChatData> = ({
       }
 
       const isValid = validateInputText(value);
-      console.log(isValid);
       setMessageTextValid(isValid);
       setMessageText(value);
     },
