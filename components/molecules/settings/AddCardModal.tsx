@@ -8,6 +8,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
@@ -38,6 +39,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
 
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isStripeReady, setIsStripeReady] = useState(false);
@@ -50,7 +52,9 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/settings/card-setup-complete`,
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${
+          router.locale !== 'en-US' ? `/${router.locale}` : ''
+        }/profile/settings/card-setup-complete`,
       },
       redirect: 'if_required',
     });
