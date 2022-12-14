@@ -9,8 +9,8 @@ import getDisplayname from '../../../utils/getDisplayname';
 import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
+import PostTitleContent from '../PostTitleContent';
 
 interface IFunction {
   posts: newnewapi.IPost[];
@@ -72,7 +72,9 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                 </SUserAvatar>
                 <SPostData>
                   {data.title && (
-                    <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
+                    <SPostTitle>
+                      <PostTitleContent>{data.title}</PostTitleContent>
+                    </SPostTitle>
                   )}
                   <SCreatorUsername>
                     {getDisplayname(data.creator)}
@@ -146,6 +148,7 @@ const SPost = styled.div`
   padding: 8px 16px;
   margin: 0 -16px;
   cursor: pointer;
+
   &:hover {
     background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
@@ -153,6 +156,7 @@ const SPost = styled.div`
 
 const SLeftSide = styled.div`
   display: flex;
+  overflow: hidden;
 `;
 
 const SPostData = styled.div`
@@ -177,6 +181,10 @@ const SUserAvatar = styled.div`
 
 const SPostTitle = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
 `;
 
 const SCreatorUsername = styled.span`
