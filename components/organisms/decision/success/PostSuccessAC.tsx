@@ -98,6 +98,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    console.log(winningOption);
+
     // Scroll to comments if hash is present
     useEffect(() => {
       const handleCommentsInitialHash = () => {
@@ -220,15 +222,35 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                     <>
                       <SWinningBidCreator>
                         <SCreator>
-                          <Link href={`/${winningOption.creator?.username}`}>
+                          <Link
+                            href={`/${
+                              winningOption.creator?.uuid ===
+                                user.userData?.userUuid ||
+                              winningOption.isSupportedByMe
+                                ? 'profile'
+                                : winningOption.creator?.username
+                            }`}
+                          >
                             <SCreatorImage
-                              src={winningOption.creator?.avatarUrl ?? ''}
+                              src={
+                                winningOption.creator?.uuid ===
+                                  user.userData?.userUuid ||
+                                winningOption.isSupportedByMe
+                                  ? user.userData?.avatarUrl ?? ''
+                                  : winningOption.creator?.avatarUrl ?? ''
+                              }
                             />
                           </Link>
                           <SWinningBidCreatorText>
                             <SSpan>
                               <Link
-                                href={`/${winningOption.creator?.username}`}
+                                href={`/${
+                                  winningOption.creator?.uuid ===
+                                    user.userData?.userUuid ||
+                                  winningOption.isSupportedByMe
+                                    ? 'profile'
+                                    : winningOption.creator?.username
+                                }`}
                               >
                                 {winningOption.creator?.uuid ===
                                   user.userData?.userUuid ||
@@ -243,7 +265,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                               <>
                                 {' & '}
                                 {formatNumber(
-                                  winningOption.supporterCount,
+                                  winningOption.supporterCount - 1,
                                   true
                                 )}{' '}
                                 {t('acPostSuccess.others')}
