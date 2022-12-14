@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
-import { v4 as uuidv4 } from 'uuid';
+
 import { useTranslation } from 'next-i18next';
 
 import styled, { useTheme } from 'styled-components';
@@ -12,15 +12,16 @@ import SmsNotificationModal, {
   SubscriptionToCreator,
 } from './SmsNotificationModal';
 import {
-  getGuestSmsNotificationsSubscriptionToCreatorStatus,
-  getSmsNotificationsSubscriptionToCreatorStatus,
-  subscribeGuestToCreatorSmsNotifications,
-  subscribeToCreatorSmsNotifications,
-  unsubscribeFromCreatorSmsNotifications,
-  unsubscribeGuestFromCreatorSmsNotifications,
+  getGuestSmsNotificationsSubscriptionStatus,
+  getSmsNotificationsSubscriptionStatus,
+  subscribeGuestToSmsNotifications,
+  subscribeToSmsNotifications,
+  unsubscribeFromSmsNotifications,
+  unsubscribeGuestFromSmsNotifications,
 } from '../../../api/endpoints/phone';
 import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import getGuestId from '../../../utils/getGuestId';
 
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
@@ -65,25 +66,15 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     []
   );
 
-  // TODO: Move to some other place, create it on app startup
-  const getGuestId = useCallback((): string => {
-    const GUEST_ID_KEY = 'savedGuestId';
-    let guestId = localStorage.getItem(GUEST_ID_KEY);
-    if (!guestId) {
-      guestId = uuidv4();
-      localStorage.setItem(GUEST_ID_KEY, guestId);
-    }
-    return guestId;
-  }, []);
-
+  // TODO: Add a hook for handling sms notifications status
   const submitPhoneSmsNotificationsRequest = useCallback(
     async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
       try {
         if (!currentUser.loggedIn) {
           const guestId = getGuestId();
 
-          const res = await subscribeGuestToCreatorSmsNotifications(
-            subscription.userId,
+          const res = await subscribeGuestToSmsNotifications(
+            { creatorUuid: subscription.userId },
             guestId,
             phoneNumber
           );
@@ -112,8 +103,8 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           );
           localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
         } else {
-          const res = await subscribeToCreatorSmsNotifications(
-            subscription.userId,
+          const res = await subscribeToSmsNotifications(
+            { creatorUuid: subscription.userId },
             phoneNumber
           );
 
@@ -143,21 +134,15 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         throw err;
       }
     },
-    [
-      currentUser.loggedIn,
-      getGuestId,
-      showErrorToastCustom,
-      subscription.userId,
-      t,
-    ]
+    [currentUser.loggedIn, showErrorToastCustom, subscription.userId, t]
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     if (subscribedToSmsNotifications) {
       if (!currentUser.loggedIn) {
         const guestId = getGuestId();
-        const res = await unsubscribeGuestFromCreatorSmsNotifications(
-          subscription.userId,
+        const res = await unsubscribeGuestFromSmsNotifications(
+          { creatorUuid: subscription.userId },
           guestId
         );
 
@@ -166,9 +151,9 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           showErrorToastCustom(t('smsNotifications.error.requestFailed'));
         }
       } else {
-        const res = await unsubscribeFromCreatorSmsNotifications(
-          subscription.userId
-        );
+        const res = await unsubscribeFromSmsNotifications({
+          creatorUuid: subscription.userId,
+        });
 
         if (!res.data || res.error) {
           console.error('Unsubscribe from SMS failed');
@@ -190,9 +175,9 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
       }
     } else if (currentUser.userData?.options?.isPhoneNumberConfirmed) {
       try {
-        const res = await subscribeToCreatorSmsNotifications(
-          subscription.userId
-        );
+        const res = await subscribeToSmsNotifications({
+          creatorUuid: subscription.userId,
+        });
 
         if (
           !res.data ||
@@ -221,7 +206,6 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     subscribedToSmsNotifications,
     currentUser.loggedIn,
     currentUser.userData?.options?.isPhoneNumberConfirmed,
-    getGuestId,
     subscription.userId,
     showErrorToastCustom,
     t,
@@ -236,8 +220,8 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     if (!currentUser.loggedIn) {
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
-        const res = await getGuestSmsNotificationsSubscriptionToCreatorStatus(
-          subscription.userId,
+        const res = await getGuestSmsNotificationsSubscriptionStatus(
+          { creatorUuid: subscription.userId },
           guestId
         );
 
@@ -267,18 +251,18 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           // Do nothing
         });
     } else {
-      getSmsNotificationsSubscriptionToCreatorStatus(subscription.userId).then(
-        (res) => {
-          if (!res.data || res.error) {
-            console.error('Unable to get sms notifications status');
-            return;
-          }
-
-          setSubscribedToSmsNotifications(
-            res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
-          );
+      getSmsNotificationsSubscriptionStatus({
+        creatorUuid: subscription.userId,
+      }).then((res) => {
+        if (!res.data || res.error) {
+          console.error('Unable to get sms notifications status');
+          return;
         }
-      );
+
+        setSubscribedToSmsNotifications(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+      });
     }
 
     return () => {};
@@ -287,7 +271,6 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     currentUser.loggedIn,
     subscription.userId,
     t,
-    getGuestId,
   ]);
 
   useEffect(() => {

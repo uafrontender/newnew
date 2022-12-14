@@ -7,15 +7,13 @@ import {
 
 const BASE_URL_PHONE = `${BASE_URL}/phone`;
 
-export const subscribeToCreatorSmsNotifications = (
-  creatorUuid: string,
+export const subscribeToSmsNotifications = (
+  subscriptionObject: newnewapi.ISmsNotificationObject,
   phoneNumber?: newnewapi.IPhoneNumber,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.SubscribeSmsNotificationsRequest({
-    object: {
-      creatorUuid,
-    },
+    object: subscriptionObject,
     phoneNumber,
   });
 
@@ -32,14 +30,12 @@ export const subscribeToCreatorSmsNotifications = (
   );
 };
 
-export const unsubscribeFromCreatorSmsNotifications = (
-  creatorUuid: string,
+export const unsubscribeFromSmsNotifications = (
+  subscriptionObject: newnewapi.ISmsNotificationObject,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.UnsubscribeSmsNotificationsRequest({
-    object: {
-      creatorUuid,
-    },
+    object: subscriptionObject,
   });
 
   return fetchProtobufProtectedIntercepted<
@@ -55,14 +51,12 @@ export const unsubscribeFromCreatorSmsNotifications = (
   );
 };
 
-export const getSmsNotificationsSubscriptionToCreatorStatus = (
-  creatorUuid: string,
+export const getSmsNotificationsSubscriptionStatus = (
+  subscriptionObject: newnewapi.ISmsNotificationObject,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.GetSmsNotificationsStatusRequest({
-    object: {
-      creatorUuid,
-    },
+    object: subscriptionObject,
   });
 
   return fetchProtobufProtectedIntercepted<
@@ -79,16 +73,14 @@ export const getSmsNotificationsSubscriptionToCreatorStatus = (
 };
 
 // Guest
-export const subscribeGuestToCreatorSmsNotifications = (
-  creatorUuid: string,
+export const subscribeGuestToSmsNotifications = (
+  subscriptionObject: newnewapi.ISmsNotificationObject,
   guestId: string,
   phoneNumber?: newnewapi.IPhoneNumber,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.SubscribeSmsNotificationsRequest({
-    object: {
-      creatorUuid,
-    },
+    object: subscriptionObject,
     guestId,
     phoneNumber,
   });
@@ -106,15 +98,13 @@ export const subscribeGuestToCreatorSmsNotifications = (
   );
 };
 
-export const unsubscribeGuestFromCreatorSmsNotifications = (
-  creatorUuid: string,
+export const unsubscribeGuestFromSmsNotifications = (
+  subscriptionObject: newnewapi.ISmsNotificationObject,
   guestId: string,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.UnsubscribeSmsNotificationsRequest({
-    object: {
-      creatorUuid,
-    },
+    object: subscriptionObject,
     guestId,
   });
 
@@ -131,15 +121,13 @@ export const unsubscribeGuestFromCreatorSmsNotifications = (
   );
 };
 
-export const getGuestSmsNotificationsSubscriptionToCreatorStatus = (
-  creatorUuid: string,
+export const getGuestSmsNotificationsSubscriptionStatus = (
+  subscriptionObject: newnewapi.ISmsNotificationObject,
   guestId: string,
   signal?: RequestInit['signal']
 ) => {
   const payload = new newnewapi.GetSmsNotificationsStatusRequest({
-    object: {
-      creatorUuid,
-    },
+    object: subscriptionObject,
     guestId,
   });
 
