@@ -84,7 +84,7 @@ const PushNotificationsContextProvider: React.FC<
 
   // Get config
   useEffect(() => {
-    const getWebConfig = async (isSecondTry?: boolean) => {
+    const getWebConfig = async () => {
       try {
         setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
@@ -94,16 +94,15 @@ const PushNotificationsContextProvider: React.FC<
         setPublicKey(response.data?.publicKey || '');
       } catch (err) {
         console.error(err);
-        if (!isSecondTry) {
-          getWebConfig(true);
-        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    getWebConfig();
-  }, []);
+    if (user.loggedIn) {
+      getWebConfig();
+    }
+  }, [user.loggedIn]);
 
   // Get browser permission
   const getPermissionData: () => {
