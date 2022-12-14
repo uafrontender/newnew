@@ -101,6 +101,36 @@ const Notification: React.FC<newnewapi.INotification> = ({
     return () => {};
   }, [inView, isUnread, markNotificationAsRead]);
 
+  const getNotificationTitle = useCallback((): React.ReactNode => {
+    if (!content) {
+      return null;
+    }
+
+    if (
+      content.relatedUser &&
+      content.relatedUser.uuid !== user.userData?.userUuid
+    ) {
+      return (
+        <>
+          <STitleText>{getDisplayname(content.relatedUser)}</STitleText>
+          {content?.relatedUser?.isVerified && (
+            <SInlineSVG
+              svg={VerificationCheckmark}
+              width='16px'
+              height='16px'
+            />
+          )}
+        </>
+      );
+    }
+
+    if (content.relatedPost?.title) {
+      return <STitleText>{content.relatedPost.title}</STitleText>;
+    }
+
+    return <STitleText>{t('title.newMessage')}</STitleText>;
+  }, [content, user.userData?.userUuid, t]);
+
   return (
     <Link href={url}>
       <a>
@@ -139,16 +169,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
             </SAvatarHolder>
           )}
           <SInfo ref={ref}>
-            <STitle>
-              {getDisplayname(content?.relatedUser) || t('title.newMessage')}
-              {content?.relatedUser?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                />
-              )}
-            </STitle>
+            <STitle>{getNotificationTitle()}</STitle>
             <SContent>{content?.message}</SContent>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
@@ -161,7 +182,9 @@ const Notification: React.FC<newnewapi.INotification> = ({
                 avatarUrl={content?.relatedPost.thumbnailImageUrl}
               />
             )}
-          <SStatus>{isUnread && <SBullet />}</SStatus>
+          <SStatus>
+            <SBullet visible={isUnread} />
+          </SStatus>
         </SWrapper>
       </a>
     </Link>
@@ -218,6 +241,7 @@ const SInfo = styled.div`
   line-height: 20px;
   font-weight: 600;
   width: 100%;
+  overflow: hidden;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   border-bottom: 1px solid
     ${(props) => props.theme.colorsThemed.background.outlines1};
@@ -229,13 +253,22 @@ const SInfo = styled.div`
 `;
 
 const STitle = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  margin-bottom: 0;
   display: flex;
   align-items: center;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  margin-bottom: 0;
+  overflow: hidden;
+
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
   }
+`;
+
+const STitleText = styled.div`
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const SContent = styled.p`
@@ -276,7 +309,7 @@ const SStatus = styled.div`
   }
 `;
 
-const SBullet = styled.div`
+const SBullet = styled.div<{ visible: boolean }>`
   flex-shrink: 0;
   width: 10px;
   height: 10px;
@@ -284,6 +317,7 @@ const SBullet = styled.div`
   border-radius: 50%;
   margin-left: 10px;
   margin-right: 8px;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
 
   ${({ theme }) => theme.media.tablet} {
     margin-left: 20px;
