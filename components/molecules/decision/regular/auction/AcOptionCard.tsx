@@ -520,7 +520,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               </Link>
             )}
             {(isSupportedByMe && !isMyBid) ||
-            (isSupportedByMe && !!option.whitelistSupporter) ? (
+            (isSupportedByMe &&
+              !!option.whitelistSupporter &&
+              option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
               <Link
                 href={`/profile${
                   user.userData?.options?.isCreator ? '/my-posts' : ''
