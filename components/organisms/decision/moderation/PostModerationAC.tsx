@@ -410,7 +410,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         }
       };
 
-      const socketHandlerOptionDeleted = (data: any) => {
+      const socketHandlerOptionDeleted = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
@@ -419,6 +419,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             const workingArr = [...curr];
             return workingArr.filter((o) => o.id !== decoded.optionId);
           });
+
+          await fetchPostLatestData();
         }
       };
       const socketHandlerPostData = (data: any) => {
