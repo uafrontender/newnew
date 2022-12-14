@@ -611,7 +611,7 @@ const SSelectOptionWidget = styled.div`
   border-radius: 12px;
   overflow: hidden;
 
-  height: 40px;
+  height: 100%;
 `;
 
 const SPickOptionButton = styled.button<{
