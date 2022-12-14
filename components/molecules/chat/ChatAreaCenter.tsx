@@ -56,13 +56,10 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
         setMessagesLoading(true);
         const payload = new newnewapi.GetMessagesRequest({
           roomId: chatRoom?.id,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
+          paging: {
+            pageToken,
+            limit: 30, // fix for iphone
+          },
         });
         const res = await getMessages(payload);
 
@@ -125,7 +122,8 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     if (inView && !messagesLoading && messagesNextPageToken) {
       getChatMessages(messagesNextPageToken);
     }
-  }, [inView, messagesLoading, messagesNextPageToken, getChatMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, messagesLoading, messagesNextPageToken]);
 
   useEffect(() => {
     if (newMessage && newMessage.roomId === chatRoom?.id) {

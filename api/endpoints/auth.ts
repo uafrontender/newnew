@@ -15,7 +15,8 @@ sendVerificationEmail(email) -> redirect to verification code page -> sendSignIn
  * user is redirected to Code Verification page.
  */
 export const sendVerificationEmail = (
-  payload: newnewapi.SendVerificationEmailRequest, signal?: RequestInit['signal']
+  payload: newnewapi.SendVerificationEmailRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<
     newnewapi.SendVerificationEmailRequest,
@@ -29,7 +30,7 @@ export const sendVerificationEmail = (
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 /**
@@ -37,7 +38,10 @@ export const sendVerificationEmail = (
  * The arguments are the cached email address and the code
  * manually input by the user.
  */
-export const signInWithEmail = (payload: newnewapi.EmailSignInRequest, signal?: RequestInit['signal']) =>
+export const signInWithEmail = (
+  payload: newnewapi.EmailSignInRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.EmailSignInRequest, newnewapi.SignInResponse>(
     newnewapi.EmailSignInRequest,
     newnewapi.SignInResponse,
@@ -47,7 +51,7 @@ export const signInWithEmail = (payload: newnewapi.EmailSignInRequest, signal?: 
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 // One-click sign up
@@ -57,7 +61,10 @@ These functions are likely to be called client-side or in the on-page
 providers (Apple, Facebook, etc.)
 */
 
-export const signInWithApple = (payload: newnewapi.AppleSignInRequest, signal?: RequestInit['signal']) =>
+export const signInWithApple = (
+  payload: newnewapi.AppleSignInRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.AppleSignInRequest, newnewapi.SignInResponse>(
     newnewapi.AppleSignInRequest,
     newnewapi.SignInResponse,
@@ -67,10 +74,13 @@ export const signInWithApple = (payload: newnewapi.AppleSignInRequest, signal?: 
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const signInWithGoogle = (payload: newnewapi.GoogleSignInRequest, signal?: RequestInit['signal']) =>
+export const signInWithGoogle = (
+  payload: newnewapi.GoogleSignInRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.GoogleSignInRequest, newnewapi.SignInResponse>(
     newnewapi.GoogleSignInRequest,
     newnewapi.SignInResponse,
@@ -80,10 +90,13 @@ export const signInWithGoogle = (payload: newnewapi.GoogleSignInRequest, signal?
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const signInWithFacebook = (payload: newnewapi.FacebookSignInRequest, signal?: RequestInit['signal']) =>
+export const signInWithFacebook = (
+  payload: newnewapi.FacebookSignInRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.FacebookSignInRequest, newnewapi.SignInResponse>(
     newnewapi.FacebookSignInRequest,
     newnewapi.SignInResponse,
@@ -93,10 +106,13 @@ export const signInWithFacebook = (payload: newnewapi.FacebookSignInRequest, sig
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const signInWithTwitter = (payload: newnewapi.TwitterSignInRequest, signal?: RequestInit['signal']) =>
+export const signInWithTwitter = (
+  payload: newnewapi.TwitterSignInRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.TwitterSignInRequest, newnewapi.SignInResponse>(
     newnewapi.TwitterSignInRequest,
     newnewapi.SignInResponse,
@@ -106,5 +122,5 @@ export const signInWithTwitter = (payload: newnewapi.TwitterSignInRequest, signa
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
