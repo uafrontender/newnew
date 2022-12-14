@@ -98,13 +98,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    console.log(winningOption);
-
     // Scroll to comments if hash is present
     useEffect(() => {
       const handleCommentsInitialHash = () => {
         const { hash } = window.location;
-        console.log(hash);
 
         if (!hash) {
           return;
