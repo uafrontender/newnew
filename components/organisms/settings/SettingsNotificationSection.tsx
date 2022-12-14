@@ -14,7 +14,6 @@ import Toggle from '../../atoms/Toggle';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
-import isIOS from '../../../utils/isIOS';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
@@ -27,6 +26,7 @@ const SettingsNotificationsSection = () => {
 
   const {
     inSubscribed,
+    isPushNotificationSupported,
     isLoading: isStateLoading,
     unsubscribe,
     requestPermission,
@@ -129,7 +129,7 @@ const SettingsNotificationsSection = () => {
 
               return null;
             })}
-          {!isIOS() && (
+          {isPushNotificationSupported && (
             <SSubsection>
               <Text variant={2} weight={600}>
                 {t('Settings.sections.notifications.push')}

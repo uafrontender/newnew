@@ -13,6 +13,7 @@ import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import isSafari from '../../utils/isSafari';
+import isWindows from '../../utils/isWindows';
 
 interface IPushNotificationAlert {
   show: boolean;
@@ -83,6 +84,11 @@ const PushNotificationAlert: React.FC<IPushNotificationAlert> = ({
           {isSafari() && (
             <SSubtitle variant='subtitle'>
               {t('pushNotification.alert.safari.subtitle')}
+            </SSubtitle>
+          )}
+          {isWindows() && (
+            <SSubtitle variant='subtitle'>
+              {t('pushNotification.alert.windows.subtitle')}
             </SSubtitle>
           )}
         </SContent>

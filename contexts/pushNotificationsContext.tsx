@@ -19,6 +19,7 @@ import { useAppSelector } from '../redux-store/store';
 import isSafari from '../utils/isSafari';
 import isIOS from '../utils/isIOS';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
+import isBrowser from '../utils/isBrowser';
 
 const WEB_PUSH_PROMPT_KEY =
   'isUserPromptedWithPushNotificationsPermissionModal';
@@ -30,6 +31,7 @@ export const PushNotificationsContext = createContext<{
   isPermissionRequestModalOpen: boolean;
   isLoading: boolean;
   isPushNotificationAlertShown: boolean;
+  isPushNotificationSupported: boolean;
   subscribe: (callback?: () => void) => void;
   unsubscribe: () => void;
   requestPermission: () => void;
@@ -43,6 +45,7 @@ export const PushNotificationsContext = createContext<{
   isPermissionRequestModalOpen: false,
   isLoading: false,
   isPushNotificationAlertShown: false,
+  isPushNotificationSupported: false,
   subscribe: () => {},
   unsubscribe: () => {},
   requestPermission: () => {},
@@ -80,6 +83,15 @@ const PushNotificationsContextProvider: React.FC<
     isSafari() &&
       (window as any).safari &&
       'pushNotification' in (window as any).safari
+  );
+
+  const isPushNotificationSupported = useRef(
+    isBrowser() &&
+      (isSafariBrowser ||
+        ('serviceWorker' in navigator &&
+          'PushManager' in window &&
+          'Notification' in window)) &&
+      !isIOS()
   );
 
   // Get config
@@ -257,11 +269,11 @@ const PushNotificationsContextProvider: React.FC<
   ]);
 
   const checkSubscription = useCallback(async () => {
-    let isSubscribed = false;
-
-    if (isIOS()) {
+    if (!isPushNotificationSupported.current) {
       return;
     }
+
+    let isSubscribed = false;
 
     if (isSafariBrowser.current) {
       isSubscribed = await checkSubscriptionSafari();
@@ -288,7 +300,7 @@ const PushNotificationsContextProvider: React.FC<
   const promptUserWithPushNotificationsPermissionModal = useCallback(() => {
     if (
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
-      !isIOS() &&
+      isPushNotificationSupported.current &&
       getPermissionData().permission === 'default' &&
       user.loggedIn
     ) {
@@ -304,7 +316,7 @@ const PushNotificationsContextProvider: React.FC<
     const shouldShowModal =
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       user.loggedIn &&
-      !isIOS() &&
+      isPushNotificationSupported.current &&
       getPermissionData().permission === 'default';
 
     if (shouldShowModal) {
@@ -408,6 +420,12 @@ const PushNotificationsContextProvider: React.FC<
   const subscribeNonSafari = useCallback(
     async (onSuccess?: () => void) => {
       try {
+        if (!('serviceWorker' in navigator)) {
+          throw new Error(
+            `Sorry, your browser doesn't support push notifications`
+          );
+        }
+
         const swReg = await navigator.serviceWorker.register('/sw.js');
 
         const notificationPermission = await Notification.requestPermission();
@@ -527,7 +545,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [unregister]);
 
   const pauseNotification = useCallback(() => {
-    if (isIOS()) {
+    if (!isPushNotificationSupported.current) {
       return;
     }
 
@@ -585,7 +603,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [getPermissionData, registerSubscriptionNonSafari]);
 
   const resumePushNotification = useCallback(() => {
-    if (isIOS()) {
+    if (!isPushNotificationSupported.current) {
       return;
     }
 
@@ -620,6 +638,7 @@ const PushNotificationsContextProvider: React.FC<
       isLoading,
       isPermissionRequestModalOpen,
       isPushNotificationAlertShown,
+      isPushNotificationSupported: isPushNotificationSupported.current,
       requestPermission,
       subscribe,
       unsubscribe,
@@ -654,7 +673,11 @@ const PushNotificationsContextProvider: React.FC<
   }, [user.loggedIn]);
 
   useEffect(() => {
-    if (!user.loggedIn && isUserWasLoggedIn.current) {
+    if (
+      !user.loggedIn &&
+      isUserWasLoggedIn.current &&
+      isPushNotificationSupported.current
+    ) {
       pauseNotification();
     }
   }, [user.loggedIn, pauseNotification]);

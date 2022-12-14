@@ -267,6 +267,9 @@
       },
       "nonSafari": {
         "title": "Turn on web notifications by clicking the lock"
+      },
+      "windows": {
+        "subtitle": "or go to Start > Settings > System > Notifications"
       }
     },
     "requestModal": {
