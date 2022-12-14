@@ -1387,6 +1387,10 @@ const SBiddersInfo = styled(Text)`
 
 const SSpanBiddersHighlighted = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  a {
+    color: inherit !important;
+  }
 `;
 
 const SSpanBiddersRegular = styled.span`

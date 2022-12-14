@@ -1,13 +1,12 @@
 /* eslint-disable consistent-return */
-/* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable no-nested-ternary */
 import React, {
   useState,
   useEffect,
   useCallback,
   useContext,
   useRef,
+  useMemo,
 } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -19,7 +18,6 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 /* API */
-import { markUser } from '../../../api/endpoints/user';
 import { reportUser } from '../../../api/endpoints/report';
 import { sendMessage } from '../../../api/endpoints/chat';
 
@@ -73,7 +71,8 @@ const ChatArea: React.FC<IChatData> = ({
     resizeMode
   );
 
-  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
+    useGetBlockedUsers();
 
   const [messageText, setMessageText] = useState<string>('');
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -84,9 +83,6 @@ const ChatArea: React.FC<IChatData> = ({
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
-  const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
-  const [isMessagingDisabled, setIsMessagingDisabled] =
-    useState<boolean>(false);
   const [isSubscriptionExpired, setIsSubscriptionExpired] =
     useState<boolean>(false);
 
@@ -120,31 +116,15 @@ const ChatArea: React.FC<IChatData> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
 
-  useEffect(() => {
-    if (usersIBlocked.length > 0 && chatRoom) {
-      const isBlocked = usersIBlocked.find(
-        (i) => i === chatRoom?.visavis?.user?.uuid
-      );
-      if (isBlocked) {
-        setIsVisavisBlocked(true);
-      } else {
-        if (isVisavisBlocked) setIsVisavisBlocked(false);
-      }
-    } else {
-      if (isVisavisBlocked) setIsVisavisBlocked(false);
-    }
-  }, [usersIBlocked, chatRoom, isVisavisBlocked]);
+  const isVisavisBlocked = useMemo(
+    () => usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersIBlocked]
+  );
 
-  useEffect(() => {
-    if (usersBlockedMe.length > 0 && chatRoom) {
-      const isBlocked = usersBlockedMe.find(
-        (i) => i === chatRoom?.visavis?.user?.uuid
-      );
-      if (isBlocked) {
-        setIsMessagingDisabled(true);
-      }
-    }
-  }, [usersBlockedMe, chatRoom]);
+  const isMessagingDisabled = useMemo(
+    () => usersBlockedMe.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersBlockedMe]
+  );
 
   const handleOpenEllipseMenu = useCallback(() => {
     setEllipseMenuOpen(true);
@@ -154,29 +134,18 @@ const ChatArea: React.FC<IChatData> = ({
     setEllipseMenuOpen(false);
   }, []);
 
-  const unblockUserRequest = useCallback(async () => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: 4,
-        userUuid: chatRoom?.visavis?.user?.uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      if (chatRoom?.visavis?.user?.uuid)
-        unblockUser(chatRoom.visavis.user?.uuid);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [chatRoom, unblockUser]);
-
   const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) setConfirmBlockUser(true);
     } else {
-      unblockUserRequest();
+      changeUserBlockedStatus(chatRoom?.visavis?.user?.uuid, false);
     }
-  }, [isVisavisBlocked, confirmBlockUser, unblockUserRequest]);
+  }, [
+    isVisavisBlocked,
+    confirmBlockUser,
+    chatRoom?.visavis?.user?.uuid,
+    changeUserBlockedStatus,
+  ]);
 
   const onUserReport = useCallback(() => {
     setConfirmReportUser(true);
@@ -243,32 +212,51 @@ const ChatArea: React.FC<IChatData> = ({
     }
   };
 
-  const isTextareaVisible = useCallback(() => {
-    if (
+  const isTextareaHidden = useMemo(
+    () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
       isSubscriptionExpired ||
       chatRoom?.visavis?.user?.options?.isTombstone ||
-      !chatRoom
-    ) {
-      return false;
-    }
-
-    if (isAnnouncement && !isMyAnnouncement) {
-      return false;
-    }
-
-    return true;
-  }, [
-    isVisavisBlocked,
-    isSubscriptionExpired,
-    isMessagingDisabled,
-    isAnnouncement,
-    isMyAnnouncement,
-    chatRoom,
-  ]);
+      !chatRoom ||
+      (isAnnouncement && !isMyAnnouncement),
+    [
+      isVisavisBlocked,
+      isSubscriptionExpired,
+      isMessagingDisabled,
+      isAnnouncement,
+      isMyAnnouncement,
+      chatRoom,
+    ]
+  );
 
   const moreButtonRef: any = useRef();
+
+  const whatComponentToDisplay = useCallback(() => {
+    if (chatRoom?.visavis?.user?.options?.isTombstone)
+      return <AccountDeleted />;
+
+    if (isMessagingDisabled && chatRoom?.visavis?.user)
+      return <MessagingDisabled user={chatRoom.visavis.user} />;
+
+    if (
+      isSubscriptionExpired &&
+      chatRoom?.visavis?.user?.uuid &&
+      chatRoom.myRole
+    )
+      return (
+        <SubscriptionExpired
+          user={chatRoom.visavis.user}
+          myRole={chatRoom.myRole}
+        />
+      );
+    return null;
+  }, [
+    isMessagingDisabled,
+    chatRoom?.visavis?.user,
+    isSubscriptionExpired,
+    chatRoom?.myRole,
+  ]);
 
   return (
     <SContainer>
@@ -335,32 +323,16 @@ const ChatArea: React.FC<IChatData> = ({
       />
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
-          chatRoom &&
-          chatRoom.visavis && (
+          chatRoom?.visavis && (
             <BlockedUser
               confirmBlockUser={confirmBlockUser}
               isBlocked={isVisavisBlocked}
               user={chatRoom.visavis}
               onUserBlock={onUserBlock}
               closeModal={() => setConfirmBlockUser(false)}
-              // isAnnouncement={isAnnouncement}
             />
           )}
-
-        {chatRoom?.visavis?.user?.options?.isTombstone ? (
-          <AccountDeleted />
-        ) : chatRoom && chatRoom.visavis ? (
-          isMessagingDisabled ? (
-            <MessagingDisabled user={chatRoom.visavis.user!!} />
-          ) : isSubscriptionExpired && chatRoom.visavis?.user?.uuid ? (
-            <SubscriptionExpired
-              user={chatRoom.visavis.user!!}
-              myRole={chatRoom.myRole!!}
-            />
-          ) : null
-        ) : null}
-
-        {isTextareaVisible() && (
+        {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>
               <TextArea
@@ -388,6 +360,8 @@ const ChatArea: React.FC<IChatData> = ({
               />
             </SButton>
           </SBottomTextarea>
+        ) : (
+          whatComponentToDisplay()
         )}
       </SBottomPart>
       {chatRoom?.visavis && (

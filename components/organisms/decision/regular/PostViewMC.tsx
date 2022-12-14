@@ -437,7 +437,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
 
-    const socketHandlerOptionDeleted = (data: any) => {
+    const socketHandlerOptionDeleted = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.McOptionDeleted.decode(arr);
 
@@ -446,6 +446,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           const workingArr = [...curr];
           return workingArr.filter((o) => o.id !== decoded.optionId);
         });
+
+        await fetchPostLatestData();
       }
     };
 

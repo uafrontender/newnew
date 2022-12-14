@@ -5,12 +5,14 @@ import React, {
   useCallback,
   useContext,
   useRef,
+  useMemo,
 } from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
+import dynamic from 'next/dynamic';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
 import { IChatData } from '../../../interfaces/ichat';
@@ -30,6 +32,14 @@ import isBrowser from '../../../../utils/isBrowser';
 import validateInputText from '../../../../utils/validateMessageText';
 import getDisplayname from '../../../../utils/getDisplayname';
 import isSafari from '../../../../utils/isSafari';
+import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
+
+const AccountDeleted = dynamic(() => import('../../chat/AccountDeleted'));
+const MessagingDisabled = dynamic(() => import('../../chat/MessagingDisabled'));
+const BlockedUser = dynamic(() => import('../../chat/BlockedUser'));
+const SubscriptionExpired = dynamic(
+  () => import('../../chat/SubscriptionExpired')
+);
 
 const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -37,6 +47,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
+
+  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
+    useGetBlockedUsers();
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -57,6 +70,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     string | undefined | null
   >('');
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
+  const [isSubscriptionExpired, setIsSubscriptionExpired] =
+    useState<boolean>(false);
 
   const getChatMessages = useCallback(
     async (pageToken?: string) => {
@@ -99,6 +115,9 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   useEffect(() => {
     if (chatRoom) {
+      if (!chatRoom?.visavis?.isSubscriptionActive) {
+        setIsSubscriptionExpired(true);
+      }
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
@@ -317,17 +336,6 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       showChatList();
     }
   };
-
-  const isTextareaHidden = useCallback(() => {
-    if (!chatRoom) {
-      return false;
-    }
-    if (isAnnouncement && !isMyAnnouncement) {
-      return false;
-    }
-    return true;
-  }, [isAnnouncement, isMyAnnouncement, chatRoom]);
-
   const messagesScrollContainerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -354,6 +362,65 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       }, 5);
     }
   }, [messages]);
+
+  const isVisavisBlocked = useMemo(
+    () => usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersIBlocked]
+  );
+
+  const isMessagingDisabled = useMemo(
+    () => usersBlockedMe.includes(chatRoom?.visavis?.user?.uuid ?? ''),
+    [chatRoom?.visavis?.user?.uuid, usersBlockedMe]
+  );
+
+  const isTextareaHidden = useMemo(
+    () =>
+      isMessagingDisabled ||
+      isVisavisBlocked ||
+      isSubscriptionExpired ||
+      chatRoom?.visavis?.user?.options?.isTombstone ||
+      !chatRoom,
+    [isVisavisBlocked, isSubscriptionExpired, isMessagingDisabled, chatRoom]
+  );
+
+  const onUserBlock = useCallback(() => {
+    if (!isVisavisBlocked) {
+      if (!confirmBlockUser) setConfirmBlockUser(true);
+    } else {
+      changeUserBlockedStatus(chatRoom?.visavis?.user?.uuid, false);
+    }
+  }, [
+    isVisavisBlocked,
+    confirmBlockUser,
+    chatRoom?.visavis?.user?.uuid,
+    changeUserBlockedStatus,
+  ]);
+
+  const whatComponentToDisplay = useCallback(() => {
+    if (chatRoom?.visavis?.user?.options?.isTombstone)
+      return <AccountDeleted />;
+
+    if (isMessagingDisabled && chatRoom?.visavis?.user)
+      return <MessagingDisabled user={chatRoom.visavis.user} />;
+
+    if (
+      isSubscriptionExpired &&
+      chatRoom?.visavis?.user?.uuid &&
+      chatRoom.myRole
+    )
+      return (
+        <SubscriptionExpired
+          user={chatRoom.visavis.user}
+          myRole={chatRoom.myRole}
+        />
+      );
+    return null;
+  }, [
+    isMessagingDisabled,
+    chatRoom?.visavis?.user,
+    isSubscriptionExpired,
+    chatRoom?.myRole,
+  ]);
 
   return (
     <SContainer>
@@ -406,7 +473,19 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        {isTextareaHidden() && (
+        {(isVisavisBlocked === true || confirmBlockUser) &&
+          chatRoom &&
+          chatRoom.visavis && (
+            <BlockedUser
+              confirmBlockUser={confirmBlockUser}
+              isBlocked={isVisavisBlocked}
+              user={chatRoom.visavis}
+              onUserBlock={onUserBlock}
+              closeModal={() => setConfirmBlockUser(false)}
+            />
+          )}
+
+        {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>
               <TextArea
@@ -434,6 +513,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
               />
             </SButton>
           </SBottomTextarea>
+        ) : (
+          whatComponentToDisplay()
         )}
       </SBottomPart>
     </SContainer>

@@ -16,7 +16,6 @@ import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { useBundles } from '../../../contexts/bundlesContext';
@@ -49,7 +48,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, changeUserBlockedStatus } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
     [usersIBlocked, creator.uuid]
@@ -60,21 +59,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     () => bundles?.find((bundle) => bundle.creator?.uuid === creator.uuid),
     [bundles, creator.uuid]
   );
-
-  const unblockUserAsync = async (uuid: string) => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-        userUuid: uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(uuid);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleClickReport = useCallback(() => {
     // Redirect only after the persist data is pulled
@@ -132,7 +116,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUserAsync(creator.uuid as string);
+              changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
@@ -189,7 +173,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           onClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUserAsync(creator.uuid as string);
+              changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }

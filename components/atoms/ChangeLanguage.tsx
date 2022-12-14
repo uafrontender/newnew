@@ -32,7 +32,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
   const isTablet = ['tablet'].includes(resizeMode);
 
   const ddHeight =
-    (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
+    (options.length > 6 ? 372 : options.length * (isTablet ? 54 : 56)) + 24;
 
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
@@ -184,6 +184,7 @@ const SButton = styled(Button)<ISButton>`
   ${(props) => props.theme.media.tablet} {
     min-width: 136px;
     justify-content: flex-start;
+    margin-bottom: 4px;
   }
 `;
 

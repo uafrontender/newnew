@@ -72,8 +72,6 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
             setShadeVisible(scrollable && (!scrolledToTheBottom || hasMore));
           }}
         >
-          {/* TODO: add no results message (otherwise there is an empty space) */}
-
           <CreatorsList
             loading={loading && initialLoadDone}
             collection={creators}

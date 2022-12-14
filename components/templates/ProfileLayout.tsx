@@ -26,7 +26,6 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-import { markUser } from '../../api/endpoints/user';
 
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
@@ -44,7 +43,6 @@ import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton'
 import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
-import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../utils/getDisplayname';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
@@ -79,7 +77,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { showErrorToastPredefined } = useErrorToasts();
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -129,7 +126,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
+  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
+    useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
     [usersIBlocked, user.uuid]
@@ -140,22 +138,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       usersIBlocked.includes(user.uuid) || usersBlockedMe.includes(user.uuid),
     [usersIBlocked, user.uuid, usersBlockedMe]
   );
-
-  const unblockUserAsync = async (uuid: string) => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-        userUuid: uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(uuid);
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-    }
-  };
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
@@ -526,7 +508,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleClickBlock={() => {
                 if (isUserBlocked) {
-                  unblockUserAsync(user.uuid);
+                  changeUserBlockedStatus(user.uuid, false);
                 } else {
                   setBlockUserModalOpen(true);
                 }
@@ -638,7 +620,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           onClose={() => setIsEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUserAsync(user.uuid);
+              changeUserBlockedStatus(user.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
