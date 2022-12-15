@@ -102,6 +102,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
+  const [isDisabledAdditionally, setIsDisabledAdditionally] = useState(false);
+
   const allowedRoutes = [
     '/creation',
     '/creation/auction',
@@ -314,6 +316,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       dispatch(setPostData(data));
 
       if (isMobile) {
+        setIsDisabledAdditionally(true);
         router.push(`/creation/${tab}/published`);
       } else {
         playerRef?.current?.pause();
@@ -535,8 +538,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             <SButton
               view='primaryGrad'
               loading={isSubmitting}
-              onClick={handleSubmit}
-              disabled={disabled}
+              onClick={handleSubmitWithRecaptchaProtection}
+              disabled={disabled || isDisabledAdditionally}
             >
               {t('preview.button.submit')}
             </SButton>
