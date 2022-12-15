@@ -633,7 +633,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (res.data) {
       return {
         props: {
-          initialPostsRA: res.data.toJSON().posts,
+          initialPostsRA: res.data.toJSON().posts ?? null,
           ...(res.data.paging?.nextPageToken
             ? {
                 initialNextPageTokenRA: res.data.paging?.nextPageToken,

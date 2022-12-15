@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -22,17 +20,9 @@ const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
 interface IChat {
   username?: string;
-  setupIntentClientSecretFromRedirect?: string;
-  saveCardFromRedirect?: boolean;
-  resetStripeSetupIntent: () => void;
 }
 
-export const Chat: React.FC<IChat> = ({
-  username,
-  setupIntentClientSecretFromRedirect,
-  saveCardFromRedirect,
-  resetStripeSetupIntent,
-}) => {
+export const Chat: React.FC<IChat> = ({ username }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const [chatData, setChatData] = useState<IChatData>({
