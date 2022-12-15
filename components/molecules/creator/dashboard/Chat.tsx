@@ -418,15 +418,18 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     [chatRoom?.visavis?.user?.uuid, usersBlockedMe]
   );
 
-  const isTextareaHidden = useMemo(
-    () =>
-      isMessagingDisabled ||
-      isVisavisBlocked ||
-      isSubscriptionExpired ||
-      chatRoom?.visavis?.user?.options?.isTombstone ||
-      !chatRoom,
-    [isVisavisBlocked, isSubscriptionExpired, isMessagingDisabled, chatRoom]
-  );
+  const isTextareaHidden = useMemo(() => {
+    if (chatRoom?.kind !== newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
+      return (
+        isMessagingDisabled ||
+        isVisavisBlocked ||
+        isSubscriptionExpired ||
+        chatRoom?.visavis?.user?.options?.isTombstone ||
+        !chatRoom
+      );
+    }
+    return false;
+  }, [isVisavisBlocked, isSubscriptionExpired, isMessagingDisabled, chatRoom]);
 
   const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
@@ -558,6 +561,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                 value={messageText}
                 onChange={handleChange}
                 placeholder={t('chat.placeholder')}
+                gotMaxLength={handleSubmit}
               />
             </STextArea>
             <SButton

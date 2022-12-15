@@ -14,6 +14,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
+import { useRouter } from 'next/router';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
@@ -60,6 +61,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
   const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
+  const router = useRouter();
 
   const [isStripeReady, setIsStripeReady] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -133,7 +135,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         const { error } = await stripe.confirmSetup({
           elements,
           confirmParams: {
-            return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${redirectUrl}?save_card=${saveCard}`,
+            return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `/${router.locale}` : ''
+            }/${redirectUrl}?save_card=${saveCard}`,
           },
           redirect: 'if_required',
         });
