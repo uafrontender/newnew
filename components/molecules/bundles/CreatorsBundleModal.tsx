@@ -188,6 +188,7 @@ const SUserInfo = styled.div`
   flex-direction: row;
   align-items: center;
   margin-bottom: 12px;
+  max-width: 100%;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -202,6 +203,7 @@ const SUserAvatar = styled(UserAvatar)`
 const SForLine = styled.p`
   display: inline-flex;
   white-space: pre;
+  overflow: hidden;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 600;
   font-size: 16px;
@@ -209,6 +211,8 @@ const SForLine = styled.p`
 `;
 
 const SUserName = styled.p`
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 
@@ -219,6 +223,7 @@ const SUserName = styled.p`
 
 const SInlineSvg = styled(InlineSvg)`
   margin-left: 2px;
+  flex-shrink: 0;
 `;
 
 const SBundleInfo = styled.div`

@@ -594,7 +594,7 @@ const SCreatorLink = styled.a`
 `;
 
 const SInlineSvg = styled(InlineSvg)`
-  margin-right: 4px;
+  flex-shrink: 0;
 `;
 
 const SContainer = styled.div`
