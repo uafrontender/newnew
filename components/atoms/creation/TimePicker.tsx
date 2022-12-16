@@ -74,8 +74,12 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         return HOURS.slice(hCorrected);
       }
 
-      if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'am' && h !== 0) {
         offset = h - 1;
+
+        if (h > 0) {
+          return HOURS.slice(offset, HOURS.length - 1);
+        }
       }
     }
 

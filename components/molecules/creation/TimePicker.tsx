@@ -49,17 +49,6 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
 
   const hours: TDropdownSelectItem<string>[] = useMemo(() => {
     let offset;
-    if (isDaySame) {
-      const h = moment().hour();
-
-      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm' && h !== 12) {
-        const hCorrected = h - 13;
-
-        offset = hCorrected;
-      } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
-        offset = h - 1;
-      }
-    }
     const hoursArray = new Array(12).fill('').map((_, i) => ({
       value:
         (i + 1).toString().length > 1
@@ -67,6 +56,22 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
           : `0${(i + 1).toString()}`,
       name: (i + 1).toString(),
     }));
+
+    if (isDaySame) {
+      const h = moment().hour();
+
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm' && h !== 12) {
+        const hCorrected = h - 13;
+
+        offset = hCorrected;
+      } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am' && h !== 0) {
+        offset = h - 1;
+
+        if (h > 0) {
+          return hoursArray.slice(offset, hoursArray.length - 1);
+        }
+      }
+    }
 
     if (offset) {
       return hoursArray.slice(offset);
