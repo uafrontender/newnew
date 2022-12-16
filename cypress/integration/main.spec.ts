@@ -22,7 +22,7 @@ context('Main flow', () => {
   });
 
   describe('Creator', () => {
-    const CREATOR_EMAIL = `test-creator-${testSeed}@newnew.co`;
+    const CREATOR_EMAIL = `test_creator_${testSeed}@newnew.co`;
 
     const defaultStorage = {
       userTutorialsProgress:
@@ -292,7 +292,7 @@ context('Main flow', () => {
       cy.wait(2000);
 
       const attemptSeed = Math.floor(Math.random() * 100);
-      USER_EMAIL = `test-user-${testSeed}${attemptSeed}0@newnew.co`;
+      USER_EMAIL = `test_user_${testSeed}${attemptSeed}0@newnew.co`;
       const BID_OPTION_TEXT = 'something';
       const BID_OPTION_AMOUNT = '10';
 
@@ -389,7 +389,7 @@ context('Main flow', () => {
       cy.wait(2000);
 
       const attemptSeed = Math.floor(Math.random() * 100);
-      USER_EMAIL = `test-user-${testSeed}${attemptSeed}0@newnew.co`;
+      USER_EMAIL = `test_user_${testSeed}${attemptSeed}0@newnew.co`;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollId}`);
       cy.url().should('include', '/p/');
@@ -469,7 +469,7 @@ context('Main flow', () => {
   });
 
   describe('User willing to contribute', () => {
-    const USER_EMAIL = `test-user-${testSeed}2@newnew.co`;
+    const USER_EMAIL = `test_user_${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -569,7 +569,7 @@ context('Main flow', () => {
   });
 
   describe('User willing to buy a bundle', () => {
-    const USER_EMAIL = `test-user-${testSeed}3@newnew.co`;
+    const USER_EMAIL = `test_user_${testSeed}3@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
@@ -684,7 +684,7 @@ context('Main flow', () => {
   });
 
   describe('User willing to add card first', () => {
-    const USER_EMAIL = `test-user-${testSeed}4@newnew.co`;
+    const USER_EMAIL = `test_user_${testSeed}4@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
