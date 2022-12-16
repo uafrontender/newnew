@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -9,98 +9,55 @@ import Headline from '../../atoms/Headline';
 import Button from '../../atoms/Button';
 import FilterButton from '../../atoms/FilterButton';
 import Text from '../../atoms/Text';
+import Lottie from '../../atoms/Lottie';
 
 import { getMyPosts } from '../../../api/endpoints/user';
+import usePagination, {
+  PaginatedResponse,
+  Paging,
+} from '../../../utils/hooks/usePagination';
+
+import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
   const { t } = useTranslation('page-Home');
 
-  const [posts, setPosts] = useState<newnewapi.Post[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const isPostsRequested = useRef(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
   const [statusFilter, setStatusFilter] =
     useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
 
-  const prevStatusFilter = useRef(statusFilter);
-
-  const [nextPageToken, setNextPageToken] = useState<
-    string | undefined | null
-  >();
-
   const fetchCreatorPosts = useCallback(
-    async (abortController?: AbortController) => {
-      try {
-        setIsError(false);
-        setIsLoadingMore(true);
-        const payload = new newnewapi.GetRelatedToMePostsRequest({
-          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-          statusFilter:
-            statusFilter ||
-            newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
-          paging: {
-            ...(nextPageToken ? { pageToken: nextPageToken } : {}),
-            limit: 10,
-          },
-          // ...(statusFilterValue
-          //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
-          //   : {}),
-        });
+    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IPost>> => {
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+        statusFilter:
+          statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
+        paging,
+        // ...(statusFilterValue
+        //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
+        //   : {}),
+      });
 
-        const postsResponse = await getMyPosts(
-          payload,
-          abortController?.signal
-        );
+      const postsResponse = await getMyPosts(payload);
 
-        if (postsResponse.data && postsResponse.data.posts) {
-          setPosts((curr) => [
-            ...(nextPageToken ? curr : []),
-            ...(postsResponse.data?.posts as newnewapi.Post[]),
-          ]);
-          setNextPageToken(postsResponse.data.paging?.nextPageToken);
-        } else if ((postsResponse?.error as any)?.code !== 20) {
-          setPosts([]);
-          throw new Error('Request failed');
-        }
-      } catch (err: any) {
-        console.error(err);
-        setIsError(err.message);
-      } finally {
-        setIsLoadingMore(false);
-        isPostsRequested.current = true;
+      if (!postsResponse.data || postsResponse.error) {
+        throw new Error('Request failed');
       }
+
+      return {
+        nextData: postsResponse.data.posts,
+        nextPageToken: postsResponse.data.paging?.nextPageToken,
+      };
     },
-    [nextPageToken, statusFilter]
+    [statusFilter]
   );
 
-  const initialFetch = useCallback(
-    async (abortController?: AbortController) => {
-      setIsLoading(true);
-      await fetchCreatorPosts(abortController);
-      setIsLoading(false);
-    },
-    [fetchCreatorPosts]
-  );
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    if (posts.length === 0 && !isPostsRequested.current) {
-      initialFetch(abortController);
-    }
-
-    return () => {
-      abortController.abort();
-    };
-  }, [initialFetch, posts.length, nextPageToken]);
-
-  const loadMorePosts = useCallback(() => {
-    if (nextPageToken && !isLoadingMore) {
-      fetchCreatorPosts();
-    }
-  }, [fetchCreatorPosts, nextPageToken, isLoadingMore]);
+  const {
+    data: posts,
+    loading,
+    loadMore,
+    initialLoadDone,
+  } = usePagination<newnewapi.IPost>(fetchCreatorPosts, 10);
 
   const handleSetStatusFilter = (
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
@@ -110,24 +67,10 @@ const YourPostsSection = () => {
     } else {
       setStatusFilter(newStatusFilter);
     }
-
-    setNextPageToken(null);
-    setPosts([]);
   };
 
-  useEffect(() => {
-    if (prevStatusFilter.current !== statusFilter) {
-      initialFetch();
-      prevStatusFilter.current = statusFilter;
-    }
-  }, [statusFilter, initialFetch]);
-
-  if (
-    isPostsRequested.current &&
-    posts.length === 0 &&
-    !statusFilter &&
-    !isLoading
-  ) {
+  // Create you first post block
+  if (posts.length === 0 && !statusFilter && !loading && initialLoadDone) {
     return (
       <SCreateFirstContainer>
         <SHeadline>{t('createFirstPost.title')}</SHeadline>
@@ -142,7 +85,10 @@ const YourPostsSection = () => {
 
   return (
     <SContainer
-      style={{ paddingTop: posts.length === 0 && !isLoading ? '62px' : 0 }}
+      style={{
+        paddingTop:
+          posts.length === 0 && !loading && initialLoadDone ? '62px' : 0,
+      }}
     >
       <SFilterContainer>
         <FilterButton
@@ -174,24 +120,38 @@ const YourPostsSection = () => {
           {t('createFirstPost.filter.ended')}
         </FilterButton>
       </SFilterContainer>
-      {!isError && (posts.length || isLoading) && (
+      {(posts.length || loading) && (
         <SCardsSection
           category='my-posts'
           collection={posts}
-          loading={isLoading}
-          onReachEnd={loadMorePosts}
+          loading={loading && !initialLoadDone}
+          onReachEnd={loadMore}
           seeMoreLink='/profile/my-posts'
         />
       )}
-      {!isLoading && posts.length === 0 && (
+      {!loading && posts.length === 0 && (
         <SNoPostsView>
-          <Headline variant={4}>{t('ooops')}</Headline>
-          <SHint variant='subtitle'>{t('noPosts')}</SHint>
-          <Link href='/creation'>
-            <a>
-              <Button>{tCommon('button.createDecision')}</Button>
-            </a>
-          </Link>
+          {initialLoadDone ? (
+            <>
+              <Headline variant={4}>{t('ooops')}</Headline>
+              <SHint variant='subtitle'>{t('noPosts')}</SHint>
+              <Link href='/creation'>
+                <a>
+                  <Button>{tCommon('button.createDecision')}</Button>
+                </a>
+              </Link>
+            </>
+          ) : (
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: logoAnimation,
+              }}
+            />
+          )}
         </SNoPostsView>
       )}
     </SContainer>
