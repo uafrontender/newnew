@@ -66,3 +66,19 @@ export const webPushConfig = (
     payload,
     signal ?? undefined
   );
+
+export const webPushCheck = (
+  payload: newnewapi.WebPushCheckRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.WebPushCheckRequest,
+    newnewapi.WebPushCheckResponse
+  >(
+    newnewapi.WebPushCheckRequest,
+    newnewapi.WebPushCheckResponse,
+    `${BASE_URL_WEB_PUSH}/check`,
+    'post',
+    payload,
+    signal ?? undefined
+  );

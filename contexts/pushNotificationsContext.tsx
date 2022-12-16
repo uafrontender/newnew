@@ -10,6 +10,7 @@ import React, {
 import { newnewapi } from 'newnew-api';
 
 import {
+  webPushCheck,
   webPushConfig,
   webPushRegister,
   webPushUnRegister,
@@ -193,19 +194,18 @@ const PushNotificationsContextProvider: React.FC<
   }, []);
 
   // check subscription existing on BE
-  const fetchCheckSubscription = useCallback(async (token: string) => {
+  const fetchCheckSubscription = useCallback(async (endpoint: string) => {
     try {
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL
-        }/web_push/safari/check?token=${token}&access_token=${cookiesInstance.get(
-          'accessToken'
-        )}`
-      );
+      const payload = new newnewapi.WebPushCheckRequest({
+        endpoint,
+      });
+      const res = await webPushCheck(payload);
 
-      const response = await res.json();
+      if (res.error) {
+        return false;
+      }
 
-      return !(Object.keys(response).length === 0);
+      return res.data?.exists || false;
     } catch (err) {
       return false;
     }
