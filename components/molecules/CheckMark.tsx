@@ -9,7 +9,7 @@ import CheckmarkIcon from '../../public/images/svg/icons/outlined/Checkmark.svg'
 interface ICheckMark {
   id?: string;
   className?: string;
-  label: string;
+  label?: string;
   selected?: boolean;
   disabled?: boolean;
   handleChange?: (e: any, id?: string) => void;

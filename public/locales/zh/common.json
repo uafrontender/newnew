@@ -259,5 +259,12 @@
       "dark": "深色",
       "auto": "自動"
     }
+  },
+  "timer": {
+    "daysLeft": "天",
+    "hoursLeft": "小時",
+    "minutesLeft": "分鐘",
+    "secondsLeft": "秒",
+    "endedOn": "結束於"
   }
 }
