@@ -1,25 +1,41 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-plusplus */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
+import moment from 'moment';
 
 import { ITimeComponents } from './TimePicker';
 import { TDropdownSelectItem } from '../../atoms/DropdownSelect';
 import Button from '../../atoms/Button';
+import { MINUTES } from '../../../constants/general';
 
 interface ITimePickerMobileModal {
   currentTime: ITimeComponents;
+  isDaySame: boolean;
   hours: TDropdownSelectItem<string>[];
-  minutes: TDropdownSelectItem<string>[];
+  hoursFormat: 'am' | 'pm';
   handleChangeTime: (newValue: ITimeComponents) => void;
   handleClose: () => void;
 }
 
 const TimePickerMobileModal: React.FunctionComponent<
   ITimePickerMobileModal
-> = ({ currentTime, hours, minutes, handleChangeTime, handleClose }) => {
+> = ({
+  currentTime,
+  isDaySame,
+  hours,
+  hoursFormat,
+  handleChangeTime,
+  handleClose,
+}) => {
   const theme = useTheme();
-  const [innerTime, setInnerDate] = useState(
+  const [innerTime, setInnerTime] = useState(
     currentTime.hours && currentTime.minutes
       ? currentTime
       : {
@@ -28,20 +44,78 @@ const TimePickerMobileModal: React.FunctionComponent<
         }
   );
 
+  const { isHourSame, minutesOffset } = useMemo(() => {
+    const t = moment();
+    const h = t.hour();
+
+    const timeForCurrentValue = moment(
+      `${innerTime.hours}:${innerTime.minutes} ${hoursFormat}`,
+      'HH:mm a'
+    );
+
+    return {
+      isHourSame: timeForCurrentValue.hour() === h,
+      minutesOffset: t.minute() - 59,
+    };
+  }, [hoursFormat, innerTime.hours, innerTime.minutes]);
+
+  const minutes: TDropdownSelectItem<string>[] = useMemo(() => {
+    const minutesAll = new Array(60).fill('').map((_, i) => ({
+      value: i.toString().length > 1 ? i.toString() : `0${i.toString()}`,
+      name: i.toString(),
+    }));
+
+    if (isDaySame && isHourSame && minutesOffset) {
+      return minutesAll.slice(minutesOffset);
+    }
+
+    return minutesAll;
+  }, [isDaySame, isHourSame, minutesOffset]);
+
   const handleUpdateHours = useCallback(
     (newHours: string) => {
       const working = { ...innerTime };
       working.hours = newHours;
-      setInnerDate(working);
+
+      // Check if day and time are going to be the same
+      const time = moment();
+      const h = time.hour();
+      const ltd = h >= 12 ? 'pm' : 'am';
+
+      const timeForItemValue = moment(`${working} ${hoursFormat}`, 'HH:mm a');
+
+      const isTimeOfTheDaySameForItemValue = ltd === hoursFormat;
+      const localTimeOfTheDayForItemValue = ltd;
+      const isHourSameForItemValue = timeForItemValue.hour() === h;
+      const minutesOffsetForItemValue = timeForItemValue.minute() - 59;
+      const availableMinutes = MINUTES.slice(minutesOffsetForItemValue);
+      let minuteIsInAvailableMinutes = false;
+      for (let i = 0; i < availableMinutes.length; i++) {
+        if (availableMinutes[i].value === working.minutes) {
+          minuteIsInAvailableMinutes = true;
+          break;
+        }
+      }
+      if (
+        isTimeOfTheDaySameForItemValue &&
+        localTimeOfTheDayForItemValue &&
+        isHourSameForItemValue
+      ) {
+        if (!minuteIsInAvailableMinutes) {
+          working.minutes = availableMinutes[0].value;
+        }
+      }
+
+      setInnerTime(working);
     },
-    [innerTime]
+    [hoursFormat, innerTime]
   );
 
   const handleUpdateMinutes = useCallback(
     (newMinutes: string) => {
       const working = { ...innerTime };
       working.minutes = newMinutes;
-      setInnerDate(working);
+      setInnerTime(working);
     },
     [innerTime]
   );
@@ -69,11 +143,18 @@ const TimePickerMobileModal: React.FunctionComponent<
     const updateMinutes = () => {
       const boundingRect = minutesScrollerRef.current?.getBoundingClientRect();
       for (let i = 0; i < minutesRefs.current.length; i++) {
-        const pos =
-          minutesRefs.current[i].getBoundingClientRect().top -
-          boundingRect!!.top!!;
-        if (pos > 48 && pos < 72) {
+        const pos = minutesRefs.current[i]?.getBoundingClientRect?.()?.top
+          ? minutesRefs.current[i].getBoundingClientRect().top -
+            boundingRect!!.top!!
+          : boundingRect!!.top!!;
+        if (pos > 48 && pos < 72 && minutes[i]?.value) {
           handleUpdateMinutes(minutes[i].value);
+          break;
+        } else if (
+          !minutes[i]?.value &&
+          !minutesRefs.current[i]?.getBoundingClientRect?.()?.top
+        ) {
+          handleUpdateMinutes(minutes[0].value);
           break;
         }
       }

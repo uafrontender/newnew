@@ -327,6 +327,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         showErrorToastPredefined(
           ErrorToastPredefinedMessage.ProcessingLimitReachedError
         );
+      } else if (err.message === 'Invalid date') {
+        showErrorToastPredefined(ErrorToastPredefinedMessage.InvalidDateError);
       } else {
         showErrorToastCustom(err);
       }

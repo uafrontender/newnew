@@ -9,6 +9,7 @@ export enum ErrorToastPredefinedMessage {
   RecaptchaError = 'recaptchaError',
   UnsupportedImageFormatError = 'usupportedImageFormatError',
   ProcessingLimitReachedError = 'processingLimitReachedError',
+  InvalidDateError = 'invalidDateError',
 }
 
 interface IUseErrorToasts {

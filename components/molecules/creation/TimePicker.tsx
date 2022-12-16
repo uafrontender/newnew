@@ -19,6 +19,7 @@ interface ITimePicker {
   disabled?: boolean;
   isDaySame: boolean;
   isTimeOfTheDaySame: boolean;
+  hoursFormat: 'am' | 'pm';
   localTimeOfTheDay: 'am' | 'pm';
   onChange: (e: any) => void;
 }
@@ -29,6 +30,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     disabled,
     isDaySame,
     isTimeOfTheDaySame,
+    hoursFormat,
     localTimeOfTheDay,
     onChange,
   } = props;
@@ -50,8 +52,8 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     if (isDaySame) {
       const h = moment().hour();
 
-      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm') {
-        const hCorrected = h - 12;
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm' && h !== 12) {
+        const hCorrected = h - 13;
 
         offset = hCorrected;
       } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
@@ -72,15 +74,6 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
 
     return hoursArray;
   }, [isDaySame, isTimeOfTheDaySame, localTimeOfTheDay]);
-
-  const minutes: TDropdownSelectItem<string>[] = useMemo(
-    () =>
-      new Array(60).fill('').map((_, i) => ({
-        value: i.toString().length > 1 ? i.toString() : `0${i.toString()}`,
-        name: i.toString(),
-      })),
-    []
-  );
 
   const handleChangeTime = (newValue: ITimeComponents) => {
     const val = `${newValue.hours}:${newValue.minutes}`;
@@ -116,8 +109,10 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       >
         {modalOpen && (
           <TimePickerMobileModal
+            isDaySame={isDaySame}
             hours={hours}
-            minutes={minutes}
+            // minutes={minutes}
+            hoursFormat={hoursFormat}
             currentTime={currentTime}
             handleClose={() => setModalOpen(false)}
             handleChangeTime={handleChangeTime}
