@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -47,6 +47,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -157,7 +159,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitiesContainer dimmedBackground={openedMainSection === 'main'}>
+          <SActivitiesContainer
+            dimmedBackground={openedMainSection === 'main'}
+            ref={activitiesContainerRef}
+          >
             {openedMainSection === 'main' ? (
               <>
                 <DecisionEndedBox
@@ -286,7 +291,13 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           {t('acPostSuccess.bidChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
-                          onClick={() => setOpenedMainSection('bids')}
+                          onClick={() => {
+                            setOpenedMainSection('bids');
+
+                            if (activitiesContainerRef.current) {
+                              activitiesContainerRef.current.scrollIntoView();
+                            }
+                          }}
                         >
                           {t('acPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
