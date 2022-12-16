@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import styled from 'styled-components';
@@ -481,7 +482,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     sortOptions,
   ]);
 
+  const isBidMadeAfterRedirect = useRef(false);
+
   useEffect(() => {
+    const controller = new AbortController();
     const makeBidAfterStripeRedirect = async () => {
       if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
 
@@ -502,9 +506,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         _component: 'PostViewAC',
       });
 
-      try {
-        setLoadingModalOpen(true);
+      isBidMadeAfterRedirect.current = true;
 
+      try {
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             stripeSetupIntentClientSecret,
@@ -517,7 +521,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
         resetSetupIntentClientSecret();
 
-        const res = await placeBidOnAuction(stripeContributionRequest);
+        const res = await placeBidOnAuction(
+          stripeContributionRequest,
+          controller.signal
+        );
 
         if (
           !res.data ||
@@ -543,12 +550,24 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         showErrorToastCustom(err.message);
 
         setLoadingModalOpen(false);
+      } finally {
+        router.replace(
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
+            post.postUuid
+          }`,
+          undefined,
+          { shallow: true }
+        );
       }
     };
 
-    if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+    if (stripeSetupIntentClientSecret && !isBidMadeAfterRedirect.current) {
       makeBidAfterStripeRedirect();
     }
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user._persist?.rehydrated]);
 

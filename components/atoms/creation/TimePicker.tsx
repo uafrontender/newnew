@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import React, { useRef, useState, useCallback, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';
@@ -17,7 +18,12 @@ import { HOURS, MINUTES, FORMAT } from '../../../constants/general';
 interface ITimePicker {
   time: any;
   format: 'pm' | 'am';
-  currValue: any;
+  currValue: {
+    type: string;
+    date: string;
+    time: string;
+    'hours-format': 'am' | 'pm';
+  };
   onChange: (key: string, value: any) => void;
 }
 
@@ -39,28 +45,41 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     return false;
   }, [currValue.date]);
 
-  const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
-    const h = moment().hour();
-    const ltd = h >= 12 ? 'pm' : 'am';
-    return {
-      isTimeOfTheDaySame: ltd === currValue?.['hours-format'],
-      localTimeOfTheDay: ltd,
-    };
-  }, [currValue]);
+  const { isTimeOfTheDaySame, localTimeOfTheDay, isHourSame, minutesOffset } =
+    useMemo(() => {
+      const currentTime = moment();
+      const h = currentTime.hour();
+      const ltd = h >= 12 ? 'pm' : 'am';
+
+      const timeForCurrentValue = moment(
+        `${currValue.time} ${currValue['hours-format']}`,
+        'HH:mm a'
+      );
+
+      return {
+        isTimeOfTheDaySame: ltd === currValue?.['hours-format'],
+        localTimeOfTheDay: ltd,
+        isHourSame: timeForCurrentValue.hour() === h,
+        minutesOffset: currentTime.minute() - 59,
+      };
+    }, [currValue]);
 
   const hours = useMemo(() => {
     let offset;
     if (isDaySame) {
       const h = moment().hour();
 
-      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm') {
-        const hCorrected = h - 12;
-
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm' && h !== 12) {
+        const hCorrected = h - 13;
         return HOURS.slice(hCorrected);
       }
 
-      if (isTimeOfTheDaySame && localTimeOfTheDay === 'am') {
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'am' && h !== 0) {
         offset = h - 1;
+
+        if (h > 0) {
+          return HOURS.slice(offset, HOURS.length - 1);
+        }
       }
     }
 
@@ -70,6 +89,14 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
 
     return HOURS;
   }, [isDaySame, isTimeOfTheDaySame, localTimeOfTheDay]);
+
+  const minutes = useMemo(() => {
+    if (isDaySame && isHourSame && minutesOffset) {
+      return MINUTES.slice(minutesOffset);
+    }
+
+    return MINUTES;
+  }, [isDaySame, isHourSame, minutesOffset]);
 
   // Dragging state hours
   const [clientY, setClientY] = useState<number>(0);
@@ -188,9 +215,46 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   const renderHourItem = useCallback(
     (item: any) => {
       const selected = hour === item.value;
+
       const handleItemClick = () => {
         if (!isDragging) {
-          handleTimeChange(`${item.value}:${minute}`);
+          // Check if day and time are going to be the same
+
+          const currentTime = moment();
+          const h = currentTime.hour();
+          const ltd = h >= 12 ? 'pm' : 'am';
+
+          const timeForItemValue = moment(
+            `${item.value}:${minute} ${currValue['hours-format']}`,
+            'HH:mm a'
+          );
+
+          const isTimeOfTheDaySameForItemValue =
+            ltd === currValue?.['hours-format'];
+          const localTimeOfTheDayForItemValue = ltd;
+          const isHourSameForItemValue = timeForItemValue.hour() === h;
+          const minutesOffsetForItemValue = currentTime.minute() - 59;
+          const availableMinutes = MINUTES.slice(minutesOffsetForItemValue);
+          let minuteIsInAvailableMinutes = false;
+          for (let i = 0; i < availableMinutes.length; i++) {
+            if (availableMinutes[i].value === minute) {
+              minuteIsInAvailableMinutes = true;
+              break;
+            }
+          }
+          if (
+            isTimeOfTheDaySameForItemValue &&
+            localTimeOfTheDayForItemValue &&
+            isHourSameForItemValue
+          ) {
+            if (!minuteIsInAvailableMinutes) {
+              handleTimeChange(`${item.value}:${availableMinutes[0].value}`);
+            } else {
+              handleTimeChange(`${item.value}:${minute}`);
+            }
+          } else {
+            handleTimeChange(`${item.value}:${minute}`);
+          }
         }
       };
 
@@ -207,8 +271,9 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         </SItem>
       );
     },
-    [handleTimeChange, isDragging, hour, minute]
+    [hour, minute, currValue, isDragging, handleTimeChange]
   );
+
   const renderMinuteItem = useCallback(
     (item: any) => {
       const selected = minute === item.value;
@@ -236,8 +301,11 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   const renderFormatItem = useCallback(
     (item: any) => {
       const selected = format === item.value;
+
+      const isDisabled =
+        item.value === 'am' && isDaySame && localTimeOfTheDay === 'pm';
       const handleItemClick = () => {
-        if (isDaySame && localTimeOfTheDay === 'pm') return;
+        if (isDisabled) return;
         handleFormatChange(item.value);
       };
 
@@ -246,6 +314,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
           id={`format-${item.value}`}
           key={`format-item-${item.value}`}
           onClick={handleItemClick}
+          isDisabled={isDisabled}
           selected={selected}
         >
           <SItemLabel weight={500} variant={2} selected={selected}>
@@ -301,7 +370,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
               onMouseMove={mouseMoveHandlerMinutes}
               onMouseLeave={mouseUpHandlerMinutes}
             >
-              {MINUTES.map(renderMinuteItem)}
+              {minutes.map(renderMinuteItem)}
             </SScrollList>
           </SScrollListWrapper>
           <SScrollList noPadding>{FORMAT.map(renderFormatItem)}</SScrollList>
@@ -390,6 +459,7 @@ const SScrollList = styled.div<ISScrollList>`
 
 interface ISItem {
   selected: boolean;
+  isDisabled?: boolean;
 }
 
 const SItem = styled.div<ISItem>`
@@ -410,6 +480,14 @@ const SItem = styled.div<ISItem>`
         ? props.theme.colorsThemed.accent.blue
         : props.theme.colorsThemed.background.quaternary};
   }
+
+  ${({ isDisabled }) =>
+    isDisabled
+      ? css`
+          opacity: 0.6;
+          cursor: not-allowed;
+        `
+      : null}
 `;
 
 const SItemLabel = styled(Text)<ISItem>`

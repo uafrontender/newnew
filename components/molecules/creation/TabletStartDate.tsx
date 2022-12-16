@@ -12,7 +12,12 @@ import AnimatedPresence, {
 
 interface ITabletStartDate {
   id: string;
-  value: any;
+  value: {
+    type: string;
+    date: string;
+    time: string;
+    'hours-format': 'am' | 'pm';
+  };
   onChange: (key: string, value: string | number | boolean | object) => void;
 }
 

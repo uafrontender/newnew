@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -491,9 +492,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     sortOptions,
   ]);
 
+  const isVoteMadeAfterRedirect = useRef(false);
+
   useEffect(() => {
+    const controller = new AbortController();
     const makeVoteAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret) return;
+      if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
 
       if (!user._persist?.rehydrated) {
         return;
@@ -505,6 +509,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         );
         return;
       }
+
+      isVoteMadeAfterRedirect.current = true;
 
       Mixpanel.track('MakeVoteAfterStripeRedirect', {
         _stage: 'Post',
@@ -527,7 +533,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
         resetSetupIntentClientSecret();
 
-        const res = await voteOnPost(stripeContributionRequest);
+        const res = await voteOnPost(
+          stripeContributionRequest,
+          controller.signal
+        );
 
         if (
           !res.data ||
@@ -553,12 +562,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         console.error(err);
         showErrorToastCustom(err.message);
         setLoadingModalOpen(false);
+      } finally {
+        router.replace(
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
+            post.postUuid
+          }`,
+          undefined,
+          { shallow: true }
+        );
       }
     };
 
-    if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+    if (stripeSetupIntentClientSecret && !isVoteMadeAfterRedirect.current) {
       makeVoteAfterStripeRedirect();
     }
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user._persist?.rehydrated]);
 

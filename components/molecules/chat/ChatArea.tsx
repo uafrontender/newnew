@@ -340,6 +340,7 @@ const ChatArea: React.FC<IChatData> = ({
                 value={messageText}
                 onChange={handleChange}
                 placeholder={t('chat.placeholder')}
+                gotMaxLength={handleSubmit}
               />
             </STextArea>
             <SButton
