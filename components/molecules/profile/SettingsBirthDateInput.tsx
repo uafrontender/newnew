@@ -9,6 +9,7 @@ import DatePicker, {
   registerLocale,
 } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment';
 
 // Components
 import InlineSvg from '../../atoms/InlineSVG';
@@ -43,6 +44,7 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { useAppSelector } from '../../../redux-store/store';
+import getDateFormatForTimeZone from '../../../utils/getDateFormatForTimeZone';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -103,6 +105,8 @@ const SettingsBirthDateInput: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
+
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -187,10 +191,11 @@ const SettingsBirthDateInput: React.FunctionComponent<
         return CakeIcon.src;
       }
 
-      let replaced: any = inputData?.toString().split('-');
-      replaced = [replaced[1], replaced[0], replaced[2]].join('/');
+      const parsedDate = moment(
+        inputData?.toString(),
+        getDateFormatForTimeZone(user.userData?.timeZone)
+      ).toDate();
 
-      const parsedDate = new Date(replaced);
       if (
         parsedDate instanceof Date &&
         !Number.isNaN((parsedDate as Date).valueOf()) &&
@@ -305,8 +310,10 @@ const SettingsBirthDateInput: React.FunctionComponent<
         <DatePicker
           disabled={disabled}
           selected={value ?? undefined}
-          placeholderText='DD-MM-YY'
-          dateFormat='dd-MM-yy'
+          placeholderText={getDateFormatForTimeZone(
+            user.userData?.timeZone
+          ).toUpperCase()}
+          dateFormat={getDateFormatForTimeZone(user.userData?.timeZone, true)}
           minDate={minDate}
           maxDate={maxDate}
           shouldCloseOnSelect={false}
