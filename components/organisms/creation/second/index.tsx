@@ -279,13 +279,6 @@ export const CreationSecondStepContent: React.FC<
     tab !== 'crowdfunding' ||
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
 
-  const disabled =
-    !!titleError ||
-    !post.title ||
-    !post.announcementVideoUrl ||
-    !optionsAreValid ||
-    !targetBackersValid;
-
   const validateTitleDebounced = useDebounce(post.title, 500);
   const formatStartsAt = useCallback(() => {
     const time = moment(
@@ -333,6 +326,28 @@ export const CreationSecondStepContent: React.FC<
 
     return dateValue;
   }, [post.expiresAt, post.startsAt]);
+
+  const disabled = useMemo(
+    () =>
+      !!titleError ||
+      !post.title ||
+      !post.announcementVideoUrl ||
+      !optionsAreValid ||
+      !targetBackersValid ||
+      formatExpiresAt().unix() < moment().unix() ||
+      (post.startsAt.type !== 'right-away' &&
+        formatStartsAt().unix() < moment().unix()),
+    [
+      formatExpiresAt,
+      formatStartsAt,
+      optionsAreValid,
+      post.announcementVideoUrl,
+      post.startsAt.type,
+      post.title,
+      targetBackersValid,
+      titleError,
+    ]
+  );
 
   const formatExpiresAtNoStartsAt = useCallback(() => {
     const dateValue = moment();
@@ -1124,7 +1139,7 @@ export const CreationSecondStepContent: React.FC<
           type: post.startsAt.type,
           date: moment().format(),
           time: moment().format('hh:mm'),
-          'hours-format': post.startsAt['hours-format'],
+          'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
         };
         dispatch(setCreationStartDate(newStartAt));
       }, 1000);
