@@ -66,8 +66,10 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   }, [value?.date]);
 
   const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
-    const h = moment().hour();
+    const currentTime = moment();
+    const h = currentTime.hour();
     const ltd = h >= 12 ? 'pm' : 'am';
+
     return {
       isTimeOfTheDaySame: ltd === value?.['hours-format'],
       localTimeOfTheDay: ltd,
@@ -233,6 +235,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   <TimePicker
                     disabled={value?.type === 'right-away'}
                     value={value?.time}
+                    hoursFormat={value['hours-format']}
                     isDaySame={isDaySame}
                     isTimeOfTheDaySame={isTimeOfTheDaySame}
                     localTimeOfTheDay={localTimeOfTheDay as any}
@@ -242,7 +245,9 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 <CustomToggle
                   disabled={
                     value?.type === 'right-away' ||
-                    (isDaySame && localTimeOfTheDay === 'pm')
+                    (isDaySame &&
+                      localTimeOfTheDay === 'pm' &&
+                      value?.['hours-format'] === 'pm')
                   }
                   options={formatOptions}
                   selected={value?.['hours-format']}
