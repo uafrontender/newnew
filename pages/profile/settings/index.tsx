@@ -206,7 +206,6 @@ const MyProfileSettingsIndex = () => {
           //   )
           // )}
           isMobile={isMobile}
-          handleSetActive={() => {}}
         />
       ),
     },

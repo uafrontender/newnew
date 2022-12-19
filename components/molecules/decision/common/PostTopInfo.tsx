@@ -964,7 +964,7 @@ const SSelectingWinnerOption = styled.div`
 
 const STrophyImg = styled.img`
   position: absolute;
-  right: -16px;
+  right: 16px;
   top: 8px;
 `;
 
