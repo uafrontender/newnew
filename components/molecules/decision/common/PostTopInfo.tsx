@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, {
@@ -119,7 +117,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     typeOfPost,
     postStatus,
     isFollowingDecision,
-    hasRecommendations,
+    // hasRecommendations,
     handleReportOpen,
     handleSetIsFollowingDecision,
     handleCloseAndGoBack,
@@ -176,15 +174,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-
-  const handleOpenSmsNotificationMenu = () => {
-    Mixpanel.track('Opened SMS Notification Menu', {
-      _stage: 'Post',
-      _postUuid: postId,
-      _component: 'PostTopInfo',
-    });
-    setSmsNotificationModalOpen(true);
-  };
 
   const handleCloseSmsNotificationModal = useCallback(
     () => setSmsNotificationModalOpen(false),
@@ -289,7 +278,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           const guestId = getGuestId();
 
           const res = await subscribeGuestToSmsNotifications(
-            { creatorUuid: subscription.postId },
+            { postUuid: subscription.postId },
             guestId,
             phoneNumber
           );
@@ -319,7 +308,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
         } else {
           const res = await subscribeToSmsNotifications(
-            { creatorUuid: subscription.postId },
+            { postUuid: subscription.postId },
             phoneNumber
           );
 
@@ -353,11 +342,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
+    Mixpanel.track('Opened SMS Notification Menu', {
+      _stage: 'Post',
+      _postUuid: postId,
+      _component: 'PostTopInfo',
+    });
+
     if (subscribedToSmsNotifications) {
       if (!user.loggedIn) {
         const guestId = getGuestId();
         const res = await unsubscribeGuestFromSmsNotifications(
-          { creatorUuid: subscription.postId },
+          { postUuid: subscription.postId },
           guestId
         );
 
@@ -367,7 +362,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         }
       } else {
         const res = await unsubscribeFromSmsNotifications({
-          creatorUuid: subscription.postId,
+          postUuid: subscription.postId,
         });
 
         if (!res.data || res.error) {
@@ -391,7 +386,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } else if (user.userData?.options?.isPhoneNumberConfirmed) {
       try {
         const res = await subscribeToSmsNotifications({
-          creatorUuid: subscription.postId,
+          postUuid: subscription.postId,
         });
 
         if (
@@ -418,6 +413,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       setSmsNotificationModalOpen(true);
     }
   }, [
+    postId,
     subscribedToSmsNotifications,
     user.loggedIn,
     user.userData?.options?.isPhoneNumberConfirmed,
@@ -433,18 +429,21 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     if (!user.loggedIn) {
+      console.log('POLL');
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
         const res = await getGuestSmsNotificationsSubscriptionStatus(
           { postUuid: subscription.postId },
           guestId
         );
-
+        console.log(res.data);
         if (!res.data || res.error) {
           console.error('Unable to get sms notifications status');
           throw new Error('Request failed');
         }
-
+        console.log(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
         setSubscribedToSmsNotifications(
           res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
         );
@@ -501,11 +500,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!decoded) return;
 
-      if (decoded.object?.creatorUuid === subscription.postId) {
+      if (decoded.object?.postUuid === subscription.postId) {
         setSubscribedToSmsNotifications(false);
       }
 
-      if (decoded.object && !decoded.object.creatorUuid) {
+      if (decoded.object && !decoded.object.postUuid) {
         // Unsubscribed from all
         setSubscribedToSmsNotifications(false);
       }
@@ -610,7 +609,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             style={{
               padding: '8px',
             }}
-            onClick={() => handleOpenSmsNotificationMenu()}
+            onClick={handleSmsNotificationButtonClicked}
             ref={shareButtonRef}
           >
             <InlineSvg
