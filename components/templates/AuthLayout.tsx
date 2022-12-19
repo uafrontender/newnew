@@ -174,15 +174,25 @@ const HeroVisualContainer = styled('div')`
 `;
 
 const VerifyEmailVisual: React.FunctionComponent = () => {
+  const theme = useTheme();
+
   return (
     <SVerifyEmailBgWrapper>
       <img
-        src={assets.floatingAssets.darkBottomGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkBottomGlassSphere
+            : assets.floatingAssets.lightBottomGlassSphere
+        }
         alt='background'
         className='email-bg-BottomGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkBottomSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkBottomSphere
+            : assets.floatingAssets.lightBottomSphere
+        }
         alt='background'
         className='email-bg-BottomSphereImage'
       />
@@ -192,42 +202,74 @@ const VerifyEmailVisual: React.FunctionComponent = () => {
         className='email-bg-CrowdfundingImage'
       /> */}
       <img
-        src={assets.floatingAssets.darkLeftGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkLeftGlassSphere
+            : assets.floatingAssets.lightLeftGlassSphere
+        }
         alt='background'
         className='email-bg-LeftGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkSubMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
-        className='email-bg-BulbImage'
+        className={`email-bg-BulbImage ${theme.name}`}
       />
       <img
-        src={assets.floatingAssets.darkMultipleChoice}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkMultipleChoice
+            : assets.floatingAssets.lightMultipleChoice
+        }
         alt='background'
         className='email-bg-ChoiceImage'
       />
       <img
-        src={assets.floatingAssets.darkRightGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkRightGlassSphere
+            : assets.floatingAssets.lightRightGlassSphere
+        }
         alt='background'
         className='email-bg-RightGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkTopGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkTopGlassSphere
+            : assets.floatingAssets.lightTopGlassSphere
+        }
         alt='background'
         className='email-bg-TopGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkTopMiddleSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkTopMiddleSphere
+            : assets.floatingAssets.lightTopMiddleSphere
+        }
         alt='background'
         className='email-bg-TopMiddleSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkBottomSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkBottomSphere
+            : assets.floatingAssets.lightBottomSphere
+        }
         alt='background'
         className='email-bg-BottomMiddleSphereImage'
       />
       <img
-        src={assets.floatingAssets.darkVotes}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkVotes
+            : assets.floatingAssets.lightVotes
+        }
         alt='background'
         className='email-bg-VotesImage'
       />
@@ -319,6 +361,15 @@ const SVerifyEmailBgWrapper = styled.div`
 
     animation: enter-BulbImage ease forwards 1.4s,
       floating infinite alternate linear 3.6s 1.4s;
+
+    &.light {
+      @media (max-width: 1440px) {
+        height: 135px;
+      }
+
+      height: 175px;
+      top: 5px;
+    }
   }
 
   .email-bg-ChoiceImage {
