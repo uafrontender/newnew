@@ -294,8 +294,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           onClick={() => {
                             setOpenedMainSection('bids');
 
-                            if (activitiesContainerRef.current) {
-                              activitiesContainerRef.current.scrollIntoView();
+                            if (activitiesContainerRef.current && isMobile) {
+                              activitiesContainerRef.current.scrollIntoView({
+                                behavior: 'smooth',
+                              });
                             }
                           }}
                         >
