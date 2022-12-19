@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+} from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -39,6 +45,7 @@ import usePagination, {
   Paging,
 } from '../utils/hooks/usePagination';
 import isSafari from '../utils/isSafari';
+import { TTokenCookie } from '../api/apiConfigs';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -55,6 +62,8 @@ interface IHome {
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
+  initialPostsRA: newnewapi.IPost[];
+  initialNextPageTokenRA: string;
 }
 
 // No sense to memorize
@@ -63,6 +72,8 @@ const Home: NextPage<IHome> = ({
   staticBids,
   staticSuperpolls,
   assumeLoggedIn,
+  initialPostsRA,
+  initialNextPageTokenRA,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
@@ -282,11 +293,15 @@ const Home: NextPage<IHome> = ({
     [user.loggedIn]
   );
 
-  const {
-    data: collectionRA,
-    initialLoadDone: collectionRAInitialLoading,
-    loadMore,
-  } = usePagination<newnewapi.IPost>(fetchRAPosts, 6);
+  const { data: collectionRA, loadMore } = usePagination<newnewapi.IPost>(
+    fetchRAPosts,
+    6,
+    false,
+    {
+      data: initialPostsRA,
+      pageToken: initialNextPageTokenRA,
+    }
+  );
 
   return (
     <>
@@ -320,12 +335,11 @@ const Home: NextPage<IHome> = ({
             </SHeading>
           )}
           {/* Recent activity */}
-          {collectionRAInitialLoading && collectionRA?.length > 0 ? (
+          {collectionRA?.length > 0 ? (
             <CardsSection
               title={t('cardsSection.title.recent-activity')}
               category='recent-activity'
               collection={collectionRA}
-              loading={!collectionRAInitialLoading}
               tutorialCard={
                 user.loggedIn ? (
                   <STutorialCard
@@ -590,6 +604,49 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // const top10payload = new newnewapi.EmptyRequest({});
 
   // const resTop10 = await fetchCuratedPosts(top10payload);
+
+  if (assumeLoggedIn) {
+    const payload = new newnewapi.GetRelatedToMePostsRequest({
+      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+      paging: {
+        limit: 6,
+      },
+    });
+    const res = await getMyPosts(
+      payload,
+      undefined,
+      {
+        accessToken: req.cookies?.accessToken,
+        refreshToken: req.cookies?.refreshToken,
+      },
+      (tokens: TTokenCookie[]) => {
+        const parsedTokens = tokens.map(
+          (t) =>
+            `${t.name}=${t.value}; ${
+              t.expires ? `expires=${t.expires}; ` : ''
+            } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
+        );
+        context.res.setHeader('set-cookie', parsedTokens);
+      }
+    );
+
+    if (res.data && res.data.toJSON().posts) {
+      return {
+        props: {
+          initialPostsRA: res.data.toJSON().posts,
+          ...(res.data.paging?.nextPageToken
+            ? {
+                initialNextPageTokenRA: res.data.paging?.nextPageToken,
+              }
+            : {}),
+          assumeLoggedIn,
+          staticSuperpolls,
+          staticBids,
+          ...translationContext,
+        },
+      };
+    }
+  }
 
   return {
     props: {

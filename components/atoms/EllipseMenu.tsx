@@ -10,19 +10,24 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import Text from './Text';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
 
+const ELLIPSE_MARGIN = 5;
+
 const getTopPosition = (
   verticalOrigin: 'top' | 'center' | 'bottom',
-  anchorElRect?: DOMRect
+  anchorElRect?: DOMRect,
+  ellipseRect?: DOMRect
 ) => {
   if (!anchorElRect) {
     return 0;
   }
 
+  const ellipseMenuHeight = ellipseRect?.height || 0;
+
   switch (verticalOrigin) {
     case 'top':
-      return anchorElRect.top;
+      return anchorElRect.top - ellipseMenuHeight - ELLIPSE_MARGIN;
     case 'bottom':
-      return anchorElRect.bottom;
+      return anchorElRect.bottom + ELLIPSE_MARGIN;
     case 'center':
       return anchorElRect.top + anchorElRect.height / 2;
     default:
@@ -102,7 +107,8 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
   const [position, setPosition] = useState(() => ({
     top: getTopPosition(
       anchorOrigin.vertical,
-      anchorElement?.getBoundingClientRect()
+      anchorElement?.getBoundingClientRect(),
+      containerRef.current?.getBoundingClientRect()
     ),
     right: getRightPosition(
       anchorOrigin.horizontal,
@@ -114,7 +120,8 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
     setPosition({
       top: getTopPosition(
         anchorOrigin.vertical,
-        anchorElement?.getBoundingClientRect()
+        anchorElement?.getBoundingClientRect(),
+        containerRef.current?.getBoundingClientRect()
       ),
       right: getRightPosition(
         anchorOrigin.horizontal,

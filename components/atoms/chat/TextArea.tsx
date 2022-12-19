@@ -18,6 +18,7 @@ interface ITextArea {
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
   isDashboard?: boolean;
+  gotMaxLength?: () => void;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
@@ -33,6 +34,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     onChange,
     placeholder,
     isDashboard,
+    gotMaxLength,
   } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
@@ -48,12 +50,19 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     e.preventDefault();
   }
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    /* eslint-disable no-unused-expressions */
-    e.key === 'Enter' && e.shiftKey === true
-      ? setisShiftEnter(true)
-      : setisShiftEnter(false);
-  }, []);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      /* eslint-disable no-unused-expressions */
+      if (e.key === 'Enter' && value.length === 500) {
+        gotMaxLength?.();
+      }
+
+      e.key === 'Enter' && e.shiftKey === true
+        ? setisShiftEnter(true)
+        : setisShiftEnter(false);
+    },
+    [gotMaxLength, value.length]
+  );
 
   const handleBlur = useCallback(() => {
     if (isSafari() && isMobile)
@@ -62,9 +71,11 @@ export const TextArea: React.FC<ITextArea> = (props) => {
 
   const handleFocus = useCallback(() => {
     if (isSafari() && isMobile)
-      document.body.addEventListener('touchmove', preventScroll, {
-        passive: false,
-      });
+      setTimeout(() => {
+        document.body.addEventListener('touchmove', preventScroll, {
+          passive: false,
+        });
+      }, 500);
   }, [isMobile]);
 
   return (
@@ -99,6 +110,7 @@ TextArea.defaultProps = {
   id: '',
   error: '',
   maxlength: 524288,
+  gotMaxLength: () => {},
 };
 
 const SWrapper = styled.div`
