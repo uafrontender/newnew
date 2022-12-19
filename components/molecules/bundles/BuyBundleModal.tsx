@@ -62,7 +62,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
               <SUserData>
                 <SUsername>{getDisplayname(creator)}</SUsername>
                 {creator.options?.isVerified && (
-                  <InlineSvg
+                  <SInlineSvg
                     svg={VerificationCheckmark}
                     width='24px'
                     height='24px'
@@ -149,6 +149,7 @@ const SUserData = styled.div`
   flex-direction: row;
   align-items: center;
   margin-bottom: 16px;
+  max-width: 100%;
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 24px;
@@ -160,11 +161,18 @@ const SUsername = styled.h4`
   font-weight: 700;
   font-size: 20px;
   line-height: 28px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   ${({ theme }) => theme.media.laptop} {
     font-size: 24px;
     line-height: 32px;
   }
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  flex-shrink: 0;
 `;
 
 const SOfferedBundleList = styled.div`

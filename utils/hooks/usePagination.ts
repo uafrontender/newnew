@@ -24,16 +24,26 @@ interface PaginatedData<T> {
 function usePagination<T>(
   loadData: LoadDataCallback<T>,
   pageSize: number,
-  delay?: boolean
+  delay?: boolean,
+  initialState?: {
+    data: T[];
+    pageToken?: string;
+  }
 ): PaginatedData<T> {
   const lifeCycleIdRef = useRef<string | undefined>();
-  const [data, setData] = useState<T[]>([]);
+  const [data, setData] = useState<T[]>(initialState?.data || []);
   const [loading, setLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [initialLoadDone, setInitialLoadDone] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(
+    initialState ? !!initialState.pageToken : true
+  );
+  const [initialLoadDone, setInitialLoadDone] = useState<boolean>(
+    !!initialState
+  );
   const [delayed, setDelayed] = useState<boolean>(!!delay);
 
-  const savedPageToken = useRef<string | undefined>(undefined);
+  const savedPageToken = useRef<string | undefined>(initialState?.pageToken);
+
+  const initialStateRef = useRef(initialState);
 
   const loadMoreData = useCallback(
     async (lifeCycleIdAtStart: string, limit?: number, initial?: boolean) => {
@@ -94,6 +104,12 @@ function usePagination<T>(
     // Function for loading data change, clean and set new cycle id
     const newLifeCycle = uuidv4();
     lifeCycleIdRef.current = newLifeCycle;
+
+    // Skip initial load when initialState provided
+    if (initialStateRef.current) {
+      return;
+    }
+
     setInitialLoadDone(false);
     setHasMore(true);
     setLoading(false);
