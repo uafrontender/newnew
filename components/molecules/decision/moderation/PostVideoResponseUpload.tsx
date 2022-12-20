@@ -10,13 +10,7 @@ import Caption from '../../../atoms/Caption';
 import InlineSVG from '../../../atoms/InlineSVG';
 import DeleteVideo from '../../creation/DeleteVideo';
 
-import { loadVideo } from '../../../../utils/loadVideo';
-
-import {
-  MAX_VIDEO_SIZE,
-  MIN_VIDEO_DURATION,
-  MAX_VIDEO_DURATION,
-} from '../../../../constants/general';
+import { MAX_VIDEO_SIZE } from '../../../../constants/general';
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
 // import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
@@ -102,20 +96,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           t('postVideo.uploadResponseForm.video.error.maxSize')
         );
       } else {
-        const media: any = await loadVideo(file);
-
-        if (media.duration < MIN_VIDEO_DURATION) {
-          showErrorToastCustom(
-            t('postVideo.uploadResponseForm.video.error.minLength')
-          );
-        } else if (media.duration > MAX_VIDEO_DURATION) {
-          showErrorToastCustom(
-            t('postVideo.uploadResponseForm.video.error.maxLength')
-          );
-        } else {
-          setLocalFile(file);
-          handleItemChange(id, file);
-        }
+        setLocalFile(file);
+        handleItemChange(id, file);
       }
     },
     [showErrorToastCustom, t, handleItemChange, id]
