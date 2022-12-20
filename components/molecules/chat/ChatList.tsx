@@ -208,6 +208,9 @@ const ChatList: React.FC<IFunctionProps> = ({
                 )
                   arr.push(chat);
               });
+              if (arr.length < 1) {
+                setDisplayAllRooms(true);
+              }
               return arr;
             });
           } else {
