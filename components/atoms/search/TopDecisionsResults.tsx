@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -9,8 +7,8 @@ import getDisplayname from '../../../utils/getDisplayname';
 import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
+import PostTitleContent from '../PostTitleContent';
 
 interface IFunction {
   posts: newnewapi.IPost[];
@@ -18,7 +16,6 @@ interface IFunction {
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
-  const { t: tPostCard } = useTranslation('component-PostCard');
   const [updateTimer, setUpdateTimer] = useState<boolean>(false);
   const interval = useRef<number>();
   const isPageVisible = usePageVisibility();
@@ -33,13 +30,10 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
 
   const renderItem = useCallback(
     (post: newnewapi.IPost) => {
-      const postType = Object.keys(post)[0];
       const data = Object.values(post)[0] as
         | newnewapi.Auction
         | newnewapi.Crowdfunding
         | newnewapi.MultipleChoice;
-
-      let postTypeConverted = '';
 
       const timestampSeconds = new Date(
         (data.expiresAt?.seconds as number) * 1000
@@ -52,17 +46,6 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
         'noTrim'
       );
 
-      switch (postType) {
-        case 'auction':
-          postTypeConverted = t('postType.ac');
-          break;
-        case 'crowdfunding':
-          postTypeConverted = t('postType.cf');
-          break;
-        default:
-          postTypeConverted = t('postType.mc');
-      }
-
       return (
         <Link href={`/p/${data.postUuid}`} key={data.postUuid}>
           <a>
@@ -73,7 +56,9 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                 </SUserAvatar>
                 <SPostData>
                   {data.title && (
-                    <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
+                    <SPostTitle>
+                      <PostTitleContent>{data.title}</PostTitleContent>
+                    </SPostTitle>
                   )}
                   <SCreatorUsername>
                     {getDisplayname(data.creator)}
@@ -82,24 +67,25 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
               </SLeftSide>
               <SPostDetails>
                 {!hasEnded ? (
-                  <SPostEnded>
+                  <STimeLeft>
                     {parsed.days !== '00' &&
-                      `${parsed.days}${tPostCard('timer.daysLeft')}`}{' '}
+                      `${parsed.days}${t('timer.daysLeft')}`}{' '}
                     {`${
                       parsed.hours !== '00' ||
                       (parsed.days !== '00' && parsed.hours === '00')
-                        ? `${parsed.hours}${tPostCard('timer.hoursLeft')}`
+                        ? `${parsed.hours}${t('timer.hoursLeft')}`
                         : ''
-                    } ${parsed.minutes}${tPostCard('timer.minutesLeft')}
+                    } ${parsed.minutes}${t('timer.minutesLeft')}
                     ${
                       parsed.days === '00'
-                        ? `${parsed.seconds}${tPostCard('timer.secondsLeft')}`
+                        ? `${parsed.seconds}${t('timer.secondsLeft')}`
                         : ''
                     }`}
-                  </SPostEnded>
+                  </STimeLeft>
                 ) : (
                   <SPostEnded>
-                    {tPostCard('timer.endedOn')}
+                    {t('timer.endedOn')}
+                    <br />
                     {new Date(
                       (data.expiresAt?.seconds as number) * 1000
                     ).toLocaleDateString()}
@@ -112,7 +98,7 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t, tPostCard, updateTimer]
+    [t, updateTimer]
   );
 
   return (
@@ -147,6 +133,7 @@ const SPost = styled.div`
   padding: 8px 16px;
   margin: 0 -16px;
   cursor: pointer;
+
   &:hover {
     background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
@@ -154,11 +141,14 @@ const SPost = styled.div`
 
 const SLeftSide = styled.div`
   display: flex;
+  overflow: hidden;
+  padding-right: 12px;
 `;
 
 const SPostData = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SUserAvatar = styled.div`
@@ -178,17 +168,23 @@ const SUserAvatar = styled.div`
 
 const SPostTitle = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
 `;
 
 const SCreatorUsername = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SPostType = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+const STimeLeft = styled.span`
+  white-space: nowrap;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SPostEnded = styled.span`
+  white-space: nowrap;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 

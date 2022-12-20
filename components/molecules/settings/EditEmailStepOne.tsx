@@ -144,7 +144,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         width='60px'
         height='40px'
       />
-      <Headline variant={4}>{t('heading.mainHeading')}</Headline>
+      <SHeadline variant={4}>{t('heading.mainHeading')}</SHeadline>
       <SText variant={2}>
         {`${t('heading.subHeading')} ${user.userData?.email}`}
       </SText>
@@ -191,6 +191,10 @@ const SWrapper = styled.div`
 
 const SLogo = styled(InlineSvg)`
   margin-bottom: 35px;
+`;
+
+const SHeadline = styled(Headline)`
+  text-align: center;
 `;
 
 const SText = styled(Text)`
