@@ -18,11 +18,7 @@ import { loadVideo } from '../../../utils/loadVideo';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
-import {
-  MAX_VIDEO_SIZE,
-  MIN_VIDEO_DURATION,
-  MAX_VIDEO_DURATION,
-} from '../../../constants/general';
+import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 // import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
@@ -209,17 +205,10 @@ const FileUpload: React.FC<IFileUpload> = ({
       if (file.size > MAX_VIDEO_SIZE) {
         showErrorToastCustom(t('secondStep.video.error.maxSize'));
       } else {
-        const media: any = await loadVideo(file);
         Mixpanel.track('Video Loading', { _stage: 'Creation' });
 
-        if (media.duration < MIN_VIDEO_DURATION) {
-          showErrorToastCustom(t('secondStep.video.error.minLength'));
-        } else if (media.duration > MAX_VIDEO_DURATION) {
-          showErrorToastCustom(t('secondStep.video.error.maxLength'));
-        } else {
-          setLocalFile(file);
-          onChange(id, file);
-        }
+        setLocalFile(file);
+        onChange(id, file);
       }
     },
     [id, showErrorToastCustom, onChange, t]
