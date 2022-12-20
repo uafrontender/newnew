@@ -606,11 +606,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             iconOnly
             withDim
             withShrink
-            style={{
-              padding: '8px',
-            }}
             onClick={handleSmsNotificationButtonClicked}
-            ref={shareButtonRef}
           >
             <InlineSvg
               svg={
@@ -623,14 +619,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               height='20px'
             />
           </SButton>
-          <SButton
+          <SButtonEnabling
             view='transparent'
             iconOnly
             withDim
             withShrink
-            style={{
-              padding: '8px',
-            }}
             onClick={() => handleOpenShareMenu()}
             ref={shareButtonRef}
           >
@@ -640,8 +633,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               width='20px'
               height='20px'
             />
-          </SButton>
-          <SButton
+          </SButtonEnabling>
+          <SButtonEnabling
             view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
@@ -653,7 +646,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               width='20px'
               height='20px'
             />
-          </SButton>
+          </SButtonEnabling>
           <SmsNotificationModal
             show={smsNotificationModalOpen}
             subscription={subscription}
@@ -885,6 +878,24 @@ const SActionsDiv = styled.div`
 `;
 
 const SButton = styled(Button)`
+  background: none;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  margin-left: 4px;
+  padding: 8px;
+
+  &:focus:enabled {
+    background: none;
+  }
+
+  &:hover:enabled {
+    background: ${({ theme, view }) =>
+      view ? theme.colorsThemed.button.background[view] : ''};
+  }
+`;
+
+const SButtonEnabling = styled(Button)`
   background: none;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
