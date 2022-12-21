@@ -49,6 +49,7 @@ const useScrollRestoration = () => {
 
     const onRouteChangeComplete = (
       url: keyof IScrollPositions,
+      _: any,
       recursion?: boolean
     ) => {
       if (
@@ -61,14 +62,14 @@ const useScrollRestoration = () => {
             top: scrollPositions.current[url]?.offsetTop,
             behavior: 'auto',
           });
-          console.log(`Aiming at: ${scrollPositions.current[url]?.offsetTop}`);
-          console.log(`Current: ${window.scrollY}`);
+          // console.log(`Aiming at: ${scrollPositions.current[url]?.offsetTop}`);
+          // console.log(`Current: ${window.scrollY}`);
           const target = scrollPositions.current[url]?.offsetTop ?? 0;
           const current = window.scrollY;
           if (target > current && scrollRestorationAttemptsAmount.current < 8) {
             scrollRestorationAttemptsAmount.current += 1;
             setIsRestoringScroll(true);
-            onRouteChangeComplete(url, true);
+            onRouteChangeComplete(url, undefined, true);
           } else {
             scrollRestorationAttemptsAmount.current = 0;
             setIsRestoringScroll(false);

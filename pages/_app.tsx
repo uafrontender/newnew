@@ -21,7 +21,6 @@ import { useRouter } from 'next/router';
 import moment from 'moment-timezone';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
-import styled from 'styled-components';
 
 // Custom error page
 import Error from './_error';
@@ -53,8 +52,6 @@ import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 import CardsContextProvider from '../contexts/cardsContext';
 
-import loadingAnimation from '../public/animations/logo-loading-blue.json';
-
 // Images to be prefetched
 import assets from '../constants/assets';
 
@@ -69,7 +66,7 @@ import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import useScrollRestoration from '../utils/hooks/useScrollRestoration';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
-import Lottie from '../components/atoms/Lottie';
+import ScrollRestorationAnimationContainer from '../components/atoms/ScrollRestorationAnimationContainer';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -263,22 +260,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                   />
                                                 )}
                                                 {isRestoringScroll ? (
-                                                  <SScrollRestorationAnimationContainer
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                    }}
-                                                  >
-                                                    <Lottie
-                                                      width={64}
-                                                      height={64}
-                                                      options={{
-                                                        loop: true,
-                                                        autoplay: true,
-                                                        animationData:
-                                                          loadingAnimation,
-                                                      }}
-                                                    />
-                                                  </SScrollRestorationAnimationContainer>
+                                                  <ScrollRestorationAnimationContainer />
                                                 ) : null}
                                               </ErrorBoundary>
                                             </VideoProcessingWrapper>
@@ -335,42 +317,6 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
 };
 
 export default MyAppWithTranslationAndRedux;
-
-const SScrollRestorationAnimationContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  z-index: 10;
-
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  backdrop-filter: blur(64px);
-  -webkit-backdrop-filter: blur(64px);
-  background-color: ${({ theme }) => theme.colorsThemed.background.overlaydim};
-
-  ::before {
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    bottom: 0;
-    height: 100vh;
-    content: '';
-    z-index: -1;
-    position: absolute;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-
-    background-color: ${({ theme }) =>
-      theme.colorsThemed.background.overlaydim};
-  }
-`;
 
 // Preload assets
 const PRE_FETCH_LINKS_COMMON = (
