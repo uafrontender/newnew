@@ -45,6 +45,7 @@ import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -363,6 +364,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
+  const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postId: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  );
+
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -672,7 +682,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               />
             )}
           </SExpiresSection>
-          <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+          <PostTopInfo
+            subscription={subscription}
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
         </>
       )}
       <SWrapper>
@@ -714,7 +728,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        {isMobile && <PostTopInfo totalVotes={totalVotes} hasWinner={false} />}
+        {isMobile && (
+          <PostTopInfo
+            subscription={subscription}
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
+        )}
         <SActivitiesContainer>
           <div
             style={{
@@ -750,7 +770,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                     />
                   )}
                 </SExpiresSection>
-                <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+                <PostTopInfo
+                  subscription={subscription}
+                  totalVotes={totalVotes}
+                  hasWinner={false}
+                />
               </>
             )}
             <PostVotingTab

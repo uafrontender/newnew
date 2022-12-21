@@ -123,6 +123,9 @@
     "body": "查看更多類似的。",
     "buttonText": "查看更多"
   },
+  "postTopInfo": {
+    "notifyMe": "通知我"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "帖子",
