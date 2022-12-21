@@ -33,7 +33,7 @@ const Loader = ({
   height,
   className,
 }: ILoader) => (
-  <SLoader size={size} className={className}>
+  <SLoader size={size} className={className} width={width} height={height}>
     <Lottie
       width={width || sizes[size]}
       height={height || sizes[size]}
@@ -50,7 +50,9 @@ export default Loader;
 
 const SLoader = styled.div<{
   size: TSize;
+  width?: number;
+  height?: number;
 }>`
-  width: ${({ size }) => `${sizes[size]}px`};
-  height: ${({ size }) => `${sizes[size]}px`};
+  width: ${({ size, width }) => `${width || sizes[size]}px`};
+  height: ${({ size, height }) => `${height || sizes[size]}px`};
 `;
