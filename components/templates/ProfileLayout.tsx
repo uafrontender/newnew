@@ -158,6 +158,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const subscription: SubscriptionToCreator = useMemo(
     () => ({
+      type: 'creator',
       userId: user.uuid,
       username: user.username,
     }),

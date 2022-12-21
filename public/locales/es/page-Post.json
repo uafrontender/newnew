@@ -123,6 +123,9 @@
     "body": "Ver más parecidos.",
     "buttonText": "Ver más"
   },
+  "postTopInfo": {
+    "notifyMe": "Notificarme"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "Publicar",
