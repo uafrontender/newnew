@@ -13,13 +13,34 @@ import CheckMark from '../CheckMark';
 import { I18nNamespaces } from '../../../@types/i18next';
 
 export interface SubscriptionToCreator {
+  type: 'creator';
   userId: string;
   username: string;
 }
 
+export interface SubscriptionToPost {
+  type: 'post';
+  postId: string;
+  postTitle: string;
+}
+
+type Subscription = SubscriptionToCreator | SubscriptionToPost;
+
+function getSubscriptionSubject(subscription: Subscription): string {
+  if (subscription.type === 'creator') {
+    return subscription.username;
+  }
+
+  if (subscription.type === 'post') {
+    return subscription.postTitle;
+  }
+
+  throw new Error(`Unexpected subscription type ${(subscription as any).type}`);
+}
+
 interface ISmsNotificationModal {
   show: boolean;
-  subscription: SubscriptionToCreator;
+  subscription: Subscription;
   zIndex?: number;
   onSubmit: (newPhoneNumber: newnewapi.PhoneNumber) => Promise<string>;
   onClose: () => void;
@@ -89,7 +110,7 @@ const SmsNotificationModal: React.FC<ISmsNotificationModal> = React.memo(
               <SuccessStepContent phoneNumber={phoneNumber} onClose={onClose} />
             ) : (
               <RequestStepContent
-                subject={subscription.username}
+                subject={getSubscriptionSubject(subscription)}
                 busy={busy}
                 onSmsNotificationRequest={onSmsNotificationRequest}
               />

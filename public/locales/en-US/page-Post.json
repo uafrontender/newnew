@@ -123,6 +123,9 @@
     "body": "Checkout more like it.",
     "buttonText": "See more"
   },
+  "postTopInfo": {
+    "notifyMe": "Notify me"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "Post",
