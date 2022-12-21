@@ -42,6 +42,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -353,6 +354,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     }
   };
 
+  const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postId: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  );
+
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -661,6 +671,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
+            subscription={subscription}
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -707,6 +718,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
+            subscription={subscription}
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -747,6 +759,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
+                  subscription={subscription}
                   amountInBids={totalAmount}
                   hasWinner={!!post.winningOptionId}
                 />
