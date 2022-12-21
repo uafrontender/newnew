@@ -56,6 +56,7 @@ import SmsNotificationModal, {
 } from '../../profile/SmsNotificationModal';
 import { SocketContext } from '../../../../contexts/socketContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import Tooltip from '../../../atoms/Tooltip';
 
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
@@ -111,6 +112,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
 
   const {
     postParsed,
@@ -167,6 +169,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     () => postType === 'ac' && postStatus === 'waiting_for_decision',
     [postType, postStatus]
   );
+  const [notificationTooltipVisible, setNotificationTooltipVisible] =
+    useState(false);
 
   const [subscribedToSmsNotifications, setSubscribedToSmsNotifications] =
     useState(false);
@@ -532,6 +536,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     };
   }, [user.loggedIn, subscription.postId, socketConnection]);
 
+  const notificationButtonRef: any = useRef();
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
 
@@ -600,13 +605,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </Link>
         </SCreatorCard>
         <SActionsDiv>
-          {/* TODO: Add a tooltip on hover */}
+          {notificationTooltipVisible && !isMobile && !isTablet && (
+            <Tooltip target={notificationButtonRef}>
+              {t('postTopInfo.notifyMe')}
+            </Tooltip>
+          )}
           <SButton
             view='transparent'
             iconOnly
             withDim
             withShrink
             onClick={handleSmsNotificationButtonClicked}
+            onMouseEnter={() => setNotificationTooltipVisible(true)}
+            onMouseLeave={() => setNotificationTooltipVisible(false)}
+            ref={notificationButtonRef}
           >
             <InlineSvg
               svg={
