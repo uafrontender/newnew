@@ -4,6 +4,9 @@ import styled, { useTheme } from 'styled-components';
 import Indicator from '../atoms/Indicator';
 import InlineSVG from '../atoms/InlineSVG';
 import Button from '../atoms/Button';
+
+import { Mixpanel } from '../../utils/mixpanel';
+
 import iconNotifications from '../../public/images/svg/icons/outlined/Notifications.svg';
 import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
 
@@ -31,7 +34,15 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
   return (
     <Link href={item.url}>
       <a>
-        <SNavItem iconOnly view='tertiary'>
+        <SNavItem
+          iconOnly
+          view='tertiary'
+          onClick={() => {
+            Mixpanel.track('Navigation Item Clicked', {
+              _target: item.url,
+            });
+          }}
+        >
           <InlineSVG
             fill={theme.colorsThemed.text.primary}
             svg={icons[item.key]}

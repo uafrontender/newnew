@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import hashtagIcon from '../../../public/images/svg/icons/outlined/Hashtag.svg';
 import InlineSvg from '../InlineSVG';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IHashtagsResults {
   hashtags: newnewapi.IHashtag[];
@@ -22,7 +23,13 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
           key={hashtag.text}
         >
           <a>
-            <SPost>
+            <SPost
+              onClick={() => {
+                Mixpanel.track('Search Result Tag Clicked', {
+                  _tagText: hashtag.text,
+                });
+              }}
+            >
               <SLeftSide>
                 <SHashtagIcon>
                   <InlineSvg
