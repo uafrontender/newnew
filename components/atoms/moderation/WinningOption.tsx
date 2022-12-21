@@ -1,12 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 
 import Headline from '../Headline';
 import Text from '../Text';
 import InlineSvg from '../InlineSVG';
-// import GenericSkeleton from '../../molecules/GenericSkeleton';
+import GenericSkeleton from '../../molecules/GenericSkeleton';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { TPostType } from '../../../utils/switchPostType';
@@ -28,6 +28,7 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
+  const theme = useTheme();
 
   if (postType === 'ac' && winningOptionAc) {
     return (
@@ -144,7 +145,18 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
     );
   }
 
-  return null;
+  return (
+    <SSkeletonContainer>
+      <SGenericSkeletonTop
+        bgColor={theme.colorsThemed.background.secondary}
+        highlightColor={theme.colorsThemed.background.quaternary}
+      />
+      <SGenericSkeletonBottom
+        bgColor={theme.colorsThemed.background.secondary}
+        highlightColor={theme.colorsThemed.background.quaternary}
+      />
+    </SSkeletonContainer>
+  );
 };
 
 export default WinningOption;
@@ -188,14 +200,20 @@ const SHeadline = styled(Headline)`
   word-break: break-word;
 `;
 
-// const SSkeletonContainer = styled.div`
-//   display: flex;
-//   align-items: center;
-// `;
+const SSkeletonContainer = styled.div`
+  margin-top: 24px;
+`;
 
-// const SGenericSkeleton = styled(GenericSkeleton)`
-//   height: 50px;
-//   width: 30px;
-//   margin-right: 2px;
-//   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-// `;
+const SGenericSkeleton = styled(GenericSkeleton)`
+  width: 250px;
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+`;
+
+const SGenericSkeletonTop = styled(SGenericSkeleton)`
+  height: 24px;
+  margin-bottom: 5px;
+`;
+
+const SGenericSkeletonBottom = styled(SGenericSkeleton)`
+  height: 30px;
+`;

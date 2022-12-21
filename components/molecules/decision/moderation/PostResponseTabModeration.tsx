@@ -18,6 +18,7 @@ import { usePostModerationResponsesContext } from '../../../../contexts/postMode
 import { TPostType } from '../../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import { formatNumber } from '../../../../utils/format';
+import copyToClipboard from '../../../../utils/copyToClipboard';
 
 interface IPostResponseTabModeration {
   postId: string;
@@ -109,19 +110,11 @@ const PostResponseTabModeration: React.FunctionComponent<
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
   const handleCopyLink = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/p/${postId}`;
 
-      copyPostUrlToClipboard(url)
+      copyToClipboard(url)
         .then(() => {
           setIsCopiedUrl(true);
           setTimeout(() => {
@@ -185,14 +178,12 @@ const PostResponseTabModeration: React.FunctionComponent<
             earnedAmountLoading ? (
               <SSkeletonContainer>
                 <SAmountHeadline variant={1}>$</SAmountHeadline>
-                {new Array(Math.max(amountSwitch().toString().length, 2) - 2)
-                  .fill('')
-                  .map(() => (
-                    <SGenericSkeleton
-                      bgColor={theme.colorsThemed.background.secondary}
-                      highlightColor={theme.colorsThemed.background.quaternary}
-                    />
-                  ))}
+                {new Array(2).fill('').map(() => (
+                  <SGenericSkeleton
+                    bgColor={theme.colorsThemed.background.secondary}
+                    highlightColor={theme.colorsThemed.background.quaternary}
+                  />
+                ))}
                 <SAmountHeadline variant={1}>.</SAmountHeadline>
                 {new Array(2).fill('').map(() => (
                   <SGenericSkeleton
@@ -265,28 +256,18 @@ const PostResponseTabModeration: React.FunctionComponent<
         <Text variant={2} weight={600}>
           {t('postResponseTabModeration.awaiting.youWillGet')}
         </Text>
-        {postType === 'ac' && winningOptionAc?.totalAmount?.usdCents && (
-          <SAmountHeadline variant={1}>
-            $
-            {formatNumber(
-              winningOptionAc.totalAmount.usdCents / 100 ?? 0,
-              true
-            )}
-          </SAmountHeadline>
-        )}
-        {postType === 'mc' && winningOptionMc?.totalAmount?.usdCents && (
-          <SAmountHeadline variant={1}>
-            $
-            {formatNumber(
-              winningOptionMc.totalAmount.usdCents / 100 ?? 0,
-              true
-            )}
-          </SAmountHeadline>
-        )}
-        {postType === 'cf' && moneyBacked?.usdCents && (
-          <SAmountHeadline variant={1}>
-            ${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}
-          </SAmountHeadline>
+        {amountSwitch() ? (
+          <SAmountHeadline variant={1}>{amountSwitch()}</SAmountHeadline>
+        ) : (
+          <SSkeletonContainer>
+            <SAmountHeadline variant={1}>$</SAmountHeadline>
+            {new Array(2).fill('').map(() => (
+              <SGenericSkeleton
+                bgColor={theme.colorsThemed.background.secondary}
+                highlightColor={theme.colorsThemed.background.quaternary}
+              />
+            ))}
+          </SSkeletonContainer>
         )}
 
         <WinningOption
