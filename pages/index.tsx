@@ -79,6 +79,14 @@ const Home: NextPage<IHome> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
 
+  const isUserLoggedIn = useMemo(() => {
+    if (user._persist?.rehydrated) {
+      return user.loggedIn;
+    }
+
+    return assumeLoggedIn;
+  }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
+
   // Posts
   // Top section/Curated posts
   // const [topSectionCollection, setTopSectionCollection] = useState<
@@ -312,7 +320,7 @@ const Home: NextPage<IHome> = ({
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {!user.loggedIn && <HeroSection />}
+      {!isUserLoggedIn && <HeroSection />}
 
       {user.userData?.options?.isCreator && (
         <>

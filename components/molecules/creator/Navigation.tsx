@@ -56,7 +56,7 @@ export const Navigation = () => {
               iconOutlined: walletOutlinedIcon,
             },
           ]
-        : [])
+        : []),
     ],
     [
       t,
@@ -70,19 +70,13 @@ export const Navigation = () => {
       const active = router.route.includes(item.url);
       return (
         <Link href={item.url} key={item.url}>
-          <SItem
-            id={item.id}
-            active={active}
-            isfill={item.url !== '/creator/bundles'}
-          >
+          <SItem id={item.id} active={active}>
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
               fill={
-                item.url !== '/creator/bundles'
-                  ? active
-                    ? theme.colorsThemed.accent.blue
-                    : theme.colorsThemed.text.tertiary
-                  : 'none'
+                active
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
               }
               width='24px'
               height='24px'
@@ -130,7 +124,6 @@ const SContainer = styled.aside`
 
 interface ISItem {
   active: boolean;
-  isfill: boolean;
 }
 
 const SItem = styled.a<ISItem>`
@@ -143,11 +136,9 @@ const SItem = styled.a<ISItem>`
 
   svg {
     fill: ${(props) =>
-      props.isfill
-        ? props.active
-          ? props.theme.colorsThemed.accent.blue
-          : props.theme.colorsThemed.text.tertiary
-        : 'none'};
+      props.active
+        ? props.theme.colorsThemed.accent.blue
+        : props.theme.colorsThemed.text.tertiary};
 
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
