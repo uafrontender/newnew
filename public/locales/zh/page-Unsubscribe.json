@@ -3,5 +3,9 @@
     "title_NEED_TRANSLATION": "Unsubscribe from NewNew"
   },
   "heading_NEED_TRANSLATION": "You have successfully unsubscribed",
-  "subheading_NEED_TRANSLATION": "Manage email notifications from your settings page."
+  "subheading_NEED_TRANSLATION": "Manage email notifications from your settings page.",
+  "confirm_NEED_TRANSLATION": "Ok",
+  "error": {
+    "requestFailed": "請求失敗"
+  }
 }
