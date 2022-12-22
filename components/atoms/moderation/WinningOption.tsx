@@ -82,65 +82,59 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
   if (postType === 'mc' && winningOptionMc) {
     return (
       <>
-        {postType === 'mc' && winningOptionMc && (
-          <>
-            <SText variant={2} weight={600}>
+        <SText variant={2} weight={600}>
+          <SSpan>
+            {winningOptionMc.supporterCount === 1
+              ? t(
+                  'postResponseTabModeration.winner.mc.numBiddersChoseSingular',
+                  {
+                    amount: 1,
+                  }
+                )
+              : t('postResponseTabModeration.winner.mc.numBiddersChose', {
+                  amount: formatNumber(
+                    winningOptionMc.supporterCount ?? 0,
+                    true
+                  ),
+                })}
+          </SSpan>{' '}
+          {winningOptionMc.creator &&
+          winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
+            <>
+              <SUserAvatar
+                draggable={false}
+                src={winningOptionMc?.creator?.avatarUrl!!}
+              />
               <SSpan>
-                {winningOptionMc.supporterCount === 1
-                  ? t(
-                      'postResponseTabModeration.winner.mc.numBiddersChoseSingular',
-                      {
-                        amount: 1,
-                      }
-                    )
-                  : t('postResponseTabModeration.winner.mc.numBiddersChose', {
-                      amount: formatNumber(
-                        winningOptionMc.supporterCount ?? 0,
-                        true
-                      ),
-                    })}
-              </SSpan>{' '}
-              {winningOptionMc.creator &&
-              winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
-                <>
-                  <SUserAvatar
-                    draggable={false}
-                    src={winningOptionMc?.creator?.avatarUrl!!}
-                  />
-                  <SSpan>
-                    {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
-                    <Trans
-                      i18nKey='postResponseTabModeration.winner.mc.optionCreator'
-                      t={t}
-                      // @ts-ignore
-                      components={[
-                        <SCreatorLink
-                          href={`/${winningOptionMc.creator?.username}`}
-                        />,
-                        winningOptionMc.creator?.options?.isVerified ? (
-                          <SInlineSvg
-                            svg={VerificationCheckmark}
-                            width='22px'
-                            height='22px'
-                            fill='none'
-                          />
-                        ) : null,
-                        {
-                          nickname: getDisplayname(winningOptionMc.creator!!),
-                        },
-                      ]}
-                    />
-                  </SSpan>
-                </>
-              ) : (
-                <SSpan>
-                  {t('postResponseTabModeration.winner.mc.optionOwn')}
-                </SSpan>
-              )}
-            </SText>
-            <SHeadline variant={5}>{winningOptionMc.text}</SHeadline>
-          </>
-        )}
+                {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
+                <Trans
+                  i18nKey='postResponseTabModeration.winner.mc.optionCreator'
+                  t={t}
+                  // @ts-ignore
+                  components={[
+                    <SCreatorLink
+                      href={`/${winningOptionMc.creator?.username}`}
+                    />,
+                    winningOptionMc.creator?.options?.isVerified ? (
+                      <SInlineSvg
+                        svg={VerificationCheckmark}
+                        width='22px'
+                        height='22px'
+                        fill='none'
+                      />
+                    ) : null,
+                    {
+                      nickname: getDisplayname(winningOptionMc.creator!!),
+                    },
+                  ]}
+                />
+              </SSpan>
+            </>
+          ) : (
+            <SSpan>{t('postResponseTabModeration.winner.mc.optionOwn')}</SSpan>
+          )}
+        </SText>
+        <SHeadline variant={5}>{winningOptionMc.text}</SHeadline>
       </>
     );
   }

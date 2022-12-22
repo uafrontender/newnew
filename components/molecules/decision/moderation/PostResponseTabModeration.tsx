@@ -169,6 +169,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         >
           <PostResponseTabModerationHeader
             title={t('postResponseTabModeration.succeeded.topHeader')}
+            successVariant
           />
           <STextContentWrapper>
             <Text variant={2} weight={600}>

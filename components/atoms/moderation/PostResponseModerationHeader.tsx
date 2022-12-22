@@ -10,13 +10,16 @@ import assets from '../../../constants/assets';
 
 interface IPostResponseTabModerationHeader {
   title: string;
+  successVariant?: boolean;
 }
 
 const PostResponseTabModerationHeader: React.FunctionComponent<
   IPostResponseTabModerationHeader
-> = ({ title }) => (
+> = ({ title, successVariant }) => (
   <SHeaderDiv>
-    <SHeaderHeadline variant={3}>{title}</SHeaderHeadline>
+    <SHeaderHeadline variant={3} successVariant={successVariant}>
+      {title}
+    </SHeaderHeadline>
     <SCoin_1
       className='headerDiv__coinImage'
       src={assets.decision.gold}
