@@ -51,5 +51,5 @@ yarn-error.log*
 .sentryclirc
 
 # SEO
-# /public/robots.txt
-# /public/sitemap*.xml
+/public/robots.txt
+/public/sitemap*.xml
