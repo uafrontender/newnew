@@ -774,7 +774,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             </PostVotingTab>
           </div>
           <AcOptionsTab
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             postStatus={postStatus}
             postText={post.title}
             postCreatorName={getDisplayname(post.creator)}
