@@ -625,7 +625,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             )}
             <PostVideoModeration
               key={`key_${announcement?.coverImageUrl}`}
-              postId={post.postUuid}
+              postUuid={post.postUuid}
               announcement={announcement!!}
               thumbnails={{
                 startTime: 1,

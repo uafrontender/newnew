@@ -720,7 +720,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
