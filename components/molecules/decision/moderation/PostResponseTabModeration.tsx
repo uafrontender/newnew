@@ -26,7 +26,8 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import GenericSkeleton from '../../GenericSkeleton';
 
 interface IPostResponseTabModeration {
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postType: TPostType;
   postStatus: TPostStatusStringified;
   postTitle: string;
@@ -38,7 +39,8 @@ interface IPostResponseTabModeration {
 const PostResponseTabModeration: React.FunctionComponent<
   IPostResponseTabModeration
 > = ({
-  postId,
+  postUuid,
+  postShortId,
   postType,
   postStatus,
   postTitle,
@@ -126,7 +128,7 @@ const PostResponseTabModeration: React.FunctionComponent<
 
   const handleCopyLink = useCallback(() => {
     if (window) {
-      const url = `${window.location.origin}/p/${postId}`;
+      const url = `${window.location.origin}/p/${postShortId ?? postUuid}`;
 
       copyPostUrlToClipboard(url)
         .then(() => {
@@ -139,14 +141,14 @@ const PostResponseTabModeration: React.FunctionComponent<
           console.error(err);
         });
     }
-  }, [postId]);
+  }, [postShortId, postUuid]);
 
   useEffect(() => {
     async function loadEarnedAmount() {
       setEarnedAmountLoading(true);
       try {
         const payload = new newnewapi.GetMyEarningsByPostsRequest({
-          postUuids: [postId],
+          postUuids: [postUuid],
         });
 
         const res = await getMyEarningsByPosts(payload);
@@ -168,7 +170,7 @@ const PostResponseTabModeration: React.FunctionComponent<
     if (postStatus === 'succeeded') {
       loadEarnedAmount();
     }
-  }, [postId, postStatus]);
+  }, [postUuid, postStatus]);
 
   if (postStatus === 'succeeded') {
     return (

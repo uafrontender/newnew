@@ -722,7 +722,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 </>
               ) : (
                 <PostResponseTabModeration
-                  postId={post.postUuid}
+                  postUuid={post.postUuid}
+                  postShortId={post.postShortId}
                   postType='ac'
                   postStatus={postStatus}
                   postTitle={post.title}

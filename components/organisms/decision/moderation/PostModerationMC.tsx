@@ -703,7 +703,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                 </>
               ) : (
                 <PostResponseTabModeration
-                  postId={post.postUuid}
+                  postUuid={post.postUuid}
+                  postShortId={post.postShortId}
                   postType='mc'
                   postStatus={postStatus}
                   postTitle={post.title}
