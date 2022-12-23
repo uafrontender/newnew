@@ -125,7 +125,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     handleCloseAndGoBack,
   } = usePostInnerState();
 
-  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postUuid = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postShortId = useMemo(
+    () => postParsed?.postShortId ?? '',
+    [postParsed]
+  );
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
   const creator = useMemo(() => postParsed?.creator!!, [postParsed]);
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
@@ -187,7 +191,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleOpenShareMenu = () => {
     Mixpanel.track('Opened Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(true);
@@ -196,16 +200,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseShareMenu = useCallback(() => {
     Mixpanel.track('Close Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleOpenEllipseMenu = () => {
     Mixpanel.track('Open Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(true);
@@ -213,17 +217,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseEllipseMenu = useCallback(() => {
     Mixpanel.track('Close Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleFollowDecision = useCallback(async () => {
     try {
       Mixpanel.track('Favorite Post', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'PostTopInfo',
       });
 
@@ -240,7 +244,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         markAs: !isFollowingDecision
           ? newnewapi.MarkPostRequest.Kind.FAVORITE
           : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-        postUuid: postId,
+        postUuid,
       });
 
       const res = await markPost(markAsFavoritePayload);
@@ -254,7 +258,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }, [
     handleSetIsFollowingDecision,
     isFollowingDecision,
-    postId,
+    postUuid,
     router,
     user.loggedIn,
     user._persist?.rehydrated,
@@ -263,7 +267,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleSeeNewFailedBox = useCallback(() => {
     Mixpanel.track('See New Failde Box', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     if (router.pathname === '/') {
@@ -272,7 +276,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       router.push('/');
     }
     // }
-  }, [router, postId, handleCloseAndGoBack]);
+  }, [router, postUuid, handleCloseAndGoBack]);
 
   // TODO: Add a hook for handling sms notifications status
   const submitPhoneSmsNotificationsRequest = useCallback(
@@ -348,7 +352,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     Mixpanel.track('Opened SMS Notification Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
 
@@ -417,7 +421,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       setSmsNotificationModalOpen(true);
     }
   }, [
-    postId,
+    postUuid,
     subscribedToSmsNotifications,
     user.loggedIn,
     user.userData?.options?.isPhoneNumberConfirmed,
@@ -564,7 +568,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator avatar', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -583,7 +587,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator username', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -668,7 +672,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Share menu */}
           {!isMobile && (
             <PostShareEllipseMenu
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
               anchorElement={shareButtonRef.current}
@@ -678,7 +683,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               onClose={handleCloseShareMenu}
             />
           ) : null}
