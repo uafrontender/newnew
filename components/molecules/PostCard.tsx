@@ -224,13 +224,23 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postParsed.postUuid}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+              postParsed.postShortId
+                ? postParsed.postShortId
+                : postParsed.postUuid
+            }`
           )}`
         );
         return;
       }
       setIsReportModalOpen(true);
-    }, [user.loggedIn, user._persist?.rehydrated, router, postParsed.postUuid]);
+    }, [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      router,
+      postParsed.postShortId,
+      postParsed.postUuid,
+    ]);
 
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
