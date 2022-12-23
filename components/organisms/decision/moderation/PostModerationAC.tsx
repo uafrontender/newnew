@@ -708,7 +708,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                     </PostVotingTab>
                   </div>
                   <AcOptionsTabModeration
-                    postId={post.postUuid}
+                    postUuid={post.postUuid}
                     postStatus={postStatus}
                     options={options}
                     optionsLoading={optionsLoading}
