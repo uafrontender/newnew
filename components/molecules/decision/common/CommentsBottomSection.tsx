@@ -333,7 +333,7 @@ const CommentsBottomSection: React.FunctionComponent<
         setComments((curr) => {
           const workingArr = [...curr];
 
-          if (decoded.newMessage?.parentId && decoded.newMessage !== 0) {
+          if (decoded.newMessage?.parentId) {
             const parentMsgIdx = workingArr.findIndex(
               (msg) => msg.id === decoded.newMessage?.parentId
             );
