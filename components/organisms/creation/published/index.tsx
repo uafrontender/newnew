@@ -81,13 +81,19 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
-              url += postData.auction.postUuid;
+              url += postData.auction.postShortId
+                ? postData.auction.postShortId
+                : postData.auction.postUuid;
             }
             if (postData.crowdfunding) {
-              url += postData.crowdfunding.postUuid;
+              url += postData.crowdfunding.postShortId
+                ? postData.crowdfunding.postShortId
+                : postData.crowdfunding.postUuid;
             }
             if (postData.multipleChoice) {
-              url += postData.multipleChoice.postUuid;
+              url += postData.multipleChoice.postShortId
+                ? postData.multipleChoice.postShortId
+                : postData.multipleChoice.postUuid;
             }
 
             copyPostUrlToClipboard(url)
@@ -115,13 +121,19 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
-              url += postData.auction.postUuid;
+              url += postData.auction.postShortId
+                ? postData.auction.postShortId
+                : postData.auction.postUuid;
             }
             if (postData.crowdfunding) {
-              url += postData.crowdfunding.postUuid;
+              url += postData.crowdfunding.postShortId
+                ? postData.crowdfunding.postShortId
+                : postData.crowdfunding.postUuid;
             }
             if (postData.multipleChoice) {
-              url += postData.multipleChoice.postUuid;
+              url += postData.multipleChoice.postShortId
+                ? postData.multipleChoice.postShortId
+                : postData.multipleChoice.postUuid;
             }
 
             router.push(url).then(() => {

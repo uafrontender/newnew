@@ -82,7 +82,9 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         | newnewapi.MultipleChoice;
       const handleShareClick = () => {
         if (window) {
-          const url = `${window.location.origin}/p/${data.postUuid}`;
+          const url = `${window.location.origin}/p/${
+            data.postShortId ? data.postShortId : data.postUuid
+          }`;
           copyPostUrlToClipboard(url)
             .then(() => {
               setIsCopiedUrlIndex(index);
@@ -146,7 +148,11 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 </SListBodyItem>
 
                 <SListBodyItem width='150px' align='center'>
-                  <Link href={`/p/${data.postUuid}`}>
+                  <Link
+                    href={`/p/${
+                      data.postShortId ? data.postShortId : data.postUuid
+                    }`}
+                  >
                     <a>
                       <SListDecideButton view='primary'>
                         {t('dashboard.expirationPosts.decide.desktop')}
@@ -193,7 +199,11 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                     />
                   )}
                 </SListShareButton>
-                <Link href={`/p/${data.postUuid}`}>
+                <Link
+                  href={`/p/${
+                    data.postShortId ? data.postShortId : data.postUuid
+                  }`}
+                >
                   <a>
                     <SListDecideButton view='primary'>
                       {t('dashboard.expirationPosts.decide.mobile')}

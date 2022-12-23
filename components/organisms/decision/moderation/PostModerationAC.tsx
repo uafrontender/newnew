@@ -625,7 +625,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             )}
             <PostVideoModeration
               key={`key_${announcement?.coverImageUrl}`}
-              postId={post.postUuid}
+              postUuid={post.postUuid}
               announcement={announcement!!}
               thumbnails={{
                 startTime: 1,
@@ -708,7 +708,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                     </PostVotingTab>
                   </div>
                   <AcOptionsTabModeration
-                    postId={post.postUuid}
+                    postUuid={post.postUuid}
                     postStatus={postStatus}
                     options={options}
                     optionsLoading={optionsLoading}
@@ -722,7 +722,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 </>
               ) : (
                 <PostResponseTabModeration
-                  postId={post.postUuid}
+                  postUuid={post.postUuid}
+                  postShortId={post.postShortId}
                   postType='ac'
                   postStatus={postStatus}
                   postTitle={post.title}
@@ -746,6 +747,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
               canDeleteComments
               onFormBlur={handleCommentBlur}

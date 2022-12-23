@@ -88,7 +88,8 @@ const getPayWithCardErrorMessage = (
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreatorName: string;
   postText: string;
   index: number;
@@ -107,7 +108,8 @@ interface IMcOptionCard {
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
-  postId,
+  postUuid,
+  postShortId,
   postCreatorName,
   postText,
   index,
@@ -283,20 +285,22 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const voteOnPostRequest = useMemo(
     () =>
       new newnewapi.VoteOnPostRequest({
-        postUuid: postId,
+        postUuid,
         votesCount: supportVoteOffer?.amountOfVotes,
         customerFee: new newnewapi.MoneyAmount({
           usdCents: paymentFeeInCents,
         }),
         optionId: option.id,
       }),
-    [postId, supportVoteOffer, option.id, paymentFeeInCents]
+    [postUuid, supportVoteOffer, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+      postShortId ?? postUuid
+    }`,
   });
 
   const handlePayWithCard = useCallback(
@@ -319,7 +323,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'McOptionCard',
         _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
@@ -369,7 +373,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     },
     [
       setupIntent,
-      postId,
+      postUuid,
       router,
       handleAddOrUpdateOptionFromResponse,
       handleSetPaymentSuccessValue,
@@ -388,7 +392,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         const payload = new newnewapi.VoteOnPostRequest({
           votesCount,
           optionId: option.id,
-          postUuid: postId,
+          postUuid,
         });
 
         const res = await voteWithBundleVotes(payload);
@@ -417,7 +421,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     },
     [
       option.id,
-      postId,
+      postUuid,
       handleAddOrUpdateOptionFromResponse,
       handleSetPaymentSuccessValue,
       showErrorToastCustom,
@@ -567,7 +571,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
                     _stage: 'Post',
-                    _postUuid: postId,
+                    _postUuid: postUuid,
                     _component: 'McOptionCard',
                   });
                 }}
@@ -613,7 +617,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
                     _stage: 'Post',
-                    _postUuid: postId,
+                    _postUuid: postUuid,
                     _component: 'McOptionCard',
                   });
                 }}
@@ -684,7 +688,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
-            redirectUrl={`p/${postId}`}
+            redirectUrl={`p/${postShortId ?? postUuid}`}
             bottomCaption={
               (!appConstants.minHoldAmount?.usdCents ||
                 paymentWithFeeInCents >

@@ -148,7 +148,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             additionalResponses={post.additionalResponses}
@@ -356,6 +356,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>

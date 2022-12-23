@@ -108,7 +108,11 @@ export const TopSection: React.FC<ITopSection> = React.memo(
 
     const renderItem = (item: newnewapi.Post, index: number) => (
       <Link
-        href={`/p/${switchPostType(item)[0].postUuid}`}
+        href={`/p/${
+          switchPostType(item)[0].postShortId
+            ? switchPostType(item)[0].postShortId
+            : switchPostType(item)[0].postUuid
+        }`}
         key={switchPostType(item)[0].postUuid}
       >
         <SItemWrapper

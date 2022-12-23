@@ -62,6 +62,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
     if (res.error) throw new Error(res.error?.message ?? 'Request failed');
   }, [id]);
 
+  // TODO: support for postShortId in routing target
   useEffect(() => {
     if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)

@@ -125,7 +125,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     handleCloseAndGoBack,
   } = usePostInnerState();
 
-  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postUuid = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postShortId = useMemo(
+    () => postParsed?.postShortId ?? '',
+    [postParsed]
+  );
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
   const creator = useMemo(() => postParsed?.creator!!, [postParsed]);
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
@@ -187,7 +191,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleOpenShareMenu = () => {
     Mixpanel.track('Opened Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(true);
@@ -196,16 +200,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseShareMenu = useCallback(() => {
     Mixpanel.track('Close Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleOpenEllipseMenu = () => {
     Mixpanel.track('Open Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(true);
@@ -213,17 +217,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseEllipseMenu = useCallback(() => {
     Mixpanel.track('Close Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleFollowDecision = useCallback(async () => {
     try {
       Mixpanel.track('Favorite Post', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'PostTopInfo',
       });
 
@@ -240,7 +244,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         markAs: !isFollowingDecision
           ? newnewapi.MarkPostRequest.Kind.FAVORITE
           : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-        postUuid: postId,
+        postUuid,
       });
 
       const res = await markPost(markAsFavoritePayload);
@@ -254,7 +258,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }, [
     handleSetIsFollowingDecision,
     isFollowingDecision,
-    postId,
+    postUuid,
     router,
     user.loggedIn,
     user._persist?.rehydrated,
@@ -263,7 +267,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleSeeNewFailedBox = useCallback(() => {
     Mixpanel.track('See New Failde Box', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     if (router.pathname === '/') {
@@ -272,7 +276,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       router.push('/');
     }
     // }
-  }, [router, postId, handleCloseAndGoBack]);
+  }, [router, postUuid, handleCloseAndGoBack]);
 
   // TODO: Add a hook for handling sms notifications status
   const submitPhoneSmsNotificationsRequest = useCallback(
@@ -282,7 +286,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           const guestId = getGuestId();
 
           const res = await subscribeGuestToSmsNotifications(
-            { postUuid: subscription.postId },
+            { postUuid: subscription.postUuid },
             guestId,
             phoneNumber
           );
@@ -312,7 +316,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
         } else {
           const res = await subscribeToSmsNotifications(
-            { postUuid: subscription.postId },
+            { postUuid: subscription.postUuid },
             phoneNumber
           );
 
@@ -342,13 +346,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         throw err;
       }
     },
-    [user.loggedIn, showErrorToastCustom, subscription.postId, t]
+    [user.loggedIn, showErrorToastCustom, subscription.postUuid, t]
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     Mixpanel.track('Opened SMS Notification Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
 
@@ -356,7 +360,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       if (!user.loggedIn) {
         const guestId = getGuestId();
         const res = await unsubscribeGuestFromSmsNotifications(
-          { postUuid: subscription.postId },
+          { postUuid: subscription.postUuid },
           guestId
         );
 
@@ -366,7 +370,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         }
       } else {
         const res = await unsubscribeFromSmsNotifications({
-          postUuid: subscription.postId,
+          postUuid: subscription.postUuid,
         });
 
         if (!res.data || res.error) {
@@ -390,7 +394,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } else if (user.userData?.options?.isPhoneNumberConfirmed) {
       try {
         const res = await subscribeToSmsNotifications({
-          postUuid: subscription.postId,
+          postUuid: subscription.postUuid,
         });
 
         if (
@@ -417,11 +421,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       setSmsNotificationModalOpen(true);
     }
   }, [
-    postId,
+    postUuid,
     subscribedToSmsNotifications,
     user.loggedIn,
     user.userData?.options?.isPhoneNumberConfirmed,
-    subscription.postId,
+    subscription.postUuid,
     showErrorToastCustom,
     tCommon,
     submitPhoneSmsNotificationsRequest,
@@ -437,7 +441,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
         const res = await getGuestSmsNotificationsSubscriptionStatus(
-          { postUuid: subscription.postId },
+          { postUuid: subscription.postUuid },
           guestId
         );
         console.log(res.data);
@@ -470,7 +474,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         });
     } else {
       getSmsNotificationsSubscriptionStatus({
-        postUuid: subscription.postId,
+        postUuid: subscription.postUuid,
       }).then((res) => {
         if (!res.data || res.error) {
           console.error('Unable to get sms notifications status');
@@ -484,7 +488,12 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     return () => {};
-  }, [user._persist?.rehydrated, user.loggedIn, subscription.postId, tCommon]);
+  }, [
+    user._persist?.rehydrated,
+    user.loggedIn,
+    subscription.postUuid,
+    tCommon,
+  ]);
 
   useEffect(() => {
     const handleSubscribedToSms = async (data: any) => {
@@ -493,7 +502,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!decoded) return;
 
-      if (decoded.object?.postUuid === subscription.postId) {
+      if (decoded.object?.postUuid === subscription.postUuid) {
         setSubscribedToSmsNotifications(true);
       }
     };
@@ -504,7 +513,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!decoded) return;
 
-      if (decoded.object?.postUuid === subscription.postId) {
+      if (decoded.object?.postUuid === subscription.postUuid) {
         setSubscribedToSmsNotifications(false);
       }
 
@@ -534,7 +543,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         );
       }
     };
-  }, [user.loggedIn, subscription.postId, socketConnection]);
+  }, [user.loggedIn, subscription.postUuid, socketConnection]);
 
   const notificationButtonRef: any = useRef();
   const moreButtonRef: any = useRef();
@@ -564,7 +573,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator avatar', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -583,7 +592,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator username', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -668,7 +677,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Share menu */}
           {!isMobile && (
             <PostShareEllipseMenu
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
               anchorElement={shareButtonRef.current}
@@ -678,7 +688,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               onClose={handleCloseShareMenu}
             />
           ) : null}
