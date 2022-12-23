@@ -523,6 +523,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
+                    postShortId={postParsed.postShortId ?? ''}
                     postType={typeOfPost as TPostType}
                     isVisible={isEllipseMenuOpen}
                     postCreator={postParsed.creator as newnewapi.User}
@@ -564,6 +565,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               isOpen={isEllipseMenuOpen}
               zIndex={11}
               postUuid={postParsed.postUuid}
+              postShortId={postParsed.postShortId ?? ''}
               postType={typeOfPost as TPostType}
               postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
@@ -626,6 +628,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               {!isMobile && (
                 <PostCardEllipseMenu
                   postUuid={postParsed.postUuid}
+                  postShortId={postParsed.postShortId ?? ''}
                   postType={typeOfPost as TPostType}
                   isVisible={isEllipseMenuOpen}
                   postCreator={postParsed.creator as newnewapi.User}
@@ -753,6 +756,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             isOpen={isEllipseMenuOpen}
             zIndex={11}
             postUuid={postParsed.postUuid}
+            postShortId={postParsed.postShortId ?? ''}
             postType={typeOfPost as TPostType}
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}
