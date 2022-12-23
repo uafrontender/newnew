@@ -151,8 +151,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
   const [triedLoading, setTriedLoading] = useState(false);
 
-  // const currLocation = `/p/${post.postUuid}`;
-
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
@@ -560,7 +558,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -830,7 +828,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
             }}
