@@ -216,7 +216,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-      postShortId ?? postUuid
+      postShortId || postUuid
     }`,
   });
 
@@ -471,7 +471,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
-          redirectUrl={`p/${postShortId ?? postUuid}`}
+          redirectUrl={`p/${postShortId || postUuid}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           setupIntent={setupIntent}

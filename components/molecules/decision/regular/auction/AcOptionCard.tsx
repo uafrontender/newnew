@@ -274,7 +274,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-      postShortId ?? postUuid
+      postShortId || postUuid
     }`,
   });
 
@@ -734,7 +734,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
-          redirectUrl={`p/${postShortId ?? postUuid}`}
+          redirectUrl={`p/${postShortId || postUuid}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           bottomCaption={
