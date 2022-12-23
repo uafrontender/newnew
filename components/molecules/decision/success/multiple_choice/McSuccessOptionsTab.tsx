@@ -206,7 +206,8 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             key={option.id.toString()}
             option={option as TMcOptionWithHighestField}
             creator={option.creator ?? post.creator!!}
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }

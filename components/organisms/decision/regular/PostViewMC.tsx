@@ -367,7 +367,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const subscription: SubscriptionToPost = useMemo(
     () => ({
       type: 'post',
-      postId: post.postUuid,
+      postUuid: post.postUuid,
       postTitle: post.title,
     }),
     [post]
@@ -572,7 +572,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -720,7 +720,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
@@ -814,7 +814,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
             }}
@@ -871,6 +871,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SCommentsHeadline>
           <CommentsBottomSection
             postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}

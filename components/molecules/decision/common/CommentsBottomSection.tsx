@@ -42,6 +42,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface ICommentsBottomSection {
   postUuid: string;
+  postShortId: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
   onFormFocus?: () => void;
@@ -52,6 +53,7 @@ const CommentsBottomSection: React.FunctionComponent<
   ICommentsBottomSection
 > = ({
   postUuid,
+  postShortId,
   canDeleteComments,
   commentsRoomId,
   onFormFocus,
@@ -184,7 +186,7 @@ const CommentsBottomSection: React.FunctionComponent<
       try {
         Mixpanel.track('Added Comment', {
           _stage: 'Post',
-          _postId: postUuid,
+          _postUuid: postUuid,
         });
         const payload = new newnewapi.SendMessageRequest({
           roomId: commentsRoomId,
@@ -277,7 +279,7 @@ const CommentsBottomSection: React.FunctionComponent<
       try {
         Mixpanel.track('Deleted Comment', {
           _stage: 'Post',
-          _postId: postUuid,
+          _postUuid: postUuid,
           _messageId: comment.id,
         });
         const payload = new newnewapi.DeleteMessageRequest({
@@ -331,7 +333,7 @@ const CommentsBottomSection: React.FunctionComponent<
         setComments((curr) => {
           const workingArr = [...curr];
 
-          if (decoded.newMessage?.parentId && decoded.newMessage !== 0) {
+          if (decoded.newMessage?.parentId) {
             const parentMsgIdx = workingArr.findIndex(
               (msg) => msg.id === decoded.newMessage?.parentId
             );
@@ -531,7 +533,7 @@ const CommentsBottomSection: React.FunctionComponent<
         >
           <CommentForm
             isRoot
-            postUuid={postUuid}
+            postUuidOrShortId={postShortId ?? postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
@@ -594,7 +596,7 @@ const CommentsBottomSection: React.FunctionComponent<
                 onClick={() => {
                   Mixpanel.track('Click Load More Comments', {
                     _stage: 'Post',
-                    _postId: postUuid,
+                    _postUuid: postUuid,
                   });
                   fetchComments(commentsNextPageToken);
                 }}

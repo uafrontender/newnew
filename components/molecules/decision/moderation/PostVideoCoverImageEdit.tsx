@@ -27,7 +27,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface IPostVideoCoverImageEdit {
   open: boolean;
-  postId: string;
+  postUuid: string;
   originalCoverUrl?: string;
   handleClose: () => void;
   handleSubmit: (newCoverUrl: string | undefined) => void;
@@ -35,7 +35,7 @@ interface IPostVideoCoverImageEdit {
 
 const PostVideoCoverImageEdit: React.FunctionComponent<
   IPostVideoCoverImageEdit
-> = ({ open, postId, originalCoverUrl, handleClose, handleSubmit }) => {
+> = ({ open, postUuid, originalCoverUrl, handleClose, handleSubmit }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined } = useErrorToasts();
@@ -119,7 +119,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
         );
 
         const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
-          postUuid: postId,
+          postUuid,
         });
 
         const res = await getCoverImageUploadUrl(imageUrlPayload);
@@ -140,7 +140,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
         }
 
         const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
-          postUuid: postId,
+          postUuid,
           action: newnewapi.SetPostCoverImageRequest.Action.COVER_UPLOADED,
         });
 
@@ -155,7 +155,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
         handleSubmit(URL.createObjectURL(coverImageFile));
       } else if (!coverImageToBeSaved) {
         const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
-          postUuid: postId,
+          postUuid,
           action: newnewapi.SetPostCoverImageRequest.Action.DELETE_COVER,
         });
 

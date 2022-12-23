@@ -1,3 +1,5 @@
+/* eslint-disable prefer-template */
+/* eslint-disable operator-assignment */
 /* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
@@ -18,6 +20,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { validate as validateUuid } from 'uuid';
 
 import {
   deleteMyPost,
@@ -47,7 +50,7 @@ import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 interface IPostPage {
-  postUuid: string;
+  postUuidOrShortId: string;
   post?: newnewapi.Post;
   setup_intent_client_secret?: string;
   comment_id?: string;
@@ -57,7 +60,7 @@ interface IPostPage {
 }
 
 const PostPage: NextPage<IPostPage> = ({
-  postUuid,
+  postUuidOrShortId,
   post,
   setup_intent_client_secret,
   comment_id,
@@ -126,7 +129,7 @@ const PostPage: NextPage<IPostPage> = ({
       try {
         setIsPostLoading(true);
         const getPostPayload = new newnewapi.GetPostRequest({
-          postUuid,
+          postUuid: postUuidOrShortId,
         });
 
         const res = await fetchPostByUUID(getPostPayload);
@@ -358,7 +361,13 @@ const PostPage: NextPage<IPostPage> = ({
         _stage: 'Post',
         _postUuid: newPostParsed.postUuid,
       });
-      router.push(`/p/${newPostParsed.postUuid}`);
+      router.push(
+        `/p/${
+          newPostParsed.postShortId
+            ? newPostParsed.postShortId
+            : newPostParsed.postUuid
+        }`
+      );
     },
     [router]
   );
@@ -409,7 +418,7 @@ const PostPage: NextPage<IPostPage> = ({
     if (commentContentFromUrl) {
       handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
 
-      router.replace(`/p/${postUuid}`, undefined, {
+      router.replace(`/p/${postUuidOrShortId}`, undefined, {
         shallow: true,
       });
     }
@@ -533,7 +542,7 @@ const PostPage: NextPage<IPostPage> = ({
 
   return (
     <motion.div
-      key={postUuid}
+      key={postUuidOrShortId}
       initial={{
         x: isMobile && !isServerSide ? 500 : 0,
         y: 0,
@@ -556,7 +565,7 @@ const PostPage: NextPage<IPostPage> = ({
       }}
     >
       <PostInnerContextProvider
-        key={postUuid}
+        key={postUuidOrShortId}
         postParsed={postParsed}
         typeOfPost={typeOfPost}
         postStatus={postStatus}
@@ -592,7 +601,7 @@ const PostPage: NextPage<IPostPage> = ({
           <meta property='og:title' content={postParsed?.title} />
           <meta
             property='og:url'
-            content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`}
+            content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuidOrShortId}`}
           />
           <meta
             property='og:image'
@@ -659,7 +668,9 @@ export default PostPage;
   <GeneralLayout noMobieNavigation noPaddingMobile>
     <CommentFromUrlContextProvider>
       <AnimatePresence>
-        <React.Fragment key={page.props.postUuid}>{page}</React.Fragment>
+        <React.Fragment key={page.props.postUuidOrShortId}>
+          {page}
+        </React.Fragment>
       </AnimatePresence>
     </CommentFromUrlContextProvider>
   </GeneralLayout>
@@ -667,7 +678,7 @@ export default PostPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
-    post_uuid,
+    post_uuid_or_short_id,
     setup_intent_client_secret,
     comment_id,
     comment_content,
@@ -686,7 +697,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     SUPPORTED_LANGUAGES
   );
 
-  if (!post_uuid || Array.isArray(post_uuid)) {
+  if (!post_uuid_or_short_id || Array.isArray(post_uuid_or_short_id)) {
     return {
       redirect: {
         destination: '/',
@@ -699,7 +710,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // console.log('I am from direct link, making SSR request');
 
     const getPostPayload = new newnewapi.GetPostRequest({
-      postUuid: post_uuid,
+      postUuid: post_uuid_or_short_id,
     });
 
     const res = await fetchPostByUUID(
@@ -717,9 +728,51 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
+    if (
+      validateUuid(post_uuid_or_short_id) &&
+      !!switchPostType(res.data)[0].postShortId
+    ) {
+      let queryString = '';
+      const queryObject = {
+        ...(setup_intent_client_secret
+          ? {
+              setup_intent_client_secret,
+            }
+          : {}),
+        ...(comment_id
+          ? {
+              comment_id,
+            }
+          : {}),
+        ...(comment_content
+          ? {
+              comment_content,
+            }
+          : {}),
+        ...(save_card
+          ? {
+              save_card,
+            }
+          : {}),
+      };
+
+      if (Object.keys(queryObject).length !== 0) {
+        queryString = '?' + new URLSearchParams(queryObject as any).toString();
+      }
+
+      return {
+        redirect: {
+          destination: `/p/${
+            switchPostType(res.data)[0].postShortId
+          }${queryString}`,
+          permanent: true,
+        },
+      };
+    }
+
     return {
       props: {
-        postUuid: post_uuid,
+        postUuidOrShortId: post_uuid_or_short_id,
         isServerSide: true,
         post: res.data.toJSON(),
         ...(setup_intent_client_secret
@@ -751,7 +804,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      postUuid: post_uuid,
+      postUuidOrShortId: post_uuid_or_short_id,
       isServerSide: false,
       ...(setup_intent_client_secret
         ? {

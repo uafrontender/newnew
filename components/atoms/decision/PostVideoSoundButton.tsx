@@ -11,14 +11,14 @@ import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 
 interface IPostVideoSoundButton {
-  postId: string;
+  postUuid: string;
   isMuted?: boolean;
   soundBtnBottomOverriden?: number;
   handleToggleMuted: () => void;
 }
 
 const PostVideoSoundButton: React.FunctionComponent<IPostVideoSoundButton> = ({
-  postId,
+  postUuid,
   isMuted,
   soundBtnBottomOverriden,
   handleToggleMuted,
@@ -40,7 +40,7 @@ const PostVideoSoundButton: React.FunctionComponent<IPostVideoSoundButton> = ({
       onClick={(e) => {
         Mixpanel.track('Toggle Muted Mode', {
           _stage: 'Post',
-          _postUuid: postId,
+          _postUuid: postUuid,
         });
         e.stopPropagation();
         handleToggleMuted();

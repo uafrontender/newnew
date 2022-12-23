@@ -27,12 +27,13 @@ const SOCIAL_ICONS: any = {
 interface IPostShareEllipseModal {
   isOpen: boolean;
   zIndex: number;
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   onClose: () => void;
 }
 
 const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
-  React.memo(({ isOpen, zIndex, postId, onClose }) => {
+  React.memo(({ isOpen, zIndex, postUuid, postShortId, onClose }) => {
     const { t } = useTranslation('common');
 
     // const socialButtons = useMemo(() => [
@@ -79,10 +80,10 @@ const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
 
     const handlerCopy = useCallback(() => {
       if (window) {
-        const url = `${window.location.origin}/p/${postId}`;
+        const url = `${window.location.origin}/p/${postShortId ?? postUuid}`;
         Mixpanel.track('Copied Link Post', {
           _stage: 'Post',
-          _postUuid: postId,
+          _postUuid: postUuid,
         });
         copyPostUrlToClipboard(url)
           .then(() => {
@@ -96,7 +97,7 @@ const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
             console.log(err);
           });
       }
-    }, [postId, onClose]);
+    }, [postShortId, postUuid, onClose]);
 
     return (
       <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>

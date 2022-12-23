@@ -258,7 +258,8 @@ const AcWaitingOptionsSection: React.FunctionComponent<
             key={option.id.toString()}
             option={option as TAcOptionWithHighestField}
             optionBeingSupported=''
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             postCreatorName={getDisplayname(post.creator)}
             postDeadline=''
             postText=''
