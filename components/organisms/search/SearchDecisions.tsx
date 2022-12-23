@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useUpdateEffect } from 'react-use';
 
 import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
@@ -193,7 +194,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingPosts, postsNextPageToken]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (router.query.tab !== 'posts') {
       return;
     }
