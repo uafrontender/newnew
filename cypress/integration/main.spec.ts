@@ -80,7 +80,7 @@ context('Main flow', () => {
 
       cy.dGet('#settings_first_name_input').type('testCreator');
       cy.dGet('#settings_last_name_input').type('testCreator');
-      cy.dGet('#nickname_input').type('testCreator');
+      cy.dGet('#nickname_input').type(testSeed.toString());
 
       cy.dGet('#select-day').click();
       cy.dGet('#select-day-options').contains('1').click();
