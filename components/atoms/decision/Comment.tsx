@@ -408,7 +408,7 @@ const SText = styled.div`
 
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  word-break: break-all;
+  word-break: break-word;
   user-select: text;
 `;
 
