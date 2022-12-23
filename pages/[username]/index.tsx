@@ -71,6 +71,8 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
         setIsLoading(true);
         setTriedLoading(true);
 
+        const cardsLimit = sessionStorage?.getItem('cardsLimit');
+
         const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
           userUuid: user.uuid,
           filter: postsFilter,
@@ -79,7 +81,13 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
             : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
           // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
           paging: {
-            ...(token ? { pageToken: token } : {}),
+            ...(token
+              ? { pageToken: token }
+              : cardsLimit && needCount
+              ? {
+                  limit: parseInt(cardsLimit),
+                }
+              : {}),
           },
           ...(needCount
             ? {
@@ -89,6 +97,10 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
         });
 
         const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
+
+        if (cardsLimit) {
+          sessionStorage.removeItem('cardsLimit');
+        }
 
         if (postsResponse.data && postsResponse.data.posts) {
           handleSetPosts((curr) => [

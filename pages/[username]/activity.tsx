@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -63,13 +64,22 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       try {
         setIsLoading(true);
         setTriedLoading(true);
+
+        const cardsLimit = sessionStorage?.getItem('cardsLimit');
+
         const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
           userUuid: user.uuid,
           filter: postsFilter,
           relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
           // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
           paging: {
-            ...(token ? { pageToken: token } : {}),
+            ...(token
+              ? { pageToken: token }
+              : cardsLimit && needCount
+              ? {
+                  limit: parseInt(cardsLimit),
+                }
+              : {}),
           },
           ...(needCount
             ? {
@@ -79,6 +89,10 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
         });
 
         const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
+
+        if (cardsLimit) {
+          sessionStorage.removeItem('cardsLimit');
+        }
 
         if (postsResponse.data && postsResponse.data.posts) {
           handleSetPosts((curr) => [
