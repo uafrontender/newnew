@@ -141,7 +141,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     handleUpdatePostStatus,
     handleSetIsConfirmToClosePost,
   } = usePostInnerState();
-  const postId = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
+  const postUuid = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
 
   // Core response
   const [coreResponse, setCoreResponse] = useState<
@@ -422,7 +422,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     setCoreResponseUploading(true);
     try {
       const payload = new newnewapi.UploadPostResponseRequest({
-        postUuid: postId,
+        postUuid,
         responseVideoUrl: uploadedResponseVideoUrl,
       });
 
@@ -461,7 +461,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       setCoreResponseUploading(false);
     }
   }, [
-    postId,
+    postUuid,
     uploadedResponseVideoUrl,
     handleUpdateResponseVideo,
     handleUpdatePostStatus,
@@ -471,7 +471,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const handleUploadVideoNotProcessed = useCallback(async () => {
     try {
       const payload = new newnewapi.UploadPostResponseRequest({
-        postUuid: postId,
+        postUuid,
         responseVideoUrl: uploadedResponseVideoUrl,
       });
 
@@ -493,7 +493,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       }
     }
   }, [
-    postId,
+    postUuid,
     uploadedResponseVideoUrl,
     t,
     handleUpdatePostStatus,
@@ -504,7 +504,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     setUploadingAdditionalResponse(true);
     try {
       const payload = new newnewapi.UploadAdditionalPostResponseRequest({
-        postUuid: postId,
+        postUuid,
         additionalResponseVideoUrl: uploadedResponseVideoUrl,
       });
 
@@ -571,7 +571,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     }
   }, [
     handleAddAdditonalResponse,
-    postId,
+    postUuid,
     showErrorToastPredefined,
     uploadedResponseVideoUrl,
   ]);
@@ -585,7 +585,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       if (
         decoded.taskUuid === videoProcessing?.taskUuid ||
-        decoded.postUuid === postId
+        decoded.postUuid === postUuid
       ) {
         setResponseFileProcessingETA(
           decoded.estimatedTimeLeft?.seconds as number
@@ -626,7 +626,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     [
       videoProcessing?.taskUuid,
       videoProcessing.targetUrls?.hlsStreamUrl,
-      postId,
+      postUuid,
       responseFileProcessingProgress,
       showErrorToastPredefined,
     ]

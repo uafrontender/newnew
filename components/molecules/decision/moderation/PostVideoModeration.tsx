@@ -46,7 +46,7 @@ const PostVideoThumbnailEdit = dynamic(
 );
 
 interface IPostVideoModeration {
-  postId: string;
+  postUuid: string;
   thumbnails: any;
   announcement: newnewapi.IVideoUrls;
   isMuted: boolean;
@@ -54,7 +54,7 @@ interface IPostVideoModeration {
 }
 
 const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
-  postId,
+  postUuid,
   announcement,
   thumbnails,
   isMuted,
@@ -128,13 +128,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     (newCoverUrl: string | undefined) => {
       Mixpanel.track('Submit New Cover Image', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'PostVideoModeration',
       });
       setCurrentCoverUrl(newCoverUrl);
       setCoverImageModalOpen(false);
     },
-    [postId]
+    [postUuid]
   );
 
   // Show controls on shorter screens
@@ -152,11 +152,11 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     try {
       Mixpanel.track('Submit New Thumbnail', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'PostVideoModeration',
       });
       const payload = new newnewapi.SetPostThumbnailRequest({
-        postUuid: postId,
+        postUuid,
         thumbnailParameters: {
           startTime: {
             seconds: params.startTime,
@@ -192,7 +192,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         document.getElementById('toggle-video-widget')?.getBoundingClientRect();
 
       const videoRect =
-        document.getElementById(`${postId}`)?.getBoundingClientRect() ||
+        document.getElementById(`${postUuid}`)?.getBoundingClientRect() ||
         document.getElementById('video-wrapper')?.getBoundingClientRect();
 
       if (rect && videoRect) {
@@ -233,14 +233,14 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobileOrTablet, postId]);
+  }, [isMobileOrTablet, postUuid]);
 
   return (
     <>
       <SVideoWrapper id='video-wrapper'>
         {openedTab === 'announcement' ? (
           <PostVideoAnnouncementTab
-            postId={postId}
+            postUuid={postUuid}
             announcement={announcement}
             hasCoverImage={!!currentCoverUrl}
             isMuted={isMuted}
@@ -265,7 +265,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           !responseFileProcessingLoading ? (
           <>
             <PostBitmovinPlayer
-              id={postId}
+              id={postUuid}
               resources={videoProcessing.targetUrls!!}
               muted={isMuted}
               showPlayButton
@@ -274,7 +274,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               {t('postVideo.reuploadButton')}
             </SReuploadButton>
             <PostVideoSoundButton
-              postId={postId}
+              postUuid={postUuid}
               isMuted={isMuted}
               soundBtnBottomOverriden={bottomOffset}
               handleToggleMuted={handleToggleMuted}
@@ -319,7 +319,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             onClick={() => {
               Mixpanel.track('Open Edit Thumbnail Menu', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoModaration',
               });
               handleOpenEditThumbnailMenu();
@@ -331,7 +331,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             onClick={() => {
               Mixpanel.track('Open Edit Cover Image Menu', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoModaration',
               });
               handleOpenEditCoverImageMenu();
@@ -351,7 +351,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             onClick={() => {
               Mixpanel.track('Open Edit Thumbnail Menu', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoModaration',
               });
               handleOpenEditThumbnailMenu();
@@ -363,7 +363,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             onClick={() => {
               Mixpanel.track('Open Edit Cover Image Menu', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoModaration',
               });
               handleOpenEditCoverImageMenu();
@@ -385,7 +385,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       {coverImageModalOpen && (
         <PostVideoCoverImageEdit
           open={coverImageModalOpen}
-          postId={postId}
+          postUuid={postUuid}
           originalCoverUrl={currentCoverUrl}
           handleClose={handleCloseCoverImageEditClick}
           handleSubmit={handleSubmitNewCoverImage}

@@ -104,6 +104,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
               isFollowingDecision={isFollowingDecision}
               isMobile={isMobile}
               postUuid={postParsed?.postUuid ?? ''}
+              postShortId={postParsed?.postShortId ?? ''}
               shareMenuOpen={shareMenuOpen}
               typeOfPost={typeOfPost ?? 'ac'}
               handleCloseAndGoBack={handleCloseAndGoBack}

@@ -38,7 +38,7 @@ export const reportUser = (
 };
 
 export const reportPost = (
-  postId: string,
+  postUuid: string,
   reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
@@ -47,7 +47,7 @@ export const reportPost = (
     message,
     content: {
       postAnnounce: {
-        postUuid: postId,
+        postUuid,
       },
     },
   });

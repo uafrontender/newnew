@@ -32,7 +32,8 @@ import NoContentYetImg from '../../../../../public/images/decision/no-content-ye
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
 
 interface IAcOptionsTab {
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreatorName: string;
   postText: string;
   postDeadline: string;
@@ -49,7 +50,8 @@ interface IAcOptionsTab {
 }
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
-  postId,
+  postUuid,
+  postShortId,
   postCreatorName,
   postText,
   postDeadline,
@@ -207,7 +209,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <AcOptionCard
               key={option.id.toString()}
               option={option as TAcOptionWithHighestField}
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               postCreatorName={postCreatorName}
               postDeadline={postDeadline}
               postText={postText}
@@ -224,7 +227,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               handleRemoveOption={() => {
                 Mixpanel.track('Removed Option', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'AcOptionsTab',
                 });
                 handleRemoveOption(option);
@@ -241,7 +244,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               onClick={() => {
                 Mixpanel.track('Click Load More', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'AcOptionsTab',
                 });
                 handleLoadBids(pagingToken);

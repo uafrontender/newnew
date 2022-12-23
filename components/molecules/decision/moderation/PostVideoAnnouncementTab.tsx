@@ -21,7 +21,7 @@ const PostBitmovinPlayer = dynamic(
 );
 
 interface IPostVideoAnnouncementTab {
-  postId: string;
+  postUuid: string;
   announcement: newnewapi.IVideoUrls;
   hasCoverImage: boolean;
   isMuted: boolean;
@@ -35,7 +35,7 @@ interface IPostVideoAnnouncementTab {
 const PostVideoAnnouncementTab: React.FunctionComponent<
   IPostVideoAnnouncementTab
 > = ({
-  postId,
+  postUuid,
   announcement,
   hasCoverImage,
   isMuted,
@@ -58,7 +58,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
   return (
     <>
       <PostBitmovinPlayer
-        id={postId}
+        id={postUuid}
         resources={announcement}
         muted={isMuted}
         showPlayButton
@@ -71,7 +71,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
           onClick={() => {
             Mixpanel.track('Open Ellipse Menu', {
               _stage: 'Post',
-              _postUuid: postId,
+              _postUuid: postUuid,
               _component: 'PostVideoModeration',
             });
             handleOpenEllipseMenu();
@@ -98,7 +98,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
           onClick={() => {
             Mixpanel.track('Open Ellipse Menu', {
               _stage: 'Post',
-              _postUuid: postId,
+              _postUuid: postUuid,
               _component: 'PostVideoModeration',
             });
             handleOpenEllipseMenu();
@@ -117,7 +117,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
         </SSetThumbnailButton>
       )}
       <PostVideoSoundButton
-        postId={postId}
+        postUuid={postUuid}
         isMuted={isMuted}
         soundBtnBottomOverriden={soundBtnBottomOverriden}
         handleToggleMuted={handleToggleMuted}
