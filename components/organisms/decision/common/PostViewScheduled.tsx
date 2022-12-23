@@ -84,7 +84,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     const subscription: SubscriptionToPost = useMemo(
       () => ({
         type: 'post',
-        postId: post.postUuid,
+        postUuid: post.postUuid,
         postTitle: post.title,
       }),
       [post]

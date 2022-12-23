@@ -355,7 +355,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const subscription: SubscriptionToPost = useMemo(
     () => ({
       type: 'post',
-      postId: post.postUuid,
+      postUuid: post.postUuid,
       postTitle: post.title,
     }),
     [post]

@@ -186,7 +186,7 @@ const CommentsBottomSection: React.FunctionComponent<
       try {
         Mixpanel.track('Added Comment', {
           _stage: 'Post',
-          _postId: postUuid,
+          _postUuid: postUuid,
         });
         const payload = new newnewapi.SendMessageRequest({
           roomId: commentsRoomId,
@@ -279,7 +279,7 @@ const CommentsBottomSection: React.FunctionComponent<
       try {
         Mixpanel.track('Deleted Comment', {
           _stage: 'Post',
-          _postId: postUuid,
+          _postUuid: postUuid,
           _messageId: comment.id,
         });
         const payload = new newnewapi.DeleteMessageRequest({
@@ -596,7 +596,7 @@ const CommentsBottomSection: React.FunctionComponent<
                 onClick={() => {
                   Mixpanel.track('Click Load More Comments', {
                     _stage: 'Post',
-                    _postId: postUuid,
+                    _postUuid: postUuid,
                   });
                   fetchComments(commentsNextPageToken);
                 }}
