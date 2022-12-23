@@ -9,6 +9,7 @@ import UserAvatar from '../../molecules/UserAvatar';
 import InlineSvg from '../InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -22,7 +23,13 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
       {creators.map((creator) => (
         <Link href={`/${creator.username}`} key={creator.uuid}>
           <a>
-            <SPost>
+            <SPost
+              onClick={() => {
+                Mixpanel.track('Search Result Creator Clicked', {
+                  _creatorUsername: creator.username,
+                });
+              }}
+            >
               <SLeftSide>
                 <SUserAvatar>
                   <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
