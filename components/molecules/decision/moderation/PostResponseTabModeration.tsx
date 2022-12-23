@@ -128,7 +128,7 @@ const PostResponseTabModeration: React.FunctionComponent<
 
   const handleCopyLink = useCallback(() => {
     if (window) {
-      const url = `${window.location.origin}/p/${postShortId ?? postUuid}`;
+      const url = `${window.location.origin}/p/${postShortId || postUuid}`;
 
       copyPostUrlToClipboard(url)
         .then(() => {

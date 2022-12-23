@@ -299,7 +299,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-      postShortId ?? postUuid
+      postShortId || postUuid
     }`,
   });
 
@@ -688,7 +688,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
-            redirectUrl={`p/${postShortId ?? postUuid}`}
+            redirectUrl={`p/${postShortId || postUuid}`}
             bottomCaption={
               (!appConstants.minHoldAmount?.usdCents ||
                 paymentWithFeeInCents >
