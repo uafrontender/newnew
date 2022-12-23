@@ -1,3 +1,5 @@
+/* eslint-disable prefer-template */
+/* eslint-disable operator-assignment */
 /* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
@@ -18,6 +20,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { validate as validateUuid } from 'uuid';
 
 import {
   deleteMyPost,
@@ -713,6 +716,45 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         redirect: {
           destination: '/',
           permanent: false,
+        },
+      };
+    }
+
+    if (validateUuid(post_uuid) && !!switchPostType(res.data)[0].postShortId) {
+      let queryString = '';
+      const queryObject = {
+        ...(setup_intent_client_secret
+          ? {
+              setup_intent_client_secret,
+            }
+          : {}),
+        ...(comment_id
+          ? {
+              comment_id,
+            }
+          : {}),
+        ...(comment_content
+          ? {
+              comment_content,
+            }
+          : {}),
+        ...(save_card
+          ? {
+              save_card,
+            }
+          : {}),
+      };
+
+      if (Object.keys(queryObject).length !== 0) {
+        queryString = '?' + new URLSearchParams(queryObject as any).toString();
+      }
+
+      return {
+        redirect: {
+          destination: `/p/${
+            switchPostType(res.data)[0].postShortId
+          }${queryString}`,
+          permanent: true,
         },
       };
     }
