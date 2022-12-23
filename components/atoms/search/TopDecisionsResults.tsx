@@ -47,7 +47,10 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       );
 
       return (
-        <Link href={`/p/${data.postUuid}`} key={data.postUuid}>
+        <Link
+          href={`/p/${data.postShortId ? data.postShortId : data.postUuid}`}
+          key={data.postUuid}
+        >
           <a>
             <SPost>
               <SLeftSide>
