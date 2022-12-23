@@ -42,6 +42,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 interface ICommentsBottomSection {
   postUuid: string;
+  postShortId: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
   onFormFocus?: () => void;
@@ -52,6 +53,7 @@ const CommentsBottomSection: React.FunctionComponent<
   ICommentsBottomSection
 > = ({
   postUuid,
+  postShortId,
   canDeleteComments,
   commentsRoomId,
   onFormFocus,
@@ -531,7 +533,7 @@ const CommentsBottomSection: React.FunctionComponent<
         >
           <CommentForm
             isRoot
-            postUuid={postUuid}
+            postUuidOrShortId={postShortId ?? postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
