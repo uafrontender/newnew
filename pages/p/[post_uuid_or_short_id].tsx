@@ -361,7 +361,13 @@ const PostPage: NextPage<IPostPage> = ({
         _stage: 'Post',
         _postUuid: newPostParsed.postUuid,
       });
-      router.push(`/p/${newPostParsed.postUuid}`);
+      router.push(
+        `/p/${
+          newPostParsed.postShortId
+            ? newPostParsed.postShortId
+            : newPostParsed.postUuid
+        }`
+      );
     },
     [router]
   );
