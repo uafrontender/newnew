@@ -12,6 +12,7 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import { useAppSelector } from '../../redux-store/store';
 import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -43,6 +44,10 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   const handlerCopy = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
+
+      Mixpanel.track('Copied My Link', {
+        _component: 'MoreMenuTablet',
+      });
 
       copyPostUrlToClipboard(url)
         .then(() => {
@@ -77,7 +82,16 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
             }
           >
             <SLink>
-              <SButton>
+              <SButton
+                onClick={() => {
+                  Mixpanel.track('My Avatar Clicked', {
+                    _component: 'MoreMenuTablet',
+                    _target: user.userData?.options?.isCreator
+                      ? '/profile/my-posts'
+                      : '/profile',
+                  });
+                }}
+              >
                 <SAvatar>
                   <img
                     src={user?.userData?.avatarUrl ?? ''}

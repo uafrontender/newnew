@@ -395,6 +395,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                 ?.supporterCount as number;
               workingArr[idx].firstVoter = decoded.option?.firstVoter;
               workingArrUnsorted = workingArr;
+              workingArr[idx].totalAmount = decoded.option?.totalAmount;
             }
 
             return sortOptions(workingArrUnsorted);
@@ -709,6 +710,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   postStatus={postStatus}
                   postTitle={post.title}
                   winningOptionMc={winningOption}
+                  options={options}
                 />
               )}
             </SActivitiesContainer>
