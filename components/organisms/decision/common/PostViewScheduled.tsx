@@ -103,7 +103,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
           )}
         </SExpiresSection>
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={false}
