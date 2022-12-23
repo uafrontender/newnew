@@ -27,10 +27,20 @@
 import 'cypress-file-upload';
 
 Cypress.Commands.add('getIframeElementOf', (container, element) => {
+  // Delay emulates a user searching for an element
+  // Could prevent Detached some minor detached from DOM issue
+  cy.wait(300);
   return cy
     .get(container)
     .find('iframe')
     .its('0.contentDocument.body')
     .find(element)
     .then(cy.wrap);
+});
+
+Cypress.Commands.add('dGet', (elementSelector, options) => {
+  // Delay emulates a user searching for an element
+  // Could prevent Detached some minor detached from DOM issue
+  cy.wait(300);
+  return cy.get(elementSelector, options);
 });

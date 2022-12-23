@@ -71,10 +71,11 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
       setSaveCard(undefined);
 
       const res = await buyCreatorsBundle(stripeContributionRequest);
+
       if (
         !res.data ||
         res.error ||
-        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+        res.data.status !== newnewapi.BuyCreatorsBundleResponse.Status.SUCCESS
       ) {
         throw new Error(res.error?.message ?? t('error.requestFailed'));
       }

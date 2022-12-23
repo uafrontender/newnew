@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
+import { useCookies } from 'react-cookie';
 import React, {
   useCallback,
   useContext,
@@ -12,6 +13,7 @@ import {
   getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
+  setMyTimeZone,
 } from '../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
@@ -25,6 +27,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
+import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
 
 interface ISyncUserWrapper {
   children: React.ReactNode;
@@ -33,6 +36,7 @@ interface ISyncUserWrapper {
 const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   children,
 }) => {
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const socketConnection = useContext(SocketContext);
@@ -126,67 +130,112 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     socketConnection,
   ]);
 
-  useEffect(() => {
-    async function syncUserData() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
+  const syncUserData = useCallback(async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest({});
 
-        const { data } = await getMe(payload);
+      const { data } = await getMe(payload);
 
-        if (data?.me) {
-          dispatch(
-            setUserData({
-              username: data.me?.username,
-              nickname: data.me?.nickname,
-              email: data.me?.email,
-              avatarUrl: data.me?.avatarUrl,
-              coverUrl: data.me?.coverUrl,
-              userUuid: data.me?.userUuid,
-              bio: data.me?.bio,
-              dateOfBirth: {
-                day: data.me?.dateOfBirth?.day,
-                month: data.me?.dateOfBirth?.month,
-                year: data.me?.dateOfBirth?.year,
-              },
-              countryCode: data.me?.countryCode,
-              usernameChangedAt: data.me.usernameChangedAt,
-              genderPronouns: data.me.genderPronouns,
-              phoneNumber: data.me.phoneNumber,
+      if (data?.me) {
+        dispatch(
+          setUserData({
+            username: data.me?.username,
+            nickname: data.me?.nickname,
+            email: data.me?.email,
+            avatarUrl: data.me?.avatarUrl,
+            coverUrl: data.me?.coverUrl,
+            userUuid: data.me?.userUuid,
+            bio: data.me?.bio,
+            dateOfBirth: {
+              day: data.me?.dateOfBirth?.day,
+              month: data.me?.dateOfBirth?.month,
+              year: data.me?.dateOfBirth?.year,
+            },
+            countryCode: data.me?.countryCode,
+            usernameChangedAt: data.me.usernameChangedAt,
+            genderPronouns: data.me.genderPronouns,
+            phoneNumber: data.me.phoneNumber,
 
-              options: {
-                isActivityPrivate: data.me?.options?.isActivityPrivate,
-                isCreator: data.me?.options?.isCreator,
-                isVerified: data.me?.options?.isVerified,
-                creatorStatus: data.me?.options?.creatorStatus,
-                birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
-                isOfferingBundles: data.me.options?.isOfferingBundles,
-                isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
-                isWhiteListed: data.me.options?.isWhiteListed,
-              },
-            } as TUserData)
-          );
-        }
-        if (data?.me?.options?.isCreator) {
-          try {
-            const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
-            const res = await getMyOnboardingState(getMyOnboardingStatePayload);
+            options: {
+              isActivityPrivate: data.me?.options?.isActivityPrivate,
+              isCreator: data.me?.options?.isCreator,
+              isVerified: data.me?.options?.isVerified,
+              creatorStatus: data.me?.options?.creatorStatus,
+              birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
+              isOfferingBundles: data.me.options?.isOfferingBundles,
+              isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
+              isWhiteListed: data.me.options?.isWhiteListed,
+            },
+          } as TUserData)
+        );
+      }
+      if (data?.me?.options?.isCreator) {
+        try {
+          const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
+          const res = await getMyOnboardingState(getMyOnboardingStatePayload);
 
-            if (res.data) {
-              dispatch(
-                setCreatorData({
-                  options: {
-                    ...user.creatorData?.options,
-                    ...res.data,
-                  },
-                })
-              );
-            }
-            updateCreatorDataSteps();
-          } catch (err) {
-            console.error(err);
-            updateCreatorDataSteps();
+          if (res.data) {
+            dispatch(
+              setCreatorData({
+                options: {
+                  ...user.creatorData?.options,
+                  ...res.data,
+                },
+              })
+            );
           }
+          updateCreatorDataSteps();
+        } catch (err) {
+          console.error(err);
+          updateCreatorDataSteps();
         }
+      }
+    } catch (err) {
+      console.error(err);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(
+          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+        );
+      }
+    }
+  }, [dispatch, user.creatorData?.options, updateCreatorDataSteps]);
+
+  useEffect(() => {
+    const setUserTimeZone = async () => {
+      const timezoneInRedux = user.userData?.timeZone;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      if (timezoneInRedux && timezoneInRedux === timezone) {
+        // No need to make the request
+        return;
+      }
+
+      try {
+        const payload = new newnewapi.SetMyTimeZoneRequest({
+          name: timezone,
+        });
+
+        const response = await setMyTimeZone(payload);
+
+        if (response.error) {
+          throw new Error('Cannot set time zone');
+        }
+
+        dispatch(
+          setUserData({
+            timeZone: timezone,
+          })
+        );
+        setCookie('timezone', timezone, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
@@ -200,7 +249,17 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           );
         }
       }
-    }
+    };
+
+    const setUserTimezoneCookieOnly = () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setCookie('timezone', timezone, {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      });
+    };
 
     async function syncUserTutorialsProgress(
       localUserTutorialsProgress: newnewapi.IGetTutorialsStatusResponse
@@ -402,6 +461,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
+      setUserTimeZone();
       syncUserData();
     } else {
       if (!localUserTutorialsProgress) {
@@ -416,6 +476,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         );
       }
       dispatch(setUserTutorialsProgressSynced(true));
+      setUserTimezoneCookieOnly();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
@@ -441,7 +502,16 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
+
+  const syncUserDataOnReturnOnTab = useCallback(() => {
+    if (user.loggedIn) {
+      syncUserData();
+    }
+  }, [user.loggedIn, syncUserData]);
+
+  useRunOnReturnOnTab(syncUserDataOnReturnOnTab);
 
   return <>{children}</>;
 };

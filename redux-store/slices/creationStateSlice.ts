@@ -20,7 +20,7 @@ export interface ICreationStateInterface {
       type: string;
       date: string;
       time: string;
-      'hours-format': string;
+      'hours-format': 'am' | 'pm';
     };
     expiresAt: string;
     options: {
@@ -68,7 +68,7 @@ const defaultUIState: ICreationStateInterface = {
       type: 'right-away',
       date: moment().format(),
       time: moment().format('hh:mm'),
-      'hours-format': moment().format('a'),
+      'hours-format': moment().format('a') as 'am' | 'pm',
     },
     expiresAt: '1-hour',
     options: {

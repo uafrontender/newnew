@@ -8,6 +8,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { SetupIntent } from '@stripe/stripe-js';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
 import { useAppSelector } from '../../../redux-store/store';
@@ -38,6 +39,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
 
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isStripeReady, setIsStripeReady] = useState(false);
@@ -50,7 +52,9 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile/settings/card-setup-complete`,
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${
+          router.locale !== 'en-US' ? `/${router.locale}` : ''
+        }/profile/settings/card-setup-complete`,
       },
       redirect: 'if_required',
     });
@@ -89,6 +93,13 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
+
+  useEffect(() => {
+    // fix recaptcha challenge overlay issue
+    if (isRecaptchaV2Required) {
+      document.body.style.top = '0';
+    }
+  }, [isRecaptchaV2Required]);
 
   useEffect(
     () => () => {
@@ -160,7 +171,7 @@ interface IAddCardModal {
 const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   const { t } = useTranslation('page-Profile');
 
-  const [stipeSecret, setStripeSecret] = useState('');
+  const [stripeSecret, setStripeSecret] = useState('');
   const [isStripeSecretLoading, setIsStripeSecretLoading] = useState(false);
 
   const { loggedIn } = useAppSelector((state) => state.user);
@@ -240,7 +251,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
               />
             </SLoader>
           )}
-          <StripeElements stipeSecret={stipeSecret}>
+          <StripeElements stipeSecret={stripeSecret}>
             <AddCardForm onCancel={closeModal} onSuccess={onCardSuccess} />
           </StripeElements>
         </SModalPaper>

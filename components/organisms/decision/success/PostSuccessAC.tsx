@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -47,6 +47,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -102,7 +104,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     useEffect(() => {
       const handleCommentsInitialHash = () => {
         const { hash } = window.location;
-        console.log(hash);
 
         if (!hash) {
           return;
@@ -158,7 +159,10 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitiesContainer dimmedBackground={openedMainSection === 'main'}>
+          <SActivitiesContainer
+            dimmedBackground={openedMainSection === 'main'}
+            ref={activitiesContainerRef}
+          >
             {openedMainSection === 'main' ? (
               <>
                 <DecisionEndedBox
@@ -220,15 +224,35 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                     <>
                       <SWinningBidCreator>
                         <SCreator>
-                          <Link href={`/${winningOption.creator?.username}`}>
+                          <Link
+                            href={`/${
+                              winningOption.creator?.uuid ===
+                                user.userData?.userUuid ||
+                              winningOption.isSupportedByMe
+                                ? 'profile'
+                                : winningOption.creator?.username
+                            }`}
+                          >
                             <SCreatorImage
-                              src={winningOption.creator?.avatarUrl ?? ''}
+                              src={
+                                winningOption.creator?.uuid ===
+                                  user.userData?.userUuid ||
+                                winningOption.isSupportedByMe
+                                  ? user.userData?.avatarUrl ?? ''
+                                  : winningOption.creator?.avatarUrl ?? ''
+                              }
                             />
                           </Link>
                           <SWinningBidCreatorText>
                             <SSpan>
                               <Link
-                                href={`/${winningOption.creator?.username}`}
+                                href={`/${
+                                  winningOption.creator?.uuid ===
+                                    user.userData?.userUuid ||
+                                  winningOption.isSupportedByMe
+                                    ? 'profile'
+                                    : winningOption.creator?.username
+                                }`}
                               >
                                 {winningOption.creator?.uuid ===
                                   user.userData?.userUuid ||
@@ -243,7 +267,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                               <>
                                 {' & '}
                                 {formatNumber(
-                                  winningOption.supporterCount,
+                                  winningOption.supporterCount - 1,
                                   true
                                 )}{' '}
                                 {t('acPostSuccess.others')}
@@ -267,7 +291,15 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           {t('acPostSuccess.bidChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
-                          onClick={() => setOpenedMainSection('bids')}
+                          onClick={() => {
+                            setOpenedMainSection('bids');
+
+                            if (activitiesContainerRef.current && isMobile) {
+                              activitiesContainerRef.current.scrollIntoView({
+                                behavior: 'smooth',
+                              });
+                            }
+                          }}
                         >
                           {t('acPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>

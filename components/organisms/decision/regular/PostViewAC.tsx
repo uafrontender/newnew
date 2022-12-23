@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import styled from 'styled-components';
@@ -41,6 +42,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -352,6 +354,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     }
   };
 
+  const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postId: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  );
+
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -422,7 +433,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       }
     };
 
-    const socketHandlerOptionDeleted = (data: any) => {
+    const socketHandlerOptionDeleted = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
@@ -431,6 +442,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           const workingArr = [...curr];
           return workingArr.filter((o) => o.id !== decoded.optionId);
         });
+
+        await fetchPostLatestData();
       }
     };
 
@@ -476,7 +489,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     sortOptions,
   ]);
 
+  const isBidMadeAfterRedirect = useRef(false);
+
   useEffect(() => {
+    const controller = new AbortController();
     const makeBidAfterStripeRedirect = async () => {
       if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
 
@@ -497,9 +513,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         _component: 'PostViewAC',
       });
 
-      try {
-        setLoadingModalOpen(true);
+      isBidMadeAfterRedirect.current = true;
 
+      try {
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             stripeSetupIntentClientSecret,
@@ -512,7 +528,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
         resetSetupIntentClientSecret();
 
-        const res = await placeBidOnAuction(stripeContributionRequest);
+        const res = await placeBidOnAuction(
+          stripeContributionRequest,
+          controller.signal
+        );
 
         if (
           !res.data ||
@@ -538,12 +557,24 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         showErrorToastCustom(err.message);
 
         setLoadingModalOpen(false);
+      } finally {
+        router.replace(
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
+            post.postUuid
+          }`,
+          undefined,
+          { shallow: true }
+        );
       }
     };
 
-    if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+    if (stripeSetupIntentClientSecret && !isBidMadeAfterRedirect.current) {
       makeBidAfterStripeRedirect();
     }
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user._persist?.rehydrated]);
 
@@ -640,6 +671,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
+            subscription={subscription}
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -686,6 +718,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
+            subscription={subscription}
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -726,6 +759,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
+                  subscription={subscription}
                   amountInBids={totalAmount}
                   hasWinner={!!post.winningOptionId}
                 />

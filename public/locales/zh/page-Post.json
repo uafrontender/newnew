@@ -123,6 +123,9 @@
     "body": "查看更多類似的。",
     "buttonText": "查看更多"
   },
+  "postTopInfo": {
+    "notifyMe": "通知我"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "帖子",
@@ -135,6 +138,7 @@
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
+    "changeThumbnail_NEED_TRANSLATION": "Change thumbnail",
     "responseUploadedNonProcessed": "成功！你的回應將在視頻處理完畢後可見",
     "uploadResponseForm": {
       "fileUpload": {

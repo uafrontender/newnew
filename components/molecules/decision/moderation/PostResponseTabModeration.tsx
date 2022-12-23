@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-pascal-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 
@@ -23,6 +23,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import GenericSkeleton from '../../GenericSkeleton';
 
 interface IPostResponseTabModeration {
   postId: string;
@@ -47,6 +48,7 @@ const PostResponseTabModeration: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
+  const theme = useTheme();
 
   const {
     coreResponseUploading,
@@ -77,6 +79,7 @@ const PostResponseTabModeration: React.FunctionComponent<
     newnewapi.MoneyAmount | undefined
   >(undefined);
   const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
+  const [isEarnedAmountFetched, setIsEarnedAmountFetched] = useState(false);
 
   const amountSwitch = useCallback(() => {
     if (earnedAmount && !earnedAmountLoading) {
@@ -158,6 +161,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         console.error(err);
       } finally {
         setEarnedAmountLoading(false);
+        setIsEarnedAmountFetched(true);
       }
     }
 
@@ -222,10 +226,28 @@ const PostResponseTabModeration: React.FunctionComponent<
             <Text variant={2} weight={600}>
               {t('postResponseTabModeration.succeeded.youMade')}
             </Text>
-            {earnedAmount?.usdCents && !earnedAmountLoading && (
-              <SAmountHeadline variant={1}>
-                ${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}
-              </SAmountHeadline>
+            {(postStatus === 'succeeded' && !isEarnedAmountFetched) ||
+            earnedAmountLoading ? (
+              <SSkeletonContainer>
+                <SAmountHeadline variant={1}>$</SAmountHeadline>
+                {new Array(Math.max(amountSwitch().toString().length, 2) - 2)
+                  .fill('')
+                  .map(() => (
+                    <SGenericSkeleton
+                      bgColor={theme.colorsThemed.background.secondary}
+                      highlightColor={theme.colorsThemed.background.quaternary}
+                    />
+                  ))}
+                <SAmountHeadline variant={1}>.</SAmountHeadline>
+                {new Array(2).fill('').map(() => (
+                  <SGenericSkeleton
+                    bgColor={theme.colorsThemed.background.secondary}
+                    highlightColor={theme.colorsThemed.background.quaternary}
+                  />
+                ))}
+              </SSkeletonContainer>
+            ) : (
+              <SAmountHeadline variant={1}>{amountSwitch()}</SAmountHeadline>
             )}
             {postType === 'ac' && winningOptionAc && (
               <>
@@ -598,7 +620,7 @@ const SCreatorLink = styled.a`
 `;
 
 const SInlineSvg = styled(InlineSvg)`
-  margin-right: 4px;
+  flex-shrink: 0;
 `;
 
 const SContainer = styled.div`
@@ -847,4 +869,16 @@ const SShareButton = styled(Button)`
     filter: brightness(400%);
     -webkit-filter: brightness(400%);
   }
+`;
+
+const SSkeletonContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const SGenericSkeleton = styled(GenericSkeleton)`
+  height: 50px;
+  width: 30px;
+  margin-right: 2px;
+  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 `;

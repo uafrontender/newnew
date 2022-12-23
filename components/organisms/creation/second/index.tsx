@@ -71,7 +71,9 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
-import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
@@ -277,13 +279,6 @@ export const CreationSecondStepContent: React.FC<
     tab !== 'crowdfunding' ||
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
 
-  const disabled =
-    !!titleError ||
-    !post.title ||
-    !post.announcementVideoUrl ||
-    !optionsAreValid ||
-    !targetBackersValid;
-
   const validateTitleDebounced = useDebounce(post.title, 500);
   const formatStartsAt = useCallback(() => {
     const time = moment(
@@ -331,6 +326,28 @@ export const CreationSecondStepContent: React.FC<
 
     return dateValue;
   }, [post.expiresAt, post.startsAt]);
+
+  const disabled = useMemo(
+    () =>
+      !!titleError ||
+      !post.title ||
+      !post.announcementVideoUrl ||
+      !optionsAreValid ||
+      !targetBackersValid ||
+      formatExpiresAt().unix() < moment().unix() ||
+      (post.startsAt.type !== 'right-away' &&
+        formatStartsAt().unix() < moment().unix()),
+    [
+      formatExpiresAt,
+      formatStartsAt,
+      optionsAreValid,
+      post.announcementVideoUrl,
+      post.startsAt.type,
+      post.title,
+      targetBackersValid,
+      titleError,
+    ]
+  );
 
   const formatExpiresAtNoStartsAt = useCallback(() => {
     const dateValue = moment();
@@ -531,6 +548,11 @@ export const CreationSecondStepContent: React.FC<
         if (error.message === 'Upload failed') {
           dispatch(setCreationFileUploadError(true));
           showErrorToastPredefined(undefined);
+        } else if (error.message === 'Processing limit reached') {
+          dispatch(setCreationFileUploadError(true));
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.ProcessingLimitReachedError
+          );
         } else {
           console.log('Upload aborted');
         }
@@ -1117,7 +1139,7 @@ export const CreationSecondStepContent: React.FC<
           type: post.startsAt.type,
           date: moment().format(),
           time: moment().format('hh:mm'),
-          'hours-format': post.startsAt['hours-format'],
+          'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
         };
         dispatch(setCreationStartDate(newStartAt));
       }, 1000);

@@ -257,7 +257,7 @@ const SFloatingImage = styled.img`
 `;
 
 const SSubImageLeftTop = styled(SFloatingImage)`
-  width: ${({ theme }) => (theme.name === 'dark' ? '70px' : '33px')};
+  width: ${({ theme }) => (theme.name === 'dark' ? '41px' : '33px')};
   height: 41px;
   left: -2.3%;
   top: -3.2%;

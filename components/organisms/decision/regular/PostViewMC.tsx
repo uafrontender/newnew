@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -44,6 +45,7 @@ import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -362,6 +364,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
+  const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postId: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  );
+
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -434,7 +445,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
 
-    const socketHandlerOptionDeleted = (data: any) => {
+    const socketHandlerOptionDeleted = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.McOptionDeleted.decode(arr);
 
@@ -443,6 +454,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           const workingArr = [...curr];
           return workingArr.filter((o) => o.id !== decoded.optionId);
         });
+
+        await fetchPostLatestData();
       }
     };
 
@@ -486,9 +499,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     sortOptions,
   ]);
 
+  const isVoteMadeAfterRedirect = useRef(false);
+
   useEffect(() => {
+    const controller = new AbortController();
     const makeVoteAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret) return;
+      if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
 
       if (!user._persist?.rehydrated) {
         return;
@@ -500,6 +516,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         );
         return;
       }
+
+      isVoteMadeAfterRedirect.current = true;
 
       Mixpanel.track('MakeVoteAfterStripeRedirect', {
         _stage: 'Post',
@@ -522,7 +540,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
         resetSetupIntentClientSecret();
 
-        const res = await voteOnPost(stripeContributionRequest);
+        const res = await voteOnPost(
+          stripeContributionRequest,
+          controller.signal
+        );
 
         if (
           !res.data ||
@@ -548,12 +569,24 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         console.error(err);
         showErrorToastCustom(err.message);
         setLoadingModalOpen(false);
+      } finally {
+        router.replace(
+          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
+            post.postUuid
+          }`,
+          undefined,
+          { shallow: true }
+        );
       }
     };
 
-    if (stripeSetupIntentClientSecret && !loadingModalOpen) {
+    if (stripeSetupIntentClientSecret && !isVoteMadeAfterRedirect.current) {
       makeVoteAfterStripeRedirect();
     }
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user._persist?.rehydrated]);
 
@@ -649,7 +682,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               />
             )}
           </SExpiresSection>
-          <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+          <PostTopInfo
+            subscription={subscription}
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
         </>
       )}
       <SWrapper>
@@ -691,7 +728,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        {isMobile && <PostTopInfo totalVotes={totalVotes} hasWinner={false} />}
+        {isMobile && (
+          <PostTopInfo
+            subscription={subscription}
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
+        )}
         <SActivitiesContainer>
           <div
             style={{
@@ -727,7 +770,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                     />
                   )}
                 </SExpiresSection>
-                <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+                <PostTopInfo
+                  subscription={subscription}
+                  totalVotes={totalVotes}
+                  hasWinner={false}
+                />
               </>
             )}
             <PostVotingTab

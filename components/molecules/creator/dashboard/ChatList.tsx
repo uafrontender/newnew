@@ -212,7 +212,6 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
-      if (chat.visavis?.isVisavisBlocked) return null;
       const handleItemClick = async () => {
         if (searchedRooms) {
           setSearchedRooms(null);

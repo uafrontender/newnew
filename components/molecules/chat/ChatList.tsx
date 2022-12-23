@@ -208,6 +208,9 @@ const ChatList: React.FC<IFunctionProps> = ({
                 )
                   arr.push(chat);
               });
+              if (arr.length < 1) {
+                setDisplayAllRooms(true);
+              }
               return arr;
             });
           } else {
@@ -245,8 +248,7 @@ const ChatList: React.FC<IFunctionProps> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms.length > 0) {
-        if (!res.data.rooms[0].visavis?.isVisavisBlocked)
-          setUpdatedChat(res.data.rooms[0]);
+        setUpdatedChat(res.data.rooms[0]);
       }
     } catch (err) {
       console.error(err);

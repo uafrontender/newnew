@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -68,7 +68,7 @@ interface IAcAddNewOption {
     newOption: newnewapi.Auction.Option
   ) => void;
 }
-
+// empty change
 const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   postId,
   postCreator,
@@ -293,6 +293,13 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       showErrorToastCustom,
     ]
   );
+
+  useEffect(() => {
+    if (!suggestNewMobileOpen) {
+      setNewBidAmount('');
+      setNewBidText('');
+    }
+  }, [suggestNewMobileOpen]);
 
   return (
     <>

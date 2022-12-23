@@ -44,7 +44,9 @@ import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 
@@ -99,6 +101,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
+
+  const [isDisabledAdditionally, setIsDisabledAdditionally] = useState(false);
 
   const allowedRoutes = [
     '/creation',
@@ -312,13 +316,22 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       dispatch(setPostData(data));
 
       if (isMobile) {
+        setIsDisabledAdditionally(true);
         router.push(`/creation/${tab}/published`);
       } else {
         playerRef?.current?.pause();
         setShowModal(true);
       }
     } catch (err: any) {
-      showErrorToastCustom(err);
+      if (err.message === 'Processing limit reached') {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
+      } else if (err.message === 'Invalid date') {
+        showErrorToastPredefined(ErrorToastPredefinedMessage.InvalidDateError);
+      } else {
+        showErrorToastCustom(err);
+      }
     }
   }, [
     customCoverImageUrl,
@@ -338,6 +351,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     userData?.options?.isOfferingBundles,
     crowdfunding.targetBackerCount,
     router,
+    showErrorToastPredefined,
     showErrorToastCustom,
   ]);
 
@@ -526,8 +540,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             <SButton
               view='primaryGrad'
               loading={isSubmitting}
-              onClick={handleSubmit}
-              disabled={disabled}
+              onClick={handleSubmitWithRecaptchaProtection}
+              disabled={disabled || isDisabledAdditionally}
             >
               {t('preview.button.submit')}
             </SButton>

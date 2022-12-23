@@ -123,6 +123,9 @@
     "body": "Ver más parecidos.",
     "buttonText": "Ver más"
   },
+  "postTopInfo": {
+    "notifyMe": "Notificarme"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "Publicar",
@@ -135,6 +138,7 @@
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
+    "changeThumbnail_NEED_TRANSLATION": "Change thumbnail",
     "responseUploadedNonProcessed": "¡Éxito! Tu respuesta estará disponible una vez que el video haya sido procesado",
     "uploadResponseForm": {
       "fileUpload": {

@@ -227,7 +227,9 @@
     "generic": "An error occurred, please try again later",
     "serverError": "A server-side error occurred, please try again later",
     "recaptchaError": "Recaptcha failed, please try again later",
-    "usupportedImageFormatError": "Image format not supported, please try another image"
+    "usupportedImageFormatError": "Image format not supported, please try another image",
+    "processingLimitReachedError": "Please wait until you can upload more videos",
+    "invalidDateError": "Please check date and time"
   },
   "smsNotifications": {
     "title": "What's your number?",
@@ -257,5 +259,12 @@
       "dark": "Dark",
       "auto": "Auto"
     }
+  },
+  "timer": {
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Ended on "
   }
 }

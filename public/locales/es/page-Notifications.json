@@ -4,6 +4,9 @@
     "description": "Las notificaciones NewNew mantienen a los creadores al día con su audiencia"
   },
   "noNotifications": "Las nuevas notificaciones que recibas\naparecerán aquí",
+  "title": {
+    "newMessage": "Nuevo Mensaje"
+  },
   "button": {
     "markAllAsRead": "Marcar todos como leídos"
   }
