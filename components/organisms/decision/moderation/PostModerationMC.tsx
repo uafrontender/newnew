@@ -709,6 +709,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
                   postStatus={postStatus}
                   postTitle={post.title}
                   winningOptionMc={winningOption}
+                  options={options}
                 />
               )}
             </SActivitiesContainer>

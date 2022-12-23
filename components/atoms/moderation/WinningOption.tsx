@@ -170,6 +170,10 @@ const SInlineSvg = styled(InlineSvg)`
 const SText = styled(Text)`
   margin-top: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  &:first-child {
+    margin-top: 0;
+  }
 `;
 
 const SSpan = styled.span`
@@ -196,6 +200,10 @@ const SHeadline = styled(Headline)`
 
 const SSkeletonContainer = styled.div`
   margin-top: 24px;
+
+  &:first-child {
+    margin-top: 0;
+  }
 `;
 
 const SGenericSkeleton = styled(GenericSkeleton)`
@@ -204,10 +212,19 @@ const SGenericSkeleton = styled(GenericSkeleton)`
 `;
 
 const SGenericSkeletonTop = styled(SGenericSkeleton)`
-  height: 24px;
+  height: 20px;
   margin-bottom: 5px;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 24px;
+  }
 `;
 
 const SGenericSkeletonBottom = styled(SGenericSkeleton)`
-  height: 30px;
+  height: 26px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 24px;
+    height: 30px;
+  }
 `;

@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -10,7 +10,6 @@ import Text from '../../../atoms/Text';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import WinningOption from '../../../atoms/moderation/WinningOption';
 import PostResponseTabModerationHeader from '../../../atoms/moderation/PostResponseModerationHeader';
-import GenericSkeleton from '../../GenericSkeleton';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 
 import { getMyEarningsByPosts } from '../../../../api/endpoints/payments';
@@ -19,6 +18,7 @@ import { TPostType } from '../../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import { formatNumber } from '../../../../utils/format';
 import copyToClipboard from '../../../../utils/copyToClipboard';
+import PostEarnings from '../../../atoms/moderation/PostEarnings';
 
 interface IPostResponseTabModeration {
   postUuid: string;
@@ -29,6 +29,7 @@ interface IPostResponseTabModeration {
   winningOptionAc?: newnewapi.Auction.Option;
   winningOptionMc?: newnewapi.MultipleChoice.Option;
   moneyBacked?: newnewapi.MoneyAmount;
+  options?: newnewapi.MultipleChoice.Option[];
 }
 
 const PostResponseTabModeration: React.FunctionComponent<
@@ -42,9 +43,9 @@ const PostResponseTabModeration: React.FunctionComponent<
   winningOptionAc,
   winningOptionMc,
   moneyBacked,
+  options,
 }) => {
   const { t } = useTranslation('page-Post');
-  const theme = useTheme();
 
   const {
     coreResponseUploading,
@@ -79,34 +80,41 @@ const PostResponseTabModeration: React.FunctionComponent<
 
   const amountSwitch = useCallback(() => {
     if (earnedAmount && !earnedAmountLoading) {
-      return `$${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}`;
+      return formatNumber(earnedAmount.usdCents / 100 ?? 0, false);
+    }
+
+    if (!winningOptionAc && (!options || !options.length) && !moneyBacked) {
+      return undefined;
     }
 
     if (postType === 'ac' && winningOptionAc?.totalAmount?.usdCents) {
-      return `$${formatNumber(
+      return formatNumber(
         winningOptionAc.totalAmount.usdCents / 100 ?? 0,
         true
-      )}`;
+      );
     }
-    if (postType === 'mc' && winningOptionMc?.totalAmount?.usdCents) {
-      return `$${formatNumber(
-        winningOptionMc.totalAmount.usdCents / 100 ?? 0,
+    if (postType === 'mc' && options) {
+      return formatNumber(
+        options.reduce(
+          (sum, option) => sum + (option.totalAmount?.usdCents || 0),
+          0
+        ) / 100 ?? 0,
         true
-      )}`;
+      );
     }
 
     if (postType === 'cf' && moneyBacked?.usdCents) {
-      return `$${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}`;
+      return formatNumber(moneyBacked.usdCents / 100 ?? 0, true);
     }
 
-    return '';
+    return '0';
   }, [
     earnedAmount,
     earnedAmountLoading,
     moneyBacked,
     postType,
-    winningOptionAc?.totalAmount?.usdCents,
-    winningOptionMc?.totalAmount?.usdCents,
+    winningOptionAc,
+    options,
   ]);
 
   // Share
@@ -135,6 +143,7 @@ const PostResponseTabModeration: React.FunctionComponent<
       try {
         const payload = new newnewapi.GetMyEarningsByPostsRequest({
           postUuids: [postUuid],
+          ignoreTransactionStatus: true,
         });
 
         const res = await getMyEarningsByPosts(payload);
@@ -174,36 +183,17 @@ const PostResponseTabModeration: React.FunctionComponent<
             successVariant
           />
           <STextContentWrapper>
-            <Text variant={2} weight={600}>
-              {t('postResponseTabModeration.succeeded.youMade')}
-            </Text>
-            {(postStatus === 'succeeded' && !isEarnedAmountFetched) ||
-            earnedAmountLoading ? (
-              <SSkeletonContainer>
-                <SAmountHeadline variant={1}>$</SAmountHeadline>
-                {new Array(2).fill('').map(() => (
-                  <SGenericSkeleton
-                    bgColor={theme.colorsThemed.background.secondary}
-                    highlightColor={theme.colorsThemed.background.quaternary}
-                  />
-                ))}
-                <SAmountHeadline variant={1}>.</SAmountHeadline>
-                {new Array(2).fill('').map(() => (
-                  <SGenericSkeleton
-                    bgColor={theme.colorsThemed.background.secondary}
-                    highlightColor={theme.colorsThemed.background.quaternary}
-                  />
-                ))}
-              </SSkeletonContainer>
-            ) : (
-              <SAmountHeadline variant={1}>{amountSwitch()}</SAmountHeadline>
-            )}
+            <PostEarnings
+              amount={amountSwitch()}
+              label={t('postResponseTabModeration.succeeded.youMade')}
+              isEarnedAmountFetched={isEarnedAmountFetched}
+              loading={earnedAmountLoading || !isEarnedAmountFetched}
+            />
             <WinningOption
               postType={postType}
               winningOptionAc={winningOptionAc}
               winningOptionMc={winningOptionMc}
             />
-
             <SText variant={2} weight={600}>
               <SSpan>
                 {t('postResponseTabModeration.winner.inResponseToYourPost')}
@@ -240,11 +230,13 @@ const PostResponseTabModeration: React.FunctionComponent<
           />
         )}
         {/* Success modal */}
-        <PostResponseSuccessModal
-          amount={amountSwitch()}
-          isOpen={responseUploadSuccess}
-          zIndex={20}
-        />
+        {amountSwitch() && amountSwitch() !== '0' && (
+          <PostResponseSuccessModal
+            amount={`$${amountSwitch()!!}`}
+            isOpen={responseUploadSuccess}
+            zIndex={20}
+          />
+        )}
       </>
     );
   }
@@ -256,22 +248,10 @@ const PostResponseTabModeration: React.FunctionComponent<
       />
 
       <STextContentWrapper>
-        <Text variant={2} weight={600}>
-          {t('postResponseTabModeration.awaiting.youWillGet')}
-        </Text>
-        {amountSwitch() ? (
-          <SAmountHeadline variant={1}>{amountSwitch()}</SAmountHeadline>
-        ) : (
-          <SSkeletonContainer>
-            <SAmountHeadline variant={1}>$</SAmountHeadline>
-            {new Array(2).fill('').map(() => (
-              <SGenericSkeleton
-                bgColor={theme.colorsThemed.background.secondary}
-                highlightColor={theme.colorsThemed.background.quaternary}
-              />
-            ))}
-          </SSkeletonContainer>
-        )}
+        <PostEarnings
+          amount={amountSwitch()}
+          label={t('postResponseTabModeration.awaiting.youWillGet')}
+        />
 
         <WinningOption
           postType={postType}
@@ -294,11 +274,13 @@ const PostResponseTabModeration: React.FunctionComponent<
         {t('postResponseTabModeration.awaiting.postResponseBtn')}
       </SUploadButton>
       {/* Success modal */}
-      <PostResponseSuccessModal
-        amount={amountSwitch()}
-        isOpen={responseUploadSuccess}
-        zIndex={20}
-      />
+      {amountSwitch() && amountSwitch() !== '0' && (
+        <PostResponseSuccessModal
+          amount={`$${amountSwitch()!!}`}
+          isOpen={responseUploadSuccess}
+          zIndex={20}
+        />
+      )}
     </SContainer>
   );
 };
@@ -336,8 +318,6 @@ const STextContentWrapper = styled.div`
 
   margin-top: 32px;
 `;
-
-const SAmountHeadline = styled(Headline)``;
 
 const SText = styled(Text)`
   margin-top: 24px;
@@ -416,16 +396,4 @@ const SShareButton = styled(Button)`
     filter: brightness(400%);
     -webkit-filter: brightness(400%);
   }
-`;
-
-const SSkeletonContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const SGenericSkeleton = styled(GenericSkeleton)`
-  height: 50px;
-  width: 30px;
-  margin-right: 2px;
-  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 `;
