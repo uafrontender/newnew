@@ -21,7 +21,7 @@ const PostBitmovinPlayer = dynamic(
 );
 
 interface IPostVideoSuccess {
-  postId: string;
+  postUuid: string;
   announcement: newnewapi.IVideoUrls;
   response?: newnewapi.IVideoUrls;
   responseViewed: boolean;
@@ -34,7 +34,7 @@ interface IPostVideoSuccess {
 }
 
 const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
-  postId,
+  postUuid,
   isMuted,
   announcement,
   response,
@@ -65,7 +65,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     async function markResponseAsViewed() {
       try {
         const payload = new newnewapi.MarkPostRequest({
-          postUuid: postId,
+          postUuid,
           markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
         });
 
@@ -85,7 +85,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       handleSetResponseViewed(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postId, user.loggedIn, responseViewed]);
+  }, [openedTab, postUuid, user.loggedIn, responseViewed]);
 
   // Adjust sound button if needed
   useEffect(() => {
@@ -95,7 +95,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         ?.getBoundingClientRect();
 
       const videoRect = document
-        .getElementById(`${postId}`)
+        .getElementById(`${postUuid}`)
         ?.getBoundingClientRect();
 
       if (rect && videoRect) {
@@ -136,7 +136,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobileOrTablet, postId]);
+  }, [isMobileOrTablet, postUuid]);
 
   return (
     <SVideoWrapper>
@@ -144,9 +144,8 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         <>
           {!additionalResponses || additionalResponses.length === 0 ? (
             <PostBitmovinPlayer
-              // key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
-              key={postId}
-              id={`video-${postId}`}
+              key={postUuid}
+              id={`video-${postUuid}`}
               resources={response}
               muted={isMuted}
               showPlayButton
@@ -158,7 +157,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             />
           )}
           <PostVideoSoundButton
-            postId={postId}
+            postUuid={postUuid}
             isMuted={isMuted}
             soundBtnBottomOverriden={soundBtnBottomOverriden}
             handleToggleMuted={handleToggleMuted}
@@ -167,13 +166,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       ) : (
         <>
           <PostBitmovinPlayer
-            id={postId}
+            id={postUuid}
             resources={announcement}
             muted={isMuted}
             showPlayButton
           />
           <PostVideoSoundButton
-            postId={postId}
+            postUuid={postUuid}
             isMuted={isMuted}
             soundBtnBottomOverriden={soundBtnBottomOverriden}
             handleToggleMuted={handleToggleMuted}
@@ -187,7 +186,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             onClickCapture={() => {
               Mixpanel.track('Set Opened Tab Response', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoSuccess',
               });
             }}
@@ -204,7 +203,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             onClickCapture={() => {
               Mixpanel.track('Set Opened Tab Announcement', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoSuccess',
               });
             }}
@@ -217,7 +216,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             onClickCapture={() => {
               Mixpanel.track('Set Opened Tab Response', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'PostVideoSuccess',
               });
             }}

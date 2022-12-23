@@ -128,6 +128,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     }
   }, [inView, loading, hasMore, loadMore]);
 
+  // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2)

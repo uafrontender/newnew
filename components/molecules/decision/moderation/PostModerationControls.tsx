@@ -23,6 +23,7 @@ interface IPostModerationControls {
   ellipseMenuOpen: boolean;
   isMobile: boolean;
   postUuid: string;
+  postShortId: string;
   shareMenuOpen: boolean;
   deletePostOpen: boolean;
   handleCloseAndGoBack: () => void;
@@ -42,6 +43,7 @@ const PostModerationControls: React.FunctionComponent<
   ellipseMenuOpen,
   isMobile,
   postUuid,
+  postShortId,
   shareMenuOpen,
   typeOfPost,
   deletePostOpen,
@@ -127,7 +129,8 @@ const PostModerationControls: React.FunctionComponent<
       {/* Share menu */}
       {!isMobile && postUuid && (
         <PostShareEllipseMenu
-          postId={postUuid}
+          postUuid={postUuid}
+          postShortId={postShortId}
           isVisible={shareMenuOpen}
           onClose={handleShareClose}
           anchorElement={shareButtonRef.current as HTMLElement}
@@ -137,7 +140,8 @@ const PostModerationControls: React.FunctionComponent<
         <PostShareEllipseModal
           isOpen={shareMenuOpen}
           zIndex={11}
-          postId={postUuid}
+          postUuid={postUuid}
+          postShortId={postShortId}
           onClose={handleShareClose}
         />
       )}
