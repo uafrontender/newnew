@@ -224,13 +224,23 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postParsed.postUuid}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+              postParsed.postShortId
+                ? postParsed.postShortId
+                : postParsed.postUuid
+            }`
           )}`
         );
         return;
       }
       setIsReportModalOpen(true);
-    }, [user.loggedIn, user._persist?.rehydrated, router, postParsed.postUuid]);
+    }, [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      router,
+      postParsed.postShortId,
+      postParsed.postUuid,
+    ]);
 
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
@@ -418,7 +428,13 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, []);
 
     useEffect(() => {
-      router.prefetch(`/p/${switchPostType(item)[0].postUuid}`);
+      router.prefetch(
+        `/p/${
+          switchPostType(item)[0].postShortId
+            ? switchPostType(item)[0].postShortId
+            : switchPostType(item)[0].postUuid
+        }`
+      );
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -507,6 +523,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
+                    postShortId={postParsed.postShortId ?? ''}
                     postType={typeOfPost as TPostType}
                     isVisible={isEllipseMenuOpen}
                     postCreator={postParsed.creator as newnewapi.User}
@@ -548,6 +565,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               isOpen={isEllipseMenuOpen}
               zIndex={11}
               postUuid={postParsed.postUuid}
+              postShortId={postParsed.postShortId ?? ''}
               postType={typeOfPost as TPostType}
               postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
@@ -610,6 +628,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               {!isMobile && (
                 <PostCardEllipseMenu
                   postUuid={postParsed.postUuid}
+                  postShortId={postParsed.postShortId ?? ''}
                   postType={typeOfPost as TPostType}
                   isVisible={isEllipseMenuOpen}
                   postCreator={postParsed.creator as newnewapi.User}
@@ -737,6 +756,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             isOpen={isEllipseMenuOpen}
             zIndex={11}
             postUuid={postParsed.postUuid}
+            postShortId={postParsed.postShortId ?? ''}
             postType={typeOfPost as TPostType}
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}

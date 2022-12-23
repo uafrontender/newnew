@@ -129,7 +129,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             responseViewed={responseViewed}
@@ -201,6 +201,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>

@@ -26,14 +26,15 @@ const SOCIAL_ICONS: any = {
 };
 
 interface IPostShareEllipseMenu {
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   isVisible: boolean;
   onClose: () => void;
   anchorElement?: HTMLElement;
 }
 
 const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
-  React.memo(({ postId, isVisible, onClose, anchorElement }) => {
+  React.memo(({ postUuid, postShortId, isVisible, onClose, anchorElement }) => {
     const { t } = useTranslation('common');
 
     // const socialButtons = useMemo(
@@ -80,10 +81,10 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
 
     const handlerCopy = useCallback(() => {
       if (window) {
-        const url = `${window.location.origin}/p/${postId}`;
+        const url = `${window.location.origin}/p/${postShortId ?? postUuid}`;
         Mixpanel.track('Copied Link Post', {
           _stage: 'Post',
-          _postUuid: postId,
+          _postUuid: postUuid,
         });
         copyPostUrlToClipboard(url)
           .then(() => {
@@ -96,7 +97,7 @@ const PostShareEllipseMenu: React.FunctionComponent<IPostShareEllipseMenu> =
             console.log(err);
           });
       }
-    }, [postId]);
+    }, [postShortId, postUuid]);
 
     return (
       <SEllipseMenu
