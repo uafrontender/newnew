@@ -533,7 +533,7 @@ const CommentsBottomSection: React.FunctionComponent<
         >
           <CommentForm
             isRoot
-            postUuidOrShortId={postShortId ?? postUuid}
+            postUuidOrShortId={postShortId || postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
