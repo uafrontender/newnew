@@ -29,6 +29,7 @@ import PopularTagsResults from './PopularTagsResults';
 import getChunks from '../../../utils/getChunks/getChunks';
 import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -67,6 +68,10 @@ const SearchInput: React.FC = React.memo(() => {
   ].includes(resizeMode);
 
   const handleSeeResults = (query: string) => {
+    Mixpanel.track('Search All Results Clicked', {
+      _query: query,
+    });
+
     const chunks = getChunks(query);
     const firstChunk = chunks[0];
     const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
@@ -84,10 +89,13 @@ const SearchInput: React.FC = React.memo(() => {
   };
 
   const handleSearchClick = useCallback(() => {
+    Mixpanel.track('Search Clicked');
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
 
   const handleSearchClose = () => {
+    Mixpanel.track('Search Closed');
+
     setSearchValue('');
     dispatch(setGlobalSearchActive(false));
   };
