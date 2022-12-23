@@ -66,3 +66,18 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ## Tests
 
 We use cypress tests that run locally and on CI pipeline. to run tests use `npm run cypress` command. After a test you can find a video of it running in `cypress/video` folder. In order to see test running in browser use `npm run cypress:open` command.
+
+## Sms Notifications
+
+Currently (12/21/2022) they are partially done. One phone number only works for one account
+
+### Replying from outside US
+
+This can be problematic. Send messages to +13103402606
+
+### Free phone number
+
+In order to free the phone number you can send `RM` text command to the Twilio number.
+This will remove it from our DB, thus you can re-run the flow on any account.
+Then you can use it again. In case nothing comes, try sending `YES` message to Twilio number.
+In case you replied with `STOP` you have to reply with `START` before proceeding
