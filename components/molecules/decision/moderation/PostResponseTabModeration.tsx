@@ -1,29 +1,24 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable camelcase */
-/* eslint-disable react/jsx-pascal-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { Trans, useTranslation } from 'next-i18next';
-
-import { TPostType } from '../../../../utils/switchPostType';
-import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { useTranslation } from 'next-i18next';
 
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
-
-import assets from '../../../../constants/assets';
 import Text from '../../../atoms/Text';
-import { formatNumber } from '../../../../utils/format';
-import { getMyEarningsByPosts } from '../../../../api/endpoints/payments';
-import getDisplayname from '../../../../utils/getDisplayname';
-import { useAppSelector } from '../../../../redux-store/store';
-import PostResponseSuccessModal from './PostResponseSuccessModal';
 import PostTitleContent from '../../../atoms/PostTitleContent';
+import WinningOption from '../../../atoms/moderation/WinningOption';
+import PostResponseTabModerationHeader from '../../../atoms/moderation/PostResponseModerationHeader';
+import PostResponseSuccessModal from './PostResponseSuccessModal';
+
+import { getMyEarningsByPosts } from '../../../../api/endpoints/payments';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import InlineSvg from '../../../atoms/InlineSVG';
-import GenericSkeleton from '../../GenericSkeleton';
+import { TPostType } from '../../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { formatNumber } from '../../../../utils/format';
+import copyToClipboard from '../../../../utils/copyToClipboard';
+import PostEarnings from '../../../atoms/moderation/PostEarnings';
 
 interface IPostResponseTabModeration {
   postUuid: string;
@@ -34,6 +29,7 @@ interface IPostResponseTabModeration {
   winningOptionAc?: newnewapi.Auction.Option;
   winningOptionMc?: newnewapi.MultipleChoice.Option;
   moneyBacked?: newnewapi.MoneyAmount;
+  options?: newnewapi.MultipleChoice.Option[];
 }
 
 const PostResponseTabModeration: React.FunctionComponent<
@@ -47,10 +43,9 @@ const PostResponseTabModeration: React.FunctionComponent<
   winningOptionAc,
   winningOptionMc,
   moneyBacked,
+  options,
 }) => {
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
-  const theme = useTheme();
 
   const {
     coreResponseUploading,
@@ -85,52 +80,51 @@ const PostResponseTabModeration: React.FunctionComponent<
 
   const amountSwitch = useCallback(() => {
     if (earnedAmount && !earnedAmountLoading) {
-      return `$${formatNumber(earnedAmount.usdCents / 100 ?? 0, false)}`;
+      return formatNumber(earnedAmount.usdCents / 100 ?? 0, false);
+    }
+
+    if (!winningOptionAc && (!options || !options.length) && !moneyBacked) {
+      return undefined;
     }
 
     if (postType === 'ac' && winningOptionAc?.totalAmount?.usdCents) {
-      return `$${formatNumber(
+      return formatNumber(
         winningOptionAc.totalAmount.usdCents / 100 ?? 0,
         true
-      )}`;
+      );
     }
-    if (postType === 'mc' && winningOptionMc?.totalAmount?.usdCents) {
-      return `$${formatNumber(
-        winningOptionMc.totalAmount.usdCents / 100 ?? 0,
+    if (postType === 'mc' && options) {
+      return formatNumber(
+        options.reduce(
+          (sum, option) => sum + (option.totalAmount?.usdCents || 0),
+          0
+        ) / 100 ?? 0,
         true
-      )}`;
+      );
     }
 
     if (postType === 'cf' && moneyBacked?.usdCents) {
-      return `$${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}`;
+      return formatNumber(moneyBacked.usdCents / 100 ?? 0, true);
     }
 
-    return '';
+    return '0';
   }, [
     earnedAmount,
     earnedAmountLoading,
     moneyBacked,
     postType,
-    winningOptionAc?.totalAmount?.usdCents,
-    winningOptionMc?.totalAmount?.usdCents,
+    winningOptionAc,
+    options,
   ]);
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
   const handleCopyLink = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/p/${postShortId || postUuid}`;
 
-      copyPostUrlToClipboard(url)
+      copyToClipboard(url)
         .then(() => {
           setIsCopiedUrl(true);
           setTimeout(() => {
@@ -149,6 +143,7 @@ const PostResponseTabModeration: React.FunctionComponent<
       try {
         const payload = new newnewapi.GetMyEarningsByPostsRequest({
           postUuids: [postUuid],
+          ignoreTransactionStatus: true,
         });
 
         const res = await getMyEarningsByPosts(payload);
@@ -183,189 +178,22 @@ const PostResponseTabModeration: React.FunctionComponent<
             !!uploadedResponseVideoUrl
           }
         >
-          <SHeaderDiv>
-            <SHeaderHeadline variant={3} successVariant>
-              {t('postResponseTabModeration.succeeded.topHeader')}
-            </SHeaderHeadline>
-            <SCoin_1
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_2
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_3
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_4
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_5
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-            <SCoin_6
-              className='headerDiv__coinImage'
-              src={assets.decision.gold}
-              alt='coin'
-              draggable={false}
-            />
-          </SHeaderDiv>
+          <PostResponseTabModerationHeader
+            title={t('postResponseTabModeration.succeeded.topHeader')}
+            successVariant
+          />
           <STextContentWrapper>
-            <Text variant={2} weight={600}>
-              {t('postResponseTabModeration.succeeded.youMade')}
-            </Text>
-            {(postStatus === 'succeeded' && !isEarnedAmountFetched) ||
-            earnedAmountLoading ? (
-              <SSkeletonContainer>
-                <SAmountHeadline variant={1}>$</SAmountHeadline>
-                {new Array(Math.max(amountSwitch().toString().length, 2) - 2)
-                  .fill('')
-                  .map(() => (
-                    <SGenericSkeleton
-                      bgColor={theme.colorsThemed.background.secondary}
-                      highlightColor={theme.colorsThemed.background.quaternary}
-                    />
-                  ))}
-                <SAmountHeadline variant={1}>.</SAmountHeadline>
-                {new Array(2).fill('').map(() => (
-                  <SGenericSkeleton
-                    bgColor={theme.colorsThemed.background.secondary}
-                    highlightColor={theme.colorsThemed.background.quaternary}
-                  />
-                ))}
-              </SSkeletonContainer>
-            ) : (
-              <SAmountHeadline variant={1}>{amountSwitch()}</SAmountHeadline>
-            )}
-            {postType === 'ac' && winningOptionAc && (
-              <>
-                <SText variant={2} weight={600}>
-                  <SSpan>
-                    {winningOptionAc.supporterCount === 1
-                      ? t(
-                          'postResponseTabModeration.winner.ac.numBiddersChoseSingular',
-                          {
-                            amount: 1,
-                          }
-                        )
-                      : t(
-                          'postResponseTabModeration.winner.ac.numBiddersChose',
-                          {
-                            amount: formatNumber(
-                              winningOptionAc.supporterCount ?? 0,
-                              true
-                            ),
-                          }
-                        )}
-                  </SSpan>
-                  <SUserAvatar
-                    draggable={false}
-                    src={winningOptionAc?.creator?.avatarUrl!!}
-                  />
-                  <SSpan>
-                    <Trans
-                      i18nKey='postResponseTabModeration.winner.ac.optionCreator'
-                      t={t}
-                      // Can it be reworked wso it uses t inside the Link element (without Trans element)?
-                      // @ts-ignore
-                      components={[
-                        <SCreatorLink
-                          href={`/${winningOptionAc.creator?.username}`}
-                        />,
-                        winningOptionAc.creator?.options?.isVerified ? (
-                          <SInlineSvg
-                            svg={VerificationCheckmark}
-                            width='22px'
-                            height='22px'
-                            fill='none'
-                          />
-                        ) : null,
-                        { nickname: getDisplayname(winningOptionAc.creator!!) },
-                      ]}
-                    />
-                  </SSpan>
-                </SText>
-                <SHeadline variant={5}>{winningOptionAc.title}</SHeadline>
-              </>
-            )}
-            {postType === 'mc' && winningOptionMc && (
-              <>
-                <SText variant={2} weight={600}>
-                  <SSpan>
-                    {winningOptionMc.supporterCount === 1
-                      ? t(
-                          'postResponseTabModeration.winner.mc.numBiddersChoseSingular',
-                          {
-                            amount: 1,
-                          }
-                        )
-                      : t(
-                          'postResponseTabModeration.winner.mc.numBiddersChose',
-                          {
-                            amount: formatNumber(
-                              winningOptionMc.supporterCount ?? 0,
-                              true
-                            ),
-                          }
-                        )}
-                  </SSpan>{' '}
-                  {winningOptionMc.creator &&
-                  winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
-                    <>
-                      <SUserAvatar
-                        draggable={false}
-                        src={winningOptionMc?.creator?.avatarUrl!!}
-                      />
-                      <SSpan>
-                        {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
-                        <Trans
-                          i18nKey='postResponseTabModeration.winner.mc.optionCreator'
-                          t={t}
-                          // @ts-ignore
-                          components={[
-                            <SCreatorLink
-                              href={`/${winningOptionMc.creator?.username}`}
-                            />,
-                            winningOptionMc.creator?.options?.isVerified ? (
-                              <SInlineSvg
-                                svg={VerificationCheckmark}
-                                width='22px'
-                                height='22px'
-                                fill='none'
-                              />
-                            ) : null,
-                            {
-                              nickname: getDisplayname(
-                                winningOptionMc.creator!!
-                              ),
-                            },
-                          ]}
-                        />
-                      </SSpan>
-                    </>
-                  ) : (
-                    <SSpan>
-                      {t('postResponseTabModeration.winner.mc.optionOwn')}
-                    </SSpan>
-                  )}
-                </SText>
-                <SHeadline variant={5}>{winningOptionMc.text}</SHeadline>
-              </>
-            )}
+            <PostEarnings
+              amount={amountSwitch()}
+              label={t('postResponseTabModeration.succeeded.youMade')}
+              isEarnedAmountFetched={isEarnedAmountFetched}
+              loading={earnedAmountLoading || !isEarnedAmountFetched}
+            />
+            <WinningOption
+              postType={postType}
+              winningOptionAc={winningOptionAc}
+              winningOptionMc={winningOptionMc}
+            />
             <SText variant={2} weight={600}>
               <SSpan>
                 {t('postResponseTabModeration.winner.inResponseToYourPost')}
@@ -402,190 +230,34 @@ const PostResponseTabModeration: React.FunctionComponent<
           />
         )}
         {/* Success modal */}
-        <PostResponseSuccessModal
-          amount={amountSwitch()}
-          isOpen={responseUploadSuccess}
-          zIndex={20}
-        />
+        {amountSwitch() && amountSwitch() !== '0' && (
+          <PostResponseSuccessModal
+            amount={`$${amountSwitch()!!}`}
+            isOpen={responseUploadSuccess}
+            zIndex={20}
+          />
+        )}
       </>
     );
   }
 
   return (
     <SContainer>
-      <SHeaderDiv>
-        <SHeaderHeadline variant={3}>
-          {t('postResponseTabModeration.awaiting.topHeader')}
-        </SHeaderHeadline>
-        <SCoin_1
-          className='headerDiv__coinImage'
-          src={assets.decision.gold}
-          alt='coin'
-          draggable={false}
-        />
-        <SCoin_2
-          className='headerDiv__coinImage'
-          src={assets.decision.gold}
-          alt='coin'
-          draggable={false}
-        />
-        <SCoin_3
-          className='headerDiv__coinImage'
-          src={assets.decision.gold}
-          alt='coin'
-          draggable={false}
-        />
-        <SCoin_4
-          className='headerDiv__coinImage'
-          src={assets.decision.gold}
-          alt='coin'
-          draggable={false}
-        />
-        <SCoin_5
-          className='headerDiv__coinImage'
-          src={assets.decision.gold}
-          alt='coin'
-          draggable={false}
-        />
-        <SCoin_6
-          className='headerDiv__coinImage'
-          src={assets.decision.gold}
-          alt='coin'
-          draggable={false}
-        />
-      </SHeaderDiv>
+      <PostResponseTabModerationHeader
+        title={t('postResponseTabModeration.awaiting.topHeader')}
+      />
+
       <STextContentWrapper>
-        <Text variant={2} weight={600}>
-          {t('postResponseTabModeration.awaiting.youWillGet')}
-        </Text>
-        {postType === 'ac' && winningOptionAc?.totalAmount?.usdCents && (
-          <SAmountHeadline variant={1}>
-            $
-            {formatNumber(
-              winningOptionAc.totalAmount.usdCents / 100 ?? 0,
-              true
-            )}
-          </SAmountHeadline>
-        )}
-        {postType === 'mc' && winningOptionMc?.totalAmount?.usdCents && (
-          <SAmountHeadline variant={1}>
-            $
-            {formatNumber(
-              winningOptionMc.totalAmount.usdCents / 100 ?? 0,
-              true
-            )}
-          </SAmountHeadline>
-        )}
-        {postType === 'cf' && moneyBacked?.usdCents && (
-          <SAmountHeadline variant={1}>
-            ${formatNumber(moneyBacked.usdCents / 100 ?? 0, true)}
-          </SAmountHeadline>
-        )}
-        {postType === 'ac' && winningOptionAc && (
-          <>
-            <SText variant={2} weight={600}>
-              <SSpan>
-                {winningOptionAc.supporterCount === 1
-                  ? t(
-                      'postResponseTabModeration.winner.ac.numBiddersChoseSingular',
-                      {
-                        amount: 1,
-                      }
-                    )
-                  : t('postResponseTabModeration.winner.ac.numBiddersChose', {
-                      amount: formatNumber(
-                        winningOptionAc.supporterCount ?? 0,
-                        true
-                      ),
-                    })}
-              </SSpan>
-              <SUserAvatar
-                draggable={false}
-                src={winningOptionAc?.creator?.avatarUrl!!}
-              />
-              <SSpan>
-                <Trans
-                  i18nKey='postResponseTabModeration.winner.ac.optionCreator'
-                  t={t}
-                  // @ts-ignore
-                  components={[
-                    <SCreatorLink
-                      href={`/${winningOptionAc.creator?.username}`}
-                    />,
-                    winningOptionAc.creator?.options?.isVerified ? (
-                      <SInlineSvg
-                        svg={VerificationCheckmark}
-                        width='22px'
-                        height='22px'
-                        fill='none'
-                      />
-                    ) : null,
-                    { nickname: getDisplayname(winningOptionAc.creator!!) },
-                  ]}
-                />
-              </SSpan>
-            </SText>
-            <SHeadline variant={5}>{winningOptionAc.title}</SHeadline>
-          </>
-        )}
-        {postType === 'mc' && winningOptionMc && (
-          <>
-            <SText variant={2} weight={600}>
-              <SSpan>
-                {winningOptionMc.supporterCount === 1
-                  ? t(
-                      'postResponseTabModeration.winner.mc.numBiddersChoseSingular',
-                      {
-                        amount: 1,
-                      }
-                    )
-                  : t('postResponseTabModeration.winner.mc.numBiddersChose', {
-                      amount: formatNumber(
-                        winningOptionMc.supporterCount ?? 0,
-                        true
-                      ),
-                    })}
-              </SSpan>{' '}
-              {winningOptionMc.creator &&
-              winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
-                <>
-                  <SUserAvatar
-                    draggable={false}
-                    src={winningOptionMc?.creator?.avatarUrl!!}
-                  />
-                  <SSpan>
-                    <Trans
-                      i18nKey='postResponseTabModeration.winner.mc.optionCreator'
-                      t={t}
-                      // @ts-ignore
-                      components={[
-                        <SCreatorLink
-                          href={`/${winningOptionMc.creator?.username}`}
-                        />,
-                        winningOptionMc.creator?.options?.isVerified ? (
-                          <SInlineSvg
-                            svg={VerificationCheckmark}
-                            width='22px'
-                            height='22px'
-                            fill='none'
-                          />
-                        ) : null,
-                        {
-                          nickname: getDisplayname(winningOptionMc.creator!!),
-                        },
-                      ]}
-                    />
-                  </SSpan>
-                </>
-              ) : (
-                <SSpan>
-                  {t('postResponseTabModeration.winner.mc.optionOwn')}
-                </SSpan>
-              )}
-            </SText>
-            <SHeadline variant={5}>{winningOptionMc.text}</SHeadline>
-          </>
-        )}
+        <PostEarnings
+          amount={amountSwitch()}
+          label={t('postResponseTabModeration.awaiting.youWillGet')}
+        />
+
+        <WinningOption
+          postType={postType}
+          winningOptionAc={winningOptionAc}
+          winningOptionMc={winningOptionMc}
+        />
         <SText variant={2} weight={600}>
           <SSpan>
             {t('postResponseTabModeration.winner.inResponseToYourPost')}
@@ -602,28 +274,18 @@ const PostResponseTabModeration: React.FunctionComponent<
         {t('postResponseTabModeration.awaiting.postResponseBtn')}
       </SUploadButton>
       {/* Success modal */}
-      <PostResponseSuccessModal
-        amount={amountSwitch()}
-        isOpen={responseUploadSuccess}
-        zIndex={20}
-      />
+      {amountSwitch() && amountSwitch() !== '0' && (
+        <PostResponseSuccessModal
+          amount={`$${amountSwitch()!!}`}
+          isOpen={responseUploadSuccess}
+          zIndex={20}
+        />
+      )}
     </SContainer>
   );
 };
 
 export default PostResponseTabModeration;
-
-const SCreatorLink = styled.a`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  &:hover {
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-  }
-`;
-
-const SInlineSvg = styled(InlineSvg)`
-  flex-shrink: 0;
-`;
 
 const SContainer = styled.div`
   height: 100%;
@@ -649,129 +311,6 @@ const SSucceededContainer = styled.div<{
   }
 `;
 
-const SHeaderDiv = styled.div`
-  position: relative;
-  overflow: hidden;
-
-  display: flex;
-  align-items: center;
-  padding-left: 32px;
-  padding-top: 24px;
-  padding-bottom: 24px;
-
-  background: linear-gradient(
-    74.02deg,
-    #00c291 2.52%,
-    #07df74 49.24%,
-    #0ff34f 99.43%
-  );
-  border-radius: 16px 16px 0px 0px;
-
-  width: 100%;
-  min-height: 122px;
-
-  margin-top: 16px;
-
-  .headerDiv__coinImage {
-    position: absolute;
-    object-fit: contain;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    min-height: 128px;
-    margin-top: 0px;
-  }
-`;
-
-const SHeaderHeadline = styled(Headline)<{
-  successVariant?: boolean;
-}>`
-  color: #ffffff;
-  white-space: pre;
-
-  ${({ theme }) => theme.media.laptopL} {
-    font-size: 56px;
-    line-height: 64px;
-    ${({ successVariant }) =>
-      successVariant
-        ? css`
-            white-space: initial;
-          `
-        : null}
-  }
-`;
-
-const SCoin_1 = styled.img`
-  width: 56px;
-  bottom: -32px;
-  left: 5px;
-
-  transform: scale(0.8) rotate(180deg) scale(1, -1);
-
-  ${({ theme }) => theme.media.tablet} {
-    transform: rotate(180deg) scale(1, -1);
-  }
-`;
-
-const SCoin_2 = styled.img`
-  width: 86px;
-  top: -48px;
-  left: 15%;
-
-  transform: scale(0.8);
-
-  ${({ theme }) => theme.media.tablet} {
-    transform: initial;
-  }
-`;
-
-const SCoin_3 = styled.img`
-  width: 98px;
-  top: 10%;
-  right: 5%;
-  transform: scale(0.8) rotate(180deg) scale(1, -1);
-
-  ${({ theme }) => theme.media.tablet} {
-    transform: rotate(180deg) scale(1, -1);
-  }
-`;
-
-const SCoin_4 = styled.img`
-  width: 56px;
-  top: 16%;
-  right: 25%;
-
-  transform: scale(0.8);
-
-  ${({ theme }) => theme.media.tablet} {
-    transform: initial;
-  }
-`;
-
-const SCoin_5 = styled.img`
-  width: 84px;
-  bottom: -28px;
-  right: 25%;
-
-  transform: scale(0.8);
-
-  ${({ theme }) => theme.media.tablet} {
-    transform: initial;
-  }
-`;
-
-const SCoin_6 = styled.img`
-  width: 32px;
-  top: 16px;
-  right: 35%;
-
-  transform: scale(0.8);
-
-  ${({ theme }) => theme.media.tablet} {
-    transform: initial;
-  }
-`;
-
 const STextContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -779,8 +318,6 @@ const STextContentWrapper = styled.div`
 
   margin-top: 32px;
 `;
-
-const SAmountHeadline = styled(Headline)``;
 
 const SText = styled(Text)`
   margin-top: 24px;
@@ -790,18 +327,6 @@ const SText = styled(Text)`
 const SSpan = styled.span`
   display: inline-flex;
   white-space: pre;
-`;
-
-const SUserAvatar = styled.img`
-  position: relative;
-  top: 6px;
-
-  width: 24px;
-  margin-left: 8px;
-  margin-right: 4px;
-
-  border-radius: 50%;
-  object-fit: contain;
 `;
 
 const SHeadline = styled(Headline)`
@@ -871,16 +396,4 @@ const SShareButton = styled(Button)`
     filter: brightness(400%);
     -webkit-filter: brightness(400%);
   }
-`;
-
-const SSkeletonContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const SGenericSkeleton = styled(GenericSkeleton)`
-  height: 50px;
-  width: 30px;
-  margin-right: 2px;
-  border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 `;
