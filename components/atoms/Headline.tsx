@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import AnimatedPresence, { TWordsAnimation } from './AnimatedPresence';
 
 interface IHeadline {
+  id?: string;
   variant?: 1 | 2 | 3 | 4 | 5 | 6;
   children: React.ReactNode;
   animation?: TWordsAnimation;

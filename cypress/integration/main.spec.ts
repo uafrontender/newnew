@@ -12,6 +12,8 @@ context('Main flow', () => {
   let superpollShortId = '';
   // let crowdfundingId = '';
 
+  const CREATOR_EMAIL = `test_creator_${testSeed}@newnew.co`;
+
   Cypress.on('uncaught:exception', (err, runnable) => {
     // Do nothing
     return false;
@@ -22,8 +24,6 @@ context('Main flow', () => {
   });
 
   describe('Creator', () => {
-    const CREATOR_EMAIL = `test_creator_${testSeed}@newnew.co`;
-
     const defaultStorage = {
       userTutorialsProgress:
         '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
@@ -113,7 +113,9 @@ context('Main flow', () => {
       cy.dGet('#title').type(`CI post ${Date.now()}`);
       cy.dGet('#minimalBid').clear().type('10');
 
-      // IDEA: change duration
+      cy.dGet('#expiresAt').click();
+      cy.dGet('#10-minutes').click();
+
       // IDEA: change to scheduled
       // IDEA: change scheduled at time
       // IDEA: toggle comments
@@ -167,6 +169,9 @@ context('Main flow', () => {
       cy.dGet('#option-2').type(`third option`);
 
       // IDEA: move option around?
+
+      cy.dGet('#expiresAt').click();
+      cy.dGet('#10-minutes').click();
 
       cy.fixture('test.mp4', 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
@@ -796,6 +801,88 @@ context('Main flow', () => {
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
       }).click();
+    });
+  });
+
+  describe('Creator willing to respond', () => {
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can sign in', () => {
+      cy.dGet('#log-in-to-create').click();
+      cy.url().should('include', '/sign-up?to=create');
+
+      cy.dGet('#authenticate-input').type(CREATOR_EMAIL);
+      cy.dGet('#authenticate-form').submit();
+      cy.url().should('include', 'verify-email');
+      cy.contains(CREATOR_EMAIL);
+
+      enterVerificationCode(VERIFICATION_CODE);
+      cy.url().should('include', '/creator/dashboard', {
+        timeout: 15000,
+      });
+    });
+
+    it('can wait for a post to end', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+
+      cy.dGet('#post-tab-response', {
+        timeout: 150000,
+      }).click();
+
+      cy.dGet('#upload-button');
+    });
+
+    /* it('can respond to an event', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+
+      // TODO: change to number
+      cy.dGet('#post-earnings').contains(25);
+    }); */
+
+    it('can respond to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      // TODO: change to number
+      cy.dGet('#post-earnings').contains('10');
+
+      cy.dGet('#upload-response-btn').should('be.enabled');
+
+      cy.fixture('test.mp4', 'binary')
+        .then(Cypress.Blob.binaryStringToBlob)
+        .then((fileContent) => {
+          cy.dGet('#file').attachFile({
+            fileContent,
+            fileName: 'test.mp4',
+            mimeType: 'video/mp4',
+            encoding: 'utf8',
+          });
+        });
+
+      cy.dGet('#upload-button').click();
+
+      cy.wait(5000);
     });
   });
 });
