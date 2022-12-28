@@ -171,6 +171,7 @@ context('Main flow', () => {
       cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
+      // TODO: might be too short, expand
       cy.dGet('#5-minutes').click();
 
       // IDEA: change to scheduled
@@ -228,6 +229,7 @@ context('Main flow', () => {
       // IDEA: move option around?
 
       cy.dGet('#expiresAt').click();
+      // TODO: might be too short, expand
       cy.dGet('#5-minutes').click();
 
       cy.fixture('test.mp4', 'binary')
@@ -898,7 +900,7 @@ context('Main flow', () => {
       cy.url().should('include', '/p/');
 
       cy.dGet('#post-tab-response', {
-        timeout: 600000,
+        timeout: 120000,
       }).click();
 
       cy.dGet('#upload-button');

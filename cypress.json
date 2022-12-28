@@ -5,11 +5,11 @@
   "nodeVersion": "system",
   "viewportHeight": 1000,
   "viewportWidth": 1280,
+  "scrollBehavior": "bottom",
   "retries": {
     "runMode": 2,
     "openMode": 1
   },
-
   "env": {
     "base_url": "http://localhost:4000"
   },
