@@ -3,16 +3,73 @@ import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 const VERIFICATION_CODE = '111111';
-const postShortIdRegex = /p\/(.{6})/;
+const postShortIdRegex = /p\/(.{6})(\/|$)/;
 
 context('Main flow', () => {
   const testSeed = Date.now();
 
+  const CREATOR_EMAIL = `test_creator_${testSeed}@newnew.co`;
+
   let eventShortId = '';
   let superpollShortId = '';
+  let payedToSuperpoll = [];
+  let payedForBundles = 0;
+  let winningBid: { text: string; amount: number } | undefined = undefined;
   // let crowdfundingId = '';
 
-  const CREATOR_EMAIL = `test_creator_${testSeed}@newnew.co`;
+  const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25];
+  type SuperpollOption = typeof SUPERPOLL_OPTIONS[number];
+
+  function voteOnSuperpoll(
+    optionIndex: number | 'supported',
+    voteOptionPrice: SuperpollOption
+  ) {
+    const supportButtonSelector = `#support-button-${optionIndex}`;
+    cy.dGet(supportButtonSelector).click();
+
+    const voteOptionIndex = SUPERPOLL_OPTIONS.indexOf(voteOptionPrice);
+    const votePriceSelector = `#vote-option-${voteOptionIndex}-price`;
+    cy.dGet(votePriceSelector).contains(voteOptionPrice);
+
+    const voteButtonSelector = `#vote-option-${voteOptionIndex}`;
+    cy.dGet(voteButtonSelector).click();
+    cy.dGet('#confirm-vote').click();
+
+    return () => {
+      payedToSuperpoll.push(voteOptionPrice);
+    };
+  }
+
+  function bidOnEvent(optionText: string, optionAmount: number): () => void {
+    cy.dGet('#text-input').type(optionText);
+    cy.dGet('#bid-input').type(optionAmount.toString());
+    cy.dGet('#submit')
+      .should('be.enabled')
+      .should('not.have.css', 'cursor', 'wait')
+      .click();
+
+    return () => {
+      if (!winningBid || winningBid.amount < optionAmount) {
+        winningBid = {
+          text: optionText,
+          amount: optionAmount,
+        };
+      }
+    };
+  }
+
+  function calculateEarnings(rawAmount: number): number {
+    const rawAmountInCents = rawAmount * 100;
+    const feesInCents = Math.ceil(0.129 * rawAmountInCents) + 30;
+    return (rawAmountInCents - feesInCents) / 100;
+  }
+
+  function calculateSuperpollEarnings(contributions: number[]): number {
+    const earnings = contributions.map((contribution) =>
+      calculateEarnings(contribution)
+    );
+    return Math.ceil(earnings.reduce((acc, next) => acc + next) * 100) / 100;
+  }
 
   Cypress.on('uncaught:exception', (err, runnable) => {
     // Do nothing
@@ -114,7 +171,7 @@ context('Main flow', () => {
       cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
-      cy.dGet('#10-minutes').click();
+      cy.dGet('#5-minutes').click();
 
       // IDEA: change to scheduled
       // IDEA: change scheduled at time
@@ -171,7 +228,7 @@ context('Main flow', () => {
       // IDEA: move option around?
 
       cy.dGet('#expiresAt').click();
-      cy.dGet('#10-minutes').click();
+      cy.dGet('#5-minutes').click();
 
       cy.fixture('test.mp4', 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
@@ -299,17 +356,12 @@ context('Main flow', () => {
       const attemptSeed = Math.floor(Math.random() * 100);
       USER_EMAIL = `test_user_${testSeed}${attemptSeed}0@newnew.co`;
       const BID_OPTION_TEXT = 'something';
-      const BID_OPTION_AMOUNT = '10';
+      const BID_OPTION_AMOUNT = 10;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#text-input').type(BID_OPTION_TEXT);
-      cy.dGet('#bid-input').type(BID_OPTION_AMOUNT);
-      cy.dGet('#submit')
-        .should('be.enabled')
-        .should('not.have.css', 'cursor', 'wait')
-        .click();
+      const onSuccess = bidOnEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
 
       cy.dGet('#email-input').type(USER_EMAIL);
       enterCardInfo(
@@ -332,15 +384,15 @@ context('Main flow', () => {
 
       cy.contains(BID_OPTION_TEXT);
       cy.contains(`${BID_OPTION_AMOUNT}`);
+
+      onSuccess();
     });
 
     it('can enter another post page and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#support-button-0').click();
-      cy.dGet('#vote-option-0').click();
-      cy.dGet('#confirm-vote').click();
+      const onSuccess = voteOnSuperpoll(0, 1);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -351,6 +403,8 @@ context('Main flow', () => {
       }).click();
 
       cy.dGet('#support-button-supported').click();
+
+      onSuccess();
     });
   });
 
@@ -459,9 +513,7 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#support-button-supported').click();
-      cy.dGet('#vote-option-0').click();
-      cy.dGet('#confirm-vote').click();
+      const onSuccess = voteOnSuperpoll('supported', 1);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -470,6 +522,8 @@ context('Main flow', () => {
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
       }).click();
+
+      onSuccess();
     });
   });
 
@@ -520,17 +574,12 @@ context('Main flow', () => {
 
     it('can enter the post page and contribute to an event', () => {
       const BID_OPTION_TEXT = 'something else';
-      const BID_OPTION_AMOUNT = '15';
+      const BID_OPTION_AMOUNT = 15;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#text-input').type(BID_OPTION_TEXT);
-      cy.dGet('#bid-input').type(BID_OPTION_AMOUNT);
-      cy.dGet('#submit')
-        .should('be.enabled')
-        .should('not.have.css', 'cursor', 'wait')
-        .click();
+      const onSuccess = bidOnEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
 
       // Wait for stripe elements to load
       cy.wait(2000);
@@ -551,15 +600,15 @@ context('Main flow', () => {
 
       cy.contains(BID_OPTION_TEXT);
       cy.contains(`${BID_OPTION_AMOUNT}`);
+
+      onSuccess();
     });
 
     it('can enter another post page and contribute to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#support-button-1').click();
-      cy.dGet('#vote-option-1').click();
-      cy.dGet('#confirm-vote').click();
+      const onSuccess = voteOnSuperpoll(1, 2);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -570,6 +619,8 @@ context('Main flow', () => {
       }).click();
 
       cy.dGet('#support-button-supported').click();
+
+      onSuccess();
     });
   });
 
@@ -674,9 +725,7 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#support-button-supported').click();
-      cy.dGet('#vote-option-0').click();
-      cy.dGet('#confirm-vote').click();
+      const onSuccess = voteOnSuperpoll('supported', 1);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -685,6 +734,8 @@ context('Main flow', () => {
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
       }).click();
+
+      onSuccess();
     });
   });
 
@@ -763,9 +814,7 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      cy.dGet('#support-button-2').click();
-      cy.dGet('#vote-option-2').click();
-      cy.dGet('#confirm-vote').click();
+      const onSuccess = voteOnSuperpoll(2, 5);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -776,6 +825,8 @@ context('Main flow', () => {
       }).click();
 
       cy.dGet('#support-button-supported').click();
+
+      onSuccess();
     });
 
     it('can enter the post page, buy a bundle and contribute to a superpoll', () => {
@@ -844,30 +895,59 @@ context('Main flow', () => {
 
     it('can wait for a post to end', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
 
       cy.dGet('#post-tab-response', {
-        timeout: 150000,
+        timeout: 600000,
       }).click();
 
       cy.dGet('#upload-button');
     });
 
-    /* it('can respond to an event', () => {
+    it('can respond to an event', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
       // TODO: change to number
-      cy.dGet('#post-earnings').contains(25);
-    }); */
+      cy.dGet('#total-bids-amount').contains('$25');
+
+      cy.dGet('#select-option-0').click();
+
+      cy.dGet('#bid-details').contains(winningBid.amount.toString());
+      cy.dGet('#bid-details').contains(winningBid.text);
+
+      cy.dGet('#confirm-winning-bid').click();
+
+      cy.dGet('#post-tab-response').click();
+      cy.dGet('#post-earnings').contains(winningBid.amount);
+
+      cy.dGet('#upload-response-button').should('be.enabled');
+
+      cy.fixture('test.mp4', 'binary')
+        .then(Cypress.Blob.binaryStringToBlob)
+        .then((fileContent) => {
+          cy.dGet('#file').attachFile({
+            fileContent,
+            fileName: 'test.mp4',
+            mimeType: 'video/mp4',
+            encoding: 'utf8',
+          });
+        });
+
+      cy.dGet('#upload-button').click();
+      cy.dGet('#earned-amount').contains(calculateEarnings(winningBid.amount));
+    });
 
     it('can respond to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      // TODO: change to number
-      cy.dGet('#post-earnings').contains('10');
+      const payedToSuperpollTotal = payedToSuperpoll.reduce(
+        (acc, next) => acc + next
+      );
+      cy.dGet('#post-earnings').contains(payedToSuperpollTotal);
 
-      cy.dGet('#upload-response-btn').should('be.enabled');
+      cy.dGet('#upload-response-button').should('be.enabled');
 
       cy.fixture('test.mp4', 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
@@ -882,7 +962,13 @@ context('Main flow', () => {
 
       cy.dGet('#upload-button').click();
 
-      cy.wait(5000);
+      cy.dGet('#earned-amount').contains(
+        calculateSuperpollEarnings(payedToSuperpoll)
+      );
     });
+
+    /*it('can earnings on dashboard', () => {
+      // TODO: Add
+    });*/
   });
 });

@@ -124,7 +124,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                       ? t('mcPost.optionsTab.optionCard.selectVotesMenu.vote')
                       : t('mcPost.optionsTab.optionCard.selectVotesMenu.votes')}
                   </SBoldSpan>{' '}
-                  <SOpaqueSpan>{`($${
+                  <SOpaqueSpan id={`vote-option-${id}-price`}>{`($${
                     (voteOffer.price?.usdCents || 0) / 100
                   })`}</SOpaqueSpan>
                 </Text>

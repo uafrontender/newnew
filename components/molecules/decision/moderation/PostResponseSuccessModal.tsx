@@ -79,7 +79,9 @@ const PostResponseSuccessModal: React.FunctionComponent<
           <SText variant={2} weight={500}>
             {t('youMade')}
           </SText>
-          <SHeadline variant={1}>{amount}</SHeadline>
+          <SHeadline id='earned-amount' variant={1}>
+            {amount}
+          </SHeadline>
           <SMakeAnotherPostButton>
             <Link href='/creation' scroll>
               <a href='/creation'>

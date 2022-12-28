@@ -232,6 +232,7 @@ const AcOptionCardModeration: React.FunctionComponent<
             !isMobile ? (
               <SSelectOptionWidget>
                 <SPickOptionButton
+                  id={`select-option-${index}`}
                   winner={!!isWinner}
                   onClick={() => {
                     if (isWinner) return;
@@ -331,7 +332,7 @@ const AcOptionCardModeration: React.FunctionComponent<
           handleConfirmWinningOption();
         }}
       >
-        <SBidDetailsModal>
+        <SBidDetailsModal id='bid-details'>
           <SBidAmount>
             <OptionActionIcon
               src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
