@@ -82,11 +82,15 @@ const Home: NextPage<IHome> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  if (sessionExpired) {
-    dispatch(
-      logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-    );
-  }
+
+  useEffect(() => {
+    if (sessionExpired) {
+      dispatch(
+        logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionExpired]);
 
   // Posts
   // Top section/Curated posts
