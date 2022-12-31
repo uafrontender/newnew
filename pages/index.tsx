@@ -442,27 +442,27 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-const SCardsSection = styled(CardsSection)`
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 12px;
-  }
+// const SCardsSection = styled(CardsSection)`
+//   ${({ theme }) => theme.media.laptop} {
+//     margin-top: 12px;
+//   }
 
-  &:last-child {
-    padding-bottom: 40px;
-  }
+//   &:last-child {
+//     padding-bottom: 40px;
+//   }
 
-  ${({ theme }) => theme.media.tablet} {
-    &:last-child {
-      padding-bottom: 60px;
-    }
-  }
+//   ${({ theme }) => theme.media.tablet} {
+//     &:last-child {
+//       padding-bottom: 60px;
+//     }
+//   }
 
-  ${({ theme }) => theme.media.laptop} {
-    &:last-child {
-      padding-bottom: 80px;
-    }
-  }
-`;
+//   ${({ theme }) => theme.media.laptop} {
+//     &:last-child {
+//       padding-bottom: 80px;
+//     }
+//   }
+// `;
 
 const SHeading = styled.div`
   margin-top: 40px;
@@ -665,6 +665,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         return {
           props: {
             sessionExpired: true,
+            assumeLoggedIn,
+            staticSuperpolls,
+            staticBids,
+            ...translationContext,
           },
         };
       }
