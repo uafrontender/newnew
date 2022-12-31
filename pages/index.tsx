@@ -23,7 +23,7 @@ import Text from '../components/atoms/Text';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 
-import { useAppSelector } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
   fetchForYouPosts,
@@ -46,6 +46,7 @@ import usePagination, {
 } from '../utils/hooks/usePagination';
 import isSafari from '../utils/isSafari';
 import { TTokenCookie } from '../api/apiConfigs';
+import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -64,6 +65,7 @@ interface IHome {
   staticBids: TStaticPost[];
   initialPostsRA: newnewapi.IPost[];
   initialNextPageTokenRA: string;
+  sessionExpired?: boolean;
 }
 
 // No sense to memorize
@@ -74,10 +76,21 @@ const Home: NextPage<IHome> = ({
   assumeLoggedIn,
   initialPostsRA,
   initialNextPageTokenRA,
+  sessionExpired,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (sessionExpired) {
+      dispatch(
+        logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionExpired]);
 
   // Posts
   // Top section/Curated posts
@@ -606,45 +619,55 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // const resTop10 = await fetchCuratedPosts(top10payload);
 
   if (assumeLoggedIn) {
-    const payload = new newnewapi.GetRelatedToMePostsRequest({
-      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-      paging: {
-        limit: 6,
-      },
-    });
-    const res = await getMyPosts(
-      payload,
-      undefined,
-      {
-        accessToken: req.cookies?.accessToken,
-        refreshToken: req.cookies?.refreshToken,
-      },
-      (tokens: TTokenCookie[]) => {
-        const parsedTokens = tokens.map(
-          (t) =>
-            `${t.name}=${t.value}; ${
-              t.expires ? `expires=${t.expires}; ` : ''
-            } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
-        );
-        context.res.setHeader('set-cookie', parsedTokens);
-      }
-    );
-
-    if (res.data && res.data.toJSON().posts) {
-      return {
-        props: {
-          initialPostsRA: res.data.toJSON().posts,
-          ...(res.data.paging?.nextPageToken
-            ? {
-                initialNextPageTokenRA: res.data.paging?.nextPageToken,
-              }
-            : {}),
-          assumeLoggedIn,
-          staticSuperpolls,
-          staticBids,
-          ...translationContext,
+    try {
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+        paging: {
+          limit: 6,
         },
-      };
+      });
+      const res = await getMyPosts(
+        payload,
+        undefined,
+        {
+          accessToken: req.cookies?.accessToken,
+          refreshToken: req.cookies?.refreshToken,
+        },
+        (tokens: TTokenCookie[]) => {
+          const parsedTokens = tokens.map(
+            (t) =>
+              `${t.name}=${t.value}; ${
+                t.expires ? `expires=${t.expires}; ` : ''
+              } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
+          );
+          context.res.setHeader('set-cookie', parsedTokens);
+        }
+      );
+
+      if (res.data && res.data.toJSON().posts) {
+        return {
+          props: {
+            initialPostsRA: res.data.toJSON().posts,
+            ...(res.data.paging?.nextPageToken
+              ? {
+                  initialNextPageTokenRA: res.data.paging?.nextPageToken,
+                }
+              : {}),
+            assumeLoggedIn,
+            staticSuperpolls,
+            staticBids,
+            ...translationContext,
+          },
+        };
+      }
+    } catch (err) {
+      if ((err as Error).message === 'Refresh token invalid') {
+        return {
+          props: {
+            sessionExpired: true,
+          },
+        };
+      }
     }
   }
 
