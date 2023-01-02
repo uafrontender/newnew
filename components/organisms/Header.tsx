@@ -43,17 +43,21 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.totalBundleEarnings?.usdCents) setHasSoldBundles(true);
-        saveStateLS('creatorHasSoldBundles', true);
+        if (res.data.totalBundleEarnings?.usdCents) {
+          setHasSoldBundles(true);
+          saveStateLS('creatorHasSoldBundles', true);
+        }
       } catch (err) {
         console.error(err);
       }
     }
+
     const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
-    if (!localHasSoldBundles) {
-      user.userData?.options?.creatorStatus === 2 && fetchMyBundlesEarnings();
-    } else {
+    if (localHasSoldBundles) {
       setHasSoldBundles(true);
+      // TODO: should we show it only for creators who added a bank account?
+    } else if (user.userData?.options?.creatorStatus === 2) {
+      fetchMyBundlesEarnings();
     }
   });
 
