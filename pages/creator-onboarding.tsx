@@ -41,7 +41,7 @@ const countriesMock: Omit<newnewapi.Country, 'toJSON'>[] = [
 ];
 
 interface ICreatorOnboarding {
-  availableCountriesRes: newnewapi.GetSupportedCreatorCountriesResponse;
+  availableCountriesRes: newnewapi.IGetSupportedCreatorCountriesResponse;
 }
 
 const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
@@ -141,7 +141,9 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 
 export default CreatorOnboarding;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  ICreatorOnboarding
+> = async (context) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-CreatorOnboarding'],

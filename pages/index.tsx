@@ -59,12 +59,12 @@ const TutorialCard = dynamic(
 );
 
 interface IHome {
-  top10posts: newnewapi.NonPagedPostsResponse;
+  top10posts?: newnewapi.NonPagedPostsResponse;
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
-  initialPostsRA: newnewapi.IPost[];
-  initialNextPageTokenRA: string;
+  initialPostsRA?: newnewapi.IPost[];
+  initialNextPageTokenRA?: string;
   sessionExpired?: boolean;
 }
 
@@ -319,7 +319,7 @@ const Home: NextPage<IHome> = ({
     6,
     false,
     {
-      data: initialPostsRA,
+      data: initialPostsRA ?? [],
       pageToken: initialNextPageTokenRA,
     }
   );
@@ -547,7 +547,9 @@ const STutorialCard = styled(TutorialCard)`
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IHome> = async (
+  context
+) => {
   const { req } = context;
   const accessToken = req.cookies?.accessToken;
 
@@ -593,7 +595,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       coverImageUrl: assets.home.mcExampleThumb3,
       avatarUrl: assets.home.mcExampleAvatar3,
     },
-  ];
+  ] as TStaticPost[];
 
   const staticBids = [
     {
@@ -620,7 +622,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       coverImageUrl: assets.home.acExampleThumb3,
       avatarUrl: assets.home.acExampleAvatar3,
     },
-  ];
+  ] as TStaticPost[];
 
   // const top10payload = new newnewapi.EmptyRequest({});
 
