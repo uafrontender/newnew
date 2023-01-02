@@ -51,7 +51,7 @@ import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 interface IPostPage {
   postUuidOrShortId: string;
-  post?: newnewapi.Post;
+  post?: newnewapi.IPost;
   setup_intent_client_secret?: string;
   comment_id?: string;
   comment_content?: string;
@@ -156,6 +156,8 @@ const PostPage: NextPage<IPostPage> = ({
   const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
+        // NB! Status can be a string
+        // @ts-ignore
         return switchPostStatusString(typeOfPost, postParsed?.status);
       }
       return switchPostStatus(typeOfPost, postParsed?.status);
@@ -475,6 +477,8 @@ const PostPage: NextPage<IPostPage> = ({
     setPostStatus(() => {
       if (typeOfPost && postParsed?.status) {
         if (typeof postParsed.status === 'string') {
+          // NB! Status can be a string
+          // @ts-ignore
           return switchPostStatusString(typeOfPost, postParsed?.status);
         }
         return switchPostStatus(typeOfPost, postParsed?.status);
@@ -676,7 +680,9 @@ export default PostPage;
   </GeneralLayout>
 );
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IPostPage> = async (
+  context
+) => {
   const {
     post_uuid_or_short_id,
     setup_intent_client_secret,
@@ -734,22 +740,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ) {
       let queryString = '';
       const queryObject = {
-        ...(setup_intent_client_secret
+        ...(setup_intent_client_secret &&
+        !Array.isArray(setup_intent_client_secret)
           ? {
               setup_intent_client_secret,
             }
           : {}),
-        ...(comment_id
+        ...(comment_id && !Array.isArray(comment_id)
           ? {
               comment_id,
             }
           : {}),
-        ...(comment_content
+        ...(comment_content && !Array.isArray(comment_content)
           ? {
               comment_content,
             }
           : {}),
-        ...(save_card
+        ...(save_card && !Array.isArray(save_card)
           ? {
               save_card,
             }
@@ -774,23 +781,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         postUuidOrShortId: post_uuid_or_short_id,
         isServerSide: true,
-        post: res.data.toJSON(),
-        ...(setup_intent_client_secret
+        post: res.data.toJSON() as newnewapi.IPost,
+        ...(setup_intent_client_secret &&
+        !Array.isArray(setup_intent_client_secret)
           ? {
               setup_intent_client_secret,
             }
           : {}),
-        ...(save_card
+        ...(save_card && !Array.isArray(save_card)
           ? {
               save_card: save_card === 'true',
             }
           : {}),
-        ...(comment_id
+        ...(comment_id && !Array.isArray(comment_id)
           ? {
               comment_id,
             }
           : {}),
-        ...(comment_content
+        ...(comment_content && !Array.isArray(comment_content)
           ? {
               comment_content,
             }
@@ -806,22 +814,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       postUuidOrShortId: post_uuid_or_short_id,
       isServerSide: false,
-      ...(setup_intent_client_secret
+      ...(setup_intent_client_secret &&
+      !Array.isArray(setup_intent_client_secret)
         ? {
             setup_intent_client_secret,
           }
         : {}),
-      ...(save_card
+      ...(save_card && !Array.isArray(save_card)
         ? {
             save_card: save_card === 'true',
           }
         : {}),
-      ...(comment_id
+      ...(comment_id && !Array.isArray(comment_id)
         ? {
             comment_id,
           }
         : {}),
-      ...(comment_content
+      ...(comment_content && !Array.isArray(comment_content)
         ? {
             comment_content,
           }
