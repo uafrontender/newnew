@@ -74,10 +74,17 @@ export default CardSetupComplete;
   return <MyProfileSettingsLayout>{page}</MyProfileSettingsLayout>;
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  ICardSetupComplete
+> = async (context) => {
   const { setup_intent_client_secret, setup_intent } = context.query;
 
-  if (!setup_intent_client_secret || !setup_intent) {
+  if (
+    !setup_intent_client_secret ||
+    !setup_intent ||
+    Array.isArray(setup_intent_client_secret) ||
+    Array.isArray(setup_intent)
+  ) {
     return {
       redirect: {
         destination: `${
@@ -97,16 +104,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      ...(setup_intent_client_secret
-        ? {
-            setup_intent_client_secret,
-          }
-        : {}),
-      ...(setup_intent
-        ? {
-            setup_intent,
-          }
-        : {}),
+      setup_intent_client_secret,
+      setup_intent,
       ...translationContext,
     },
   };

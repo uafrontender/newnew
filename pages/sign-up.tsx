@@ -114,7 +114,9 @@ const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
 
 export default Signup;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<ISignUp> = async (
+  context
+) => {
   const { to, reason, redirect } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
