@@ -47,7 +47,9 @@ export default Chat;
   <SGeneral>{page}</SGeneral>
 );
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IChat> = async (
+  context
+) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
@@ -60,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const accessToken = req.cookies?.accessToken;
 
-  if (!accessToken) {
+  if (!accessToken || !username || Array.isArray(username)) {
     return {
       redirect: {
         permanent: false,

@@ -14,7 +14,6 @@ import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
 import PostList from '../../components/organisms/see-more/PostList';
-// import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import Text from '../../components/atoms/Text';
 import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
@@ -24,7 +23,7 @@ import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import getDisplayname from '../../utils/getDisplayname';
 
 interface IUserPageActivity {
-  user: Omit<newnewapi.User, 'toJSON'>;
+  user: newnewapi.IUser;
   pagedPosts?: newnewapi.PagedPostsResponse;
   posts?: newnewapi.Post[];
   postsFilter: newnewapi.Post.Filter;
@@ -195,7 +194,8 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 (UserPageActivity as NextPageWithLayout).getLayout = function getLayout(
   page: ReactElement
 ) {
-  const renderedPage = page.props.user?.options?.isActivityPrivate
+  const renderedPage = (page.props as IUserPageActivity).user?.options
+    ?.isActivityPrivate
     ? 'activityHidden'
     : 'activity';
 
@@ -227,7 +227,9 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 
 export default UserPageActivity;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  Partial<IUserPageActivity>
+> = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
@@ -266,42 +268,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-  // const isActivityPrivate = res.data.options?.isActivityPrivate;
-  // const isActivityPrivate = false;
-
-  // // will fetch only for users with open activity history
-  // if (!isActivityPrivate && !context.req.url?.startsWith('/_next')) {
-  //   const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
-  //     userUuid: res.data.uuid,
-  //     filter: newnewapi.Post.Filter.ALL,
-  //     relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-  //     // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
-  //     needTotalCount: true,
-  //     paging: {
-  //       limit: 10,
-  //     },
-  //   });
-
-  //   const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
-
-  //   if (postsResponse.data) {
-  //     return {
-  //       props: {
-  //         user: res.data.toJSON(),
-  //         pagedPosts: postsResponse.data.toJSON(),
-  //         ...(postsResponse.data.paging?.nextPageToken ? {
-  //           nextPageTokenFromServer: postsResponse.data.paging?.nextPageToken,
-  //         } : {}),
-  //         ...translationContext,
-  //       },
-  //     };
-  //   }
-  // }
 
   return {
     props: {
       user: res.data.toJSON(),
-      pagedPosts: {},
+      pagedPosts: {} as newnewapi.PagedPostsResponse,
       ...translationContext,
     },
   };
