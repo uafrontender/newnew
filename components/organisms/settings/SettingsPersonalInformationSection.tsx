@@ -70,7 +70,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         if (
           wasDateModified &&
           dateInEdit &&
-          dateInEdit.getMonth() &&
+          dateInEdit.getMonth() + 1 &&
           dateInEdit.getFullYear() &&
           dateInEdit.getDate()
         ) {
