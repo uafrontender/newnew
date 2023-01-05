@@ -450,6 +450,38 @@ const PostPage: NextPage<IPostPage> = ({
     }
   }, [postParsed?.postUuid]);
 
+  // Mark post as viewed if logged in and not own post
+  useEffect(() => {
+    async function markAsViewed() {
+      if (
+        !postParsed ||
+        !user.loggedIn ||
+        user.userData?.userUuid === postParsed?.creator?.uuid
+      )
+        return;
+      try {
+        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
+          postUuid: postParsed?.postUuid,
+        });
+
+        const res = await markPost(markAsViewedPayload);
+
+        if (res.error) throw new Error('Failed to mark post as viewed');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // setTimeout used to fix the React memory leak warning
+    const timer = setTimeout(() => {
+      markAsViewed();
+    });
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [post, postParsed, user.loggedIn, user.userData?.userUuid]);
+
   // Infinite scroll
   useEffect(() => {
     if (inView && !recommendedPostsLoading) {

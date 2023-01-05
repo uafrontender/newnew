@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
   fetchCurrentBidsForPost,
   placeBidOnAuction,
@@ -360,34 +360,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     }),
     [post]
   );
-
-  // Mark post as viewed if logged in
-  useEffect(() => {
-    async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-        return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-
-        if (res.error) throw new Error('Failed to mark post as viewed');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [post, user.loggedIn, user.userData?.userUuid]);
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
