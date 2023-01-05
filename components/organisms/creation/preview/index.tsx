@@ -21,6 +21,7 @@ import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 import ReCaptchaV2 from '../../../atoms/ReCaptchaV2';
+import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
@@ -103,6 +104,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const isDesktop = !isMobile && !isTablet;
 
   const [isDisabledAdditionally, setIsDisabledAdditionally] = useState(false);
+  const [isGoingToHomepage, setIsGoingToHomepage] = useState(false);
 
   const allowedRoutes = [
     '/creation',
@@ -212,6 +214,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   }, [router]);
 
   const handleCloseModal = useCallback(() => {
+    setIsGoingToHomepage(true);
     setShowModal(false);
     router.push('/');
     dispatch(clearCreation(undefined));
@@ -461,10 +464,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   );
 
   useUpdateEffect(() => {
-    if (!post.title) {
+    if (!post.title && !isGoingToHomepage) {
       router?.push('/creation');
     }
-  }, [post.title, router]);
+  }, [post.title, router, isGoingToHomepage]);
 
   // This effect results in the form re-rendering every second
   // However, it re renders after every letter typed anyway
@@ -500,6 +503,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   if (isMobile) {
     return (
       <>
+        {isGoingToHomepage && <LoadingView />}
         <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
@@ -553,6 +557,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   return (
     <>
+      {isGoingToHomepage && <LoadingView />}
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
       <STabletContent>
         <SLeftPart>
