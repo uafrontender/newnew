@@ -301,6 +301,10 @@
         "minutes": "分鐘",
         "seconds": "秒"
       }
+    },
+    "loading_NEED_TRANSLATION": {
+      "title": "Almost Done...",
+      "subtitle": "Just a little bit left!"
     }
   },
   "acPost": {
