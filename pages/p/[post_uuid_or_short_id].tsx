@@ -104,11 +104,12 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const [, setPostFromAjax] = useState<newnewapi.Post | undefined>(undefined);
-  const [, setIsPostLoading] = useState(!post);
-
   const { data: postFromAjax, isLoading: isPostLoading } = useQuery(
-    `post/${postUuidOrShortId}`,
+    [
+      user.loggedIn ? 'private' : 'public',
+      'fetchPostByUUID',
+      postUuidOrShortId,
+    ],
     async () => {
       const getPostPayload = new newnewapi.GetPostRequest({
         postUuid: postUuidOrShortId,
@@ -116,10 +117,18 @@ const PostPage: NextPage<IPostPage> = ({
 
       const res = await fetchPostByUUID(getPostPayload);
 
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Post not found');
+
       return res.data;
     },
     {
       initialData: post,
+      onError: (error) => {
+        console.error(error);
+        router.replace('/404');
+      },
+      enabled: !post,
     }
   );
 
@@ -138,35 +147,6 @@ const PostPage: NextPage<IPostPage> = ({
         : [undefined, undefined],
     [post, postFromAjax]
   );
-
-  useEffect(() => {
-    async function fetchPost() {
-      try {
-        setIsPostLoading(true);
-        const getPostPayload = new newnewapi.GetPostRequest({
-          postUuid: postUuidOrShortId,
-        });
-
-        const res = await fetchPostByUUID(getPostPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Post not found');
-
-        setPostFromAjax(res.data);
-
-        setIsPostLoading(false);
-      } catch (err) {
-        console.error(err);
-        router.replace('/404');
-      }
-    }
-
-    if (!post) {
-      // console.log('Fetching post');
-      fetchPost();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
@@ -441,29 +421,6 @@ const PostPage: NextPage<IPostPage> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
-
-  // Fetch whether or not the Post is favorited
-  useEffect(() => {
-    async function fetchIsFavorited() {
-      try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: postParsed?.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
-
-        if (res.data) {
-          setIsFollowingDecision(!!switchPostType(res.data)[0].isFavoritedByMe);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (postParsed?.postUuid) {
-      fetchIsFavorited();
-    }
-  }, [postParsed?.postUuid]);
 
   // Infinite scroll
   useEffect(() => {
