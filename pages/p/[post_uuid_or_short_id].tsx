@@ -21,6 +21,7 @@ import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { validate as validateUuid } from 'uuid';
+import { useQuery } from 'react-query';
 
 import {
   deleteMyPost,
@@ -103,10 +104,24 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const [postFromAjax, setPostFromAjax] = useState<newnewapi.Post | undefined>(
-    undefined
+  const [, setPostFromAjax] = useState<newnewapi.Post | undefined>(undefined);
+  const [, setIsPostLoading] = useState(!post);
+
+  const { data: postFromAjax, isLoading: isPostLoading } = useQuery(
+    `post/${postUuidOrShortId}`,
+    async () => {
+      const getPostPayload = new newnewapi.GetPostRequest({
+        postUuid: postUuidOrShortId,
+      });
+
+      const res = await fetchPostByUUID(getPostPayload);
+
+      return res.data;
+    },
+    {
+      initialData: post,
+    }
   );
-  const [isPostLoading, setIsPostLoading] = useState(!post);
 
   const [postParsed, typeOfPost] = useMemo<
     | [
