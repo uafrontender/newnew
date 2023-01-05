@@ -41,6 +41,7 @@ import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { I18nNamespaces } from '../../../../@types/i18next';
 import getGuestId from '../../../../utils/getGuestId';
 import {
@@ -113,6 +114,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
+
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -252,11 +256,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       if (!res.error) {
         handleSetIsFollowingDecision(!isFollowingDecision);
       }
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
   }, [
     handleSetIsFollowingDecision,
+    promptUserWithPushNotificationsPermissionModal,
     isFollowingDecision,
     postUuid,
     router,

@@ -41,6 +41,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
@@ -111,6 +112,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
   const router = useRouter();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -817,6 +820,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
+              promptUserWithPushNotificationsPermissionModal();
             }}
           >
             {t('paymentSuccessModal.mc', {

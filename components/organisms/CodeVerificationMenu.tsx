@@ -33,6 +33,7 @@ import AnimatedPresence from '../atoms/AnimatedPresence';
 import { Mixpanel } from '../../utils/mixpanel';
 import useRecaptcha from '../../utils/hooks/useRecaptcha';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
@@ -45,6 +46,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
+  const { resumePushNotification } = usePushNotifications();
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -143,6 +145,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
         setIsSuccess(true);
 
+        resumePushNotification();
+
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
@@ -159,6 +163,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     [
       setSubmitError,
       setCookie,
+      resumePushNotification,
       signupEmailInput,
       dispatch,
       router,

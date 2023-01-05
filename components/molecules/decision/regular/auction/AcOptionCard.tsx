@@ -47,6 +47,7 @@ import {
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -126,6 +127,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   );
   const { appConstants } = useGetAppConstants();
   const { showErrorToastPredefined } = useErrorToasts();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -792,7 +795,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         postType='ac'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator: postCreatorName,
