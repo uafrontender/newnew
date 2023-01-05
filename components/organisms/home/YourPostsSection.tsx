@@ -3,6 +3,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { useQuery } from 'react-query';
 
 import CardsSection from './CardsSection';
 import Headline from '../../atoms/Headline';
@@ -52,12 +53,30 @@ const YourPostsSection = () => {
     [statusFilter]
   );
 
-  const {
-    data: posts,
-    loading,
-    loadMore,
-    initialLoadDone,
-  } = usePagination<newnewapi.IPost>(fetchCreatorPosts, 10);
+  // Queries
+  const query = useQuery('todos', async () => {
+    const payload = new newnewapi.GetRelatedToMePostsRequest({
+      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+      statusFilter:
+        statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
+      // paging,
+      // ...(statusFilterValue
+      //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
+      //   : {}),
+    });
+    const postsResponse = await getMyPosts(payload);
+
+    return postsResponse?.data?.posts || [];
+  });
+
+  const { data: posts = [], isLoading: loading } = query;
+
+  console.log(query, 'query');
+
+  const { loadMore, initialLoadDone } = usePagination<newnewapi.IPost>(
+    fetchCreatorPosts,
+    10
+  );
 
   const handleSetStatusFilter = (
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter

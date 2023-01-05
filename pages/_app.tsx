@@ -21,6 +21,7 @@ import { useRouter } from 'next/router';
 import moment from 'moment-timezone';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 // Custom error page
 import Error from './_error';
@@ -79,6 +80,8 @@ interface IMyApp extends AppProps {
   colorMode: string;
   themeFromCookie?: 'light' | 'dark';
 }
+
+const queryClient = new QueryClient();
 
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
@@ -204,85 +207,89 @@ const MyApp = (props: IMyApp): ReactElement => {
         {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
-          language={locale}
-          scriptProps={{
-            async: false,
-            defer: false,
-            appendTo: 'head',
-            nonce: undefined,
-          }}
-          container={{
-            element: 'recaptchaBadge',
-            parameters: {
-              badge: 'bottomleft',
-              theme: 'dark',
-            },
-          }}
-        >
-          <LanguageWrapper>
-            <AppConstantsContextProvider>
-              <SocketContextProvider>
-                <ChannelsContextProvider>
-                  <PersistanceProvider store={store}>
-                    <SyncUserWrapper>
-                      <NotificationsProvider>
-                        <ModalNotificationsContextProvider>
-                          <BlockedUsersProvider>
-                            <FollowingsContextProvider>
-                              <CardsContextProvider>
-                                <BundlesContextProvider>
-                                  <ChatsProvider>
-                                    <OverlayModeProvider>
-                                      <ResizeMode>
-                                        <GlobalTheme
-                                          initialTheme={colorMode}
-                                          themeFromCookie={themeFromCookie}
-                                        >
-                                          <>
-                                            <ToastContainer containerId='toast-container' />
-                                            <VideoProcessingWrapper>
-                                              <ErrorBoundary>
-                                                {!pageProps.error ? (
-                                                  getLayout(
-                                                    <Component {...pageProps} />
-                                                  )
-                                                ) : (
-                                                  <Error
-                                                    title={
-                                                      pageProps.error?.message
-                                                    }
-                                                    statusCode={
-                                                      pageProps.error
-                                                        ?.statusCode ?? 500
-                                                    }
-                                                  />
-                                                )}
-                                                {isRestoringScroll ? (
-                                                  <ScrollRestorationAnimationContainer />
-                                                ) : null}
-                                              </ErrorBoundary>
-                                            </VideoProcessingWrapper>
-                                            <ReCaptchaBadgeModal />
-                                          </>
-                                        </GlobalTheme>
-                                      </ResizeMode>
-                                    </OverlayModeProvider>
-                                  </ChatsProvider>
-                                </BundlesContextProvider>
-                              </CardsContextProvider>
-                            </FollowingsContextProvider>
-                          </BlockedUsersProvider>
-                        </ModalNotificationsContextProvider>
-                      </NotificationsProvider>
-                    </SyncUserWrapper>
-                  </PersistanceProvider>
-                </ChannelsContextProvider>
-              </SocketContextProvider>
-            </AppConstantsContextProvider>
-          </LanguageWrapper>
-        </GoogleReCaptchaProvider>
+        <QueryClientProvider client={queryClient}>
+          <GoogleReCaptchaProvider
+            reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
+            language={locale}
+            scriptProps={{
+              async: false,
+              defer: false,
+              appendTo: 'head',
+              nonce: undefined,
+            }}
+            container={{
+              element: 'recaptchaBadge',
+              parameters: {
+                badge: 'bottomleft',
+                theme: 'dark',
+              },
+            }}
+          >
+            <LanguageWrapper>
+              <AppConstantsContextProvider>
+                <SocketContextProvider>
+                  <ChannelsContextProvider>
+                    <PersistanceProvider store={store}>
+                      <SyncUserWrapper>
+                        <NotificationsProvider>
+                          <ModalNotificationsContextProvider>
+                            <BlockedUsersProvider>
+                              <FollowingsContextProvider>
+                                <CardsContextProvider>
+                                  <BundlesContextProvider>
+                                    <ChatsProvider>
+                                      <OverlayModeProvider>
+                                        <ResizeMode>
+                                          <GlobalTheme
+                                            initialTheme={colorMode}
+                                            themeFromCookie={themeFromCookie}
+                                          >
+                                            <>
+                                              <ToastContainer containerId='toast-container' />
+                                              <VideoProcessingWrapper>
+                                                <ErrorBoundary>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
+                                                      />
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                  {isRestoringScroll ? (
+                                                    <ScrollRestorationAnimationContainer />
+                                                  ) : null}
+                                                </ErrorBoundary>
+                                              </VideoProcessingWrapper>
+                                              <ReCaptchaBadgeModal />
+                                            </>
+                                          </GlobalTheme>
+                                        </ResizeMode>
+                                      </OverlayModeProvider>
+                                    </ChatsProvider>
+                                  </BundlesContextProvider>
+                                </CardsContextProvider>
+                              </FollowingsContextProvider>
+                            </BlockedUsersProvider>
+                          </ModalNotificationsContextProvider>
+                        </NotificationsProvider>
+                      </SyncUserWrapper>
+                    </PersistanceProvider>
+                  </ChannelsContextProvider>
+                </SocketContextProvider>
+              </AppConstantsContextProvider>
+            </LanguageWrapper>
+          </GoogleReCaptchaProvider>
+        </QueryClientProvider>
       </CookiesProvider>
     </>
   );
