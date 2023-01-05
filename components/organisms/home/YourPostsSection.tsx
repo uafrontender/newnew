@@ -13,10 +13,6 @@ import Text from '../../atoms/Text';
 import Lottie from '../../atoms/Lottie';
 
 import { getMyPosts } from '../../../api/endpoints/user';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../utils/hooks/usePagination';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 
@@ -27,37 +23,19 @@ const YourPostsSection = () => {
   const [statusFilter, setStatusFilter] =
     useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
 
-  const fetchCreatorPosts = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IPost>> => {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-        statusFilter:
-          statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
-        paging,
-        // ...(statusFilterValue
-        //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
-        //   : {}),
-      });
-
-      const postsResponse = await getMyPosts(payload);
-
-      if (!postsResponse.data || postsResponse.error) {
-        throw new Error('Request failed');
-      }
-
-      return {
-        nextData: postsResponse.data.posts,
-        nextPageToken: postsResponse.data.paging?.nextPageToken,
-      };
-    },
-    [statusFilter]
-  );
-
-  // Queries
-  const query = useInfiniteQuery(
-    'posts',
+  const {
+    data,
+    isLoading: loading,
+    hasNextPage,
+    fetchNextPage,
+    isFetched: initialLoadDone,
+  } = useInfiniteQuery(
+    [
+      'getMyPosts',
+      newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+      statusFilter,
+    ],
     async ({ pageParam }) => {
-      console.log(pageParam, 'pageParam');
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
         statusFilter:
@@ -69,6 +47,10 @@ const YourPostsSection = () => {
       });
       const postsResponse = await getMyPosts(payload);
 
+      if (!postsResponse.data || postsResponse.error) {
+        throw new Error('Request failed');
+      }
+
       return {
         posts: postsResponse?.data?.posts || [],
         paging: postsResponse?.data?.paging,
@@ -76,10 +58,11 @@ const YourPostsSection = () => {
     },
     {
       getNextPageParam: (lastPage) => lastPage.paging?.nextPageToken,
+      onError: (error) => {
+        console.error(error);
+      },
     }
   );
-
-  const { data, isLoading: loading, hasNextPage, fetchNextPage } = query;
 
   const posts = useMemo(
     () => (data ? data.pages.map((page) => page.posts).flat() : []),
@@ -91,13 +74,6 @@ const YourPostsSection = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage]);
-
-  console.log(query, 'query');
-
-  const { initialLoadDone } = usePagination<newnewapi.IPost>(
-    fetchCreatorPosts,
-    10
-  );
 
   const handleSetStatusFilter = (
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
