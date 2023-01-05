@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { useQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 
 import CardsSection from './CardsSection';
 import Headline from '../../atoms/Headline';
@@ -54,26 +54,47 @@ const YourPostsSection = () => {
   );
 
   // Queries
-  const query = useQuery('todos', async () => {
-    const payload = new newnewapi.GetRelatedToMePostsRequest({
-      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-      statusFilter:
-        statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
-      // paging,
-      // ...(statusFilterValue
-      //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
-      //   : {}),
-    });
-    const postsResponse = await getMyPosts(payload);
+  const query = useInfiniteQuery(
+    'posts',
+    async ({ pageParam }) => {
+      console.log(pageParam, 'pageParam');
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+        statusFilter:
+          statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
+        paging: {
+          pageToken: pageParam,
+          limit: 10,
+        },
+      });
+      const postsResponse = await getMyPosts(payload);
 
-    return postsResponse?.data?.posts || [];
-  });
+      return {
+        posts: postsResponse?.data?.posts || [],
+        paging: postsResponse?.data?.paging,
+      };
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.paging?.nextPageToken,
+    }
+  );
 
-  const { data: posts = [], isLoading: loading } = query;
+  const { data, isLoading: loading, hasNextPage, fetchNextPage } = query;
+
+  const posts = useMemo(
+    () => (data ? data.pages.map((page) => page.posts).flat() : []),
+    [data]
+  );
+
+  const loadMore = useCallback(() => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage]);
 
   console.log(query, 'query');
 
-  const { loadMore, initialLoadDone } = usePagination<newnewapi.IPost>(
+  const { initialLoadDone } = usePagination<newnewapi.IPost>(
     fetchCreatorPosts,
     10
   );
