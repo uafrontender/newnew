@@ -17,6 +17,7 @@ import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../../utils/mixpanel';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
@@ -49,6 +50,9 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const router = useRouter();
       const { t } = useTranslation('common');
       const user = useAppSelector((state) => state.user);
+
+      const { promptUserWithPushNotificationsPermissionModal } =
+        usePushNotifications();
 
       const { showErrorToastPredefined } = useErrorToasts();
 
@@ -122,6 +126,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               handleRemovePostFromState?.();
             } else {
               handleAddPostToState?.();
+              promptUserWithPushNotificationsPermissionModal();
             }
           }
         } catch (err) {
@@ -138,6 +143,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         handleRemovePostFromState,
         handleAddPostToState,
         showErrorToastPredefined,
+        promptUserWithPushNotificationsPermissionModal,
       ]);
 
       useEffect(() => {

@@ -132,7 +132,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         if (redirect === 'settings') {
           router.push('/profile/settings');
         } else {
-          router.push('/creator/dashboard');
+          router.push('/creator/dashboard?askPushNotificationPermission=true');
         }
       } catch (err: any) {
         setIsSignInWithEmailLoading(false);
