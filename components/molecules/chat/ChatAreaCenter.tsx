@@ -9,6 +9,9 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
+
+import Loader from '../../atoms/Loader';
+
 import { SocketContext } from '../../../contexts/socketContext';
 import { getMessages } from '../../../api/endpoints/chat';
 import isSafari from '../../../utils/isSafari';
@@ -169,6 +172,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
         messagesScrollContainerRef.current = el!!;
       }}
     >
+      {messagesLoading && <SLoader size='md' />}
       {messages.length === 0 &&
         !isAnnouncement &&
         messagesLoading === false &&
@@ -229,4 +233,11 @@ const SRef = styled.span`
   text-indent: -9999px;
   height: 0;
   overflow: hidden;
+`;
+
+const SLoader = styled(Loader)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
