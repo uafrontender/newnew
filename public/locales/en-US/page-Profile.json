@@ -250,8 +250,7 @@
       "notifications": {
         "title": "Notifications",
         "email": "Email Notifications",
-        "push": "Push Notifications",
-        "inApp": "In-app Notifications"
+        "push": "Push Notifications"
       },
       "transactions": {
         "title": "Transactions",

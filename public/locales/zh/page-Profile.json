@@ -250,8 +250,7 @@
       "notifications": {
         "title": "通知",
         "email": "電子郵件通知",
-        "push": "推送通知",
-        "inApp_NEED_TRANSLATION": "In-app Notifications"
+        "push": "推送通知"
       },
       "transactions": {
         "title": "交易",
