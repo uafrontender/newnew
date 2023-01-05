@@ -568,7 +568,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
             isLoaded: true,
           })
         );
-        router.push('/creator/dashboard');
+        router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
     } catch (err) {
       console.error(err);

@@ -23,6 +23,7 @@ import { createCustomOption } from '../../../../../api/endpoints/multiple_choice
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 import Button from '../../../../atoms/Button';
 import McOptionCard from './McOptionCard';
@@ -91,6 +92,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // Scroll block
   const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -496,7 +500,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         postType='mc'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.mc', {
           postCreator: postCreatorName,

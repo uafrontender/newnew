@@ -9,6 +9,7 @@ import { useUpdateEffect } from 'react-use';
 import Lottie from '../../components/atoms/Lottie';
 
 import { signInWithEmail } from '../../api/endpoints/auth';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
@@ -35,6 +36,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const { resumePushNotification } = usePushNotifications();
 
   useEffect(() => {
     setMounted(true);
@@ -107,6 +110,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         dispatch(setSignupEmailInput(''));
         dispatch(setUserLoggedIn(true));
+
+        resumePushNotification();
 
         setIsLoading(false);
         if (data.redirectUrl) {
