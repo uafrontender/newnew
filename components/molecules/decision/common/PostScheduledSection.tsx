@@ -98,6 +98,13 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
                 position: 'fixed',
               }
             : {}),
+          ...(isMobile && isScrolledDown && !overlayModeEnabled
+            ? {
+                width: '100%',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+              }
+            : {}),
           ...(isMobile && overlayModeEnabled
             ? {
                 opacity: 0,
@@ -136,6 +143,13 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
         ...(isMobile && !isScrolledDown && !overlayModeEnabled
           ? {
               position: 'fixed',
+            }
+          : {}),
+        ...(isMobile && isScrolledDown && !overlayModeEnabled
+          ? {
+              width: '100%',
+              paddingLeft: '16px',
+              paddingRight: '16px',
             }
           : {}),
         ...(isMobile && overlayModeEnabled
@@ -223,7 +237,7 @@ const SContainer = styled.div<{
   left: 16px;
   bottom: 16px;
 
-  width: 100%;
+  width: calc(100% - 32px);
 
   padding: 16px;
   margin-top: ${({ isModeration }) => (isModeration ? '126px' : 'unset')};
@@ -234,10 +248,13 @@ const SContainer = styled.div<{
   z-index: 9;
 
   transition: 0.3s linear;
+  transition: width 0s linear;
 
   ${({ theme }) => theme.media.tablet} {
     background-color: transparent;
     transition: initial;
+
+    width: 100%;
 
     margin-top: auto;
     margin-bottom: auto;
