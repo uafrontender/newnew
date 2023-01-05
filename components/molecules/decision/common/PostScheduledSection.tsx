@@ -88,6 +88,54 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     };
   }, []);
 
+  if (hasEnded) {
+    return (
+      <SContainer
+        isModeration={variant === 'moderation'}
+        style={{
+          ...(isMobile && !isScrolledDown && !overlayModeEnabled
+            ? {
+                position: 'fixed',
+              }
+            : {}),
+          ...(isMobile && isScrolledDown && !overlayModeEnabled
+            ? {
+                width: '100%',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+              }
+            : {}),
+          ...(isMobile && overlayModeEnabled
+            ? {
+                opacity: 0,
+                position: 'static',
+              }
+            : {}),
+          ...(!isMobile && {
+            height: '62%',
+          }),
+        }}
+      >
+        <SLoadingContainer>
+          <SLogoAnimated
+            src={
+              theme.name === 'light'
+                ? assets.common.lightLogoAnimated()
+                : assets.common.darkLogoAnimated()
+            }
+            alt='NewNew logo'
+          />
+          <SLoadingTitle variant={5}>
+            {t('postScheduled.loading.title')}
+          </SLoadingTitle>
+          <SSubtitle variant={3}>
+            {t('postScheduled.loading.subtitle')}
+          </SSubtitle>
+        </SLoadingContainer>
+      </SContainer>
+    );
+  }
+
   return (
     <SContainer
       isModeration={variant === 'moderation'}
@@ -95,6 +143,13 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
         ...(isMobile && !isScrolledDown && !overlayModeEnabled
           ? {
               position: 'fixed',
+            }
+          : {}),
+        ...(isMobile && isScrolledDown && !overlayModeEnabled
+          ? {
+              width: '100%',
+              paddingLeft: '16px',
+              paddingRight: '16px',
             }
           : {}),
         ...(isMobile && overlayModeEnabled
@@ -193,10 +248,13 @@ const SContainer = styled.div<{
   z-index: 9;
 
   transition: 0.3s linear;
+  transition: width 0s linear;
 
   ${({ theme }) => theme.media.tablet} {
     background-color: transparent;
     transition: initial;
+
+    width: 100%;
 
     margin-top: auto;
     margin-bottom: auto;
@@ -288,6 +346,10 @@ const STitle = styled(Headline)`
   margin-bottom: 4px;
 `;
 
+const SSubtitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
 const SSubtitle1 = styled(Text)`
   grid-area: subtitle_1;
 
@@ -302,10 +364,8 @@ const SSubtitle1 = styled(Text)`
   }
 `;
 
-const SSubtitle2 = styled(Text)`
+const SSubtitle2 = styled(SSubtitle)`
   grid-area: subtitle_2;
-
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
 // Timer
@@ -357,4 +417,22 @@ const SCTAButton = styled(Button)`
     margin-left: auto;
     margin-right: auto;
   }
+`;
+
+const SLoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const SLoadingTitle = styled(Headline)`
+  font-size: 24px;
+  line-height: 32px;
+  margin-bottom: 4px;
+`;
+
+const SLogoAnimated = styled.img`
+  width: 140px;
+  height: 104px;
+  margin-bottom: 24px;
 `;
