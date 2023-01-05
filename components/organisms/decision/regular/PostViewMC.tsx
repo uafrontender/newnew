@@ -46,6 +46,7 @@ import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -366,6 +367,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
+  const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postUuid: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  );
+
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -565,7 +575,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -675,7 +685,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               />
             )}
           </SExpiresSection>
-          <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+          <PostTopInfo
+            subscription={subscription}
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
         </>
       )}
       <SWrapper>
@@ -709,7 +723,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
@@ -717,7 +731,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        {isMobile && <PostTopInfo totalVotes={totalVotes} hasWinner={false} />}
+        {isMobile && (
+          <PostTopInfo
+            subscription={subscription}
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
+        )}
         <SActivitiesContainer>
           <div
             style={{
@@ -753,7 +773,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                     />
                   )}
                 </SExpiresSection>
-                <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+                <PostTopInfo
+                  subscription={subscription}
+                  totalVotes={totalVotes}
+                  hasWinner={false}
+                />
               </>
             )}
             <PostVotingTab
@@ -793,7 +817,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
@@ -851,6 +875,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SCommentsHeadline>
           <CommentsBottomSection
             postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}

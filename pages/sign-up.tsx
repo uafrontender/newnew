@@ -4,7 +4,6 @@ import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/dist/client/router';
 import { motion } from 'framer-motion';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -37,28 +36,6 @@ interface ISignUp {
 
 const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
   const { t } = useTranslation('page-SignUp');
-
-  const router = useRouter();
-
-  // Redirect if the user is logged in
-  // useEffect(() => {
-  //   if (loggedIn) router.push('/');
-  // }, [loggedIn, router]);
-
-  useEffect(() => {
-    const handlerHistory = () => {
-      const postId = window?.history?.state?.postId;
-      if (postId && window?.history?.state?.fromPost) {
-        router.push(`/p/${postId}`);
-      }
-    };
-
-    window?.addEventListener('popstate', handlerHistory);
-
-    return () => {
-      window?.removeEventListener('popstate', handlerHistory);
-    };
-  }, [router]);
 
   return (
     <>
@@ -137,7 +114,9 @@ const Signup: NextPage<ISignUp> = ({ reason, goal, redirectURL }) => {
 
 export default Signup;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<ISignUp> = async (
+  context
+) => {
   const { to, reason, redirect } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,

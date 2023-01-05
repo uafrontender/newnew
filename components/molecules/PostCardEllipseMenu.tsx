@@ -21,6 +21,7 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
+  postShortId: string;
   postType: TPostType;
   isVisible: boolean;
   postCreator: newnewapi.User;
@@ -38,6 +39,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       isVisible,
       postCreator,
       postUuid,
+      postShortId,
       handleReportOpen,
       onClose,
       handleRemovePostFromState,
@@ -67,7 +69,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
 
       const handleCopyLink = useCallback(() => {
         if (window) {
-          const url = `${window.location.origin}/p/${postUuid}`;
+          const url = `${window.location.origin}/p/${postShortId || postUuid}`;
           Mixpanel.track('Copied Link Post Modal', {
             _stage: 'Post',
             _postUuid: postUuid,
@@ -84,7 +86,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               console.log(err);
             });
         }
-      }, [postUuid, onClose]);
+      }, [postShortId, postUuid, onClose]);
 
       // Following
       const [isFollowingDecision, setIsFollowingDecision] = useState(false);
@@ -101,7 +103,9 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           if (!user.loggedIn && user._persist?.rehydrated) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-                `${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`
+                `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                  postShortId || postUuid
+                }`
               )}`
             );
             return;
@@ -135,6 +139,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         user._persist?.rehydrated,
         isFollowingDecision,
         router,
+        postShortId,
         handleRemovePostFromState,
         handleAddPostToState,
         showErrorToastPredefined,

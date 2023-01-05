@@ -52,7 +52,9 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = () => {
 
 export default CreatorOnboardingAbout;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  ICreatorOnboardingAbout
+> = async (context) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-CreatorOnboarding'],

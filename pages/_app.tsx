@@ -68,6 +68,7 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import useScrollRestoration from '../utils/hooks/useScrollRestoration';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
+import ScrollRestorationAnimationContainer from '../components/atoms/ScrollRestorationAnimationContainer';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -88,7 +89,7 @@ const MyApp = (props: IMyApp): ReactElement => {
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
 
-  useScrollRestoration();
+  const { isRestoringScroll } = useScrollRestoration();
 
   // Shared layouts
   const getLayout = useMemo(
@@ -264,6 +265,9 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                     />
                                                   )}
                                                   <PushNotificationModalContainer />
+                                                  {isRestoringScroll ? (
+                                                    <ScrollRestorationAnimationContainer />
+                                                  ) : null}
                                                 </ErrorBoundary>
                                               </VideoProcessingWrapper>
                                               <ReCaptchaBadgeModal />

@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -52,6 +52,8 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -152,7 +154,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             additionalResponses={post.additionalResponses}
@@ -163,7 +165,10 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitiesContainer dimmedBackground={openedMainSection === 'main'}>
+          <SActivitiesContainer
+            dimmedBackground={openedMainSection === 'main'}
+            ref={activitiesContainerRef}
+          >
             {openedMainSection === 'main' ? (
               <>
                 <DecisionEndedBox
@@ -293,7 +298,15 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                               _component: 'PostSuccessMC',
                             });
                           }}
-                          onClick={() => setOpenedMainSection('options')}
+                          onClick={() => {
+                            setOpenedMainSection('options');
+
+                            if (activitiesContainerRef.current && isMobile) {
+                              activitiesContainerRef.current.scrollIntoView({
+                                behavior: 'smooth',
+                              });
+                            }
+                          }}
                         >
                           {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
@@ -378,6 +391,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>

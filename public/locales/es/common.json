@@ -260,6 +260,13 @@
       "auto": "Automático"
     }
   },
+  "timer": {
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Terminó el "
+  },
   "pushNotification_NEED_TRANSLATION": {
     "alert": {
       "safari": {

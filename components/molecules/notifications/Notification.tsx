@@ -53,6 +53,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
     if (!id) {
       return;
     }
+
     const payload = new newnewapi.MarkAsReadRequest({
       notificationIds: [id],
     });
@@ -60,8 +61,11 @@ const Notification: React.FC<newnewapi.INotification> = ({
     const res = await markAsRead(payload);
 
     if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+    setIsUnread(false);
   }, [id]);
 
+  // TODO: support for postShortId in routing target
   useEffect(() => {
     if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
@@ -84,7 +88,6 @@ const Notification: React.FC<newnewapi.INotification> = ({
       const MARK_AS_READ_DELAY = 3000;
       markAsReadTimeoutRef.current = setTimeout(() => {
         markNotificationAsRead();
-        setIsUnread(false);
       }, MARK_AS_READ_DELAY);
       return () => {
         if (markAsReadTimeoutRef.current) {

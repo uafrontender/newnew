@@ -158,6 +158,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const subscription: SubscriptionToCreator = useMemo(
     () => ({
+      type: 'creator',
       userId: user.uuid,
       username: user.username,
     }),
@@ -767,7 +768,7 @@ const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
 
   user-select: unset;
 

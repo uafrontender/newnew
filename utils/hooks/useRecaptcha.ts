@@ -5,6 +5,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { IReCaptchaRes } from '../../components/interfaces/reCaptcha';
 import { ErrorToastPredefinedMessage } from './useErrorToasts';
 
+// TODO: remove or return minDoubleCheckScore
 // first executes reCaptcha v3 if the score is lower that minSuccessScore, reCaptcha v2 is shown
 const useRecaptcha = (
   callback: (...args: any) => any,
@@ -15,7 +16,7 @@ const useRecaptcha = (
   }
 ) => {
   const { executeRecaptcha: executeGoogleRecaptchaV3 } = useGoogleReCaptcha();
-  const { minSuccessScore = 0.5, minDoubleCheckScore = 0.1 } = options || {};
+  const { minSuccessScore = 0.5 } = options || {};
 
   const [isRecaptchaV2Required, setIsRecaptchaV2Required] =
     useState<boolean>(false);
@@ -140,7 +141,7 @@ const useRecaptcha = (
       }
 
       // reCaptcha v3
-      const { isPassed, score, error, errorCodes } = await executeRecaptchaV3();
+      const { isPassed, score } = await executeRecaptchaV3();
 
       if (isPassed && score && score >= minSuccessScore) {
         await callback(...callbackArgs);
@@ -148,36 +149,15 @@ const useRecaptcha = (
         return;
       }
 
-      // show reCaptcha v2 if score for v3 is between minDoubleCheckScore and minSuccessScore
-      if (isPassed && score && score >= minDoubleCheckScore) {
-        setIsRecaptchaV2Required(true);
-        setIsSubmitting(false);
-        return;
-      }
-
-      // show reCaptcha v2 when incorrect-captcha-sol error appears
-      if (
-        errorCodes &&
-        errorCodes.length === 1 &&
-        errorCodes.includes('incorrect-captcha-sol')
-      ) {
-        setIsRecaptchaV2Required(true);
-        setIsSubmitting(false);
-        return;
-      }
-
-      // show error without showing reCaptcha v2 if score for v3 is lower that minDoubleCheckScore
-      if (error) {
-        setErrorMessage(ErrorToastPredefinedMessage.RecaptchaError);
-        setIsSubmitting(false);
-      }
+      // show reCaptcha v2 if score for v3 fails
+      setIsRecaptchaV2Required(true);
+      setIsSubmitting(false);
     },
     [
       callback,
       isRecaptchaV2Required,
       minSuccessScore,
       executeRecaptchaV3,
-      minDoubleCheckScore,
       recaptchaTokenV2,
       checkRecaptchaV2,
     ]

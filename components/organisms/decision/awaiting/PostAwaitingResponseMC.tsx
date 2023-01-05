@@ -1,7 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -44,7 +50,12 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+
+    const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -168,7 +179,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             responseViewed={responseViewed}
@@ -178,7 +189,10 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-          <SActivitiesContainer dimmedBackground={openedMainSection === 'main'}>
+          <SActivitiesContainer
+            dimmedBackground={openedMainSection === 'main'}
+            ref={activitiesContainerRef}
+          >
             {openedMainSection === 'main' ? (
               <>
                 <WaitingForResponseBox
@@ -305,7 +319,15 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                               _component: 'PostAwaitingResponseMC',
                             });
                           }}
-                          onClick={() => setOpenedMainSection('options')}
+                          onClick={() => {
+                            setOpenedMainSection('options');
+
+                            if (activitiesContainerRef.current && isMobile) {
+                              activitiesContainerRef.current.scrollIntoView({
+                                behavior: 'smooth',
+                              });
+                            }
+                          }}
                         >
                           {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
@@ -339,6 +361,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>

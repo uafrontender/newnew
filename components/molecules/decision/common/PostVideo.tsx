@@ -16,7 +16,7 @@ const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
 });
 
 interface IPostVideo {
-  postId: string;
+  postUuid: string;
   announcement: newnewapi.IVideoUrls;
   response?: newnewapi.IVideoUrls;
   responseViewed: boolean;
@@ -26,7 +26,7 @@ interface IPostVideo {
 }
 
 const PostVideo: React.FunctionComponent<IPostVideo> = ({
-  postId,
+  postUuid,
   announcement,
   response,
   responseViewed,
@@ -59,7 +59,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
     async function markResponseAsViewed() {
       try {
         const payload = new newnewapi.MarkPostRequest({
-          postUuid: postId,
+          postUuid,
           markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
         });
 
@@ -79,7 +79,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       markResponseAsViewed();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postId, user.loggedIn, responseViewed]);
+  }, [openedTab, postUuid, user.loggedIn, responseViewed]);
 
   // Adjust sound button if needed
   useEffect(() => {
@@ -89,7 +89,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         ?.getBoundingClientRect();
 
       const videoRect = document
-        .getElementById(`${postId}`)
+        .getElementById(`${postUuid}`)
         ?.getBoundingClientRect();
 
       if (rect && videoRect) {
@@ -130,21 +130,21 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobileOrTablet, postId]);
+  }, [isMobileOrTablet, postUuid]);
 
   return (
     <SVideoWrapper>
       {openedTab === 'response' && response ? (
         <>
           <PostBitmovinPlayer
-            key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
-            id={`video-${postId}`}
+            key={`${postUuid}--${isMuted ? 'muted' : 'sound'}`}
+            id={`video-${postUuid}`}
             resources={response}
             muted={isMuted}
             showPlayButton
           />
           <PostVideoSoundButton
-            postId={postId}
+            postUuid={postUuid}
             isMuted={isMuted}
             soundBtnBottomOverriden={soundBtnBottomOverriden}
             handleToggleMuted={handleToggleMuted}
@@ -153,13 +153,13 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       ) : (
         <>
           <PostBitmovinPlayer
-            id={postId}
+            id={postUuid}
             resources={announcement}
             muted={isMuted}
             showPlayButton
           />
           <PostVideoSoundButton
-            postId={postId}
+            postUuid={postUuid}
             isMuted={isMuted}
             soundBtnBottomOverriden={soundBtnBottomOverriden}
             handleToggleMuted={handleToggleMuted}

@@ -58,7 +58,8 @@ const getPayWithCardErrorMessage = (
 };
 
 interface IAcAddNewOption {
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreator: string;
   postText: string;
   postDeadline: string;
@@ -69,9 +70,10 @@ interface IAcAddNewOption {
     newOption: newnewapi.Auction.Option
   ) => void;
 }
-
+// empty change
 const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
-  postId,
+  postUuid,
+  postShortId,
   postCreator,
   postText,
   postDeadline,
@@ -201,7 +203,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   const placeBidRequest = useMemo(
     () =>
       new newnewapi.PlaceBidRequest({
-        postUuid: postId,
+        postUuid,
         amount: new newnewapi.MoneyAmount({
           usdCents: paymentAmountInCents,
         }),
@@ -210,13 +212,15 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         }),
         optionTitle: newBidText,
       }),
-    [postId, paymentAmountInCents, newBidText, paymentFeeInCents]
+    [postUuid, paymentAmountInCents, newBidText, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+      postShortId || postUuid
+    }`,
   });
 
   const handlePayWithCard = useCallback(
@@ -238,7 +242,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'AcOptionsTab',
         _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
@@ -288,7 +292,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
     },
     [
       setupIntent,
-      postId,
+      postUuid,
       router,
       handleAddOrUpdateOptionFromResponse,
       paymentAmountInCents,
@@ -387,7 +391,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
             onClickCapture={() =>
               Mixpanel.track('SuggestNewMobile', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'AcOptionsTab',
               })
             }
@@ -470,7 +474,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
-          redirectUrl={`p/${postId}`}
+          redirectUrl={`p/${postShortId || postUuid}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           setupIntent={setupIntent}

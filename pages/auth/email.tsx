@@ -175,7 +175,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
 export default EmailAuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  IEmailAuthRedirectPage
+> = async (context) => {
   const { email_address, token } = context.query;
 
   if (

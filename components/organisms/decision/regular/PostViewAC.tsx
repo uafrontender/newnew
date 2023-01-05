@@ -43,6 +43,7 @@ import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNew
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -152,8 +153,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
   const [triedLoading, setTriedLoading] = useState(false);
-
-  // const currLocation = `/p/${post.postUuid}`;
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -356,6 +355,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     }
   };
 
+  const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postUuid: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  );
+
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
@@ -553,7 +561,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -664,6 +672,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
+            subscription={subscription}
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -700,7 +709,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
@@ -710,6 +719,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
+            subscription={subscription}
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -750,6 +760,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
+                  subscription={subscription}
                   amountInBids={totalAmount}
                   hasWinner={!!post.winningOptionId}
                 />
@@ -764,7 +775,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             </PostVotingTab>
           </div>
           <AcOptionsTab
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             postStatus={postStatus}
             postText={post.title}
             postCreatorName={getDisplayname(post.creator)}
@@ -785,7 +797,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           />
           {postStatus === 'voting' && (
             <AcAddNewOption
-              postId={post.postUuid}
+              postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               postStatus={postStatus}
               postText={post.title}
               postCreator={getDisplayname(post.creator)}
@@ -818,7 +831,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
@@ -849,6 +862,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           </SCommentsHeadline>
           <CommentsBottomSection
             postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}

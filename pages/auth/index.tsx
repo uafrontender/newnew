@@ -210,7 +210,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
 export default AuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IAuthRedirectPage> = async (
+  context
+) => {
   const { provider } = context.query;
 
   const { req } = context;

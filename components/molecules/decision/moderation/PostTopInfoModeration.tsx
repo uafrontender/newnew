@@ -89,7 +89,11 @@ const PostTopInfoModeration: React.FunctionComponent<
     handleCloseDeletePostModal,
   } = usePostInnerState();
 
-  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postUuid = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postShortId = useMemo(
+    () => postParsed?.postShortId ?? '',
+    [postParsed]
+  );
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
   const creator = useMemo(() => postParsed?.creator ?? {}, [postParsed]);
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
@@ -185,7 +189,7 @@ const PostTopInfoModeration: React.FunctionComponent<
               onClickCapture={() => {
                 Mixpanel.track('Click on own avatar', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -204,7 +208,7 @@ const PostTopInfoModeration: React.FunctionComponent<
               onClickCapture={() => {
                 Mixpanel.track('Click on own username', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -258,7 +262,8 @@ const PostTopInfoModeration: React.FunctionComponent<
           {/* Share menu */}
           {!isMobile && (
             <PostShareEllipseMenu
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               isVisible={shareMenuOpen}
               onClose={handleShareClose}
               anchorElement={shareButtonRef.current}
@@ -268,7 +273,8 @@ const PostTopInfoModeration: React.FunctionComponent<
             <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               onClose={handleShareClose}
             />
           ) : null}
@@ -335,7 +341,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           handleButtonClick={() => {
             Mixpanel.track('PostFailedBox Button Click', {
               _stage: 'Post',
-              _postUuid: postId,
+              _postUuid: postUuid,
               _component: 'PostTopInfoModeration',
               _postType: postType,
             });
@@ -510,7 +516,7 @@ const SSelectWinnerOption = styled.div<{
 
 const STrophyImg = styled.img`
   position: absolute;
-  right: -16px;
+  right: 16px;
   top: 8px;
 
   width: 88px;

@@ -171,7 +171,7 @@ const SContent = styled.div<ISContent>`
     outline: none;
     background: transparent;
     font-weight: 500;
-    word-break: break-all;
+    word-break: break-word;
 
     font-size: 14px;
     line-height: 20px;

@@ -23,7 +23,7 @@ import Text from '../components/atoms/Text';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 
-import { useAppSelector } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
   fetchForYouPosts,
@@ -46,6 +46,7 @@ import usePagination, {
 } from '../utils/hooks/usePagination';
 import isSafari from '../utils/isSafari';
 import { TTokenCookie } from '../api/apiConfigs';
+import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -58,12 +59,13 @@ const TutorialCard = dynamic(
 );
 
 interface IHome {
-  top10posts: newnewapi.NonPagedPostsResponse;
+  top10posts?: newnewapi.NonPagedPostsResponse;
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
-  initialPostsRA: newnewapi.IPost[];
-  initialNextPageTokenRA: string;
+  initialPostsRA?: newnewapi.IPost[];
+  initialNextPageTokenRA?: string;
+  sessionExpired?: boolean;
 }
 
 // No sense to memorize
@@ -74,10 +76,29 @@ const Home: NextPage<IHome> = ({
   assumeLoggedIn,
   initialPostsRA,
   initialNextPageTokenRA,
+  sessionExpired,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (sessionExpired) {
+      dispatch(
+        logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionExpired]);
+
+  const isUserLoggedIn = useMemo(() => {
+    if (user._persist?.rehydrated) {
+      return user.loggedIn;
+    }
+
+    return assumeLoggedIn;
+  }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
 
   // Posts
   // Top section/Curated posts
@@ -298,7 +319,7 @@ const Home: NextPage<IHome> = ({
     6,
     false,
     {
-      data: initialPostsRA,
+      data: initialPostsRA ?? [],
       pageToken: initialNextPageTokenRA,
     }
   );
@@ -312,7 +333,7 @@ const Home: NextPage<IHome> = ({
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {!user.loggedIn && <HeroSection />}
+      {!isUserLoggedIn && <HeroSection />}
 
       {user.userData?.options?.isCreator && (
         <>
@@ -429,27 +450,27 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-const SCardsSection = styled(CardsSection)`
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 12px;
-  }
+// const SCardsSection = styled(CardsSection)`
+//   ${({ theme }) => theme.media.laptop} {
+//     margin-top: 12px;
+//   }
 
-  &:last-child {
-    padding-bottom: 40px;
-  }
+//   &:last-child {
+//     padding-bottom: 40px;
+//   }
 
-  ${({ theme }) => theme.media.tablet} {
-    &:last-child {
-      padding-bottom: 60px;
-    }
-  }
+//   ${({ theme }) => theme.media.tablet} {
+//     &:last-child {
+//       padding-bottom: 60px;
+//     }
+//   }
 
-  ${({ theme }) => theme.media.laptop} {
-    &:last-child {
-      padding-bottom: 80px;
-    }
-  }
-`;
+//   ${({ theme }) => theme.media.laptop} {
+//     &:last-child {
+//       padding-bottom: 80px;
+//     }
+//   }
+// `;
 
 const SHeading = styled.div`
   margin-top: 40px;
@@ -526,7 +547,9 @@ const STutorialCard = styled(TutorialCard)`
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IHome> = async (
+  context
+) => {
   const { req } = context;
   const accessToken = req.cookies?.accessToken;
 
@@ -572,7 +595,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       coverImageUrl: assets.home.mcExampleThumb3,
       avatarUrl: assets.home.mcExampleAvatar3,
     },
-  ];
+  ] as TStaticPost[];
 
   const staticBids = [
     {
@@ -599,52 +622,66 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       coverImageUrl: assets.home.acExampleThumb3,
       avatarUrl: assets.home.acExampleAvatar3,
     },
-  ];
+  ] as TStaticPost[];
 
   // const top10payload = new newnewapi.EmptyRequest({});
 
   // const resTop10 = await fetchCuratedPosts(top10payload);
 
   if (assumeLoggedIn) {
-    const payload = new newnewapi.GetRelatedToMePostsRequest({
-      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-      paging: {
-        limit: 6,
-      },
-    });
-    const res = await getMyPosts(
-      payload,
-      undefined,
-      {
-        accessToken: req.cookies?.accessToken,
-        refreshToken: req.cookies?.refreshToken,
-      },
-      (tokens: TTokenCookie[]) => {
-        const parsedTokens = tokens.map(
-          (t) =>
-            `${t.name}=${t.value}; ${
-              t.expires ? `expires=${t.expires}; ` : ''
-            } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
-        );
-        context.res.setHeader('set-cookie', parsedTokens);
-      }
-    );
-
-    if (res.data && res.data.toJSON().posts) {
-      return {
-        props: {
-          initialPostsRA: res.data.toJSON().posts,
-          ...(res.data.paging?.nextPageToken
-            ? {
-                initialNextPageTokenRA: res.data.paging?.nextPageToken,
-              }
-            : {}),
-          assumeLoggedIn,
-          staticSuperpolls,
-          staticBids,
-          ...translationContext,
+    try {
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+        paging: {
+          limit: 6,
         },
-      };
+      });
+      const res = await getMyPosts(
+        payload,
+        undefined,
+        {
+          accessToken: req.cookies?.accessToken,
+          refreshToken: req.cookies?.refreshToken,
+        },
+        (tokens: TTokenCookie[]) => {
+          const parsedTokens = tokens.map(
+            (t) =>
+              `${t.name}=${t.value}; ${
+                t.expires ? `expires=${t.expires}; ` : ''
+              } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
+          );
+          context.res.setHeader('set-cookie', parsedTokens);
+        }
+      );
+
+      if (res.data && res.data.toJSON().posts) {
+        return {
+          props: {
+            initialPostsRA: res.data.toJSON().posts,
+            ...(res.data.paging?.nextPageToken
+              ? {
+                  initialNextPageTokenRA: res.data.paging?.nextPageToken,
+                }
+              : {}),
+            assumeLoggedIn,
+            staticSuperpolls,
+            staticBids,
+            ...translationContext,
+          },
+        };
+      }
+    } catch (err) {
+      if ((err as Error).message === 'Refresh token invalid') {
+        return {
+          props: {
+            sessionExpired: true,
+            assumeLoggedIn,
+            staticSuperpolls,
+            staticBids,
+            ...translationContext,
+          },
+        };
+      }
     }
   }
 

@@ -159,7 +159,9 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
 export default TwitterAuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  ITwitterAuthRedirectPage
+> = async (context) => {
   const { oauth_token, oauth_verifier } = context.query;
 
   if (
