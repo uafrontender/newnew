@@ -328,6 +328,7 @@ const PostPage: NextPage<IPostPage> = ({
     });
     if (
       isConfirmToClosePost &&
+      // eslint-disable-next-line no-alert
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
