@@ -13,6 +13,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled, { useTheme } from 'styled-components';
+import { useInfiniteQuery, InfiniteData } from 'react-query';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -40,11 +41,6 @@ import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 import { getMyPosts } from '../api/endpoints/user';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../utils/hooks/usePagination';
-import isSafari from '../utils/isSafari';
 import { TTokenCookie } from '../api/apiConfigs';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
 
@@ -63,7 +59,10 @@ interface IHome {
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
-  initialPostsRA?: newnewapi.IPost[];
+  initialPageRA?: {
+    posts: newnewapi.IPost[];
+    paging: newnewapi.PagingResponse;
+  };
   initialNextPageTokenRA?: string;
   sessionExpired?: boolean;
 }
@@ -74,8 +73,7 @@ const Home: NextPage<IHome> = ({
   staticBids,
   staticSuperpolls,
   assumeLoggedIn,
-  initialPostsRA,
-  initialNextPageTokenRA,
+  initialPageRA,
   sessionExpired,
 }) => {
   const { t } = useTranslation('page-Home');
@@ -287,18 +285,23 @@ const Home: NextPage<IHome> = ({
   // }, []);
 
   // Resent activity
-  const fetchRAPosts = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IPost>> => {
-      if (!user.loggedIn) {
-        return {
-          nextData: [],
-          nextPageToken: undefined,
-        };
-      }
-
+  const {
+    data: collectionRAPages,
+    hasNextPage: hasNextPageRA,
+    fetchNextPage: fetchNextPageRA,
+  } = useInfiniteQuery(
+    [
+      'private',
+      'getMyPosts',
+      newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+    ],
+    async ({ pageParam }) => {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-        paging,
+        paging: {
+          limit: 6,
+          pageToken: pageParam,
+        },
       });
       const postsResponse = await getMyPosts(payload);
 
@@ -307,22 +310,37 @@ const Home: NextPage<IHome> = ({
       }
 
       return {
-        nextData: postsResponse.data.posts,
-        nextPageToken: postsResponse.data.paging?.nextPageToken,
+        posts: postsResponse?.data?.posts || [],
+        paging: postsResponse?.data?.paging,
       };
     },
-    [user.loggedIn]
-  );
-
-  const { data: collectionRA, loadMore } = usePagination<newnewapi.IPost>(
-    fetchRAPosts,
-    6,
-    false,
     {
-      data: initialPostsRA ?? [],
-      pageToken: initialNextPageTokenRA,
+      getNextPageParam: (lastPage) => lastPage?.paging?.nextPageToken,
+      onError: (error) => {
+        console.error(error);
+      },
+      initialData: {
+        pages: [initialPageRA],
+        pageParams: [initialPageRA?.paging.nextPageToken],
+      },
+      enabled: user.loggedIn,
     }
   );
+
+  const collectionRA = useMemo(
+    () =>
+      collectionRAPages
+        ? collectionRAPages.pages.map((page) => page?.posts || []).flat()
+        : [],
+
+    [collectionRAPages]
+  );
+
+  const loadMoreCollectionRA = useCallback(() => {
+    if (hasNextPageRA) {
+      fetchNextPageRA();
+    }
+  }, [fetchNextPageRA, hasNextPageRA]);
 
   return (
     <>
@@ -375,7 +393,7 @@ const Home: NextPage<IHome> = ({
                 ) : undefined
               }
               padding={user.loggedIn ? 'small' : 'large'}
-              onReachEnd={loadMore}
+              onReachEnd={loadMoreCollectionRA}
               seeMoreLink='/profile/purchases'
             />
           ) : null}
@@ -657,12 +675,10 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
       if (res.data && res.data.toJSON().posts) {
         return {
           props: {
-            initialPostsRA: res.data.toJSON().posts,
-            ...(res.data.paging?.nextPageToken
-              ? {
-                  initialNextPageTokenRA: res.data.paging?.nextPageToken,
-                }
-              : {}),
+            initialPageRA: {
+              posts: res.data.toJSON().posts,
+              paging: res.data.toJSON().paging,
+            },
             assumeLoggedIn,
             staticSuperpolls,
             staticBids,
