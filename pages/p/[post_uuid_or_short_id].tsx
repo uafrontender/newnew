@@ -42,6 +42,7 @@ import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../contexts/commentFromUrlContext';
 import PostInnerContextProvider from '../../contexts/postInnerContext';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import { NextPageWithLayout } from '../_app';
 import GeneralLayout from '../../components/templates/General';
@@ -71,6 +72,8 @@ const PostPage: NextPage<IPostPage> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { user, ui } = useAppSelector((state) => state);
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -212,6 +215,10 @@ const PostPage: NextPage<IPostPage> = ({
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
       }
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
@@ -221,6 +228,7 @@ const PostPage: NextPage<IPostPage> = ({
     user._persist?.rehydrated,
     isFollowingDecision,
     router,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   const handleUpdatePostStatus = useCallback(
@@ -333,6 +341,7 @@ const PostPage: NextPage<IPostPage> = ({
     });
     if (
       isConfirmToClosePost &&
+      // eslint-disable-next-line no-alert
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;

@@ -13,6 +13,8 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import Toggle from '../../atoms/Toggle';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
   const { showErrorToastPredefined } = useErrorToasts();
@@ -21,6 +23,14 @@ const SettingsNotificationsSection = () => {
   const [myNotificationState, setMyNotificationState] = useState<
     newnewapi.INotificationState[] | null
   >(null);
+
+  const {
+    inSubscribed,
+    isPushNotificationSupported,
+    isLoading: isStateLoading,
+    unsubscribe,
+    requestPermission,
+  } = usePushNotifications();
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -77,9 +87,13 @@ const SettingsNotificationsSection = () => {
     });
   };
 
+  const turnOnNotification = () => {
+    requestPermission();
+  };
+
   return (
     <SWrapper>
-      {isLoading !== false ? (
+      {isLoading !== false || isStateLoading ? (
         <Lottie
           width={64}
           height={64}
@@ -90,29 +104,44 @@ const SettingsNotificationsSection = () => {
           }}
         />
       ) : (
-        myNotificationState !== null &&
-        myNotificationState.map((subsection, idx) => (
-          <SSubsection
-            key={`notificationsource-${subsection.notificationSource}`}
-          >
-            <Text variant={2} weight={600}>
-              {subsection.notificationSource &&
-              subsection.notificationSource === 1
-                ? t('Settings.sections.notifications.email')
-                : t('Settings.sections.notifications.push')}
-            </Text>
-            <Toggle
-              title={
+        <>
+          {myNotificationState !== null &&
+            myNotificationState.map((subsection, idx) => {
+              if (
                 subsection.notificationSource &&
                 subsection.notificationSource === 1
-                  ? t('Settings.sections.notifications.email')
-                  : t('Settings.sections.notifications.push')
+              ) {
+                return (
+                  <SSubsection
+                    key={`notificationsource-${subsection.notificationSource}`}
+                  >
+                    <Text variant={2} weight={600}>
+                      {t('Settings.sections.notifications.email')}
+                    </Text>
+                    <Toggle
+                      title={t('Settings.sections.notifications.email')}
+                      checked={subsection.isEnabled ?? false}
+                      onChange={() => handleUpdateItem(idx)}
+                    />
+                  </SSubsection>
+                );
               }
-              checked={subsection.isEnabled ?? false}
-              onChange={() => handleUpdateItem(idx)}
-            />
-          </SSubsection>
-        ))
+
+              return null;
+            })}
+          {isPushNotificationSupported && (
+            <SSubsection>
+              <Text variant={2} weight={600}>
+                {t('Settings.sections.notifications.push')}
+              </Text>
+              <Toggle
+                title={t('Settings.sections.notifications.push')}
+                checked={inSubscribed}
+                onChange={inSubscribed ? unsubscribe : turnOnNotification}
+              />
+            </SSubsection>
+          )}
+        </>
       )}
     </SWrapper>
   );
