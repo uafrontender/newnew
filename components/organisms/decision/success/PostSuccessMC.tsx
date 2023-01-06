@@ -267,11 +267,11 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                                     )}
                               </Link>
                             </SSpan>
-                            {winningOption.supporterCount > 1 ? (
+                            {winningOption.supporterCount - 1 > 0 ? (
                               <>
                                 {' & '}
                                 {formatNumber(
-                                  winningOption.supporterCount,
+                                  winningOption.supporterCount - 1,
                                   true
                                 )}{' '}
                                 {t('mcPostSuccess.others')}

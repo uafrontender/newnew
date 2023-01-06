@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -12,6 +12,9 @@ import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.sv
 import InlineSvg from '../../../../atoms/InlineSVG';
 import assets from '../../../../../constants/assets';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import VotesAmountInputModal from '../../../../atoms/decision/VotesAmountInputModal';
+import { usePostInnerState } from '../../../../../contexts/postInnerContext';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IMcConfirmVoteModal {
   isOpen: boolean;
@@ -19,8 +22,13 @@ interface IMcConfirmVoteModal {
   postCreatorName: string;
   optionText: string;
   supportVotesAmount: string;
+  customSupportVotesAmount: string;
+  customPaymentWithFeeInCents: number;
+  isAmountPredefined: boolean;
+  minAmount: number;
   onClose: () => void;
   handleOpenPaymentModal: () => void;
+  handleSetSupportVotesAmount: (newAmount: string) => void;
 }
 
 const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
@@ -29,11 +37,89 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   postCreatorName,
   optionText,
   supportVotesAmount,
+  isAmountPredefined,
+  customSupportVotesAmount,
+  customPaymentWithFeeInCents,
+  minAmount,
   onClose,
   handleOpenPaymentModal,
+  handleSetSupportVotesAmount,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
+
+  const { postParsed } = usePostInnerState();
+
+  const postCreator = useMemo(() => postParsed?.creator, [postParsed]);
+
+  if (!isAmountPredefined) {
+    return (
+      <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <SCloseButton
+              iconOnly
+              view='transparent'
+              onClick={onClose}
+              onClickCapture={() => {
+                Mixpanel.track('Close McConfirmVoteModal', {
+                  _stage: 'Post',
+                  _component: 'McConfirmVoteModal',
+                });
+              }}
+            >
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
+            </SCloseButton>
+            <SHeadline variant={4}>
+              {t('mcPost.optionsTab.optionCard.confirmVoteModal.custom')}
+            </SHeadline>
+            <SCreatorsText variant={2}>
+              {t('mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes', {
+                creator: getDisplayname(postCreator),
+              })}
+            </SCreatorsText>
+            <SCaption variant={3}>
+              {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
+            </SCaption>
+            <SOptionText variant={2}>{optionText}</SOptionText>
+            <VotesAmountInputModal
+              value={customSupportVotesAmount}
+              customPaymentWithFeeInCents={customPaymentWithFeeInCents}
+              onChange={(newValue: string) =>
+                handleSetSupportVotesAmount(newValue)
+              }
+              minAmount={minAmount}
+            />
+            <SVoteButton
+              view='primary'
+              disabled={
+                !customSupportVotesAmount ||
+                parseInt(customSupportVotesAmount) < minAmount
+              }
+              onClickCapture={() => {
+                Mixpanel.track('Submit Votes Amount and Open Payment Modal', {
+                  _stage: 'Post',
+                  _component: 'McConfirmVoteModal',
+                });
+              }}
+              onClick={() => handleOpenPaymentModal()}
+            >
+              {t('mcPost.optionsTab.optionCard.confirmVoteModal.voteButton')}
+            </SVoteButton>
+          </SContentContainer>
+        </SWrapper>
+      </Modal>
+    );
+  }
 
   return (
     <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
