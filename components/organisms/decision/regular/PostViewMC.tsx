@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
   fetchCurrentOptionsForMCPost,
   voteOnPost,
@@ -375,34 +375,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }),
     [post]
   );
-
-  // Mark post as viewed if logged in
-  useEffect(() => {
-    async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-        return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-
-        if (res.error) throw new Error('Failed to mark post as viewed');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [post, user.loggedIn, user.userData?.userUuid]);
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -927,15 +899,27 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   position: relative;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    'back timer'
+    'endsOn endsOn';
   justify-content: center;
   flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 `;
 
 const SEndDate = styled.div`
+  grid-area: endsOn;
   width: 100%;
   text-align: center;
   padding: 8px 0px;
@@ -947,9 +931,10 @@ const SEndDate = styled.div`
 `;
 
 const SGoBackButton = styled(GoBackButton)`
-  position: absolute;
-  left: 0;
-  top: 4px;
+  grid-area: back;
+  position: relative;
+  top: -4px;
+  left: -8px;
 `;
 
 const SActivitiesContainer = styled.div`

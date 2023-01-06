@@ -177,7 +177,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                   </a>
                 </Link>
               </SCreator>
-              {post.totalAmount?.usdCents && (
+              {post.totalAmount?.usdCents && post.totalAmount?.usdCents > 0 ? (
                 <STotal>
                   {`$${formatNumber(
                     post.totalAmount.usdCents / 100 ?? 0,
@@ -185,7 +185,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                   )}`}{' '}
                   <span>{t('acPostAwaiting.inTotalBids')}</span>
                 </STotal>
-              )}
+              ) : null}
             </SCreatorInfoDiv>
             <SPostTitle variant={4}>
               <PostTitleContent>{post.title}</PostTitleContent>
