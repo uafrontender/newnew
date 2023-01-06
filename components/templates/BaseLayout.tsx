@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
 
@@ -14,7 +15,7 @@ const BaseLayout: React.FunctionComponent<IBaseLayout> = React.memo(
     const { overlayModeEnabled } = useOverlayMode();
     const savedScrollPosition = useRef(0);
 
-    useEffect(() => {
+    useUpdateEffect(() => {
       if (overlayModeEnabled) {
         savedScrollPosition.current = window ? window.scrollY : 0;
 

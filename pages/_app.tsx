@@ -65,9 +65,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
-import useScrollRestoration from '../utils/hooks/useScrollRestoration';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
-import ScrollRestorationAnimationContainer from '../components/atoms/ScrollRestorationAnimationContainer';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -89,8 +87,6 @@ const MyApp = (props: IMyApp): ReactElement => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
-
-  const { isRestoringScroll } = useScrollRestoration();
 
   // Shared layouts
   const getLayout = useMemo(
@@ -265,9 +261,9 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                       }
                                                     />
                                                   )}
-                                                  {isRestoringScroll ? (
+                                                  {/* {isRestoringScroll ? (
                                                     <ScrollRestorationAnimationContainer />
-                                                  ) : null}
+                                                  ) : null} */}
                                                 </ErrorBoundary>
                                               </VideoProcessingWrapper>
                                               <ReCaptchaBadgeModal />

@@ -33,40 +33,41 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
   const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
 
-  const { data, hasNextPage, fetchNextPage, isLoading } = useInfiniteQuery(
-    [
-      'private',
-      'getMyPosts',
-      newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-    ],
-    async ({ pageParam }) => {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-        filter: postsFilter,
-        paging: {
-          pageToken: pageParam,
-        },
-        needTotalCount: true,
-      });
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useInfiniteQuery(
+      [
+        'private',
+        'getMyPosts',
+        newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+      ],
+      async ({ pageParam }) => {
+        const payload = new newnewapi.GetRelatedToMePostsRequest({
+          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+          filter: postsFilter,
+          paging: {
+            pageToken: pageParam,
+          },
+          needTotalCount: true,
+        });
 
-      const postsResponse = await getMyPosts(payload);
+        const postsResponse = await getMyPosts(payload);
 
-      if (!postsResponse.data || postsResponse.error) {
-        throw new Error('Request failed');
-      }
+        if (!postsResponse.data || postsResponse.error) {
+          throw new Error('Request failed');
+        }
 
-      return {
-        posts: postsResponse?.data?.posts || [],
-        paging: postsResponse?.data?.paging,
-      };
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage?.paging?.nextPageToken,
-      onError: (error) => {
-        console.error(error);
+        return {
+          posts: postsResponse?.data?.posts || [],
+          paging: postsResponse?.data?.paging,
+        };
       },
-    }
-  );
+      {
+        getNextPageParam: (lastPage) => lastPage?.paging?.nextPageToken,
+        onError: (error) => {
+          console.error(error);
+        },
+      }
+    );
 
   const posts = useMemo(
     () => data?.pages.map((page) => page.posts).flat(),
@@ -96,7 +97,7 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
           {posts && (
             <PostList
               category=''
-              loading={isLoading}
+              loading={isLoading || isFetchingNextPage}
               collection={posts}
               wrapperStyle={{
                 left: 0,
