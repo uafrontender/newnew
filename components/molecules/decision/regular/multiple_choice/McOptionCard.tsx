@@ -226,7 +226,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
 
-  //
+  // Predefined and custom votes
   const [isAmountPredefined, setIsAmountPredefined] = useState(false);
   const [supportVoteOffer, setSupportVoteOffer] =
     useState<newnewapi.McVoteOffer | null>(null);
