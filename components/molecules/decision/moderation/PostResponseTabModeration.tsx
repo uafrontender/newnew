@@ -392,8 +392,5 @@ const SShareButton = styled(Button)`
       theme.name === 'light' ? theme.colors.dark : '#FFFFFF'};
     color: ${({ theme }) =>
       theme.name === 'light' ? '#FFFFFF' : theme.colors.dark};
-
-    filter: brightness(400%);
-    -webkit-filter: brightness(400%);
   }
 `;

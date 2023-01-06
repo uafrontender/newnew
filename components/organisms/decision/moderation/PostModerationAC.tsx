@@ -582,12 +582,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           >
             {isMobile && (
               <SExpiresSection>
-                <SGoBackButton
-                  style={{
-                    gridArea: 'closeBtnMobile',
-                  }}
-                  onClick={handleGoBackInsidePost}
-                />
+                <SGoBackButton onClick={handleGoBackInsidePost} />
                 {postStatus === 'waiting_for_response' ||
                 postStatus === 'waiting_for_decision' ? (
                   <ResponseTimer
@@ -789,15 +784,27 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   position: relative;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    'back timer'
+    'endsOn endsOn';
   justify-content: center;
   flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 `;
 
 const SEndDate = styled.div`
+  grid-area: endsOn;
   width: 100%;
   text-align: center;
   padding: 8px 0px;
@@ -809,9 +816,10 @@ const SEndDate = styled.div`
 `;
 
 const SGoBackButton = styled(GoBackButton)`
-  position: absolute;
-  left: 0;
-  top: 4px;
+  grid-area: back;
+  position: relative;
+  top: -4px;
+  left: -8px;
 `;
 
 const SActivitiesContainer = styled.div`
