@@ -6,11 +6,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
-import { useInfiniteQuery } from 'react-query';
 
 import dynamic from 'next/dynamic';
 import { NextPageWithLayout } from '../_app';
-import { getMyPosts } from '../../api/endpoints/user';
+import useMyPosts from '../../utils/hooks/useMyPosts';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
@@ -34,40 +33,10 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
   const { t } = useTranslation('page-Profile');
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
-    useInfiniteQuery(
-      [
-        'private',
-        'getMyPosts',
-        newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-      ],
-      async ({ pageParam }) => {
-        const payload = new newnewapi.GetRelatedToMePostsRequest({
-          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-          filter: postsFilter,
-          paging: {
-            pageToken: pageParam,
-          },
-          needTotalCount: true,
-        });
-
-        const postsResponse = await getMyPosts(payload);
-
-        if (!postsResponse.data || postsResponse.error) {
-          throw new Error('Request failed');
-        }
-
-        return {
-          posts: postsResponse?.data?.posts || [],
-          paging: postsResponse?.data?.paging,
-        };
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage?.paging?.nextPageToken,
-        onError: (error) => {
-          console.error(error);
-        },
-      }
-    );
+    useMyPosts({
+      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+      postsFilter,
+    });
 
   const posts = useMemo(
     () => data?.pages.map((page) => page.posts).flat(),
