@@ -39,8 +39,7 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import CustomLink from '../atoms/CustomLink';
-import SmsNotificationsButton from '../molecules/profile/SmsNotificationsButton';
-import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
+// import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
@@ -156,13 +155,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     return [];
   }, [user]);
 
-  const subscription: SubscriptionToCreator = useMemo(
+  // TODO: Re-enable once new SMS service is integrated
+  /* const subscription: SubscriptionToCreator = useMemo(
     () => ({
       userId: user.uuid,
       username: user.username,
     }),
     [user.uuid, user.username]
-  );
+  );  */
 
   // Posts
   const [creatorsDecisions, setCreatorsDecisions] = useState(
@@ -477,11 +477,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SFavoritesButton> */}
 
           <SSideButtons>
-            {user.options?.isCreator && !isBlocked ? (
+            {
+              // TODO: Re-enable once new SMS service is integrated
+              /* user.options?.isCreator && !isBlocked ? (
               <SmsNotificationsButton subscription={subscription} />
-            ) : (
+            ) : ( */
               <div />
-            )}
+              /* ) */
+            }
             <RightSideButtons>
               {!isMobile && (
                 <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
