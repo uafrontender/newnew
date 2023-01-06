@@ -212,10 +212,12 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                         </a>
                       </Link>
                     </SCreator>
-                    <STotal>
-                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
-                      <span>{t('mcPostSuccess.inTotalVotes')}</span>
-                    </STotal>
+                    {post.totalVotes && post.totalVotes > 0 ? (
+                      <STotal>
+                        {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                        <span>{t('mcPostSuccess.inTotalVotes')}</span>
+                      </STotal>
+                    ) : null}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
