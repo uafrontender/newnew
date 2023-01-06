@@ -442,12 +442,8 @@
         "button": "Votar"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "votos",
-            "vote": "voto"
-          }
-        },
+        "votesAmount_NEED_TRANSLATION": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment_NEED_TRANSLATION": "Total",
         "suggestionPlaceholder": "Agregar tu propia opción",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",

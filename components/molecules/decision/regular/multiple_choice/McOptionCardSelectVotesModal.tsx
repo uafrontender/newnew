@@ -21,6 +21,7 @@ interface IMcOptionCardSelectVotesModal {
   handleClose: () => void;
   handleSetVoteOfferAndOpenModal: (votesAmount: newnewapi.McVoteOffer) => void;
   handleOpenBundleVotesModal?: () => void;
+  handleOpenCustomAmountModal: () => void;
 }
 
 const McOptionCardSelectVotesModal: React.FunctionComponent<
@@ -33,6 +34,7 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
   handleClose,
   handleSetVoteOfferAndOpenModal,
   handleOpenBundleVotesModal,
+  handleOpenCustomAmountModal,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
@@ -81,6 +83,11 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
               </Text>
             </SButton>
           ))}
+          <SButton onClick={() => handleOpenCustomAmountModal()}>
+            <Text variant={3}>
+              {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
+            </Text>
+          </SButton>
         </SButtonsContainer>
         {handleOpenBundleVotesModal && (
           <SUseVotesContainer>
@@ -137,6 +144,10 @@ const SButtonsContainer = styled.div`
   grid-template-columns: 1fr 1fr;
   grid-row-gap: 8px;
   grid-column-gap: 16px;
+
+  & > button:last-of-type {
+    grid-column: 1 / -1;
+  }
 `;
 
 const SButton = styled.button`

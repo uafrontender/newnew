@@ -442,12 +442,8 @@
         "button": "投票"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "票",
-            "vote": "票"
-          }
-        },
+        "votesAmount_NEED_TRANSLATION": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment_NEED_TRANSLATION": "Total",
         "suggestionPlaceholder": "添加你自己的選項",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",

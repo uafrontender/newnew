@@ -133,6 +133,7 @@ const SWrapper = styled.div`
 
   position: relative;
   top: -4px;
+  left: -14px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.pink};
 
