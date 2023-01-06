@@ -305,6 +305,7 @@ const SWrapper = styled.div<{
 
   position: relative;
   top: -4px;
+  left: -14px;
 
   ${({ shouldTurnRed }) =>
     shouldTurnRed
