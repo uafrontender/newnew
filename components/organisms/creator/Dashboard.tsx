@@ -5,7 +5,9 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import moment from 'moment';
+
 import { useAppSelector } from '../../../redux-store/store';
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
@@ -15,6 +17,7 @@ import { getMyUrgentPosts } from '../../../api/endpoints/post';
 import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
 import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -35,11 +38,14 @@ const AboutBundles = dynamic(
 
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
+  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
     undefined
@@ -54,6 +60,13 @@ export const Dashboard: React.FC = React.memo(() => {
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
+
+  useEffect(() => {
+    if (router.query.askPushNotificationPermission === 'true') {
+      setTimeout(() => promptUserWithPushNotificationsPermissionModal(), 200);
+      router.replace(router.pathname);
+    }
+  }, [promptUserWithPushNotificationsPermissionModal, router]);
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {

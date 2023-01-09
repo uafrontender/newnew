@@ -63,10 +63,6 @@ const OptionEllipseModal: React.FunctionComponent<IOptionModal> = ({
           }
         }
 
-        if (!canDelete && isMyOption) {
-          onClose();
-        }
-
         setCanDeleteOption(canDelete);
       } catch (err) {
         console.error(err);
@@ -79,8 +75,6 @@ const OptionEllipseModal: React.FunctionComponent<IOptionModal> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isMyOption, optionType, optionId, optionCreatorUuid]);
-
-  if (!isOpen || (isMyOption && isCanDeleteOptionLoading)) return null;
 
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>

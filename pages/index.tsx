@@ -365,7 +365,7 @@ const Home: NextPage<IHome> = ({
       {user.loggedIn && (
         <>
           {user.userData?.options?.isCreator && collectionRA?.length > 0 && (
-            <SHeading>
+            <SHeading style={{ marginTop: '80px' }}>
               <SHeadline>{t('section.explore')}</SHeadline>
               {/* <SSubtitle variant='subtitle'>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
@@ -491,14 +491,7 @@ const Home: NextPage<IHome> = ({
 // `;
 
 const SHeading = styled.div`
-  margin-top: 40px;
   margin-bottom: 20px;
-
-  ${(props) => props.theme.media.laptopM} {
-    max-width: 1248px;
-    margin-left: auto;
-    margin-right: auto;
-  }
 
   ${(props) => props.theme.media.tablet} {
     margin-bottom: 48px;
@@ -506,6 +499,13 @@ const SHeading = styled.div`
     & + section {
       padding-top: 0;
     }
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
   }
 `;
 

@@ -301,6 +301,10 @@
         "minutes": "Minutes",
         "seconds": "Seconds"
       }
+    },
+    "loading": {
+      "title": "Almost Done...",
+      "subtitle": "Just a little bit left!"
     }
   },
   "acPost": {
@@ -438,12 +442,8 @@
         "button": "Vote"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "votes",
-            "vote": "vote"
-          }
-        },
+        "votesAmount": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment": "Total",
         "suggestionPlaceholder": "Add your own option",
         "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option",

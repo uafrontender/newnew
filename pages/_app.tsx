@@ -52,6 +52,7 @@ import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 import CardsContextProvider from '../contexts/cardsContext';
+import PushNotificationContextProvider from '../contexts/pushNotificationsContext';
 
 // Images to be prefetched
 import assets from '../constants/assets';
@@ -65,6 +66,7 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
+import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 
 // interface for shared layouts
@@ -229,53 +231,57 @@ const MyApp = (props: IMyApp): ReactElement => {
                       <SyncUserWrapper>
                         <NotificationsProvider>
                           <ModalNotificationsContextProvider>
-                            <BlockedUsersProvider>
-                              <FollowingsContextProvider>
-                                <CardsContextProvider>
-                                  <BundlesContextProvider>
-                                    <ChatsProvider>
-                                      <OverlayModeProvider>
-                                        <ResizeMode>
-                                          <GlobalTheme
-                                            initialTheme={colorMode}
-                                            themeFromCookie={themeFromCookie}
-                                          >
-                                            <>
-                                              <ToastContainer containerId='toast-container' />
-                                              <VideoProcessingWrapper>
-                                                <ErrorBoundary>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
+                            <PushNotificationContextProvider>
+                              <BlockedUsersProvider>
+                                <FollowingsContextProvider>
+                                  <CardsContextProvider>
+                                    <BundlesContextProvider>
+                                      <ChatsProvider>
+                                        <OverlayModeProvider>
+                                          <ResizeMode>
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  <ErrorBoundary>
+                                                    {!pageProps.error ? (
+                                                      getLayout(
+                                                        <Component
+                                                          {...pageProps}
+                                                        />
+                                                      )
+                                                    ) : (
+                                                      <Error
+                                                        title={
+                                                          pageProps.error
+                                                            ?.message
+                                                        }
+                                                        statusCode={
+                                                          pageProps.error
+                                                            ?.statusCode ?? 500
+                                                        }
                                                       />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                  {/* {isRestoringScroll ? (
-                                                    <ScrollRestorationAnimationContainer />
-                                                  ) : null} */}
-                                                </ErrorBoundary>
-                                              </VideoProcessingWrapper>
-                                              <ReCaptchaBadgeModal />
-                                            </>
-                                          </GlobalTheme>
-                                        </ResizeMode>
-                                      </OverlayModeProvider>
-                                    </ChatsProvider>
-                                  </BundlesContextProvider>
-                                </CardsContextProvider>
-                              </FollowingsContextProvider>
-                            </BlockedUsersProvider>
+                                                    )}
+                                                    <PushNotificationModalContainer />
+                                                    {/* {isRestoringScroll ? (
+                                                      <ScrollRestorationAnimationContainer />
+                                                    ) : null} */}
+                                                  </ErrorBoundary>
+                                                </VideoProcessingWrapper>
+                                                <ReCaptchaBadgeModal />
+                                              </>
+                                            </GlobalTheme>
+                                          </ResizeMode>
+                                        </OverlayModeProvider>
+                                      </ChatsProvider>
+                                    </BundlesContextProvider>
+                                  </CardsContextProvider>
+                                </FollowingsContextProvider>
+                              </BlockedUsersProvider>
+                            </PushNotificationContextProvider>
                           </ModalNotificationsContextProvider>
                         </NotificationsProvider>
                       </SyncUserWrapper>
