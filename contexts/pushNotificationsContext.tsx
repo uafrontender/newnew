@@ -269,6 +269,10 @@ const PushNotificationsContextProvider: React.FC<
   ]);
 
   const checkSubscription = useCallback(async () => {
+    if (!user.loggedIn) {
+      return;
+    }
+
     if (!isPushNotificationSupported.current) {
       return;
     }
@@ -282,7 +286,7 @@ const PushNotificationsContextProvider: React.FC<
     }
 
     setIsSubscribed(isSubscribed);
-  }, [checkSubscriptionSafari, checkSubscriptionNonSafari]);
+  }, [checkSubscriptionSafari, checkSubscriptionNonSafari, user.loggedIn]);
 
   useEffect(() => {
     checkSubscription();
@@ -679,6 +683,11 @@ const PushNotificationsContextProvider: React.FC<
       isPushNotificationSupported.current
     ) {
       pauseNotification();
+      setIsSubscribed(false);
+      setIsPushNotificationAlertShown(false);
+      setIsPermissionRequestModalOpen(false);
+      setIsLoading(false);
+      setPublicKey('');
     }
   }, [user.loggedIn, pauseNotification]);
 
