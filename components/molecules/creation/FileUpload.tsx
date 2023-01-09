@@ -365,26 +365,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SLoadingDescriptionWithEllipseAnimated variant={2} weight={600}>
             {t('secondStep.video.processing.description')}
           </SLoadingDescriptionWithEllipseAnimated>
-          {/* <SLoadingBottomBlock>
-            <SLoadingDescription variant={2} weight={600}>
-              {t('secondStep.video.processing.process', {
-                time: `${etaProcessing} seconds`,
-                progress: progressProcessing,
-              })}
-            </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => {
-                handleCancelVideoProcessing();
-              }}
-              disabled={!value?.hlsStreamUrl}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
-          </SLoadingBottomBlock> */}
-          {/* <SSpinnerWrapper>
-            <InlineSVG svg={spinnerIcon} width='16px' />
-          </SSpinnerWrapper> */}
         </SLoadingBox>
       );
     } else if (progressProcessing === 100) {
