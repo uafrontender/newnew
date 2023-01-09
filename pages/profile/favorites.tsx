@@ -1,10 +1,8 @@
-/* eslint-disable no-param-reassign */
 import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-// import { useQueryClient } from 'react-query';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -29,15 +27,7 @@ interface IMyProfileFavorites {
 }
 
 const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
-
-  // Tried out `queryClient.invalidateQueries()` along with `refetch()`
-  // Not sure which fits better
-  // The endpoint is seemingly broken (as well as the view-history one) because it returns
-  // a lot of duplicate items and in the wrong order
-  // const queryClient = useQueryClient();
 
   const {
     data,
@@ -56,19 +46,17 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
     [data]
   );
 
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
+
   useEffect(() => {
     if (inView) {
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
 
-  const handleRemovePostFromState = (postUuid: string) => {
+  const handleRemovePostFromState = () => {
     refetch();
-    // queryClient.invalidateQueries([
-    //   'private',
-    //   'getMyPosts',
-    //   newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
-    // ]);
   };
 
   return (
@@ -93,9 +81,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
               wrapperStyle={{
                 left: 0,
               }}
-              handleRemovePostFromState={(uuid: string) =>
-                handleRemovePostFromState(uuid)
-              }
+              handleRemovePostFromState={handleRemovePostFromState}
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
@@ -118,10 +104,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
   return (
     <MyProfileLayout
       renderedPage='favorites'
-      postsCachedFavorites={[]}
       postsCachedFavoritesFilter={newnewapi.Post.Filter.ALL}
-      postsCachedFavoritesCount={0}
-      postsCachedFavoritesPageToken={page.props.nextPageTokenFromServer}
     >
       {page}
     </MyProfileLayout>

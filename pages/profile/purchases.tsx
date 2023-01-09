@@ -29,8 +29,6 @@ interface IMyProfilePurchases {
 }
 
 const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({ postsFilter }) => {
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
@@ -43,6 +41,9 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({ postsFilter }) => {
     () => data?.pages.map((page) => page.posts).flat(),
     [data]
   );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -94,10 +95,7 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({ postsFilter }) => {
   return (
     <MyProfileLayout
       renderedPage='purchases'
-      postsCachedMyPurchases={[]}
       postsCachedMyPurchasesFilter={newnewapi.Post.Filter.ALL}
-      postsCachedMyPurchasesCount={0}
-      postsCachedMyPurchasesPageToken={page.props.nextPageTokenFromServer}
     >
       {page}
     </MyProfileLayout>

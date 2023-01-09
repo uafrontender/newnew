@@ -28,8 +28,6 @@ interface IMyProfileMyPosts {
 }
 
 const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
@@ -42,6 +40,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
     () => data?.pages.map((page) => page.posts).flat(),
     [data]
   );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -93,10 +94,7 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
   return (
     <MyProfileLayout
       renderedPage='myposts'
-      postsCachedMyPosts={[]}
       postsCachedMyPostsFilter={newnewapi.Post.Filter.ALL}
-      postsCachedMyPostsCount={0}
-      postsCachedMyPostsPageToken={page.props.nextPageTokenFromServer}
     >
       {page}
     </MyProfileLayout>

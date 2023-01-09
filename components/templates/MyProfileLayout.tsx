@@ -30,14 +30,15 @@ import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 import isBrowser from '../../utils/isBrowser';
 import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../utils/getDisplayname';
+import copyToClipboard from '../../utils/copyToClipboard';
 
 type TPageType =
   | 'activelyBidding'
@@ -48,51 +49,21 @@ type TPageType =
 
 interface IMyProfileLayout {
   renderedPage: TPageType;
-  postsCachedActivelyBiddingOn?: newnewapi.Post[];
   postsCachedActivelyBiddingOnFilter?: newnewapi.Post.Filter;
-  postsCachedActivelyBiddingPageToken?: string | null | undefined;
-  postsCachedActivelyBiddingCount?: number;
-  postsCachedMyPurchases?: newnewapi.Post[];
   postsCachedMyPurchasesFilter?: newnewapi.Post.Filter;
-  postsCachedMyPurchasesPageToken?: string | null | undefined;
-  postsCachedMyPurchasesCount?: number;
-  postsCachedViewHistory?: newnewapi.Post[];
   postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
-  postsCachedViewHistoryPageToken?: string | null | undefined;
-  postsCachedViewHistoryCount?: number;
-  postsCachedFavorites?: newnewapi.Post[];
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
-  postsCachedFavoritesPageToken?: string | null | undefined;
-  postsCachedFavoritesCount?: number;
-  postsCachedMyPosts?: newnewapi.Post[];
   postsCachedMyPostsFilter?: newnewapi.Post.Filter;
-  postsCachedMyPostsCount?: number;
-  postsCachedMyPostsPageToken?: string | null | undefined;
   children: React.ReactNode;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   renderedPage,
-  postsCachedActivelyBiddingOn,
   postsCachedActivelyBiddingOnFilter,
-  postsCachedActivelyBiddingCount,
-  postsCachedMyPurchases,
   postsCachedMyPurchasesFilter,
-  postsCachedMyPurchasesCount,
-  postsCachedViewHistory,
   postsCachedViewHistoryFilter,
-  postsCachedViewHistoryCount,
-  postsCachedFavorites,
   postsCachedFavoritesFilter,
-  postsCachedFavoritesCount,
-  postsCachedMyPosts,
   postsCachedMyPostsFilter,
-  postsCachedMyPostsCount,
-  postsCachedActivelyBiddingPageToken,
-  postsCachedMyPurchasesPageToken,
-  postsCachedViewHistoryPageToken,
-  postsCachedFavoritesPageToken,
-  postsCachedMyPostsPageToken,
   children,
 }) => {
   const { t } = useTranslation('page-Profile');
@@ -147,19 +118,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
   const handleCopyLink = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
 
-      copyPostUrlToClipboard(url)
+      copyToClipboard(url)
         .then(() => {
           setIsCopiedUrl(true);
           setTimeout(() => {
@@ -172,88 +135,25 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [user.userData?.username]);
 
-  // Cached posts
-  const [postsActivelyBiddingOn, setPostsActivelyBiddingOn] = useState(
-    postsCachedActivelyBiddingOn ?? []
-  );
+  // Filter
   const [postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter] =
     useState(postsCachedActivelyBiddingOnFilter ?? newnewapi.Post.Filter.ALL);
-  const [activelyBiddingPageToken, setActivelyBiddingPageToken] = useState(
-    postsCachedActivelyBiddingPageToken
-  );
-  const [activelyBiddingCount, setActivelyBiddingCount] = useState(
-    postsCachedActivelyBiddingCount
-  );
 
-  const [postsMyPurchases, setPostsMyPurchases] = useState(
-    postsCachedMyPurchases ?? []
-  );
   const [postsMyPurchasesFilter, setPostsMyPurchasesFilter] = useState(
     postsCachedMyPurchasesFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [myPurchasesPageToken, setMyPurchasesPageToken] = useState(
-    postsCachedMyPurchasesPageToken
-  );
-  const [myPurchasesCount, setMyPurchasesCount] = useState(
-    postsCachedMyPurchasesCount
-  );
 
-  const [postsViewHistory, setPostsViewHistory] = useState(
-    postsCachedViewHistory ?? []
-  );
   const [postsViewHistoryFilter, setPostsViewHistoryFilter] = useState(
     postsCachedViewHistoryFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [viewHistoryPageToken, setViewHistoryPageToken] = useState(
-    postsCachedViewHistoryPageToken
-  );
-  const [viewHistoryCount, setViewHistoryCount] = useState(
-    postsCachedViewHistoryCount
-  );
-  const [postsFavorites, setPostsFavorites] = useState(
-    postsCachedFavorites ?? []
-  );
+
   const [postsFavoritesFilter, setPostsFavoritesFilter] = useState(
     postsCachedFavoritesFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [favoritesPageToken, setFavoritesPageToken] = useState(
-    postsCachedFavoritesPageToken
-  );
-  const [postsFavoritesCount, setFavoritesCount] = useState(
-    postsCachedFavoritesCount
-  );
 
-  const [postsMyPosts, setPostsMyPosts] = useState(postsCachedMyPosts ?? []);
   const [postsMyPostsFilter, setPostsMyPostsFilter] = useState(
     postsCachedMyPostsFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [myPostsPageToken, setMyPostsPageToken] = useState(
-    postsCachedMyPostsPageToken
-  );
-  const [postsMyPostsCount, setMyPostsCount] = useState(
-    postsCachedMyPostsCount
-  );
-
-  // UpdateCachedPosts
-  const handleSetPostsActivelyBiddingOn: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsActivelyBiddingOn, [setPostsActivelyBiddingOn]);
-
-  const handleSetPostsMyPurchases: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsMyPurchases, [setPostsMyPurchases]);
-
-  const handleSetPostsViewHistory: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsViewHistory, [setPostsViewHistory]);
-
-  const handleSetPostsFavorites: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsFavorites, [setPostsFavorites]);
-
-  const handleSetPostsMyPosts: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsMyPosts, [setPostsMyPosts]);
 
   const handleUpdateFilter = useCallback(
     (value: newnewapi.Post.Filter) => {
@@ -286,118 +186,28 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     [renderedPage]
   );
 
-  const handleUpdatePageToken = useCallback(
-    (value: string | null | undefined) => {
-      switch (renderedPage) {
-        case 'activelyBidding': {
-          setActivelyBiddingPageToken(value);
-          break;
-        }
-        case 'purchases': {
-          setMyPurchasesPageToken(value);
-          break;
-        }
-        case 'viewHistory': {
-          setViewHistoryPageToken(value);
-          break;
-        }
-        case 'favorites': {
-          setFavoritesPageToken(value);
-          break;
-        }
-        case 'myposts': {
-          setMyPostsPageToken(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
-  const handleUpdateCount = useCallback(
-    (value: number) => {
-      switch (renderedPage) {
-        case 'activelyBidding': {
-          setActivelyBiddingCount(value);
-          break;
-        }
-        case 'purchases': {
-          setMyPurchasesCount(value);
-          break;
-        }
-        case 'viewHistory': {
-          setViewHistoryCount(value);
-          break;
-        }
-        case 'favorites': {
-          setFavoritesCount(value);
-          break;
-        }
-        case 'myposts': {
-          setMyPostsCount(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
   const renderChildren = () => {
-    let postsForPage = {};
     let postsForPageFilter;
-    let pageToken;
-    let handleSetPosts;
-    let totalCount;
-    let handleSetFavoritePosts;
 
     switch (renderedPage) {
       case 'activelyBidding': {
-        postsForPage = postsActivelyBiddingOn;
         postsForPageFilter = postsActivelyBiddingOnFilter;
-        pageToken = activelyBiddingPageToken;
-        totalCount = activelyBiddingCount;
-        handleSetPosts = handleSetPostsActivelyBiddingOn;
-        handleSetFavoritePosts = handleSetPostsFavorites;
         break;
       }
       case 'purchases': {
-        postsForPage = postsMyPurchases;
         postsForPageFilter = postsMyPurchasesFilter;
-        pageToken = myPurchasesPageToken;
-        totalCount = myPurchasesCount;
-        handleSetPosts = handleSetPostsMyPurchases;
-        handleSetFavoritePosts = handleSetPostsFavorites;
         break;
       }
       case 'viewHistory': {
-        postsForPage = postsViewHistory;
         postsForPageFilter = postsViewHistoryFilter;
-        pageToken = viewHistoryPageToken;
-        totalCount = viewHistoryCount;
-        handleSetPosts = handleSetPostsViewHistory;
-        handleSetFavoritePosts = handleSetPostsFavorites;
         break;
       }
       case 'favorites': {
-        postsForPage = postsFavorites;
         postsForPageFilter = postsFavoritesFilter;
-        pageToken = favoritesPageToken;
-        totalCount = postsFavoritesCount;
-        handleSetPosts = handleSetPostsFavorites;
         break;
       }
       case 'myposts': {
-        postsForPage = postsMyPosts;
         postsForPageFilter = postsMyPostsFilter;
-        pageToken = myPostsPageToken;
-        totalCount = postsMyPostsCount;
-        handleSetPosts = handleSetPostsMyPosts;
         break;
       }
       default: {
@@ -406,15 +216,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
 
     return React.cloneElement(children as ReactElement, {
-      ...(postsForPage ? { posts: postsForPage } : {}),
       ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
-      pageToken,
-      totalCount,
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
       handleUpdateFilter,
-      handleSetFavoritePosts,
     });
   };
 
@@ -687,26 +490,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 };
 
 MyProfileLayout.defaultProps = {
-  postsCachedActivelyBiddingOn: undefined,
   postsCachedActivelyBiddingOnFilter: undefined,
-  postsCachedActivelyBiddingCount: undefined,
-  postsCachedMyPurchases: undefined,
   postsCachedMyPurchasesFilter: undefined,
-  postsCachedMyPurchasesCount: undefined,
-  postsCachedViewHistory: undefined,
   postsCachedViewHistoryFilter: undefined,
-  postsCachedViewHistoryCount: undefined,
-  postsCachedFavorites: undefined,
   postsCachedFavoritesFilter: undefined,
-  postsCachedFavoritesCount: undefined,
-  postsCachedActivelyBiddingPageToken: undefined,
-  postsCachedMyPurchasesPageToken: undefined,
-  postsCachedViewHistoryPageToken: undefined,
-  postsCachedFavoritesPageToken: undefined,
-  postsCachedMyPosts: undefined,
   postsCachedMyPostsFilter: undefined,
-  postsCachedMyPostsCount: undefined,
-  postsCachedMyPostsPageToken: undefined,
 };
 
 export default MyProfileLayout;

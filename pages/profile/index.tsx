@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
 import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -31,8 +29,6 @@ interface IMyProfileIndex {
 }
 
 const MyProfileIndex: NextPage<IMyProfileIndex> = ({ postsFilter }) => {
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
@@ -46,6 +42,9 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({ postsFilter }) => {
     () => data?.pages.map((page) => page.posts).flat(),
     [data]
   );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -99,10 +98,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({ postsFilter }) => {
   return (
     <MyProfileLayout
       renderedPage='activelyBidding'
-      postsCachedActivelyBiddingOn={[]}
       postsCachedActivelyBiddingOnFilter={newnewapi.Post.Filter.ALL}
-      postsCachedActivelyBiddingCount={0}
-      postsCachedActivelyBiddingPageToken={page.props.nextPageTokenFromServer}
     >
       {page}
     </MyProfileLayout>

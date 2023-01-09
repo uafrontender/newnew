@@ -10,7 +10,7 @@ interface IUseMyPosts {
 
 const useMyPosts = (params: IUseMyPosts) => {
   const query = useInfiniteQuery(
-    ['private', 'getMyPosts', params.relation],
+    ['private', 'getMyPosts', params.relation, params.postsFilter],
     async ({ pageParam }) => {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: params.relation,

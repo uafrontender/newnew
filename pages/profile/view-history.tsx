@@ -29,8 +29,6 @@ interface IMyProfileViewHistory {
 const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   postsFilter,
 }) => {
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('page-Profile');
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
@@ -43,6 +41,9 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
     () => data?.pages.map((page) => page.posts).flat(),
     [data]
   );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
     if (inView) {
@@ -97,10 +98,7 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
   return (
     <MyProfileLayout
       renderedPage='viewHistory'
-      postsCachedViewHistory={[]}
       postsCachedViewHistoryFilter={newnewapi.Post.Filter.ALL}
-      postsCachedViewHistoryCount={0}
-      postsCachedViewHistoryPageToken={page.props.nextPageTokenFromServer}
     >
       {page}
     </MyProfileLayout>
