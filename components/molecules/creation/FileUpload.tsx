@@ -626,9 +626,11 @@ const SVideoButton = styled.button<ISVideoButton>`
   font-weight: bold;
   line-height: 24px;
 
-  padding: 8px 16px;
+  padding: 0px 2px;
 
   border-radius: 16px;
+
+  text-align: left;
 
   ${({ active }) =>
     active
@@ -639,6 +641,10 @@ const SVideoButton = styled.button<ISVideoButton>`
               : theme.colorsThemed.background.tertiary};
         `
       : ''}
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 8px 16px;
+  }
 `;
 
 const SLoadingBox = styled.div`
