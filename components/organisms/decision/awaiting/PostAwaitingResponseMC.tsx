@@ -28,6 +28,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -244,7 +245,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                     <PostTitleContent>{post.title}</PostTitleContent>
                   </SPostTitle>
                   <SSeparator />
-                  {winningOption && (
+                  {winningOption ? (
                     <>
                       <SWinningBidCreator>
                         <SCreator>
@@ -338,8 +339,13 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                         </SWinningOptionDetailsTitle>
                       </SWinningOptionDetails>
                     </>
+                  ) : (
+                    <McWaitingOptionsSection post={post} />
                   )}
                 </SMainSectionWrapper>
+                {/* {!winningOption ? (
+                  <McWaitingOptionsSection post={post} />
+                ) : null} */}
               </>
             ) : (
               <McSuccessOptionsTab
@@ -414,8 +420,12 @@ const SActivitiesContainer = styled.div<{
   margin-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    flex-direction: column;
+
     margin-top: 0px;
     min-height: 506px;
+    height: 100%;
 
     background-color: ${({ theme }) =>
       theme.name === 'dark'
@@ -426,9 +436,6 @@ const SActivitiesContainer = styled.div<{
   ${({ theme }) => theme.media.laptop} {
     min-height: unset;
     height: 728px;
-    display: flex;
-    flex-direction: column;
-    /* justify-content: space-between; */
   }
 `;
 
@@ -441,6 +448,7 @@ const SMainSectionWrapper = styled.div`
     padding-right: 16px;
 
     height: calc(100% - 260px);
+    height: 100%;
 
     display: flex;
     flex-direction: column;
