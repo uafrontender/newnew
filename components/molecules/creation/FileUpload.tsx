@@ -478,9 +478,9 @@ const FileUpload: React.FC<IFileUpload> = ({
           anchorElement={ellipseButtonRef.current}
           anchorOrigin={{
             horizontal: 'right',
-            vertical: 'top',
+            vertical: 'center',
           }}
-          offsetRight='200px'
+          offsetRight='180px'
         >
           <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
