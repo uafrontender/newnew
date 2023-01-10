@@ -457,7 +457,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleSetStageToEditingProfilePicture = () => {
     if (isBrowser()) {
-      syncedHistoryPushState(
+      syncedHistoryReplaceState(
         {
           stage: 'edit-profile-picture',
         },
