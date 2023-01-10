@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
+
 import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IBaseLayout {

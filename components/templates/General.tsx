@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo, useState } from 'react';
-import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -19,7 +18,6 @@ import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
-// import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
@@ -35,7 +33,6 @@ import { loadStateLS } from '../../utils/localStorage';
 interface IGeneral {
   className?: string;
   withChat?: boolean;
-  specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
   noMobieNavigation?: boolean;
   noPaddingMobile?: boolean;
@@ -46,7 +43,6 @@ export const General: React.FC<IGeneral> = (props) => {
   const {
     className,
     withChat,
-    specialStatusBarColor,
     restrictMaxWidth,
     noMobieNavigation,
     noPaddingMobile,
@@ -195,16 +191,6 @@ export const General: React.FC<IGeneral> = (props) => {
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <Head>
-          <meta
-            name='theme-color'
-            content={
-              specialStatusBarColor
-                ? specialStatusBarColor
-                : theme.colorsThemed.statusBar.background
-            }
-          />
-        </Head>
         <Header
           visible={!isMobile || mobileNavigationVisible || globalSearchActive}
         />
@@ -278,7 +264,6 @@ export default General;
 
 General.defaultProps = {
   withChat: false,
-  specialStatusBarColor: undefined,
   restrictMaxWidth: undefined,
 };
 

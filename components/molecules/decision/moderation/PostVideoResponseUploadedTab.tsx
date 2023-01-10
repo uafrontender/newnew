@@ -172,6 +172,11 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleItemChange(id, localFile);
   }, [id, localFile, handleItemChange]);
 
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
+
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
@@ -236,7 +241,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
               </SLoadingDescription>
               <SLoadingBottomBlockButton
                 view='secondary'
-                onClick={handleCancelVideoUpload}
+                onClick={() => handleCancelUploadAndClearLocalFile()}
               >
                 {t('postVideo.uploadResponseForm.button.cancel')}
               </SLoadingBottomBlockButton>
@@ -292,6 +297,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           </SLoadingBox>
         </SLoadingContainer>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
@@ -303,9 +310,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingLoading,
     responseFileUploadETA,
     responseFileUploadProgress,
-    handleCancelVideoUpload,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
+    handleCancelUploadAndClearLocalFile,
     localFile,
   ]);
 

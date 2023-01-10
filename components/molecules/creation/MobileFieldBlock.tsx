@@ -476,6 +476,8 @@ const SMobileDateContent = styled.div`
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   z-index: 3;
+
+  overflow-y: auto;
 `;
 
 const SMobileList = styled.div`
@@ -488,6 +490,8 @@ const SMobileList = styled.div`
     props.theme.colorsThemed.background.backgroundDD};
 
   z-index: 3;
+
+  overflow-y: auto;
 `;
 
 interface ISButton {
@@ -497,6 +501,8 @@ interface ISButton {
 const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 16px;
+
+  flex-shrink: 0;
 
   ${(props) => props.theme.media.tablet} {
     min-width: 136px;
@@ -515,6 +521,8 @@ const SScheduleButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 12px;
   margin-bottom: 8px;
+  height: 56px;
+  flex-shrink: 0;
 `;
 
 const SItemTitle = styled(Text)`
