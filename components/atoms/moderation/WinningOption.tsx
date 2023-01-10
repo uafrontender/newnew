@@ -1,7 +1,9 @@
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
+import Link, { LinkProps } from 'next/link';
 
 import Headline from '../Headline';
 import Text from '../Text';
@@ -57,10 +59,9 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
             <Trans
               i18nKey='postResponseTabModeration.winner.ac.optionCreator'
               t={t}
-              // Can it be reworked wso it uses t inside the Link element (without Trans element)?
               // @ts-ignore
               components={[
-                <SCreatorLink href={`/${winningOptionAc.creator?.username}`} />,
+                <CreatorLink href={`/${winningOptionAc.creator?.username}`} />,
                 winningOptionAc.creator?.options?.isVerified ? (
                   <SInlineSvg
                     svg={VerificationCheckmark}
@@ -106,13 +107,12 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                 src={winningOptionMc?.creator?.avatarUrl!!}
               />
               <SSpan>
-                {/* Can it be reworked wso it uses t inside the Link element (without Trans element)? */}
                 <Trans
                   i18nKey='postResponseTabModeration.winner.mc.optionCreator'
                   t={t}
                   // @ts-ignore
                   components={[
-                    <SCreatorLink
+                    <CreatorLink
                       href={`/${winningOptionMc.creator?.username}`}
                     />,
                     winningOptionMc.creator?.options?.isVerified ? (
@@ -155,13 +155,22 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
 
 export default WinningOption;
 
-const SCreatorLink = styled.a`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+const SCreatorLink = styled(Link)``;
 
-  &:hover {
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-  }
-`;
+type TCreatorLink<T> = React.AnchorHTMLAttributes<HTMLAnchorElement> &
+  React.PropsWithChildren<T>;
+
+const CreatorLink = ({
+  href,
+  children,
+  ...restProps
+}: TCreatorLink<LinkProps>) => (
+  <SCreatorLink href={href || ''}>
+    <a {...restProps} className='creatorLinkAnchor'>
+      {children}
+    </a>
+  </SCreatorLink>
+);
 
 const SInlineSvg = styled(InlineSvg)`
   flex-shrink: 0;
@@ -179,6 +188,14 @@ const SText = styled(Text)`
 const SSpan = styled.span`
   display: inline-flex;
   white-space: pre;
+
+  .creatorLinkAnchor {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+    &:hover {
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
 `;
 
 const SUserAvatar = styled.img`
