@@ -64,14 +64,17 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     });
     inputRef.current?.click();
   }, []);
+
   const handleDeleteVideoShow = useCallback(() => {
     setShowVideoDelete(true);
     playerRef.current.pause();
   }, []);
+
   const handleCloseDeleteVideoClick = useCallback(() => {
     setShowVideoDelete(false);
     playerRef.current.play();
   }, []);
+
   const handleDeleteVideo = useCallback(() => {
     Mixpanel.track('Post Video Response Delete', {
       _stage: 'Post',
@@ -102,9 +105,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     },
     [showErrorToastCustom, t, handleItemChange, id]
   );
+
   const handleRetryVideoUpload = useCallback(() => {
     handleItemChange(id, localFile);
   }, [id, localFile, handleItemChange]);
+
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
@@ -194,7 +203,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             </SLoadingDescription>
             <SLoadingBottomBlockButton
               view='secondary'
-              onClick={handleCancelVideoUpload}
+              onClick={() => handleCancelUploadAndClearLocalFile()}
             >
               {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
@@ -293,6 +302,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           </SButtonsContainer>
         </SFileBox>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
@@ -305,13 +316,13 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     postStatus,
     responseFileProcessingLoading,
     responseFileProcessingProgress,
+    localFile,
     handleFileChange,
     responseFileUploadETA,
     responseFileUploadProgress,
-    handleCancelVideoUpload,
+    handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    localFile,
     value,
     handleDeleteVideoShow,
   ]);

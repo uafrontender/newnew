@@ -222,6 +222,11 @@ const FileUpload: React.FC<IFileUpload> = ({
     onChange(id, localFile);
   }, [id, localFile, onChange]);
 
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
+
   const handleCancelVideoProcessing = useCallback(async () => {
     Mixpanel.track('Cancel Video Processing', {
       _stage: 'Creation',
@@ -315,9 +320,7 @@ const FileUpload: React.FC<IFileUpload> = ({
             </SLoadingDescription>
             <SLoadingBottomBlockButton
               view='secondary'
-              onClick={() => {
-                handleCancelVideoUpload();
-              }}
+              onClick={() => handleCancelUploadAndClearLocalFile()}
             >
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
@@ -416,6 +419,8 @@ const FileUpload: React.FC<IFileUpload> = ({
           </SButtonsContainer>
         </SFileBox>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
@@ -427,13 +432,13 @@ const FileUpload: React.FC<IFileUpload> = ({
     errorProcessing,
     loadingProcessing,
     progressProcessing,
+    localFile,
     handleFileChange,
     etaUpload,
     progressUpload,
-    handleCancelVideoUpload,
+    handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    localFile,
     value,
     thumbnails,
     showEllipseMenu,
