@@ -3,7 +3,6 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { useInfiniteQuery } from 'react-query';
 
 import CardsSection from './CardsSection';
 import Headline from '../../atoms/Headline';
@@ -12,9 +11,8 @@ import FilterButton from '../../atoms/FilterButton';
 import Text from '../../atoms/Text';
 import Lottie from '../../atoms/Lottie';
 
-import { getMyPosts } from '../../../api/endpoints/user';
-
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import useMyPosts from '../../../utils/hooks/useMyPosts';
 
 const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
@@ -29,40 +27,12 @@ const YourPostsSection = () => {
     hasNextPage,
     fetchNextPage,
     isFetched: initialLoadDone,
-  } = useInfiniteQuery(
-    [
-      'getMyPosts',
-      newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-      statusFilter,
-    ],
-    async ({ pageParam }) => {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-        statusFilter:
-          statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
-        paging: {
-          pageToken: pageParam,
-          limit: 10,
-        },
-      });
-      const postsResponse = await getMyPosts(payload);
-
-      if (!postsResponse.data || postsResponse.error) {
-        throw new Error('Request failed');
-      }
-
-      return {
-        posts: postsResponse?.data?.posts || [],
-        paging: postsResponse?.data?.paging,
-      };
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.paging?.nextPageToken,
-      onError: (error) => {
-        console.error(error);
-      },
-    }
-  );
+  } = useMyPosts({
+    relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+    limit: 6,
+    statusFilter:
+      statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
+  });
 
   const posts = useMemo(
     () => (data ? data.pages.map((page) => page.posts).flat() : []),

@@ -22,6 +22,7 @@ import moment from 'moment-timezone';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 // Custom error page
 import Error from './_error';
@@ -291,6 +292,7 @@ const MyApp = (props: IMyApp): ReactElement => {
               </AppConstantsContextProvider>
             </LanguageWrapper>
           </GoogleReCaptchaProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </CookiesProvider>
     </>
