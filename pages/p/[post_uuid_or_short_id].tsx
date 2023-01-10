@@ -21,7 +21,6 @@ import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { validate as validateUuid } from 'uuid';
-import { useQuery } from 'react-query';
 
 import {
   deleteMyPost,
@@ -50,6 +49,7 @@ import GeneralLayout from '../../components/templates/General';
 import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import usePost from '../../utils/hooks/usePost';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -107,23 +107,10 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const { data: postFromAjax, isLoading: isPostLoading } = useQuery(
-    [
-      user.loggedIn ? 'private' : 'public',
-      'fetchPostByUUID',
-      postUuidOrShortId,
-    ],
-    async () => {
-      const getPostPayload = new newnewapi.GetPostRequest({
-        postUuid: postUuidOrShortId,
-      });
-
-      const res = await fetchPostByUUID(getPostPayload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Post not found');
-
-      return res.data;
+  const { data: postFromAjax, isLoading: isPostLoading } = usePost(
+    {
+      loggedInUser: user.loggedIn,
+      postUuid: postUuidOrShortId,
     },
     {
       initialData: post,
