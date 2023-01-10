@@ -659,7 +659,7 @@
     "hero": {
       "title": "Votes are in!",
       "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
-      "bodyNoResponse": "{{creator}} has {{time}} to do respond Stay tuned!",
+      "bodyNoResponse": "{{creator}} has {{time}} to do respond. Stay tuned!",
       "expires": {
         "days": "days",
         "days_singular": "day",
