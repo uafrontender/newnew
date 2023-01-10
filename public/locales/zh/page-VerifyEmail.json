@@ -4,7 +4,7 @@
     "description": "驗證電子郵件"
   },
   "heading": {
-    "mainHeading": "驗證你的電子郵件",
+    "mainHeading_NEED_TRANSLATION": "Confirm your email",
     "subHeading": "請輸入我們發送的代碼"
   },
   "expired": {
