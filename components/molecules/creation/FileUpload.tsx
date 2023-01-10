@@ -222,6 +222,11 @@ const FileUpload: React.FC<IFileUpload> = ({
     onChange(id, localFile);
   }, [id, localFile, onChange]);
 
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
+
   const handleCancelVideoProcessing = useCallback(async () => {
     Mixpanel.track('Cancel Video Processing', {
       _stage: 'Creation',
@@ -315,9 +320,7 @@ const FileUpload: React.FC<IFileUpload> = ({
             </SLoadingDescription>
             <SLoadingBottomBlockButton
               view='secondary'
-              onClick={() => {
-                handleCancelVideoUpload();
-              }}
+              onClick={() => handleCancelUploadAndClearLocalFile()}
             >
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
@@ -365,26 +368,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SLoadingDescriptionWithEllipseAnimated variant={2} weight={600}>
             {t('secondStep.video.processing.description')}
           </SLoadingDescriptionWithEllipseAnimated>
-          {/* <SLoadingBottomBlock>
-            <SLoadingDescription variant={2} weight={600}>
-              {t('secondStep.video.processing.process', {
-                time: `${etaProcessing} seconds`,
-                progress: progressProcessing,
-              })}
-            </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => {
-                handleCancelVideoProcessing();
-              }}
-              disabled={!value?.hlsStreamUrl}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
-          </SLoadingBottomBlock> */}
-          {/* <SSpinnerWrapper>
-            <InlineSVG svg={spinnerIcon} width='16px' />
-          </SSpinnerWrapper> */}
         </SLoadingBox>
       );
     } else if (progressProcessing === 100) {
@@ -436,6 +419,8 @@ const FileUpload: React.FC<IFileUpload> = ({
           </SButtonsContainer>
         </SFileBox>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
@@ -447,13 +432,13 @@ const FileUpload: React.FC<IFileUpload> = ({
     errorProcessing,
     loadingProcessing,
     progressProcessing,
+    localFile,
     handleFileChange,
     etaUpload,
     progressUpload,
-    handleCancelVideoUpload,
+    handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    localFile,
     value,
     thumbnails,
     showEllipseMenu,
@@ -498,9 +483,9 @@ const FileUpload: React.FC<IFileUpload> = ({
           anchorElement={ellipseButtonRef.current}
           anchorOrigin={{
             horizontal: 'right',
-            vertical: 'top',
+            vertical: 'center',
           }}
-          offsetRight='200px'
+          offsetRight='180px'
         >
           <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
@@ -626,9 +611,11 @@ const SVideoButton = styled.button<ISVideoButton>`
   font-weight: bold;
   line-height: 24px;
 
-  padding: 8px 16px;
+  padding: 0px 2px;
 
   border-radius: 16px;
+
+  text-align: left;
 
   ${({ active }) =>
     active
@@ -639,6 +626,10 @@ const SVideoButton = styled.button<ISVideoButton>`
               : theme.colorsThemed.background.tertiary};
         `
       : ''}
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 8px 16px;
+  }
 `;
 
 const SLoadingBox = styled.div`
