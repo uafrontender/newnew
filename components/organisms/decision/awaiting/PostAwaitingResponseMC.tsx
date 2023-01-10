@@ -198,10 +198,17 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
               <>
                 <WaitingForResponseBox
                   title={t('mcPostAwaiting.hero.title')}
-                  body={t('mcPostAwaiting.hero.body', {
-                    creator: getDisplayname(post.creator),
-                    time: waitingTime,
-                  })}
+                  body={
+                    winningOption
+                      ? t('mcPostAwaiting.hero.body', {
+                          creator: getDisplayname(post.creator),
+                          time: waitingTime,
+                        })
+                      : t('mcPostAwaiting.hero.bodyNoResponse', {
+                          creator: getDisplayname(post.creator),
+                          time: waitingTime,
+                        })
+                  }
                 />
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>

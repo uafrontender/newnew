@@ -659,6 +659,7 @@
     "hero": {
       "title": "投票結果出來了！",
       "body": "{{creator}}有{{time}}完成這個選項。請繼續關注！",
+      "bodyNoResponse_NEED_TRANSLATION": "{{creator}} has {{time}} to do respond Stay tuned!",
       "expires": {
         "days": "天",
         "days_singular": "天",

@@ -659,6 +659,7 @@
     "hero": {
       "title": "¡Los votos ya han sido conteados!",
       "body": "{{creator}} tiene {{time}} para realizar esta opción. ¡Mantente atento!",
+      "bodyNoResponse_NEED_TRANSLATION": "{{creator}} has {{time}} to do respond Stay tuned!",
       "expires": {
         "days": "días",
         "days_singular": "día",
