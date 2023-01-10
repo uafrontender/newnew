@@ -23,6 +23,7 @@ import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import isSafari from '../../../utils/isSafari';
 import { I18nNamespaces } from '../../../@types/i18next';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -66,6 +67,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
     resizeMode
   );
 
+  const { pauseNotification } = usePushNotifications();
+
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Bio
@@ -97,18 +100,20 @@ const OnboardingSectionAbout: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setBioError, dispatch]
+    [setBioError, dispatch, pauseNotification]
   );
 
   const validateBioViaApiDebounced = useMemo(
@@ -162,11 +167,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
       console.log(err);
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
+        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -177,6 +184,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
     dispatch,
     router,
     user.creatorData?.options?.stripeConnectStatus,
+    pauseNotification,
   ]);
 
   useEffect(() => {

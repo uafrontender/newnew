@@ -43,12 +43,14 @@ import PrivacySection from '../../../components/organisms/settings/PrivacySectio
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
 
   const { showErrorToastPredefined } = useErrorToasts();
+  const { pauseNotification } = usePushNotifications();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -110,17 +112,19 @@ const MyProfileSettingsIndex = () => {
       console.error(err);
       setIsLogoutLoading(false);
       if ((err as Error).message === 'No token') {
+        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie]);
+  }, [dispatch, setIsLogoutLoading, removeCookie, pauseNotification]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 

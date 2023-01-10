@@ -549,7 +549,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [unregister]);
 
   const pauseNotification = useCallback(() => {
-    if (!isPushNotificationSupported.current) {
+    if (!isPushNotificationSupported.current && inSubscribed) {
       return;
     }
 
@@ -558,7 +558,7 @@ const PushNotificationsContextProvider: React.FC<
     } else {
       pauseNotificationNonSafari();
     }
-  }, [unsubscribeSafari, pauseNotificationNonSafari]);
+  }, [inSubscribed, unsubscribeSafari, pauseNotificationNonSafari]);
 
   const resumePushNotificationSafari = useCallback(async () => {
     try {
@@ -682,8 +682,6 @@ const PushNotificationsContextProvider: React.FC<
       isUserWasLoggedIn.current &&
       isPushNotificationSupported.current
     ) {
-      pauseNotification();
-      setIsSubscribed(false);
       setIsPushNotificationAlertShown(false);
       setIsPermissionRequestModalOpen(false);
       setIsLoading(false);
