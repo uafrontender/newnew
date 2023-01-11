@@ -25,7 +25,7 @@ const SettingsNotificationsSection = () => {
   >(null);
 
   const {
-    inSubscribed,
+    isSubscribed,
     isPushNotificationSupported,
     isLoading: isStateLoading,
     unsubscribe,
@@ -136,8 +136,8 @@ const SettingsNotificationsSection = () => {
               </Text>
               <Toggle
                 title={t('Settings.sections.notifications.push')}
-                checked={inSubscribed}
-                onChange={inSubscribed ? unsubscribe : turnOnNotification}
+                checked={isSubscribed}
+                onChange={isSubscribed ? unsubscribe : turnOnNotification}
               />
             </SSubsection>
           )}

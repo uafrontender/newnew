@@ -5,7 +5,6 @@ import NextErrorComponent from 'next/error';
 import * as Sentry from '@sentry/nextjs';
 import { useAppDispatch } from '../redux-store/store';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
-import { usePushNotifications } from '../contexts/pushNotificationsContext';
 
 interface IErrorPage {
   statusCode: number;
@@ -27,24 +26,21 @@ const MyError: NextPage<IErrorPage> = ({
   }
 
   const dispatch = useAppDispatch();
-  const { pauseNotification } = usePushNotifications();
 
   useEffect(() => {
     // User was probably not authenticated in the first place
     // Redirect to homepage
     if (errorMsg === 'No token') {
-      pauseNotification();
       dispatch(logoutUserClearCookiesAndRedirect());
     }
     // Refresh token was present, session probably expired
     // Redirect to sign up page
     if (errorMsg === 'Refresh token invalid') {
-      pauseNotification();
       dispatch(
         logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
       );
     }
-  }, [errorMsg, dispatch, pauseNotification]);
+  }, [errorMsg, dispatch]);
 
   return <NextErrorComponent statusCode={statusCode} />;
 };

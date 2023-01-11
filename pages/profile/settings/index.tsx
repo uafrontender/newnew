@@ -92,6 +92,7 @@ const MyProfileSettingsIndex = () => {
   const handleLogout = useCallback(async () => {
     try {
       setIsLogoutLoading(true);
+      await pauseNotification();
       const payload = new newnewapi.EmptyRequest({});
       const res = await logout(payload);
 
@@ -112,13 +113,11 @@ const MyProfileSettingsIndex = () => {
       console.error(err);
       setIsLogoutLoading(false);
       if ((err as Error).message === 'No token') {
-        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );

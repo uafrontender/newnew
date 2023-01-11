@@ -59,7 +59,6 @@ import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
-import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -168,8 +167,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     ui.resizeMode
   );
 
-  const { pauseNotification } = usePushNotifications();
-
   // Common
   const [isLoading, setIsLoading] = useState(false);
 
@@ -222,20 +219,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setFormErrors, dispatch, pauseNotification]
+    [setFormErrors, dispatch]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -308,20 +303,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setFormErrors, dispatch, pauseNotification]
+    [setFormErrors, dispatch]
   );
 
   const validateTextViaAPIDebounced = useMemo(
@@ -559,10 +552,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
-        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       } else if ((err as Error).message === 'Refresh token invalid') {
-        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -589,7 +580,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEditAnimatedExtension,
     coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
-    pauseNotification,
   ]);
 
   // Profile image editing
@@ -710,13 +700,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setUpdateProfileImageLoading(false);
       if ((err as Error).message === 'No token') {
-        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -727,7 +715,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     avatarUrlInEdit,
     handleSetStageToEditingGeneral,
     dispatch,
-    pauseNotification,
   ]);
   const scrollPosition = useRef(0);
 

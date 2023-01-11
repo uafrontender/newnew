@@ -87,7 +87,6 @@ const Home: NextPage<IHome> = ({
 
   useEffect(() => {
     if (sessionExpired) {
-      pauseNotification();
       dispatch(
         logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
       );

@@ -46,7 +46,6 @@ import isSafari from '../../../utils/isSafari';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../utils/hooks/useErrorToasts';
-import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -151,8 +150,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const { pauseNotification } = usePushNotifications();
-
   const onlySpacesRegex = /^\s+$/;
 
   // Firstname
@@ -245,20 +242,18 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setUsernameError, dispatch, user.userData?.username, pauseNotification]
+    [setUsernameError, dispatch, user.userData?.username]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -293,20 +288,18 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setNicknameError, dispatch, pauseNotification]
+    [setNicknameError, dispatch]
   );
 
   const validateNicknameViaAPIDebounced = useMemo(
@@ -592,13 +585,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
 
       if ((err as Error).message === 'No token') {
-        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -620,7 +611,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
     dispatch,
     isAPIValidateLoading,
     setLoadingModalOpen,
-    pauseNotification,
   ]);
 
   // Update image to be saved

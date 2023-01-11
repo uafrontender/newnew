@@ -9,7 +9,6 @@ import Button from '../../atoms/Button';
 import { useAppDispatch } from '../../../redux-store/store';
 import { deleteMyAccount } from '../../../api/endpoints/user';
 import { logoutUserClearCookiesAndRedirect } from '../../../redux-store/slices/userStateSlice';
-import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 interface IConfirmDeleteAccountModal {
   isVisible: boolean;
@@ -22,7 +21,6 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const dispatch = useAppDispatch();
-  const { pauseNotification } = usePushNotifications();
 
   async function deleteUser() {
     try {
@@ -31,7 +29,6 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
       const res = await deleteMyAccount(payload);
 
       if (!res.error) {
-        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
     } catch (err) {

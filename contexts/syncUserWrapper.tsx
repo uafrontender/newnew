@@ -28,7 +28,6 @@ import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
 import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
-import { usePushNotifications } from './pushNotificationsContext';
 
 interface ISyncUserWrapper {
   children: React.ReactNode;
@@ -43,8 +42,6 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   const socketConnection = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
   const userWasLoggedIn = useRef(false);
-
-  const { pauseNotification } = usePushNotifications();
 
   const updateCreatorDataSteps = useCallback(
     () => setCreatorDataSteps((curr) => curr + 1),
@@ -196,24 +193,17 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     } catch (err) {
       console.error(err);
       if ((err as Error).message === 'No token') {
-        pauseNotification();
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        pauseNotification();
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       }
     }
-  }, [
-    dispatch,
-    user.creatorData?.options,
-    updateCreatorDataSteps,
-    pauseNotification,
-  ]);
+  }, [dispatch, user.creatorData?.options, updateCreatorDataSteps]);
 
   useEffect(() => {
     const setUserTimeZone = async () => {
@@ -249,13 +239,11 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
-          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
@@ -456,13 +444,11 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
-          pauseNotification();
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          pauseNotification();
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
