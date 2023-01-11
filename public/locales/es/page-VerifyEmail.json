@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Verificación de correo electrónico",
-    "description": "Verificar correo electrónico"
+    "title_NEED_TRANSLATION": "Email confirmation",
+    "description_NEED_TRANSLATION": "Confirm email"
   },
   "heading": {
     "mainHeading_NEED_TRANSLATION": "Confirm your email",

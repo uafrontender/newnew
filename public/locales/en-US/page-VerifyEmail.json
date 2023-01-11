@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Email verification",
-    "description": "Verify email"
+    "title": "Email confirmation",
+    "description": "Confirm email"
   },
   "heading": {
     "mainHeading": "Confirm your email",
