@@ -43,12 +43,14 @@ import PrivacySection from '../../../components/organisms/settings/PrivacySectio
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
 
   const { showErrorToastPredefined } = useErrorToasts();
+  const { pauseNotification } = usePushNotifications();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -90,6 +92,7 @@ const MyProfileSettingsIndex = () => {
   const handleLogout = useCallback(async () => {
     try {
       setIsLogoutLoading(true);
+      await pauseNotification();
       const payload = new newnewapi.EmptyRequest({});
       const res = await logout(payload);
 
@@ -120,7 +123,7 @@ const MyProfileSettingsIndex = () => {
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie]);
+  }, [dispatch, setIsLogoutLoading, removeCookie, pauseNotification]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 
