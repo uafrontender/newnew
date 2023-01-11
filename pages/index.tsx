@@ -47,7 +47,6 @@ import usePagination, {
 import isSafari from '../utils/isSafari';
 import { TTokenCookie } from '../api/apiConfigs';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
-import { usePushNotifications } from '../contexts/pushNotificationsContext';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -83,7 +82,6 @@ const Home: NextPage<IHome> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { pauseNotification } = usePushNotifications();
 
   useEffect(() => {
     if (sessionExpired) {
