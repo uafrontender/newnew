@@ -28,7 +28,7 @@ const WEB_PUSH_PROMPT_KEY =
 const SESSION_TIME = 240000;
 
 export const PushNotificationsContext = createContext<{
-  inSubscribed: boolean;
+  isSubscribed: boolean;
   isPermissionRequestModalOpen: boolean;
   isLoading: boolean;
   isPushNotificationAlertShown: boolean;
@@ -42,7 +42,7 @@ export const PushNotificationsContext = createContext<{
   pauseNotification: () => void;
   resumePushNotification: () => void;
 }>({
-  inSubscribed: false,
+  isSubscribed: false,
   isPermissionRequestModalOpen: false,
   isLoading: false,
   isPushNotificationAlertShown: false,
@@ -75,7 +75,7 @@ const PushNotificationsContextProvider: React.FC<
   const [isPushNotificationAlertShown, setIsPushNotificationAlertShown] =
     useState(false);
 
-  const [inSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [publicKey, setPublicKey] = useState('');
 
   const { showErrorToastPredefined } = useErrorToasts();
@@ -264,8 +264,8 @@ const PushNotificationsContextProvider: React.FC<
     }
   }, [
     getPermissionData,
-    registerSubscriptionNonSafari,
     fetchCheckSubscription,
+    registerSubscriptionNonSafari,
   ]);
 
   const checkSubscription = useCallback(async () => {
@@ -277,15 +277,15 @@ const PushNotificationsContextProvider: React.FC<
       return;
     }
 
-    let isSubscribed = false;
+    let isSubscribedValue = false;
 
     if (isSafariBrowser.current) {
-      isSubscribed = await checkSubscriptionSafari();
+      isSubscribedValue = await checkSubscriptionSafari();
     } else {
-      isSubscribed = await checkSubscriptionNonSafari();
+      isSubscribedValue = await checkSubscriptionNonSafari();
     }
 
-    setIsSubscribed(isSubscribed);
+    setIsSubscribed(isSubscribedValue);
   }, [checkSubscriptionSafari, checkSubscriptionNonSafari, user.loggedIn]);
 
   useEffect(() => {
@@ -549,7 +549,7 @@ const PushNotificationsContextProvider: React.FC<
   }, [unregister]);
 
   const pauseNotification = useCallback(() => {
-    if (!isPushNotificationSupported.current) {
+    if (!isPushNotificationSupported.current || !isSubscribed) {
       return;
     }
 
@@ -558,7 +558,7 @@ const PushNotificationsContextProvider: React.FC<
     } else {
       pauseNotificationNonSafari();
     }
-  }, [unsubscribeSafari, pauseNotificationNonSafari]);
+  }, [isSubscribed, unsubscribeSafari, pauseNotificationNonSafari]);
 
   const resumePushNotificationSafari = useCallback(async () => {
     try {
@@ -638,7 +638,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const contextValue = useMemo(
     () => ({
-      inSubscribed,
+      isSubscribed,
       isLoading,
       isPermissionRequestModalOpen,
       isPushNotificationAlertShown,
@@ -653,7 +653,7 @@ const PushNotificationsContextProvider: React.FC<
       resumePushNotification,
     }),
     [
-      inSubscribed,
+      isSubscribed,
       isLoading,
       isPermissionRequestModalOpen,
       isPushNotificationAlertShown,
@@ -682,8 +682,6 @@ const PushNotificationsContextProvider: React.FC<
       isUserWasLoggedIn.current &&
       isPushNotificationSupported.current
     ) {
-      pauseNotification();
-      setIsSubscribed(false);
       setIsPushNotificationAlertShown(false);
       setIsPermissionRequestModalOpen(false);
       setIsLoading(false);
