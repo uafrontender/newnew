@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import { useUpdateEffect } from 'react-use';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { useOverlayMode } from '../../contexts/overlayModeContext';
@@ -14,30 +13,34 @@ interface IBaseLayout {
 const BaseLayout: React.FunctionComponent<IBaseLayout> = React.memo(
   ({ id, className, containerRef, children }) => {
     const { overlayModeEnabled } = useOverlayMode();
-    const savedScrollPosition = useRef(0);
+    const isOverlayModeWasEnabled = useRef(overlayModeEnabled);
 
-    useUpdateEffect(() => {
+    useEffect(() => {
       if (overlayModeEnabled) {
-        savedScrollPosition.current = window ? window.scrollY : 0;
+        isOverlayModeWasEnabled.current = overlayModeEnabled;
+      }
+    }, [overlayModeEnabled]);
 
+    useEffect(() => {
+      if (overlayModeEnabled) {
         document.body.style.cssText = `
-            overflow: hidden;
-            position: fixed;
-            top: -${savedScrollPosition.current}px;
-          `;
-      } else {
+          overflow: hidden;
+        `;
+      } else if (isOverlayModeWasEnabled.current && !overlayModeEnabled) {
         // eslint-disable-next-line no-param-reassign
         document.body.style.cssText = '';
-        window?.scroll(0, savedScrollPosition.current);
-        savedScrollPosition.current = 0;
+        isOverlayModeWasEnabled.current = false;
       }
-
-      return () => {
-        document.body.style.cssText = '';
-        window?.scroll(0, 0);
-        savedScrollPosition.current = 0;
-      };
     }, [overlayModeEnabled]);
+
+    useEffect(
+      () => () => {
+        if (isOverlayModeWasEnabled.current) {
+          document.body.style.cssText = '';
+        }
+      },
+      []
+    );
 
     return (
       <SWrapper
