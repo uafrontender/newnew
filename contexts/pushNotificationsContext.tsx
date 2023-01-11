@@ -254,12 +254,19 @@ const PushNotificationsContextProvider: React.FC<
         return true;
       }
 
-      return false;
+      // renew subscription if it has been updated
+      await registerSubscriptionNonSafari(subscription);
+
+      return true;
     } catch (err) {
       console.error(err);
       return false;
     }
-  }, [getPermissionData, fetchCheckSubscription]);
+  }, [
+    getPermissionData,
+    fetchCheckSubscription,
+    registerSubscriptionNonSafari,
+  ]);
 
   const checkSubscription = useCallback(async () => {
     if (!user.loggedIn) {
