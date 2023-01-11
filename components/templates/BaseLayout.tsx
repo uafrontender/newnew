@@ -31,6 +31,12 @@ const BaseLayout: React.FunctionComponent<IBaseLayout> = React.memo(
         window?.scroll(0, savedScrollPosition.current);
         savedScrollPosition.current = 0;
       }
+
+      return () => {
+        document.body.style.cssText = '';
+        window?.scroll(0, 0);
+        savedScrollPosition.current = 0;
+      };
     }, [overlayModeEnabled]);
 
     return (
