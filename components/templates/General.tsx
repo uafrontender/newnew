@@ -112,23 +112,22 @@ export const General: React.FC<IGeneral> = (props) => {
               url: '/',
             },
             {
+              key: 'notifications',
+              url: '/notifications',
+              counter: unreadNotificationCount,
+            },
+            {
               key: 'add',
               url: '/creator-onboarding',
             },
-            bundles && bundles.length > 0
-              ? {
-                  key: 'bundles',
-                  url: '/bundles',
-                }
-              : {
-                  key: 'notifications',
-                  url: '/notifications',
-                  counter: unreadNotificationCount,
-                },
           ] as TBottomNavigationItem[]
         ).concat(
-          user.userData?.options?.isCreator || (bundles && bundles.length > 0)
+          bundles && bundles.length > 0
             ? [
+                {
+                  key: 'bundles',
+                  url: '/bundles',
+                },
                 {
                   key: 'dms',
                   url: '/direct-messages',
