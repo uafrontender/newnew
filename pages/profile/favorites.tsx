@@ -1,6 +1,4 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
@@ -10,149 +8,56 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 
-import { NextPageWithLayout } from '../_app';
-import { getMyPosts } from '../../api/endpoints/user';
-// import { TTokenCookie } from '../../api/apiConfigs';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import useMyPosts from '../../utils/hooks/useMyPosts';
 
+import { NextPageWithLayout } from '../_app';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-// import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
+
 import assets from '../../constants/assets';
-import { SUPPORTED_LANGUAGES } from '../../constants/general';
-import switchPostType from '../../utils/switchPostType';
 
 const PostList = dynamic(
   () => import('../../components/organisms/see-more/PostList')
 );
 
 interface IMyProfileFavorites {
-  user: Omit<newnewapi.User, 'toJSON'>;
-  pagedPosts?: newnewapi.PagedPostsResponse;
-  posts?: newnewapi.Post[];
   postsFilter: newnewapi.Post.Filter;
-  nextPageTokenFromServer?: string;
-  pageToken: string | null | undefined;
-  totalCount: number;
-  handleUpdatePageToken: (value: string | null | undefined) => void;
-  handleUpdateCount: (value: number) => void;
-  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
-  handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
 
-const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
-  user,
-  pagedPosts,
-  nextPageTokenFromServer,
-  posts,
-  postsFilter,
-  pageToken,
-  totalCount,
-  handleUpdatePageToken,
-  handleUpdateCount,
-  handleUpdateFilter,
-  handleSetPosts,
-}) => {
-  // Loading state
-  const [isLoading, setIsLoading] = useState(false);
-  const { ref: loadingRef, inView } = useInView();
+const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
   const { t } = useTranslation('page-Profile');
-  const [triedLoading, setTriedLoading] = useState(false);
 
-  // TODO: filters and other parameters
-  const loadPosts = useCallback(
-    async (token?: string, needCount?: boolean) => {
-      if (isLoading) return;
-      try {
-        setIsLoading(true);
-        setTriedLoading(true);
+  const {
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    refetch,
+  } = useMyPosts({
+    relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
+    postsFilter,
+  });
 
-        const cardsLimit = sessionStorage?.getItem('cardsLimit');
-
-        const payload = new newnewapi.GetRelatedToMePostsRequest({
-          relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
-          filter: postsFilter,
-          paging: {
-            ...(token
-              ? { pageToken: token }
-              : cardsLimit && needCount
-              ? {
-                  limit: parseInt(cardsLimit),
-                }
-              : {}),
-          },
-          ...(needCount
-            ? {
-                needTotalCount: true,
-              }
-            : {}),
-        });
-        const postsResponse = await getMyPosts(payload);
-
-        if (cardsLimit) {
-          sessionStorage.removeItem('cardsLimit');
-        }
-
-        if (postsResponse.data && postsResponse.data.posts) {
-          handleSetPosts((curr) => [
-            ...curr,
-            ...(postsResponse.data?.posts as newnewapi.Post[]),
-          ]);
-          handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
-
-          if (postsResponse.data.totalCount) {
-            handleUpdateCount(postsResponse.data.totalCount);
-          } else if (needCount) {
-            handleUpdateCount(0);
-          }
-        }
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-        console.error(err);
-      }
-    },
-    [
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
-      postsFilter,
-      isLoading,
-    ]
+  const posts = useMemo(
+    () => data?.pages.map((page) => page.posts).flat(),
+    [data]
   );
 
-  const handleRemovePostFromState = (postUuid: string) => {
-    handleSetPosts((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
-    if (inView && !isLoading) {
-      if (pageToken) {
-        loadPosts(pageToken);
-      } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts(undefined, true);
-      }
-    } else if (!triedLoading && posts?.length === 0) {
-      loadPosts(undefined, true);
+    if (inView) {
+      fetchNextPage();
     }
+  }, [inView, fetchNextPage]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
-
-  // Clear up the state on page unmount
-  useEffect(
-    () => () => {
-      handleUpdatePageToken(undefined);
-      handleSetPosts([]);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  const handleRemovePostFromState = () => {
+    refetch();
+  };
 
   return (
     <div>
@@ -171,14 +76,12 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
           {posts && (
             <PostList
               category=''
-              loading={isLoading}
+              loading={isLoading || isFetchingNextPage}
               collection={posts}
               wrapperStyle={{
                 left: 0,
               }}
-              handleRemovePostFromState={(uuid: string) =>
-                handleRemovePostFromState(uuid)
-              }
+              handleRemovePostFromState={handleRemovePostFromState}
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
@@ -189,7 +92,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
             </NoContentCard>
           )}
         </SCardsSection>
-        <div ref={loadingRef} />
+        {hasNextPage && <div ref={loadingRef} />}
       </SMain>
     </div>
   );
@@ -201,10 +104,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   return (
     <MyProfileLayout
       renderedPage='favorites'
-      postsCachedFavorites={page.props.pagedPosts.posts}
       postsCachedFavoritesFilter={newnewapi.Post.Filter.ALL}
-      postsCachedFavoritesPageToken={page.props.nextPageTokenFromServer}
-      postsCachedFavoritesCount={page.props.pagedPosts.totalCount}
     >
       {page}
     </MyProfileLayout>
@@ -216,73 +116,25 @@ export default MyProfileFavorites;
 export async function getServerSideProps(
   context: GetServerSidePropsContext
 ): Promise<any> {
-  try {
-    const translationContext = await serverSideTranslations(
-      context.locale!!,
-      [
-        'common',
-        'page-Profile',
-        'component-PostCard',
-        'page-Post',
-        'modal-PaymentModal',
-        'modal-ResponseSuccessModal',
-      ],
-      null,
-      SUPPORTED_LANGUAGES
-    );
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    [
+      'common',
+      'page-Profile',
+      'component-PostCard',
+      'page-Post',
+      'modal-PaymentModal',
+      'modal-ResponseSuccessModal',
+    ],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
-    // const { req } = context;
-    // // Try to fetch only if actual SSR needed
-    // if (!context.req.url?.startsWith('/_next')) {
-    //   const payload = new newnewapi.GetRelatedToMePostsRequest({
-    //     relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
-    //     filter: newnewapi.Post.Filter.ALL,
-    //     needTotalCount: true,
-    //   });
-    //   const res = await getMyPosts(
-    //     payload,
-    //     {
-    //       accessToken: req.cookies?.accessToken,
-    //       refreshToken: req.cookies?.refreshToken,
-    //     },
-    //     (tokens: TTokenCookie[]) => {
-    //       const parsedTokens = tokens.map((t) => `${t.name}=${t.value}; ${t.expires ? `expires=${t.expires}; ` : ''} ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`);
-    //       context.res.setHeader(
-    //         'set-cookie',
-    //         parsedTokens,
-    //       );
-    //     },
-    //   );
-
-    //   if (res.data) {
-    //     return {
-    //       props: {
-    //         pagedPosts: res.data.toJSON(),
-    //         ...(res.data.paging?.nextPageToken ? {
-    //           nextPageTokenFromServer: res.data.paging?.nextPageToken,
-    //         } : {}),
-    //         ...translationContext,
-    //       },
-    //     };
-    //   }
-    // }
-
-    return {
-      props: {
-        pagedPosts: {},
-        ...translationContext,
-      },
-    };
-  } catch (err) {
-    return {
-      props: {
-        error: {
-          message: (err as Error).message,
-          statusCode: 400,
-        },
-      },
-    };
-  }
+  return {
+    props: {
+      ...translationContext,
+    },
+  };
 }
 
 const SMain = styled.main`
