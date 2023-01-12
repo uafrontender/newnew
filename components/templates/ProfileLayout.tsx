@@ -15,6 +15,7 @@ import { useAppSelector } from '../../redux-store/store';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
+import CustomLink from '../atoms/CustomLink';
 import General from './General';
 import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
@@ -22,25 +23,24 @@ import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
+import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
+import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
+import UserEllipseModal from '../molecules/profile/UserEllipseModal';
+import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
+import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
+import BackButton from '../molecules/profile/BackButton';
+// import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
-import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
-import UserEllipseModal from '../molecules/profile/UserEllipseModal';
-import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
-import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
-import BackButton from '../molecules/profile/BackButton';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
-import CustomLink from '../atoms/CustomLink';
-// import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
-import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
 
@@ -487,7 +487,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               /* ) */
             }
             <RightSideButtons>
-              {!isMobile && (
+              {!isMobile && !isUserBlocked && (
                 <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
               )}
               <SIconButton
@@ -599,7 +599,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </CustomLink>
             )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-            {isMobile && (
+            {isMobile && !isUserBlocked && (
               <SMobileSeeBundleButton
                 user={user}
                 creatorBundle={creatorsBundle}
