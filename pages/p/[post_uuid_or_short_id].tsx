@@ -49,6 +49,7 @@ import GeneralLayout from '../../components/templates/General';
 import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import usePost from '../../utils/hooks/usePost';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -106,10 +107,20 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const [postFromAjax, setPostFromAjax] = useState<newnewapi.Post | undefined>(
-    undefined
+  const { data: postFromAjax, isLoading: isPostLoading } = usePost(
+    {
+      loggedInUser: user.loggedIn,
+      postUuid: postUuidOrShortId,
+    },
+    {
+      initialData: post,
+      onError: (error) => {
+        console.error(error);
+        router.replace('/404');
+      },
+      enabled: !post,
+    }
   );
-  const [isPostLoading, setIsPostLoading] = useState(!post);
 
   const [postParsed, typeOfPost] = useMemo<
     | [
@@ -126,35 +137,6 @@ const PostPage: NextPage<IPostPage> = ({
         : [undefined, undefined],
     [post, postFromAjax]
   );
-
-  useEffect(() => {
-    async function fetchPost() {
-      try {
-        setIsPostLoading(true);
-        const getPostPayload = new newnewapi.GetPostRequest({
-          postUuid: postUuidOrShortId,
-        });
-
-        const res = await fetchPostByUUID(getPostPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Post not found');
-
-        setPostFromAjax(res.data);
-
-        setIsPostLoading(false);
-      } catch (err) {
-        console.error(err);
-        router.replace('/404');
-      }
-    }
-
-    if (!post) {
-      // console.log('Fetching post');
-      fetchPost();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
@@ -435,29 +417,6 @@ const PostPage: NextPage<IPostPage> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
-
-  // Fetch whether or not the Post is favorited
-  useEffect(() => {
-    async function fetchIsFavorited() {
-      try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: postParsed?.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
-
-        if (res.data) {
-          setIsFollowingDecision(!!switchPostType(res.data)[0].isFavoritedByMe);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (postParsed?.postUuid) {
-      fetchIsFavorited();
-    }
-  }, [postParsed?.postUuid]);
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {
