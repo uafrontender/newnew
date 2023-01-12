@@ -79,7 +79,7 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
             </div>
             <div>
               <SBundlePrice isBundlesEnabled={isBundlesEnabled}>
-                ${formatNumber(totalEarnings / 100 ?? 0, true)}
+                ${formatNumber(totalEarnings / 100 ?? 0, false)}
               </SBundlePrice>
               <SText variant={3}>{t('myBundles.earnings.earned')}</SText>
             </div>
