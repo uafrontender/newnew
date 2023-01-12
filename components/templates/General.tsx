@@ -276,7 +276,6 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   transition: padding ease 0.5s;
   padding-top: ${(props) =>
     !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
-  padding-bottom: 56px;
   flex-direction: column;
   justify-content: space-between;
 
