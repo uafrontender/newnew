@@ -21,6 +21,8 @@ import { useRouter } from 'next/router';
 import moment from 'moment-timezone';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 // Custom error page
 import Error from './_error';
@@ -65,10 +67,8 @@ import { Mixpanel } from '../utils/mixpanel';
 import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
-import useScrollRestoration from '../utils/hooks/useScrollRestoration';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
-import ScrollRestorationAnimationContainer from '../components/atoms/ScrollRestorationAnimationContainer';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -82,14 +82,14 @@ interface IMyApp extends AppProps {
   themeFromCookie?: 'light' | 'dark';
 }
 
+const queryClient = new QueryClient();
+
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
   const store = useStore();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
-
-  const { isRestoringScroll } = useScrollRestoration();
 
   // Shared layouts
   const getLayout = useMemo(
@@ -206,90 +206,94 @@ const MyApp = (props: IMyApp): ReactElement => {
         {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
-          language={locale}
-          scriptProps={{
-            async: false,
-            defer: false,
-            appendTo: 'head',
-            nonce: undefined,
-          }}
-          container={{
-            element: 'recaptchaBadge',
-            parameters: {
-              badge: 'bottomleft',
-              theme: 'dark',
-            },
-          }}
-        >
-          <LanguageWrapper>
-            <AppConstantsContextProvider>
-              <SocketContextProvider>
-                <ChannelsContextProvider>
-                  <PersistanceProvider store={store}>
-                    <SyncUserWrapper>
-                      <NotificationsProvider>
-                        <ModalNotificationsContextProvider>
-                          <PushNotificationContextProvider>
-                            <BlockedUsersProvider>
-                              <FollowingsContextProvider>
-                                <CardsContextProvider>
-                                  <BundlesContextProvider>
-                                    <ChatsProvider>
-                                      <OverlayModeProvider>
-                                        <ResizeMode>
-                                          <GlobalTheme
-                                            initialTheme={colorMode}
-                                            themeFromCookie={themeFromCookie}
-                                          >
-                                            <>
-                                              <ToastContainer containerId='toast-container' />
-                                              <VideoProcessingWrapper>
-                                                <ErrorBoundary>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
+        <QueryClientProvider client={queryClient}>
+          <GoogleReCaptchaProvider
+            reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
+            language={locale}
+            scriptProps={{
+              async: false,
+              defer: false,
+              appendTo: 'head',
+              nonce: undefined,
+            }}
+            container={{
+              element: 'recaptchaBadge',
+              parameters: {
+                badge: 'bottomleft',
+                theme: 'dark',
+              },
+            }}
+          >
+            <LanguageWrapper>
+              <AppConstantsContextProvider>
+                <SocketContextProvider>
+                  <ChannelsContextProvider>
+                    <PersistanceProvider store={store}>
+                      <SyncUserWrapper>
+                        <NotificationsProvider>
+                          <ModalNotificationsContextProvider>
+                            <PushNotificationContextProvider>
+                              <BlockedUsersProvider>
+                                <FollowingsContextProvider>
+                                  <CardsContextProvider>
+                                    <BundlesContextProvider>
+                                      <ChatsProvider>
+                                        <OverlayModeProvider>
+                                          <ResizeMode>
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  <ErrorBoundary>
+                                                    {!pageProps.error ? (
+                                                      getLayout(
+                                                        <Component
+                                                          {...pageProps}
+                                                        />
+                                                      )
+                                                    ) : (
+                                                      <Error
+                                                        title={
+                                                          pageProps.error
+                                                            ?.message
+                                                        }
+                                                        statusCode={
+                                                          pageProps.error
+                                                            ?.statusCode ?? 500
+                                                        }
                                                       />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                  <PushNotificationModalContainer />
-                                                  {isRestoringScroll ? (
-                                                    <ScrollRestorationAnimationContainer />
-                                                  ) : null}
-                                                </ErrorBoundary>
-                                              </VideoProcessingWrapper>
-                                              <ReCaptchaBadgeModal />
-                                            </>
-                                          </GlobalTheme>
-                                        </ResizeMode>
-                                      </OverlayModeProvider>
-                                    </ChatsProvider>
-                                  </BundlesContextProvider>
-                                </CardsContextProvider>
-                              </FollowingsContextProvider>
-                            </BlockedUsersProvider>
-                          </PushNotificationContextProvider>
-                        </ModalNotificationsContextProvider>
-                      </NotificationsProvider>
-                    </SyncUserWrapper>
-                  </PersistanceProvider>
-                </ChannelsContextProvider>
-              </SocketContextProvider>
-            </AppConstantsContextProvider>
-          </LanguageWrapper>
-        </GoogleReCaptchaProvider>
+                                                    )}
+                                                    <PushNotificationModalContainer />
+                                                    {/* {isRestoringScroll ? (
+                                                      <ScrollRestorationAnimationContainer />
+                                                    ) : null} */}
+                                                  </ErrorBoundary>
+                                                </VideoProcessingWrapper>
+                                                <ReCaptchaBadgeModal />
+                                              </>
+                                            </GlobalTheme>
+                                          </ResizeMode>
+                                        </OverlayModeProvider>
+                                      </ChatsProvider>
+                                    </BundlesContextProvider>
+                                  </CardsContextProvider>
+                                </FollowingsContextProvider>
+                              </BlockedUsersProvider>
+                            </PushNotificationContextProvider>
+                          </ModalNotificationsContextProvider>
+                        </NotificationsProvider>
+                      </SyncUserWrapper>
+                    </PersistanceProvider>
+                  </ChannelsContextProvider>
+                </SocketContextProvider>
+              </AppConstantsContextProvider>
+            </LanguageWrapper>
+          </GoogleReCaptchaProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </CookiesProvider>
     </>
   );
