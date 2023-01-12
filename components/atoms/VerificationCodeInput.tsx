@@ -206,9 +206,8 @@ const SVerficationInput = styled.div<ISVerficationInput>`
       return theme.colorsThemed.accent.error;
     }};
 
-    width: calc(
-      (100vw - 32px - (6px * 5)) / 6
-    ); // 32px - left and right padding, 6px - gap between inputs
+    // 32px - left and right padding, 6px - gap between inputs
+    width: calc((100vw - 32px - (6px * 5)) / 6);
     max-width: 52px;
     height: 68px;
 
