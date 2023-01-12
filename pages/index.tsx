@@ -1,11 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-} from 'react';
+import React, { ReactElement, useCallback, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -19,34 +12,18 @@ import HomeLayout from '../components/templates/HomeLayout';
 import FaqSection from '../components/organisms/home/FaqSection';
 import PostTypeSection from '../components/organisms/home/PostTypeSection';
 import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSection';
-import Text from '../components/atoms/Text';
+import YourPostsSection from '../components/organisms/home/YourPostsSection';
+import Headline from '../components/atoms/Headline';
+import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import {
-  fetchPostByUUID,
-  fetchForYouPosts,
-  fetchCuratedPosts,
-  fetchBiggestPosts,
-} from '../api/endpoints/post';
-import { fetchLiveAuctions } from '../api/endpoints/auction';
-// import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
-import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
-import switchPostType from '../utils/switchPostType';
-import assets from '../constants/assets';
-import { Mixpanel } from '../utils/mixpanel';
-import YourPostsSection from '../components/organisms/home/YourPostsSection';
-import Headline from '../components/atoms/Headline';
-import { TStaticPost } from '../components/molecules/home/StaticPostCard';
-import { getMyPosts } from '../api/endpoints/user';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../utils/hooks/usePagination';
-import isSafari from '../utils/isSafari';
-import { TTokenCookie } from '../api/apiConfigs';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
+import { getMyPosts } from '../api/endpoints/user';
+import { TTokenCookie } from '../api/apiConfigs';
+import useMyPosts from '../utils/hooks/useMyPosts';
+import assets from '../constants/assets';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -63,19 +40,20 @@ interface IHome {
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
-  initialPostsRA?: newnewapi.IPost[];
+  initialPageRA?: {
+    posts: newnewapi.IPost[];
+    paging: newnewapi.PagingResponse | null | undefined;
+  };
   initialNextPageTokenRA?: string;
   sessionExpired?: boolean;
 }
 
 // No sense to memorize
 const Home: NextPage<IHome> = ({
-  top10posts,
   staticBids,
   staticSuperpolls,
   assumeLoggedIn,
-  initialPostsRA,
-  initialNextPageTokenRA,
+  initialPageRA,
   sessionExpired,
 }) => {
   const { t } = useTranslation('page-Home');
@@ -100,229 +78,43 @@ const Home: NextPage<IHome> = ({
     return assumeLoggedIn;
   }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
 
-  // Posts
-  // Top section/Curated posts
-  // const [topSectionCollection, setTopSectionCollection] = useState<
-  //   newnewapi.Post[]
-  // >((top10posts?.posts as newnewapi.Post[]) ?? []);
-  // For you - authenticated users only
-  // const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
-  // const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
-  //   useState(false);
-  // const [collectionFYError, setCollectionFYError] = useState(false);
-  // Auctions
-  // const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
-  // const [collectionACInitialLoading, setCollectionACInitialLoading] =
-  //   useState(true);
-  // const [, setCollectionACError] = useState(false);
-  // Multiple choice
-  // const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
-  // const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
-  // useState(true);
-  // const [, setCollectionMCError] = useState(false);
-  // Crowdfunding
-  // const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
-  // const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
-  //   useState(true);
-  // const [collectionCFError, setCollectionCFError] = useState(false);
-  // Biggest of all time
-  // const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
-  //   []
-  // );
-  // const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] =
-  //   useState(false);
-  // const [collectionBiggestError, setCollectionBiggestError] = useState(false);
-
-  // Recent activity
-  // const [collectionRA, setCollectionRA] = useState<newnewapi.Post[]>([]);
-  // const [collectionRAInitialLoading, setCollectionRAInitialLoading] =
-  //   useState(false);
-  // const [collectionRAError, setCollectionRAError] = useState(false);
-
-  // Fetch top posts of various types
-  // FY posts
-  // useEffect(() => {
-  //   async function fetchFYPosts() {
-  //     try {
-  //       setCollectionFYInitialLoading(true);
-
-  //       const fyPayload = new newnewapi.PagedRequest({
-  //         paging: {
-  //           limit: 10,
-  //         },
-  //       });
-
-  //       const resFY = await fetchForYouPosts(fyPayload);
-
-  //       if (resFY) {
-  //         setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
-  //         setCollectionFYInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionFYInitialLoading(false);
-  //       setCollectionFYError(true);
-  //     }
-  //   }
-
-  //   if (user.loggedIn) {
-  //     fetchFYPosts();
-  //   }
-
-  //   return () => {
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  // Live Auctions posts
-  // useEffect(() => {
-  //   async function fetchAuctions() {
-  //     try {
-  //       setCollectionACInitialLoading(true);
-
-  //       const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
-  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-  //       });
-
-  //       const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
-
-  //       if (resLiveAuctions) {
-  //         setCollectionAC(
-  //           () => resLiveAuctions.data?.auctions as newnewapi.Post[]
-  //         );
-  //         setCollectionACInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionACInitialLoading(false);
-  //       setCollectionACError(true);
-  //     }
-  //   }
-
-  //   fetchAuctions();
-  // }, []);
-
-  // Top Multiple Choices
-  // useEffect(() => {
-  //   async function fetchMultipleChoices() {
-  //     try {
-  //       setCollectionMCInitialLoading(true);
-  //       const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
-  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-  //       });
-
-  //       const resMultichoices = await fetchTopMultipleChoices(
-  //         multichoicePayload
-  //       );
-
-  //       if (resMultichoices) {
-  //         setCollectionMC(
-  //           () => resMultichoices.data?.multipleChoices as newnewapi.Post[]
-  //         );
-  //         setCollectionMCInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionMCInitialLoading(false);
-  //       setCollectionMCError(true);
-  //     }
-  //   }
-
-  //   fetchMultipleChoices();
-  // }, []);
-
-  // Top Crowdfunding
-  // useEffect(() => {
-  //   async function fetchCrowdfundings() {
-  //     try {
-  //       setCollectionCFInitialLoading(true);
-  //       const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
-  //         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-  //       });
-  //
-  //       const resCF = await fetchTopCrowdfundings(cfPayload);
-  //
-  //       if (resCF) {
-  //         setCollectionCF(() => resCF.data?.crowdfundings as newnewapi.Post[]);
-  //         setCollectionCFInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionCFInitialLoading(false);
-  //       setCollectionCFError(true);
-  //     }
-  //   }
-  //
-  //   fetchCrowdfundings();
-  // }, []);
-
-  // Biggest of all time
-  // useEffect(() => {
-  //   async function fetchBiggest() {
-  //     try {
-  //       setCollectionBiggestInitialLoading(true);
-  //       const biggestPayload = new newnewapi.PagedRequest({});
-
-  //       const resBiggest = await fetchBiggestPosts(biggestPayload);
-
-  //       if (resBiggest) {
-  //         setCollectionBiggest(
-  //           () => resBiggest.data?.posts as newnewapi.Post[]
-  //         );
-  //         setCollectionBiggestInitialLoading(false);
-  //       } else {
-  //         throw new Error('Request failed');
-  //       }
-  //     } catch (err) {
-  //       setCollectionBiggestInitialLoading(false);
-  //       setCollectionBiggestError(true);
-  //     }
-  //   }
-
-  //   fetchBiggest();
-  // }, []);
-
   // Resent activity
-  const fetchRAPosts = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IPost>> => {
-      if (!user.loggedIn) {
-        return {
-          nextData: [],
-          nextPageToken: undefined,
-        };
-      }
-
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-        paging,
-      });
-      const postsResponse = await getMyPosts(payload);
-
-      if (!postsResponse.data || postsResponse.error) {
-        throw new Error('Request failed');
-      }
-
-      return {
-        nextData: postsResponse.data.posts,
-        nextPageToken: postsResponse.data.paging?.nextPageToken,
-      };
-    },
-    [user.loggedIn]
-  );
-
-  const { data: collectionRA, loadMore } = usePagination<newnewapi.IPost>(
-    fetchRAPosts,
-    6,
-    false,
+  const {
+    data: collectionRAPages,
+    hasNextPage: hasNextPageRA,
+    fetchNextPage: fetchNextPageRA,
+  } = useMyPosts(
     {
-      data: initialPostsRA ?? [],
-      pageToken: initialNextPageTokenRA,
+      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
+      limit: 6,
+    },
+    {
+      ...(initialPageRA
+        ? {
+            initialData: {
+              pages: [initialPageRA],
+              pageParams: [undefined],
+            },
+          }
+        : {}),
+      enabled: user.loggedIn,
     }
   );
+
+  const collectionRA = useMemo(
+    () =>
+      collectionRAPages
+        ? collectionRAPages.pages.map((page) => page?.posts || []).flat()
+        : [],
+
+    [collectionRAPages]
+  );
+
+  const loadMoreCollectionRA = useCallback(() => {
+    if (hasNextPageRA) {
+      fetchNextPageRA();
+    }
+  }, [fetchNextPageRA, hasNextPageRA]);
 
   return (
     <>
@@ -375,7 +167,7 @@ const Home: NextPage<IHome> = ({
                 ) : undefined
               }
               padding={user.loggedIn ? 'small' : 'large'}
-              onReachEnd={loadMore}
+              onReachEnd={loadMoreCollectionRA}
               seeMoreLink='/profile/purchases'
             />
           ) : null}
@@ -512,18 +304,18 @@ const SHeadline = styled(Headline)`
   }
 `;
 
-const SSubtitle = styled(Text)`
-  max-width: 570px;
+// const SSubtitle = styled(Text)`
+//   max-width: 570px;
 
-  font-size: 14px;
-  line-height: 24px;
-  font-weight: 600;
+//   font-size: 14px;
+//   line-height: 24px;
+//   font-weight: 600;
 
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
+//   ${({ theme }) => theme.media.tablet} {
+//     font-size: 16px;
+//     line-height: 24px;
+//   }
+// `;
 
 const STutorialCard = styled(TutorialCard)`
   & img {
@@ -657,12 +449,10 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
       if (res.data && res.data.toJSON().posts) {
         return {
           props: {
-            initialPostsRA: res.data.toJSON().posts,
-            ...(res.data.paging?.nextPageToken
-              ? {
-                  initialNextPageTokenRA: res.data.paging?.nextPageToken,
-                }
-              : {}),
+            initialPageRA: {
+              posts: res.data.toJSON().posts,
+              paging: res.data.toJSON().paging || null,
+            },
             assumeLoggedIn,
             staticSuperpolls,
             staticBids,
