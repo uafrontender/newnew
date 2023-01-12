@@ -80,6 +80,8 @@ const SHeadline = styled(Headline)`
   z-index: 1;
   font-size: 20px;
   line-height: 28px;
+  text-align: center;
+
   color: ${({ theme }) => theme.colors.white};
 
   ${({ theme }) => theme.media.tablet} {

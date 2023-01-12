@@ -4,8 +4,10 @@
 /* eslint-disable padded-blocks */
 import React, { useEffect, useState } from 'react';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+
 import Caption from '../../atoms/Caption';
 import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
@@ -137,7 +139,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 )}
               </SNickname>
 
-              <SUsername variant={2}>{`@${user.username}`}</SUsername>
+              <Link href={`/${user.username}`}>
+                <a>
+                  <SUsername variant={2}>{`@${user.username}`}</SUsername>
+                </a>
+              </Link>
               <SUnblockButton
                 onClick={() => changeUserBlockedStatus(user.uuid, false)}
                 view='secondary'
@@ -262,6 +268,7 @@ const SUsername = styled(Caption)`
   position: relative;
   top: -6px;
 
+  cursor: pointer;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
