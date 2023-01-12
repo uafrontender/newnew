@@ -451,7 +451,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
           props: {
             initialPageRA: {
               posts: res.data.toJSON().posts,
-              paging: res.data.toJSON().paging,
+              paging: res.data.toJSON().paging || null,
             },
             assumeLoggedIn,
             staticSuperpolls,
