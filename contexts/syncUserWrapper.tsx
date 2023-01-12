@@ -8,6 +8,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useQueryClient } from 'react-query';
+
 import {
   getMe,
   getMyOnboardingState,
@@ -43,6 +45,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
   const userWasLoggedIn = useRef(false);
 
+  const queryClient = useQueryClient();
+
   const updateCreatorDataSteps = useCallback(
     () => setCreatorDataSteps((curr) => curr + 1),
     []
@@ -59,12 +63,13 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       setCreatorDataSteps(0);
       removeStateLS('userTutorialsProgress');
       userWasLoggedIn.current = false;
+      queryClient.removeQueries({ queryKey: ['private'] });
     }
 
     if (user.loggedIn) {
       userWasLoggedIn.current = true;
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, queryClient]);
 
   useEffect(() => {
     if (creatorDataSteps === 1) {
