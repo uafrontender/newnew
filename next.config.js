@@ -64,6 +64,9 @@ const moduleExports = {
       },
     ]
   },
+  experimental: {
+    scrollRestoration: true,
+  },
 };
 
 const sentryWebpackPluginOptions = {
