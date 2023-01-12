@@ -472,7 +472,7 @@ const SListWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
     /* padding: 24px 24px 0 24px; */
     /* padding: 32px 56px 0 64px; */
-    padding: 24px 32px 0;
+    padding: 24px 0px 0 32px;
     left: -8px;
 
     flex-direction: row;
@@ -480,31 +480,46 @@ const SListWrapper = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     left: -16px;
-    width: calc(100% + 32px);
+    width: calc(100% + 16px);
     padding: 32px 0 0 0;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    width: calc(100% + 32px);
   }
 `;
 
 const SCardSkeletonSection = styled(CardSkeletonSection)`
   &&& {
     & > span {
-      gap: 16px;
+      margin: 16px 0;
+      gap: 0;
+      left: 0;
+
+      ${({ theme }) => theme.media.tablet} {
+        margin: 0;
+        gap: 16px;
+        left: 8px;
+      }
 
       ${({ theme }) => theme.media.laptop} {
         gap: 32px;
+        left: 16px;
       }
     }
   }
 
   & > span > div {
+    width: calc(100vw - 32px);
+
     ${({ theme }) => theme.media.tablet} {
       height: 410px;
-      width: 214px;
+      width: 224px;
     }
 
-    /* ${({ theme }) => theme.media.mobileL} {
-      width: 224px;
-    } */
+    ${({ theme }) => theme.media.laptop} {
+      height: 454px;
+    }
   }
 `;
 
