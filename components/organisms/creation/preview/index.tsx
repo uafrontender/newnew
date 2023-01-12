@@ -22,6 +22,7 @@ import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 import ReCaptchaV2 from '../../../atoms/ReCaptchaV2';
 import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
@@ -43,7 +44,7 @@ import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/Chevro
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
-import PostTitleContent from '../../../atoms/PostTitleContent';
+
 import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
@@ -124,7 +125,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   }
 
   useLeavePageConfirm(
-    showModal ? false : true,
+    showModal || !post.title ? false : true,
     t('secondStep.modal.leave.message'),
     allowedRoutes
   );
@@ -499,6 +500,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!post.title) {
+    return <LoadingView />;
+  }
 
   if (isMobile) {
     return (
