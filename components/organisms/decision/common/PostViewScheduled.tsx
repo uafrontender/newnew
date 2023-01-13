@@ -13,7 +13,7 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostScheduledSection from '../../../molecules/decision/common/PostScheduledSection';
-import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -88,14 +88,14 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       }
     };
 
-    const subscription: SubscriptionToPost = useMemo(
+    /* const subscription: SubscriptionToPost = useMemo(
       () => ({
         type: 'post',
         postUuid: post.postUuid,
         postTitle: post.title,
       }),
       [post]
-    );
+    ); */
 
     return (
       <SWrapper>
@@ -120,7 +120,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
         />
         {isMobile &&
           (variant === 'decision' ? (
-            <PostTopInfo subscription={subscription} hasWinner={false} />
+            <PostTopInfo /* subscription={subscription} */ hasWinner={false} />
           ) : (
             <PostTopInfoModeration hasWinner={false} />
           ))}
@@ -133,7 +133,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
           >
             {!isMobile &&
               (variant === 'decision' ? (
-                <PostTopInfo subscription={subscription} hasWinner={false} />
+                <PostTopInfo
+                  /* subscription={subscription} */ hasWinner={false}
+                />
               ) : (
                 <PostTopInfoModeration hasWinner={false} />
               ))}
