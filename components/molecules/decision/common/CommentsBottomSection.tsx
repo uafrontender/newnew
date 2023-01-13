@@ -12,7 +12,6 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
-import { useRouter } from 'next/router';
 
 import GradientMask from '../../../atoms/GradientMask';
 import Comment from '../../../atoms/decision/Comment';
@@ -56,7 +55,6 @@ const CommentsBottomSection: React.FunctionComponent<
   onFormBlur,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -272,7 +270,6 @@ const CommentsBottomSection: React.FunctionComponent<
       );
 
       if (idx === -1) {
-        // console.log('Looking further');
         scrollRef.current?.scrollIntoView();
 
         if (isMobile && hasNextPage && !commentsLoading) {
@@ -283,8 +280,6 @@ const CommentsBottomSection: React.FunctionComponent<
           });
         }
       } else {
-        // console.log('Found the comment');
-
         if (!flat[idx].parentId || flat[idx].parentId === 0) {
           document
             ?.getElementById(`comment_id_${flat[idx].id}`)
@@ -331,34 +326,6 @@ const CommentsBottomSection: React.FunctionComponent<
     scrollRef.current,
     'comments-scrolling-container'
   );
-
-  useEffect(() => {
-    router.beforePopState(({ url, as }) => {
-      // const url = router.asPath || router.asPath;
-      console.log(as);
-      const itemFromSS = sessionStorage.getItem(as) ?? undefined;
-      const parsedItemFromSS = itemFromSS ? JSON.parse(itemFromSS) : undefined;
-
-      console.log(parsedItemFromSS);
-
-      if (
-        parsedItemFromSS &&
-        parsedItemFromSS['comments-scrolling-container']
-      ) {
-        console.log('hey hey hey');
-        console.log(parsedItemFromSS['comments-scrolling-container']);
-
-        setTimeout(() => {
-          document?.getElementById?.('comments-scrolling-container')?.scrollTo({
-            top: parsedItemFromSS['comments-scrolling-container'].y,
-          });
-        }, 300);
-      }
-
-      return true;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <>
