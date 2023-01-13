@@ -97,7 +97,6 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
     }
   }, [code, length, onComplete]);
 
-
   return (
     <>
       {/* Allows tabbing to the input */}
@@ -207,8 +206,10 @@ const SVerficationInput = styled.div<ISVerficationInput>`
       return theme.colorsThemed.accent.error;
     }};
 
-    width: 52px;
-    height: 72px;
+    // 32px - left and right padding, 6px - gap between inputs
+    width: calc((100vw - 32px - (6px * 5)) / 6);
+    max-width: 52px;
+    height: 68px;
 
     padding: 14px;
 
@@ -220,6 +221,11 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     background: transparent;
 
     caret-color: transparent;
+
+    ${({ theme }) => theme.media.mobileM} {
+      width: 52px;
+      height: 72px;
+    }
 
     &:read-only {
       outline: none;
