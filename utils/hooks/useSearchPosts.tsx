@@ -1,18 +1,19 @@
 import { newnewapi } from 'newnew-api';
 import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
 
-import { fetchUsersPosts } from '../../api/endpoints/post';
+import { searchPosts } from '../../api/endpoints/search';
 
-interface IUseUserPosts {
-  userUuid: string;
+interface IUseSearchPosts {
   loggedInUser: boolean;
-  relation: newnewapi.GetUserPostsRequest.Relation;
-  postsFilter: newnewapi.Post.Filter;
+  query: string;
+  searchType: newnewapi.SearchPostsRequest.SearchType;
+  filters: newnewapi.Post.Filter[];
+  sorting: newnewapi.PostSorting;
   limit?: number;
 }
 
-const useUserPosts = (
-  params: IUseUserPosts,
+const useSearchPosts = (
+  params: IUseSearchPosts,
   options?: Omit<
     UseInfiniteQueryOptions<{
       posts: newnewapi.IPost[];
@@ -22,20 +23,20 @@ const useUserPosts = (
   >
 ) => {
   const query = useInfiniteQuery(
-    [params.loggedInUser ? 'private' : 'public', 'getUserPosts', params],
+    [params.loggedInUser ? 'private' : 'public', 'getSearchPosts', params],
     async ({ pageParam }) => {
-      const payload = new newnewapi.GetUserPostsRequest({
-        userUuid: params.userUuid,
-        relation: params.relation,
+      const payload = new newnewapi.SearchPostsRequest({
+        query: params.query,
+        searchType: params.searchType,
+        sorting: params.sorting,
+        filters: params.filters,
         paging: {
           pageToken: pageParam,
           ...(params.limit ? { limit: params.limit } : {}),
         },
-        needTotalCount: true,
-        ...(params.postsFilter ? { filter: params.postsFilter } : {}),
       });
 
-      const postsResponse = await fetchUsersPosts(payload);
+      const postsResponse = await searchPosts(payload);
 
       if (!postsResponse.data || postsResponse.error) {
         throw new Error('Request failed');
@@ -64,4 +65,4 @@ const useUserPosts = (
   return query;
 };
 
-export default useUserPosts;
+export default useSearchPosts;

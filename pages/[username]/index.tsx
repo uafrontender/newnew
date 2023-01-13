@@ -12,6 +12,7 @@ import ProfileLayout from '../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import useUserPosts from '../../utils/hooks/useUserPosts';
+import { useAppSelector } from '../../redux-store/store';
 
 import PostList from '../../components/organisms/see-more/PostList';
 import InlineSvg from '../../components/atoms/InlineSVG';
@@ -35,6 +36,7 @@ interface IUserPageIndex {
 const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { loggedIn } = useAppSelector((state) => state.user);
 
   const isCreator = useMemo(
     () => !!user?.options?.isCreator,
@@ -48,6 +50,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useUserPosts({
       userUuid: user.uuid as string,
+      loggedInUser: loggedIn,
       relation: isCreator
         ? newnewapi.GetUserPostsRequest.Relation.THEY_CREATED
         : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,

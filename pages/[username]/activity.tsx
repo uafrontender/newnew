@@ -11,6 +11,7 @@ import ProfileLayout from '../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import useUserPosts from '../../utils/hooks/useUserPosts';
+import { useAppSelector } from '../../redux-store/store';
 
 import PostList from '../../components/organisms/see-more/PostList';
 import Text from '../../components/atoms/Text';
@@ -32,6 +33,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { loggedIn } = useAppSelector((state) => state.user);
 
   const isActivityPrivate = useMemo(
     () => !!user?.options?.isActivityPrivate,
@@ -41,6 +43,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useUserPosts({
       userUuid: user.uuid as string,
+      loggedInUser: loggedIn,
       relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
       postsFilter,
     });

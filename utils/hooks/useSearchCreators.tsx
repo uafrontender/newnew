@@ -1,49 +1,46 @@
 import { newnewapi } from 'newnew-api';
 import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
 
-import { fetchUsersPosts } from '../../api/endpoints/post';
+import { searchCreators } from '../../api/endpoints/search';
 
-interface IUseUserPosts {
-  userUuid: string;
+interface IUseSearchCreators {
   loggedInUser: boolean;
-  relation: newnewapi.GetUserPostsRequest.Relation;
-  postsFilter: newnewapi.Post.Filter;
+  query: string;
+  filter?: newnewapi.SearchCreatorsRequest.Filter;
   limit?: number;
 }
 
-const useUserPosts = (
-  params: IUseUserPosts,
+const useSearchCreators = (
+  params: IUseSearchCreators,
   options?: Omit<
     UseInfiniteQueryOptions<{
-      posts: newnewapi.IPost[];
+      creators: newnewapi.IUser[];
       paging: newnewapi.IPagingResponse | null | undefined;
     }>,
     'queryKey' | 'queryFn'
   >
 ) => {
   const query = useInfiniteQuery(
-    [params.loggedInUser ? 'private' : 'public', 'getUserPosts', params],
+    [params.loggedInUser ? 'private' : 'public', 'getSearchCreators', params],
     async ({ pageParam }) => {
-      const payload = new newnewapi.GetUserPostsRequest({
-        userUuid: params.userUuid,
-        relation: params.relation,
+      const payload = new newnewapi.SearchCreatorsRequest({
+        query: params.query,
         paging: {
           pageToken: pageParam,
           ...(params.limit ? { limit: params.limit } : {}),
         },
-        needTotalCount: true,
-        ...(params.postsFilter ? { filter: params.postsFilter } : {}),
+        ...(params.filter ? { filter: params.filter } : {}),
       });
 
-      const postsResponse = await fetchUsersPosts(payload);
+      const creatorsResponse = await searchCreators(payload);
 
-      if (!postsResponse.data || postsResponse.error) {
+      if (!creatorsResponse.data || creatorsResponse.error) {
         throw new Error('Request failed');
       }
 
       return {
-        posts: postsResponse?.data?.posts || [],
-        paging: postsResponse?.data?.paging,
+        creators: creatorsResponse?.data?.creators || [],
+        paging: creatorsResponse?.data?.paging,
       };
     },
     {
@@ -54,7 +51,7 @@ const useUserPosts = (
       ...(options || {}),
     } as Omit<
       UseInfiniteQueryOptions<{
-        posts: newnewapi.IPost[];
+        creators: newnewapi.IUser[];
         paging: newnewapi.IPagingResponse | null | undefined;
       }>,
       'queryKey' | 'queryFn'
@@ -64,4 +61,4 @@ const useUserPosts = (
   return query;
 };
 
-export default useUserPosts;
+export default useSearchCreators;
