@@ -43,7 +43,7 @@ import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNew
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import getDisplayname from '../../../../utils/getDisplayname';
-import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -355,14 +355,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     }
   };
 
-  const subscription: SubscriptionToPost = useMemo(
+  /* const subscription: SubscriptionToPost = useMemo(
     () => ({
       type: 'post',
       postUuid: post.postUuid,
       postTitle: post.title,
     }),
     [post]
-  );
+  ); */
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -644,7 +644,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
-            subscription={subscription}
+            /* subscription={subscription} */
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -691,7 +691,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
-            subscription={subscription}
+            /* subscription={subscription} */
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -732,7 +732,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
-                  subscription={subscription}
+                  /* subscription={subscription} */
                   amountInBids={totalAmount}
                   hasWinner={!!post.winningOptionId}
                 />
