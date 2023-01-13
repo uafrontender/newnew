@@ -914,6 +914,10 @@ const SButton = styled(Button)`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
+  svg {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  }
+
   margin-left: 4px;
   padding: 8px;
 

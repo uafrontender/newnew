@@ -193,6 +193,7 @@ const SCaption = styled(Caption)<ISTitle>`
 
 const SSVGContainer = styled.div`
   position: relative;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SIndicatorContainer = styled.div`
