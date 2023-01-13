@@ -193,12 +193,12 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                 post.creator?.options?.isVerified ? (
                                   <SInlineSVG
                                     svg={VerificationCheckmark}
-                                    width='16px'
-                                    height='16px'
                                     fill='none'
                                   />
                                 ) : null,
-                                { creator: getDisplayname(post.creator) },
+                                {
+                                  creator: getDisplayname(post.creator),
+                                },
                               ]}
                             />
                           </SWantsToKnow>
@@ -263,6 +263,12 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                   : getDisplayname(winningOption.creator!!)}
                               </Link>
                             </SSpan>
+                            {winningOption.creator?.options?.isVerified && (
+                              <SInlineSVG
+                                svg={VerificationCheckmark}
+                                fill='none'
+                              />
+                            )}
                             {winningOption.supporterCount > 1 ? (
                               <>
                                 {' & '}
@@ -472,6 +478,9 @@ const SCreatorInfoDiv = styled.div`
 `;
 
 const SCreator = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   line-height: 24px;
 
   vertical-align: middle;
@@ -493,6 +502,7 @@ const SWantsToKnow = styled.span`
   display: inline-flex;
   align-items: center;
   top: -6px;
+  white-space: pre;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
@@ -507,7 +517,13 @@ const SWantsToKnow = styled.span`
 `;
 
 const SInlineSVG = styled(InlineSvg)`
-  margin-right: 2px;
+  height: 16px;
+  width: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 24px;
+    width: 24px;
+  }
 `;
 
 const STotal = styled.div`
@@ -571,9 +587,11 @@ const SWinningBidCreator = styled.div`
   }
 `;
 
-const SWinningBidCreatorText = styled.span`
-  position: relative;
-  top: -6px;
+const SWinningBidCreatorText = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: pre;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
