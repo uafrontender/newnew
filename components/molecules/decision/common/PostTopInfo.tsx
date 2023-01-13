@@ -1,12 +1,14 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
+// TODO: Re-enable SMS related logic once new SMS service is integrated
+// TODO: Move SMS related logic to a component once new SMS service is integrated
 import React, {
   useCallback,
   useMemo,
   useState,
   useRef,
-  useEffect,
-  useContext,
+  // useEffect,
+  // useContext,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -28,8 +30,8 @@ import PostShareEllipseModal from './PostShareEllipseModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 
-import NotificationIconFilled from '../../../../public/images/svg/icons/filled/Notifications.svg';
-import NotificationIconOutlined from '../../../../public/images/svg/icons/outlined/Notifications.svg';
+// import NotificationIconFilled from '../../../../public/images/svg/icons/filled/Notifications.svg';
+// import NotificationIconOutlined from '../../../../public/images/svg/icons/outlined/Notifications.svg';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
@@ -43,18 +45,18 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { I18nNamespaces } from '../../../../@types/i18next';
-import getGuestId from '../../../../utils/getGuestId';
-import {
+/* import getGuestId from '../../../../utils/getGuestId';
+ import {
   getGuestSmsNotificationsSubscriptionStatus,
   getSmsNotificationsSubscriptionStatus,
   subscribeGuestToSmsNotifications,
   subscribeToSmsNotifications,
   unsubscribeFromSmsNotifications,
   unsubscribeGuestFromSmsNotifications,
-} from '../../../../api/endpoints/phone';
+} from '../../../../api/endpoints/phone'; 
 import SmsNotificationModal, {
   SubscriptionToPost,
-} from '../../profile/SmsNotificationModal';
+} from '../../profile/SmsNotificationModal'; 
 import { SocketContext } from '../../../../contexts/socketContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import Tooltip from '../../../atoms/Tooltip';
@@ -62,7 +64,7 @@ import Tooltip from '../../../atoms/Tooltip';
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
 
-const getSmsNotificationSubscriptionErrorMessage = (
+ const getSmsNotificationSubscriptionErrorMessage = (
   status?: newnewapi.SmsNotificationsStatus
 ) => {
   switch (status) {
@@ -71,7 +73,7 @@ const getSmsNotificationSubscriptionErrorMessage = (
     default:
       return 'smsNotifications.error.requestFailed';
   }
-};
+}; */
 
 const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.common.ac.darkAcAnimated,
@@ -86,7 +88,7 @@ const LIGHT_IMAGES: Record<string, () => string> = {
 };
 
 interface IPostTopInfo {
-  subscription: SubscriptionToPost;
+  // subscription: SubscriptionToPost;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
@@ -95,7 +97,7 @@ interface IPostTopInfo {
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
-  subscription,
+  //  subscription,
   totalVotes,
   totalPledges,
   targetPledges,
@@ -108,12 +110,12 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const socketConnection = useContext(SocketContext);
-  const { showErrorToastCustom } = useErrorToasts();
+  // const socketConnection = useContext(SocketContext);
+  // const { showErrorToastCustom } = useErrorToasts();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet'].includes(resizeMode);
+  // const isTablet = ['tablet'].includes(resizeMode);
 
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
@@ -177,20 +179,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     () => postType === 'ac' && postStatus === 'waiting_for_decision',
     [postType, postStatus]
   );
-  const [notificationTooltipVisible, setNotificationTooltipVisible] =
+  /* const [notificationTooltipVisible, setNotificationTooltipVisible] =
     useState(false);
 
   const [subscribedToSmsNotifications, setSubscribedToSmsNotifications] =
     useState(false);
   const [smsNotificationModalOpen, setSmsNotificationModalOpen] =
-    useState(false);
+    useState(false); */
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const handleCloseSmsNotificationModal = useCallback(
+  /* const handleCloseSmsNotificationModal = useCallback(
     () => setSmsNotificationModalOpen(false),
     []
-  );
+  ); */
 
   const handleOpenShareMenu = () => {
     Mixpanel.track('Opened Share Menu', {
@@ -288,7 +290,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }, [router, postUuid, handleCloseAndGoBack]);
 
   // TODO: Add a hook for handling sms notifications status
-  const submitPhoneSmsNotificationsRequest = useCallback(
+  /* const submitPhoneSmsNotificationsRequest = useCallback(
     async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
       try {
         if (!user.loggedIn) {
@@ -356,7 +358,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       }
     },
     [user.loggedIn, showErrorToastCustom, subscription.postUuid, t]
-  );
+  ); 
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     Mixpanel.track('Opened SMS Notification Menu', {
@@ -446,7 +448,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     if (!user.loggedIn) {
-      console.log('POLL');
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
         const res = await getGuestSmsNotificationsSubscriptionStatus(
@@ -552,9 +553,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         );
       }
     };
-  }, [user.loggedIn, subscription.postUuid, socketConnection]);
+  }, [user.loggedIn, subscription.postUuid, socketConnection]); 
 
-  const notificationButtonRef: any = useRef();
+  const notificationButtonRef: any = useRef(); */
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
 
@@ -623,12 +624,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </Link>
         </SCreatorCard>
         <SActionsDiv>
+          {/*
           {notificationTooltipVisible && !isMobile && !isTablet && (
             <Tooltip target={notificationButtonRef}>
               {t('postTopInfo.notifyMe')}
             </Tooltip>
           )}
-          <SButton
+           <SButton
             view='transparent'
             iconOnly
             withDim
@@ -648,7 +650,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               width='20px'
               height='20px'
             />
-          </SButton>
+            </SButton> */}
           <SButtonEnabling
             view='transparent'
             iconOnly
@@ -677,12 +679,12 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               height='20px'
             />
           </SButtonEnabling>
-          <SmsNotificationModal
+          {/* <SmsNotificationModal
             show={smsNotificationModalOpen}
             subscription={subscription}
             onSubmit={submitPhoneSmsNotificationsRequest}
             onClose={handleCloseSmsNotificationModal}
-          />
+          /> */}
           {/* Share menu */}
           {!isMobile && (
             <PostShareEllipseMenu
@@ -909,7 +911,7 @@ const SActionsDiv = styled.div`
   justify-content: flex-end;
 `;
 
-const SButton = styled(Button)`
+/* const SButton = styled(Button)`
   background: none;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -925,7 +927,7 @@ const SButton = styled(Button)`
     background: ${({ theme, view }) =>
       view ? theme.colorsThemed.button.background[view] : ''};
   }
-`;
+`; */
 
 const SButtonEnabling = styled(Button)`
   background: none;
