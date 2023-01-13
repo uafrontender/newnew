@@ -24,6 +24,7 @@ import {
   setUserData,
   setUserLoggedIn,
 } from '../../redux-store/slices/userStateSlice';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -47,6 +48,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const { resumePushNotification } = usePushNotifications();
 
   useEffect(() => {
     setMounted(true);
@@ -155,6 +158,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
         dispatch(setUserLoggedIn(true));
 
+        resumePushNotification();
+
         setIsLoading(false);
         if (data.redirectUrl) {
           router?.push(data.redirectUrl);
@@ -205,7 +210,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
 export default AuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IAuthRedirectPage> = async (
+  context
+) => {
   const { provider } = context.query;
 
   const { req } = context;

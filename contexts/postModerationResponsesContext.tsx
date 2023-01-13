@@ -671,6 +671,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       if (available) {
         setResponseFileProcessingLoading(false);
+        setResponseFileProcessingProgress(100);
       } else {
         setResponseFileUploadError(true);
         showErrorToastPredefined(undefined);

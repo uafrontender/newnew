@@ -44,7 +44,7 @@
         "file": "Subir video",
         "decision": "Detalles",
         "advanced": "Duración",
-        "floating": "Vista previa"
+        "floating": "Preestrenar"
       },
       "subTitle": {
         "votesInfo": "Las personas gastarán un mínimo de $1 para votar",
@@ -160,13 +160,13 @@
         "title": "Ups...",
         "description": "Hubo un error y tu archivo no pudo ser cargado. ¿Quieres volver a intentarlo?."
       },
-      "setThumbnail": "Establece una imagen de miniatura",
+      "setThumbnail": "Establecer miniatura",
       "thumbnailEllipseMenu": {
         "selectSnippetButton": "Selecciona un fragmento",
         "uploadImageButton": "Subir una imagen"
       },
       "deleteFile": "Borrar archivo",
-      "previewFull": "Vista previa",
+      "previewFull": "Preestrenar",
       "thumbnail": {
         "info": "Más información",
         "title": "Establecer una imagen miniatura del video",

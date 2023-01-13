@@ -29,6 +29,7 @@ import TutorialTooltip, {
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
 import { Mixpanel } from '../../../../../utils/mixpanel';
@@ -94,6 +95,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   );
 
   const { appConstants } = useGetAppConstants();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
@@ -527,7 +530,10 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         postType='ac'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

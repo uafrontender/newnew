@@ -332,6 +332,7 @@ const SChatItemCenter = styled.div`
   display: flex;
   padding: 2px 12px;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SChatItemLastMessage = styled(Text)`

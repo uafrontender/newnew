@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 import InlineSvg from '../../../atoms/InlineSVG';
 import Modal from '../../../organisms/Modal';
+import AnimatedBackground from '../../../atoms/AnimationBackground';
 
 import assets from '../../../../constants/assets';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
-import AnimatedBackground from '../../../atoms/AnimationBackground';
+import CopyLinkIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 interface IPostResponseSuccessModal {
   isOpen: boolean;
@@ -27,12 +30,46 @@ const PostResponseSuccessModal: React.FunctionComponent<
 > = ({ amount, isOpen, zIndex }) => {
   const theme = useTheme();
   const router = useRouter();
+  const { t: tCommon } = useTranslation('common');
   const { t } = useTranslation('modal-ResponseSuccessModal');
   const { resizeMode } = useAppSelector((state) => state.ui);
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const { postParsed } = usePostInnerState();
+  const postShortId = useMemo(() => postParsed?.postShortId, [postParsed]);
+  const postUuid = useMemo(() => postParsed?.postUuid, [postParsed]);
+
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handlerCopy = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/p/${postShortId || postUuid}`;
+      Mixpanel.track('Copied Link Post', {
+        _stage: 'Post',
+        _postUuid: postUuid,
+      });
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [postShortId, postUuid]);
 
   const handleGoToDashboard = () => {
     router?.push('/creator/dashboard', undefined, {
@@ -41,7 +78,7 @@ const PostResponseSuccessModal: React.FunctionComponent<
   };
 
   return (
-    <Modal show={isOpen} additionalz={zIndex}>
+    <Modal show={isOpen} additionalz={zIndex} overlaydim>
       {!isMobile && (
         <AnimatedBackground src={assets.decision.gold} alt='coin' noBlur />
       )}
@@ -93,6 +130,17 @@ const PostResponseSuccessModal: React.FunctionComponent<
               </a>
             </Link>
           </SMakeAnotherPostButton>
+          <SCopyLinkButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handlerCopy();
+            }}
+          >
+            <InlineSvg svg={CopyLinkIcon} width='24px' height='24px' />
+            {isCopiedUrl
+              ? tCommon('ellipse.linkCopied')
+              : tCommon('ellipse.copyLink')}
+          </SCopyLinkButton>
         </SContentContainer>
       </SWrapper>
     </Modal>
@@ -128,7 +176,10 @@ const SContentContainer = styled.div`
   align-items: center;
   justify-content: center;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary};
 
   padding: 16px;
 
@@ -167,7 +218,7 @@ const SMakeAnotherPostButton = styled.button`
 
   width: 224px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
 
   cursor: pointer;
   transition: 0.2s linear;
@@ -219,4 +270,26 @@ const SCloseButton = styled(Button)`
     right: 24px;
     top: 32px;
   }
+`;
+
+const SCopyLinkButton = styled.div`
+  width: 224px;
+  height: 48px;
+
+  margin-top: 24px;
+
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 12px;
+  background: ${(props) => props.theme.colorsThemed.social.copy.main};
+
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+
+  color: #ffffff;
+  cursor: pointer;
 `;

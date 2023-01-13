@@ -21,6 +21,7 @@ interface IMcOptionCardSelectVotesMenu {
   handleClose: () => void;
   handleSetVoteOfferAndOpenModal: (voteOffer: newnewapi.McVoteOffer) => void;
   handleOpenBundleVotesModal?: () => void;
+  handleOpenCustomAmountModal: () => void;
 }
 
 const McOptionCardSelectVotesMenu: React.FunctionComponent<
@@ -33,6 +34,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
   handleClose,
   handleOpenBundleVotesModal,
   handleSetVoteOfferAndOpenModal,
+  handleOpenCustomAmountModal,
 }) => {
   const { t } = useTranslation('page-Post');
   const containerRef = useRef<HTMLDivElement>();
@@ -130,6 +132,19 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                 </Text>
               </SButton>
             ))}
+            <SButton
+              onClickCapture={() => {
+                Mixpanel.track('Open Custom Votes Amount', {
+                  _stage: 'Post',
+                  _component: 'McOptionCardSelectVotesMenu',
+                });
+              }}
+              onClick={() => handleOpenCustomAmountModal()}
+            >
+              <Text variant={3}>
+                {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
+              </Text>
+            </SButton>
             {handleOpenBundleVotesModal && (
               <SUseVotesContainer>
                 <SUseVotesButton

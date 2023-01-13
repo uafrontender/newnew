@@ -42,16 +42,18 @@ import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../contexts/commentFromUrlContext';
 import PostInnerContextProvider from '../../contexts/postInnerContext';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import { NextPageWithLayout } from '../_app';
 import GeneralLayout from '../../components/templates/General';
 import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import usePost from '../../utils/hooks/usePost';
 
 interface IPostPage {
   postUuidOrShortId: string;
-  post?: newnewapi.Post;
+  post?: newnewapi.IPost;
   setup_intent_client_secret?: string;
   comment_id?: string;
   comment_content?: string;
@@ -71,6 +73,8 @@ const PostPage: NextPage<IPostPage> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { user, ui } = useAppSelector((state) => state);
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -103,10 +107,20 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const [postFromAjax, setPostFromAjax] = useState<newnewapi.Post | undefined>(
-    undefined
+  const { data: postFromAjax, isLoading: isPostLoading } = usePost(
+    {
+      loggedInUser: user.loggedIn,
+      postUuid: postUuidOrShortId,
+    },
+    {
+      initialData: post,
+      onError: (error) => {
+        console.error(error);
+        router.replace('/404');
+      },
+      enabled: !post,
+    }
   );
-  const [isPostLoading, setIsPostLoading] = useState(!post);
 
   const [postParsed, typeOfPost] = useMemo<
     | [
@@ -124,38 +138,11 @@ const PostPage: NextPage<IPostPage> = ({
     [post, postFromAjax]
   );
 
-  useEffect(() => {
-    async function fetchPost() {
-      try {
-        setIsPostLoading(true);
-        const getPostPayload = new newnewapi.GetPostRequest({
-          postUuid: postUuidOrShortId,
-        });
-
-        const res = await fetchPostByUUID(getPostPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Post not found');
-
-        setPostFromAjax(res.data);
-
-        setIsPostLoading(false);
-      } catch (err) {
-        console.error(err);
-        router.replace('/404');
-      }
-    }
-
-    if (!post) {
-      // console.log('Fetching post');
-      fetchPost();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
+        // NB! Status can be a string
+        // @ts-ignore
         return switchPostStatusString(typeOfPost, postParsed?.status);
       }
       return switchPostStatus(typeOfPost, postParsed?.status);
@@ -210,6 +197,10 @@ const PostPage: NextPage<IPostPage> = ({
       if (!res.error) {
         setIsFollowingDecision((currentValue) => !currentValue);
       }
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
@@ -219,6 +210,7 @@ const PostPage: NextPage<IPostPage> = ({
     user._persist?.rehydrated,
     isFollowingDecision,
     router,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   const handleUpdatePostStatus = useCallback(
@@ -331,6 +323,7 @@ const PostPage: NextPage<IPostPage> = ({
     });
     if (
       isConfirmToClosePost &&
+      // eslint-disable-next-line no-alert
       !window.confirm(t('postVideo.cannotLeavePageMsg'))
     ) {
       return;
@@ -425,28 +418,37 @@ const PostPage: NextPage<IPostPage> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
 
-  // Fetch whether or not the Post is favorited
+  // Mark post as viewed if logged in and not own post
   useEffect(() => {
-    async function fetchIsFavorited() {
+    async function markAsViewed() {
+      if (
+        !postParsed ||
+        !user.loggedIn ||
+        user.userData?.userUuid === postParsed?.creator?.uuid
+      )
+        return;
       try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
+        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
           postUuid: postParsed?.postUuid,
         });
 
-        const res = await fetchPostByUUID(fetchPostPayload);
+        const res = await markPost(markAsViewedPayload);
 
-        if (res.data) {
-          setIsFollowingDecision(!!switchPostType(res.data)[0].isFavoritedByMe);
-        }
+        if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
         console.error(err);
       }
     }
 
-    if (postParsed?.postUuid) {
-      fetchIsFavorited();
-    }
-  }, [postParsed?.postUuid]);
+    // setTimeout used to fix the React memory leak warning
+    const timer = setTimeout(() => {
+      markAsViewed();
+    });
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [post, postParsed, user.loggedIn, user.userData?.userUuid]);
 
   // Infinite scroll
   useEffect(() => {
@@ -475,6 +477,8 @@ const PostPage: NextPage<IPostPage> = ({
     setPostStatus(() => {
       if (typeOfPost && postParsed?.status) {
         if (typeof postParsed.status === 'string') {
+          // NB! Status can be a string
+          // @ts-ignore
           return switchPostStatusString(typeOfPost, postParsed?.status);
         }
         return switchPostStatus(typeOfPost, postParsed?.status);
@@ -676,7 +680,9 @@ export default PostPage;
   </GeneralLayout>
 );
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IPostPage> = async (
+  context
+) => {
   const {
     post_uuid_or_short_id,
     setup_intent_client_secret,
@@ -734,22 +740,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ) {
       let queryString = '';
       const queryObject = {
-        ...(setup_intent_client_secret
+        ...(setup_intent_client_secret &&
+        !Array.isArray(setup_intent_client_secret)
           ? {
               setup_intent_client_secret,
             }
           : {}),
-        ...(comment_id
+        ...(comment_id && !Array.isArray(comment_id)
           ? {
               comment_id,
             }
           : {}),
-        ...(comment_content
+        ...(comment_content && !Array.isArray(comment_content)
           ? {
               comment_content,
             }
           : {}),
-        ...(save_card
+        ...(save_card && !Array.isArray(save_card)
           ? {
               save_card,
             }
@@ -774,23 +781,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         postUuidOrShortId: post_uuid_or_short_id,
         isServerSide: true,
-        post: res.data.toJSON(),
-        ...(setup_intent_client_secret
+        post: res.data.toJSON() as newnewapi.IPost,
+        ...(setup_intent_client_secret &&
+        !Array.isArray(setup_intent_client_secret)
           ? {
               setup_intent_client_secret,
             }
           : {}),
-        ...(save_card
+        ...(save_card && !Array.isArray(save_card)
           ? {
               save_card: save_card === 'true',
             }
           : {}),
-        ...(comment_id
+        ...(comment_id && !Array.isArray(comment_id)
           ? {
               comment_id,
             }
           : {}),
-        ...(comment_content
+        ...(comment_content && !Array.isArray(comment_content)
           ? {
               comment_content,
             }
@@ -806,22 +814,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       postUuidOrShortId: post_uuid_or_short_id,
       isServerSide: false,
-      ...(setup_intent_client_secret
+      ...(setup_intent_client_secret &&
+      !Array.isArray(setup_intent_client_secret)
         ? {
             setup_intent_client_secret,
           }
         : {}),
-      ...(save_card
+      ...(save_card && !Array.isArray(save_card)
         ? {
             save_card: save_card === 'true',
           }
         : {}),
-      ...(comment_id
+      ...(comment_id && !Array.isArray(comment_id)
         ? {
             comment_id,
           }
         : {}),
-      ...(comment_content
+      ...(comment_content && !Array.isArray(comment_content)
         ? {
             comment_content,
           }

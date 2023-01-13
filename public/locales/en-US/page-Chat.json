@@ -7,7 +7,7 @@
     "placeholder": "Type a message...",
     "welcomeMessage": "You can now message",
     "noMessagesFirstLine": "No messages here yet...",
-    "noMessagesSecondLine": "Send a message to start conversation.",
+    "noMessagesSecondLine": "Send a message to start a conversation.",
     "typing": "Typing..."
   },
   "userBlocked": {

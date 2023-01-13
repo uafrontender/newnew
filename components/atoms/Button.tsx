@@ -324,8 +324,7 @@ const SButton = styled.button<ISButton>`
       props.theme.colorsThemed.button.active[props.view ?? 'primary']};
   }
 
-  &:focus:enabled,
-  &:hover:enabled {
+  &:focus:enabled {
     outline: none;
 
     ${(props) => {
@@ -361,6 +360,48 @@ const SButton = styled.button<ISButton>`
       css`
         box-shadow: ${props.theme.shadows.intenseBlue};
       `}
+  }
+
+  &:hover:enabled {
+    outline: none;
+  }
+
+  @media (hover: hover) {
+    &:hover:enabled {
+      ${(props) => {
+        switch (props.view) {
+          case 'primaryGrad': {
+            return css`
+              // for gradient button background animation on hover
+              :after {
+                opacity: 1;
+              }
+            `;
+          }
+          case 'common': {
+            return css`
+              color: ${({ theme }) => theme.colors.white};
+              background: ${props.theme.colorsThemed.button.hover[
+                props.view ?? 'primary'
+              ]};
+            `;
+          }
+          default: {
+            return css`
+              background: ${props.theme.colorsThemed.button.hover[
+                props.view ?? 'primary'
+              ]};
+            `;
+          }
+        }
+      }}
+
+      ${(props) =>
+        props.withShadow &&
+        css`
+          box-shadow: ${props.theme.shadows.intenseBlue};
+        `}
+    }
   }
 
   &:disabled {
