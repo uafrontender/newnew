@@ -113,7 +113,6 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, [store]);
 
   useEffect(() => {
-    console.log(locale);
     // Imported one by one not to break import\no-dynamic-require rule
     if (locale === 'zh') {
       // eslint-disable-next-line global-require
