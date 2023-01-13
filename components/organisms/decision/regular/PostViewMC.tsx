@@ -46,7 +46,7 @@ import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
-import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -367,14 +367,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
-  const subscription: SubscriptionToPost = useMemo(
+  /* const subscription: SubscriptionToPost = useMemo(
     () => ({
       type: 'post',
       postUuid: post.postUuid,
       postTitle: post.title,
     }),
     [post]
-  );
+  ); */
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -658,7 +658,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
-            subscription={subscription}
+            /* subscription={subscription} */
             totalVotes={totalVotes}
             hasWinner={false}
           />
@@ -705,7 +705,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
-            subscription={subscription}
+            /* subscription={subscription} */
             totalVotes={totalVotes}
             hasWinner={false}
           />
@@ -746,7 +746,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
-                  subscription={subscription}
+                  /* subscription={subscription} */
                   totalVotes={totalVotes}
                   hasWinner={false}
                 />
