@@ -14,7 +14,7 @@ import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTo
 import PostVideoProcessingHolder from '../../../molecules/decision/common/PostVideoProcessingHolder';
 
 import assets from '../../../../constants/assets';
-import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 
@@ -60,14 +60,14 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
     [postParsed]
   );
 
-  const subscription: SubscriptionToPost = useMemo(
+  /* const subscription: SubscriptionToPost = useMemo(
     () => ({
       type: 'post',
       postUuid: post.postUuid,
       postTitle: post.title,
     }),
     [post]
-  );
+  ); */
 
   return (
     <SWrapper>
@@ -90,7 +90,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
       />
       {isMobile &&
         (variant === 'decision' ? (
-          <PostTopInfo subscription={subscription} hasWinner={false} />
+          <PostTopInfo /* subscription={subscription} */ hasWinner={false} />
         ) : (
           <PostTopInfoModeration hasWinner={false} />
         ))}
@@ -103,7 +103,9 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
         >
           {!isMobile &&
             (variant === 'decision' ? (
-              <PostTopInfo subscription={subscription} hasWinner={false} />
+              <PostTopInfo
+                /* subscription={subscription} */ hasWinner={false}
+              />
             ) : (
               <PostTopInfoModeration hasWinner={false} />
             ))}
