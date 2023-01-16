@@ -8,15 +8,14 @@ import React, {
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { isString } from 'lodash';
 import dynamic from 'next/dynamic';
+import { newnewapi } from 'newnew-api';
 
 import Button from '../../../atoms/Button';
 import { Tab } from '../../Tabs';
 import AnimatedPresence, {
   TElementAnimations,
 } from '../../../atoms/AnimatedPresence';
-import SearchInput from './SearchInput';
 
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
@@ -29,10 +28,17 @@ import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
-const NewMessageModal = dynamic(() => import('./NewMessageModal'));
+const SearchInput = dynamic(() => import('./SearchInput'));
+const ChatContent = dynamic(
+  () => import('../../../organisms/direct-messages/ChatContent')
+);
+// TODO: Adjust New Message modal for dashboard to get only bundle owners
+const NewMessageModal = dynamic(
+  () => import('../../direct-messages/NewMessageModal')
+);
 const NotificationsList = dynamic(() => import('./NotificationsList'));
-const ChatList = dynamic(() => import('./ChatList'));
-const Chat = dynamic(() => import('./Chat'));
+const ChatList = dynamic(() => import('../../direct-messages/ChatList'));
+// const Chat = dynamic(() => import('./Chat'));
 const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 const Indicator = dynamic(() => import('../../../atoms/Indicator'));
 const Tabs = dynamic(() => import('../../Tabs'));
@@ -46,7 +52,8 @@ export const DynamicSection = () => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const { unreadCountForCreator } = useGetChats();
+  const { unreadCountForCreator, setActiveTab, activeTab, activeChatRoom } =
+    useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
@@ -130,11 +137,10 @@ export const DynamicSection = () => {
     };
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
-  const [searchText, setSearchText] = useState('');
-
-  const handleSetSearchText = useCallback((searchStr: string) => {
-    setSearchText(searchStr);
-  }, []);
+  useEffect(() => {
+    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR)
+      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+  }, [activeTab, setActiveTab]);
 
   return (
     <STopButtons>
@@ -192,13 +198,7 @@ export const DynamicSection = () => {
       >
         <SAnimatedContainer ref={containerRef}>
           {tab === 'direct-messages' ? (
-            <Chat
-              roomID={
-                router.query.roomID && isString(router.query.roomID)
-                  ? router.query.roomID
-                  : ''
-              }
-            />
+            activeChatRoom && <ChatContent chatRoom={activeChatRoom!!} />
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>
@@ -233,7 +233,7 @@ export const DynamicSection = () => {
                     </>
                   ) : (
                     <>
-                      <SearchInput passInputValue={handleSetSearchText} />
+                      <SearchInput />
                       <SChatButton
                         view='secondary'
                         onClick={handleBulkMessageClick}
@@ -258,7 +258,7 @@ export const DynamicSection = () => {
                   markReadNotifications={markReadNotifications}
                 />
               ) : (
-                <ChatList searchText={searchText} />
+                <ChatList />
               )}
             </>
           )}

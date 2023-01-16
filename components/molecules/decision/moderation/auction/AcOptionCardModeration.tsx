@@ -17,7 +17,7 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 

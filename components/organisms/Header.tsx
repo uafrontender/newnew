@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-expressions */
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
-import { useEffectOnce } from 'react-use';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -14,8 +12,6 @@ import Container from '../atoms/Grid/Container';
 
 import { useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
-import { getMyBundleEarnings } from '../../api/endpoints/bundles';
-import { loadStateLS, saveStateLS } from '../../utils/localStorage';
 
 interface IHeader {
   visible: boolean;
@@ -30,36 +26,6 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
   );
   const isTablet = ['tablet', 'laptop'].includes(resizeMode);
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
-  const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
-  const user = useAppSelector((state) => state.user);
-
-  useEffectOnce(() => {
-    // if creator did not sell any bundle we should
-    // hide navigation link to direct messages
-    async function fetchMyBundlesEarnings() {
-      try {
-        const payload = new newnewapi.GetMyBundleEarningsRequest();
-        const res = await getMyBundleEarnings(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.totalBundleEarnings?.usdCents) {
-          setHasSoldBundles(true);
-          saveStateLS('creatorHasSoldBundles', true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
-    if (localHasSoldBundles) {
-      setHasSoldBundles(true);
-      // TODO: should we show it only for creators who added a bank account?
-    } else if (user.userData?.options?.creatorStatus === 2) {
-      fetchMyBundlesEarnings();
-    }
-  });
 
   const hasMounted = useHasMounted();
 
@@ -78,8 +44,8 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
           <Row>
             <Col>
               {isMobile && <Mobile />}
-              {isTablet && <Tablet hasSoldBundles={hasSoldBundles} />}
-              {isDesktop && <Desktop hasSoldBundles={hasSoldBundles} />}
+              {isTablet && <Tablet />}
+              {isDesktop && <Desktop />}
             </Col>
           </Row>
         </Container>

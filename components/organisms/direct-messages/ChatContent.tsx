@@ -1,11 +1,11 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useState,
   useEffect,
   useCallback,
   useContext,
-  useRef,
   useMemo,
 } from 'react';
 import dynamic from 'next/dynamic';
@@ -22,39 +22,44 @@ import { reportUser } from '../../../api/endpoints/report';
 import { sendMessage } from '../../../api/endpoints/chat';
 
 /* Utils */
-import { IChatData } from '../../interfaces/ichat';
 import getDisplayname from '../../../utils/getDisplayname';
 import { useAppSelector } from '../../../redux-store/store';
 import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 /* Components */
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
-import TextArea from '../../atoms/chat/TextArea';
+import TextArea from '../../atoms/direct-messages/TextArea';
+import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader';
 
-const ReportModal = dynamic(() => import('./ReportModal'));
-const BlockedUser = dynamic(() => import('./BlockedUser'));
-const GoBackButton = dynamic(() => import('../GoBackButton'));
-const AccountDeleted = dynamic(() => import('./AccountDeleted'));
-const ChatAreaCenter = dynamic(() => import('./ChatAreaCenter'));
-const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
-const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
-const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
-const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
-const AnnouncementHeader = dynamic(
-  () => import('../../atoms/chat/AnnouncementHeader')
+const ReportModal = dynamic(
+  () => import('../../molecules/direct-messages/ReportModal')
 );
-const ChatUserData = dynamic(() => import('../../atoms/chat/ChatUserData'));
+const BlockedUser = dynamic(
+  () => import('../../molecules/direct-messages/BlockedUser')
+);
+const AccountDeleted = dynamic(
+  () => import('../../molecules/direct-messages/AccountDeleted')
+);
+const ChatAreaCenter = dynamic(
+  () => import('../../molecules/direct-messages/ChatAreaCenter')
+);
 
-const ChatArea: React.FC<IChatData> = ({
-  chatRoom,
-  showChatList,
-  updateLastMessage,
-}) => {
+const MessagingDisabled = dynamic(
+  () => import('../../molecules/direct-messages/MessagingDisabled')
+);
+const SubscriptionExpired = dynamic(
+  () => import('../../molecules/direct-messages/SubscriptionExpired')
+);
+
+interface IFuncProps {
+  chatRoom: newnewapi.IChatRoom;
+}
+
+const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Chat');
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -67,19 +72,15 @@ const ChatArea: React.FC<IChatData> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
 
   const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
     useGetBlockedUsers();
 
   const [messageText, setMessageText] = useState<string>('');
-  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [messageTextValid, setMessageTextValid] = useState(false);
+
   const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
-  const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
@@ -87,63 +88,39 @@ const ChatArea: React.FC<IChatData> = ({
     useState<boolean>(false);
 
   useEffect(() => {
-    if (chatRoom) {
-      if (chatRoom && chatRoom.visavis) {
-        if (!chatRoom.visavis.isSubscriptionActive) {
-          setIsSubscriptionExpired(true);
-        }
-      }
-      if (chatRoom.kind === 4) {
-        setIsAnnouncement(true);
-        chatRoom.myRole === 2
-          ? setIsMyAnnouncement(true)
-          : setIsMyAnnouncement(false);
-      } else {
-        setIsAnnouncement(false);
-        setIsMyAnnouncement(false);
-      }
-      if (chatRoom.id) {
-        addChannel(`chat_${chatRoom.id.toString()}`, {
-          chatRoomUpdates: {
-            chatRoomId: chatRoom.id,
-          },
-        });
-      }
-      return () => {
-        if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
-      };
+    if (chatRoom.id) {
+      addChannel(`chat_${chatRoom.id.toString()}`, {
+        chatRoomUpdates: {
+          chatRoomId: chatRoom.id,
+        },
+      });
     }
+    return () => {
+      if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
 
   const isVisavisBlocked = useMemo(
-    () => usersIBlocked.includes(chatRoom?.visavis?.user?.uuid ?? ''),
-    [chatRoom?.visavis?.user?.uuid, usersIBlocked]
+    () => usersIBlocked.includes(chatRoom.visavis?.user?.uuid ?? ''),
+    [chatRoom.visavis?.user?.uuid, usersIBlocked]
   );
 
   const isMessagingDisabled = useMemo(
-    () => usersBlockedMe.includes(chatRoom?.visavis?.user?.uuid ?? ''),
-    [chatRoom?.visavis?.user?.uuid, usersBlockedMe]
+    () => usersBlockedMe.includes(chatRoom.visavis?.user?.uuid ?? ''),
+    [chatRoom.visavis?.user?.uuid, usersBlockedMe]
   );
-
-  const handleOpenEllipseMenu = useCallback(() => {
-    setEllipseMenuOpen(true);
-  }, []);
-
-  const handleCloseEllipseMenu = useCallback(() => {
-    setEllipseMenuOpen(false);
-  }, []);
 
   const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) setConfirmBlockUser(true);
     } else {
-      changeUserBlockedStatus(chatRoom?.visavis?.user?.uuid, false);
+      changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
     }
   }, [
     isVisavisBlocked,
     confirmBlockUser,
-    chatRoom?.visavis?.user?.uuid,
+    chatRoom.visavis?.user?.uuid,
     changeUserBlockedStatus,
   ]);
 
@@ -167,11 +144,7 @@ const ChatArea: React.FC<IChatData> = ({
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data.message) {
-          setMessages([res.data.message].concat(messages));
-        }
         setSendingMessage(false);
-        if (updateLastMessage) updateLastMessage({ roomId: chatRoom.id });
       } catch (err) {
         console.error(err);
         setMessageText(tmpMsgText);
@@ -179,7 +152,7 @@ const ChatArea: React.FC<IChatData> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom?.id, messageTextValid, messageText]);
+  }, [chatRoom.id, messageTextValid, messageText]);
 
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
@@ -205,19 +178,12 @@ const ChatArea: React.FC<IChatData> = ({
     [messageText, isMobileOrTablet, handleSubmit]
   );
 
-  const goBackHandler = () => {
-    if (showChatList) {
-      setMessageText('');
-      showChatList();
-    }
-  };
-
   const isTextareaHidden = useMemo(
     () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
       isSubscriptionExpired ||
-      chatRoom?.visavis?.user?.options?.isTombstone ||
+      chatRoom.visavis?.user?.options?.isTombstone ||
       !chatRoom ||
       (isAnnouncement && !isMyAnnouncement),
     [
@@ -230,18 +196,15 @@ const ChatArea: React.FC<IChatData> = ({
     ]
   );
 
-  const moreButtonRef: any = useRef();
-
   const whatComponentToDisplay = useCallback(() => {
-    if (chatRoom?.visavis?.user?.options?.isTombstone)
-      return <AccountDeleted />;
+    if (chatRoom.visavis?.user?.options?.isTombstone) return <AccountDeleted />;
 
-    if (isMessagingDisabled && chatRoom?.visavis?.user)
+    if (isMessagingDisabled && chatRoom.visavis?.user)
       return <MessagingDisabled user={chatRoom.visavis.user} />;
 
     if (
       isSubscriptionExpired &&
-      chatRoom?.visavis?.user?.uuid &&
+      chatRoom.visavis?.user?.uuid &&
       chatRoom.myRole
     )
       return (
@@ -253,77 +216,24 @@ const ChatArea: React.FC<IChatData> = ({
     return null;
   }, [
     isMessagingDisabled,
-    chatRoom?.visavis?.user,
+    chatRoom.visavis?.user,
     isSubscriptionExpired,
-    chatRoom?.myRole,
+    chatRoom.myRole,
   ]);
 
   return (
     <SContainer>
-      {chatRoom && (
-        <STopPart>
-          {isMobileOrTablet && <GoBackButton onClick={goBackHandler} />}
-          <ChatUserData
-            chatRoom={chatRoom}
-            isAnnouncement={isAnnouncement}
-            isMyAnnouncement={isMyAnnouncement}
-          />
-          <SActionsDiv>
-            {!isMyAnnouncement && (
-              <SMoreButton
-                view='transparent'
-                iconOnly
-                onClick={() => handleOpenEllipseMenu()}
-                ref={moreButtonRef}
-              >
-                <InlineSVG
-                  svg={MoreIconFilled}
-                  fill={theme.colorsThemed.text.secondary}
-                  width='20px'
-                  height='20px'
-                />
-              </SMoreButton>
-            )}
-            {/* Ellipse menu */}
-            {!isMobile && chatRoom.visavis && (
-              <ChatEllipseMenu
-                myRole={chatRoom.myRole ? chatRoom.myRole : 0}
-                user={chatRoom.visavis}
-                isVisible={ellipseMenuOpen}
-                handleClose={handleCloseEllipseMenu}
-                userBlocked={isVisavisBlocked}
-                onUserBlock={onUserBlock}
-                onUserReport={onUserReport}
-                isAnnouncement={isAnnouncement}
-                anchorElement={moreButtonRef.current}
-              />
-            )}
-            {isMobile && ellipseMenuOpen ? (
-              <ChatEllipseModal
-                isOpen={ellipseMenuOpen}
-                zIndex={21}
-                onClose={handleCloseEllipseMenu}
-                userBlocked={isVisavisBlocked}
-                onUserBlock={onUserBlock}
-                onUserReport={onUserReport}
-                visavis={chatRoom.visavis}
-                isAnnouncement={isAnnouncement}
-              />
-            ) : null}
-          </SActionsDiv>
-        </STopPart>
-      )}
-      {isAnnouncement && !isMyAnnouncement && chatRoom?.visavis?.user && (
-        <AnnouncementHeader user={chatRoom.visavis?.user} />
-      )}
-      <ChatAreaCenter
+      <ChatContentHeader
         chatRoom={chatRoom}
-        isAnnouncement={isAnnouncement}
-        updateLastMessage={updateLastMessage}
+        isVisavisBlocked
+        onUserReport={onUserReport}
+        onUserBlock={onUserBlock}
       />
+
+      <ChatAreaCenter chatRoom={chatRoom} isAnnouncement={isAnnouncement} />
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
-          chatRoom?.visavis && (
+          chatRoom.visavis && (
             <BlockedUser
               confirmBlockUser={confirmBlockUser}
               isBlocked={isVisavisBlocked}
@@ -365,13 +275,13 @@ const ChatArea: React.FC<IChatData> = ({
           whatComponentToDisplay()
         )}
       </SBottomPart>
-      {chatRoom?.visavis && (
+      {chatRoom.visavis && (
         <ReportModal
           show={confirmReportUser}
           reportedDisplayname={getDisplayname(chatRoom.visavis?.user!!)}
           onClose={() => setConfirmReportUser(false)}
           onSubmit={async ({ reasons, message }) => {
-            if (chatRoom?.visavis?.user?.uuid) {
+            if (chatRoom.visavis?.user?.uuid) {
               await reportUser(
                 chatRoom.visavis.user?.uuid,
                 reasons,
@@ -385,40 +295,13 @@ const ChatArea: React.FC<IChatData> = ({
   );
 };
 
-export default ChatArea;
+export default ChatContent;
 
 const SContainer = styled.div`
   height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;
-`;
-
-const STopPart = styled.header`
-  height: 80px;
-  border-bottom: 1px solid
-    ${(props) => props.theme.colorsThemed.background.outlines1};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px 0 24px;
-`;
-
-const SActionsDiv = styled.div`
-  position: relative;
-`;
-
-const SMoreButton = styled(Button)`
-  background: none;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  padding: 8px;
-  margin-right: 18px;
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
 `;
 
 const SBottomPart = styled.div`
