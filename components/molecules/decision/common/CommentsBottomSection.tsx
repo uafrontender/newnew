@@ -1,12 +1,9 @@
 /* eslint-disable no-plusplus */
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -25,11 +22,7 @@ import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
-import {
-  deleteMessage,
-  getMessages,
-  sendMessage,
-} from '../../../../api/endpoints/chat';
+import { deleteMessage, sendMessage } from '../../../../api/endpoints/chat';
 import { CommentFromUrlContext } from '../../../../contexts/commentFromUrlContext';
 
 import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
@@ -39,6 +32,8 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import usePostComments from '../../../../utils/hooks/usePostComments';
+import useComponentScrollRestoration from '../../../../utils/hooks/useComponentScrollRestoration';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -88,97 +83,22 @@ const CommentsBottomSection: React.FunctionComponent<
   const commentFormRef = useRef<HTMLFormElement>();
   const [heightDelta, setHeightDelta] = useState(70);
 
-  // Comments
-  const [comments, setComments] = useState<TCommentWithReplies[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
+  const {
+    processedComments: comments,
+    handleOpenCommentProgrammatically,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    refetch,
+  } = usePostComments({
+    loggedInUser: user.loggedIn,
+    commentsRoomId,
+  });
 
-  const processComments = (
-    commentsRaw: Array<newnewapi.ChatMessage | TCommentWithReplies>
-  ): TCommentWithReplies[] => {
-    let lastParentId;
-    let lastParentIdx;
-    const goalArr: TCommentWithReplies[] = [];
-
-    const workingArr = [...commentsRaw];
-
-    workingArr.forEach((rawItem, i) => {
-      const workingItem = { ...rawItem };
-
-      if (!rawItem.parentId || rawItem.parentId === 0) {
-        lastParentId = undefined;
-        lastParentIdx = undefined;
-
-        workingItem.parentId = undefined;
-        goalArr.push(workingItem as TCommentWithReplies);
-      } else {
-        lastParentId = workingItem.parentId;
-        lastParentIdx = goalArr.findIndex((o) => o.id === workingItem.parentId);
-
-        if (lastParentIdx !== -1) {
-          if (!goalArr[lastParentIdx].replies) {
-            goalArr[lastParentIdx].replies = [];
-          }
-
-          // @ts-ignore
-          const workingSubarr = [...goalArr[lastParentIdx].replies];
-
-          goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
-        }
-      }
-    });
-
-    return goalArr;
-  };
-
-  const fetchComments = useCallback(
-    async (pageToken?: string) => {
-      if (commentsLoading) return;
-      try {
-        setCommentsLoading(true);
-        setLoadingCommentsError('');
-
-        const getCommentsPayload = new newnewapi.GetMessagesRequest({
-          roomId: commentsRoomId,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await getMessages(getCommentsPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.messages) {
-          setComments((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.messages as newnewapi.ChatMessage[]),
-            ];
-
-            return processComments(workingArr);
-          });
-
-          // console.log(res.data.paging?.nextPageToken)
-          setCommentsNextPageToken(res.data.paging?.nextPageToken);
-        }
-
-        setCommentsLoading(false);
-      } catch (err) {
-        setCommentsLoading(false);
-        setLoadingCommentsError((err as Error).message);
-        console.error(err);
-      }
-    },
-    [commentsLoading, commentsRoomId]
+  const commentsLoading = useMemo(
+    () => isLoading || isFetchingNextPage,
+    [isLoading, isFetchingNextPage]
   );
 
   const handleAddComment = useCallback(
@@ -203,37 +123,7 @@ const CommentsBottomSection: React.FunctionComponent<
         const res = await sendMessage(payload);
 
         if (res.data?.message) {
-          setComments((curr) => {
-            const workingArr = [...curr];
-
-            if (
-              res.data?.message?.parentId &&
-              res.data?.message?.parentId !== 0
-            ) {
-              const parentMsgIdx = workingArr.findIndex(
-                (msg) => msg.id === res.data?.message?.parentId
-              );
-
-              if (parentMsgIdx === -1 || !workingArr[parentMsgIdx])
-                return workingArr;
-
-              if (
-                workingArr[parentMsgIdx].replies &&
-                Array.isArray(workingArr[parentMsgIdx].replies)
-              ) {
-                workingArr[parentMsgIdx].replies!!.push(
-                  res.data.message as newnewapi.ChatMessage
-                );
-                return workingArr;
-              }
-
-              workingArr[parentMsgIdx].replies = [
-                res.data.message as newnewapi.ChatMessage,
-              ];
-              return workingArr;
-            }
-            return [res.data?.message, ...curr] as TCommentWithReplies[];
-          });
+          await refetch();
         }
       } catch (err) {
         console.error(err);
@@ -245,33 +135,6 @@ const CommentsBottomSection: React.FunctionComponent<
   );
 
   const [isDeletingComment, setIsDeletingComment] = useState(false);
-
-  const markCommentAsDeleted = useCallback(
-    (comment: TCommentWithReplies) => {
-      setComments((curr) => {
-        const workingArr = [...curr];
-
-        if (!comment.parentId || comment.parentId === 0) {
-          return workingArr.filter((c) => c.id !== comment.id);
-        }
-
-        const parentIdx = workingArr.findIndex(
-          (c) => c.id === comment.parentId
-        );
-
-        if (parentIdx === -1) return workingArr;
-
-        if (workingArr[parentIdx].replies) {
-          workingArr[parentIdx].replies = workingArr[parentIdx].replies?.filter(
-            (c) => c.id !== comment.id
-          );
-        }
-
-        return workingArr;
-      });
-    },
-    [setComments]
-  );
 
   const handleDeleteComment = useCallback(
     async (comment: TCommentWithReplies) => {
@@ -289,7 +152,7 @@ const CommentsBottomSection: React.FunctionComponent<
         const res = await deleteMessage(payload);
 
         if (!res.error) {
-          markCommentAsDeleted(comment);
+          refetch();
         }
       } catch (err) {
         console.error(err);
@@ -298,21 +161,15 @@ const CommentsBottomSection: React.FunctionComponent<
         setIsDeletingComment(false);
       }
     },
-    [markCommentAsDeleted, postUuid, showErrorToastPredefined]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [postUuid, showErrorToastPredefined]
   );
 
   useEffect(() => {
-    fetchComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (inView && !commentsLoading && commentsNextPageToken) {
-      // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
-      fetchComments(commentsNextPageToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, commentsNextPageToken, commentsLoading]);
+  }, [inView, fetchNextPage]);
 
   useEffect(() => {
     if (commentsRoomId && socketConnection?.connected) {
@@ -326,39 +183,11 @@ const CommentsBottomSection: React.FunctionComponent<
   }, [socketConnection?.connected, commentsRoomId]);
 
   useEffect(() => {
-    const socketHandlerMessageCreated = (data: any) => {
+    const socketHandlerMessageCreated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (decoded.newMessage!!.sender?.uuid !== user.userData?.userUuid) {
-        setComments((curr) => {
-          const workingArr = [...curr];
-
-          if (decoded.newMessage?.parentId) {
-            const parentMsgIdx = workingArr.findIndex(
-              (msg) => msg.id === decoded.newMessage?.parentId
-            );
-
-            if (parentMsgIdx === -1 || !workingArr[parentMsgIdx])
-              return workingArr;
-
-            if (!workingArr[parentMsgIdx].replies) {
-              workingArr[parentMsgIdx].replies = [];
-            }
-
-            // @ts-ignore
-            const workingSubarr = [...workingArr[parentMsgIdx].replies];
-
-            // NB! Fix
-            workingArr[parentMsgIdx].replies = [
-              decoded.newMessage as newnewapi.ChatMessage,
-              ...workingSubarr,
-            ];
-
-            return workingArr;
-          }
-
-          return [decoded.newMessage, ...workingArr] as TCommentWithReplies[];
-        });
+        refetch();
       }
     };
 
@@ -366,7 +195,7 @@ const CommentsBottomSection: React.FunctionComponent<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageDeleted.decode(arr);
       if (decoded.deletedMessage) {
-        markCommentAsDeleted(decoded.deletedMessage as TCommentWithReplies);
+        refetch();
       }
     };
 
@@ -388,17 +217,15 @@ const CommentsBottomSection: React.FunctionComponent<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, user.userData?.userUuid, setComments]);
+  }, [socketConnection, user.userData?.userUuid]);
 
   // Cleanup
   useEffect(
-    () => {
-      return () => {
-        if (commentsRoomId) {
-          if (commentsRoomId)
-            removeChannel(`comments_${commentsRoomId.toString()}`);
-        }
-      };
+    () => () => {
+      if (commentsRoomId) {
+        if (commentsRoomId)
+          removeChannel(`comments_${commentsRoomId.toString()}`);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -443,24 +270,17 @@ const CommentsBottomSection: React.FunctionComponent<
       );
 
       if (idx === -1) {
-        // console.log('Looking further');
         scrollRef.current?.scrollIntoView();
 
-        if (isMobile && commentsNextPageToken && !commentsLoading) {
-          await fetchComments(commentsNextPageToken);
+        if (isMobile && hasNextPage && !commentsLoading) {
+          await fetchNextPage();
         } else {
           scrollRef.current?.scrollBy({
             top: scrollRef.current.scrollHeight,
           });
         }
       } else {
-        // console.log('Found the comment');
-
         if (!flat[idx].parentId || flat[idx].parentId === 0) {
-          const offset = (
-            scrollRef.current?.childNodes[1]?.childNodes[idx] as HTMLDivElement
-          )?.offsetTop;
-
           document
             ?.getElementById(`comment_id_${flat[idx].id}`)
             ?.scrollIntoView({
@@ -476,16 +296,7 @@ const CommentsBottomSection: React.FunctionComponent<
           );
 
           if (parentIdx !== -1) {
-            const offsetTopParent = (
-              scrollRef.current?.childNodes[1].childNodes[
-                parentIdx
-              ] as HTMLDivElement
-            ).offsetTop;
-            setComments((curr) => {
-              const working = [...curr];
-              working[parentIdx].isOpen = true;
-              return working;
-            });
+            handleOpenCommentProgrammatically(parentIdx);
 
             setTimeout(() => {
               document
@@ -509,13 +320,12 @@ const CommentsBottomSection: React.FunctionComponent<
       findComment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    commentIdFromUrl,
-    comments,
-    isMobile,
-    commentsNextPageToken,
-    commentsLoading,
-  ]);
+  }, [commentIdFromUrl, comments, isMobile, commentsLoading]);
+
+  useComponentScrollRestoration(
+    scrollRef.current,
+    'comments-scrolling-container'
+  );
 
   return (
     <>
@@ -562,23 +372,21 @@ const CommentsBottomSection: React.FunctionComponent<
               </SNoCommentsYet>
             ) : null}
             {comments &&
-              comments.map((item, index) => {
-                return (
-                  <Comment
-                    key={item.id.toString()}
-                    canDeleteComment={canDeleteComments}
-                    lastChild={index === comments.length - 1}
-                    comment={item}
-                    isDeletingComment={isDeletingComment}
-                    handleAddComment={(newMsg: string) =>
-                      handleAddComment(newMsg, item.id as number)
-                    }
-                    handleDeleteComment={handleDeleteComment}
-                    onFormBlur={onFormBlur ?? undefined}
-                    onFormFocus={onFormFocus ?? undefined}
-                  />
-                );
-              })}
+              comments.map((item, index) => (
+                <Comment
+                  key={item.id.toString()}
+                  canDeleteComment={canDeleteComments}
+                  lastChild={index === comments.length - 1}
+                  comment={item}
+                  isDeletingComment={isDeletingComment}
+                  handleAddComment={(newMsg: string) =>
+                    handleAddComment(newMsg, item.id as number)
+                  }
+                  handleDeleteComment={handleDeleteComment}
+                  onFormBlur={onFormBlur ?? undefined}
+                  onFormFocus={onFormFocus ?? undefined}
+                />
+              ))}
             <SLoaderDiv
               ref={loadingRef}
               style={{
@@ -589,7 +397,7 @@ const CommentsBottomSection: React.FunctionComponent<
                   : {}),
               }}
             />
-            {isMobile && commentsNextPageToken && (
+            {isMobile && hasNextPage && (
               <SLoadMoreButton
                 view='secondary'
                 disabled={commentsLoading}
@@ -598,7 +406,7 @@ const CommentsBottomSection: React.FunctionComponent<
                     _stage: 'Post',
                     _postUuid: postUuid,
                   });
-                  fetchComments(commentsNextPageToken);
+                  fetchNextPage();
                 }}
               >
                 {t('comments.seeMore')}

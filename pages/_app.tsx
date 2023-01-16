@@ -69,6 +69,7 @@ import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
+import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -230,41 +231,41 @@ const MyApp = (props: IMyApp): ReactElement => {
                                   <BundlesContextProvider>
                                     <ChatsProvider>
                                       <OverlayModeProvider>
-                                        <ResizeMode>
-                                          <GlobalTheme
-                                            initialTheme={colorMode}
-                                            themeFromCookie={themeFromCookie}
-                                          >
-                                            <>
-                                              <ToastContainer containerId='toast-container' />
-                                              <VideoProcessingWrapper>
-                                                <ErrorBoundary>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
+                                        <MultipleBeforePopStateContextProvider>
+                                          <ResizeMode>
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  <ErrorBoundary>
+                                                    {!pageProps.error ? (
+                                                      getLayout(
+                                                        <Component
+                                                          {...pageProps}
+                                                        />
+                                                      )
+                                                    ) : (
+                                                      <Error
+                                                        title={
+                                                          pageProps.error
+                                                            ?.message
+                                                        }
+                                                        statusCode={
+                                                          pageProps.error
+                                                            ?.statusCode ?? 500
+                                                        }
                                                       />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                  <PushNotificationModalContainer />
-                                                  {/* {isRestoringScroll ? (
-                                                      <ScrollRestorationAnimationContainer />
-                                                    ) : null} */}
-                                                </ErrorBoundary>
-                                              </VideoProcessingWrapper>
-                                            </>
-                                          </GlobalTheme>
-                                        </ResizeMode>
+                                                    )}
+                                                    <PushNotificationModalContainer />
+                                                  </ErrorBoundary>
+                                                </VideoProcessingWrapper>
+                                              </>
+                                            </GlobalTheme>
+                                          </ResizeMode>
+                                        </MultipleBeforePopStateContextProvider>
                                       </OverlayModeProvider>
                                     </ChatsProvider>
                                   </BundlesContextProvider>
