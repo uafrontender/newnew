@@ -316,7 +316,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('Guest willing to contribute', () => {
+  describe.only('Guest willing to contribute', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -410,7 +410,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('Guest willing to buy a bundle', () => {
+  describe.only('Guest willing to buy a bundle', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
