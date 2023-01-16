@@ -37,9 +37,6 @@ long-test:
     - sleep 30
     - curl http://localhost:4000
     - npm run cypress:ci
-  artifacts:
-    untracked: true
-    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
       when: never

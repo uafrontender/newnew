@@ -80,7 +80,7 @@ context('Main flow', () => {
     cy.task('log', `test seed is ${testSeed}`);
   });
 
-  describe('Creator', () => {
+  describe.only('Creator', () => {
     const defaultStorage = {
       userTutorialsProgress:
         '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
@@ -530,7 +530,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('User willing to contribute', () => {
+  describe.only('User willing to contribute', () => {
     const USER_EMAIL = `test_user_${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -627,7 +627,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('User willing to buy a bundle', () => {
+  describe.only('User willing to buy a bundle', () => {
     const USER_EMAIL = `test_user_${testSeed}3@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -746,7 +746,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('User willing to add card first', () => {
+  describe.only('User willing to add card first', () => {
     const USER_EMAIL = `test_user_${testSeed}4@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
