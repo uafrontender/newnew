@@ -5,6 +5,7 @@ import enterVerificationCode from './utils/enterVerificationCode';
 const VERIFICATION_CODE = '111111';
 const postShortIdRegex = /p\/(.{6})(\/|$)/;
 
+// TODO: Need a way to end post at any time by request
 context('Main flow', () => {
   const testSeed = Date.now();
 
