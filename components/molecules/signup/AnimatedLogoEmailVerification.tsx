@@ -10,21 +10,22 @@ interface IAnimatedLogoEmailVerification {
   isLoading: boolean;
 }
 
-const AnimatedLogoEmailVerification: React.FunctionComponent<IAnimatedLogoEmailVerification> =
-  ({ isLoading }) => (
-    <SAnimatedLogoEmailVerification>
-      <Lottie
-        width={64}
-        height={64}
-        options={{
-          loop: true,
-          autoplay: true,
-          animationData: loadingAnimation,
-        }}
-        isStopped={!isLoading}
-      />
-    </SAnimatedLogoEmailVerification>
-  );
+const AnimatedLogoEmailVerification: React.FunctionComponent<
+  IAnimatedLogoEmailVerification
+> = ({ isLoading }) => (
+  <SAnimatedLogoEmailVerification>
+    <Lottie
+      width={64}
+      height={64}
+      options={{
+        loop: true,
+        autoplay: true,
+        animationData: loadingAnimation,
+      }}
+      isStopped={!isLoading}
+    />
+  </SAnimatedLogoEmailVerification>
+);
 
 export default AnimatedLogoEmailVerification;
 
@@ -35,7 +36,7 @@ const SAnimatedLogoEmailVerification = styled.div`
   margin-top: 148px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-top: 276px;
+    margin-top: calc(50vh - 200px);
   }
 
   ${({ theme }) => theme.media.laptopL} {
