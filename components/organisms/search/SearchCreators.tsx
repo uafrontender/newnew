@@ -1,19 +1,14 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
-import { newnewapi } from 'newnew-api';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { searchCreators } from '../../../api/endpoints/search';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import useSearchCreators from '../../../utils/hooks/useSearchCreators';
+import { useAppSelector } from '../../../redux-store/store';
+
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../utils/hooks/usePagination';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 const CreatorsList = dynamic(() => import('./CreatorsList'));
@@ -23,49 +18,44 @@ interface IFunction {
 }
 
 export const SearchCreators: React.FC<IFunction> = ({ query }) => {
+  const { loggedIn } = useAppSelector((state) => state.user);
   const { showErrorToastPredefined } = useErrorToasts();
+
+  const onLoadingCreatorsError = useCallback((err: any) => {
+    console.error(err);
+    showErrorToastPredefined(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useSearchCreators(
+      {
+        loggedInUser: loggedIn,
+        query,
+      },
+      {
+        onError: onLoadingCreatorsError,
+      }
+    );
+
+  const creators = useMemo(
+    () => (data?.pages ? data?.pages.map((page) => page.creators).flat() : []),
+    [data]
+  );
+
+  const hasNoResults = useMemo(
+    () => !isLoading && creators?.length === 0,
+    [isLoading, creators?.length]
+  );
+
   // Loading state
   const { ref: loadingRef, inView } = useInView();
 
-  const loadData = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
-      if (query.length === 0) {
-        return {
-          nextData: [],
-          nextPageToken: undefined,
-        };
-      }
-
-      const payload = new newnewapi.SearchCreatorsRequest({
-        query,
-        paging,
-      });
-
-      const res = await searchCreators(payload);
-
-      if (!res.data || res.error) {
-        showErrorToastPredefined(undefined);
-        throw new Error(res.error?.message ?? 'Request failed');
-      }
-
-      return {
-        nextData: res.data.creators,
-        nextPageToken: res.data.paging?.nextPageToken,
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query]
-  );
-
-  const { data, loading, hasMore, loadMore } = usePagination(loadData, 10);
-
   useEffect(() => {
-    if (inView && !loading && hasMore) {
-      loadMore().catch((e) => console.error(e));
+    if (inView) {
+      fetchNextPage();
     }
-  }, [inView, loading, hasMore, loadMore]);
-
-  const hasNoResults = data.length === 0 && !hasMore;
+  }, [inView, fetchNextPage]);
 
   if (hasNoResults) {
     return (
@@ -79,7 +69,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
 
   return (
     <div>
-      {data.length === 0 ? (
+      {creators.length === 0 ? (
         <SNoResults>
           <Lottie
             width={64}
@@ -94,9 +84,13 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
       ) : (
         <>
           <SCardsSection>
-            <CreatorsList loading={loading} collection={data} withEllipseMenu />
+            <CreatorsList
+              loading={isLoading || isFetchingNextPage}
+              collection={creators}
+              withEllipseMenu
+            />
           </SCardsSection>
-          {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
+          {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
         </>
       )}
     </div>
@@ -111,8 +105,7 @@ const SCardsSection = styled.div`
 `;
 
 const SRef = styled.span`
-  text-indent: -9999px;
-  height: 0;
+  height: 10px;
   overflow: hidden;
 `;
 

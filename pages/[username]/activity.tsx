@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -11,7 +10,8 @@ import { useTranslation } from 'next-i18next';
 import ProfileLayout from '../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
-import { fetchUsersPosts } from '../../api/endpoints/post';
+import useUserPosts from '../../utils/hooks/useUserPosts';
+import { useAppSelector } from '../../redux-store/store';
 
 import PostList from '../../components/organisms/see-more/PostList';
 import Text from '../../components/atoms/Text';
@@ -24,128 +24,52 @@ import getDisplayname from '../../utils/getDisplayname';
 
 interface IUserPageActivity {
   user: newnewapi.IUser;
-  pagedPosts?: newnewapi.PagedPostsResponse;
-  posts?: newnewapi.Post[];
   postsFilter: newnewapi.Post.Filter;
-  nextPageTokenFromServer?: string;
-  pageToken: string | null | undefined;
-  totalCount: number;
-  handleUpdatePageToken: (value: string | null | undefined) => void;
-  handleUpdateCount: (value: number) => void;
-  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
-  handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
 
 const UserPageActivity: NextPage<IUserPageActivity> = ({
   user,
-  pagedPosts,
-  nextPageTokenFromServer,
-  posts,
   postsFilter,
-  pageToken,
-  totalCount,
-  handleUpdatePageToken,
-  handleUpdateCount,
-  handleUpdateFilter,
-  handleSetPosts,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { loggedIn } = useAppSelector((state) => state.user);
 
-  // Loading state
-  const [isLoading, setIsLoading] = useState(false);
-  const { ref: loadingRef, inView } = useInView();
-  const [triedLoading, setTriedLoading] = useState(false);
-
-  const loadPosts = useCallback(
-    async (token?: string, needCount?: boolean) => {
-      if (isLoading) return;
-      try {
-        setIsLoading(true);
-        setTriedLoading(true);
-
-        const cardsLimit = sessionStorage?.getItem('cardsLimit');
-
-        const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
-          userUuid: user.uuid,
-          filter: postsFilter,
-          relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-          // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
-          paging: {
-            ...(token
-              ? { pageToken: token }
-              : cardsLimit && needCount
-              ? {
-                  limit: parseInt(cardsLimit),
-                }
-              : {}),
-          },
-          ...(needCount
-            ? {
-                needTotalCount: true,
-              }
-            : {}),
-        });
-
-        const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
-
-        if (cardsLimit) {
-          sessionStorage.removeItem('cardsLimit');
-        }
-
-        if (postsResponse.data && postsResponse.data.posts) {
-          handleSetPosts((curr) => [
-            ...curr,
-            ...(postsResponse.data?.posts as newnewapi.Post[]),
-          ]);
-          handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
-
-          if (postsResponse.data.totalCount) {
-            handleUpdateCount(postsResponse.data.totalCount);
-          } else if (needCount) {
-            handleUpdateCount(0);
-          }
-        }
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-        console.error(err);
-      }
-    },
-    [
-      user.uuid,
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
-      postsFilter,
-      isLoading,
-    ]
+  const isActivityPrivate = useMemo(
+    () => !!user?.options?.isActivityPrivate,
+    [user?.options?.isActivityPrivate]
   );
 
-  useEffect(() => {
-    if (!user.options) {
-      return;
-    }
-
-    if (user.options.isActivityPrivate) {
-      return;
-    }
-
-    if (inView && !isLoading) {
-      if (pageToken) {
-        loadPosts(pageToken);
-      } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts(undefined, true);
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useUserPosts(
+      {
+        userUuid: user.uuid as string,
+        loggedInUser: loggedIn,
+        relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+        postsFilter,
+      },
+      {
+        enabled: !isActivityPrivate,
       }
-    } else if (!triedLoading && posts?.length === 0) {
-      loadPosts(undefined, true);
+    );
+
+  const posts = useMemo(
+    () => data?.pages.map((page) => page.posts).flat(),
+    [data]
+  );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
+  }, [inView, fetchNextPage]);
 
   return (
     <div>
-      {user.options?.isActivityPrivate ? (
+      {isActivityPrivate ? (
         <SMain>
           <SAccountPrivate>
             <SPrivateLock>
@@ -169,7 +93,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
             {posts && (
               <PostList
                 category=''
-                loading={isLoading}
+                loading={isLoading || isFetchingNextPage}
                 collection={posts}
                 wrapperStyle={{
                   left: 0,
@@ -184,7 +108,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
               </NoContentCard>
             )}
           </SCardsSection>
-          <div ref={loadingRef} />
+          {hasNextPage && <div ref={loadingRef} />}
         </SMain>
       )}
     </div>
@@ -202,23 +126,8 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   return (
     <ProfileLayout
       key={page.props.user.uuid}
-      renderedPage={renderedPage}
       user={page.props.user}
-      {...{
-        ...(renderedPage !== 'activityHidden'
-          ? {
-              postsCachedActivity: page.props.pagedPosts.posts,
-              postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
-              postsCachedActivityPageToken: page.props.nextPageTokenFromServer,
-              postsCachedActivityCount: page.props.pagedPosts.totalCount,
-            }
-          : {
-              postsCachedActivity: [],
-              postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
-              postsCachedActivityPageToken: undefined,
-              postsCachedActivityCount: undefined,
-            }),
-      }}
+      renderedPage={renderedPage}
     >
       {page}
     </ProfileLayout>
@@ -272,7 +181,6 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       user: res.data.toJSON(),
-      pagedPosts: {} as newnewapi.PagedPostsResponse,
       ...translationContext,
     },
   };
