@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -21,17 +21,22 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const { loggedIn } = useAppSelector((state) => state.user);
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const {
-    data,
-    hasNextPage,
-    fetchNextPage,
-    isLoading,
-    isFetchingNextPage,
-    isError,
-  } = useSearchCreators({
-    loggedInUser: loggedIn,
-    query,
-  });
+  const onLoadingCreatorsError = useCallback((err: any) => {
+    console.error(err);
+    showErrorToastPredefined(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useSearchCreators(
+      {
+        loggedInUser: loggedIn,
+        query,
+      },
+      {
+        onError: onLoadingCreatorsError,
+      }
+    );
 
   const creators = useMemo(
     () => (data?.pages ? data?.pages.map((page) => page.creators).flat() : []),
@@ -45,12 +50,6 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
 
   // Loading state
   const { ref: loadingRef, inView } = useInView();
-
-  useEffect(() => {
-    if (isError) {
-      showErrorToastPredefined(undefined);
-    }
-  }, [isError, showErrorToastPredefined]);
 
   useEffect(() => {
     if (inView) {

@@ -16,6 +16,7 @@ const useSearchCreators = (
     UseInfiniteQueryOptions<{
       creators: newnewapi.IUser[];
       paging: newnewapi.IPagingResponse | null | undefined;
+      onError?: (err: any) => void;
     }>,
     'queryKey' | 'queryFn'
   >
@@ -45,9 +46,11 @@ const useSearchCreators = (
     },
     {
       getNextPageParam: (lastPage) => lastPage?.paging?.nextPageToken,
-      onError: (error) => {
-        console.error(error);
-      },
+      onError: options?.onError
+        ? options.onError
+        : (error) => {
+            console.error(error);
+          },
       ...(options || {}),
     } as Omit<
       UseInfiniteQueryOptions<{
