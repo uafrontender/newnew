@@ -18,7 +18,6 @@ import { I18nNamespaces } from '../../../../@types/i18next';
 import getDisplayname from '../../../../utils/getDisplayname';
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { useMultipleBeforePopState } from '../../../../contexts/multipleBeforePopStateContext';
 
 import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
@@ -54,11 +53,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  const {
-    handleAddBeforePopStateCallback,
-    handleRemoveBeforePopStateCallback,
-  } = useMultipleBeforePopState();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -235,26 +229,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       </SItemTitle>
     </SItem>
   );
-
-  useEffect(() => {
-    const returnToMyPostsOnBackBtn = () => {
-      router.push('/profile/my-posts');
-    };
-
-    // Redirect to `/profile/my-posts` and override default `beforePopState` behaviour
-    handleAddBeforePopStateCallback('returnToMyPostsOnBackBtn_publishedPage', {
-      cbFunction: returnToMyPostsOnBackBtn,
-      overrideReturn: true,
-    });
-
-    // Clean up the default `beforePopState` override on unmount
-    return () => {
-      handleRemoveBeforePopStateCallback(
-        'returnToMyPostsOnBackBtn_publishedPage'
-      );
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Redirect if post state is empty
   useEffect(() => {
