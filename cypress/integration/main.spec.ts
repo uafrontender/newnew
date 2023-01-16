@@ -499,8 +499,8 @@ context('Main flow', () => {
       const CUSTOM_OPTION = `new option ${testSeed}0`;
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
-
       cy.dGet('#bundles');
+
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
       cy.dGet('#add-option-submit').click();
@@ -712,8 +712,8 @@ context('Main flow', () => {
       const CUSTOM_OPTION = `new option ${testSeed}1`;
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
-
       cy.dGet('#bundles');
+
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
       cy.dGet('#add-option-submit').click();
