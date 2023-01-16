@@ -118,7 +118,11 @@ const useRecaptcha = (
       setIsSubmitting(true);
 
       // skip reCaptcha for tests
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'test') {
+      // skip reCaptcha for production
+      if (
+        process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' ||
+        process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
+      ) {
         await callback(...callbackArgs);
         setIsSubmitting(false);
         return;

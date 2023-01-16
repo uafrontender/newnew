@@ -11,9 +11,9 @@ import { useUpdateEffect } from 'react-use';
 import Button from '../../atoms/Button';
 import Sorting from '../Sorting';
 
-import { searchPosts } from '../../../api/endpoints/search';
 import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
+import useSearchPosts from '../../../utils/hooks/useSearchPosts';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const PostList = dynamic(() => import('./PostList'));
@@ -86,16 +86,15 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   type,
 }) => {
   const { t: tCommon } = useTranslation('common');
-  const { showErrorToastPredefined } = useErrorToasts();
   const router = useRouter();
 
+  const { showErrorToastPredefined } = useErrorToasts();
+
+  const { loggedIn } = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
 
   const { sorting = '', filter = '' } = router.query;
 
@@ -114,85 +113,47 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     [postSorting]
   );
 
-  const [hasNoResults, setHasNoResults] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(false);
-  const [loadingPosts, setLoadingPosts] = useState(false);
-  const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-
-  const getSearchResult = useCallback(
-    async (pageToken?: string) => {
-      try {
-        setLoadingPosts(true);
-
-        const payload = new newnewapi.SearchPostsRequest({
-          query,
-          searchType:
-            type === 'hashtags'
-              ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
-              : newnewapi.SearchPostsRequest.SearchType.UNSET,
-          paging: {
-            limit: 20,
-            pageToken: pageToken ?? null,
-          },
-          sorting: getSortingValue(postSorting),
-          filters: activeTabs,
-        });
-
-        const res = await searchPosts(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (!initialLoad) setInitialLoad(true);
-
-        if (res.data.posts && res.data.posts.length > 0) {
-          if (hasNoResults) setHasNoResults(false);
-
-          setResultsPosts((curr) => {
-            if (!pageToken) {
-              return res.data?.posts || [];
-            }
-
-            const arr = [...curr, ...(res.data?.posts as newnewapi.IPost[])];
-
-            return arr;
-          });
-          setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else if (!pageToken) {
-          setResultsPosts([]);
-          setHasNoResults(true);
-        }
-
-        if (!res.data.paging?.nextPageToken) {
-          setPostsRoomsNextPageToken(null);
-        }
-
-        setLoadingPosts(false);
-      } catch (err) {
-        setLoadingPosts(false);
-        showErrorToastPredefined(undefined);
-        console.error(err);
-      }
-    },
-
+  const onLoadingCreatorsError = useCallback((err: any) => {
+    console.error(err);
+    showErrorToastPredefined(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [postSorting, query, type, initialLoad, activeTabs, hasNoResults]
+  }, []);
+
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useSearchPosts(
+      {
+        loggedInUser: loggedIn,
+        query,
+        searchType:
+          type === 'hashtags'
+            ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
+            : newnewapi.SearchPostsRequest.SearchType.UNSET,
+        sorting: getSortingValue(postSorting),
+        filters: activeTabs,
+      },
+      {
+        onError: onLoadingCreatorsError,
+      }
+    );
+
+  const posts = useMemo(
+    () => (data?.pages ? data?.pages.map((page) => page.posts).flat() : []),
+    [data]
   );
 
-  useEffect(() => {
-    setPostsRoomsNextPageToken(null);
-    getSearchResult();
-  }, [getSearchResult]);
+  const hasNoResults = useMemo(
+    () => !isLoading && posts?.length === 0,
+    [isLoading, posts?.length]
+  );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
-    if (inView && !loadingPosts && postsNextPageToken) {
-      getSearchResult(postsNextPageToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loadingPosts, postsNextPageToken]);
+  }, [inView, fetchNextPage]);
 
   useUpdateEffect(() => {
     if (router.query.tab !== 'posts') {
@@ -208,9 +169,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         case newnewapi.Post.Filter.MULTIPLE_CHOICES:
           routerArr.push('mc');
           break;
-        // case newnewapi.Post.Filter.CROWDFUNDINGS:
-        //   routerArr.push('cf');
-        //   break;
       }
     });
 
@@ -239,18 +197,13 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         id: 'multipleChoice',
         title: tCommon('postType.mc'),
       },
-      // {
-      //   type: newnewapi.Post.Filter.CROWDFUNDINGS,
-      //   id: 'crowdfunding',
-      //   title: tCommon('postType.cf'),
-      // },
     ],
     [tCommon]
   );
 
   const updateActiveTabs = useCallback(
     (tabType: newnewapi.Post.Filter) => {
-      if (!loadingPosts) {
+      if (!isLoading) {
         setActiveTabs((curr) => {
           const arr = [...curr];
           const index = arr.findIndex((item) => item === tabType);
@@ -265,7 +218,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         });
       }
     },
-    [loadingPosts]
+    [isLoading]
   );
 
   const clearSorting = useCallback(() => {
@@ -309,11 +262,11 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
 
   const handleTypeChange = useCallback(
     (newSort: { sortingtype: string }) => {
-      if (!loadingPosts) {
+      if (!isLoading) {
         setPostSorting(newSort.sortingtype);
       }
     },
-    [loadingPosts]
+    [isLoading]
   );
 
   return (
@@ -333,14 +286,14 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
           />
         </SToolBar>
       )}
-
       <SCardsSection>
-        <PostList loading={loadingPosts} collection={resultsPosts} />
+        <PostList
+          loading={isLoading || isFetchingNextPage}
+          collection={posts}
+        />
       </SCardsSection>
-      {postsNextPageToken && !loadingPosts && (
-        <SRef ref={loadingRef}>Loading...</SRef>
-      )}
-      {hasNoResults && initialLoad && (
+      {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
+      {hasNoResults && !isLoading && (
         <SNoResults>
           <NoResults />
         </SNoResults>
@@ -415,8 +368,7 @@ const SCardsSection = styled.div`
 `;
 
 const SRef = styled.span`
-  text-indent: -9999px;
-  height: 0;
+  height: 10px;
   overflow: hidden;
 `;
 

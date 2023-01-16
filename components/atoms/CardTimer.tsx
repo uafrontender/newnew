@@ -81,13 +81,13 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     useEffect(() => {
       // TODO: we can set the interval recursively and first one can
       // be equal to seconds + milliseconds portion of the time left
-      if (isBrowser() && isPageVisible) {
+      if (isBrowser() && isPageVisible && !hasEnded) {
         interval.current = window.setInterval(() => {
           setSeconds(() => (endsAt - Date.now()) / 1000);
         }, 1000);
       }
       return () => clearInterval(interval.current);
-    }, [endsAt, isPageVisible]);
+    }, [endsAt, isPageVisible, hasEnded]);
 
     useEffect(() => {
       setParsedSeconds(secondsToDHMS(seconds));

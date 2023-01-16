@@ -112,7 +112,8 @@
       "back": "Back",
       "submit": "Done"
     },
-    "agreedToTosCheckbox": "I have read and agree to"
+    "agreedToTosCheckbox": "I have read and agree to",
+    "linkText": "NewNew's terms"
   },
   "aboutSection": {
     "meta": {
