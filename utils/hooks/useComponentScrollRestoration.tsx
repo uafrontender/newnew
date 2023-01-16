@@ -25,7 +25,7 @@ const useComponentScrollRestoration = (
         // If there's no identifier with the provided elementId,
         // the rest of the code won't be executed
         if (parsedItemFromSS && parsedItemFromSS[elementId]) {
-          getElementByIdAsync<HTMLElement>(elementId)
+          getElementByIdAsync(elementId)
             .then((scrollElement) => {
               if (scrollElement) {
                 (scrollElement as HTMLElement)?.scrollTo({
