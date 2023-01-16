@@ -473,7 +473,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         ? t('me')
                         : t('my')
                       : getDisplayname(option.creator!!)}
-                    {!isMyBid && option.creator.options?.isVerified && (
+                    {option.creator.options?.isVerified && (
                       <SInlineSvgVerificationIcon
                         svg={
                           !isBlue
@@ -499,6 +499,18 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                       ? t('me')
                       : t('my')
                     : getDisplayname(option.creator!!)}
+                  {user.userData?.options?.isVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={
+                        !isBlue
+                          ? VerificationCheckmark
+                          : VerificationCheckmarkInverted
+                      }
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               )
             ) : (
