@@ -14,6 +14,8 @@ import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
 import InlineSVG, { InlineSvg } from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
 
+import { I18nNamespaces } from '../../../../@types/i18next';
+import getDisplayname from '../../../../utils/getDisplayname';
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
@@ -24,8 +26,6 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import { I18nNamespaces } from '../../../../@types/i18next';
-import getDisplayname from '../../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -229,18 +229,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       </SItemTitle>
     </SItem>
   );
-
-  useEffect(() => {
-    router.beforePopState((state: any) => {
-      router.push('/profile/my-posts');
-      return false;
-    });
-
-    return () => {
-      router.beforePopState(() => true);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Redirect if post state is empty
   useEffect(() => {
