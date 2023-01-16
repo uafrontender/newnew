@@ -90,6 +90,8 @@ const MyApp = (props: IMyApp): ReactElement => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [currentLocale, setCurrentLocale] = useState(locale);
 
   // Shared layouts
   const getLayout = useMemo(
@@ -129,6 +131,12 @@ const MyApp = (props: IMyApp): ReactElement => {
       // eslint-disable-next-line global-require
       countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
     }
+
+    // Force update is needed as new locale applies only to new moments
+    // This makes components which use moment not pure and this not optimizable
+    // Solutions: force re-render of the whole tree, reload page,
+    // Expand router to handle moment.locale before setting state and force dependencies to locale where moment is used
+    setCurrentLocale(locale);
   }, [locale]);
 
   useEffect(() => {

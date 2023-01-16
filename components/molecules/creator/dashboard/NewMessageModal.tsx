@@ -91,6 +91,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         res.data.rooms.forEach((chat) => {
           if (chat.kind === 4) {
             if (chat.myRole === 2) {
+              // TODO: fix it. This statement can be executed VERY late into the scrolling. And until
+              // creator scrolls to their announcement chat they are unable to open it using new announcement button
               setMyAnnouncement(chat);
             }
           } else {
@@ -177,10 +179,11 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   }, [searchValue, chatRooms]);
 
   const createNewAnnouncement = () => {
-    if (myAnnouncement)
+    if (myAnnouncement) {
       router.push(
         `/creator/dashboard?tab=direct-messages&roomID=${myAnnouncement.id}`
       );
+    }
     closeModal();
   };
 
