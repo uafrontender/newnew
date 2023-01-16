@@ -14,6 +14,7 @@ import Sorting from '../Sorting';
 import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
 import useSearchPosts from '../../../utils/hooks/useSearchPosts';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const PostList = dynamic(() => import('./PostList'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
@@ -87,6 +88,8 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const { loggedIn } = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -110,17 +113,28 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     [postSorting]
   );
 
+  const onLoadingCreatorsError = useCallback((err: any) => {
+    console.error(err);
+    showErrorToastPredefined(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
-    useSearchPosts({
-      loggedInUser: loggedIn,
-      query,
-      searchType:
-        type === 'hashtags'
-          ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
-          : newnewapi.SearchPostsRequest.SearchType.UNSET,
-      sorting: getSortingValue(postSorting),
-      filters: activeTabs,
-    });
+    useSearchPosts(
+      {
+        loggedInUser: loggedIn,
+        query,
+        searchType:
+          type === 'hashtags'
+            ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
+            : newnewapi.SearchPostsRequest.SearchType.UNSET,
+        sorting: getSortingValue(postSorting),
+        filters: activeTabs,
+      },
+      {
+        onError: onLoadingCreatorsError,
+      }
+    );
 
   const posts = useMemo(
     () => (data?.pages ? data?.pages.map((page) => page.posts).flat() : []),
