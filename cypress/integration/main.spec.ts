@@ -171,8 +171,8 @@ context('Main flow', () => {
       cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
-      // TODO: might be too short, expand
-      cy.dGet('#5-minutes').click();
+
+      cy.dGet('#10-minutes').click();
 
       // IDEA: change to scheduled
       // IDEA: change scheduled at time
