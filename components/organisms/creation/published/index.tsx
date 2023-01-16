@@ -10,6 +10,7 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
+import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
 import InlineSVG, { InlineSvg } from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
 
@@ -262,6 +263,10 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!post.title) {
+    return <LoadingView />;
+  }
 
   const displayName = getDisplayname(user.userData);
 
