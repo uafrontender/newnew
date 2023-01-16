@@ -14,7 +14,7 @@
     "dev:ci:win": "cross-env NODE_ENV='test' npm run dev",
     "cypress": "cypress run --browser chrome --config \"video=true\"",
     "cypress:open": "cypress open --browser chrome --config \"video=true\"",
-    "cypress:ci": "cypress run --browser chrome ",
+    "cypress:ci": "cypress run --browser chrome --config \"video=true\"",
     "cypress:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
     "jest": "jest",
     "test": "npm run jest && npm run cypress:ci",
