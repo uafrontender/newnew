@@ -112,7 +112,8 @@
       "back": "Regresar",
       "submit": "Hecho"
     },
-    "agreedToTosCheckbox": "He leído y acepto"
+    "agreedToTosCheckbox": "He leído y acepto",
+    "linkText_NEED_TRANSLATION": "NewNew's terms"
   },
   "aboutSection": {
     "meta": {
