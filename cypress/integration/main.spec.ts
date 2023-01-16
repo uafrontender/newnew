@@ -675,6 +675,9 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
+      // Wait for bundle offers to load
+      cy.wait(4000);
+
       cy.dGet('#buy-bundle-button').click();
       cy.dGet('#buy-bundle-1-button').click();
 
@@ -818,6 +821,8 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
+      // Possible hot fix for CI
+      cy.wait(5000);
       const onSuccess = voteOnSuperpoll(2, 5);
 
       // Wait stripe elements
@@ -837,6 +842,8 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
+      // Wait for bundle offers to load
+      cy.wait(4000);
       cy.dGet('#buy-bundle-button').click();
       cy.dGet('#buy-bundle-1-button').click();
 
