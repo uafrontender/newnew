@@ -31,6 +31,10 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const theme = useTheme();
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   if (postType === 'ac' && winningOptionAc) {
     return (
@@ -65,8 +69,8 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                 winningOptionAc.creator?.options?.isVerified ? (
                   <SInlineSvg
                     svg={VerificationCheckmark}
-                    width='22px'
-                    height='22px'
+                    width={isMobile ? '18px' : '22px'}
+                    height={isMobile ? '18px' : '22px'}
                     fill='none'
                   />
                 ) : null,

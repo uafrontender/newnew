@@ -128,7 +128,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 <img alt={user.username} src={user.avatarUrl} />
               </SAvatar>
               <SNickname variant={3}>
-                {getDisplayname(user)}
+                <SNicknameText>{getDisplayname(user)}</SNicknameText>
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -140,9 +140,9 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
               </SNickname>
 
               <Link href={`/${user.username}`}>
-                <a>
+                <SLink>
                   <SUsername variant={2}>{`@${user.username}`}</SUsername>
-                </a>
+                </SLink>
               </Link>
               <SUnblockButton
                 onClick={() => changeUserBlockedStatus(user.uuid, false)}
@@ -255,6 +255,13 @@ const SNickname = styled(Text)`
   display: flex;
   align-items: center;
   grid-area: nickname;
+  overflow: hidden;
+`;
+
+const SNicknameText = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const SInlineSVG = styled(InlineSvg)`
@@ -263,16 +270,23 @@ const SInlineSVG = styled(InlineSvg)`
   margin-left: 6px;
 `;
 
+const SLink = styled.a`
+  overflow: hidden;
+`;
+
 const SUsername = styled(Caption)`
   grid-area: username;
   position: relative;
   top: -6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   cursor: pointer;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SUnblockButton = styled(Button)`
+  margin-left: 12px;
   grid-area: unblock;
   justify-self: right;
 `;

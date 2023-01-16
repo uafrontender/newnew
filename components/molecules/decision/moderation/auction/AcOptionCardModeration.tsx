@@ -160,8 +160,8 @@ const AcOptionCardModeration: React.FunctionComponent<
                               ? VerificationCheckmark
                               : VerificationCheckmarkInverted
                           }
-                          width='14px'
-                          height='14px'
+                          width='16px'
+                          height='16px'
                           fill='none'
                         />
                       )}
@@ -180,8 +180,8 @@ const AcOptionCardModeration: React.FunctionComponent<
                             ? VerificationCheckmark
                             : VerificationCheckmarkInverted
                         }
-                        width='14px'
-                        height='14px'
+                        width='16px'
+                        height='16px'
                         fill='none'
                       />
                     )}
@@ -204,8 +204,8 @@ const AcOptionCardModeration: React.FunctionComponent<
                             ? VerificationCheckmark
                             : VerificationCheckmarkInverted
                         }
-                        width='14px'
-                        height='14px'
+                        width='16px'
+                        height='16px'
                         fill='none'
                       />
                     )}
@@ -349,23 +349,49 @@ const AcOptionCardModeration: React.FunctionComponent<
           <SOptionInfo variant={3}>{option.title}</SOptionInfo>
           <SBiddersInfo variant={3}>
             {option.creator?.username ? (
-              <Link href={`/${option.creator?.username}`}>
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  {getDisplayname(option.creator)}
-                </SSpanBiddersHighlighted>
-              </Link>
+              <>
+                <Link href={`/${option.creator?.username}`}>
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {getDisplayname(option.creator)}
+                  </SSpanBiddersHighlighted>
+                </Link>
+                {option.creator?.options?.isVerified && (
+                  <SInlineSvgVerificationIcon
+                    svg={
+                      !isWinner
+                        ? VerificationCheckmark
+                        : VerificationCheckmarkInverted
+                    }
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
+              </>
             ) : (
               <SSpanBiddersHighlighted
                 className='spanHighlighted'
                 onClick={(e) => e.stopPropagation()}
               >
                 {getDisplayname(option.creator)}
+                {option.creator?.options?.isVerified && (
+                  <SInlineSvgVerificationIcon
+                    svg={
+                      !isWinner
+                        ? VerificationCheckmark
+                        : VerificationCheckmarkInverted
+                    }
+                    width='16px'
+                    height='16px'
+                    fill='none'
+                  />
+                )}
               </SSpanBiddersHighlighted>
             )}
             {option.supporterCount > 1 ? (
@@ -765,4 +791,7 @@ const SInlineSvgVerificationIcon = styled(InlineSvg)`
 
   position: relative;
   top: 3px;
+
+  height: 16px;
+  width: 16px;
 `;
