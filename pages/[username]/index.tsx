@@ -48,14 +48,21 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
   );
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
-    useUserPosts({
-      userUuid: user.uuid as string,
-      loggedInUser: loggedIn,
-      relation: isCreator
-        ? newnewapi.GetUserPostsRequest.Relation.THEY_CREATED
-        : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-      postsFilter,
-    });
+    useUserPosts(
+      {
+        userUuid: user.uuid as string,
+        loggedInUser: loggedIn,
+        relation: isCreator
+          ? newnewapi.GetUserPostsRequest.Relation.THEY_CREATED
+          : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+        postsFilter,
+      },
+      !isCreator
+        ? {
+            enabled: !isActivityPrivate,
+          }
+        : {}
+    );
 
   const posts = useMemo(
     () => data?.pages.map((page) => page.posts).flat(),

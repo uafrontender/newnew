@@ -41,12 +41,17 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   );
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
-    useUserPosts({
-      userUuid: user.uuid as string,
-      loggedInUser: loggedIn,
-      relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-      postsFilter,
-    });
+    useUserPosts(
+      {
+        userUuid: user.uuid as string,
+        loggedInUser: loggedIn,
+        relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+        postsFilter,
+      },
+      {
+        enabled: !isActivityPrivate,
+      }
+    );
 
   const posts = useMemo(
     () => data?.pages.map((page) => page.posts).flat(),
