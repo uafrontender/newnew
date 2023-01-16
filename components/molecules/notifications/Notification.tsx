@@ -117,10 +117,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
         <>
           <STitleText>{getDisplayname(content.relatedUser)}</STitleText>
           {content?.relatedUser?.isVerified && (
-            <SInlineSVG
+            <SVerificationSvg
               svg={VerificationCheckmark}
-              width='16px'
-              height='16px'
+              width='20px'
+              height='20px'
             />
           )}
         </>
@@ -349,6 +349,11 @@ const SIcon = styled.span`
     height: 40px;
     border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
   }
+`;
+
+const SVerificationSvg = styled(InlineSvg)`
+  min-width: 20px;
+  min-height: 20px;
 `;
 
 const SInlineSVG = styled(InlineSvg)`

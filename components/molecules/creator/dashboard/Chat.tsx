@@ -498,6 +498,16 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
               {`${t('announcement.beforeName')} ${getDisplayname(
                 user.userData
               )}${t('announcement.suffix')} ${t('announcement.afterName')}`}
+              {(chatRoom?.visavis?.user?.options?.isVerified ||
+                (chatRoom.myRole === 2 &&
+                  user.userData?.options?.isVerified)) && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                  fill='none'
+                />
+              )}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
