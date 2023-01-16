@@ -440,7 +440,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                     }${t('announcement.suffix')} ${t('announcement.afterName')}`
                   : getDisplayname(chatRoom.visavis?.user)
               }
-              {chatRoom.visavis?.user?.options?.isVerified &&
+              {(chatRoom.visavis?.user?.options?.isVerified ||
+                (isMyAnnouncement && user.userData?.options?.isVerified)) &&
                 !isAnnouncement && (
                   <SInlineSVG
                     svg={VerificationCheckmark}

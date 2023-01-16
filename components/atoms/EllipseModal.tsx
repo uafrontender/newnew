@@ -92,8 +92,9 @@ const SWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
+  padding-top: 16px;
   padding-bottom: 16px;
 `;
 
@@ -114,7 +115,7 @@ const SContentContainer = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   z-index: 1;
-  overflow: hidden;
+  overflow: auto;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
@@ -124,6 +125,7 @@ const SContentContainer = styled.div`
 `;
 
 const CancelButton = styled(Button)`
+  flex-shrink: 0;
   height: 56px;
   width: calc(100% - 32px);
 
