@@ -26,9 +26,6 @@ quick-test:
 # A set of longer tests
 long-test:
   stage: test
-  artifacts:
-    untracked: true
-    expire_in: 1 week
   script:
     - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
     - sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
@@ -40,6 +37,9 @@ long-test:
     - sleep 30
     - curl http://localhost:4000
     - npm run cypress:ci
+  artifacts:
+    untracked: true
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
       when: never
