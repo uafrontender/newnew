@@ -13,8 +13,11 @@ import Headline from '../../../atoms/Headline';
 import InlineSVG, { InlineSvg } from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
 
+import { I18nNamespaces } from '../../../../@types/i18next';
+import getDisplayname from '../../../../utils/getDisplayname';
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useMultipleBeforePopState } from '../../../../contexts/multipleBeforePopStateContext';
 
 import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
@@ -23,8 +26,6 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import { I18nNamespaces } from '../../../../@types/i18next';
-import getDisplayname from '../../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -52,6 +53,11 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const {
+    handleAddBeforePopStateCallback,
+    handleRemoveBeforePopStateCallback,
+  } = useMultipleBeforePopState();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -230,13 +236,21 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   );
 
   useEffect(() => {
-    router.beforePopState((state: any) => {
+    const returnToMyPostsOnBackBtn = () => {
       router.push('/profile/my-posts');
-      return false;
+    };
+
+    // Redirect to `/profile/my-posts` and override default `beforePopState` behaviour
+    handleAddBeforePopStateCallback('returnToMyPostsOnBackBtn_publishedPage', {
+      cbFunction: returnToMyPostsOnBackBtn,
+      overrideReturn: true,
     });
 
+    // Clean up the default `beforePopState` override on unmount
     return () => {
-      router.beforePopState(() => true);
+      handleRemoveBeforePopStateCallback(
+        'returnToMyPostsOnBackBtn_publishedPage'
+      );
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

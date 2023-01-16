@@ -2,50 +2,57 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import getElementByIdAsync from '../getElementByIdAsync';
+import {
+  INextHistoryState,
+  useMultipleBeforePopState,
+} from '../../contexts/multipleBeforePopStateContext';
 
 const useComponentScrollRestoration = (
   scrollableElement: HTMLElement | undefined,
   elementId: string
 ) => {
   const router = useRouter();
-
-  const handleUnsetSessionStorageValue = () => {};
+  const { handleAddBeforePopStateCallback } = useMultipleBeforePopState();
 
   useEffect(() => {
-    // Try to retrive scroll position of the element
-    // @ts-ignore
-    router.beforePopState(async ({ url, as }) => {
+    const beforePopStateHandler = ({ as }: INextHistoryState) => {
       try {
         const itemFromSS = sessionStorage.getItem(as) ?? undefined;
         const parsedItemFromSS = itemFromSS
           ? JSON.parse(itemFromSS)
           : undefined;
 
+        // If there's no identifier with the provided elementId,
+        // the rest of the code won't be executed
         if (parsedItemFromSS && parsedItemFromSS[elementId]) {
-          const scrollElement = await getElementByIdAsync<HTMLElement>(
-            elementId
-          );
-
-          if (scrollElement) {
-            (scrollElement as HTMLElement)?.scrollTo({
-              top: parsedItemFromSS[elementId].y,
-              left: parsedItemFromSS[elementId].x,
+          getElementByIdAsync<HTMLElement>(elementId)
+            .then((scrollElement) => {
+              if (scrollElement) {
+                (scrollElement as HTMLElement)?.scrollTo({
+                  top: parsedItemFromSS[elementId].y,
+                  left: parsedItemFromSS[elementId].x,
+                });
+              }
+            })
+            .catch((err) => {
+              if ((err as Error).message === 'Element not found') {
+                console.error(err);
+              }
             });
-          }
         }
-
-        return true;
       } catch (err) {
-        if ((err as Error).message === 'Element not found') {
-          console.error(err);
-        }
-        return true;
+        console.error(err);
       }
+    };
+
+    // Try to retrive scroll position of the element
+    handleAddBeforePopStateCallback(`beforePopStateHandler_${elementId}`, {
+      cbFunction: beforePopStateHandler,
     });
 
-    // Try to save scroll position of the element
+    // Try to save scroll position of the element on route change
     const onRouteChangeStart = () => {
-      const url = router.asPath || router.asPath;
+      const url = router.asPath;
       const itemFromSS = sessionStorage.getItem(url) ?? undefined;
       let parsedItemFromSS = itemFromSS ? JSON.parse(itemFromSS) : {};
 
@@ -67,11 +74,8 @@ const useComponentScrollRestoration = (
     return () => {
       router.events.off('routeChangeStart', onRouteChangeStart);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elementId, router, scrollableElement]);
-
-  return {
-    handleUnsetSessionStorageValue,
-  };
 };
 
 export default useComponentScrollRestoration;

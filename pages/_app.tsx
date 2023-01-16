@@ -69,6 +69,7 @@ import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
+import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -239,43 +240,48 @@ const MyApp = (props: IMyApp): ReactElement => {
                                     <BundlesContextProvider>
                                       <ChatsProvider>
                                         <OverlayModeProvider>
-                                          <ResizeMode>
-                                            <GlobalTheme
-                                              initialTheme={colorMode}
-                                              themeFromCookie={themeFromCookie}
-                                            >
-                                              <>
-                                                <ToastContainer containerId='toast-container' />
-                                                <VideoProcessingWrapper>
-                                                  <ErrorBoundary>
-                                                    {!pageProps.error ? (
-                                                      getLayout(
-                                                        <Component
-                                                          {...pageProps}
+                                          <MultipleBeforePopStateContextProvider>
+                                            <ResizeMode>
+                                              <GlobalTheme
+                                                initialTheme={colorMode}
+                                                themeFromCookie={
+                                                  themeFromCookie
+                                                }
+                                              >
+                                                <>
+                                                  <ToastContainer containerId='toast-container' />
+                                                  <VideoProcessingWrapper>
+                                                    <ErrorBoundary>
+                                                      {!pageProps.error ? (
+                                                        getLayout(
+                                                          <Component
+                                                            {...pageProps}
+                                                          />
+                                                        )
+                                                      ) : (
+                                                        <Error
+                                                          title={
+                                                            pageProps.error
+                                                              ?.message
+                                                          }
+                                                          statusCode={
+                                                            pageProps.error
+                                                              ?.statusCode ??
+                                                            500
+                                                          }
                                                         />
-                                                      )
-                                                    ) : (
-                                                      <Error
-                                                        title={
-                                                          pageProps.error
-                                                            ?.message
-                                                        }
-                                                        statusCode={
-                                                          pageProps.error
-                                                            ?.statusCode ?? 500
-                                                        }
-                                                      />
-                                                    )}
-                                                    <PushNotificationModalContainer />
-                                                    {/* {isRestoringScroll ? (
+                                                      )}
+                                                      <PushNotificationModalContainer />
+                                                      {/* {isRestoringScroll ? (
                                                       <ScrollRestorationAnimationContainer />
                                                     ) : null} */}
-                                                  </ErrorBoundary>
-                                                </VideoProcessingWrapper>
-                                                <ReCaptchaBadgeModal />
-                                              </>
-                                            </GlobalTheme>
-                                          </ResizeMode>
+                                                    </ErrorBoundary>
+                                                  </VideoProcessingWrapper>
+                                                  <ReCaptchaBadgeModal />
+                                                </>
+                                              </GlobalTheme>
+                                            </ResizeMode>
+                                          </MultipleBeforePopStateContextProvider>
                                         </OverlayModeProvider>
                                       </ChatsProvider>
                                     </BundlesContextProvider>

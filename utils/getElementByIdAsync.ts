@@ -1,3 +1,4 @@
+// Tries to find an element asynchrously, limited to 200 frames, i.e. 200 attempts
 export default function getElementByIdAsync<T> (id: string) : Promise<T> {
   let frameCounter = 0
   return new Promise((resolve, reject) => {
@@ -16,5 +17,4 @@ export default function getElementByIdAsync<T> (id: string) : Promise<T> {
     };
     getElement();
   });
-
 }
