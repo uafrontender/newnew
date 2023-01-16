@@ -481,6 +481,7 @@ context('Main flow', () => {
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
+      cy.dGet('#bundles');
 
       cy.dGet('#support-button-0').click();
       cy.dGet('#vote-option-bundle').click();
@@ -693,6 +694,7 @@ context('Main flow', () => {
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
       }).click();
+      cy.dGet('#bundles');
 
       cy.dGet('#support-button-0').click();
       cy.dGet('#vote-option-bundle').click();
@@ -845,6 +847,7 @@ context('Main flow', () => {
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
       }).click();
+      cy.dGet('#bundles');
 
       cy.dGet('#support-button-supported').click();
       cy.dGet('#vote-option-bundle').click();
