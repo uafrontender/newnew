@@ -669,7 +669,7 @@ const PostPage: NextPage<IPostPage> = ({
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <GeneralLayout noMobieNavigation noPaddingMobile>
+  <GeneralLayout noMobileNavigation noPaddingMobile>
     <CommentFromUrlContextProvider>
       <AnimatePresence>
         <React.Fragment key={page.props.postUuidOrShortId}>

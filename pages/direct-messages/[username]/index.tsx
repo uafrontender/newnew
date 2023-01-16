@@ -1,19 +1,16 @@
-/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement } from 'react';
 import Head from 'next/head';
-import styled from 'styled-components';
+import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
-import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useUpdateEffect } from 'react-use';
-
-import General from '../../../components/templates/General';
-import Content from '../../../components/organisms/Chat';
-
 import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import ChatLayout from '../../../components/templates/ChatLayout';
+import ChatContainer from '../../../components/organisms/direct-messages/ChatContainer';
 
 interface IChat {
   username: string;
@@ -29,31 +26,29 @@ const Chat: NextPage<IChat> = ({ username }) => {
     if (!user.loggedIn && user._persist?.rehydrated) {
       router?.push('/sign-up');
     }
-  }, [user.loggedIn, user._persist?.rehydrated, router]);
+  }, [router, user.loggedIn, user._persist?.rehydrated]);
 
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <Content username={username} />
+      <ChatContainer />
     </>
   );
 };
 
-export default Chat;
-
 (Chat as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <SGeneral>{page}</SGeneral>
+  <ChatLayout>{page}</ChatLayout>
 );
 
-export const getServerSideProps: GetServerSideProps<IChat> = async (
-  context
-) => {
+export default Chat;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'page-Chat', 'modal-PaymentModal', 'page-SubscribeToUser'],
+    ['common', 'page-Chat', 'modal-PaymentModal'],
     null,
     SUPPORTED_LANGUAGES
   );
@@ -62,7 +57,7 @@ export const getServerSideProps: GetServerSideProps<IChat> = async (
 
   const accessToken = req.cookies?.accessToken;
 
-  if (!accessToken || !username || Array.isArray(username)) {
+  if (!accessToken) {
     return {
       redirect: {
         permanent: false,
@@ -73,22 +68,7 @@ export const getServerSideProps: GetServerSideProps<IChat> = async (
 
   return {
     props: {
-      username,
       ...translationContext,
     },
   };
 };
-
-const SGeneral = styled(General)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.secondary
-      : props.theme.colorsThemed.background.primary};
-
-  ${({ theme }) => theme.media.laptop} {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.white
-        : props.theme.colorsThemed.background.primary};
-  }
-`;

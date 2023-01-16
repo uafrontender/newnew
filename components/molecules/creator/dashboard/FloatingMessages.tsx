@@ -8,16 +8,14 @@ import { useGetChats } from '../../../../contexts/chatContext';
 
 interface IFloatingMessages {
   withCounter?: boolean;
-  openChat: () => void;
 }
 
 export const FloatingMessages: React.FC<IFloatingMessages> = ({
   withCounter,
-  openChat,
 }) => {
   const { unreadCountForCreator } = useGetChats();
   return (
-    <SContainer onClick={openChat}>
+    <SContainer>
       <InlineSVG svg={chatIcon} width='24px' height='24px' />
       {withCounter && (
         <SIndicatorContainer>

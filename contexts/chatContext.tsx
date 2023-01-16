@@ -10,23 +10,42 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
-import { getTotalUnreadMessageCounts } from '../api/endpoints/chat';
-import { IChatData } from '../components/interfaces/ichat';
+import { getMyRooms, getTotalUnreadMessageCounts } from '../api/endpoints/chat';
 
-const ChatsContext = createContext({
+interface IChatsContext {
+  unreadCountForUser: number;
+  unreadCountForCreator: number;
+  unreadCount: number;
+  mobileChatOpened: boolean;
+  hasChatsWithCreators: boolean;
+  hasChatsWithSubs: boolean;
+  hiddenMessagesArea: boolean | null;
+  activeChatRoom: newnewapi.IChatRoom | null;
+  activeTab: newnewapi.ChatRoom.MyRole | undefined;
+  searchChatroom: string;
+  setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => void;
+  setActiveTab: (activeTab: newnewapi.ChatRoom.MyRole | undefined) => void;
+  setHiddenMessagesArea: (hiddenMessagesArea: boolean | null) => void;
+  setSearchChatroom: (str: string) => void;
+  setMobileChatOpened: (mobileChatOpened: boolean) => void;
+}
+
+const ChatsContext = createContext<IChatsContext>({
   unreadCountForUser: 0,
   unreadCountForCreator: 0,
   unreadCount: 0,
   mobileChatOpened: false,
-  chatData: {
-    chatRoom: null,
-    showChatList: null,
-  } as IChatData,
-  setChatData: (newChatData: IChatData) => {},
-  setMobileChatOpened: (
-    mobileChatOpened: boolean,
-    initialChatRoom?: IChatData
-  ) => {},
+  hasChatsWithCreators: false,
+  hasChatsWithSubs: false,
+  hiddenMessagesArea: null,
+  activeChatRoom: null,
+  activeTab: undefined,
+  searchChatroom: '',
+  setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => {},
+  setActiveTab: (activeTab: newnewapi.ChatRoom.MyRole | undefined) => {},
+  setHiddenMessagesArea: (hiddenMessagesArea: boolean | null) => {},
+  setSearchChatroom: (str: string) => {},
+  setMobileChatOpened: (mobileChatOpened: boolean) => {},
 });
 
 interface IChatsProvider {
@@ -38,11 +57,36 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
   const [unreadCountForCreator, setUnreadCountForCreator] = useState<number>(0);
   const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [mobileChatOpened, _setMobileChatOpened] = useState<boolean>(false);
-  const [chatData, setChatData] = useState<IChatData>({
-    chatRoom: null,
-    showChatList: null,
-  });
+  const [mobileChatOpened, setMobileChatOpened] = useState<boolean>(false);
+  const [hasChatsWithCreators, setHasChatsWithCreators] =
+    useState<boolean>(false);
+  const [hiddenMessagesArea, setHiddenMessagesArea] = useState<boolean | null>(
+    null
+  );
+  const [hasChatsWithSubs, setHasChatsWithSubs] = useState<boolean>(false);
+  const [activeChatRoom, setActiveChatRoom] =
+    useState<newnewapi.IChatRoom | null>(null);
+  const [searchChatroom, setSearchChatroom] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<
+    newnewapi.ChatRoom.MyRole | undefined
+  >();
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
+  useEffect(() => {
+    if (isMobileOrTablet) {
+      setHiddenMessagesArea(true);
+    } else {
+      setHiddenMessagesArea(null);
+    }
+  }, [isMobileOrTablet]);
 
   const socketConnection = useContext(SocketContext);
 
@@ -55,22 +99,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-  const setMobileChatOpened = (
-    mobileChatOpened: boolean,
-    initialChatData?: IChatData
-  ) => {
-    if (initialChatData) {
-      setChatData(initialChatData);
-    }
-
-    if (!mobileChatOpened) {
-      setChatData({ chatRoom: null, showChatList: null });
-    }
-
-    return _setMobileChatOpened(mobileChatOpened);
-  };
-
   useEffect(() => {
     async function getUnread() {
       if (!user.loggedIn) return;
@@ -109,26 +137,90 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
+  useEffect(() => {
+    if (user.userData?.options?.creatorStatus === 2) {
+      (async () => {
+        try {
+          const payload = new newnewapi.GetMyRoomsRequest({
+            paging: {
+              limit: 1,
+            },
+            myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+          });
+
+          const res = await getMyRooms(payload);
+          if (!res.data || res.error) {
+            throw new Error(res.error?.message ?? 'Request failed');
+          }
+          if (res.data && res.data.rooms.length > 0) {
+            setHasChatsWithSubs(true);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+  }, [user.userData?.options?.creatorStatus]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const payload = new newnewapi.GetMyRoomsRequest({
+          paging: {
+            limit: 1,
+          },
+          myRole: newnewapi.ChatRoom.MyRole.SUBSCRIBER,
+        });
+
+        const res = await getMyRooms(payload);
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+        if (res.data && res.data.rooms.length > 0) {
+          setHasChatsWithCreators(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [user.userData?.options?.creatorStatus]);
+
   const contextValue = useMemo(
     () => ({
       unreadCountForUser,
       unreadCountForCreator,
       unreadCount,
       mobileChatOpened,
-      chatData,
-      setChatData,
+      hasChatsWithCreators,
+      hasChatsWithSubs,
+      hiddenMessagesArea,
+      activeChatRoom,
+      searchChatroom,
+      activeTab,
+      setActiveTab,
+      setActiveChatRoom,
       setMobileChatOpened,
+      setHiddenMessagesArea,
+      setSearchChatroom,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       unreadCount,
       unreadCountForUser,
       unreadCountForCreator,
-      setData,
+      hasChatsWithCreators,
+      hasChatsWithSubs,
+      activeChatRoom,
       mobileChatOpened,
-      chatData,
-      setChatData,
+      hiddenMessagesArea,
+      searchChatroom,
+      activeTab,
+      setActiveTab,
+      setData,
+      setActiveChatRoom,
       setMobileChatOpened,
+      setHiddenMessagesArea,
+      setSearchChatroom,
     ]
   );
 

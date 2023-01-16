@@ -85,8 +85,8 @@
   },
   "userTypes": {
     "all": "Todos",
-    "subscribers": "Poseedores de bundles",
-    "subscribing": "Creadores"
+    "bundleOwners": "Poseedores de bundles",
+    "creators": "Creadores"
   },
   "dates": {
     "now": "ahora",

@@ -53,7 +53,7 @@ import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
 import PostCardEllipseMenu from './PostCardEllipseMenu';
 import getDisplayname from '../../utils/getDisplayname';
-import ReportModal, { ReportData } from './chat/ReportModal';
+import ReportModal, { ReportData } from './direct-messages/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
 import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';

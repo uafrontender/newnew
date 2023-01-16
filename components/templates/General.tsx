@@ -1,10 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -20,7 +22,6 @@ import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
-import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
@@ -28,13 +29,13 @@ import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
-import { loadStateLS } from '../../utils/localStorage';
+import ChatContainer from '../organisms/direct-messages/ChatContainer';
 
 interface IGeneral {
   className?: string;
   withChat?: boolean;
   restrictMaxWidth?: boolean;
-  noMobieNavigation?: boolean;
+  noMobileNavigation?: boolean;
   noPaddingMobile?: boolean;
   children: React.ReactNode;
 }
@@ -44,7 +45,7 @@ export const General: React.FC<IGeneral> = (props) => {
     className,
     withChat,
     restrictMaxWidth,
-    noMobieNavigation,
+    noMobileNavigation,
     noPaddingMobile,
     children,
   } = props;
@@ -56,8 +57,14 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles } = useBundles();
-  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
+  const { bundles, hasSoldBundles } = useBundles();
+  const {
+    unreadCount,
+    setMobileChatOpened,
+    mobileChatOpened,
+    activeTab,
+    setActiveTab,
+  } = useGetChats();
 
   const hasMounted = useHasMounted();
 
@@ -163,20 +170,19 @@ export const General: React.FC<IGeneral> = (props) => {
     'tablet',
   ].includes(resizeMode);
 
-  const openChat = () => {
-    setMobileChatOpened(true);
-  };
+  // const openChat = useCallback(() => {
+  //   if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
+  //     setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+  //   }
+  //   setMobileChatOpened(true);
+  // }, [activeTab, setActiveTab, setMobileChatOpened]);
 
-  const closeChat = () => {
-    setMobileChatOpened(false);
-  };
+  const chatButtonVisible = isMobile && withChat && hasSoldBundles;
 
-  const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
-
-  const chatButtonVisible = isMobile && withChat && localHasSoldBundles;
-
-  const mobileNavigationVisible =
-    isMobile && scrollDirection !== 'down' && !noMobieNavigation;
+  const mobileNavigationVisible = useMemo(
+    () => isMobile && scrollDirection !== 'down' && !noMobileNavigation,
+    [isMobile, scrollDirection, noMobileNavigation]
+  );
 
   return (
     <SBaseLayout
@@ -184,7 +190,7 @@ export const General: React.FC<IGeneral> = (props) => {
       className={className}
       containerRef={wrapperRef}
       withBanner={!!banner?.show}
-      noPaddingTop={!!noMobieNavigation}
+      noPaddingTop={!!noMobileNavigation}
     >
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
@@ -193,7 +199,7 @@ export const General: React.FC<IGeneral> = (props) => {
         <Header
           visible={!isMobile || mobileNavigationVisible || globalSearchActive}
         />
-        <SContent noPaddingTop={!!noMobieNavigation}>
+        <SContent noPaddingTop={!!noMobileNavigation}>
           <Container
             {...(restrictMaxWidth
               ? {}
@@ -229,16 +235,16 @@ export const General: React.FC<IGeneral> = (props) => {
           </>
         )}
         {chatButtonVisible && (
-          <ChatContainer
+          <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
             zIndex={moreMenuMobileOpen ? 9 : 10}
           >
             {!mobileChatOpened ? (
-              <FloatingMessages withCounter openChat={openChat} />
+              <FloatingMessages withCounter />
             ) : (
-              <MobileDashBoardChat closeChat={closeChat} />
+              <ChatContainer />
             )}
-          </ChatContainer>
+          </SChatContainer>
         )}
         {!isMobileOrTablet && !router.route.includes('direct-messages') && (
           <ReportBugButton
@@ -340,7 +346,7 @@ interface IChatContainer {
   zIndex: number;
 }
 
-const ChatContainer = styled.div<IChatContainer>`
+const SChatContainer = styled.div<IChatContainer>`
   right: 16px;
   bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
   z-index: ${(props) => props.zIndex};

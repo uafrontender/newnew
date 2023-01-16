@@ -31,7 +31,9 @@ const CommentEllipseMenu = dynamic(
 const CommentEllipseModal = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseModal')
 );
-const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
+const ReportModal = dynamic(
+  () => import('../../molecules/direct-messages/ReportModal')
+);
 const DeleteCommentModal = dynamic(
   () => import('../../molecules/decision/common/DeleteCommentModal')
 );
