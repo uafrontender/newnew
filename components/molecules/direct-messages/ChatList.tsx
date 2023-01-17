@@ -99,6 +99,7 @@ const SChatlist = styled.div`
   overflow-y: auto;
   flex-direction: column;
   overscroll-behavior: contain;
+  height: calc(100vh - 122px);
   /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;
