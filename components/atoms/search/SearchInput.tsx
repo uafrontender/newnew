@@ -31,6 +31,20 @@ import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 
+function getClearedQuery(rawQuery: string): string {
+  if (rawQuery.length === 0) {
+    return '';
+  }
+
+  // Remove leading @ for search to work, if raw was just '@', then it is empty
+  // If @ is in the middle, search fails (no results)
+  if (rawQuery[0] === '@') {
+    return rawQuery.slice(1);
+  }
+
+  return rawQuery;
+}
+
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const theme = useTheme();
@@ -79,11 +93,11 @@ const SearchInput: React.FC = React.memo(() => {
     if (isHashtag) {
       router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
     } else {
-      const clearedQuery = encodeURIComponent(query);
+      const encodedQuery = encodeURIComponent(query);
       if (resultsPosts.length === 0 && resultsCreators.length > 0) {
-        router.push(`/search?query=${clearedQuery}&tab=creators`);
+        router.push(`/search?query=${encodedQuery}&tab=creators`);
       } else {
-        router.push(`/search?query=${clearedQuery}&tab=posts`);
+        router.push(`/search?query=${encodedQuery}&tab=posts`);
       }
     }
   };
@@ -109,8 +123,9 @@ const SearchInput: React.FC = React.memo(() => {
       handleSearchClose();
     }
 
-    if (e.keyCode === 13 && searchValue) {
-      handleSeeResults(searchValue);
+    const clearedSearchValue = getClearedQuery(searchValue);
+    if (e.keyCode === 13 && clearedSearchValue) {
+      handleSeeResults(clearedSearchValue);
       closeSearch();
     }
   };
@@ -191,10 +206,11 @@ const SearchInput: React.FC = React.memo(() => {
   }
 
   useEffect(() => {
-    if (searchValue) {
-      getQuickSearchResult(searchValue);
+    const clearedSearchValue = getClearedQuery(searchValue);
+    if (clearedSearchValue) {
+      getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
-    } else if (!searchValue && !isMobileOrTablet) {
+    } else if (!clearedSearchValue && !isMobileOrTablet) {
       setIsResultsDropVisible(false);
       resetResults();
     }
@@ -312,7 +328,12 @@ const SearchInput: React.FC = React.memo(() => {
                   <PopularTagsResults hashtags={resultsHashtags} />
                 )}
                 <SButton
-                  onClick={() => handleSeeResults(searchValue)}
+                  onClick={() => {
+                    const clearedSearchValue = getClearedQuery(searchValue);
+                    if (clearedSearchValue) {
+                      handleSeeResults(clearedSearchValue);
+                    }
+                  }}
                   view='quaternary'
                 >
                   {t('search.allResults')}
@@ -356,7 +377,12 @@ const SearchInput: React.FC = React.memo(() => {
                 <PopularTagsResults hashtags={resultsHashtags} />
               )}
               <SButton
-                onClick={() => handleSeeResults(searchValue)}
+                onClick={() => {
+                  const clearedSearchValue = getClearedQuery(searchValue);
+                  if (clearedSearchValue) {
+                    handleSeeResults(clearedSearchValue);
+                  }
+                }}
                 view='quaternary'
               >
                 {t('search.allResults')}
