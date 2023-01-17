@@ -1,14 +1,15 @@
 /* eslint-disable no-nested-ternary */
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
-
+import { useRouter } from 'next/router';
 import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import isSafari from '../../../utils/isSafari';
 import { useAppSelector } from '../../../redux-store/store';
+import { useGetChats } from '../../../contexts/chatContext';
 
 interface ITextArea {
   id?: string;
@@ -17,7 +18,6 @@ interface ITextArea {
   maxlength?: number;
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
-  isDashboard?: boolean;
   gotMaxLength?: () => void;
 }
 
@@ -33,11 +33,20 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     error,
     onChange,
     placeholder,
-    isDashboard,
     gotMaxLength,
   } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
+  const router = useRouter();
+  const { mobileChatOpened } = useGetChats();
+
+  const isDashboard = useMemo(() => {
+    // if there is not visavis it's our announcement room
+    if (router.asPath.includes('/creator/dashboard')) {
+      return true;
+    }
+    return false;
+  }, [router.asPath]);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -80,7 +89,11 @@ export const TextArea: React.FC<ITextArea> = (props) => {
 
   return (
     <SWrapper>
-      <SContent error={!!error} isDashboard={isDashboard}>
+      <SContent
+        error={!!error}
+        isDashboard={isDashboard}
+        isMobileChatOpened={mobileChatOpened}
+      >
         <STextArea
           maxRows={8}
           value={value}
@@ -120,13 +133,14 @@ const SWrapper = styled.div`
 interface ISContent {
   error: boolean;
   isDashboard?: boolean;
+  isMobileChatOpened?: boolean;
 }
 
 const SContent = styled.div<ISContent>`
   padding: 10.5px 18.5px 10.5px 18.5px;
   position: relative;
-  background: ${({ theme, isDashboard }) =>
-    !isDashboard
+  background: ${({ theme, isDashboard, isMobileChatOpened }) =>
+    !isDashboard || isMobileChatOpened
       ? theme.name === 'light'
         ? theme.colors.white
         : theme.colorsThemed.background.tertiary

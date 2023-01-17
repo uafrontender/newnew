@@ -79,11 +79,9 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const [messageText, setMessageText] = useState<string>('');
   const [messageTextValid, setMessageTextValid] = useState(false);
 
-  const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
   const [isSubscriptionExpired, setIsSubscriptionExpired] =
     useState<boolean>(false);
 
@@ -100,6 +98,18 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
+
+  const isAnnouncement = useMemo(
+    () => chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+    [chatRoom.kind]
+  );
+
+  const isMyAnnouncement = useMemo(
+    () =>
+      chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
+      !chatRoom.visavis,
+    [chatRoom.kind, chatRoom.visavis]
+  );
 
   const isVisavisBlocked = useMemo(
     () => usersIBlocked.includes(chatRoom.visavis?.user?.uuid ?? ''),
@@ -225,7 +235,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     <SContainer>
       <ChatContentHeader
         chatRoom={chatRoom}
-        isVisavisBlocked
+        isVisavisBlocked={isVisavisBlocked}
         onUserReport={onUserReport}
         onUserBlock={onUserBlock}
       />

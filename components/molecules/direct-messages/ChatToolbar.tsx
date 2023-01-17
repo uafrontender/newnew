@@ -37,10 +37,6 @@ const ChatToolbar: React.FC = () => {
     [activeTab, setActiveTab, setSearchChatroom]
   );
 
-  // const openChat = useCallback(() => {
-  //   console.log('openChat');
-  // }, []);
-
   const goBackHandler = useCallback(() => {
     if (mobileChatOpened) {
       setMobileChatOpened(false);
@@ -48,15 +44,16 @@ const ChatToolbar: React.FC = () => {
   }, [mobileChatOpened, setMobileChatOpened]);
   return (
     <SToolbar isMobile={isMobileOrTablet}>
-      {isMobileOrTablet && !mobileChatOpened ? (
-        <Link href='/'>
-          <a>
-            <GoBackButton onClick={goBackHandler} />
-          </a>
-        </Link>
-      ) : (
-        <GoBackButton onClick={goBackHandler} />
-      )}
+      {isMobileOrTablet &&
+        (!mobileChatOpened ? (
+          <Link href='/'>
+            <a>
+              <GoBackButton onClick={goBackHandler} />
+            </a>
+          </Link>
+        ) : (
+          <GoBackButton onClick={goBackHandler} />
+        ))}
       <SearchInput
         placeholderText={t('toolbar.searchPlaceholder')}
         style={{ marginRight: '16px', fontSize: '16px' }}

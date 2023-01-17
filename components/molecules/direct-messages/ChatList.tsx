@@ -94,8 +94,6 @@ const ChatList: React.FC = () => {
 export default ChatList;
 
 const SChatlist = styled.div`
-  height: calc(100% - 126px);
-  height: 100%;
   display: flex;
   position: relative;
   overflow-y: auto;

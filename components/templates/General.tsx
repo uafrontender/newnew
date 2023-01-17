@@ -170,12 +170,13 @@ export const General: React.FC<IGeneral> = (props) => {
     'tablet',
   ].includes(resizeMode);
 
-  // const openChat = useCallback(() => {
-  //   if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
-  //     setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
-  //   }
-  //   setMobileChatOpened(true);
-  // }, [activeTab, setActiveTab, setMobileChatOpened]);
+  const openChat = useCallback(() => {
+    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
+      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    }
+    router.push(`/creator/dashboard?tab=chat`);
+    setMobileChatOpened(true);
+  }, [activeTab, setActiveTab, setMobileChatOpened, router]);
 
   const chatButtonVisible = isMobile && withChat && hasSoldBundles;
 
@@ -240,7 +241,7 @@ export const General: React.FC<IGeneral> = (props) => {
             zIndex={moreMenuMobileOpen ? 9 : 10}
           >
             {!mobileChatOpened ? (
-              <FloatingMessages withCounter />
+              <FloatingMessages withCounter openChat={openChat} />
             ) : (
               <ChatContainer />
             )}

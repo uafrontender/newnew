@@ -3,7 +3,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import InlineSVG from '../../../atoms/InlineSVG';
-import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
+// import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
@@ -14,7 +14,6 @@ const SearchInput: React.FC = React.memo(() => {
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
   const [isSearchActive, setIsSearchActive] = useState(false);
-
   const { searchChatroom, setSearchChatroom } = useGetChats();
 
   const handleSearchClick = useCallback(() => {
@@ -42,11 +41,11 @@ const SearchInput: React.FC = React.memo(() => {
     [handleSearchClose, searchChatroom]
   );
 
-  useOnClickOutside(inputContainerRef, () => {
-    if (isSearchActive) {
-      handleSearchClose();
-    }
-  });
+  // useOnClickOutside(inputContainerRef, () => {
+  //   if (isSearchActive) {
+  //     handleSearchClose();
+  //   }
+  // });
 
   useEffect(() => {
     setTimeout(() => {

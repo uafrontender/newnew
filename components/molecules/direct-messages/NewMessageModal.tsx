@@ -1,9 +1,16 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+/* eslint-disable no-unused-expressions */
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { toNumber } from 'lodash';
+import { useRouter } from 'next/router';
 import {
   SChatItemContainer,
   SChatItemCenter,
@@ -23,15 +30,12 @@ import InlineSVG from '../../atoms/InlineSVG';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import Modal from '../../organisms/Modal';
 
-import {
-  getMyRooms,
-  getRoom,
-  getVisavisList,
-} from '../../../api/endpoints/chat';
+import { getVisavisList } from '../../../api/endpoints/chat';
 
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
 
 const CloseModalButton = dynamic(
@@ -65,8 +69,25 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const router = useRouter();
 
-  const { setActiveChatRoom } = useGetChats();
+  const [usernameQuery, setUsernameQuery] = useState('');
+  const [roomKind, setRoomKind] = useState<newnewapi.ChatRoom.Kind>(
+    newnewapi.ChatRoom.Kind.CREATOR_TO_ONE
+  );
+
+  const { setActiveChatRoom, mobileChatOpened, setHiddenMessagesArea } =
+    useGetChats();
+  const { data } = useMyChatRooms({
+    myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+    roomKind,
+    searchQuery: usernameQuery,
+  });
+
+  const targetChatrooms = useMemo(
+    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
+    [data]
+  );
 
   const [chatroomsSortedList, setChatroomsSortedList] = useState<
     IChatroomsSorted[]
@@ -77,13 +98,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     newnewapi.IVisavisListItem[]
   >([]);
 
-  const [myAnnouncement, setMyAnnouncement] =
-    useState<newnewapi.IChatRoom | null>(null);
-
   const [loading, setLoading] = useState(false);
-  const [loadingAnnouncement, setLoadingAnnouncement] =
-    useState<boolean>(false);
-  const [chatRoomLoading, setChatRoomLoading] = useState<boolean>(false);
   const [chatRooms, setChatRooms] = useState<newnewapi.IVisavisListItem[]>([]);
 
   const passInputValue = (str: string) => {
@@ -109,35 +124,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     }
   }, [loading]);
 
-  const getMyAnnouncement = useCallback(async () => {
-    if (loadingAnnouncement) return;
-    try {
-      setLoadingAnnouncement(true);
-      const payload = new newnewapi.GetMyRoomsRequest({
-        roomKind: 4,
-        myRole: 2,
-      });
-      const res = await getMyRooms(payload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      if (res.data.rooms[0]) setMyAnnouncement(res.data.rooms[0]);
-      setLoadingAnnouncement(false);
-    } catch (err) {
-      console.error(err);
-      setLoadingAnnouncement(false);
-    }
-  }, [loadingAnnouncement]);
-
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (!myAnnouncement) getMyAnnouncement();
-  }, [getMyAnnouncement, myAnnouncement]);
 
   useEffect(() => {
     const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
@@ -187,43 +177,47 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     }
   }, [searchValue, chatRooms]);
 
-  const createNewAnnouncement = useCallback(() => {
-    if (myAnnouncement) {
-      setActiveChatRoom(myAnnouncement);
+  const isDashboard = useMemo(() => {
+    // if there is not visavis it's our announcement room
+    if (router.asPath.includes('/creator/dashboard')) {
+      return true;
     }
-    closeModal();
-  }, [myAnnouncement, setActiveChatRoom, closeModal]);
+    return false;
+  }, [router.asPath]);
 
-  const fetchChatRoom = useCallback(
-    async (roomID: number | Long.Long | null | undefined) => {
-      if (chatRoomLoading) return;
-      try {
-        setChatRoomLoading(true);
-        const payload = new newnewapi.GetRoomRequest({
-          roomId: toNumber(roomID),
-        });
-        const res = await getRoom(payload);
+  useEffect(() => {
+    // TODO: visavilist should include only creators on dashboard
+    if (isDashboard && targetChatrooms.length === 1) {
+      setActiveChatRoom(targetChatrooms[0]);
+      router.push(
+        `/creator/dashboard?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
+      );
+      if (mobileChatOpened) setHiddenMessagesArea(false);
+      closeModal();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetChatrooms]);
 
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data) {
-          setActiveChatRoom(res.data);
-          closeModal();
-        }
-        setChatRoomLoading(false);
-      } catch (err) {
-        console.error(err);
-        setChatRoomLoading(false);
-      }
-    },
-    [chatRoomLoading, closeModal, setActiveChatRoom]
-  );
+  const openMyAnnouncement = useCallback(() => {
+    if (!isDashboard) {
+      router.push(`/direct-messages/${user.userData?.username}-announcement`);
+      closeModal();
+    } else {
+      user.userData?.username && setUsernameQuery(user.userData?.username);
+      setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE);
+    }
+  }, [closeModal, router, isDashboard, user.userData?.username]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
       const handleItemClick = () => {
-        fetchChatRoom(chat.chatroomId);
+        if (!isDashboard) {
+          router.push(`/direct-messages/${chat.user?.username}`);
+          closeModal();
+        } else {
+          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
+          chat.user?.username && setUsernameQuery(chat.user?.username);
+        }
       };
 
       return (
@@ -256,7 +250,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         </SChatItemContainer>
       );
     },
-    [chatRooms, filteredChatrooms, fetchChatRoom]
+    [chatRooms, filteredChatrooms, router, closeModal, isDashboard]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
@@ -302,10 +296,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                 )
               ) : (
                 <SSectionContent ref={scrollRef}>
-                  {user.userData?.options?.isOfferingBundles &&
-                    myAnnouncement && (
-                      <NewAnnouncement handleClick={createNewAnnouncement} />
-                    )}
+                  {user.userData?.options?.isOfferingBundles && (
+                    <NewAnnouncement handleClick={openMyAnnouncement} />
+                  )}
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
                       <SSection key={section.letter}>
