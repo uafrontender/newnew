@@ -175,6 +175,25 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       [commentText, user.loggedIn, user._persist?.rehydrated, onSubmit, isRoot]
     );
 
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLFormElement>) => {
+        if (!isMobileOrTablet) {
+          if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
+            if (commentText.charCodeAt(commentText.length - 1) === 10) {
+              setCommentText((curr) => curr.slice(0, -1));
+            }
+          } else if (e.key === 'Enter') {
+            handleSubmit(e);
+          }
+        } else if (e.key === 'Enter' && commentText.length > 0) {
+          if (commentText.charCodeAt(commentText.length - 1) === 10) {
+            setCommentText((curr) => curr.slice(0, -1));
+          }
+        }
+      },
+      [commentText, handleSubmit, isMobileOrTablet]
+    );
+
     // TODO: Add loading state for mobile button on mobile
     useEffect(() => {
       if (!commentToSend || !!commentTextError) {
@@ -216,17 +235,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         }}
         position={position}
         zIndex={zIndex}
-        onKeyDown={(e) => {
-          if (!isMobileOrTablet) {
-            if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
-              if (commentText.charCodeAt(commentText.length - 1) === 10) {
-                setCommentText((curr) => curr.slice(0, -1));
-              }
-            } else if (e.key === 'Enter') {
-              handleSubmit(e);
-            }
-          }
-        }}
+        onKeyDown={handleKeyDown}
       >
         <SInputWrapper>
           <CommentTextArea
