@@ -333,7 +333,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             </SShareDiv>
 
             {creatorsBundle && (
-              <CustomLink href={`/direct-messages/${user.username}-cr`}>
+              <CustomLink href={`/direct-messages/${user.username}`}>
                 <SSendButton withShadow view='primaryGrad'>
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>

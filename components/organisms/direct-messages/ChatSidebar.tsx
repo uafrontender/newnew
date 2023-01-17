@@ -61,9 +61,9 @@ export default ChatSidebar;
 
 const SSidebar = styled.div`
   width: 100%;
-  ${(props) => props.theme.media.mobile} {
-    height: 90%;
-  }
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   ${(props) => props.theme.media.laptop} {
     background: none;
     position: static;

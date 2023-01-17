@@ -1,8 +1,10 @@
-import React, { useCallback } from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/router';
 import {
   SChatItemContainer,
   SChatItem,
@@ -32,6 +34,7 @@ interface IFunctionProps {
 const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   const { t } = useTranslation('page-Chat');
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const router = useRouter();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -39,9 +42,14 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const { activeChatRoom, setActiveChatRoom, setHiddenMessagesArea } =
-    useGetChats();
-
+  const {
+    activeChatRoom,
+    setActiveChatRoom,
+    setHiddenMessagesArea,
+    activeTab,
+    setSearchChatroom,
+  } = useGetChats();
+  const user = useAppSelector((state) => state.user);
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) => {
       if (
@@ -57,6 +65,28 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     [activeChatRoom, isMobileOrTablet]
   );
 
+  const isDashboard = useMemo(() => {
+    if (router.asPath.includes('/creator/dashboard?tab=chat')) {
+      return true;
+    }
+    return false;
+  }, [router.asPath]);
+
+  const chatRoute = useMemo(() => {
+    // if there is not visavis it's our announcement room
+    let route = `/direct-messages/${
+      chatRoom.visavis?.user?.username || user.userData?.username
+    }`;
+    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
+      route += '-announcement';
+      return route;
+    }
+    if (activeTab && chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
+      route += '-bundle';
+    }
+    return route;
+  }, [chatRoom, activeTab, user.userData?.username]);
+
   const handleItemClick = useCallback(async () => {
     if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0) {
       try {
@@ -70,11 +100,28 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
         console.error(err);
       }
     }
-    setActiveChatRoom(chatRoom);
+    if (!isDashboard) {
+      router.push(chatRoute);
+    } else {
+      router.push(
+        `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
+      );
+      setActiveChatRoom(chatRoom);
+      setSearchChatroom('');
+    }
     if (isMobileOrTablet) {
       setHiddenMessagesArea(false);
     }
-  }, [setActiveChatRoom, isMobileOrTablet, setHiddenMessagesArea, chatRoom]);
+  }, [
+    setActiveChatRoom,
+    isMobileOrTablet,
+    setHiddenMessagesArea,
+    chatRoom,
+    setSearchChatroom,
+    chatRoute,
+    isDashboard,
+    router,
+  ]);
 
   let avatar = (
     <SUserAvatar>

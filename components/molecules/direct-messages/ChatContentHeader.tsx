@@ -1,8 +1,15 @@
 /* eslint-disable no-unused-expressions */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 import { useAppSelector } from '../../../redux-store/store';
 
 import Button from '../../atoms/Button';
@@ -16,6 +23,7 @@ const GoBackButton = dynamic(
 );
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
+const UserAvatar = dynamic(() => import('../UserAvatar'));
 const AnnouncementHeader = dynamic(
   () => import('../../atoms/direct-messages/AnnouncementHeader')
 );
@@ -34,6 +42,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   chatRoom,
 }) => {
   const theme = useTheme();
+  const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -48,9 +57,14 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+  const router = useRouter();
 
-  const { activeChatRoom, setActiveChatRoom, setHiddenMessagesArea } =
-    useGetChats();
+  const {
+    activeChatRoom,
+    setActiveChatRoom,
+    setHiddenMessagesArea,
+    mobileChatOpened,
+  } = useGetChats();
 
   useEffect(() => {
     if (chatRoom.kind === 4) {
@@ -74,65 +88,107 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     setEllipseMenuOpen(false);
   }, []);
 
+  const isDashboard = useMemo(() => {
+    // if there is not visavis it's our announcement room
+    if (router.asPath.includes('/creator/dashboard')) {
+      return true;
+    }
+    return false;
+  }, [router.asPath]);
+
   const goBackHandler = useCallback(() => {
-    if (activeChatRoom) {
+    if (isDashboard) {
+      router.query = {};
+      router.push(`/creator/dashboard?tab=chat`);
+      setActiveChatRoom(null);
+    }
+    if (activeChatRoom && (!isDashboard || mobileChatOpened)) {
       setActiveChatRoom(null);
       setHiddenMessagesArea(true);
     }
-  }, [setActiveChatRoom, setHiddenMessagesArea, activeChatRoom]);
+  }, [
+    setActiveChatRoom,
+    setHiddenMessagesArea,
+    activeChatRoom,
+    isDashboard,
+    router,
+    mobileChatOpened,
+  ]);
+
+  const handleUserClick = useCallback(() => {
+    if (chatRoom?.visavis?.user?.username) {
+      router.push(`/${chatRoom?.visavis?.user?.username}`);
+    }
+  }, [chatRoom?.visavis?.user?.username, router]);
 
   return (
     <>
       <STopPart>
-        {isMobileOrTablet && <GoBackButton onClick={goBackHandler} />}
+        {(isMobileOrTablet || isDashboard) && (
+          <GoBackButton onClick={goBackHandler} />
+        )}
+        {isDashboard &&
+          !mobileChatOpened &&
+          (chatRoom?.kind === 4 ? (
+            <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
+          ) : (
+            <SUserAvatar
+              withClick
+              onClick={handleUserClick}
+              avatarUrl={chatRoom?.visavis?.user?.avatarUrl ?? ''}
+            />
+          ))}
+
         <ChatUserData
           isMyAnnouncement={isMyAnnouncement}
           isAnnouncement={isAnnouncement}
           chatRoom={chatRoom}
         />
-        <SActionsDiv>
-          {!isMyAnnouncement && (
-            <SMoreButton
-              view='transparent'
-              iconOnly
-              onClick={() => handleOpenEllipseMenu()}
-              ref={moreButtonRef}
-            >
-              <InlineSVG
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.secondary}
-                width='20px'
-                height='20px'
+        {!isDashboard && (
+          <SActionsDiv>
+            {!isMyAnnouncement && (
+              <SMoreButton
+                view='transparent'
+                iconOnly
+                onClick={() => handleOpenEllipseMenu()}
+                ref={moreButtonRef}
+              >
+                <InlineSVG
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width='20px'
+                  height='20px'
+                />
+              </SMoreButton>
+            )}
+            {/* Ellipse menu */}
+            {!isMobile && chatRoom.visavis && (
+              <ChatEllipseMenu
+                myRole={chatRoom.myRole ? chatRoom.myRole : 0}
+                user={chatRoom.visavis}
+                isVisible={ellipseMenuOpen}
+                handleClose={handleCloseEllipseMenu}
+                userBlocked={isVisavisBlocked}
+                onUserBlock={onUserBlock}
+                onUserReport={onUserReport}
+                isAnnouncement={isAnnouncement}
+                anchorElement={moreButtonRef.current}
               />
-            </SMoreButton>
-          )}
-          {/* Ellipse menu */}
-          {!isMobile && chatRoom.visavis && (
-            <ChatEllipseMenu
-              myRole={chatRoom.myRole ? chatRoom.myRole : 0}
-              user={chatRoom.visavis}
-              isVisible={ellipseMenuOpen}
-              handleClose={handleCloseEllipseMenu}
-              userBlocked={isVisavisBlocked}
-              onUserBlock={onUserBlock}
-              onUserReport={onUserReport}
-              isAnnouncement={isAnnouncement}
-              anchorElement={moreButtonRef.current}
-            />
-          )}
-          {isMobile && ellipseMenuOpen ? (
-            <ChatEllipseModal
-              isOpen={ellipseMenuOpen}
-              zIndex={21}
-              onClose={handleCloseEllipseMenu}
-              userBlocked={isVisavisBlocked}
-              onUserBlock={onUserBlock}
-              onUserReport={onUserReport}
-              visavis={chatRoom.visavis}
-              isAnnouncement={isAnnouncement}
-            />
-          ) : null}
-        </SActionsDiv>
+            )}
+            {isMobile && ellipseMenuOpen ? (
+              <ChatEllipseModal
+                isOpen={ellipseMenuOpen}
+                zIndex={21}
+                onClose={handleCloseEllipseMenu}
+                userBlocked={isVisavisBlocked}
+                onUserBlock={onUserBlock}
+                onUserReport={onUserReport}
+                visavis={chatRoom.visavis}
+                isAnnouncement={isAnnouncement}
+              />
+            ) : null}
+          </SActionsDiv>
+        )}
       </STopPart>
       {isAnnouncement && !isMyAnnouncement && chatRoom?.visavis?.user && (
         <AnnouncementHeader user={chatRoom.visavis?.user} />
@@ -168,4 +224,8 @@ const SMoreButton = styled(Button)`
     align-items: center;
     justify-content: center;
   }
+`;
+
+const SUserAvatar = styled(UserAvatar)`
+  margin: 0 12px 0 0;
 `;
