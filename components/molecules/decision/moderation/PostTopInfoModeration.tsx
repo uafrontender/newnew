@@ -473,7 +473,7 @@ const SSelectWinnerOption = styled.div<{
           position: fixed;
           bottom: 16px;
           left: 16;
-          width: calc(100% - 48px);
+          width: calc(100% - 32px);
           z-index: 20;
         `
       : css`
@@ -488,7 +488,7 @@ const SSelectWinnerOption = styled.div<{
   flex-direction: column;
   justify-content: center;
 
-  height: 130px;
+  min-height: 130px;
 
   padding: 24px 16px;
   padding-right: 134px;
@@ -503,6 +503,9 @@ const SSelectWinnerOption = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     grid-area: selectWinner;
+
+    min-height: unset;
+    height: 130px;
 
     z-index: initial;
 

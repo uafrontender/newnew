@@ -186,7 +186,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {paymentSuccessModalOpen && (
         <BundlePaymentSuccessModal
           show
-          zIndex={13}
+          zIndex={additionalZ ? additionalZ + 1 : 13}
           creator={creator}
           bundleOffer={bundleOffer}
           onClose={() => {
