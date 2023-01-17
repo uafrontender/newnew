@@ -21,6 +21,7 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
+  canCreateCustomOption,
   fetchCurrentOptionsForMCPost,
   voteOnPost,
 } from '../../../../api/endpoints/multiple_choice';
@@ -141,6 +142,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       ),
     [bundles, postParsed?.creator?.uuid]
   );
+
+  const [canAddOptionApiCheck, setCanAddOptionApiCheck] = useState(false);
+  const canAddCustomOption = useMemo(() => {
+    // Check if there's a bundle for creator
+    if (!creatorsBundle) return false;
+
+    return canAddOptionApiCheck;
+  }, [creatorsBundle, canAddOptionApiCheck]);
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
@@ -389,6 +398,34 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function checkCanAddCustomOption() {
+      try {
+        const payload = new newnewapi.CanCreateCustomMcOptionRequest({
+          postUuid: post.postUuid,
+        });
+
+        const res = await canCreateCustomOption(payload, controller.signal);
+
+        if (res.data?.canAdd) {
+          setCanAddOptionApiCheck(res.data.canAdd);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (user.loggedIn && creatorsBundle) {
+      checkCanAddCustomOption();
+    }
+
+    return () => {
+      controller.abort();
+    };
+  }, [post.postUuid, user.loggedIn, creatorsBundle]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -769,6 +806,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
+            canAddCustomOption={canAddCustomOption}
             bundle={creatorsBundle?.bundle ?? undefined}
             handleLoadOptions={fetchOptions}
             handleAddOrUpdateOptionFromResponse={
