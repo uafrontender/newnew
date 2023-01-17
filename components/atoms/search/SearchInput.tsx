@@ -30,20 +30,7 @@ import getChunks from '../../../utils/getChunks/getChunks';
 import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
-
-function getClearedQuery(rawQuery: string): string {
-  if (rawQuery.length === 0) {
-    return '';
-  }
-
-  // Remove leading @ for search to work, if raw was just '@', then it is empty
-  // If @ is in the middle, search fails (no results)
-  if (rawQuery[0] === '@') {
-    return rawQuery.slice(1);
-  }
-
-  return rawQuery;
-}
+import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -123,7 +110,7 @@ const SearchInput: React.FC = React.memo(() => {
       handleSearchClose();
     }
 
-    const clearedSearchValue = getClearedQuery(searchValue);
+    const clearedSearchValue = getClearedSearchQuery(searchValue);
     if (e.keyCode === 13 && clearedSearchValue) {
       handleSeeResults(clearedSearchValue);
       closeSearch();
@@ -206,7 +193,7 @@ const SearchInput: React.FC = React.memo(() => {
   }
 
   useEffect(() => {
-    const clearedSearchValue = getClearedQuery(searchValue);
+    const clearedSearchValue = getClearedSearchQuery(searchValue);
     if (clearedSearchValue) {
       getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
@@ -329,7 +316,8 @@ const SearchInput: React.FC = React.memo(() => {
                 )}
                 <SButton
                   onClick={() => {
-                    const clearedSearchValue = getClearedQuery(searchValue);
+                    const clearedSearchValue =
+                      getClearedSearchQuery(searchValue);
                     if (clearedSearchValue) {
                       handleSeeResults(clearedSearchValue);
                     }
@@ -378,7 +366,7 @@ const SearchInput: React.FC = React.memo(() => {
               )}
               <SButton
                 onClick={() => {
-                  const clearedSearchValue = getClearedQuery(searchValue);
+                  const clearedSearchValue = getClearedSearchQuery(searchValue);
                   if (clearedSearchValue) {
                     handleSeeResults(clearedSearchValue);
                   }
