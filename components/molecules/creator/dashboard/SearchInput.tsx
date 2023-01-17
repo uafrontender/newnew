@@ -9,10 +9,12 @@ import useDebounce from '../../../../utils/hooks/useDebounce';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
+import getClearedSearchQuery from '../../../../utils/getClearedSearchQuery';
 
 interface ISearchInput {
   passInputValue: (searchString: string) => void;
 }
+
 const SearchInput: React.FC<ISearchInput> = React.memo(({ passInputValue }) => {
   const { t } = useTranslation('common');
   const theme = useTheme();
@@ -61,7 +63,10 @@ const SearchInput: React.FC<ISearchInput> = React.memo(({ passInputValue }) => {
   const debouncedSearchValue = useDebounce(searchValue, 500);
 
   useEffect(() => {
-    if (passInputValue) passInputValue(debouncedSearchValue);
+    if (passInputValue) {
+      const clearedSearchValue = getClearedSearchQuery(debouncedSearchValue);
+      passInputValue(clearedSearchValue);
+    }
   }, [debouncedSearchValue, passInputValue]);
 
   function closeSearch() {
