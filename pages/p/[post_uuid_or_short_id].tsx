@@ -107,7 +107,11 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const { data: postFromAjax, isLoading: isPostLoading } = usePost(
+  const {
+    data: postFromAjax,
+    isLoading: isPostLoading,
+    refetch: refetchPost,
+  } = usePost(
     {
       loggedInUser: user.loggedIn,
       postUuid: postUuidOrShortId,
@@ -595,6 +599,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
+        refetchPost={refetchPost}
       >
         <Head>
           <title>{typeOfPost ? t(`meta.${typeOfPost}.title`) : ''}</title>

@@ -51,7 +51,6 @@ import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
-  postLoading: boolean;
   postStatus: TPostStatusStringified;
   postCreatorName: string;
   postDeadline: string;
@@ -69,7 +68,6 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
-  postLoading,
   postStatus,
   postCreatorName,
   postDeadline,

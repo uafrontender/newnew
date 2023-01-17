@@ -21,7 +21,6 @@ import {
   getMcOption,
 } from '../../../../api/endpoints/multiple_choice';
 import switchPostType from '../../../../utils/switchPostType';
-import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
@@ -84,6 +83,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       postStatus,
       handleGoBackInsidePost,
       handleUpdatePostStatus,
+      refetchPost,
     } = usePostInnerState();
     const post = useMemo(
       () => postParsed as newnewapi.MultipleChoice,
@@ -91,16 +91,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     );
 
     // Additional responses
-    const [
-      additionalResponsesFreshlyLoaded,
-      setAdditionalResponsesFreshlyLoaded,
-    ] = useState(post.additionalResponses);
+    const additionalResponsesFreshlyLoaded = useMemo(
+      () => post.additionalResponses,
+      [post.additionalResponses]
+    );
 
     // Socket
     const socketConnection = useContext(SocketContext);
 
     // Announcement
-    const [announcement, setAnnouncement] = useState(post.announcement);
+    const announcement = useMemo(() => post.announcement, [post.announcement]);
 
     const handleCommentFocus = () => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
@@ -130,14 +130,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     );
 
     // Total votes
-    const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
+    const totalVotes = useMemo(() => post.totalVotes ?? 0, [post.totalVotes]);
 
     // Options
-    const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-      post.optionCount ?? ''
+    const numberOfOptions = useMemo(
+      () => post.optionCount ?? '',
+      [post.optionCount]
     );
+    const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
     const [optionsNextPageToken, setOptionsNextPageToken] = useState<
       string | undefined | null
     >('');
@@ -286,28 +287,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     const fetchPostLatestData = useCallback(async () => {
       try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: post.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
+        const res = await refetchPost();
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data.multipleChoice) {
-          setTotalVotes(res.data.multipleChoice.totalVotes as number);
-          setNumberOfOptions(res.data.multipleChoice.optionCount as number);
           if (res.data.multipleChoice.status)
             handleUpdatePostStatus(res.data.multipleChoice.status);
 
-          if (res.data.multipleChoice.additionalResponses) {
-            setAdditionalResponsesFreshlyLoaded(
-              res.data.multipleChoice.additionalResponses
-            );
-          }
-
-          setAnnouncement(res.data.multipleChoice?.announcement);
           if (res.data.multipleChoice?.winningOptionId && !winningOption) {
             const winner = options.find(
               (o) => o.id === res!!.data!!.multipleChoice!!.winningOptionId
@@ -417,24 +405,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         }
       };
 
-      const socketHandlerPostData = (data: any) => {
+      const socketHandlerPostData = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostUpdated.decode(arr);
 
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
-          if (decoded.post?.multipleChoice?.totalVotes)
-            setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
-          if (decoded.post?.multipleChoice?.optionCount)
-            setNumberOfOptions(decoded.post?.multipleChoice?.optionCount);
-
-          // if (
-          //   !responseFreshlyUploaded &&
-          //   decoded.post?.multipleChoice?.response
-          // ) {
-          //   setResponseFreshlyUploaded(decoded.post.multipleChoice.response);
-          // }
+          await fetchPostLatestData();
         }
       };
 

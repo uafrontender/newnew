@@ -19,7 +19,6 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
   canCreateCustomOption,
   fetchCurrentOptionsForMCPost,
@@ -124,6 +123,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleGoBackInsidePost,
     handleUpdatePostStatus,
     resetSetupIntentClientSecret,
+    refetchPost,
   } = usePostInnerState();
   const post = useMemo(
     () => postParsed as newnewapi.MultipleChoice,
@@ -167,15 +167,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
-  // Post loading state
-  const [postLoading, setPostLoading] = useState(false);
-
   // Vote after stripe redirect
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Total votes
-  const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
+  const totalVotes = useMemo(() => post.totalVotes ?? 0, [post.totalVotes]);
 
   // Bundle modal
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
@@ -345,25 +342,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   );
 
   const fetchPostLatestData = useCallback(async () => {
-    setPostLoading(true);
     try {
-      const fetchPostPayload = new newnewapi.GetPostRequest({
-        postUuid: post.postUuid,
-      });
-
-      const res = await fetchPostByUUID(fetchPostPayload);
+      const res = await refetchPost();
 
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      setTotalVotes(res.data.multipleChoice?.totalVotes as number);
       if (res.data.multipleChoice?.status)
         handleUpdatePostStatus(res.data.multipleChoice?.status);
-
-      setPostLoading(false);
     } catch (err) {
       console.error(err);
-      setPostLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -471,15 +459,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
 
-    const socketHandlerPostData = (data: any) => {
+    const socketHandlerPostData = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostUpdated.decode(arr);
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
-        if (decoded.post?.multipleChoice?.totalVotes)
-          setTotalVotes(decoded.post?.multipleChoice?.totalVotes);
+        await fetchPostLatestData();
       }
     };
 
@@ -795,7 +782,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </div>
           <McOptionsTab
             post={post}
-            postLoading={postLoading}
             postStatus={postStatus}
             postCreatorName={getDisplayname(post.creator)}
             postDeadline={moment(

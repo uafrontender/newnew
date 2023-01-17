@@ -10,6 +10,11 @@ import React, {
   MutableRefObject,
   useCallback,
 } from 'react';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from 'react-query';
 import { reportPost } from '../api/endpoints/report';
 import { ReportData } from '../components/molecules/chat/ReportModal';
 import { useAppSelector } from '../redux-store/store';
@@ -57,6 +62,9 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  refetchPost: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
 }>({
   modalContainerRef: {} as MutableRefObject<HTMLDivElement | undefined>,
   isMyPost: false,
@@ -97,6 +105,7 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => {},
   handleCloseDeletePostModal: () => {},
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
+  refetchPost: (() => {}) as any,
 });
 
 interface IPostContextProvider {
@@ -129,6 +138,9 @@ interface IPostContextProvider {
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  refetchPost: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
   children: React.ReactNode;
 }
 
@@ -158,6 +170,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleOpenDeletePostModal,
   handleCloseDeletePostModal,
   handleSetIsConfirmToClosePost,
+  refetchPost,
   children,
 }) => {
   const router = useRouter();
@@ -247,6 +260,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      refetchPost,
     }),
     [
       modalContainerRef,
@@ -284,6 +298,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      refetchPost,
     ]
   );
 

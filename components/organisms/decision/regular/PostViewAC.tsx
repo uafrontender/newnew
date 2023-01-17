@@ -19,7 +19,6 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
   fetchCurrentBidsForPost,
   placeBidOnAuction,
@@ -111,6 +110,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     handleGoBackInsidePost,
     handleUpdatePostStatus,
     resetSetupIntentClientSecret,
+    refetchPost,
   } = usePostInnerState();
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
@@ -138,15 +138,17 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Total amount
-  const [totalAmount, setTotalAmount] = useState(
-    post.totalAmount?.usdCents ?? 0
+  const totalAmount = useMemo(
+    () => post.totalAmount?.usdCents ?? 0,
+    [post.totalAmount?.usdCents]
   );
 
   // Options
-  const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-    post.optionCount ?? ''
+  const numberOfOptions = useMemo(
+    () => post.optionCount ?? '',
+    [post.optionCount]
   );
+  const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<
     string | undefined | null
   >('');
@@ -302,17 +304,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
   const fetchPostLatestData = useCallback(async () => {
     try {
-      const fetchPostPayload = new newnewapi.GetPostRequest({
-        postUuid: post.postUuid,
-      });
-
-      const res = await fetchPostByUUID(fetchPostPayload);
+      const res = await refetchPost();
 
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       if (res.data.auction) {
-        setTotalAmount(res.data.auction.totalAmount?.usdCents as number);
-        setNumberOfOptions(res.data.auction.optionCount as number);
         if (res.data.auction.status)
           handleUpdatePostStatus(res.data.auction.status);
       }
@@ -420,17 +416,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       }
     };
 
-    const socketHandlerPostData = (data: any) => {
+    const socketHandlerPostData = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostUpdated.decode(arr);
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
-        if (decoded.post?.auction?.totalAmount?.usdCents)
-          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents);
-        if (decoded.post?.auction?.optionCount)
-          setNumberOfOptions(decoded.post?.auction?.optionCount);
+        await fetchPostLatestData();
       }
     };
 
