@@ -58,6 +58,7 @@ interface IMcOptionsTab {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  canAddCustomOption: boolean;
   bundle?: newnewapi.IBundle;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
@@ -75,6 +76,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
+  canAddCustomOption,
   bundle,
   handleLoadOptions,
   handleRemoveOption,
@@ -422,7 +424,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  if (bundle) {
+                  if (canAddCustomOption) {
                     setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);
@@ -474,7 +476,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  if (bundle) {
+                  if (canAddCustomOption) {
                     setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);
