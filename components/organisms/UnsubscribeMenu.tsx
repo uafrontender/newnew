@@ -2,36 +2,45 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-// Components
 import Text from '../atoms/Text';
 import Headline from '../atoms/Headline';
-import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 import Button from '../atoms/Button';
+import logoAnimation from '../../public/animations/mobile_logo.json';
+import Lottie from '../atoms/Lottie';
 
 interface IUnsubscribeMenu {
   onConfirm: () => void;
 }
 
-const UnsubscribeMenu: React.FC<IUnsubscribeMenu> = React.memo(
-  ({ onConfirm }) => {
-    const { t } = useTranslation('page-Unsubscribe');
+const UnsubscribeMenu: React.FC<IUnsubscribeMenu> = ({ onConfirm }) => {
+  const { t } = useTranslation('page-Unsubscribe');
 
-    return (
-      <>
-        <SUnsubscribeMenu>
-          <AnimatedLogoEmailVerification isLoading={false} />
-          <SHeadline variant={3}>{t('heading')}</SHeadline>
-          <SSubheading variant={2} weight={600}>
-            {t('subheading')}
-          </SSubheading>
-          <SButton view='primaryGrad' onClick={onConfirm}>
-            {t('confirm')}
-          </SButton>
-        </SUnsubscribeMenu>
-      </>
-    );
-  }
-);
+  return (
+    <>
+      <SUnsubscribeMenu>
+        <SAnimationWrapper>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: false,
+              autoplay: false,
+              animationData: logoAnimation,
+            }}
+            isStopped
+          />
+        </SAnimationWrapper>
+        <SHeadline variant={3}>{t('heading')}</SHeadline>
+        <SSubheading variant={2} weight={600}>
+          {t('subheading')}
+        </SSubheading>
+        <SButton view='primaryGrad' onClick={onConfirm}>
+          {t('confirm')}
+        </SButton>
+      </SUnsubscribeMenu>
+    </>
+  );
+};
 
 export default UnsubscribeMenu;
 
@@ -62,7 +71,7 @@ const SUnsubscribeMenu = styled.div`
   ${({ theme }) => theme.media.laptopL} {
     /* top: calc(50% - 224px); */
     left: calc(50% - 304px);
-    margin-top: calc(50vh - 324px);
+    margin-top: calc(50vh - 305px);
 
     width: 608px;
     height: 448px;
@@ -73,6 +82,11 @@ const SUnsubscribeMenu = styled.div`
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     padding: 25px 60px 45px 60px;
   }
+`;
+
+const SAnimationWrapper = styled.div`
+  margin-top: 35px;
+  position: relative;
 `;
 
 const SHeadline = styled(Headline)`

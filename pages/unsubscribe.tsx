@@ -69,19 +69,16 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
   }, [unsubscribed, token, showErrorToastCustom, t]);
 
   useEffect(() => {
-    if (!unsubscribed) {
-      return;
-    }
-
     authLayoutContext.setShouldHeroUnmount(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unsubscribed]);
+  }, []);
 
   // A Delay allows to cancel first request when the second full re-render happens
   useEffect(() => {
     const timer = setTimeout(() => {
       handleUnsubscribe();
     }, 100);
+
     return () => clearTimeout(timer);
   }, [handleUnsubscribe]);
 
