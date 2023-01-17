@@ -101,6 +101,22 @@ export const createCustomOption = (
     signal ?? undefined
   );
 
+export const canCreateCustomOption = (
+  payload: newnewapi.CanCreateCustomMcOptionRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.CanCreateCustomMcOptionRequest,
+    newnewapi.CanCreateCustomMcOptionResponse
+  >(
+    newnewapi.CanCreateCustomMcOptionRequest,
+    newnewapi.CanCreateCustomMcOptionResponse,
+    `${BASE_URL_MULTICHOICE}/can_create_custom_mc_option`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
+
 export const voteWithBundleVotes = (
   payload: newnewapi.VoteOnPostRequest,
   signal?: RequestInit['signal']
