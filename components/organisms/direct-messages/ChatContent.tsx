@@ -82,6 +82,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
   const [isSubscriptionExpired, setIsSubscriptionExpired] =
     useState<boolean>(false);
 
@@ -231,6 +232,10 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     chatRoom.myRole,
   ]);
 
+  const handleTextareaFocused = useCallback(() => {
+    setTextareaFocused(true);
+  }, []);
+
   return (
     <SContainer>
       <ChatContentHeader
@@ -240,7 +245,11 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
         onUserBlock={onUserBlock}
       />
 
-      <ChatAreaCenter chatRoom={chatRoom} isAnnouncement={isAnnouncement} />
+      <ChatAreaCenter
+        chatRoom={chatRoom}
+        isAnnouncement={isAnnouncement}
+        textareaFocused={textareaFocused}
+      />
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
           chatRoom.visavis && (
@@ -261,6 +270,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
                 onChange={handleChange}
                 placeholder={t('chat.placeholder')}
                 gotMaxLength={handleSubmit}
+                setTextareaFocused={handleTextareaFocused}
               />
             </STextArea>
             <SButton
@@ -310,14 +320,23 @@ export default ChatContent;
 const SContainer = styled.div`
   height: 100%;
   display: flex;
-  position: relative;
   flex-direction: column;
+  position: relative;
+  padding: 80px 0 82px;
+  /* margin-bottom: 82px;
+  margin-top: 80px; */
+  /* padding-bottom: 100px; */
 `;
 
 const SBottomPart = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 24px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  padding: 10px 24px 24px;
 `;
 
 const SBottomTextarea = styled.div`

@@ -78,11 +78,11 @@ const SContent = styled.div`
   height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   margin: 0 -15px;
-  padding: 0 0 24px;
+  padding: 0;
   ${(props) => props.theme.media.laptop} {
     height: 100%;
     width: calc(100% - 384px);
-    padding-bottom: 24px;
+    /* padding-bottom: 24px; */
     margin: 0 0 0 auto;
     border-radius: ${(props) => props.theme.borderRadius.large};
   }

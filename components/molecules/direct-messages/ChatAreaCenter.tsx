@@ -1,16 +1,15 @@
 import React, { useEffect, useContext, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 
 import Loader from '../../atoms/Loader';
 import { SocketContext } from '../../../contexts/socketContext';
-import isSafari from '../../../utils/isSafari';
 import getDisplayname from '../../../utils/getDisplayname';
-import { useAppSelector } from '../../../redux-store/store';
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
+import { isIOSMikhail } from '../../../utils/isIOS';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -21,22 +20,20 @@ const ChatMessage = dynamic(
 interface IChatAreaCenter {
   chatRoom: newnewapi.IChatRoom;
   isAnnouncement?: boolean;
+  textareaFocused: boolean;
 }
 
 const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   chatRoom,
   isAnnouncement,
+  textareaFocused,
 }) => {
   const { ref: scrollRef, inView } = useInView();
   const socketConnection = useContext(SocketContext);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
 
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useChatRoomMessages({
-      limit: 30,
+      limit: 5,
       roomId: chatRoom?.id,
     });
 
@@ -73,6 +70,20 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     }
   }, [inView, isLoading, hasNextPage, fetchNextPage]);
 
+  // useUpdateEffect(() => {
+  //   if (
+  //     isMobile &&
+  //     isSafari() &&
+  //     messages.length > 0 &&
+  //     messagesScrollContainerRef.current
+  //   ) {
+  //     messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
+  //     setTimeout(() => {
+  //       messagesScrollContainerRef.current!!.style.cssText = `flex:0 0 calc(100vh - 160px);`;
+  //     }, 5);
+  //   }
+  // }, [messages]);
+
   // useEffect(() => {
   //   if (newMessage && isBrowser()) {
   //     setTimeout(() => {
@@ -85,22 +96,24 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   // }, [newMessage]);
 
   // fix for container scrolling on Safari iOS
-  useEffect(() => {
-    if (
-      messages.length > 0 &&
-      messagesScrollContainerRef.current &&
-      isMobile &&
-      isSafari()
-    ) {
-      messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
-      setTimeout(() => {
-        messagesScrollContainerRef.current!!.style.cssText = `flex:1;`;
-      }, 5);
-    }
-  }, [messages, isMobile]);
+  // useEffect(() => {
+  //   if (
+  //     messages.length > 0 &&
+  //     messagesScrollContainerRef.current &&
+  //     isMobile &&
+  //     isSafari()
+  //   ) {
+  //     messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
+  //     setTimeout(() => {
+  //       messagesScrollContainerRef.current!!.style.cssText = `flex:1;`;
+  //     }, 10);
+  //   }
+  // }, [messages, isMobile]);
 
   return (
     <SContainer
+      isIOS={isIOSMikhail()}
+      textareaFocused={textareaFocused}
       ref={(el) => {
         messagesScrollContainerRef.current = el!!;
       }}
@@ -130,14 +143,27 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 
 export default ChatAreaCenter;
 
-const SContainer = styled.div`
+interface ISContainer {
+  textareaFocused: boolean;
+  isIOS: boolean;
+}
+const SContainer = styled.div<ISContainer>`
   flex: 1;
-  margin: 0 0 24px;
+  ${({ textareaFocused, isIOS }) =>
+    !textareaFocused && isIOS
+      ? css`
+          margin: 0 0 100px;
+        `
+      : css`
+          margin: 80px 0 0;
+        `};
   display: flex;
   overflow-y: auto;
   flex-direction: column-reverse;
   padding: 0 12px;
   position: relative;
+  height: calc(100vh - 300px);
+  min-height: calc(100vh - 300px);
   ::-webkit-scrollbar {
     display: none;
   }

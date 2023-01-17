@@ -205,6 +205,12 @@ export default ChatContentHeader;
 
 const STopPart = styled.header`
   height: 80px;
+  z-index: 1;
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   border-bottom: 1px solid
     ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;

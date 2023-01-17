@@ -7,8 +7,6 @@ import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import isSafari from '../../../utils/isSafari';
-import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 
 interface ITextArea {
@@ -19,13 +17,10 @@ interface ITextArea {
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
   gotMaxLength?: () => void;
+  setTextareaFocused?: () => void;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
   const {
     id = '',
     maxlength,
@@ -34,6 +29,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     onChange,
     placeholder,
     gotMaxLength,
+    setTextareaFocused,
   } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
@@ -55,10 +51,6 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     [id, onChange, isShiftEnter]
   );
 
-  function preventScroll(e: any) {
-    e.preventDefault();
-  }
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       /* eslint-disable no-unused-expressions */
@@ -73,19 +65,9 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     [gotMaxLength, value.length]
   );
 
-  const handleBlur = useCallback(() => {
-    if (isSafari() && isMobile)
-      document.body.removeEventListener('touchmove', preventScroll);
-  }, [isMobile]);
-
   const handleFocus = useCallback(() => {
-    if (isSafari() && isMobile)
-      setTimeout(() => {
-        document.body.addEventListener('touchmove', preventScroll, {
-          passive: false,
-        });
-      }, 500);
-  }, [isMobile]);
+    setTextareaFocused?.();
+  }, [setTextareaFocused]);
 
   return (
     <SWrapper>
@@ -102,7 +84,6 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           maxLength={maxlength}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-          onBlur={handleBlur}
         />
       </SContent>
       {error ? (
@@ -124,6 +105,7 @@ TextArea.defaultProps = {
   error: '',
   maxlength: 524288,
   gotMaxLength: () => {},
+  setTextareaFocused: () => {},
 };
 
 const SWrapper = styled.div`
