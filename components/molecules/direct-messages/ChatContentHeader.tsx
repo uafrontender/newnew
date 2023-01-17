@@ -103,6 +103,9 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
       setActiveChatRoom(null);
     }
     if (activeChatRoom && (!isDashboard || mobileChatOpened)) {
+      if (isMobileOrTablet) {
+        router.push(`/direct-messages`);
+      }
       setActiveChatRoom(null);
       setHiddenMessagesArea(true);
     }
@@ -113,6 +116,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     isDashboard,
     router,
     mobileChatOpened,
+    isMobileOrTablet,
   ]);
 
   const handleUserClick = useCallback(() => {

@@ -36,6 +36,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useChatRoomMessages({
+      limit: 30,
       roomId: chatRoom?.id,
     });
 
