@@ -531,8 +531,8 @@
   "acPostModeration": {
     "postTopInfo": {
       "selectWinner": {
-        "title": "¡Es hora de elegir!",
-        "body": "Selecciona tu oferta favorita y sube un video de respuesta antes de que se acabe el tiempo"
+        "title": "¡Hora de elegir!",
+        "body": "Elige tu oferta favorita antes de que se acabe el tiempo"
       }
     },
     "optionsTab": {
