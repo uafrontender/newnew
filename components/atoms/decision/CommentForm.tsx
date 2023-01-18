@@ -52,7 +52,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
 };
 
 interface ICommentForm {
-  postUuid?: string;
+  postUuidOrShortId?: string;
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
@@ -62,7 +62,10 @@ interface ICommentForm {
 }
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
-  ({ postUuid, position, zIndex, isRoot, onBlur, onFocus, onSubmit }, ref) => {
+  (
+    { postUuidOrShortId, position, zIndex, isRoot, onBlur, onFocus, onSubmit },
+    ref
+  ) => {
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('page-Post');
@@ -158,7 +161,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
               `/sign-up?reason=comment&redirect=${encodeURIComponent(
                 `${process.env.NEXT_PUBLIC_APP_URL}/${
                   router.locale !== 'en-US' ? `${router.locale}/` : ''
-                }p/${postUuid}?comment_content=${commentText}#comments`
+                }p/${postUuidOrShortId}?comment_content=${commentText}#comments`
               )}`
             );
           }
@@ -170,6 +173,25 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [commentText, user.loggedIn, user._persist?.rehydrated, onSubmit, isRoot]
+    );
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLFormElement>) => {
+        if (!isMobileOrTablet) {
+          if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
+            if (commentText.charCodeAt(commentText.length - 1) === 10) {
+              setCommentText((curr) => curr.slice(0, -1));
+            }
+          } else if (e.key === 'Enter') {
+            handleSubmit(e);
+          }
+        } else if (e.key === 'Enter' && commentText.length > 0) {
+          if (commentText.charCodeAt(commentText.length - 1) === 10) {
+            setCommentText((curr) => curr.slice(0, -1));
+          }
+        }
+      },
+      [commentText, handleSubmit, isMobileOrTablet]
     );
 
     // TODO: Add loading state for mobile button on mobile
@@ -213,17 +235,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         }}
         position={position}
         zIndex={zIndex}
-        onKeyDown={(e) => {
-          if (!isMobileOrTablet) {
-            if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
-              if (commentText.charCodeAt(commentText.length - 1) === 10) {
-                setCommentText((curr) => curr.slice(0, -1));
-              }
-            } else if (e.key === 'Enter') {
-              handleSubmit(e);
-            }
-          }
-        }}
+        onKeyDown={handleKeyDown}
       >
         <SInputWrapper>
           <CommentTextArea
@@ -284,7 +296,7 @@ CommentForm.defaultProps = {
   zIndex: undefined,
   position: undefined,
   isRoot: false,
-  postUuid: '',
+  postUuidOrShortId: '',
 };
 
 const SInlineSVG = styled(InlineSVG)``;

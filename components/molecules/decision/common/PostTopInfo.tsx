@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
+// TODO: Re-enable SMS related logic once new SMS service is integrated
+// TODO: Move SMS related logic to a component once new SMS service is integrated
 import React, {
   useCallback,
-  useContext,
   useMemo,
   useState,
   useRef,
+  // useEffect,
+  // useContext,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -29,19 +30,50 @@ import PostShareEllipseModal from './PostShareEllipseModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 
+// import NotificationIconFilled from '../../../../public/images/svg/icons/filled/Notifications.svg';
+// import NotificationIconOutlined from '../../../../public/images/svg/icons/outlined/Notifications.svg';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 import { formatNumber } from '../../../../utils/format';
 import { markPost } from '../../../../api/endpoints/post';
-import { FollowingsContext } from '../../../../contexts/followingContext';
 import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { I18nNamespaces } from '../../../../@types/i18next';
+/* import getGuestId from '../../../../utils/getGuestId';
+ import {
+  getGuestSmsNotificationsSubscriptionStatus,
+  getSmsNotificationsSubscriptionStatus,
+  subscribeGuestToSmsNotifications,
+  subscribeToSmsNotifications,
+  unsubscribeFromSmsNotifications,
+  unsubscribeGuestFromSmsNotifications,
+} from '../../../../api/endpoints/phone'; 
+import SmsNotificationModal, {
+  SubscriptionToPost,
+} from '../../profile/SmsNotificationModal'; 
+import { SocketContext } from '../../../../contexts/socketContext';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import Tooltip from '../../../atoms/Tooltip';
+
+const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
+const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
+
+ const getSmsNotificationSubscriptionErrorMessage = (
+  status?: newnewapi.SmsNotificationsStatus
+) => {
+  switch (status) {
+    case newnewapi.SmsNotificationsStatus.UNKNOWN_STATUS:
+      return 'smsNotifications.error.requestFailed';
+    default:
+      return 'smsNotifications.error.requestFailed';
+  }
+}; */
 
 const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.common.ac.darkAcAnimated,
@@ -56,6 +88,7 @@ const LIGHT_IMAGES: Record<string, () => string> = {
 };
 
 interface IPostTopInfo {
+  // subscription: SubscriptionToPost;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
@@ -64,6 +97,7 @@ interface IPostTopInfo {
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
+  //  subscription,
   totalVotes,
   totalPledges,
   targetPledges,
@@ -76,22 +110,32 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  // const socketConnection = useContext(SocketContext);
+  // const { showErrorToastCustom } = useErrorToasts();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  // const isTablet = ['tablet'].includes(resizeMode);
+
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
     typeOfPost,
     postStatus,
     isFollowingDecision,
-    hasRecommendations,
+    // hasRecommendations,
     handleReportOpen,
     handleSetIsFollowingDecision,
     handleCloseAndGoBack,
   } = usePostInnerState();
 
-  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postUuid = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postShortId = useMemo(
+    () => postParsed?.postShortId ?? '',
+    [postParsed]
+  );
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
   const creator = useMemo(() => postParsed?.creator!!, [postParsed]);
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
@@ -135,33 +179,43 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     () => postType === 'ac' && postStatus === 'waiting_for_decision',
     [postType, postStatus]
   );
+  /* const [notificationTooltipVisible, setNotificationTooltipVisible] =
+    useState(false);
 
-  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
-
+  const [subscribedToSmsNotifications, setSubscribedToSmsNotifications] =
+    useState(false);
+  const [smsNotificationModalOpen, setSmsNotificationModalOpen] =
+    useState(false); */
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+
+  /* const handleCloseSmsNotificationModal = useCallback(
+    () => setSmsNotificationModalOpen(false),
+    []
+  ); */
 
   const handleOpenShareMenu = () => {
     Mixpanel.track('Opened Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(true);
   };
+
   const handleCloseShareMenu = useCallback(() => {
     Mixpanel.track('Close Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleOpenEllipseMenu = () => {
     Mixpanel.track('Open Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(true);
@@ -169,17 +223,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseEllipseMenu = useCallback(() => {
     Mixpanel.track('Close Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleFollowDecision = useCallback(async () => {
     try {
       Mixpanel.track('Favorite Post', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'PostTopInfo',
       });
 
@@ -196,7 +250,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         markAs: !isFollowingDecision
           ? newnewapi.MarkPostRequest.Kind.FAVORITE
           : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-        postUuid: postId,
+        postUuid,
       });
 
       const res = await markPost(markAsFavoritePayload);
@@ -204,13 +258,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       if (!res.error) {
         handleSetIsFollowingDecision(!isFollowingDecision);
       }
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
   }, [
     handleSetIsFollowingDecision,
+    promptUserWithPushNotificationsPermissionModal,
     isFollowingDecision,
-    postId,
+    postUuid,
     router,
     user.loggedIn,
     user._persist?.rehydrated,
@@ -219,7 +278,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleSeeNewFailedBox = useCallback(() => {
     Mixpanel.track('See New Failde Box', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     if (router.pathname === '/') {
@@ -228,8 +287,275 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       router.push('/');
     }
     // }
-  }, [router, postId, handleCloseAndGoBack]);
+  }, [router, postUuid, handleCloseAndGoBack]);
 
+  // TODO: Add a hook for handling sms notifications status
+  /* const submitPhoneSmsNotificationsRequest = useCallback(
+    async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
+      try {
+        if (!user.loggedIn) {
+          const guestId = getGuestId();
+
+          const res = await subscribeGuestToSmsNotifications(
+            { postUuid: subscription.postUuid },
+            guestId,
+            phoneNumber
+          );
+
+          if (
+            !res.data ||
+            res.error ||
+            (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+              res.data.status !==
+                newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(
+                  getSmsNotificationSubscriptionErrorMessage(
+                    res.data?.status
+                  ) as any
+                )
+            );
+          }
+
+          // TODO: set on phone number confirmed (on polling returns a confirmed number)
+          localStorage.setItem(
+            SAVED_PHONE_COUNTRY_CODE_KEY,
+            phoneNumber.countryCode
+          );
+          localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
+        } else {
+          const res = await subscribeToSmsNotifications(
+            { postUuid: subscription.postUuid },
+            phoneNumber
+          );
+
+          if (
+            !res.data ||
+            res.error ||
+            (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+              res.data.status !==
+                newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+          ) {
+            throw new Error(
+              res.error?.message ??
+                t(
+                  getSmsNotificationSubscriptionErrorMessage(
+                    res.data?.status
+                  ) as any
+                )
+            );
+          }
+        }
+
+        return phoneNumber.number;
+      } catch (err: any) {
+        console.error(err);
+        showErrorToastCustom(err.message);
+        // Rethrow for a child
+        throw err;
+      }
+    },
+    [user.loggedIn, showErrorToastCustom, subscription.postUuid, t]
+  ); 
+
+  const handleSmsNotificationButtonClicked = useCallback(async () => {
+    Mixpanel.track('Opened SMS Notification Menu', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostTopInfo',
+    });
+
+    if (subscribedToSmsNotifications) {
+      if (!user.loggedIn) {
+        const guestId = getGuestId();
+        const res = await unsubscribeGuestFromSmsNotifications(
+          { postUuid: subscription.postUuid },
+          guestId
+        );
+
+        if (!res.data || res.error) {
+          console.error('Unsubscribe from SMS failed');
+          showErrorToastCustom(tCommon('smsNotifications.error.requestFailed'));
+        }
+      } else {
+        const res = await unsubscribeFromSmsNotifications({
+          postUuid: subscription.postUuid,
+        });
+
+        if (!res.data || res.error) {
+          console.error('Unsubscribe from SMS failed');
+          showErrorToastCustom(tCommon('smsNotifications.error.requestFailed'));
+        }
+      }
+    } else if (!user.loggedIn) {
+      const countryCode = localStorage.getItem(SAVED_PHONE_COUNTRY_CODE_KEY);
+      const number = localStorage.getItem(SAVED_PHONE_NUMBER_KEY);
+
+      if (countryCode && number) {
+        const phoneNumber = new newnewapi.PhoneNumber({
+          countryCode,
+          number,
+        });
+        submitPhoneSmsNotificationsRequest(phoneNumber);
+      } else {
+        setSmsNotificationModalOpen(true);
+      }
+    } else if (user.userData?.options?.isPhoneNumberConfirmed) {
+      try {
+        const res = await subscribeToSmsNotifications({
+          postUuid: subscription.postUuid,
+        });
+
+        if (
+          !res.data ||
+          res.error ||
+          (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
+            res.data.status !==
+              newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
+        ) {
+          throw new Error(
+            res.error?.message ??
+              tCommon(
+                getSmsNotificationSubscriptionErrorMessage(
+                  res.data?.status
+                ) as any
+              )
+          );
+        }
+      } catch (err: any) {
+        console.error(err);
+        showErrorToastCustom(err.message);
+      }
+    } else {
+      setSmsNotificationModalOpen(true);
+    }
+  }, [
+    postUuid,
+    subscribedToSmsNotifications,
+    user.loggedIn,
+    user.userData?.options?.isPhoneNumberConfirmed,
+    subscription.postUuid,
+    showErrorToastCustom,
+    tCommon,
+    submitPhoneSmsNotificationsRequest,
+  ]);
+
+  useEffect(() => {
+    if (!user._persist?.rehydrated) {
+      return () => {};
+    }
+
+    if (!user.loggedIn) {
+      const pollGuestSmsSubscriptionStatus = async () => {
+        const guestId = getGuestId();
+        const res = await getGuestSmsNotificationsSubscriptionStatus(
+          { postUuid: subscription.postUuid },
+          guestId
+        );
+        console.log(res.data);
+        if (!res.data || res.error) {
+          console.error('Unable to get sms notifications status');
+          throw new Error('Request failed');
+        }
+        console.log(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+        setSubscribedToSmsNotifications(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+      };
+
+      pollGuestSmsSubscriptionStatus()
+        .then(() => {
+          const pollingInterval = setInterval(() => {
+            pollGuestSmsSubscriptionStatus().catch(() => {
+              clearInterval(pollingInterval);
+            });
+          }, 5000);
+
+          return () => {
+            clearInterval(pollingInterval);
+          };
+        })
+        .catch(() => {
+          // Do nothing
+        });
+    } else {
+      getSmsNotificationsSubscriptionStatus({
+        postUuid: subscription.postUuid,
+      }).then((res) => {
+        if (!res.data || res.error) {
+          console.error('Unable to get sms notifications status');
+          return;
+        }
+
+        setSubscribedToSmsNotifications(
+          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
+        );
+      });
+    }
+
+    return () => {};
+  }, [
+    user._persist?.rehydrated,
+    user.loggedIn,
+    subscription.postUuid,
+    tCommon,
+  ]);
+
+  useEffect(() => {
+    const handleSubscribedToSms = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.SmsNotificationsSubscribed.decode(arr);
+
+      if (!decoded) return;
+
+      if (decoded.object?.postUuid === subscription.postUuid) {
+        setSubscribedToSmsNotifications(true);
+      }
+    };
+
+    const handleUnsubscribedFromSms = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.SmsNotificationsUnsubscribed.decode(arr);
+
+      if (!decoded) return;
+
+      if (decoded.object?.postUuid === subscription.postUuid) {
+        setSubscribedToSmsNotifications(false);
+      }
+
+      if (decoded.object && !decoded.object.postUuid) {
+        // Unsubscribed from all
+        setSubscribedToSmsNotifications(false);
+      }
+    };
+
+    if (socketConnection && user.loggedIn) {
+      socketConnection?.on('SmsNotificationsSubscribed', handleSubscribedToSms);
+      socketConnection?.on(
+        'SmsNotificationsUnsubscribed',
+        handleUnsubscribedFromSms
+      );
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+        socketConnection?.off(
+          'SmsNotificationsSubscribed',
+          handleSubscribedToSms
+        );
+        socketConnection?.off(
+          'SmsNotificationsUnsubscribed',
+          handleUnsubscribedFromSms
+        );
+      }
+    };
+  }, [user.loggedIn, subscription.postUuid, socketConnection]); 
+
+  const notificationButtonRef: any = useRef(); */
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
 
@@ -257,7 +583,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator avatar', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -276,7 +602,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator username', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -298,14 +624,38 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </Link>
         </SCreatorCard>
         <SActionsDiv>
-          <SShareButton
+          {/*
+          {notificationTooltipVisible && !isMobile && !isTablet && (
+            <Tooltip target={notificationButtonRef}>
+              {t('postTopInfo.notifyMe')}
+            </Tooltip>
+          )}
+           <SButton
             view='transparent'
             iconOnly
             withDim
             withShrink
-            style={{
-              padding: '8px',
-            }}
+            onClick={handleSmsNotificationButtonClicked}
+            onMouseEnter={() => setNotificationTooltipVisible(true)}
+            onMouseLeave={() => setNotificationTooltipVisible(false)}
+            ref={notificationButtonRef}
+          >
+            <InlineSvg
+              svg={
+                subscribedToSmsNotifications
+                  ? NotificationIconFilled
+                  : NotificationIconOutlined
+              }
+              fill={theme.colorsThemed.text.secondary}
+              width='20px'
+              height='20px'
+            />
+            </SButton> */}
+          <SButtonEnabling
+            view='transparent'
+            iconOnly
+            withDim
+            withShrink
             onClick={() => handleOpenShareMenu()}
             ref={shareButtonRef}
           >
@@ -315,8 +665,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               width='20px'
               height='20px'
             />
-          </SShareButton>
-          <SMoreButton
+          </SButtonEnabling>
+          <SButtonEnabling
             view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
@@ -328,11 +678,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               width='20px'
               height='20px'
             />
-          </SMoreButton>
+          </SButtonEnabling>
+          {/* <SmsNotificationModal
+            show={smsNotificationModalOpen}
+            subscription={subscription}
+            onSubmit={submitPhoneSmsNotificationsRequest}
+            onClose={handleCloseSmsNotificationModal}
+          /> */}
           {/* Share menu */}
           {!isMobile && (
             <PostShareEllipseMenu
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
               anchorElement={shareButtonRef.current}
@@ -342,7 +699,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               onClose={handleCloseShareMenu}
             />
           ) : null}
@@ -458,7 +816,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: max-content 1fr 100px;
+    grid-template-columns: max-content 1fr max-content;
     align-items: center;
 
     margin-bottom: 0px;
@@ -553,27 +911,39 @@ const SActionsDiv = styled.div`
   justify-content: flex-end;
 `;
 
-const SShareButton = styled(Button)`
-  background: none;
-  padding: 0px;
-  &:focus:enabled {
-    background: ${({ theme, view }) =>
-      view ? theme.colorsThemed.button.background[view] : ''};
-  }
-`;
-
-const SMoreButton = styled(Button)`
+/* const SButton = styled(Button)`
   background: none;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
+  svg {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  }
+
+  margin-left: 4px;
   padding: 8px;
 
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  &:focus:enabled {
+    background: none;
+  }
+
+  &:hover:enabled {
+    background: ${({ theme, view }) =>
+      view ? theme.colorsThemed.button.background[view] : ''};
+  }
+`; */
+
+const SButtonEnabling = styled(Button)`
+  background: none;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  margin-left: 4px;
+  padding: 8px;
+
+  &:focus:enabled {
+    background: ${({ theme, view }) =>
+      view ? theme.colorsThemed.button.background[view] : ''};
   }
 `;
 

@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
   fetchCurrentBidsForPost,
   placeBidOnAuction,
@@ -41,7 +41,9 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import getDisplayname from '../../../../utils/getDisplayname';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -98,6 +100,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
   const router = useRouter();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -149,8 +153,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
   const [triedLoading, setTriedLoading] = useState(false);
-
-  // const currLocation = `/p/${post.postUuid}`;
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -353,33 +355,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     }
   };
 
-  // Mark post as viewed if logged in
-  useEffect(() => {
-    async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-        return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-
-        if (res.error) throw new Error('Failed to mark post as viewed');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [post, user.loggedIn, user.userData?.userUuid]);
+  /* const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postUuid: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  ); */
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -550,7 +533,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -661,6 +644,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
+            /* subscription={subscription} */
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -697,7 +681,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
@@ -707,6 +691,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
+            /* subscription={subscription} */
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -747,6 +732,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
+                  /* subscription={subscription} */
                   amountInBids={totalAmount}
                   hasWinner={!!post.winningOptionId}
                 />
@@ -761,7 +747,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             </PostVotingTab>
           </div>
           <AcOptionsTab
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             postStatus={postStatus}
             postText={post.title}
             postCreatorName={getDisplayname(post.creator)}
@@ -782,7 +769,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           />
           {postStatus === 'voting' && (
             <AcAddNewOption
-              postId={post.postUuid}
+              postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               postStatus={postStatus}
               postText={post.title}
               postCreator={getDisplayname(post.creator)}
@@ -815,9 +803,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
+              promptUserWithPushNotificationsPermissionModal();
             }}
           >
             {t('paymentSuccessModal.ac', {
@@ -845,6 +834,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           </SCommentsHeadline>
           <CommentsBottomSection
             postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}
@@ -886,15 +876,27 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   position: relative;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    'back timer'
+    'endsOn endsOn';
   justify-content: center;
   flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 `;
 
 const SEndDate = styled.div`
+  grid-area: endsOn;
   width: 100%;
   text-align: center;
   padding: 8px 0px;
@@ -906,9 +908,10 @@ const SEndDate = styled.div`
 `;
 
 const SGoBackButton = styled(GoBackButton)`
-  position: absolute;
-  left: 0;
-  top: 4px;
+  grid-area: back;
+  position: relative;
+  top: -4px;
+  left: -8px;
 `;
 
 const SActivitiesContainer = styled.div`

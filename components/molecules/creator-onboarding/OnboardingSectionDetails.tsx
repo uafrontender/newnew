@@ -568,7 +568,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
             isLoaded: true,
           })
         );
-        router.push('/creator/dashboard');
+        router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
     } catch (err) {
       console.error(err);
@@ -922,7 +922,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         {(isMobile || isTablet) && (
           <CheckboxWithALink
             label={t('detailsSection.agreedToTosCheckbox')}
-            linkText='NewNew’s terms'
+            linkText={t('detailsSection.linkText')}
             value={agreedToTos}
             onLinkClicked={() => setTermsVisible(true)}
             onToggled={() => setAgreedToTos(!agreedToTos)}
@@ -942,7 +942,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
             <CheckboxWithALink
               id='tos-checkbox'
               label={t('detailsSection.agreedToTosCheckbox')}
-              linkText={"NewNew's terms"}
+              linkText={t('detailsSection.linkText')}
               value={agreedToTos}
               onLinkClicked={() => setTermsVisible(true)}
               onToggled={() => setAgreedToTos(!agreedToTos)}

@@ -25,7 +25,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 interface IAcOptionsTabModeration {
-  postId: string;
+  postUuid: string;
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
@@ -40,7 +40,7 @@ interface IAcOptionsTabModeration {
 const AcOptionsTabModeration: React.FunctionComponent<
   IAcOptionsTabModeration
 > = ({
-  postId,
+  postUuid,
   postStatus,
   options,
   optionsLoading,
@@ -77,7 +77,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
   ) => {
     try {
       const payload = new newnewapi.SelectWinningOptionRequest({
-        postUuid: postId,
+        postUuid,
         winningOptionId: winningOption.id,
       });
 
@@ -175,7 +175,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
                 onClickCapture={() => {
                   Mixpanel.track('Click Load More', {
                     _stage: 'Post',
-                    _postUuid: postId,
+                    _postUuid: postUuid,
                     _component: 'AcOptionsTabModeration',
                   });
                 }}

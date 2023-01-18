@@ -29,6 +29,8 @@ import PopularTagsResults from './PopularTagsResults';
 import getChunks from '../../../utils/getChunks/getChunks';
 import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
+import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -67,6 +69,10 @@ const SearchInput: React.FC = React.memo(() => {
   ].includes(resizeMode);
 
   const handleSeeResults = (query: string) => {
+    Mixpanel.track('Search All Results Clicked', {
+      _query: query,
+    });
+
     const chunks = getChunks(query);
     const firstChunk = chunks[0];
     const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
@@ -74,20 +80,23 @@ const SearchInput: React.FC = React.memo(() => {
     if (isHashtag) {
       router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
     } else {
-      const clearedQuery = encodeURIComponent(query);
+      const encodedQuery = encodeURIComponent(query);
       if (resultsPosts.length === 0 && resultsCreators.length > 0) {
-        router.push(`/search?query=${clearedQuery}&tab=creators`);
+        router.push(`/search?query=${encodedQuery}&tab=creators`);
       } else {
-        router.push(`/search?query=${clearedQuery}&tab=posts`);
+        router.push(`/search?query=${encodedQuery}&tab=posts`);
       }
     }
   };
 
   const handleSearchClick = useCallback(() => {
+    Mixpanel.track('Search Clicked');
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
 
   const handleSearchClose = () => {
+    Mixpanel.track('Search Closed');
+
     setSearchValue('');
     dispatch(setGlobalSearchActive(false));
   };
@@ -101,8 +110,9 @@ const SearchInput: React.FC = React.memo(() => {
       handleSearchClose();
     }
 
-    if (e.keyCode === 13 && searchValue) {
-      handleSeeResults(searchValue);
+    const clearedSearchValue = getClearedSearchQuery(searchValue);
+    if (e.keyCode === 13 && clearedSearchValue) {
+      handleSeeResults(clearedSearchValue);
       closeSearch();
     }
   };
@@ -183,10 +193,11 @@ const SearchInput: React.FC = React.memo(() => {
   }
 
   useEffect(() => {
-    if (searchValue) {
-      getQuickSearchResult(searchValue);
+    const clearedSearchValue = getClearedSearchQuery(searchValue);
+    if (clearedSearchValue) {
+      getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
-    } else if (!searchValue && !isMobileOrTablet) {
+    } else if (!clearedSearchValue && !isMobileOrTablet) {
       setIsResultsDropVisible(false);
       resetResults();
     }
@@ -304,7 +315,13 @@ const SearchInput: React.FC = React.memo(() => {
                   <PopularTagsResults hashtags={resultsHashtags} />
                 )}
                 <SButton
-                  onClick={() => handleSeeResults(searchValue)}
+                  onClick={() => {
+                    const clearedSearchValue =
+                      getClearedSearchQuery(searchValue);
+                    if (clearedSearchValue) {
+                      handleSeeResults(clearedSearchValue);
+                    }
+                  }}
                   view='quaternary'
                 >
                   {t('search.allResults')}
@@ -348,7 +365,12 @@ const SearchInput: React.FC = React.memo(() => {
                 <PopularTagsResults hashtags={resultsHashtags} />
               )}
               <SButton
-                onClick={() => handleSeeResults(searchValue)}
+                onClick={() => {
+                  const clearedSearchValue = getClearedSearchQuery(searchValue);
+                  if (clearedSearchValue) {
+                    handleSeeResults(clearedSearchValue);
+                  }
+                }}
                 view='quaternary'
               >
                 {t('search.allResults')}

@@ -101,6 +101,10 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, []);
 
   const markNotificationAsRead = useCallback(async (notificationId: number) => {
+    if (!notificationId) {
+      return;
+    }
+
     try {
       const payload = new newnewapi.MarkAsReadRequest({
         notificationIds: [notificationId],
@@ -110,7 +114,12 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      setUnreadNotifications(null);
+
+      setUnreadNotifications((curr) => {
+        const arr = curr ? [...curr] : [];
+        const result = arr.filter((item) => item !== notificationId);
+        return result;
+      });
     } catch (err) {
       console.error(err);
     }
@@ -128,6 +137,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     }
   }, [inView, loading, hasMore, loadMore]);
 
+  // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2)
@@ -393,7 +403,9 @@ const SRef = styled.span`
 
 const SInlineSvg = styled(InlineSvg)`
   display: inline-flex;
-  transform: translateY(4px);
+  transform: translateY(6px);
   margin-left: 2px;
-  margin-top: -2px;
+  margin-top: -6px;
+  width: 20px;
+  height: 20px;
 `;

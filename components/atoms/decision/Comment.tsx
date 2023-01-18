@@ -315,6 +315,9 @@ const SComment = styled.div`
 
   width: 100%;
 
+  // For scrollIntoView when comment_id is provided in URL
+  scroll-margin-top: -320px;
+
   &.opened-flash {
     &::before {
       content: '';
@@ -408,7 +411,7 @@ const SText = styled.div`
 
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  word-break: break-all;
+  word-break: break-word;
   user-select: text;
 `;
 

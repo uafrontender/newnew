@@ -7,6 +7,7 @@ import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 
 interface ISearchInput {
   placeholderText: string;
@@ -50,7 +51,10 @@ const SearchInput: React.FC<ISearchInput> = ({
   };
 
   useEffect(() => {
-    if (passInputValue) passInputValue(searchValue);
+    if (passInputValue) {
+      const clearedSearchValue = getClearedSearchQuery(searchValue);
+      passInputValue(clearedSearchValue);
+    }
   }, [searchValue, passInputValue]);
 
   return (

@@ -16,6 +16,7 @@ import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import getDisplayname from '../../../utils/getDisplayname';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -53,6 +54,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
     if (!id) {
       return;
     }
+
     const payload = new newnewapi.MarkAsReadRequest({
       notificationIds: [id],
     });
@@ -60,8 +62,11 @@ const Notification: React.FC<newnewapi.INotification> = ({
     const res = await markAsRead(payload);
 
     if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+    setIsUnread(false);
   }, [id]);
 
+  // TODO: support for postShortId in routing target
   useEffect(() => {
     if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
@@ -84,7 +89,6 @@ const Notification: React.FC<newnewapi.INotification> = ({
       const MARK_AS_READ_DELAY = 3000;
       markAsReadTimeoutRef.current = setTimeout(() => {
         markNotificationAsRead();
-        setIsUnread(false);
       }, MARK_AS_READ_DELAY);
       return () => {
         if (markAsReadTimeoutRef.current) {
@@ -114,10 +118,10 @@ const Notification: React.FC<newnewapi.INotification> = ({
         <>
           <STitleText>{getDisplayname(content.relatedUser)}</STitleText>
           {content?.relatedUser?.isVerified && (
-            <SInlineSVG
+            <SVerificationSvg
               svg={VerificationCheckmark}
-              width='16px'
-              height='16px'
+              width='20px'
+              height='20px'
             />
           )}
         </>
@@ -125,7 +129,11 @@ const Notification: React.FC<newnewapi.INotification> = ({
     }
 
     if (content.relatedPost?.title) {
-      return <STitleText>{content.relatedPost.title}</STitleText>;
+      return (
+        <STitleText>
+          <PostTitleContent>{content.relatedPost.title}</PostTitleContent>
+        </STitleText>
+      );
     }
 
     return <STitleText>{t('title.newMessage')}</STitleText>;
@@ -267,7 +275,7 @@ const STitle = styled.div`
 const STitleText = styled.div`
   display: block;
   overflow: hidden;
-  white-space: nowrap;
+  white-space: pre;
   text-overflow: ellipsis;
 `;
 
@@ -346,6 +354,11 @@ const SIcon = styled.span`
     height: 40px;
     border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
   }
+`;
+
+const SVerificationSvg = styled(InlineSvg)`
+  min-width: 20px;
+  min-height: 20px;
 `;
 
 const SInlineSVG = styled(InlineSvg)`

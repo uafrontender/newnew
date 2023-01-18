@@ -195,7 +195,7 @@
     },
     "emptyInbox": {
       "title": "收件箱為空",
-      "text": "開啓新的對話後，對話會列在此處"
+      "text_NEED_TRANSLATION": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
     },
     "default": {
       "searchPlaceholder": "搜索"

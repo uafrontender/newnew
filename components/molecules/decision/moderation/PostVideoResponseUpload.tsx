@@ -10,13 +10,7 @@ import Caption from '../../../atoms/Caption';
 import InlineSVG from '../../../atoms/InlineSVG';
 import DeleteVideo from '../../creation/DeleteVideo';
 
-import { loadVideo } from '../../../../utils/loadVideo';
-
-import {
-  MAX_VIDEO_SIZE,
-  MIN_VIDEO_DURATION,
-  MAX_VIDEO_DURATION,
-} from '../../../../constants/general';
+import { MAX_VIDEO_SIZE } from '../../../../constants/general';
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
 // import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
@@ -70,14 +64,17 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     });
     inputRef.current?.click();
   }, []);
+
   const handleDeleteVideoShow = useCallback(() => {
     setShowVideoDelete(true);
     playerRef.current.pause();
   }, []);
+
   const handleCloseDeleteVideoClick = useCallback(() => {
     setShowVideoDelete(false);
     playerRef.current.play();
   }, []);
+
   const handleDeleteVideo = useCallback(() => {
     Mixpanel.track('Post Video Response Delete', {
       _stage: 'Post',
@@ -102,27 +99,21 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           t('postVideo.uploadResponseForm.video.error.maxSize')
         );
       } else {
-        const media: any = await loadVideo(file);
-
-        if (media.duration < MIN_VIDEO_DURATION) {
-          showErrorToastCustom(
-            t('postVideo.uploadResponseForm.video.error.minLength')
-          );
-        } else if (media.duration > MAX_VIDEO_DURATION) {
-          showErrorToastCustom(
-            t('postVideo.uploadResponseForm.video.error.maxLength')
-          );
-        } else {
-          setLocalFile(file);
-          handleItemChange(id, file);
-        }
+        setLocalFile(file);
+        handleItemChange(id, file);
       }
     },
     [showErrorToastCustom, t, handleItemChange, id]
   );
+
   const handleRetryVideoUpload = useCallback(() => {
     handleItemChange(id, localFile);
   }, [id, localFile, handleItemChange]);
+
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
@@ -212,7 +203,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             </SLoadingDescription>
             <SLoadingBottomBlockButton
               view='secondary'
-              onClick={handleCancelVideoUpload}
+              onClick={() => handleCancelUploadAndClearLocalFile()}
             >
               {t('postVideo.uploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
@@ -311,6 +302,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           </SButtonsContainer>
         </SFileBox>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
@@ -323,13 +316,13 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     postStatus,
     responseFileProcessingLoading,
     responseFileProcessingProgress,
+    localFile,
     handleFileChange,
     responseFileUploadETA,
     responseFileUploadProgress,
-    handleCancelVideoUpload,
+    handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    localFile,
     value,
     handleDeleteVideoShow,
   ]);

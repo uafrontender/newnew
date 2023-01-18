@@ -23,6 +23,7 @@ import { createCustomOption } from '../../../../../api/endpoints/multiple_choice
 
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 import Button from '../../../../atoms/Button';
 import McOptionCard from './McOptionCard';
@@ -57,6 +58,7 @@ interface IMcOptionsTab {
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
+  canAddCustomOption: boolean;
   bundle?: newnewapi.IBundle;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
@@ -74,6 +76,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   options,
   optionsLoading,
   pagingToken,
+  canAddCustomOption,
   bundle,
   handleLoadOptions,
   handleRemoveOption,
@@ -91,6 +94,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // Scroll block
   const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -296,7 +302,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               creator={option.creator ?? post.creator!!}
               postCreatorName={postCreatorName}
               postText={post.title}
-              postId={post.postUuid}
+              postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               index={i}
               bundle={bundle}
               isCreatorsBid={
@@ -417,7 +424,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  if (bundle) {
+                  if (canAddCustomOption) {
                     setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);
@@ -469,7 +476,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  if (bundle) {
+                  if (canAddCustomOption) {
                     setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);
@@ -495,7 +502,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         postType='mc'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.mc', {
           postCreator: postCreatorName,

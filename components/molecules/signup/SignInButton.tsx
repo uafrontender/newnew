@@ -52,6 +52,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
     () => debounce(onClick!!, noRipple ? 300 : 900),
     [noRipple, onClick]
   );
+
   const handleRestoreRippling = useMemo(
     () =>
       debounce(() => {
@@ -62,7 +63,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   );
 
   const handleEnableHovered = useCallback(() => {
-    if (disabled) return;
+    if (disabled || window?.matchMedia('(hover: none)').matches) return;
     setHovered(true);
   }, [disabled, setHovered]);
 
@@ -72,7 +73,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   }, [disabled, focused, setHovered]);
 
   const handleFocusCapture = useCallback(() => {
-    if (disabled) return;
+    if (disabled || window?.matchMedia('(hover: none)').matches) return;
     setHovered(true);
     setFocused(true);
   }, [disabled, setFocused, setHovered]);
@@ -264,35 +265,38 @@ const SSignInButton = styled.button<SISignInButton>`
   -ms-user-select: none;
   user-select: none;
 
-  &:hover:enabled,
-  &:focus:enabled {
-    background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
-      if (hoverBgColor && hoverContentColor) {
-        return theme.name === 'light' ? hoverBgColor : hoverContentColor;
-      }
-      return hoverBgColor;
-    }};
+  @media (hover: hover) {
+    &:hover:enabled,
+    &:focus:enabled {
+      background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
+        if (hoverBgColor && hoverContentColor) {
+          return theme.name === 'light' ? hoverBgColor : hoverContentColor;
+        }
+        return hoverBgColor;
+      }};
 
-    color: ${({ theme, hoverBgColor, hoverContentColor }) => {
-      if (hoverBgColor && hoverContentColor) {
-        return theme.name === 'light' ? hoverContentColor : hoverBgColor;
-      }
-      return 'white';
-    }};
-
-    & path {
-      fill: ${({ theme, hoverBgColor, hoverContentColor }) => {
+      color: ${({ theme, hoverBgColor, hoverContentColor }) => {
         if (hoverBgColor && hoverContentColor) {
           return theme.name === 'light' ? hoverContentColor : hoverBgColor;
         }
         return 'white';
       }};
-    }
 
-    transition: 0.15s linear;
+      & path {
+        fill: ${({ theme, hoverBgColor, hoverContentColor }) => {
+          if (hoverBgColor && hoverContentColor) {
+            return theme.name === 'light' ? hoverContentColor : hoverBgColor;
+          }
+          return 'white';
+        }};
+      }
+
+      transition: 0.15s linear;
+    }
   }
 
-  &:focus {
+  &:focus,
+  &:hover {
     outline: transparent;
   }
 
@@ -320,9 +324,16 @@ const SSignInButton = styled.button<SISignInButton>`
 
   &:enabled:active {
     transform: scale(0.9);
-    background: ${({ noRipple, pressedBgColor }) =>
-      noRipple ? pressedBgColor : 'initial'};
     transition: 0.2s linear;
+  }
+
+  @media (hover: hover) {
+    &:enabled:active {
+      transform: scale(0.9);
+      background: ${({ noRipple, pressedBgColor }) =>
+        noRipple ? pressedBgColor : 'initial'};
+      transition: 0.2s linear;
+    }
   }
 
   &:disabled {

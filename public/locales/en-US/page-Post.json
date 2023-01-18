@@ -123,6 +123,9 @@
     "body": "Checkout more like it.",
     "buttonText": "See more"
   },
+  "postTopInfo": {
+    "notifyMe": "Notify me"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "Post",
@@ -298,6 +301,10 @@
         "minutes": "Minutes",
         "seconds": "Seconds"
       }
+    },
+    "loading": {
+      "title": "Almost Done...",
+      "subtitle": "Just a little bit left!"
     }
   },
   "acPost": {
@@ -435,12 +442,8 @@
         "button": "Vote"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "votes",
-            "vote": "vote"
-          }
-        },
+        "votesAmount": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment": "Total",
         "suggestionPlaceholder": "Add your own option",
         "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option",
@@ -656,6 +659,7 @@
     "hero": {
       "title": "Votes are in!",
       "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
+      "bodyNoResponse": "{{creator}} has {{time}} to do respond. Stay tuned!",
       "expires": {
         "days": "days",
         "days_singular": "day",

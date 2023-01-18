@@ -154,7 +154,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             additionalResponses={post.additionalResponses}
@@ -212,10 +212,12 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                         </a>
                       </Link>
                     </SCreator>
-                    <STotal>
-                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
-                      <span>{t('mcPostSuccess.inTotalVotes')}</span>
-                    </STotal>
+                    {post.totalVotes && post.totalVotes > 0 ? (
+                      <STotal>
+                        {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                        <span>{t('mcPostSuccess.inTotalVotes')}</span>
+                      </STotal>
+                    ) : null}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
@@ -265,11 +267,11 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                                     )}
                               </Link>
                             </SSpan>
-                            {winningOption.supporterCount > 1 ? (
+                            {winningOption.supporterCount - 1 > 0 ? (
                               <>
                                 {' & '}
                                 {formatNumber(
-                                  winningOption.supporterCount,
+                                  winningOption.supporterCount - 1,
                                   true
                                 )}{' '}
                                 {t('mcPostSuccess.others')}
@@ -391,6 +393,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>

@@ -22,6 +22,7 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import InlineSVG from '../../../atoms/InlineSVG';
 import TextArea from '../../../atoms/chat/TextArea';
+import Loader from '../../../atoms/Loader';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
@@ -39,6 +40,7 @@ import isBrowser from '../../../../utils/isBrowser';
 import getDisplayname from '../../../../utils/getDisplayname';
 import validateInputText from '../../../../utils/validateMessageText';
 import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
+import NoMessagesYet from '../../chat/NoMessagesYet';
 
 const AccountDeleted = dynamic(() => import('../../chat/AccountDeleted'));
 const MessagingDisabled = dynamic(() => import('../../chat/MessagingDisabled'));
@@ -496,6 +498,16 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
               {`${t('announcement.beforeName')} ${getDisplayname(
                 user.userData
               )}${t('announcement.suffix')} ${t('announcement.afterName')}`}
+              {(chatRoom?.visavis?.user?.options?.isVerified ||
+                (chatRoom.myRole === 2 &&
+                  user.userData?.options?.isVerified)) && (
+                <SInlineSVG
+                  svg={VerificationCheckmark}
+                  width='16px'
+                  height='16px'
+                  fill='none'
+                />
+              )}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
               {`${
@@ -538,7 +550,13 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           messagesScrollContainerRef.current = el!!;
         }}
       >
+        {messagesLoading && <SLoader size='md' />}
         {messages.length > 0 && messages.map(renderMessage)}
+
+        {/* No messages view */}
+        {messages.length === 0 && chatRoom?.kind !== 4 && !messagesLoading && (
+          <NoMessagesYet />
+        )}
       </SCenterPart>
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) &&
@@ -854,4 +872,11 @@ const SBottomTextarea = styled.div`
   display: flex;
   align-items: center;
   flex-direction: row;
+`;
+
+const SLoader = styled(Loader)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
