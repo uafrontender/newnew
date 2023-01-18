@@ -12,6 +12,7 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
   ({ className, placeholderSrc, videoSrcList }) => {
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [maxLoadedSrcIndex, setMaxLoadedSrcIndex] = useState(0);
+    const [placeholderLoaded, setPlaceholderLoaded] = useState(false);
 
     const getPreviousIndex = useCallback(
       (index: number) => (index > 0 ? index - 1 : videoSrcList.length - 1),
@@ -35,6 +36,13 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
 
       return 0;
     }
+
+    // Clear state on data changed
+    useEffect(() => {
+      setCurrentVideoIndex(0);
+      setMaxLoadedSrcIndex(0);
+      setPlaceholderLoaded(false);
+    }, [placeholderSrc, videoSrcList]);
 
     useEffect(() => {
       const previousVideoIndex = getPreviousIndex(currentVideoIndex);
@@ -65,7 +73,14 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
 
     return (
       <Container className={className}>
-        <Placeholder src={placeholderSrc} />
+        <Placeholder
+          key={placeholderSrc}
+          src={placeholderSrc}
+          visible={placeholderLoaded}
+          onLoad={() => {
+            setPlaceholderLoaded(true);
+          }}
+        />
         {videoSrcList.slice(0, maxLoadedSrcIndex + 1).map((videoSrc, index) => (
           <Video
             id={videoSrc}
@@ -107,9 +122,12 @@ const Container = styled.div`
   position: relative;
 `;
 
-const Placeholder = styled.img`
+const Placeholder = styled.img<{ visible: boolean }>`
   width: 100%;
   height: 100%;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
+  transition: opacity ease;
+  transition-duration: ${({ visible }) => (visible ? '1s' : '0s')}; ;
 `;
 
 const Video = styled.video<{ visibility?: 'play' | 'hold' }>`
