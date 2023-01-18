@@ -144,7 +144,9 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         if (onlySpacesRegex.test(e.target.value)) {
           setMessage('');
         } else {
-          setMessage(e.target.value.replaceAll('  ', ' '));
+          setMessage(
+            e.target.value.replaceAll('  ', ' ').replaceAll(/\n\n/g, '\n')
+          );
         }
       },
       []
