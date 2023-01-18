@@ -283,8 +283,10 @@ export const ChatList: React.FC<IChatList> = ({ searchText }) => {
         </SChatItemContainer>
       );
     },
+    // This hook should fire when updateTimer is changed (unnecessary dependency)
+    // Also has following unnecessary deps 'chatRooms', 'updatedChat'
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchedRooms, chatRooms, updatedChat, router, t, updateTimer]
+    [searchedRooms, chatRooms, updatedChat, router, t, updateTimer, theme]
   );
 
   return (
