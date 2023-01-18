@@ -42,6 +42,7 @@ import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNew
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { TAcOptionWithHighestField } from '../../../../utils/hooks/useAcOptions';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -73,10 +74,6 @@ const getPayWithCardErrorMessage = (
     default:
       return 'errors.requestFailed';
   }
-};
-
-export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
-  isHighest: boolean;
 };
 
 interface IPostViewAC {}

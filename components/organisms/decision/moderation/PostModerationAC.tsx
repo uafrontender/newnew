@@ -15,10 +15,7 @@ import { useTranslation } from 'next-i18next';
 import moment from 'moment';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import {
-  fetchAcOptionById,
-  fetchCurrentBidsForPost,
-} from '../../../../api/endpoints/auction';
+import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
@@ -37,6 +34,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import useAcOptions from '../../../../utils/hooks/useAcOptions';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -54,10 +52,6 @@ const AcOptionsTabModeration = dynamic(
 const HeroPopup = dynamic(
   () => import('../../../molecules/decision/common/HeroPopup')
 );
-
-export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
-  isHighest: boolean;
-};
 
 interface IPostModerationAC {}
 
@@ -144,13 +138,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       [post.optionCount]
     );
 
-    const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-    const [optionsNextPageToken, setOptionsNextPageToken] = useState<
-      string | undefined | null
-    >('');
-    const [optionsLoading, setOptionsLoading] = useState(false);
-    const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
     // Winning option
     const [winningOption, setWinningOption] = useState<
       newnewapi.Auction.Option | undefined
@@ -167,131 +154,23 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
 
-    const sortOptions = useCallback(
-      (unsortedArr: TAcOptionWithHighestField[]) => {
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < unsortedArr.length; i++) {
-          // eslint-disable-next-line no-param-reassign
-          unsortedArr[i].isHighest = false;
-        }
-
-        const highestOption = unsortedArr.sort(
-          (a, b) =>
-            (b?.totalAmount?.usdCents as number) -
-            (a?.totalAmount?.usdCents as number)
-        )[0];
-
-        unsortedArr.forEach((option, i) => {
-          if (i > 0) {
-            // eslint-disable-next-line no-param-reassign
-            option.isHighest = false;
-          }
-        });
-
-        const optionsByUser = user.userData?.userUuid
-          ? unsortedArr
-              .filter((o) => o.creator?.uuid === user.userData?.userUuid)
-              .sort((a, b) => {
-                return (b.id as number) - (a.id as number);
-              })
-          : [];
-
-        const optionsSupportedByUser = user.userData?.userUuid
-          ? unsortedArr
-              .filter((o) => o.isSupportedByMe)
-              .sort((a, b) => {
-                return (b.id as number) - (a.id as number);
-              })
-          : [];
-
-        const optionsByVipUsers = unsortedArr
-          .filter((o) => o.isCreatedBySubscriber)
-          .sort((a, b) => {
-            return (b.id as number) - (a.id as number);
-          });
-
-        const workingArrSorted = unsortedArr.sort((a, b) => {
-          // Sort the rest by newest first
-          return (b.id as number) - (a.id as number);
-        });
-
-        const joinedArr = [
-          ...(highestOption &&
-          (highestOption.creator?.uuid === user.userData?.userUuid ||
-            highestOption.isSupportedByMe)
-            ? [highestOption]
-            : []),
-          ...optionsByUser,
-          ...optionsSupportedByUser,
-          ...optionsByVipUsers,
-          ...(highestOption &&
-          highestOption.creator?.uuid !== user.userData?.userUuid
-            ? [highestOption]
-            : []),
-          ...workingArrSorted,
-        ];
-
-        const workingSortedUnique =
-          joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
-
-        const highestOptionIdx = (
-          workingSortedUnique as TAcOptionWithHighestField[]
-        ).findIndex((o) => o.id === highestOption.id);
-
-        if (workingSortedUnique[highestOptionIdx]) {
-          (
-            workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
-          ).isHighest = true;
-        }
-
-        return workingSortedUnique;
+    const {
+      processedOptions: options,
+      hasNextPage: hasNextOptionsPage,
+      fetchNextPage: fetchNextOptionsPage,
+      isLoading: isOptionsLoading,
+      refetch: refetchOptions,
+    } = useAcOptions(
+      {
+        postUuid: post.postUuid,
+        userUuid: user.userData?.userUuid,
+        loggedInUser: user.loggedIn,
       },
-      [user.userData?.userUuid]
-    );
-
-    const fetchBids = useCallback(
-      async (pageToken?: string) => {
-        if (optionsLoading) return;
-        try {
-          setOptionsLoading(true);
-          setLoadingOptionsError('');
-
-          const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
-            postUuid: post.postUuid,
-            ...(pageToken
-              ? {
-                  paging: {
-                    pageToken,
-                  },
-                }
-              : {}),
-          });
-
-          const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
-
-          if (!res.data || res.error)
-            throw new Error(res.error?.message ?? 'Request failed');
-
-          if (res.data && res.data.options) {
-            setOptions((curr) => {
-              const workingArr = [
-                ...curr,
-                ...(res.data?.options as TAcOptionWithHighestField[]),
-              ];
-
-              return sortOptions(workingArr);
-            });
-            setOptionsNextPageToken(res.data.paging?.nextPageToken);
-          }
-
-          setOptionsLoading(false);
-        } catch (err) {
-          setOptionsLoading(false);
-          setLoadingOptionsError((err as Error).message);
-          console.error(err);
-        }
-      },
-      [post, setOptions, sortOptions, optionsLoading]
+      {
+        onError: (err) => {
+          showErrorToastCustom((err as Error).message);
+        },
+      }
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -315,21 +194,15 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     }, []);
 
     const handleRemoveOption = useCallback(
-      (optionToRemove: newnewapi.Auction.Option) => {
+      async (optionToRemove: newnewapi.Auction.Option) => {
         Mixpanel.track('Removed Option', {
           _stage: 'Post',
           _postUuid: post.postUuid,
           _component: 'PostModerationAC',
         });
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          const workingArrUnsorted = [
-            ...workingArr.filter((o) => o.id !== optionToRemove.id),
-          ];
-          return sortOptions(workingArrUnsorted);
-        });
+        await refetchOptions();
       },
-      [setOptions, sortOptions, post.postUuid]
+      [post.postUuid, refetchOptions]
     );
 
     const handleOnResponseTimeExpired = () => {
@@ -341,13 +214,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         handleUpdatePostStatus('FAILED');
       }
     };
-
-    useEffect(() => {
-      setOptions([]);
-      setOptionsNextPageToken('');
-      fetchBids();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [post.postUuid]);
 
     useEffect(() => {
       async function fetchAndSetWinningOption(id: number) {
@@ -372,31 +238,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     }, [winningOptionId, winningOption?.id]);
 
     useEffect(() => {
-      const socketHandlerOptionCreatedOrUpdated = (data: any) => {
+      const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
         if (decoded.option && decoded.postUuid === post.postUuid) {
-          setOptions((curr) => {
-            const workingArr = [...curr];
-            let workingArrUnsorted;
-            const idx = workingArr.findIndex(
-              (op) => op.id === decoded.option?.id
-            );
-            if (idx === -1) {
-              workingArrUnsorted = [
-                ...workingArr,
-                decoded.option as TAcOptionWithHighestField,
-              ];
-            } else {
-              workingArr[idx].supporterCount = decoded.option
-                ?.supporterCount as number;
-              workingArr[idx].totalAmount = decoded.option
-                ?.totalAmount as newnewapi.IMoneyAmount;
-              workingArrUnsorted = workingArr;
-            }
-
-            return sortOptions(workingArrUnsorted);
-          });
+          await refetchOptions();
         }
       };
 
@@ -405,10 +251,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
         if (decoded.optionId) {
-          setOptions((curr) => {
-            const workingArr = [...curr];
-            return workingArr.filter((o) => o.id !== decoded.optionId);
-          });
+          await refetchOptions();
 
           await fetchPostLatestData();
         }
@@ -445,21 +288,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-      socketConnection,
-      post,
-      postStatus,
-      user.userData?.userUuid,
-      setOptions,
-      sortOptions,
-    ]);
-
-    useEffect(() => {
-      if (loadingOptionsError) {
-        showErrorToastCustom(loadingOptionsError);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loadingOptionsError]);
+    }, [socketConnection, post, postStatus, user.userData?.userUuid]);
 
     const goToNextStep = () => {
       if (
@@ -696,10 +525,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                     postUuid={post.postUuid}
                     postStatus={postStatus}
                     options={options}
-                    optionsLoading={optionsLoading}
-                    pagingToken={optionsNextPageToken}
                     winningOptionId={(winningOption?.id as number) ?? undefined}
-                    handleLoadBids={fetchBids}
+                    optionsLoading={isOptionsLoading}
+                    hasNextPage={!!hasNextOptionsPage}
+                    fetchNextPage={fetchNextOptionsPage}
                     handleRemoveOption={handleRemoveOption}
                     handleUpdatePostStatus={handleUpdatePostStatus}
                     handleUpdateWinningOption={handleUpdateWinningOption}

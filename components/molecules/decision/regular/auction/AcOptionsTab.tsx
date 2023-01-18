@@ -11,7 +11,7 @@ import {
   useAppSelector,
 } from '../../../../../redux-store/store';
 
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';

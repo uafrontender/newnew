@@ -10,7 +10,7 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import GoBackButton from '../../../GoBackButton';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 import { fetchCurrentBidsForPost } from '../../../../../api/endpoints/auction';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import AcOptionCard from '../../regular/auction/AcOptionCard';
