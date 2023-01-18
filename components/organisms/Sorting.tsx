@@ -158,8 +158,10 @@ export const Sorting: React.FC<ISorting> = (props) => {
   );
 
   if (isMobile) {
-    if (animate) {
-      // @ts-ignore
+    if (
+      animate &&
+      (document?.getElementById('sorting-container') as HTMLElement)
+    ) {
       return createPortal(
         <AnimatedPresence
           start={animate}
@@ -168,7 +170,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         >
           {content}
         </AnimatedPresence>,
-        document.getElementById('sorting-container') as HTMLElement
+        document?.getElementById('sorting-container') as HTMLElement
       );
     }
     return <div />;
