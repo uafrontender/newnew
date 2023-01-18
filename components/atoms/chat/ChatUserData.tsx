@@ -25,24 +25,26 @@ const ChatUserData: React.FC<IChatUserData> = ({
   return (
     <SUserData>
       <SUserName>
-        {
-          // eslint-disable-next-line no-nested-ternary
-          isAnnouncement
-            ? `${t('announcement.beforeName')} ${
-                isMyAnnouncement
-                  ? getDisplayname(user.userData)
-                  : getDisplayname(chatRoom.visavis?.user)
-              }${t('announcement.suffix')} ${t('announcement.afterName')}`
-            : isMyAnnouncement
-            ? getDisplayname(user.userData)
-            : getDisplayname(chatRoom.visavis?.user)
-        }
+        <SUserNameText>
+          {
+            // eslint-disable-next-line no-nested-ternary
+            isAnnouncement
+              ? `${t('announcement.beforeName')} ${
+                  isMyAnnouncement
+                    ? getDisplayname(user.userData)
+                    : getDisplayname(chatRoom.visavis?.user)
+                }${t('announcement.suffix')} ${t('announcement.afterName')}`
+              : isMyAnnouncement
+              ? getDisplayname(user.userData)
+              : getDisplayname(chatRoom.visavis?.user)
+          }
+        </SUserNameText>
         {(chatRoom.visavis?.user?.options?.isVerified ||
           (isMyAnnouncement && user.userData?.options?.isVerified)) && (
           <SVerificationSVG
             svg={VerificationCheckmark}
-            width='18px'
-            height='18px'
+            width='20px'
+            height='20px'
             fill='none'
           />
         )}
@@ -78,14 +80,22 @@ const SUserData = styled.div`
   flex-direction: column;
   font-weight: 600;
   margin-right: auto;
+  overflow: hidden;
 `;
 
-const SUserName = styled.strong`
-  font-weight: 600;
-  font-size: 16px;
-  padding-bottom: 4px;
+const SUserName = styled.div`
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
+`;
+
+const SUserNameText = styled.strong`
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SVerificationSVG = styled(InlineSVG)`
