@@ -49,10 +49,6 @@ const sortOptions = (
         .sort((a, b) => (b.id as number) - (a.id as number))
     : [];
 
-  const optionsByVipUsers = unsortedArr
-    .filter((o) => o.isCreatedBySubscriber)
-    .sort((a, b) => (b.id as number) - (a.id as number));
-
   const workingArrSorted = unsortedArr.sort(
     (a, b) =>
       // Sort the rest by newest first
@@ -66,7 +62,6 @@ const sortOptions = (
       : []),
     ...optionsByUser,
     ...optionsSupportedByUser,
-    ...optionsByVipUsers,
     ...(highestOption && highestOption.creator?.uuid !== userUuid
       ? [highestOption]
       : []),

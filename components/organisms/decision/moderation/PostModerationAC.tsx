@@ -178,8 +178,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       try {
         const res = await refetchPost();
 
-        console.log(res);
-
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
