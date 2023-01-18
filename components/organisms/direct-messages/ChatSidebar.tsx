@@ -46,12 +46,16 @@ const ChatSidebar: React.FC = () => {
   return (
     <SSidebar>
       <ChatToolbar />
-      {activeTab && searchChatroom === '' && !mobileChatOpened && (
-        <ChatlistTabs
-          activeTab={activeTab!!}
-          changeActiveTab={changeActiveTab}
-        />
-      )}
+      {activeTab &&
+        searchChatroom === '' &&
+        !mobileChatOpened &&
+        hasChatsWithCreators &&
+        hasChatsWithSubs && (
+          <ChatlistTabs
+            activeTab={activeTab!!}
+            changeActiveTab={changeActiveTab}
+          />
+        )}
       <ChatList />
     </SSidebar>
   );

@@ -1,11 +1,10 @@
-import React, { useEffect, useContext, useRef, useMemo } from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useEffect, useContext, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled, { css } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
-
-import Loader from '../../atoms/Loader';
 import { SocketContext } from '../../../contexts/socketContext';
 import getDisplayname from '../../../utils/getDisplayname';
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
@@ -28,21 +27,25 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   isAnnouncement,
   textareaFocused,
 }) => {
-  const { ref: scrollRef, inView } = useInView();
+  const { ref: loadingRef, inView } = useInView();
   const socketConnection = useContext(SocketContext);
 
-  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
-    useChatRoomMessages({
-      limit: 5,
-      roomId: chatRoom?.id,
-    });
+  const {
+    data,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+    isFetchingNextPage,
+  } = useChatRoomMessages({
+    limit: isIOSMikhail() ? 8 : 20,
+    roomId: chatRoom?.id,
+  });
 
   const messages = useMemo(
     () => (data ? data.pages.map((page) => page.messages).flat() : []),
     [data]
   );
-
-  const messagesScrollContainerRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
     const socketHandlerMessageCreated = () => {
@@ -63,70 +66,38 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
+  const hasWelcomeMessage = useMemo(
+    () =>
+      messages.length === 0 &&
+      !isAnnouncement &&
+      !isLoading &&
+      chatRoom.myRole === 1,
+    [messages, isAnnouncement, isLoading, chatRoom]
+  );
+
+  const hasNoMessagesYet = useMemo(
+    () =>
+      messages.length === 0 &&
+      !isAnnouncement &&
+      !isLoading &&
+      chatRoom.myRole === 2,
+    [messages, isAnnouncement, isLoading, chatRoom]
+  );
+
   /* loading next page of messages */
   useUpdateEffect(() => {
-    if (inView && !isLoading && hasNextPage) {
+    if (inView && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, isLoading, hasNextPage, fetchNextPage]);
-
-  // useUpdateEffect(() => {
-  //   if (
-  //     isMobile &&
-  //     isSafari() &&
-  //     messages.length > 0 &&
-  //     messagesScrollContainerRef.current
-  //   ) {
-  //     messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
-  //     setTimeout(() => {
-  //       messagesScrollContainerRef.current!!.style.cssText = `flex:0 0 calc(100vh - 160px);`;
-  //     }, 5);
-  //   }
-  // }, [messages]);
-
-  // useEffect(() => {
-  //   if (newMessage && isBrowser()) {
-  //     setTimeout(() => {
-  //       messagesScrollContainerRef.current?.scrollBy({
-  //         top: messagesScrollContainerRef.current?.scrollHeight,
-  //         behavior: 'smooth',
-  //       });
-  //     }, 100);
-  //   }
-  // }, [newMessage]);
-
-  // fix for container scrolling on Safari iOS
-  // useEffect(() => {
-  //   if (
-  //     messages.length > 0 &&
-  //     messagesScrollContainerRef.current &&
-  //     isMobile &&
-  //     isSafari()
-  //   ) {
-  //     messagesScrollContainerRef.current.style.cssText = `flex: 0 0 300px;`;
-  //     setTimeout(() => {
-  //       messagesScrollContainerRef.current!!.style.cssText = `flex:1;`;
-  //     }, 10);
-  //   }
-  // }, [messages, isMobile]);
+  }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer
-      isIOS={isIOSMikhail()}
-      textareaFocused={textareaFocused}
-      ref={(el) => {
-        messagesScrollContainerRef.current = el!!;
-      }}
-    >
-      {isLoading && <SLoader size='md' />}
-      {messages.length === 0 &&
-        !isAnnouncement &&
-        !isLoading &&
-        (chatRoom.myRole === 1 ? (
-          <WelcomeMessage userAlias={getDisplayname(chatRoom.visavis?.user)} />
-        ) : (
-          <NoMessagesYet />
-        ))}
+    <SContainer isIOS={isIOSMikhail()} textareaFocused={textareaFocused}>
+      {hasWelcomeMessage && (
+        <WelcomeMessage userAlias={getDisplayname(chatRoom.visavis?.user)} />
+      )}
+      {hasNoMessagesYet && <NoMessagesYet />}
+
       {messages.map((item, index) => (
         <ChatMessage
           key={`${chatRoom}-${item.id}`}
@@ -136,7 +107,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
           prevElement={messages[index - 1]}
         />
       ))}
-      {hasNextPage && !isLoading && <SRef ref={scrollRef}>Loading...</SRef>}
+      {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
     </SContainer>
   );
 };
@@ -154,9 +125,11 @@ const SContainer = styled.div<ISContainer>`
       ? css`
           margin: 0 0 100px;
         `
-      : css`
+      : textareaFocused && isIOS
+      ? css`
           margin: 80px 0 0;
-        `};
+        `
+      : ''};
   display: flex;
   overflow-y: auto;
   flex-direction: column-reverse;
@@ -164,26 +137,22 @@ const SContainer = styled.div<ISContainer>`
   position: relative;
   height: calc(100vh - 300px);
   min-height: calc(100vh - 300px);
+  ${(props) => props.theme.media.tablet} {
+    min-height: calc(100% - 160px);
+    flex: 0;
+    padding: 0 24px;
+    margin: 0;
+  }
   ::-webkit-scrollbar {
     display: none;
   }
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior: contain;
-  ${({ theme }) => theme.media.tablet} {
-    padding: 0 24px;
-  }
 `;
 
 const SRef = styled.span`
-  text-indent: -9999px;
-  height: 0;
+  height: 10px;
   overflow: hidden;
-`;
-
-const SLoader = styled(Loader)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin-bottom: -20px;
 `;

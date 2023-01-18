@@ -323,9 +323,9 @@ const SContainer = styled.div`
   flex-direction: column;
   position: relative;
   padding: 80px 0 82px;
-  /* margin-bottom: 82px;
-  margin-top: 80px; */
-  /* padding-bottom: 100px; */
+  ${(props) => props.theme.media.tablet} {
+    padding: 0;
+  }
 `;
 
 const SBottomPart = styled.div`
@@ -337,6 +337,10 @@ const SBottomPart = styled.div`
   right: 0;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   padding: 10px 24px 24px;
+  ${(props) => props.theme.media.tablet} {
+    position: static;
+    background: none;
+  }
 `;
 
 const SBottomTextarea = styled.div`
