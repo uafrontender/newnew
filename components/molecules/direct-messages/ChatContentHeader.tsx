@@ -59,12 +59,8 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const router = useRouter();
 
-  const {
-    activeChatRoom,
-    setActiveChatRoom,
-    setHiddenMessagesArea,
-    mobileChatOpened,
-  } = useGetChats();
+  const { setActiveChatRoom, setHiddenMessagesArea, mobileChatOpened } =
+    useGetChats();
 
   useEffect(() => {
     if (chatRoom.kind === 4) {
@@ -97,25 +93,19 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   }, [router.asPath]);
 
   const goBackHandler = useCallback(() => {
+    setHiddenMessagesArea(true);
     if (isDashboard) {
       router.query = {};
       router.push(`/creator/dashboard?tab=chat`);
       setActiveChatRoom(null);
-    }
-    if (activeChatRoom && (!isDashboard || mobileChatOpened)) {
-      if (isMobileOrTablet) {
-        router.push(`/direct-messages`);
-      }
-      setActiveChatRoom(null);
-      setHiddenMessagesArea(true);
+    } else if (isMobileOrTablet) {
+      router.push(`/direct-messages`);
     }
   }, [
     setActiveChatRoom,
     setHiddenMessagesArea,
-    activeChatRoom,
     isDashboard,
     router,
-    mobileChatOpened,
     isMobileOrTablet,
   ]);
 
@@ -211,6 +201,11 @@ const STopPart = styled.header`
   top: 0;
   left: 0;
   right: 0;
+  ${(props) => props.theme.media.tablet} {
+    background: none;
+    position: static;
+    padding: 21px 10px 21px 24px;
+  }
   border-bottom: 1px solid
     ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;
