@@ -21,7 +21,6 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import {
   canCreateCustomOption,
-  fetchCurrentOptionsForMCPost,
   voteOnPost,
 } from '../../../../api/endpoints/multiple_choice';
 
@@ -46,6 +45,7 @@ import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import useMcOptions from '../../../../utils/hooks/useMcOptions';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -86,10 +86,6 @@ const getPayWithCardErrorMessage = (
     default:
       return 'errors.requestFailed';
   }
-};
-
-export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
-  isHighest: boolean;
 };
 
 interface IPostViewMC {}
@@ -177,168 +173,40 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   // Bundle modal
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
-  // Options
-  const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  const [optionsNextPageToken, setOptionsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-  const sortOptions = useCallback(
-    (unsortedArr: TMcOptionWithHighestField[]) => {
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < unsortedArr.length; i++) {
-        // eslint-disable-next-line no-param-reassign
-        unsortedArr[i].isHighest = false;
-      }
-
-      const highestOption = unsortedArr.sort(
-        (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
-      )[0];
-
-      const optionsByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            .sort((a, b) => (b?.voteCount as number) - (a?.voteCount as number))
-        : [];
-
-      const optionsSupportedByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.isSupportedByMe)
-            .sort((a, b) => (b?.voteCount as number) - (a?.voteCount as number))
-        : [];
-
-      const optionsByVipUsers = unsortedArr
-        .filter((o) => o.isCreatedBySubscriber)
-        .sort((a, b) => {
-          return (b.id as number) - (a.id as number);
-        });
-
-      const workingArrSorted = unsortedArr.sort(
-        (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
-      );
-
-      const joinedArr = [
-        ...(highestOption &&
-        highestOption.creator?.uuid === user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...optionsByUser,
-        ...optionsSupportedByUser,
-        ...optionsByVipUsers,
-        ...(highestOption &&
-        highestOption.creator?.uuid !== user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...workingArrSorted,
-      ];
-
-      const workingSortedUnique =
-        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
-
-      const highestOptionIdx = (
-        workingSortedUnique as TMcOptionWithHighestField[]
-      ).findIndex((o) => o.id === highestOption.id);
-
-      if (workingSortedUnique[highestOptionIdx]) {
-        workingSortedUnique[highestOptionIdx].isHighest = true;
-      }
-
-      return workingSortedUnique;
+  const {
+    processedOptions: options,
+    hasNextPage: hasNextOptionsPage,
+    fetchNextPage: fetchNextOptionsPage,
+    refetch: refetchOptions,
+  } = useMcOptions(
+    {
+      postUuid: post.postUuid,
+      loggedInUser: user.loggedIn,
+      userUuid: user.userData?.userUuid,
     },
-    [user.userData?.userUuid]
-  );
-
-  const fetchOptions = useCallback(
-    async (pageToken?: string) => {
-      if (optionsLoading || loadingModalOpen) return;
-      try {
-        setOptionsLoading(true);
-        setLoadingOptionsError('');
-
-        const getCurrentOptionsPayload = new newnewapi.GetMcOptionsRequest({
-          postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await fetchCurrentOptionsForMCPost(
-          getCurrentOptionsPayload
-        );
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.options) {
-          setOptions((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.options as TMcOptionWithHighestField[]),
-            ];
-
-            return sortOptions(workingArr);
-          });
-          setOptionsNextPageToken(res.data.paging?.nextPageToken);
-        }
-
-        setOptionsLoading(false);
-      } catch (err) {
-        setOptionsLoading(false);
-        setLoadingOptionsError((err as Error).message);
-        console.error(err);
-      }
-    },
-    [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
+    {
+      onError: (err) => {
+        showErrorToastCustom((err as Error).message);
+      },
+    }
   );
 
   const handleAddOrUpdateOptionFromResponse = useCallback(
-    (newOrUpdatedption: newnewapi.MultipleChoice.Option) => {
-      setOptions((curr) => {
-        const workingArr = [...curr];
-        let workingArrUnsorted;
-        const idx = workingArr.findIndex(
-          (op) => op.id === newOrUpdatedption.id
-        );
-        if (idx === -1) {
-          workingArrUnsorted = [
-            ...workingArr,
-            newOrUpdatedption as TMcOptionWithHighestField,
-          ];
-        } else {
-          workingArr[idx].voteCount = newOrUpdatedption.voteCount as number;
-          workingArr[idx].supporterCount =
-            newOrUpdatedption.supporterCount as number;
-          workingArr[idx].isSupportedByMe = true;
-          workingArrUnsorted = workingArr;
-        }
-
-        return sortOptions(workingArrUnsorted);
-      });
+    async (newOrUpdatedption: newnewapi.MultipleChoice.Option) => {
+      await refetchOptions();
     },
-    [setOptions, sortOptions]
+    [refetchOptions]
   );
 
   const handleRemoveOption = useCallback(
-    (optionToRemove: newnewapi.MultipleChoice.Option) => {
-      setOptions((curr) => {
-        const workingArr = [...curr];
-        const workingArrUnsorted = [
-          ...workingArr.filter((o) => o.id !== optionToRemove.id),
-        ];
-        return sortOptions(workingArrUnsorted);
-      });
+    async (optionToRemove: newnewapi.MultipleChoice.Option) => {
+      await refetchOptions();
     },
-    [setOptions, sortOptions]
+    [refetchOptions]
   );
 
   const fetchPostLatestData = useCallback(async () => {
@@ -374,20 +242,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   ); */
 
   useEffect(() => {
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      setOptions([]);
-      setOptionsNextPageToken('');
-      fetchOptions();
-      fetchPostLatestData();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.postUuid]);
-
-  useEffect(() => {
     const controller = new AbortController();
 
     async function checkCanAddCustomOption() {
@@ -416,32 +270,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   }, [post.postUuid, user.loggedIn, creatorsBundle]);
 
   useEffect(() => {
-    const socketHandlerOptionCreatedOrUpdated = (data: any) => {
+    const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
       if (decoded.option && decoded.postUuid === post.postUuid) {
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          let workingArrUnsorted;
-          const idx = workingArr.findIndex(
-            (op) => op.id === decoded.option?.id
-          );
-          if (idx === -1) {
-            workingArrUnsorted = [
-              ...workingArr,
-              decoded.option as TMcOptionWithHighestField,
-            ];
-          } else {
-            // workingArr[idx] = decoded.option as TMcOptionWithHighestField;
-            workingArr[idx].voteCount = decoded.option?.voteCount as number;
-            workingArr[idx].supporterCount = decoded.option
-              ?.supporterCount as number;
-            workingArr[idx].firstVoter = decoded.option?.firstVoter;
-            workingArrUnsorted = workingArr;
-          }
-
-          return sortOptions(workingArrUnsorted);
-        });
+        refetchOptions();
       }
     };
 
@@ -450,11 +283,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       const decoded = newnewapi.McOptionDeleted.decode(arr);
 
       if (decoded.optionId) {
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          return workingArr.filter((o) => o.id !== decoded.optionId);
-        });
-
+        await refetchOptions();
         await fetchPostLatestData();
       }
     };
@@ -490,13 +319,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    socketConnection,
-    post,
-    user.userData?.userUuid,
-    setOptions,
-    sortOptions,
-  ]);
+  }, [socketConnection, post, user.userData?.userUuid]);
 
   const isVoteMadeAfterRedirect = useRef(false);
 
@@ -609,13 +432,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       );
     }
   };
-
-  useEffect(() => {
-    if (loadingOptionsError) {
-      showErrorToastCustom(loadingOptionsError);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadingOptionsError]);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   useEffect(() => {
@@ -790,11 +606,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               .subtract(3, 'days')
               .calendar()}
             options={options}
-            optionsLoading={optionsLoading}
-            pagingToken={optionsNextPageToken}
             canAddCustomOption={canAddCustomOption}
             bundle={creatorsBundle?.bundle ?? undefined}
-            handleLoadOptions={fetchOptions}
+            hasNextPage={!!hasNextOptionsPage}
+            fetchNextPage={fetchNextOptionsPage}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }

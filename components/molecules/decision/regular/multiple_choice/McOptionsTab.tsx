@@ -13,6 +13,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
+import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import {
   useAppDispatch,
@@ -21,7 +22,7 @@ import {
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
@@ -55,11 +56,18 @@ interface IMcOptionsTab {
   postCreatorName: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
-  optionsLoading: boolean;
-  pagingToken: string | undefined | null;
   canAddCustomOption: boolean;
   bundle?: newnewapi.IBundle;
-  handleLoadOptions: (token?: string) => void;
+  hasNextPage: boolean;
+  fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<
+    InfiniteQueryObserverResult<
+      {
+        mcOptions: newnewapi.MultipleChoice.IOption[];
+        paging: newnewapi.IPagingResponse | null | undefined;
+      },
+      unknown
+    >
+  >;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
@@ -72,11 +80,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   postCreatorName,
   postDeadline,
   options,
-  optionsLoading,
-  pagingToken,
   canAddCustomOption,
   bundle,
-  handleLoadOptions,
+  hasNextPage,
+  fetchNextPage,
   handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -225,11 +232,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   ]);
 
   useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadOptions(pagingToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+  }, [inView, fetchNextPage]);
 
   const goToNextStep = () => {
     if (
@@ -326,21 +332,23 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
-          {!isMobile ? (
-            <SLoaderDiv ref={loadingRef} />
-          ) : pagingToken ? (
-            <SLoadMoreBtn
-              onClick={() => {
-                Mixpanel.track('Click Load More', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-                handleLoadOptions(pagingToken);
-              }}
-            >
-              {t('loadMoreButton')}
-            </SLoadMoreBtn>
+          {hasNextPage ? (
+            !isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : (
+              <SLoadMoreBtn
+                onClick={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  fetchNextPage();
+                }}
+              >
+                {t('loadMoreButton')}
+              </SLoadMoreBtn>
+            )
           ) : null}
         </SBidsContainer>
         {user.userTutorialsProgress.remainingMcSteps && (
