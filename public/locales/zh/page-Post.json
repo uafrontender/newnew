@@ -123,6 +123,9 @@
     "body": "查看更多類似的。",
     "buttonText": "查看更多"
   },
+  "postTopInfo": {
+    "notifyMe": "通知我"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "帖子",
@@ -298,6 +301,10 @@
         "minutes": "分鐘",
         "seconds": "秒"
       }
+    },
+    "loading_NEED_TRANSLATION": {
+      "title": "Almost Done...",
+      "subtitle": "Just a little bit left!"
     }
   },
   "acPost": {
@@ -435,12 +442,8 @@
         "button": "投票"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "票",
-            "vote": "票"
-          }
-        },
+        "votesAmount_NEED_TRANSLATION": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment_NEED_TRANSLATION": "Total",
         "suggestionPlaceholder": "添加你自己的選項",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
@@ -656,6 +659,7 @@
     "hero": {
       "title": "投票結果出來了！",
       "body": "{{creator}}有{{time}}完成這個選項。請繼續關注！",
+      "bodyNoResponse_NEED_TRANSLATION": "{{creator}} has {{time}} to do respond. Stay tuned!",
       "expires": {
         "days": "天",
         "days_singular": "天",

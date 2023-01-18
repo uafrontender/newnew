@@ -47,6 +47,7 @@ import {
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -80,7 +81,8 @@ const getPayWithCardErrorMessage = (
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   votingAllowed: boolean;
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreatorName: string;
   postDeadline: string;
   postText: string;
@@ -99,7 +101,8 @@ interface IAcOptionCard {
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
   votingAllowed,
-  postId,
+  postUuid,
+  postShortId,
   postCreatorName,
   postDeadline,
   postText,
@@ -124,6 +127,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   );
   const { appConstants } = useGetAppConstants();
   const { showErrorToastPredefined } = useErrorToasts();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -256,7 +261,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const placeBidRequest = useMemo(
     () =>
       new newnewapi.PlaceBidRequest({
-        postUuid: postId,
+        postUuid,
         amount: new newnewapi.MoneyAmount({
           usdCents: paymentAmountInCents,
         }),
@@ -265,13 +270,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         }),
         optionId: option.id,
       }),
-    [postId, paymentAmountInCents, option.id, paymentFeeInCents]
+    [postUuid, paymentAmountInCents, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+      postShortId || postUuid
+    }`,
   });
 
   const handlePayWithCard = useCallback(
@@ -293,7 +300,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'AcOptionsCard',
         _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
@@ -343,7 +350,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     },
     [
       setupIntent,
-      postId,
+      postUuid,
       router,
       handleAddOrUpdateOptionFromResponse,
       paymentAmountInCents,
@@ -466,7 +473,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         ? t('me')
                         : t('my')
                       : getDisplayname(option.creator!!)}
-                    {!isMyBid && option.creator.options?.isVerified && (
+                    {option.creator.options?.isVerified && (
                       <SInlineSvgVerificationIcon
                         svg={
                           !isBlue
@@ -492,6 +499,18 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                       ? t('me')
                       : t('my')
                     : getDisplayname(option.creator!!)}
+                  {user.userData?.options?.isVerified && (
+                    <SInlineSvgVerificationIcon
+                      svg={
+                        !isBlue
+                          ? VerificationCheckmark
+                          : VerificationCheckmarkInverted
+                      }
+                      width='14px'
+                      height='14px'
+                      fill='none'
+                    />
+                  )}
                 </SSpanBiddersHighlighted>
               )
             ) : (
@@ -573,7 +592,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             onClickCapture={() => {
               Mixpanel.track('Boost Click', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'AcOptionCard',
               });
             }}
@@ -596,7 +615,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             onClickCapture={() => {
               Mixpanel.track('Boost Click', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'AcOptionCard',
               });
             }}
@@ -730,7 +749,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
-          redirectUrl={`p/${postId}`}
+          redirectUrl={`p/${postShortId || postUuid}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           bottomCaption={
@@ -788,7 +807,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         postType='ac'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator: postCreatorName,

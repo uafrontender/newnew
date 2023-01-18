@@ -8,6 +8,7 @@ import getColorMode from '../utils/getColorMode';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
+import ThemeColorTag from '../components/atoms/ThemeColorTag';
 
 interface IGlobalTheme {
   initialTheme: string;
@@ -81,6 +82,7 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   return (
     <ThemeProvider theme={themeProp}>
       <GlobalStyle />
+      <ThemeColorTag />
       {children}
     </ThemeProvider>
   );

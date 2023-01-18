@@ -22,6 +22,7 @@ import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import { Mixpanel } from '../../../utils/mixpanel';
+import useComponentScrollRestoration from '../../../utils/hooks/useComponentScrollRestoration';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -172,7 +173,13 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <SItemWrapper name={`cards-section-${category}-${0}`}>
               {tutorialCard}
             </SItemWrapper>
-            <Link href={`/p/${switchPostType(item)[0].postUuid}`}>
+            <Link
+              href={`/p/${
+                switchPostType(item)[0].postShortId
+                  ? switchPostType(item)[0].postShortId
+                  : switchPostType(item)[0].postUuid
+              }`}
+            >
               <SItemWrapper
                 name={`cards-section-${category}-${
                   tutorialCard !== undefined ? index + 1 : index
@@ -200,7 +207,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
       return (
         <Link
-          href={`/p/${switchPostType(item)[0].postUuid}`}
+          href={`/p/${
+            switchPostType(item)[0].postShortId
+              ? switchPostType(item)[0].postShortId
+              : switchPostType(item)[0].postUuid
+          }`}
           key={switchPostType(item)[0].postUuid}
         >
           <SItemWrapper
@@ -289,6 +300,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         onReachEnd();
       }
     }, [canScrollRight, onReachEnd, collection?.length]);
+
+    useComponentScrollRestoration(
+      scrollContainerRef.current ?? undefined,
+      `${category}-scrollContainer`
+    );
 
     return (
       <SWrapper name={category} {...restProps}>
@@ -462,7 +478,7 @@ const SListWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
     /* padding: 24px 24px 0 24px; */
     /* padding: 32px 56px 0 64px; */
-    padding: 24px 32px 0;
+    padding: 24px 0px 0 32px;
     left: -8px;
 
     flex-direction: row;
@@ -470,31 +486,46 @@ const SListWrapper = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     left: -16px;
-    width: calc(100% + 32px);
+    width: calc(100% + 16px);
     padding: 32px 0 0 0;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    width: calc(100% + 32px);
   }
 `;
 
 const SCardSkeletonSection = styled(CardSkeletonSection)`
   &&& {
     & > span {
-      gap: 16px;
+      margin: 16px 0;
+      gap: 0;
+      left: 0;
+
+      ${({ theme }) => theme.media.tablet} {
+        margin: 0;
+        gap: 16px;
+        left: 8px;
+      }
 
       ${({ theme }) => theme.media.laptop} {
         gap: 32px;
+        left: 16px;
       }
     }
   }
 
   & > span > div {
+    width: calc(100vw - 32px);
+
     ${({ theme }) => theme.media.tablet} {
       height: 410px;
-      width: 214px;
+      width: 224px;
     }
 
-    /* ${({ theme }) => theme.media.mobileL} {
-      width: 224px;
-    } */
+    ${({ theme }) => theme.media.laptop} {
+      height: 454px;
+    }
   }
 `;
 

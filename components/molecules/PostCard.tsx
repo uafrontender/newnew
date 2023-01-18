@@ -224,13 +224,23 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postParsed.postUuid}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+              postParsed.postShortId
+                ? postParsed.postShortId
+                : postParsed.postUuid
+            }`
           )}`
         );
         return;
       }
       setIsReportModalOpen(true);
-    }, [user.loggedIn, user._persist?.rehydrated, router, postParsed.postUuid]);
+    }, [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      router,
+      postParsed.postShortId,
+      postParsed.postUuid,
+    ]);
 
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
@@ -329,32 +339,9 @@ export const PostCard: React.FC<ICard> = React.memo(
             fetch(decoded.coverImageUrl as string)
               .then((res) => res.blob())
               .then((blobFromFetch) => {
-                const reader = new FileReader();
+                const url = URL.createObjectURL(blobFromFetch);
 
-                reader.onloadend = () => {
-                  if (!reader.result) return;
-
-                  const byteCharacters = atob(
-                    reader.result.slice(
-                      (reader.result as string).indexOf(',') + 1
-                    ) as string
-                  );
-
-                  const byteNumbers = new Array(byteCharacters.length);
-
-                  // eslint-disable-next-line no-plusplus
-                  for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                  }
-
-                  const byteArray = new Uint8Array(byteNumbers);
-                  const blob = new Blob([byteArray], { type: 'video/mp4' });
-                  const url = URL.createObjectURL(blob);
-
-                  setCoverImageUrl(url);
-                };
-
-                reader.readAsDataURL(blobFromFetch);
+                setCoverImageUrl(url);
               })
               .catch((err) => {
                 console.error(err);
@@ -418,7 +405,13 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, []);
 
     useEffect(() => {
-      router.prefetch(`/p/${switchPostType(item)[0].postUuid}`);
+      router.prefetch(
+        `/p/${
+          switchPostType(item)[0].postShortId
+            ? switchPostType(item)[0].postShortId
+            : switchPostType(item)[0].postUuid
+        }`
+      );
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -445,6 +438,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           ref={(el) => {
             wrapperRef.current = el!!;
           }}
+          className='postcard-identifier'
           onMouseEnter={() => handleSetHovered()}
           onTouchStart={() => handleSetHovered()}
           onMouseLeave={() => handleSetUnhovered()}
@@ -507,6 +501,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 {!isMobile && isEllipseMenuOpen && (
                   <PostCardEllipseMenu
                     postUuid={postParsed.postUuid}
+                    postShortId={postParsed.postShortId ?? ''}
                     postType={typeOfPost as TPostType}
                     isVisible={isEllipseMenuOpen}
                     postCreator={postParsed.creator as newnewapi.User}
@@ -548,6 +543,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               isOpen={isEllipseMenuOpen}
               zIndex={11}
               postUuid={postParsed.postUuid}
+              postShortId={postParsed.postShortId ?? ''}
               postType={typeOfPost as TPostType}
               postCreator={postParsed.creator as newnewapi.User}
               handleReportOpen={handleReportOpen}
@@ -563,6 +559,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         ref={(el) => {
           wrapperRef.current = el!!;
         }}
+        className='postcard-identifier'
         onMouseEnter={() => handleSetHovered()}
         onTouchStart={() => handleSetHovered()}
         onMouseLeave={() => handleSetUnhovered()}
@@ -610,6 +607,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               {!isMobile && (
                 <PostCardEllipseMenu
                   postUuid={postParsed.postUuid}
+                  postShortId={postParsed.postShortId ?? ''}
                   postType={typeOfPost as TPostType}
                   isVisible={isEllipseMenuOpen}
                   postCreator={postParsed.creator as newnewapi.User}
@@ -737,6 +735,7 @@ export const PostCard: React.FC<ICard> = React.memo(
             isOpen={isEllipseMenuOpen}
             zIndex={11}
             postUuid={postParsed.postUuid}
+            postShortId={postParsed.postShortId ?? ''}
             postType={typeOfPost as TPostType}
             postCreator={postParsed.creator as newnewapi.User}
             handleReportOpen={handleReportOpen}

@@ -19,14 +19,16 @@ import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
 import moment from 'moment-timezone';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 // Custom error page
 import Error from './_error';
 
 // Global CSS configurations
 import ResizeMode from '../HOC/ResizeMode';
+import withRecaptchaProvider from '../HOC/withRecaptcha';
 import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
@@ -51,6 +53,7 @@ import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 import CardsContextProvider from '../contexts/cardsContext';
+import PushNotificationContextProvider from '../contexts/pushNotificationsContext';
 
 // Images to be prefetched
 import assets from '../constants/assets';
@@ -61,11 +64,12 @@ import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
 import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 import { Mixpanel } from '../utils/mixpanel';
-import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
+
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
-import useScrollRestoration from '../utils/hooks/useScrollRestoration';
+import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
+import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -79,14 +83,16 @@ interface IMyApp extends AppProps {
   themeFromCookie?: 'light' | 'dark';
 }
 
+const queryClient = new QueryClient();
+
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
   const store = useStore();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
-
-  useScrollRestoration();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [currentLocale, setCurrentLocale] = useState(locale);
 
   // Shared layouts
   const getLayout = useMemo(
@@ -126,6 +132,12 @@ const MyApp = (props: IMyApp): ReactElement => {
       // eslint-disable-next-line global-require
       countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
     }
+
+    // Force update is needed as new locale applies only to new moments
+    // This makes components which use moment not pure and this not optimizable
+    // Solutions: force re-render of the whole tree, reload page,
+    // Expand router to handle moment.locale before setting state and force dependencies to locale where moment is used
+    setCurrentLocale(locale);
   }, [locale]);
 
   useEffect(() => {
@@ -203,23 +215,7 @@ const MyApp = (props: IMyApp): ReactElement => {
         {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
-          language={locale}
-          scriptProps={{
-            async: false,
-            defer: false,
-            appendTo: 'head',
-            nonce: undefined,
-          }}
-          container={{
-            element: 'recaptchaBadge',
-            parameters: {
-              badge: 'bottomleft',
-              theme: 'dark',
-            },
-          }}
-        >
+        <QueryClientProvider client={queryClient}>
           <LanguageWrapper>
             <AppConstantsContextProvider>
               <SocketContextProvider>
@@ -228,48 +224,55 @@ const MyApp = (props: IMyApp): ReactElement => {
                     <SyncUserWrapper>
                       <NotificationsProvider>
                         <ModalNotificationsContextProvider>
-                          <BlockedUsersProvider>
-                            <FollowingsContextProvider>
-                              <CardsContextProvider>
-                                <BundlesContextProvider>
-                                  <ChatsProvider>
-                                    <OverlayModeProvider>
-                                      <ResizeMode>
-                                        <GlobalTheme
-                                          initialTheme={colorMode}
-                                          themeFromCookie={themeFromCookie}
-                                        >
-                                          <>
-                                            <ToastContainer containerId='toast-container' />
-                                            <VideoProcessingWrapper>
-                                              <ErrorBoundary>
-                                                {!pageProps.error ? (
-                                                  getLayout(
-                                                    <Component {...pageProps} />
-                                                  )
-                                                ) : (
-                                                  <Error
-                                                    title={
-                                                      pageProps.error?.message
-                                                    }
-                                                    statusCode={
-                                                      pageProps.error
-                                                        ?.statusCode ?? 500
-                                                    }
-                                                  />
-                                                )}
-                                              </ErrorBoundary>
-                                            </VideoProcessingWrapper>
-                                            <ReCaptchaBadgeModal />
-                                          </>
-                                        </GlobalTheme>
-                                      </ResizeMode>
-                                    </OverlayModeProvider>
-                                  </ChatsProvider>
-                                </BundlesContextProvider>
-                              </CardsContextProvider>
-                            </FollowingsContextProvider>
-                          </BlockedUsersProvider>
+                          <PushNotificationContextProvider>
+                            <BlockedUsersProvider>
+                              <FollowingsContextProvider>
+                                <CardsContextProvider>
+                                  <BundlesContextProvider>
+                                    <ChatsProvider>
+                                      <OverlayModeProvider>
+                                        <MultipleBeforePopStateContextProvider>
+                                          <ResizeMode>
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  <ErrorBoundary>
+                                                    {!pageProps.error ? (
+                                                      getLayout(
+                                                        <Component
+                                                          {...pageProps}
+                                                        />
+                                                      )
+                                                    ) : (
+                                                      <Error
+                                                        title={
+                                                          pageProps.error
+                                                            ?.message
+                                                        }
+                                                        statusCode={
+                                                          pageProps.error
+                                                            ?.statusCode ?? 500
+                                                        }
+                                                      />
+                                                    )}
+                                                    <PushNotificationModalContainer />
+                                                  </ErrorBoundary>
+                                                </VideoProcessingWrapper>
+                                              </>
+                                            </GlobalTheme>
+                                          </ResizeMode>
+                                        </MultipleBeforePopStateContextProvider>
+                                      </OverlayModeProvider>
+                                    </ChatsProvider>
+                                  </BundlesContextProvider>
+                                </CardsContextProvider>
+                              </FollowingsContextProvider>
+                            </BlockedUsersProvider>
+                          </PushNotificationContextProvider>
                         </ModalNotificationsContextProvider>
                       </NotificationsProvider>
                     </SyncUserWrapper>
@@ -278,7 +281,8 @@ const MyApp = (props: IMyApp): ReactElement => {
               </SocketContextProvider>
             </AppConstantsContextProvider>
           </LanguageWrapper>
-        </GoogleReCaptchaProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </CookiesProvider>
     </>
   );
@@ -286,9 +290,17 @@ const MyApp = (props: IMyApp): ReactElement => {
 
 const MyAppWithTranslation = appWithTranslation(MyApp);
 
-const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
+const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
+  MyAppWithTranslation as React.FunctionComponent
+);
 
-MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
+const MyAppWithTranslationAndRecaptchaProviderAndRedux = wrapper.withRedux(
+  MyAppWithTranslationAndRecaptchaProvider
+);
+
+MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
+  appContext: any
+) => {
   const appProps = await App.getInitialProps(appContext);
 
   if (appContext.ctx?.req.cookies?.timezone) {
@@ -312,7 +324,7 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   };
 };
 
-export default MyAppWithTranslationAndRedux;
+export default MyAppWithTranslationAndRecaptchaProviderAndRedux;
 
 // Preload assets
 const PRE_FETCH_LINKS_COMMON = (

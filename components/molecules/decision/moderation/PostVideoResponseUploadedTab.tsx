@@ -10,17 +10,12 @@ import styled, { keyframes } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
-import loadVideo from '../../../../utils/loadVideo';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import {
   removeUploadedFile,
   stopVideoProcessing,
 } from '../../../../api/endpoints/upload';
-import {
-  MAX_VIDEO_DURATION,
-  MAX_VIDEO_SIZE,
-  MIN_VIDEO_DURATION,
-} from '../../../../constants/general';
+import { MAX_VIDEO_SIZE } from '../../../../constants/general';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import Text from '../../../atoms/Text';
@@ -157,21 +152,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           t('postVideo.uploadResponseForm.video.error.maxSize')
         );
       } else {
-        const media: any = await loadVideo(file);
-
-        if (media.duration < MIN_VIDEO_DURATION) {
-          showErrorToastCustom(
-            t('postVideo.uploadResponseForm.video.error.minLength')
-          );
-        } else if (media.duration > MAX_VIDEO_DURATION) {
-          showErrorToastCustom(
-            t('postVideo.uploadResponseForm.video.error.maxLength')
-          );
-        } else {
-          setLocalFile(file);
-          handleItemChange(id, file);
-          handleSetCurrentAdditionalResponseStep('editing');
-        }
+        setLocalFile(file);
+        handleItemChange(id, file);
+        handleSetCurrentAdditionalResponseStep('editing');
       }
     },
     [
@@ -188,6 +171,11 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const handleRetryVideoUpload = useCallback(() => {
     handleItemChange(id, localFile);
   }, [id, localFile, handleItemChange]);
+
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
@@ -253,7 +241,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
               </SLoadingDescription>
               <SLoadingBottomBlockButton
                 view='secondary'
-                onClick={handleCancelVideoUpload}
+                onClick={() => handleCancelUploadAndClearLocalFile()}
               >
                 {t('postVideo.uploadResponseForm.button.cancel')}
               </SLoadingBottomBlockButton>
@@ -309,6 +297,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           </SLoadingBox>
         </SLoadingContainer>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
@@ -320,9 +310,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingLoading,
     responseFileUploadETA,
     responseFileUploadProgress,
-    handleCancelVideoUpload,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
+    handleCancelUploadAndClearLocalFile,
     localFile,
   ]);
 

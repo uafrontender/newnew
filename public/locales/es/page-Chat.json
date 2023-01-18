@@ -63,7 +63,7 @@
   },
   "emptyInbox": {
     "title": "Su bandeja de entrada está vacía",
-    "text": "Una vez que inicies una nueva conversación, la verás listada aquí"
+    "text_NEED_TRANSLATION": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
   },
   "newAnnouncement": {
     "title": "Nuevo anuncio",
@@ -77,7 +77,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
-    "beforeName": "El anuncio de",
+    "beforeName": "El anuncios de",
     "suffix": "",
     "afterName": "",
     "topMessageStart": "Solamente",

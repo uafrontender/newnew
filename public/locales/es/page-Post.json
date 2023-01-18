@@ -123,6 +123,9 @@
     "body": "Ver más parecidos.",
     "buttonText": "Ver más"
   },
+  "postTopInfo": {
+    "notifyMe": "Notificarme"
+  },
   "postVideo": {
     "tabs": {
       "announcement": "Publicar",
@@ -298,6 +301,10 @@
         "minutes": "Minutos",
         "seconds": "Segundos"
       }
+    },
+    "loading_NEED_TRANSLATION": {
+      "title": "Almost Done...",
+      "subtitle": "Just a little bit left!"
     }
   },
   "acPost": {
@@ -435,12 +442,8 @@
         "button": "Votar"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "votos",
-            "vote": "voto"
-          }
-        },
+        "votesAmount_NEED_TRANSLATION": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment_NEED_TRANSLATION": "Total",
         "suggestionPlaceholder": "Agregar tu propia opción",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
@@ -528,8 +531,8 @@
   "acPostModeration": {
     "postTopInfo": {
       "selectWinner": {
-        "title": "¡Es hora de elegir!",
-        "body": "Selecciona tu oferta favorita y sube un video de respuesta antes de que se acabe el tiempo"
+        "title": "¡Hora de elegir!",
+        "body": "Elige tu oferta favorita antes de que se acabe el tiempo"
       }
     },
     "optionsTab": {
@@ -656,6 +659,7 @@
     "hero": {
       "title": "¡Los votos ya han sido conteados!",
       "body": "{{creator}} tiene {{time}} para realizar esta opción. ¡Mantente atento!",
+      "bodyNoResponse_NEED_TRANSLATION": "{{creator}} has {{time}} to do respond. Stay tuned!",
       "expires": {
         "days": "días",
         "days_singular": "día",

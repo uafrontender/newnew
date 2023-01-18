@@ -88,7 +88,8 @@ const getPayWithCardErrorMessage = (
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreatorName: string;
   postText: string;
   index: number;
@@ -107,7 +108,8 @@ interface IMcOptionCard {
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
-  postId,
+  postUuid,
+  postShortId,
   postCreatorName,
   postText,
   index,
@@ -147,7 +149,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const supporterCountSubtracted = useMemo(() => {
-    // if (option.supporterCount) return option.supporterCount;
     if (option.supporterCount > 0) {
       return option.supporterCount - 1;
     }
@@ -225,8 +226,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
 
+  // Predefined and custom votes
+  const [isAmountPredefined, setIsAmountPredefined] = useState(false);
   const [supportVoteOffer, setSupportVoteOffer] =
     useState<newnewapi.McVoteOffer | null>(null);
+  const [customSupportVotesAmount, setCustomSupportVotesAmount] = useState('');
+  const minCustomVotesAmount = useMemo(
+    () =>
+      appConstants.mcVoteOffers &&
+      !!appConstants.mcVoteOffers?.length &&
+      appConstants.mcVoteOffers.length > 0
+        ? appConstants.mcVoteOffers[appConstants.mcVoteOffers.length - 1]
+            .amountOfVotes!! + 1
+        : 2000,
+    [appConstants.mcVoteOffers]
+  );
 
   const handleOpenSupportForm = () => {
     setIsSupportMenuOpen(true);
@@ -242,7 +256,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [bundleVotesModalOpen, setBundleVotesModalOpen] = useState(false);
 
   // Handlers
-  const handleTogglePaymentModalOpen = () => {
+  const handleOpenPaymentModal = () => {
     setPaymentModalOpen(true);
   };
 
@@ -253,7 +267,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const handleSetVoteOfferAndOpenModal = (
     newVoteOffer: newnewapi.McVoteOffer
   ) => {
+    setCustomSupportVotesAmount('');
+    setIsAmountPredefined(true);
     setSupportVoteOffer(newVoteOffer);
+    setIsConfirmVoteModalOpen(true);
+  };
+
+  const handleOpenCustomAmountModal = () => {
+    setCustomSupportVotesAmount('');
+    setIsAmountPredefined(false);
+    setSupportVoteOffer(null);
     setIsConfirmVoteModalOpen(true);
   };
 
@@ -261,6 +284,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsConfirmVoteModalOpen(false);
   };
 
+  // Predefined amount
   const paymentAmountInCents = useMemo(
     () => supportVoteOffer?.price?.usdCents || 0,
     [supportVoteOffer]
@@ -280,23 +304,60 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     [paymentAmountInCents, paymentFeeInCents]
   );
 
-  const voteOnPostRequest = useMemo(
+  // Custom amount
+  const customPaymentAmountInCents = useMemo(
+    () => (parseInt(customSupportVotesAmount) || 0) * appConstants.mcVotePrice,
+    [appConstants, customSupportVotesAmount]
+  );
+
+  const customPaymentFeeInCents = useMemo(
     () =>
-      new newnewapi.VoteOnPostRequest({
-        postUuid: postId,
-        votesCount: supportVoteOffer?.amountOfVotes,
+      getCustomerPaymentFee(
+        customPaymentAmountInCents,
+        parseFloat(appConstants.customerFee)
+      ),
+    [customPaymentAmountInCents, appConstants.customerFee]
+  );
+
+  const customPaymentWithFeeInCents = useMemo(
+    () => customPaymentAmountInCents + customPaymentFeeInCents,
+    [customPaymentAmountInCents, customPaymentFeeInCents]
+  );
+
+  const voteOnPostRequest = useMemo(() => {
+    if (customSupportVotesAmount) {
+      return new newnewapi.VoteOnPostRequest({
+        postUuid,
+        votesCount: parseInt(customSupportVotesAmount),
         customerFee: new newnewapi.MoneyAmount({
-          usdCents: paymentFeeInCents,
+          usdCents: customPaymentFeeInCents,
         }),
         optionId: option.id,
+      });
+    }
+    return new newnewapi.VoteOnPostRequest({
+      postUuid,
+      votesCount: supportVoteOffer?.amountOfVotes,
+      customerFee: new newnewapi.MoneyAmount({
+        usdCents: paymentFeeInCents,
       }),
-    [postId, supportVoteOffer, option.id, paymentFeeInCents]
-  );
+      optionId: option.id,
+    });
+  }, [
+    customSupportVotesAmount,
+    postUuid,
+    supportVoteOffer?.amountOfVotes,
+    paymentFeeInCents,
+    option.id,
+    customPaymentFeeInCents,
+  ]);
 
   const setupIntent = useStripeSetupIntent({
     purpose: voteOnPostRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+      postShortId || postUuid
+    }`,
   });
 
   const handlePayWithCard = useCallback(
@@ -319,7 +380,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'McOptionCard',
         _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
@@ -355,9 +416,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        handleSetPaymentSuccessValue(supportVoteOffer?.amountOfVotes || 0);
+        handleSetPaymentSuccessValue(
+          isAmountPredefined
+            ? supportVoteOffer?.amountOfVotes || 0
+            : parseInt(customSupportVotesAmount)
+        );
         setPaymentModalOpen(false);
         setSupportVoteOffer(null);
+        setCustomSupportVotesAmount('');
         setIsSupportMenuOpen(false);
       } catch (err: any) {
         console.error(err);
@@ -369,11 +435,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     },
     [
       setupIntent,
-      postId,
+      postUuid,
       router,
       handleAddOrUpdateOptionFromResponse,
       handleSetPaymentSuccessValue,
+      isAmountPredefined,
       supportVoteOffer?.amountOfVotes,
+      customSupportVotesAmount,
       t,
       showErrorToastCustom,
     ]
@@ -388,7 +456,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         const payload = new newnewapi.VoteOnPostRequest({
           votesCount,
           optionId: option.id,
-          postUuid: postId,
+          postUuid,
         });
 
         const res = await voteWithBundleVotes(payload);
@@ -417,7 +485,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     },
     [
       option.id,
-      postId,
+      postUuid,
       handleAddOrUpdateOptionFromResponse,
       handleSetPaymentSuccessValue,
       showErrorToastCustom,
@@ -567,7 +635,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
                     _stage: 'Post',
-                    _postUuid: postId,
+                    _postUuid: postUuid,
                     _component: 'McOptionCard',
                   });
                 }}
@@ -613,7 +681,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 onClickCapture={() => {
                   Mixpanel.track('Vote Click', {
                     _stage: 'Post',
-                    _postUuid: postId,
+                    _postUuid: postUuid,
                     _component: 'McOptionCard',
                   });
                 }}
@@ -656,13 +724,22 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <McOptionConfirmVoteModal
             zIndex={11}
             isOpen={isConfirmVoteModalOpen}
+            isAmountPredefined={isAmountPredefined || !!supportVoteOffer}
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
             ).toString()}
             postCreatorName={getDisplayname(creator)}
             optionText={option.text}
             onClose={() => handleCloseConfirmVoteModal()}
-            handleOpenPaymentModal={() => handleTogglePaymentModalOpen()}
+            handleOpenPaymentModal={() => handleOpenPaymentModal()}
+            // Custom amount of votes
+            customSupportVotesAmount={customSupportVotesAmount}
+            customPaymentWithFeeInCents={customPaymentWithFeeInCents}
+            // Based on largest offered amount + 1 vote
+            minAmount={minCustomVotesAmount}
+            handleSetSupportVotesAmount={(newValue: string) =>
+              setCustomSupportVotesAmount(newValue)
+            }
           />
         ) : null}
         {/* Use Bundle votes vote modal */}
@@ -680,15 +757,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
-            amount={paymentWithFeeInCents}
+            amount={
+              !isAmountPredefined
+                ? customPaymentWithFeeInCents
+                : paymentWithFeeInCents
+            }
             setupIntent={setupIntent}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCard={handlePayWithCard}
-            redirectUrl={`p/${postId}`}
+            redirectUrl={`p/${postShortId || postUuid}`}
             bottomCaption={
               (!appConstants.minHoldAmount?.usdCents ||
-                paymentWithFeeInCents >
-                  appConstants.minHoldAmount?.usdCents) && (
+                paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents ||
+                (customPaymentWithFeeInCents &&
+                  customPaymentWithFeeInCents >
+                    appConstants.minHoldAmount?.usdCents)) && (
                 <SPaymentSign variant='subtitle'>
                   {t('mcPost.paymentModalFooter.body', {
                     creator: postCreatorName,
@@ -747,6 +830,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
           handleOpenBundleVotesModal={handleOpenBundleVotesModal}
+          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
@@ -831,6 +915,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             bundle?.votesLeft ? handleOpenBundleVotesModal : undefined
           }
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
+          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
         />
       )}
       {/* Ellipse modal */}

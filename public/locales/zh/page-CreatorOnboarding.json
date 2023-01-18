@@ -112,7 +112,8 @@
       "back": "返回",
       "submit": "完成"
     },
-    "agreedToTosCheckbox": "我已閱讀並同意"
+    "agreedToTosCheckbox": "我已閱讀並同意",
+    "linkText_NEED_TRANSLATION": "NewNew's terms"
   },
   "aboutSection": {
     "meta": {

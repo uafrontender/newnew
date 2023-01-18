@@ -21,6 +21,8 @@ import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 import ReCaptchaV2 from '../../../atoms/ReCaptchaV2';
+import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
@@ -42,7 +44,7 @@ import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/Chevro
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 import urltoFile from '../../../../utils/urlToFile';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
-import PostTitleContent from '../../../atoms/PostTitleContent';
+
 import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
@@ -103,6 +105,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const isDesktop = !isMobile && !isTablet;
 
   const [isDisabledAdditionally, setIsDisabledAdditionally] = useState(false);
+  const [isGoingToHomepage, setIsGoingToHomepage] = useState(false);
 
   const allowedRoutes = [
     '/creation',
@@ -122,7 +125,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   }
 
   useLeavePageConfirm(
-    showModal ? false : true,
+    showModal || !post.title ? false : true,
     t('secondStep.modal.leave.message'),
     allowedRoutes
   );
@@ -212,6 +215,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   }, [router]);
 
   const handleCloseModal = useCallback(() => {
+    setIsGoingToHomepage(true);
     setShowModal(false);
     router.push('/');
     dispatch(clearCreation(undefined));
@@ -461,10 +465,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   );
 
   useUpdateEffect(() => {
-    if (!post.title) {
+    if (!post.title && !isGoingToHomepage) {
       router?.push('/creation');
     }
-  }, [post.title, router]);
+  }, [post.title, router, isGoingToHomepage]);
 
   // This effect results in the form re-rendering every second
   // However, it re renders after every letter typed anyway
@@ -497,9 +501,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (!post.title) {
+    return <LoadingView />;
+  }
+
   if (isMobile) {
     return (
       <>
+        {isGoingToHomepage && <LoadingView />}
         <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
@@ -553,6 +562,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   return (
     <>
+      {isGoingToHomepage && <LoadingView />}
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
       <STabletContent>
         <SLeftPart>

@@ -266,5 +266,29 @@
     "minutesLeft": "分鐘",
     "secondsLeft": "秒",
     "endedOn": "結束於"
+  },
+  "pushNotification_NEED_TRANSLATION": {
+    "alert": {
+      "safari": {
+        "title": "Turn on web notifications",
+        "subtitle": " Safari > Preferences > Notification."
+      },
+      "nonSafari": {
+        "title": "Turn on web notifications by clicking the lock"
+      },
+      "windows": {
+        "subtitle": "or go to Start > Settings > System > Notifications"
+      }
+    },
+    "requestModal": {
+      "title": "Turn on notifications",
+      "description": "Turn on web notifications and get alerts about new posts on NewNew.",
+      "button": "Turn on"
+    },
+    "successModal": {
+      "title": "Cheers!",
+      "description": "Thank you, we will keep you updated about new posts on NewNew.",
+      "button": "Cool!"
+    }
   }
 }

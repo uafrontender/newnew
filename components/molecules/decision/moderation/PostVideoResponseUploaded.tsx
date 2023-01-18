@@ -95,7 +95,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
         />
       )}
       <PostVideoSoundButton
-        postId={postParsed?.postUuid ?? ''}
+        postUuid={postParsed?.postUuid ?? ''}
         isMuted={isMuted}
         soundBtnBottomOverriden={soundBtnBottomOverriden}
         handleToggleMuted={handleToggleMuted}

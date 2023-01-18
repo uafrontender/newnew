@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -439,7 +440,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                     }${t('announcement.suffix')} ${t('announcement.afterName')}`
                   : getDisplayname(chatRoom.visavis?.user)
               }
-              {chatRoom.visavis?.user?.options?.isVerified &&
+              {(chatRoom.visavis?.user?.options?.isVerified ||
+                (isMyAnnouncement && user.userData?.options?.isVerified)) &&
                 !isAnnouncement && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -448,19 +450,26 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                   />
                 )}
             </SUserName>
-            <SUserAlias>
-              {!isAnnouncement
-                ? `@${chatRoom.visavis?.user?.username}`
-                : `${
-                    chatRoom.memberCount && chatRoom.memberCount > 0
-                      ? chatRoom.memberCount
-                      : 0
-                  } ${
-                    chatRoom.memberCount && chatRoom.memberCount > 1
-                      ? t('newAnnouncement.members')
-                      : t('newAnnouncement.member')
-                  }`}
-            </SUserAlias>
+            {!isAnnouncement && (
+              <Link href={`/${chatRoom?.visavis?.user?.username}`}>
+                <a style={{ display: 'flex' }}>
+                  <SUserAlias>{`@${chatRoom.visavis?.user?.username}`}</SUserAlias>
+                </a>
+              </Link>
+            )}
+            {isAnnouncement && (
+              <SUserAlias>
+                {`${
+                  chatRoom.memberCount && chatRoom.memberCount > 0
+                    ? chatRoom.memberCount
+                    : 0
+                } ${
+                  chatRoom.memberCount && chatRoom.memberCount > 1
+                    ? t('newAnnouncement.members')
+                    : t('newAnnouncement.member')
+                }`}
+              </SUserAlias>
+            )}
           </SUserData>
         </STopPart>
       )}

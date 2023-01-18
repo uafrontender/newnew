@@ -1,5 +1,4 @@
 import React, {
-  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -15,6 +14,7 @@ import { useAppSelector } from '../../redux-store/store';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
+import CustomLink from '../atoms/CustomLink';
 import General from './General';
 import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
@@ -22,25 +22,24 @@ import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
+import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
+import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
+import UserEllipseModal from '../molecules/profile/UserEllipseModal';
+import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
+import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
+import BackButton from '../molecules/profile/BackButton';
+// import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
-import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
-import UserEllipseModal from '../molecules/profile/UserEllipseModal';
-import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
-import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
-import BackButton from '../molecules/profile/BackButton';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
-import CustomLink from '../atoms/CustomLink';
-// import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
-import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
 
@@ -49,28 +48,12 @@ type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
   renderedPage: TPageType;
-  postsCachedCreatorDecisions?: newnewapi.Post[];
-  postsCachedCreatorDecisionsFilter?: newnewapi.Post.Filter;
-  postsCachedCreatorDecisionsPageToken?: string | null | undefined;
-  postsCachedCreatorDecisionsCount?: number;
-  postsCachedActivity?: newnewapi.Post[];
-  postsCachedActivityFilter?: newnewapi.Post.Filter;
-  postsCachedActivityPageToken?: string | null | undefined;
-  postsCachedActivityCount?: number;
   children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
   renderedPage,
-  postsCachedCreatorDecisions,
-  postsCachedCreatorDecisionsFilter,
-  postsCachedCreatorDecisionsPageToken,
-  postsCachedCreatorDecisionsCount,
-  postsCachedActivity,
-  postsCachedActivityFilter,
-  postsCachedActivityPageToken,
-  postsCachedActivityCount,
   children,
 }) => {
   const router = useRouter();
@@ -158,115 +141,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // TODO: Re-enable once new SMS service is integrated
   /* const subscription: SubscriptionToCreator = useMemo(
     () => ({
+      type: 'creator',
       userId: user.uuid,
       username: user.username,
     }),
     [user.uuid, user.username]
   );  */
-
-  // Posts
-  const [creatorsDecisions, setCreatorsDecisions] = useState(
-    postsCachedCreatorDecisions ?? []
-  );
-  const [creatorsDecisionsFilter, setCreatorsDecisionsFilter] = useState(
-    postsCachedCreatorDecisionsFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [creatorsDecisionsToken, setCreatorsDecisionsPageToken] = useState(
-    postsCachedCreatorDecisionsPageToken
-  );
-  const [creatorsDecisionsCount, setCreatorsDecisionsCount] = useState(
-    postsCachedCreatorDecisionsCount
-  );
-
-  const [activityDecisions, setActivityDecisions] = useState(
-    postsCachedActivity ?? []
-  );
-  const [activityDecisionsFilter, setActivityDecisionsFilter] = useState(
-    postsCachedActivityFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [activityDecisionsToken, setActivityDecisionsPageToken] = useState(
-    postsCachedActivityPageToken
-  );
-  const [activityDecisionsCount, setActivityDecisionsCount] = useState(
-    postsCachedActivityCount
-  );
-
-  const handleSetPostsCreatorsDecisions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setCreatorsDecisions, [setCreatorsDecisions]);
-
-  const handleSetActivityDecisions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setActivityDecisions, [setActivityDecisions]);
-
-  const handleUpdateFilter = useCallback(
-    (value: newnewapi.Post.Filter) => {
-      switch (renderedPage) {
-        case 'activity': {
-          setActivityDecisionsFilter(value);
-          break;
-        }
-        case 'activityHidden': {
-          setActivityDecisionsFilter(value);
-          break;
-        }
-        case 'creatorsDecisions': {
-          setCreatorsDecisionsFilter(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
-  const handleUpdatePageToken = useCallback(
-    (value: string | null | undefined) => {
-      switch (renderedPage) {
-        case 'activity': {
-          setActivityDecisionsPageToken(value);
-          break;
-        }
-        case 'activityHidden': {
-          setActivityDecisionsPageToken(value);
-          break;
-        }
-        case 'creatorsDecisions': {
-          setCreatorsDecisionsPageToken(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
-  const handleUpdateCount = useCallback(
-    (value: number) => {
-      switch (renderedPage) {
-        case 'activity': {
-          setActivityDecisionsCount(value);
-          break;
-        }
-        case 'activityHidden': {
-          setActivityDecisionsCount(value);
-          break;
-        }
-        case 'creatorsDecisions': {
-          setCreatorsDecisionsCount(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
 
   const handleClickReport = useCallback(() => {
     // Redirect only after the persist data is pulled
@@ -291,88 +171,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     [user.uuid]
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
-
-  const renderChildren = () => {
-    let postsForPage = {};
-    let postsForPageFilter;
-    let pageToken;
-    let handleSetPosts;
-    let totalCount;
-
-    switch (renderedPage) {
-      case 'creatorsDecisions': {
-        postsForPage = creatorsDecisions;
-        postsForPageFilter = creatorsDecisionsFilter;
-        pageToken = creatorsDecisionsToken;
-        totalCount = creatorsDecisionsCount;
-        handleSetPosts = handleSetPostsCreatorsDecisions;
-        break;
-      }
-      case 'activity': {
-        postsForPage = activityDecisions;
-        postsForPageFilter = activityDecisionsFilter;
-        pageToken = activityDecisionsToken;
-        totalCount = activityDecisionsCount;
-        handleSetPosts = handleSetActivityDecisions;
-        break;
-      }
-      case 'activityHidden': {
-        postsForPage = [];
-        postsForPageFilter = activityDecisionsFilter;
-        pageToken = undefined;
-        totalCount = 0;
-        handleSetPosts = handleSetActivityDecisions;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
-    return React.cloneElement(children as ReactElement, {
-      ...(postsForPage ? { posts: postsForPage } : {}),
-      ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
-      pageToken,
-      totalCount,
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
-      handleUpdateFilter,
-    });
-  };
-
-  // const handleToggleFollowingCreator = async () => {
-  //   try {
-  //     if (!currentUser.loggedIn) {
-  //       router.push(
-  //         `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
-  //           window.location.href
-  //         )}`
-  //       );
-  //     }
-
-  //     const payload = new newnewapi.MarkUserRequest({
-  //       userUuid: user.uuid,
-  //       markAs: followingsIds.includes(user.uuid as string)
-  //         ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
-  //         : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-  //     });
-
-  //     console.log(payload);
-
-  //     const res = await markUser(payload);
-
-  //     if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-  //     if (followingsIds.includes(user.uuid as string)) {
-  //       removeId(user.uuid as string);
-  //     } else {
-  //       addId(user.uuid as string);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   // Try to pre-fetch the content
   useEffect(() => {
@@ -403,40 +201,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     user.uuid,
   ]);
 
-  /* useEffect(() => {
-    async function fetchIsSubscribed() {
-      try {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: user.uuid,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        if (res.data?.status?.activeRenewsAt) {
-          setIsSubscribed(true);
-        } else {
-          setIsSubscribed(false);
-        }
-        if (res.data?.status?.activeCancelsAt) {
-          setWasSubscribed(true);
-        } else {
-          setWasSubscribed(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchIsSubscribed();
-
-    // TODO: After update GetCreatorsImSubscribedToResponse on backend remaster this section
-    // let isSub = undefined;
-    // if (creatorsImSubscribedTo && creatorsImSubscribedTo.length > 0) {
-    //   isSub = creatorsImSubscribedTo.find((cr) => cr.uuid === user.uuid);
-    // }
-    // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
-  }, [creatorsImSubscribedTo, user.uuid]); */
-
   const moreButtonRef = useRef() as any;
 
   return (
@@ -452,30 +216,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               router.back();
             }}
           />
-          {/* <SFavoritesButton
-            view='transparent'
-            iconOnly
-            onClick={() => handleToggleFollowingCreator()}
-          >
-            <SSVGContainer active={false}>
-              <InlineSvg
-                svg={
-                  followingsIds.includes(user.uuid as string)
-                    ? FavouritesIconFilled
-                    : FavouritesIconOutlined
-                }
-                fill={
-                  followingsIds.includes(user.uuid as string)
-                    ? theme.colorsThemed.accent.blue
-                    : 'none'
-                }
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-            </SSVGContainer>
-            {t('profileLayout.buttons.favorites')}
-          </SFavoritesButton> */}
-
           <SSideButtons>
             {
               // TODO: Re-enable once new SMS service is integrated
@@ -486,7 +226,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               /* ) */
             }
             <RightSideButtons>
-              {!isMobile && (
+              {!isMobile && !isUserBlocked && (
                 <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
               )}
               <SIconButton
@@ -598,7 +338,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </CustomLink>
             )}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-            {isMobile && (
+            {isMobile && !isUserBlocked && (
               <SMobileSeeBundleButton
                 user={user}
                 creatorBundle={creatorsBundle}
@@ -611,7 +351,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
           ) : null}
         </SProfileLayout>
-        {!isBlocked && renderChildren()}
+        {!isBlocked && children}
       </SGeneral>
       {/* Modals */}
       {isMobile && (
@@ -648,16 +388,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 };
 
-ProfileLayout.defaultProps = {
-  postsCachedCreatorDecisions: undefined,
-  postsCachedCreatorDecisionsFilter: undefined,
-  postsCachedCreatorDecisionsPageToken: undefined,
-  postsCachedCreatorDecisionsCount: undefined,
-  postsCachedActivity: undefined,
-  postsCachedActivityFilter: undefined,
-  postsCachedActivityPageToken: undefined,
-  postsCachedActivityCount: undefined,
-};
+ProfileLayout.defaultProps = {};
 
 export default ProfileLayout;
 
@@ -770,7 +501,7 @@ const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
 
   user-select: unset;
 

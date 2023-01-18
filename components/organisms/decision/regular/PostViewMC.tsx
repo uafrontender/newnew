@@ -19,8 +19,9 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
+import { fetchPostByUUID } from '../../../../api/endpoints/post';
 import {
+  canCreateCustomOption,
   fetchCurrentOptionsForMCPost,
   voteOnPost,
 } from '../../../../api/endpoints/multiple_choice';
@@ -41,10 +42,12 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import BuyBundleModal from '../../../molecules/bundles/BuyBundleModal';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const LoadingModal = dynamic(() => import('../../../molecules/LoadingModal'));
@@ -110,6 +113,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
   const router = useRouter();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -137,6 +142,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       ),
     [bundles, postParsed?.creator?.uuid]
   );
+
+  const [canAddOptionApiCheck, setCanAddOptionApiCheck] = useState(false);
+  const canAddCustomOption = useMemo(() => {
+    // Check if there's a bundle for creator
+    if (!creatorsBundle) return false;
+
+    return canAddOptionApiCheck;
+  }, [creatorsBundle, canAddOptionApiCheck]);
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
@@ -363,33 +376,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     }
   };
 
-  // Mark post as viewed if logged in
-  useEffect(() => {
-    async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-        return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-
-        if (res.error) throw new Error('Failed to mark post as viewed');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [post, user.loggedIn, user.userData?.userUuid]);
+  /* const subscription: SubscriptionToPost = useMemo(
+    () => ({
+      type: 'post',
+      postUuid: post.postUuid,
+      postTitle: post.title,
+    }),
+    [post]
+  ); */
 
   useEffect(() => {
     // setTimeout used to fix the React memory leak warning
@@ -404,6 +398,34 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function checkCanAddCustomOption() {
+      try {
+        const payload = new newnewapi.CanCreateCustomMcOptionRequest({
+          postUuid: post.postUuid,
+        });
+
+        const res = await canCreateCustomOption(payload, controller.signal);
+
+        if (res.data?.canAdd) {
+          setCanAddOptionApiCheck(res.data.canAdd);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (user.loggedIn && creatorsBundle) {
+      checkCanAddCustomOption();
+    }
+
+    return () => {
+      controller.abort();
+    };
+  }, [post.postUuid, user.loggedIn, creatorsBundle]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -562,7 +584,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -672,7 +694,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               />
             )}
           </SExpiresSection>
-          <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+          <PostTopInfo
+            /* subscription={subscription} */
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
         </>
       )}
       <SWrapper>
@@ -706,7 +732,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
@@ -714,7 +740,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
         />
-        {isMobile && <PostTopInfo totalVotes={totalVotes} hasWinner={false} />}
+        {isMobile && (
+          <PostTopInfo
+            /* subscription={subscription} */
+            totalVotes={totalVotes}
+            hasWinner={false}
+          />
+        )}
         <SActivitiesContainer>
           <div
             style={{
@@ -750,7 +782,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                     />
                   )}
                 </SExpiresSection>
-                <PostTopInfo totalVotes={totalVotes} hasWinner={false} />
+                <PostTopInfo
+                  /* subscription={subscription} */
+                  totalVotes={totalVotes}
+                  hasWinner={false}
+                />
               </>
             )}
             <PostVotingTab
@@ -770,6 +806,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
+            canAddCustomOption={canAddCustomOption}
             bundle={creatorsBundle?.bundle ?? undefined}
             handleLoadOptions={fetchOptions}
             handleAddOrUpdateOptionFromResponse={
@@ -790,9 +827,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
+              promptUserWithPushNotificationsPermissionModal();
             }}
           >
             {t('paymentSuccessModal.mc', {
@@ -847,6 +885,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           </SCommentsHeadline>
           <CommentsBottomSection
             postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}
@@ -898,15 +937,27 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   position: relative;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    'back timer'
+    'endsOn endsOn';
   justify-content: center;
   flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 `;
 
 const SEndDate = styled.div`
+  grid-area: endsOn;
   width: 100%;
   text-align: center;
   padding: 8px 0px;
@@ -918,9 +969,10 @@ const SEndDate = styled.div`
 `;
 
 const SGoBackButton = styled(GoBackButton)`
-  position: absolute;
-  left: 0;
-  top: 4px;
+  grid-area: back;
+  position: relative;
+  top: -4px;
+  left: -8px;
 `;
 
 const SActivitiesContainer = styled.div`

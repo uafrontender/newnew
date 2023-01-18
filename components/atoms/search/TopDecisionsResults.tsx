@@ -6,9 +6,12 @@ import styled from 'styled-components';
 import getDisplayname from '../../../utils/getDisplayname';
 import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
+import { Mixpanel } from '../../../utils/mixpanel';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import UserAvatar from '../../molecules/UserAvatar';
+import InlineSvg from '../InlineSVG';
 import PostTitleContent from '../PostTitleContent';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
 interface IFunction {
   posts: newnewapi.IPost[];
@@ -47,9 +50,18 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
       );
 
       return (
-        <Link href={`/p/${data.postUuid}`} key={data.postUuid}>
+        <Link
+          href={`/p/${data.postShortId ? data.postShortId : data.postUuid}`}
+          key={data.postUuid}
+        >
           <a>
-            <SPost>
+            <SPost
+              onClick={() => {
+                Mixpanel.track('Search Result Post Clicked', {
+                  _postUuid: data.postUuid,
+                });
+              }}
+            >
               <SLeftSide>
                 <SUserAvatar>
                   <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
@@ -62,6 +74,14 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                   )}
                   <SCreatorUsername>
                     {getDisplayname(data.creator)}
+                    {data.creator?.options?.isVerified && (
+                      <InlineSvg
+                        svg={VerificationCheckmark}
+                        width='20px'
+                        height='20px'
+                        fill='none'
+                      />
+                    )}
                   </SCreatorUsername>
                 </SPostData>
               </SLeftSide>
@@ -174,7 +194,10 @@ const SPostTitle = styled.span`
   pointer-events: none;
 `;
 
-const SCreatorUsername = styled.span`
+const SCreatorUsername = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
