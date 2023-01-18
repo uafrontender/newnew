@@ -16,6 +16,7 @@ import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import getDisplayname from '../../../utils/getDisplayname';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -128,7 +129,11 @@ const Notification: React.FC<newnewapi.INotification> = ({
     }
 
     if (content.relatedPost?.title) {
-      return <STitleText>{content.relatedPost.title}</STitleText>;
+      return (
+        <STitleText>
+          <PostTitleContent>{content.relatedPost.title}</PostTitleContent>
+        </STitleText>
+      );
     }
 
     return <STitleText>{t('title.newMessage')}</STitleText>;
@@ -270,7 +275,7 @@ const STitle = styled.div`
 const STitleText = styled.div`
   display: block;
   overflow: hidden;
-  white-space: nowrap;
+  white-space: pre;
   text-overflow: ellipsis;
 `;
 

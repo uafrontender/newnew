@@ -643,6 +643,8 @@ const ChatList: React.FC<IFunctionProps> = ({
         </SChatItemContainer>
       );
     },
+    // This hook should fire when updateTimer is changed (unnecessary dependency)
+    // Also has following unnecessary deps 'activeTab', 'chatRooms', 'displayAllRooms'
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       searchedRooms,
@@ -650,10 +652,14 @@ const ChatList: React.FC<IFunctionProps> = ({
       displayAllRooms,
       activeTab,
       activeChatIndex,
-      sortChats,
       hasSeparator,
       updateTimer,
       isMobileOrTablet,
+      theme,
+      t,
+      isActiveChat,
+      markChatAsRead,
+      openChat,
     ]
   );
 
