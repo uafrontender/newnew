@@ -21,7 +21,7 @@ const DashboardLayout: React.FunctionComponent<IChatLayout> = React.memo(
     const { mobileChatOpened } = useGetChats();
 
     useEffect(() => {
-      if (isMobile) {
+      if (isMobile && mobileChatOpened) {
         document.body.style.cssText = `
           overflow: hidden;
           height: 100vh;
@@ -29,7 +29,7 @@ const DashboardLayout: React.FunctionComponent<IChatLayout> = React.memo(
       } else {
         document.body.style.cssText = ``;
       }
-    }, [isMobile]);
+    }, [isMobile, mobileChatOpened]);
 
     useEffect(
       () => () => {

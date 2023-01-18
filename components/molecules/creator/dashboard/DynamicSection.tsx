@@ -98,7 +98,6 @@ export const DynamicSection = () => {
   );
 
   const isDashboardMessages = useMemo(() => {
-    // if there is not visavis it's our announcement room
     if (router.asPath.includes('creator/dashboard?tab=direct-messages')) {
       return true;
     }

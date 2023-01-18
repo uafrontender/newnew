@@ -163,7 +163,8 @@ export const SChatItemLastMessage = styled(Text)`
 
 export const SChatItemRight = styled.div`
   display: flex;
-  padding: 2px 0;
+  padding: 2px 0 0;
+  margin-bottom: -2px;
   align-items: flex-end;
   flex-direction: column;
   margin-left: auto;

@@ -37,7 +37,6 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   const { mobileChatOpened } = useGetChats();
 
   const isDashboard = useMemo(() => {
-    // if there is not visavis it's our announcement room
     if (router.asPath.includes('/creator/dashboard')) {
       return true;
     }

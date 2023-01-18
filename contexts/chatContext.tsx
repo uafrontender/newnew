@@ -23,6 +23,8 @@ interface IChatsContext {
   activeChatRoom: newnewapi.IChatRoom | null;
   activeTab: newnewapi.ChatRoom.MyRole | undefined;
   searchChatroom: string;
+  justSentMessage: boolean;
+  setJustSentMessage: (value: boolean) => void;
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => void;
   setActiveTab: (activeTab: newnewapi.ChatRoom.MyRole | undefined) => void;
   setHiddenMessagesArea: (hiddenMessagesArea: boolean | null) => void;
@@ -41,6 +43,8 @@ const ChatsContext = createContext<IChatsContext>({
   activeChatRoom: null,
   activeTab: undefined,
   searchChatroom: '',
+  justSentMessage: false,
+  setJustSentMessage: (value: boolean) => {},
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => {},
   setActiveTab: (activeTab: newnewapi.ChatRoom.MyRole | undefined) => {},
   setHiddenMessagesArea: (hiddenMessagesArea: boolean | null) => {},
@@ -70,6 +74,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<
     newnewapi.ChatRoom.MyRole | undefined
   >();
+  const [justSentMessage, setJustSentMessage] = useState<boolean>(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -103,7 +108,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     async function getUnread() {
       if (!user.loggedIn) return;
       try {
-        // setLoadingRooms(true);
         const payload = new newnewapi.EmptyRequest();
         const res = await getTotalUnreadMessageCounts(payload);
         if (!res.data || res.error)
@@ -111,7 +115,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
         setData(res.data);
       } catch (err) {
         console.error(err);
-        // setLoadingRooms(false);
       }
     }
     getUnread();
@@ -185,6 +188,18 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     })();
   }, [user.userData?.options?.creatorStatus]);
 
+  useEffect(() => {
+    if (justSentMessage) {
+      const timer = setTimeout(() => {
+        setJustSentMessage(false);
+      }, 500);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [justSentMessage]);
+
   const contextValue = useMemo(
     () => ({
       unreadCountForUser,
@@ -197,6 +212,8 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       activeChatRoom,
       searchChatroom,
       activeTab,
+      justSentMessage,
+      setJustSentMessage,
       setActiveTab,
       setActiveChatRoom,
       setMobileChatOpened,
@@ -215,6 +232,8 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       hiddenMessagesArea,
       searchChatroom,
       activeTab,
+      justSentMessage,
+      setJustSentMessage,
       setActiveTab,
       setData,
       setActiveChatRoom,

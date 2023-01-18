@@ -12,7 +12,6 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
@@ -34,6 +33,7 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import TextArea from '../../atoms/direct-messages/TextArea';
 import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader';
+import { useGetChats } from '../../../contexts/chatContext';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -75,7 +75,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
   const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
     useGetBlockedUsers();
-
+  const { setJustSentMessage } = useGetChats();
   const [messageText, setMessageText] = useState<string>('');
   const [messageTextValid, setMessageTextValid] = useState(false);
 
@@ -142,28 +142,30 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const submitMessage = useCallback(async () => {
     if (chatRoom && messageTextValid) {
       const tmpMsgText = messageText.trim();
-      try {
-        setSendingMessage(true);
-        setMessageText('');
-        const payload = new newnewapi.SendMessageRequest({
-          roomId: chatRoom.id,
-          content: {
-            text: tmpMsgText,
-          },
-        });
-        const res = await sendMessage(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+      if (tmpMsgText.length > 0) {
+        try {
+          setSendingMessage(true);
+          setMessageText('');
+          const payload = new newnewapi.SendMessageRequest({
+            roomId: chatRoom.id,
+            content: {
+              text: tmpMsgText,
+            },
+          });
+          const res = await sendMessage(payload);
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
 
-        setSendingMessage(false);
-      } catch (err) {
-        console.error(err);
-        setMessageText(tmpMsgText);
-        setSendingMessage(false);
+          setJustSentMessage(true);
+          setSendingMessage(false);
+        } catch (err) {
+          console.error(err);
+          setMessageText(tmpMsgText);
+          setSendingMessage(false);
+        }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom.id, messageTextValid, messageText]);
+  }, [chatRoom, messageTextValid, messageText, setJustSentMessage]);
 
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
@@ -185,8 +187,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       setMessageTextValid(isValid);
       setMessageText(value);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [messageText, isMobileOrTablet, handleSubmit]
+    [isMobileOrTablet, handleSubmit]
   );
 
   const isTextareaHidden = useMemo(
@@ -277,12 +278,12 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
               withShadow
               view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
-              disabled={!messageTextValid}
+              disabled={!messageTextValid || messageText.length < 1}
             >
               <SInlineSVG
                 svg={sendIcon}
                 fill={
-                  messageTextValid
+                  messageTextValid && messageText.length > 0
                     ? theme.colors.white
                     : theme.colorsThemed.text.primary
                 }

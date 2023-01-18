@@ -85,7 +85,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   }, []);
 
   const isDashboard = useMemo(() => {
-    // if there is not visavis it's our announcement room
     if (router.asPath.includes('/creator/dashboard')) {
       return true;
     }
