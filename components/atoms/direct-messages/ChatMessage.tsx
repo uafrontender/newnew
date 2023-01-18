@@ -30,7 +30,6 @@ const ChatMessage: React.FC<IChatMessage> = ({
   const router = useRouter();
 
   const isDashboard = useMemo(() => {
-    // if there is not visavis it's our announcement room
     if (router.asPath.includes('/creator/dashboard')) {
       return true;
     }

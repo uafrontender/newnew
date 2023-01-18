@@ -277,7 +277,7 @@ const SLink = styled.a`
 const SUsername = styled(Caption)`
   grid-area: username;
   position: relative;
-  top: -6px;
+  top: -3px;
   overflow: hidden;
   text-overflow: ellipsis;
 

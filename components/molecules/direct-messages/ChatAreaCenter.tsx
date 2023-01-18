@@ -1,14 +1,14 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useContext, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled, { css } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
-import { SocketContext } from '../../../contexts/socketContext';
 import getDisplayname from '../../../utils/getDisplayname';
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
-import { isIOSMikhail } from '../../../utils/isIOS';
+import isIOS from '../../../utils/isIOS';
+import { useGetChats } from '../../../contexts/chatContext';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -28,7 +28,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   textareaFocused,
 }) => {
   const { ref: loadingRef, inView } = useInView();
-  const socketConnection = useContext(SocketContext);
+  const { activeChatRoom, justSentMessage } = useGetChats();
 
   const {
     data,
@@ -38,7 +38,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     refetch,
     isFetchingNextPage,
   } = useChatRoomMessages({
-    limit: isIOSMikhail() ? 8 : 20,
+    limit: isIOS() ? 8 : 20,
     roomId: chatRoom?.id,
   });
 
@@ -48,23 +48,10 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   );
 
   useEffect(() => {
-    const socketHandlerMessageCreated = () => {
+    if (activeChatRoom && justSentMessage) {
       refetch();
-    };
-    if (socketConnection) {
-      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
     }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off(
-          'ChatMessageCreated',
-          socketHandlerMessageCreated
-        );
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
+  }, [activeChatRoom, justSentMessage, refetch]);
 
   const hasWelcomeMessage = useMemo(
     () =>
@@ -92,7 +79,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer isIOS={isIOSMikhail()} textareaFocused={textareaFocused}>
+    <SContainer iOS={isIOS()} textareaFocused={textareaFocused}>
       {hasWelcomeMessage && (
         <WelcomeMessage userAlias={getDisplayname(chatRoom.visavis?.user)} />
       )}
@@ -116,16 +103,16 @@ export default ChatAreaCenter;
 
 interface ISContainer {
   textareaFocused: boolean;
-  isIOS: boolean;
+  iOS: boolean;
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
-  ${({ textareaFocused, isIOS }) =>
-    !textareaFocused && isIOS
+  ${({ textareaFocused, iOS }) =>
+    !textareaFocused && iOS
       ? css`
           margin: 0 0 100px;
         `
-      : textareaFocused && isIOS
+      : textareaFocused && iOS
       ? css`
           margin: 80px 0 0;
         `

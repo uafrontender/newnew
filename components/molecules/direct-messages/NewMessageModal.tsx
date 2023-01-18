@@ -178,7 +178,6 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   }, [searchValue, chatRooms]);
 
   const isDashboard = useMemo(() => {
-    // if there is not visavis it's our announcement room
     if (router.asPath.includes('/creator/dashboard')) {
       return true;
     }
