@@ -47,7 +47,7 @@
     "mixpanel-browser": "2.45.0",
     "moment": "2.29.1",
     "moment-timezone": "0.5.39",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#d3519a46fe9060b9fdbb31a9a6eb478a44551d8c",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#ee1e45abaa7479d81e0f1aaff287477eebd5cd93",
     "next": "12.1.6",
     "next-i18next": "13.0.0",
     "next-redux-wrapper": "7.0.5",
