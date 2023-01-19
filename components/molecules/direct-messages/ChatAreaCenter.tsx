@@ -77,7 +77,8 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     const socketHandlerMessageCreated = (dataSocket: any) => {
       const arr = new Uint8Array(dataSocket);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      if (decoded.roomId === activeChatRoom?.id) {
+      // eslint-disable-next-line eqeqeq
+      if (decoded.roomId == activeChatRoom?.id) {
         refetch();
       }
     };
@@ -93,8 +94,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
         );
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, activeChatRoom]);
+  }, [socketConnection, activeChatRoom, refetch]);
 
   /* loading next page of messages */
   useUpdateEffect(() => {
