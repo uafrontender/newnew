@@ -138,7 +138,7 @@
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
-    "changeThumbnail_NEED_TRANSLATION": "Change thumbnail",
+    "changeThumbnail": "Cambiar miniatura",
     "responseUploadedNonProcessed": "¡Éxito! Tu respuesta estará disponible una vez que el video haya sido procesado",
     "uploadResponseForm": {
       "fileUpload": {
@@ -302,9 +302,9 @@
         "seconds": "Segundos"
       }
     },
-    "loading_NEED_TRANSLATION": {
-      "title": "Almost Done...",
-      "subtitle": "Just a little bit left!"
+    "loading": {
+      "title": "Casi listo...",
+      "subtitle": "¡Queda poco!"
     }
   },
   "acPost": {
@@ -442,8 +442,8 @@
         "button": "Votar"
       },
       "actionSection": {
-        "votesAmount_NEED_TRANSLATION": "# of votes (minimum {{minAmount}} votes)",
-        "totalAmountCustomVotesPayment_NEED_TRANSLATION": "Total",
+        "votesAmount": "# de votos (mínimo {{minAmount}} votos)",
+        "totalAmountCustomVotesPayment": "Total",
         "suggestionPlaceholder": "Agregar tu propia opción",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
@@ -531,8 +531,8 @@
   "acPostModeration": {
     "postTopInfo": {
       "selectWinner": {
-        "title": "¡Hora de elegir!",
-        "body": "Elige tu oferta favorita antes de que se acabe el tiempo"
+        "title": "¡Es hora de elegir!",
+        "body": "Selecciona tu oferta favorita y sube un video de respuesta antes de que se acabe el tiempo"
       }
     },
     "optionsTab": {
@@ -659,7 +659,7 @@
     "hero": {
       "title": "¡Los votos ya han sido conteados!",
       "body": "{{creator}} tiene {{time}} para realizar esta opción. ¡Mantente atento!",
-      "bodyNoResponse_NEED_TRANSLATION": "{{creator}} has {{time}} to do respond. Stay tuned!",
+      "bodyNoResponse": "{{creator}} tiene {{time}} para responder. ¡Permanece atento!",
       "expires": {
         "days": "días",
         "days_singular": "día",

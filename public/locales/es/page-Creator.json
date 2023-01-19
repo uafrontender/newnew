@@ -238,7 +238,7 @@
       "stripeConnectedLink": "¡Stripe conectado!",
       "back": "Cerrar",
       "stripeConnecting": "Conectando...",
-      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
+      "requireInformation": "Stripe requiere información"
     }
   },
   "noNotifications": "Las nuevas notificaciones que recibas\naparecerán aquí"
