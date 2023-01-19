@@ -142,7 +142,18 @@ const PostPage: NextPage<IPostPage> = ({
     [post, postFromAjax]
   );
 
-  const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
+  // const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
+  //   if (typeOfPost && postParsed?.status) {
+  //     if (typeof postParsed.status === 'string') {
+  //       // NB! Status can be a string
+  //       // @ts-ignore
+  //       return switchPostStatusString(typeOfPost, postParsed?.status);
+  //     }
+  //     return switchPostStatus(typeOfPost, postParsed?.status);
+  //   }
+  //   return 'processing_announcement';
+  // });
+  const postStatus = useMemo<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
         // NB! Status can be a string
@@ -152,7 +163,7 @@ const PostPage: NextPage<IPostPage> = ({
       return switchPostStatus(typeOfPost, postParsed?.status);
     }
     return 'processing_announcement';
-  });
+  }, [postParsed, typeOfPost]);
 
   // TODO: a way to determine if the post was deleted by the crator themselves
   // pr by an admin
@@ -217,19 +228,25 @@ const PostPage: NextPage<IPostPage> = ({
     promptUserWithPushNotificationsPermissionModal,
   ]);
 
+  // const handleUpdatePostStatus = useCallback(
+  //   (newStatus: number | string) => {
+  //     if (typeOfPost) {
+  //       let status;
+  //       if (typeof newStatus === 'number') {
+  //         status = switchPostStatus(typeOfPost, newStatus);
+  //       } else {
+  //         status = switchPostStatusString(typeOfPost, newStatus);
+  //       }
+  //       setPostStatus(status);
+  //     }
+  //   },
+  //   [typeOfPost]
+  // );
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
-      if (typeOfPost) {
-        let status;
-        if (typeof newStatus === 'number') {
-          status = switchPostStatus(typeOfPost, newStatus);
-        } else {
-          status = switchPostStatusString(typeOfPost, newStatus);
-        }
-        setPostStatus(status);
-      }
+      refetchPost();
     },
-    [typeOfPost]
+    [refetchPost]
   );
 
   const isMyPost = useMemo(
@@ -475,21 +492,6 @@ const PostPage: NextPage<IPostPage> = ({
     recommendedPosts.length,
     triedLoading,
   ]);
-
-  // Post status
-  useEffect(() => {
-    setPostStatus(() => {
-      if (typeOfPost && postParsed?.status) {
-        if (typeof postParsed.status === 'string') {
-          // NB! Status can be a string
-          // @ts-ignore
-          return switchPostStatusString(typeOfPost, postParsed?.status);
-        }
-        return switchPostStatus(typeOfPost, postParsed?.status);
-      }
-      return 'processing_announcement';
-    });
-  }, [postParsed, typeOfPost]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
