@@ -167,6 +167,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   }, [user.userData?.options?.creatorStatus, user.loggedIn]);
 
   useEffect(() => {
+    if (!user.loggedIn) return;
     (async () => {
       try {
         const payload = new newnewapi.GetMyRoomsRequest({
