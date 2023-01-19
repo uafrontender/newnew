@@ -90,6 +90,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const isPushNotificationSupported = useRef(
     isBrowser() &&
+      typeof Notification !== 'undefined' &&
       (isSafariBrowser ||
         ('serviceWorker' in navigator &&
           'PushManager' in window &&
@@ -124,15 +125,24 @@ const PushNotificationsContextProvider: React.FC<
     permission: PermissionType;
     deviceToken?: string;
   } = useCallback(() => {
-    if (isSafariBrowser.current) {
-      const permissionData = (window as any).safari.pushNotification.permission(
-        process.env.NEXT_PUBLIC_WEB_PUSH_ID
-      );
+    try {
+      if (isSafariBrowser.current) {
+        const permissionData = (
+          window as any
+        ).safari.pushNotification.permission(
+          process.env.NEXT_PUBLIC_WEB_PUSH_ID
+        );
 
-      return permissionData;
+        return permissionData;
+      }
+
+      return { permission: Notification.permission };
+    } catch (err) {
+      console.error(err);
+      return {
+        permission: 'denied',
+      };
     }
-
-    return { permission: Notification.permission };
   }, []);
 
   // register subscription on BE
