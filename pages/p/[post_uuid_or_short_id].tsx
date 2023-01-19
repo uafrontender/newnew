@@ -107,7 +107,11 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
-  const { data: postFromAjax, isLoading: isPostLoading } = usePost(
+  const {
+    data: postFromAjax,
+    isLoading: isPostLoading,
+    refetch: refetchPost,
+  } = usePost(
     {
       loggedInUser: user.loggedIn,
       postUuid: postUuidOrShortId,
@@ -138,7 +142,18 @@ const PostPage: NextPage<IPostPage> = ({
     [post, postFromAjax]
   );
 
-  const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
+  // const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
+  //   if (typeOfPost && postParsed?.status) {
+  //     if (typeof postParsed.status === 'string') {
+  //       // NB! Status can be a string
+  //       // @ts-ignore
+  //       return switchPostStatusString(typeOfPost, postParsed?.status);
+  //     }
+  //     return switchPostStatus(typeOfPost, postParsed?.status);
+  //   }
+  //   return 'processing_announcement';
+  // });
+  const postStatus = useMemo<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
         // NB! Status can be a string
@@ -148,7 +163,7 @@ const PostPage: NextPage<IPostPage> = ({
       return switchPostStatus(typeOfPost, postParsed?.status);
     }
     return 'processing_announcement';
-  });
+  }, [postParsed, typeOfPost]);
 
   // TODO: a way to determine if the post was deleted by the crator themselves
   // pr by an admin
@@ -213,21 +228,6 @@ const PostPage: NextPage<IPostPage> = ({
     promptUserWithPushNotificationsPermissionModal,
   ]);
 
-  const handleUpdatePostStatus = useCallback(
-    (newStatus: number | string) => {
-      if (typeOfPost) {
-        let status;
-        if (typeof newStatus === 'number') {
-          status = switchPostStatus(typeOfPost, newStatus);
-        } else {
-          status = switchPostStatusString(typeOfPost, newStatus);
-        }
-        setPostStatus(status);
-      }
-    },
-    [typeOfPost]
-  );
-
   const isMyPost = useMemo(
     () =>
       user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
@@ -264,7 +264,7 @@ const PostPage: NextPage<IPostPage> = ({
       const res = await deleteMyPost(payload);
 
       if (!res.error) {
-        handleUpdatePostStatus('DELETED_BY_CREATOR');
+        await refetchPost();
         handleCloseDeletePostModal();
         if (document?.documentElement) {
           setTimeout(() => {
@@ -277,11 +277,7 @@ const PostPage: NextPage<IPostPage> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [
-    handleCloseDeletePostModal,
-    handleUpdatePostStatus,
-    postParsed?.postUuid,
-  ]);
+  }, [handleCloseDeletePostModal, refetchPost, postParsed?.postUuid]);
 
   const resetSetupIntentClientSecret = useCallback(() => {
     setStripeSetupIntentClientSecret(undefined);
@@ -472,21 +468,6 @@ const PostPage: NextPage<IPostPage> = ({
     triedLoading,
   ]);
 
-  // Post status
-  useEffect(() => {
-    setPostStatus(() => {
-      if (typeOfPost && postParsed?.status) {
-        if (typeof postParsed.status === 'string') {
-          // NB! Status can be a string
-          // @ts-ignore
-          return switchPostStatusString(typeOfPost, postParsed?.status);
-        }
-        return switchPostStatus(typeOfPost, postParsed?.status);
-      }
-      return 'processing_announcement';
-    });
-  }, [postParsed, typeOfPost]);
-
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
@@ -508,20 +489,13 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Listen for Post status updates
   useEffect(() => {
-    const socketHandlerPostStatus = (data: any) => {
+    const socketHandlerPostStatus = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
       if (!decoded) return;
       if (decoded.postUuid === postParsed?.postUuid) {
-        if (decoded.auction) {
-          handleUpdatePostStatus(decoded.auction);
-        } else if (decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice);
-        } else {
-          if (decoded.crowdfunding)
-            handleUpdatePostStatus(decoded.crowdfunding);
-        }
+        await refetchPost();
       }
     };
 
@@ -573,7 +547,6 @@ const PostPage: NextPage<IPostPage> = ({
         postParsed={postParsed}
         typeOfPost={typeOfPost}
         postStatus={postStatus}
-        handleUpdatePostStatus={handleUpdatePostStatus}
         loadingRef={loadingRef}
         modalContainerRef={modalContainerRef}
         isMyPost={isMyPost}
@@ -595,6 +568,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
+        refetchPost={refetchPost}
       >
         <Head>
           <title>{typeOfPost ? t(`meta.${typeOfPost}.title`) : ''}</title>
