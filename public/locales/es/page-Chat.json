@@ -63,7 +63,7 @@
   },
   "emptyInbox": {
     "title": "Su bandeja de entrada está vacía",
-    "text_NEED_TRANSLATION": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
+    "text": "Cuando inicies una conversación con el dueño de un Bundle, lo verás listado aquí"
   },
   "newAnnouncement": {
     "title": "Nuevo anuncio",
