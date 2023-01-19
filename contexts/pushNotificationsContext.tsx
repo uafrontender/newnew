@@ -203,13 +203,19 @@ const PushNotificationsContextProvider: React.FC<
       });
       const res = await webPushCheck(payload);
 
-      if (res.error) {
-        return false;
+      if (res.error || !res.data) {
+        return {
+          exists: false,
+          paused: false,
+        };
       }
 
-      return res.data?.exists || false;
+      return res.data;
     } catch (err) {
-      return false;
+      return {
+        exists: false,
+        paused: false,
+      };
     }
   }, []);
 
@@ -218,11 +224,11 @@ const PushNotificationsContextProvider: React.FC<
     const permissionData = getPermissionData();
 
     if (permissionData.permission === 'granted' && permissionData.deviceToken) {
-      const isSubscriptionExists = await fetchCheckSubscription(
+      const subscriptionStatus = await fetchCheckSubscription(
         permissionData.deviceToken
       );
 
-      return isSubscriptionExists;
+      return subscriptionStatus?.exists && !subscriptionStatus.paused;
     }
 
     return false;
@@ -248,12 +254,16 @@ const PushNotificationsContextProvider: React.FC<
         return false;
       }
 
-      const isSubscriptionExists = await fetchCheckSubscription(
+      const checkSubscriptionValue = await fetchCheckSubscription(
         subscription.endpoint
       );
 
-      if (isSubscriptionExists) {
+      if (checkSubscriptionValue.exists && !checkSubscriptionValue.paused) {
         return true;
+      }
+
+      if (checkSubscriptionValue?.paused) {
+        return false;
       }
 
       // renew subscription if it has been updated
@@ -600,28 +610,21 @@ const PushNotificationsContextProvider: React.FC<
         return;
       }
 
-      const isDeviceSubscribed = await checkSubscriptionSafari();
-
-      if (!isDeviceSubscribed || !permissionData.deviceToken) {
+      if (!permissionData.deviceToken) {
         return;
       }
 
-      const payload = new newnewapi.WebPushCheckRequest({
-        endpoint: permissionData.deviceToken,
-      });
-      const res = await webPushCheck(payload);
+      const payload = await fetchCheckSubscription(permissionData.deviceToken);
 
-      if (res.error || !res?.data?.paused) {
-        return;
+      if (payload.exists && payload.paused) {
+        await resume(permissionData.deviceToken);
+
+        setIsSubscribed(true);
       }
-
-      await resume(permissionData.deviceToken);
-
-      setIsSubscribed(true);
     } catch (err) {
       console.error(err);
     }
-  }, [resume, getPermissionData, checkSubscriptionSafari]);
+  }, [resume, getPermissionData, fetchCheckSubscription]);
 
   const resumePushNotificationNonSafari = useCallback(async () => {
     try {
@@ -644,20 +647,17 @@ const PushNotificationsContextProvider: React.FC<
         return;
       }
 
-      const payload = new newnewapi.WebPushCheckRequest({
-        endpoint: sub.endpoint,
-      });
-      const res = await webPushCheck(payload);
+      const payload = await fetchCheckSubscription(sub.endpoint);
 
-      if (res.error || !res?.data?.paused) {
-        return;
+      if (payload.exists && payload.paused) {
+        await resume(sub.endpoint);
+
+        setIsSubscribed(true);
       }
-
-      await resume(sub.endpoint);
     } catch (err) {
       console.error(err);
     }
-  }, [getPermissionData, resume]);
+  }, [getPermissionData, resume, fetchCheckSubscription]);
 
   const resumePushNotification = useCallback(() => {
     if (!isPushNotificationSupported.current) {
@@ -739,6 +739,7 @@ const PushNotificationsContextProvider: React.FC<
       setIsPermissionRequestModalOpen(false);
       setIsLoading(false);
       setPublicKey('');
+      pauseNotification();
     }
   }, [user.loggedIn, pauseNotification]);
 
