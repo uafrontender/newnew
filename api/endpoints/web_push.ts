@@ -1,5 +1,9 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import {
+  BASE_URL,
+  fetchProtobufProtectedIntercepted,
+  fetchProtobuf,
+} from '../apiConfigs';
 
 const BASE_URL_WEB_PUSH = `${BASE_URL}/web_push`;
 
@@ -79,6 +83,35 @@ export const webPushCheck = (
     newnewapi.WebPushCheckResponse,
     `${BASE_URL_WEB_PUSH}/check`,
     'post',
+    payload,
+    signal ?? undefined
+  );
+
+export const webPushPause = (
+  payload: newnewapi.WebPushPauseRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<newnewapi.WebPushPauseRequest, newnewapi.EmptyResponse>(
+    newnewapi.WebPushPauseRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_WEB_PUSH}/pause`,
+    'put',
+    payload,
+    signal ?? undefined
+  );
+
+export const webPushResume = (
+  payload: newnewapi.WebPushResumeRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.WebPushResumeRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.WebPushResumeRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_WEB_PUSH}/resume`,
+    'put',
     payload,
     signal ?? undefined
   );
