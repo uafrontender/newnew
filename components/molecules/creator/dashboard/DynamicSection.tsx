@@ -242,7 +242,12 @@ export const DynamicSection = () => {
           isDashboardMessages={isDashboardMessages}
         >
           {tab === 'direct-messages' ? (
-            activeChatRoom && <ChatContent chatRoom={activeChatRoom!!} />
+            activeChatRoom && (
+              <>
+                <ChatContent chatRoom={activeChatRoom!!} />
+                <ChatList hidden />
+              </>
+            )
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>

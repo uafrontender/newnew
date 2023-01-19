@@ -19,7 +19,11 @@ const NoResults = dynamic(
 
 const ChatlistItem = dynamic(() => import('./ChatListItem'));
 
-const ChatList: React.FC = () => {
+interface IChatList {
+  hidden?: boolean;
+}
+
+const ChatList: React.FC<IChatList> = ({ hidden }) => {
   const { ref: scrollRef, inView } = useInView();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
@@ -100,7 +104,15 @@ const ChatList: React.FC = () => {
   );
 
   return (
-    <SChatlist>
+    <SChatlist
+      style={
+        hidden
+          ? {
+              display: 'none',
+            }
+          : {}
+      }
+    >
       {isLoading ? (
         <Lottie
           width={64}
