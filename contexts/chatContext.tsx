@@ -122,6 +122,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   }, [user.loggedIn]);
 
   useEffect(() => {
+    if (!user.loggedIn) return;
     const socketHandlerMessageCreated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatUnreadCountsChanged.decode(arr);
@@ -137,10 +138,10 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
         socketHandlerMessageCreated
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
+  }, [socketConnection, user.loggedIn]);
 
   useEffect(() => {
+    if (!user.loggedIn) return;
     if (user.userData?.options?.creatorStatus === 2) {
       (async () => {
         try {
@@ -163,9 +164,10 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
         }
       })();
     }
-  }, [user.userData?.options?.creatorStatus]);
+  }, [user.userData?.options?.creatorStatus, user.loggedIn]);
 
   useEffect(() => {
+    if (!user.loggedIn) return;
     (async () => {
       try {
         const payload = new newnewapi.GetMyRoomsRequest({
@@ -186,7 +188,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
         console.error(err);
       }
     })();
-  }, [user.userData?.options?.creatorStatus]);
+  }, [user.userData?.options?.creatorStatus, user.loggedIn]);
 
   useEffect(() => {
     if (justSentMessage) {
