@@ -7,17 +7,20 @@ import React, {
   useCallback,
   useContext,
 } from 'react';
-import { getMyBundles } from '../api/endpoints/bundles';
+import { getMyBundleEarnings, getMyBundles } from '../api/endpoints/bundles';
 import { useAppSelector } from '../redux-store/store';
+import { loadStateLS, saveStateLS } from '../utils/localStorage';
 import { SocketContext } from './socketContext';
 
 export const BundlesContext = createContext<{
   bundles: newnewapi.ICreatorBundle[] | undefined;
   bundlesLoading: boolean;
+  hasSoldBundles: boolean;
   handleSetBundles: (newPacks: newnewapi.ICreatorBundle[]) => void;
 }>({
   bundles: undefined,
   bundlesLoading: false,
+  hasSoldBundles: false,
   handleSetBundles: (newPacks: newnewapi.ICreatorBundle[]) => {},
 });
 
@@ -36,6 +39,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     newnewapi.ICreatorBundle[] | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
 
   const handleSetBundles = useCallback(
     (newBundles: newnewapi.ICreatorBundle[]) => {
@@ -48,6 +52,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     () => ({
       bundles,
       bundlesLoading: isLoading,
+      hasSoldBundles,
       handleSetBundles,
     }),
     [bundles, isLoading, handleSetBundles]
@@ -80,6 +85,33 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     }
 
     fetchBundles();
+
+    // if creator did not sell any bundle we should
+    // hide navigation link to direct messages
+    async function fetchMyBundlesEarnings() {
+      try {
+        const payload = new newnewapi.GetMyBundleEarningsRequest();
+        const res = await getMyBundleEarnings(payload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data.totalBundleEarnings?.usdCents) {
+          setHasSoldBundles(true);
+          saveStateLS('creatorHasSoldBundles', true);
+        }
+      } catch (err) {
+        console.error(err);
+        setHasSoldBundles(false);
+      }
+    }
+    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
+    if (localHasSoldBundles) {
+      setHasSoldBundles(true);
+      // TODO: should we show it only for creators who added a bank account?
+      // Reply to TODO: no, creator can sell bundles without verified connected stripe
+    } else if (user.userData?.options?.creatorStatus === 2) {
+      fetchMyBundlesEarnings();
+    }
   }, [user.loggedIn]);
 
   // Listen for socket updates

@@ -22,18 +22,14 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-interface ITablet {
-  hasSoldBundles: boolean;
-}
-
-export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
+export const Tablet: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { bundles } = useBundles();
+  const { bundles, hasSoldBundles } = useBundles();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 

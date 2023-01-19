@@ -4,8 +4,6 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
-import { useEffectOnce } from 'react-use';
-import { newnewapi } from 'newnew-api';
 
 import Text from '../atoms/Text';
 import InlineSvg from '../atoms/InlineSVG';
@@ -21,8 +19,6 @@ import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifi
 import ShareMenu from './ShareMenu';
 import { useAppSelector } from '../../redux-store/store';
 import { useBundles } from '../../contexts/bundlesContext';
-import { getMyBundleEarnings } from '../../api/endpoints/bundles';
-import { loadStateLS, saveStateLS } from '../../utils/localStorage';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -39,7 +35,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const user = useAppSelector((state) => state.user);
   const containerRef = useRef<HTMLDivElement>();
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
-  const { bundles } = useBundles();
+  const { bundles, hasSoldBundles } = useBundles();
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
   const { unreadCount } = useGetChats();
@@ -55,35 +51,6 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
     setShareMenuOpen(false);
     handleClose();
   };
-
-  const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
-
-  useEffectOnce(() => {
-    // if creator did not sell any bundle we should
-    // hide navigation link to direct messages
-    async function fetchMyBundlesEarnings() {
-      try {
-        const payload = new newnewapi.GetMyBundleEarningsRequest();
-        const res = await getMyBundleEarnings(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.totalBundleEarnings?.usdCents) {
-          setHasSoldBundles(true);
-          saveStateLS('creatorHasSoldBundles', true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
-    if (localHasSoldBundles) {
-      setHasSoldBundles(true);
-      // TODO: should we show it only for creators who added a bank account?
-    } else if (user.userData?.options?.creatorStatus === 2) {
-      fetchMyBundlesEarnings();
-    }
-  });
 
   return (
     <AnimatePresence>

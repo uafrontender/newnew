@@ -16,7 +16,7 @@ import {
   RefetchQueryFilters,
 } from 'react-query';
 import { reportPost } from '../api/endpoints/report';
-import { ReportData } from '../components/molecules/chat/ReportModal';
+import { ReportData } from '../components/molecules/direct-messages/ReportModal';
 import { useAppSelector } from '../redux-store/store';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';

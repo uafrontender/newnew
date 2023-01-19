@@ -29,7 +29,7 @@ import TutorialTooltip, {
 import Headline from '../../../../atoms/Headline';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import AcConfirmDeleteOptionModal from '../../moderation/auction/AcConfirmDeleteOptionModal';
 
