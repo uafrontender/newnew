@@ -49,6 +49,22 @@ import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOpti
 import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
+const addOptionErrorMessage = (
+  status?: newnewapi.CreateCustomMcOptionResponse.Status
+) => {
+  console.log(status);
+  switch (status) {
+    // TODO: Cover CANNOT_CREATE_MULTIPLE_OPTIONS = 3;
+    case newnewapi.CreateCustomMcOptionResponse.Status
+      .NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'errors.notAllowedToCreateNewOption';
+    case newnewapi.CreateCustomMcOptionResponse.Status.NOT_UNIQUE:
+      return 'errors.optionNotUnique';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
   postLoading: boolean;
@@ -84,7 +100,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -203,27 +219,28 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
         res.error
       ) {
-        throw new Error(res.error?.message ?? 'Request failed');
+        throw new Error(t(addOptionErrorMessage(res.data?.status)));
       }
 
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;
       optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      setPaymentSuccessValue(1);
+    } catch (err: any) {
+      console.error(err);
+      showErrorToastCustom(err.message);
+    } finally {
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      setPaymentSuccessValue(1);
-    } catch (err) {
-      console.error(err);
-      setLoadingModalOpen(false);
-      showErrorToastPredefined(undefined);
     }
   }, [
     post.postUuid,
     newOptionText,
+    t,
     handleAddOrUpdateOptionFromResponse,
-    showErrorToastPredefined,
+    showErrorToastCustom,
   ]);
 
   useEffect(() => {

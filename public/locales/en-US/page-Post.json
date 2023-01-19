@@ -818,6 +818,7 @@
     "alreadyVoted": "You are already voted",
     "mcVoteCountTooSmall": "Vote count is too small",
     "notAllowedToCreateNewOption": "New option is not allowed",
+    "optionNotUnique": "Option already exists",
     "cfCancelled": "Goal is cancelled",
     "cfFinished": "Goal is finished already",
     "cfNotStarted": "Goal is not started yet",

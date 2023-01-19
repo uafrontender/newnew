@@ -818,6 +818,7 @@
     "alreadyVoted": "你已獲投票",
     "mcVoteCountTooSmall": "票數太少",
     "notAllowedToCreateNewOption": "不允許有新的選項",
+    "optionNotUnique_NEED_TRANSLATION": "Option already exists",
     "cfCancelled": "Goal被取消",
     "cfFinished": "Goal已經完成",
     "cfNotStarted": "Goal尚未開始",
