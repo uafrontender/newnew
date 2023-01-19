@@ -12,7 +12,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../../../redux-store/store';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';

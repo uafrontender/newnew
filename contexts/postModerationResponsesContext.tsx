@@ -135,12 +135,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const socketConnection = useContext(SocketContext);
 
-  const {
-    postParsed,
-    postStatus,
-    handleUpdatePostStatus,
-    handleSetIsConfirmToClosePost,
-  } = usePostInnerState();
+  const { postParsed, postStatus, refetchPost, handleSetIsConfirmToClosePost } =
+    usePostInnerState();
   const postUuid = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
 
   // Core response
@@ -437,7 +433,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         if (responseObj) handleUpdateResponseVideo(responseObj);
-        handleUpdatePostStatus('SUCCEEDED');
+        await refetchPost();
         setUploadedResponseVideoUrl('');
         setResponseUploadSuccess(true);
 
@@ -464,7 +460,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     postUuid,
     uploadedResponseVideoUrl,
     handleUpdateResponseVideo,
-    handleUpdatePostStatus,
+    refetchPost,
     showErrorToastPredefined,
   ]);
 
@@ -479,7 +475,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       if (res.data) {
         toast.success(t('postVideo.responseUploadedNonProcessed'));
-        handleUpdatePostStatus('PROCESSING_RESPONSE');
+        refetchPost();
         setUploadedResponseVideoUrl('');
       }
     } catch (err: any) {
@@ -496,7 +492,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     postUuid,
     uploadedResponseVideoUrl,
     t,
-    handleUpdatePostStatus,
+    refetchPost,
     showErrorToastPredefined,
   ]);
 
@@ -510,58 +506,47 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       const res = await uploadAdditionalPostResponse(payload);
 
-      if (res.data) {
-        let responseObj: newnewapi.IVideoUrls | undefined;
+      if (!res.error) {
+        const updatedData = await refetchPost();
+        let additionalResponsesFromBe: newnewapi.IVideoUrls[] = [];
+
         if (
-          res.data.auction &&
-          res.data.auction.additionalResponses &&
-          res.data.auction.additionalResponses.length
+          updatedData?.data?.auction &&
+          updatedData?.data?.auction.additionalResponses &&
+          updatedData?.data?.auction.additionalResponses.length
         ) {
-          responseObj =
-            res.data.auction.additionalResponses[
-              res.data.auction.additionalResponses.length - 1
-            ];
-        }
-        if (
-          res.data.multipleChoice &&
-          res.data.multipleChoice.additionalResponses &&
-          res.data.multipleChoice.additionalResponses.length
-        ) {
-          responseObj =
-            res.data.multipleChoice.additionalResponses[
-              res.data.multipleChoice.additionalResponses.length - 1
-            ];
+          additionalResponsesFromBe =
+            updatedData?.data?.auction?.additionalResponses;
         }
         if (
-          res.data.crowdfunding &&
-          res.data.crowdfunding.additionalResponses &&
-          res.data.crowdfunding.additionalResponses.length
+          updatedData?.data?.multipleChoice &&
+          updatedData?.data?.multipleChoice.additionalResponses &&
+          updatedData?.data?.multipleChoice.additionalResponses.length
         ) {
-          responseObj =
-            res.data.crowdfunding.additionalResponses[
-              res.data.crowdfunding.additionalResponses.length - 1
-            ];
+          additionalResponsesFromBe =
+            updatedData?.data?.multipleChoice?.additionalResponses;
         }
 
-        if (responseObj) {
-          handleAddAdditonalResponse(responseObj);
-          setUploadedResponseVideoUrl('');
+        const videoUrlsToAdd =
+          additionalResponsesFromBe[additionalResponsesFromBe.length - 1];
 
-          setResponseFileUploadError(false);
-          setResponseFileUploadLoading(false);
-          setResponseFileUploadProgress(0);
-          setResponseFileProcessingError(false);
-          setResponseFileProcessingLoading(false);
-          setResponseFileProcessingProgress(0);
-          setVideoProcessing({
-            taskUuid: '',
-            targetUrls: {},
-          });
+        handleAddAdditonalResponse(videoUrlsToAdd);
+        setUploadedResponseVideoUrl('');
 
-          setCurrentAdditionalResponseStep('regular');
-        } else {
-          throw new Error('No additional videoUrls in the response');
-        }
+        setResponseFileUploadError(false);
+        setResponseFileUploadLoading(false);
+        setResponseFileUploadProgress(0);
+        setResponseFileProcessingError(false);
+        setResponseFileProcessingLoading(false);
+        setResponseFileProcessingProgress(0);
+        setVideoProcessing({
+          taskUuid: '',
+          targetUrls: {},
+        });
+
+        setCurrentAdditionalResponseStep('regular');
+      } else {
+        throw new Error(res.error.message ?? 'An error occured');
       }
     } catch (err) {
       console.error(err);
@@ -572,6 +557,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   }, [
     handleAddAdditonalResponse,
     postUuid,
+    refetchPost,
     showErrorToastPredefined,
     uploadedResponseVideoUrl,
   ]);

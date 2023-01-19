@@ -5,13 +5,14 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
+import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../../redux-store/store';
 
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
@@ -40,9 +41,16 @@ interface IAcOptionsTab {
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
-  pagingToken: string | undefined | null;
-  triedLoading: boolean;
-  handleLoadBids: (token?: string) => void;
+  hasNextPage: boolean;
+  fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<
+    InfiniteQueryObserverResult<
+      {
+        acOptions: newnewapi.MultipleChoice.IOption[];
+        paging: newnewapi.IPagingResponse | null | undefined;
+      },
+      unknown
+    >
+  >;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.Auction.Option
   ) => void;
@@ -58,9 +66,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postStatus,
   options,
   optionsLoading,
-  pagingToken,
-  triedLoading,
-  handleLoadBids,
+  hasNextPage,
+  fetchNextPage,
   handleAddOrUpdateOptionFromResponse,
   handleRemoveOption,
 }) => {
@@ -126,11 +133,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   }, [options, optionBeingSupported, isMobile]);
 
   useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadBids(pagingToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+  }, [inView, fetchNextPage]);
 
   return (
     <>
@@ -143,10 +149,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         animate={{ opacity: 1, speed: 0.4 }}
         exit={{ opacity: 0 }}
       >
-        {options.length === 0 &&
-        !optionsLoading &&
-        postStatus !== 'failed' &&
-        triedLoading ? (
+        {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
               <img src={NoContentYetImg.src} alt='No content yet' />
@@ -159,10 +162,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             </SNoOptionsCaption>
           </SNoOptionsYet>
         ) : null}
-        {options.length === 0 &&
-        optionsLoading &&
-        postStatus !== 'failed' &&
-        !triedLoading ? (
+        {options.length === 0 && optionsLoading && postStatus !== 'failed' ? (
           <SNoOptionsYet>
             <Lottie
               width={64}
@@ -236,22 +236,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
-          {!isMobile ? (
-            <SLoaderDiv ref={loadingRef} />
-          ) : pagingToken ? (
-            <SLoadMoreBtn
-              view='secondary'
-              onClick={() => {
-                Mixpanel.track('Click Load More', {
-                  _stage: 'Post',
-                  _postUuid: postUuid,
-                  _component: 'AcOptionsTab',
-                });
-                handleLoadBids(pagingToken);
-              }}
-            >
-              {t('loadMoreButton')}
-            </SLoadMoreBtn>
+          {hasNextPage ? (
+            !isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : (
+              <SLoadMoreBtn
+                view='secondary'
+                onClick={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: postUuid,
+                    _component: 'AcOptionsTab',
+                  });
+                  fetchNextPage();
+                }}
+              >
+                {t('loadMoreButton')}
+              </SLoadMoreBtn>
+            )
           ) : null}
         </SBidsContainer>
         {user?.userTutorialsProgress.remainingAcSteps && (
