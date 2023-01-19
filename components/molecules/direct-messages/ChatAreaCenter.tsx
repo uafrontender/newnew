@@ -141,7 +141,7 @@ const SContainer = styled.div<ISContainer>`
   ${({ textareaFocused, iOS }) =>
     !textareaFocused && iOS
       ? css`
-          margin: 0 0 100px;
+          margin: 0 0 70px;
         `
       : textareaFocused && iOS
       ? css`
