@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../Text';
+import { useGetChats } from '../../../contexts/chatContext';
 
 const UserAvatar = dynamic(() => import('../../molecules/UserAvatar'));
 
@@ -25,6 +27,16 @@ const ChatMessage: React.FC<IChatMessage> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
   const user = useAppSelector((state) => state.user);
+  const router = useRouter();
+
+  const isDashboard = useMemo(() => {
+    if (router.asPath.includes('/creator/dashboard')) {
+      return true;
+    }
+    return false;
+  }, [router.asPath]);
+
+  const { mobileChatOpened } = useGetChats();
 
   const nextElDate = (nextElement?.createdAt?.seconds as number) * 1000;
   const prevElDate = (prevElement?.createdAt?.seconds as number) * 1000;
@@ -48,8 +60,10 @@ const ChatMessage: React.FC<IChatMessage> = ({
       id={item.id?.toString()}
       mine={isMine}
       prevSameUser={prevSameUser}
+      isDashboard={isDashboard}
     >
-      {(!prevSameUser || !prevSameDay) &&
+      {!isDashboard &&
+        (!prevSameUser || !prevSameDay) &&
         (isMine ? (
           <SUserAvatar
             mine={isMine}
@@ -71,6 +85,8 @@ const ChatMessage: React.FC<IChatMessage> = ({
         nextSameUser={nextSameUser}
         prevSameDay={prevSameDay}
         nextSameDay={nextSameDay}
+        isDashboard={isDashboard}
+        isMobileChatOpened={mobileChatOpened}
       >
         <SMessageText mine={isMine} weight={600} variant={3}>
           {item.content?.text}
@@ -135,6 +151,7 @@ interface ISMessage {
   type?: string;
   mine?: boolean;
   prevSameUser?: boolean;
+  isDashboard?: boolean;
 }
 
 const SMessage = styled.div<ISMessage>`
@@ -150,7 +167,7 @@ const SMessage = styled.div<ISMessage>`
           }
           ${props.theme.media.tablet} {
             padding-right: 0;
-            padding-left: 44px;
+            padding-left: ${!props.isDashboard ? '44px' : ''};
             justify-content: flex-start;
           }
         `;
@@ -161,7 +178,7 @@ const SMessage = styled.div<ISMessage>`
         }
         ${props.theme.media.tablet} {
           justify-content: flex-start;
-          padding-left: 44px;
+          padding-left: ${!props.isDashboard ? '44px' : ''};
         }
       `;
     }
@@ -192,6 +209,8 @@ interface ISMessageContent {
   nextSameUser?: boolean;
   prevSameDay?: boolean;
   nextSameDay?: boolean;
+  isDashboard?: boolean;
+  isMobileChatOpened?: boolean;
 }
 
 const SMessageContent = styled.div<ISMessageContent>`
@@ -203,7 +222,10 @@ const SMessageContent = styled.div<ISMessageContent>`
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
     }
-    if (props.theme.name === 'light') {
+    if (
+      props.theme.name === 'light' &&
+      (!props.isDashboard || props.isMobileChatOpened)
+    ) {
       return props.theme.colors.white;
     }
 

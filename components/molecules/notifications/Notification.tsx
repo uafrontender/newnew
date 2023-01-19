@@ -66,7 +66,6 @@ const Notification: React.FC<newnewapi.INotification> = ({
     setIsUnread(false);
   }, [id]);
 
-  // TODO: support for postShortId in routing target
   useEffect(() => {
     if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
@@ -76,11 +75,25 @@ const Notification: React.FC<newnewapi.INotification> = ({
         setUrl(`/direct-messages/${target.userProfile.userUsername}`);
       }
 
-      if (target.postResponse && target?.postResponse.postUuid)
-        setUrl(`/p/${target.postResponse.postUuid}`);
+      if (
+        target.postResponse &&
+        (target?.postResponse.postShortId || target?.postResponse.postUuid)
+      )
+        setUrl(
+          `/p/${
+            target?.postResponse.postShortId || target?.postResponse.postUuid
+          }`
+        );
 
-      if (target.postAnnounce && target?.postAnnounce.postUuid)
-        setUrl(`/p/${target.postAnnounce.postUuid}`);
+      if (
+        target.postAnnounce &&
+        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
+      )
+        setUrl(
+          `/p/${
+            target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
+          }`
+        );
     }
   }, [url, target]);
 

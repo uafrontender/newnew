@@ -13,17 +13,18 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 
 // Utils
-import Headline from '../../../atoms/Headline';
-import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
-
 import { formatNumber } from '../../../../utils/format';
 import getDisplayname from '../../../../utils/getDisplayname';
-import assets from '../../../../constants/assets';
-import { fetchPostByUUID } from '../../../../api/endpoints/post';
-import PostTitleContent from '../../../atoms/PostTitleContent';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+
+import Headline from '../../../atoms/Headline';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
+
+import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -55,6 +56,8 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
 
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
+    const { refetchPost } = usePostInnerState();
+
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
       newnewapi.MultipleChoice.Option | undefined
@@ -71,11 +74,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     );
     const fetchPostLatestData = useCallback(async () => {
       try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: post.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
+        const res = await refetchPost();
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');

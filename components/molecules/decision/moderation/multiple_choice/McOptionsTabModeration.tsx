@@ -1,30 +1,35 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
+import { Mixpanel } from '../../../../../utils/mixpanel';
 import { useAppSelector } from '../../../../../redux-store/store';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import McOptionCardModeration from './McOptionCardModeration';
-import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IMcOptionsTabModeration {
   post: newnewapi.MultipleChoice;
   options: newnewapi.MultipleChoice.Option[];
-  optionsLoading: boolean;
-  pagingToken: string | undefined | null;
   winningOptionId?: number;
-  handleLoadOptions: (token?: string) => void;
+  hasNextPage: boolean;
+  fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<
+    InfiniteQueryObserverResult<
+      {
+        mcOptions: newnewapi.MultipleChoice.IOption[];
+        paging: newnewapi.IPagingResponse | null | undefined;
+      },
+      unknown
+    >
+  >;
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
 
@@ -33,10 +38,9 @@ const McOptionsTabModeration: React.FunctionComponent<
 > = ({
   post,
   options,
-  optionsLoading,
-  pagingToken,
   winningOptionId,
-  handleLoadOptions,
+  hasNextPage,
+  fetchNextPage,
   handleRemoveOption,
 }) => {
   const theme = useTheme();
@@ -57,11 +61,10 @@ const McOptionsTabModeration: React.FunctionComponent<
     useScrollGradients(containerRef);
 
   useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadOptions(pagingToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+  }, [inView, fetchNextPage]);
 
   return (
     <>
@@ -119,21 +122,23 @@ const McOptionsTabModeration: React.FunctionComponent<
               handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
-          {!isMobile ? (
-            <SLoaderDiv ref={loadingRef} />
-          ) : pagingToken ? (
-            <SLoadMoreBtn
-              onClickCapture={() => {
-                Mixpanel.track('Click Load More', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTabModeration',
-                });
-              }}
-              onClick={() => handleLoadOptions(pagingToken)}
-            >
-              {t('loadMoreButton')}
-            </SLoadMoreBtn>
+          {hasNextPage ? (
+            !isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : (
+              <SLoadMoreBtn
+                onClickCapture={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTabModeration',
+                  });
+                }}
+                onClick={() => fetchNextPage()}
+              >
+                {t('loadMoreButton')}
+              </SLoadMoreBtn>
+            )
           ) : null}
         </SBidsContainer>
       </STabContainer>

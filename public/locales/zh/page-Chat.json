@@ -85,8 +85,8 @@
   },
   "userTypes": {
     "all": "所有的",
-    "subscribers": "Bundle所有者",
-    "subscribing": "創作者"
+    "bundleOwners": "Bundle所有者",
+    "creators": "創作者"
   },
   "dates": {
     "now": "現在",

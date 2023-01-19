@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -17,7 +17,7 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 
