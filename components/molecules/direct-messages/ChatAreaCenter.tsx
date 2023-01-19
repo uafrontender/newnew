@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled, { css } from 'styled-components';
@@ -9,6 +9,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
+import { SocketContext } from '../../../contexts/socketContext';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -29,6 +30,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 }) => {
   const { ref: loadingRef, inView } = useInView();
   const { activeChatRoom, justSentMessage } = useGetChats();
+  const socketConnection = useContext(SocketContext);
 
   const {
     data,
@@ -70,6 +72,29 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       chatRoom.myRole === 2,
     [messages, isAnnouncement, isLoading, chatRoom]
   );
+
+  useEffect(() => {
+    const socketHandlerMessageCreated = (dataSocket: any) => {
+      const arr = new Uint8Array(dataSocket);
+      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      if (decoded.roomId === activeChatRoom?.id) {
+        refetch();
+      }
+    };
+    if (socketConnection) {
+      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatMessageCreated',
+          socketHandlerMessageCreated
+        );
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, activeChatRoom]);
 
   /* loading next page of messages */
   useUpdateEffect(() => {
