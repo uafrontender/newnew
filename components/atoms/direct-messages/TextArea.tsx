@@ -1,14 +1,13 @@
 /* eslint-disable no-nested-ternary */
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
-
+import { useRouter } from 'next/router';
 import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import isSafari from '../../../utils/isSafari';
-import { useAppSelector } from '../../../redux-store/store';
+import { useGetChats } from '../../../contexts/chatContext';
 
 interface ITextArea {
   id?: string;
@@ -17,15 +16,11 @@ interface ITextArea {
   maxlength?: number;
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
-  isDashboard?: boolean;
   gotMaxLength?: () => void;
+  setTextareaFocused?: () => void;
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
   const {
     id = '',
     maxlength,
@@ -33,11 +28,20 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     error,
     onChange,
     placeholder,
-    isDashboard,
     gotMaxLength,
+    setTextareaFocused,
   } = props;
 
   const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
+  const router = useRouter();
+  const { mobileChatOpened } = useGetChats();
+
+  const isDashboard = useMemo(() => {
+    if (router.asPath.includes('/creator/dashboard')) {
+      return true;
+    }
+    return false;
+  }, [router.asPath]);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -45,10 +49,6 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     },
     [id, onChange, isShiftEnter]
   );
-
-  function preventScroll(e: any) {
-    e.preventDefault();
-  }
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -64,23 +64,17 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     [gotMaxLength, value.length]
   );
 
-  const handleBlur = useCallback(() => {
-    if (isSafari() && isMobile)
-      document.body.removeEventListener('touchmove', preventScroll);
-  }, [isMobile]);
-
   const handleFocus = useCallback(() => {
-    if (isSafari() && isMobile)
-      setTimeout(() => {
-        document.body.addEventListener('touchmove', preventScroll, {
-          passive: false,
-        });
-      }, 500);
-  }, [isMobile]);
+    setTextareaFocused?.();
+  }, [setTextareaFocused]);
 
   return (
     <SWrapper>
-      <SContent error={!!error} isDashboard={isDashboard}>
+      <SContent
+        error={!!error}
+        isDashboard={isDashboard}
+        isMobileChatOpened={mobileChatOpened}
+      >
         <STextArea
           maxRows={8}
           value={value}
@@ -89,7 +83,6 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           maxLength={maxlength}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-          onBlur={handleBlur}
         />
       </SContent>
       {error ? (
@@ -111,6 +104,7 @@ TextArea.defaultProps = {
   error: '',
   maxlength: 524288,
   gotMaxLength: () => {},
+  setTextareaFocused: () => {},
 };
 
 const SWrapper = styled.div`
@@ -120,13 +114,14 @@ const SWrapper = styled.div`
 interface ISContent {
   error: boolean;
   isDashboard?: boolean;
+  isMobileChatOpened?: boolean;
 }
 
 const SContent = styled.div<ISContent>`
   padding: 10.5px 18.5px 10.5px 18.5px;
   position: relative;
-  background: ${({ theme, isDashboard }) =>
-    !isDashboard
+  background: ${({ theme, isDashboard, isMobileChatOpened }) =>
+    !isDashboard || isMobileChatOpened
       ? theme.name === 'light'
         ? theme.colors.white
         : theme.colorsThemed.background.tertiary

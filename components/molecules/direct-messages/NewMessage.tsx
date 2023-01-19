@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import NewMessageButton from '../../atoms/chat/NewMessageButton';
-import { IChatData } from '../../interfaces/ichat';
+import NewMessageButton from '../../atoms/direct-messages/NewMessageButton';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
 
-interface IFunctionProps {
-  openChat: (arg: IChatData) => void;
-}
-
-const NewMessage: React.FC<IFunctionProps> = ({ openChat }) => {
+const NewMessage: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const openModal = () => {
@@ -23,11 +18,7 @@ const NewMessage: React.FC<IFunctionProps> = ({ openChat }) => {
     <>
       <NewMessageButton handleClick={openModal} />
       {showModal && (
-        <NewMessageModal
-          openChat={openChat}
-          showModal={showModal}
-          closeModal={closeModal}
-        />
+        <NewMessageModal showModal={showModal} closeModal={closeModal} />
       )}
     </>
   );

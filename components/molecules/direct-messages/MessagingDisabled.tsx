@@ -8,7 +8,7 @@ import {
   SBottomActionMessage,
   SBottomActionText,
   SBottomActionTitle,
-} from '../../atoms/chat/styles';
+} from '../../atoms/direct-messages/styles';
 import getDisplayname from '../../../utils/getDisplayname';
 
 interface IMessagingDisabled {

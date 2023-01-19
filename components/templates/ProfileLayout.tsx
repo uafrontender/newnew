@@ -26,7 +26,9 @@ import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
 import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
-import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
+import ReportModal, {
+  ReportData,
+} from '../molecules/direct-messages/ReportModal';
 import BackButton from '../molecules/profile/BackButton';
 // import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
@@ -331,7 +333,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             </SShareDiv>
 
             {creatorsBundle && (
-              <CustomLink href={`/direct-messages/${user.username}-cr`}>
+              <CustomLink href={`/direct-messages/${user.username}`}>
                 <SSendButton withShadow view='primaryGrad'>
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
