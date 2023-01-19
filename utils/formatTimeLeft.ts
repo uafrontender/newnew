@@ -39,7 +39,11 @@ function formatTimeLeft(timeLeft: number): FormattedTimeLeft[] {
     return [{ value: daysLeft, unit: 'days' }];
   }
 
-  return [{ value: 1, unit: 'day' }];
+  if (daysLeft === 1) {
+    return [{ value: 1, unit: 'day' }];
+  }
+
+  return [{ value: 0, unit: 'days' }];
 }
 
 export default formatTimeLeft;
