@@ -118,7 +118,6 @@ interface ISContent {
 }
 
 const SContent = styled.div<ISContent>`
-  padding: 10.5px 18.5px 10.5px 18.5px;
   position: relative;
   background: ${({ theme, isDashboard, isMobileChatOpened }) =>
     !isDashboard || isMobileChatOpened
@@ -146,7 +145,7 @@ const STextArea = styled(TextAreaAutoSize)`
   outline: none;
   background: transparent;
   font-weight: 500;
-
+  padding: 10.5px 18.5px 10.5px 18.5px;
   font-size: 14px;
   line-height: 20px;
 
