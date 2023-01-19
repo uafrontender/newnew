@@ -238,7 +238,7 @@
       "stripeConnectedLink": "Stripe已綁定！",
       "back": "關閉",
       "stripeConnecting": "連接中......",
-      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
+      "requireInformation": "Stripe需要資訊"
     }
   },
   "noNotifications": "你收到的任何新通知\n都會出現在這裡"

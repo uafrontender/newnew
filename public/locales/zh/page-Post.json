@@ -138,7 +138,7 @@
     "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
     "floatingUploadResponseButton": "製作回應視頻",
     "setThumbnail": "設置縮略圖",
-    "changeThumbnail_NEED_TRANSLATION": "Change thumbnail",
+    "changeThumbnail": "改變縮略圖",
     "responseUploadedNonProcessed": "成功！你的回應將在視頻處理完畢後可見",
     "uploadResponseForm": {
       "fileUpload": {
@@ -442,8 +442,8 @@
         "button": "投票"
       },
       "actionSection": {
-        "votesAmount_NEED_TRANSLATION": "# of votes (minimum {{minAmount}} votes)",
-        "totalAmountCustomVotesPayment_NEED_TRANSLATION": "Total",
+        "votesAmount": "投票票數 (最少{{minAmount}}投票)",
+        "totalAmountCustomVotesPayment": "共計",
         "suggestionPlaceholder": "添加你自己的選項",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
@@ -659,7 +659,7 @@
     "hero": {
       "title": "投票結果出來了！",
       "body": "{{creator}}有{{time}}完成這個選項。請繼續關注！",
-      "bodyNoResponse_NEED_TRANSLATION": "{{creator}} has {{time}} to do respond. Stay tuned!",
+      "bodyNoResponse": "{{creator}} 有 {{time}} 進行回應。敬請關注！",
       "expires": {
         "days": "天",
         "days_singular": "天",
