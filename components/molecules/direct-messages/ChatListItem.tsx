@@ -42,13 +42,8 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const {
-    activeChatRoom,
-    setActiveChatRoom,
-    setHiddenMessagesArea,
-    activeTab,
-    setSearchChatroom,
-  } = useGetChats();
+  const { activeChatRoom, setActiveChatRoom, activeTab, setSearchChatroom } =
+    useGetChats();
   const user = useAppSelector((state) => state.user);
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) => {
@@ -120,13 +115,8 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
       setActiveChatRoom(chatRoom);
       setSearchChatroom('');
     }
-    if (isMobileOrTablet) {
-      setHiddenMessagesArea(false);
-    }
   }, [
     setActiveChatRoom,
-    isMobileOrTablet,
-    setHiddenMessagesArea,
     chatRoom,
     setSearchChatroom,
     chatRoute,
