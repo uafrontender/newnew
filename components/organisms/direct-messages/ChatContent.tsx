@@ -324,8 +324,12 @@ const SContainer = styled.div`
   flex-direction: column;
   position: relative;
   padding: 80px 0 82px;
+
+  flex-shrink: 0;
+
   ${(props) => props.theme.media.tablet} {
     padding: 0;
+    flex-shrink: unset;
   }
 `;
 
