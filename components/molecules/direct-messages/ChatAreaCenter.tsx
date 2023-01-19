@@ -10,6 +10,7 @@ import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
 import { SocketContext } from '../../../contexts/socketContext';
+import isAndroid from '../../../utils/isAndroid';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -104,7 +105,11 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer iOS={isIOS()} textareaFocused={textareaFocused}>
+    <SContainer
+      isDeviceAndroid={isAndroid()}
+      iOS={isIOS()}
+      textareaFocused={textareaFocused}
+    >
       {hasWelcomeMessage && (
         <WelcomeMessage userAlias={getDisplayname(chatRoom.visavis?.user)} />
       )}
@@ -129,6 +134,7 @@ export default ChatAreaCenter;
 interface ISContainer {
   textareaFocused: boolean;
   iOS: boolean;
+  isDeviceAndroid: boolean;
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
@@ -146,12 +152,19 @@ const SContainer = styled.div<ISContainer>`
   overflow-y: auto;
   flex-direction: column-reverse;
   padding: 0 12px;
+  ${({ isDeviceAndroid }) =>
+    isDeviceAndroid
+      ? css`
+          padding-bottom: 82px;
+        `
+      : null}
   position: relative;
   height: calc(100vh - 300px);
   min-height: calc(100vh - 300px);
   ${(props) => props.theme.media.tablet} {
     min-height: calc(100% - 160px);
     flex: 0;
+    padding-bottom: unset;
     padding: 0 24px;
     margin: 0;
   }
