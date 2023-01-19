@@ -337,7 +337,7 @@ const SBottomPart = styled.div`
   left: 0;
   right: 0;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
-  padding: 10px 24px 24px;
+  padding: 10px 24px;
   ${(props) => props.theme.media.tablet} {
     position: absolute;
     padding: 20px;
