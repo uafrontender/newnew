@@ -17,7 +17,7 @@ import {
   voteOnPost,
 } from '../../../../../api/endpoints/multiple_choice';
 
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -46,7 +46,7 @@ import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';

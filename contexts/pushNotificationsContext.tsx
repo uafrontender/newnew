@@ -12,7 +12,9 @@ import { newnewapi } from 'newnew-api';
 import {
   webPushCheck,
   webPushConfig,
+  webPushPause,
   webPushRegister,
+  webPushResume,
   webPushUnRegister,
 } from '../api/endpoints/web_push';
 import { cookiesInstance } from '../api/apiConfigs';
@@ -88,6 +90,7 @@ const PushNotificationsContextProvider: React.FC<
 
   const isPushNotificationSupported = useRef(
     isBrowser() &&
+      typeof Notification !== 'undefined' &&
       (isSafariBrowser ||
         ('serviceWorker' in navigator &&
           'PushManager' in window &&
@@ -122,15 +125,24 @@ const PushNotificationsContextProvider: React.FC<
     permission: PermissionType;
     deviceToken?: string;
   } = useCallback(() => {
-    if (isSafariBrowser.current) {
-      const permissionData = (window as any).safari.pushNotification.permission(
-        process.env.NEXT_PUBLIC_WEB_PUSH_ID
-      );
+    try {
+      if (isSafariBrowser.current) {
+        const permissionData = (
+          window as any
+        ).safari.pushNotification.permission(
+          process.env.NEXT_PUBLIC_WEB_PUSH_ID
+        );
 
-      return permissionData;
+        return permissionData;
+      }
+
+      return { permission: Notification.permission };
+    } catch (err) {
+      console.error(err);
+      return {
+        permission: 'denied',
+      };
     }
-
-    return { permission: Notification.permission };
   }, []);
 
   // register subscription on BE
@@ -201,13 +213,19 @@ const PushNotificationsContextProvider: React.FC<
       });
       const res = await webPushCheck(payload);
 
-      if (res.error) {
-        return false;
+      if (res.error || !res.data) {
+        return {
+          exists: false,
+          paused: false,
+        };
       }
 
-      return res.data?.exists || false;
+      return res.data;
     } catch (err) {
-      return false;
+      return {
+        exists: false,
+        paused: false,
+      };
     }
   }, []);
 
@@ -216,11 +234,11 @@ const PushNotificationsContextProvider: React.FC<
     const permissionData = getPermissionData();
 
     if (permissionData.permission === 'granted' && permissionData.deviceToken) {
-      const isSubscriptionExists = await fetchCheckSubscription(
+      const subscriptionStatus = await fetchCheckSubscription(
         permissionData.deviceToken
       );
 
-      return isSubscriptionExists;
+      return subscriptionStatus?.exists && !subscriptionStatus.paused;
     }
 
     return false;
@@ -246,12 +264,16 @@ const PushNotificationsContextProvider: React.FC<
         return false;
       }
 
-      const isSubscriptionExists = await fetchCheckSubscription(
+      const checkSubscriptionValue = await fetchCheckSubscription(
         subscription.endpoint
       );
 
-      if (isSubscriptionExists) {
+      if (checkSubscriptionValue.exists && !checkSubscriptionValue.paused) {
         return true;
+      }
+
+      if (checkSubscriptionValue?.paused) {
+        return false;
       }
 
       // renew subscription if it has been updated
@@ -525,6 +547,36 @@ const PushNotificationsContextProvider: React.FC<
   }, [unsubscribeSafari, unsubscribeNonSafari]);
 
   // Pause and resume notifications
+  const pause = useCallback(async (endpoint: string) => {
+    const payload = new newnewapi.WebPushPauseRequest({
+      endpoint,
+    });
+
+    await webPushPause(payload);
+  }, []);
+
+  const resume = useCallback(async (endpoint: string) => {
+    const payload = new newnewapi.WebPushResumeRequest({
+      endpoint,
+    });
+
+    await webPushResume(payload);
+  }, []);
+
+  const pauseNotificationSafari = useCallback(async () => {
+    try {
+      const permissionData = getPermissionData();
+
+      if (permissionData.deviceToken) {
+        await pause(permissionData.deviceToken);
+      }
+
+      setIsSubscribed(false);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [pause, getPermissionData]);
+
   const pauseNotificationNonSafari = useCallback(async () => {
     try {
       const swReg = await navigator.serviceWorker.register('/sw.js');
@@ -540,13 +592,13 @@ const PushNotificationsContextProvider: React.FC<
         return;
       }
 
-      await unregister(sub.endpoint);
+      await pause(sub.endpoint);
 
       setIsSubscribed(false);
     } catch (err) {
       console.error(err);
     }
-  }, [unregister]);
+  }, [pause]);
 
   const pauseNotification = useCallback(() => {
     if (!isPushNotificationSupported.current || !isSubscribed) {
@@ -554,11 +606,11 @@ const PushNotificationsContextProvider: React.FC<
     }
 
     if (isSafariBrowser.current) {
-      unsubscribeSafari();
+      pauseNotificationSafari();
     } else {
       pauseNotificationNonSafari();
     }
-  }, [isSubscribed, unsubscribeSafari, pauseNotificationNonSafari]);
+  }, [isSubscribed, pauseNotificationSafari, pauseNotificationNonSafari]);
 
   const resumePushNotificationSafari = useCallback(async () => {
     try {
@@ -568,17 +620,21 @@ const PushNotificationsContextProvider: React.FC<
         return;
       }
 
-      const isDeviceSubscribed = await checkSubscriptionSafari();
-
-      if (!isDeviceSubscribed) {
+      if (!permissionData.deviceToken) {
         return;
       }
 
-      await registerSubscriptionSafari(permissionData.deviceToken);
+      const payload = await fetchCheckSubscription(permissionData.deviceToken);
+
+      if (payload.exists && payload.paused) {
+        await resume(permissionData.deviceToken);
+
+        setIsSubscribed(true);
+      }
     } catch (err) {
       console.error(err);
     }
-  }, [registerSubscriptionSafari, getPermissionData, checkSubscriptionSafari]);
+  }, [resume, getPermissionData, fetchCheckSubscription]);
 
   const resumePushNotificationNonSafari = useCallback(async () => {
     try {
@@ -595,16 +651,23 @@ const PushNotificationsContextProvider: React.FC<
       }
 
       const subscription = await swReg.pushManager.getSubscription();
+      const sub = subscription?.toJSON();
 
-      if (!subscription) {
+      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth || !sub.endpoint) {
         return;
       }
 
-      await registerSubscriptionNonSafari(subscription);
+      const payload = await fetchCheckSubscription(sub.endpoint);
+
+      if (payload.exists && payload.paused) {
+        await resume(sub.endpoint);
+
+        setIsSubscribed(true);
+      }
     } catch (err) {
       console.error(err);
     }
-  }, [getPermissionData, registerSubscriptionNonSafari]);
+  }, [getPermissionData, resume, fetchCheckSubscription]);
 
   const resumePushNotification = useCallback(() => {
     if (!isPushNotificationSupported.current) {
@@ -686,6 +749,7 @@ const PushNotificationsContextProvider: React.FC<
       setIsPermissionRequestModalOpen(false);
       setIsLoading(false);
       setPublicKey('');
+      pauseNotification();
     }
   }, [user.loggedIn, pauseNotification]);
 

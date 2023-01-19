@@ -16,6 +16,7 @@ import Headline from '../../../atoms/Headline';
 
 import assets from '../../../../constants/assets';
 import { TPostType } from '../../../../utils/switchPostType';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 interface IPostScheduledSection {
   postType: TPostType;
@@ -42,6 +43,8 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   const { overlayModeEnabled } = useOverlayMode();
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
+
+  const { refetchPost } = usePostInnerState();
 
   // Timer
   const parsed = (timestampSeconds - Date.now()) / 1000;
@@ -87,6 +90,17 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    async function refetchOnHasEnded() {
+      await refetchPost();
+    }
+
+    if (hasEnded) {
+      refetchOnHasEnded();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasEnded]);
 
   if (hasEnded) {
     return (

@@ -13,7 +13,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../../redux-store/store';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -29,7 +29,7 @@ import TutorialTooltip, {
 import Headline from '../../../../atoms/Headline';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import AcConfirmDeleteOptionModal from '../../moderation/auction/AcConfirmDeleteOptionModal';
 

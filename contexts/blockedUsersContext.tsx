@@ -51,7 +51,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         const res = await markUser(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-
         block
           ? setUsersIBlocked((curr) => [...curr, uuid])
           : setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
@@ -62,21 +61,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
-  );
-
-  const contextValue = useMemo(
-    () => ({
-      usersBlockedMe,
-      usersIBlocked,
-      usersBlockedLoading,
-      changeUserBlockedStatus,
-    }),
-    [
-      usersBlockedMe,
-      usersIBlocked,
-      changeUserBlockedStatus,
-      usersBlockedLoading,
-    ]
   );
 
   useEffect(() => {
@@ -103,6 +87,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.BlockStatusChanged.decode(arr);
       if (!decoded) return;
+      console.log(decoded);
 
       decoded.isBlocked
         ? setUsersBlockedMe((curr) => [...curr, decoded.userUuid])
@@ -118,6 +103,21 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
+
+  const contextValue = useMemo(
+    () => ({
+      usersBlockedMe,
+      usersIBlocked,
+      usersBlockedLoading,
+      changeUserBlockedStatus,
+    }),
+    [
+      usersBlockedMe,
+      usersIBlocked,
+      changeUserBlockedStatus,
+      usersBlockedLoading,
+    ]
+  );
 
   return (
     <BlockedUsersContext.Provider value={contextValue}>

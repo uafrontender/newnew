@@ -10,8 +10,13 @@ import React, {
   MutableRefObject,
   useCallback,
 } from 'react';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from 'react-query';
 import { reportPost } from '../api/endpoints/report';
-import { ReportData } from '../components/molecules/chat/ReportModal';
+import { ReportData } from '../components/molecules/direct-messages/ReportModal';
 import { useAppSelector } from '../redux-store/store';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
@@ -41,7 +46,6 @@ const PostInnerContext = createContext<{
   handleReportClose: () => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
-  handleUpdatePostStatus: (newStatus: number | string) => void;
   handleReportOpen: () => void;
   resetSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
@@ -57,6 +61,9 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  refetchPost: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
 }>({
   modalContainerRef: {} as MutableRefObject<HTMLDivElement | undefined>,
   isMyPost: false,
@@ -81,7 +88,6 @@ const PostInnerContext = createContext<{
   handleReportClose: () => {},
   handleSetIsFollowingDecision: (v: boolean) => {},
   handleGoBackInsidePost: () => {},
-  handleUpdatePostStatus: (newStatus: number | string) => {},
   handleReportOpen: () => {},
   resetSetupIntentClientSecret: () => {},
   handleCloseAndGoBack: () => {},
@@ -97,6 +103,7 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => {},
   handleCloseDeletePostModal: () => {},
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
+  refetchPost: (() => {}) as any,
 });
 
 interface IPostContextProvider {
@@ -120,7 +127,6 @@ interface IPostContextProvider {
   handleOpenRecommendedPost: (newPost: newnewapi.Post) => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
-  handleUpdatePostStatus: (newStatus: number | string) => void;
   resetSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
   handleFollowDecision: () => Promise<void>;
@@ -129,6 +135,9 @@ interface IPostContextProvider {
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  refetchPost: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
   children: React.ReactNode;
 }
 
@@ -150,7 +159,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleCloseAndGoBack,
   handleSetIsFollowingDecision,
   handleGoBackInsidePost,
-  handleUpdatePostStatus,
   resetSetupIntentClientSecret,
   handleFollowDecision,
   deletePostOpen,
@@ -158,6 +166,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleOpenDeletePostModal,
   handleCloseDeletePostModal,
   handleSetIsConfirmToClosePost,
+  refetchPost,
   children,
 }) => {
   const router = useRouter();
@@ -231,7 +240,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleReportClose,
       handleSetIsFollowingDecision,
       handleGoBackInsidePost,
-      handleUpdatePostStatus,
       handleReportOpen,
       resetSetupIntentClientSecret,
       handleCloseAndGoBack,
@@ -247,6 +255,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      refetchPost,
     }),
     [
       modalContainerRef,
@@ -268,7 +277,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleReportClose,
       handleSetIsFollowingDecision,
       handleGoBackInsidePost,
-      handleUpdatePostStatus,
       handleReportOpen,
       resetSetupIntentClientSecret,
       handleCloseAndGoBack,
@@ -284,6 +292,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      refetchPost,
     ]
   );
 

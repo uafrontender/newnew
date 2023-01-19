@@ -18,11 +18,7 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-interface IDesktop {
-  hasSoldBundles: boolean;
-}
-
-export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
+export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
@@ -30,7 +26,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
 
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles } = useBundles();
+  const { bundles, hasSoldBundles } = useBundles();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
