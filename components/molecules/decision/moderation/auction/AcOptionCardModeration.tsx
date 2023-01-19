@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
