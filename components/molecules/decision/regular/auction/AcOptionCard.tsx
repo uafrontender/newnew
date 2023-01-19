@@ -13,7 +13,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../../redux-store/store';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
