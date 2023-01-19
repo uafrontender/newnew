@@ -100,6 +100,7 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
         )}
         <ChatlistItem chatRoom={chatroom} />
         {index < chatrooms.length - 1 && <SChatSeparator />}
+        {index === chatrooms.length - 1 && <SChatItemFakeContainer />}
       </React.Fragment>
     ),
     [chatrooms, hasNextPage, scrollRef]
@@ -142,7 +143,7 @@ const SChatlist = styled.div`
   overflow-y: auto;
   flex-direction: column;
   overscroll-behavior: contain;
-  height: calc(100vh - 122px);
+  height: calc(100vh - 124px);
   /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;
@@ -155,4 +156,9 @@ const SRef = styled.span`
   text-indent: -9999px;
   height: 0;
   overflow: hidden;
+`;
+
+const SChatItemFakeContainer = styled.div`
+  min-height: 72px;
+  flex: 1;
 `;

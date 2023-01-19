@@ -127,8 +127,9 @@ const SContent = styled.div<ISContent>`
       : theme.colorsThemed.background.tertiary};
   border-radius: 16px;
 
-  border-width: 1.5px;
+  border-width: 0;
   border-style: solid;
+  display: flex;
   border-color: ${({ theme, error }) => {
     if (!error) {
       return 'transparent';
@@ -145,7 +146,7 @@ const STextArea = styled(TextAreaAutoSize)`
   outline: none;
   background: transparent;
   font-weight: 500;
-  padding: 10.5px 18.5px 10.5px 18.5px;
+  padding: 13px 18.5px;
   font-size: 14px;
   line-height: 20px;
 
