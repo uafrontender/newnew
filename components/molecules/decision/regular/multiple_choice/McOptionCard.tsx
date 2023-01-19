@@ -17,7 +17,7 @@ import {
   voteOnPost,
 } from '../../../../../api/endpoints/multiple_choice';
 
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
