@@ -117,7 +117,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     saveCard,
     stripeSetupIntentClientSecret,
     handleGoBackInsidePost,
-    handleUpdatePostStatus,
     resetSetupIntentClientSecret,
     refetchPost,
   } = usePostInnerState();
@@ -216,20 +215,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      if (res.data.multipleChoice?.status)
-        handleUpdatePostStatus(res.data.multipleChoice?.status);
     } catch (err) {
       console.error(err);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleOnVotingTimeExpired = () => {
-    if (options.some((o) => o.supporterCount > 0)) {
-      handleUpdatePostStatus('WAITING_FOR_RESPONSE');
-    } else {
-      handleUpdatePostStatus('FAILED');
-    }
+  const handleOnVotingTimeExpired = async () => {
+    await refetchPost();
   };
 
   /* const subscription: SubscriptionToPost = useMemo(

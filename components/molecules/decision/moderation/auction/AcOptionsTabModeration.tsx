@@ -20,14 +20,13 @@ import AcOptionCardModeration from './AcOptionCardModeration';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
-import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { selectWinningOption } from '../../../../../api/endpoints/auction';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 
 interface IAcOptionsTabModeration {
   postUuid: string;
-  postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   winningOptionId?: number;
   optionsLoading: boolean;
@@ -42,7 +41,6 @@ interface IAcOptionsTabModeration {
     >
   >;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateWinningOption: (winningOption: newnewapi.Auction.Option) => void;
 }
 
@@ -50,14 +48,12 @@ const AcOptionsTabModeration: React.FunctionComponent<
   IAcOptionsTabModeration
 > = ({
   postUuid,
-  postStatus,
   options,
   optionsLoading,
   winningOptionId,
   hasNextPage,
   fetchNextPage,
   handleRemoveOption,
-  handleUpdatePostStatus,
   handleUpdateWinningOption,
 }) => {
   const { t } = useTranslation('page-Post');
@@ -66,6 +62,8 @@ const AcOptionsTabModeration: React.FunctionComponent<
     resizeMode
   );
   const { showErrorToastPredefined } = useErrorToasts();
+
+  const { postStatus, refetchPost } = usePostInnerState();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -93,7 +91,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
       const res = await selectWinningOption(payload);
 
       if (res.data) {
-        handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
+        await refetchPost();
         handleUpdateWinningOption(winningOption);
       }
     } catch (err) {

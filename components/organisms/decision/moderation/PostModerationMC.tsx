@@ -76,13 +76,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       'tablet',
     ].includes(resizeMode);
 
-    const {
-      postParsed,
-      postStatus,
-      handleGoBackInsidePost,
-      handleUpdatePostStatus,
-      refetchPost,
-    } = usePostInnerState();
+    const { postParsed, postStatus, handleGoBackInsidePost, refetchPost } =
+      usePostInnerState();
     const post = useMemo(
       () => postParsed as newnewapi.MultipleChoice,
       [postParsed]
@@ -177,9 +172,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data.multipleChoice) {
-          if (res.data.multipleChoice.status)
-            handleUpdatePostStatus(res.data.multipleChoice.status);
-
           if (res.data.multipleChoice?.winningOptionId && !winningOption) {
             const winner = options.find(
               (o) => o.id === res!!.data!!.multipleChoice!!.winningOptionId
@@ -201,16 +193,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       }
     }, [postStatus, fetchPostLatestData]);
 
-    const handleOnResponseTimeExpired = () => {
-      handleUpdatePostStatus('FAILED');
+    const handleOnResponseTimeExpired = async () => {
+      await refetchPost();
     };
 
     const handleOnVotingTimeExpired = async () => {
-      if (options.some((o) => o.supporterCount > 0)) {
-        await fetchPostLatestData();
-      } else {
-        handleUpdatePostStatus('FAILED');
-      }
+      await refetchPost();
     };
 
     useEffect(() => {

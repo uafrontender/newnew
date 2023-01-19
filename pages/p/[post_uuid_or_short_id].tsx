@@ -228,27 +228,6 @@ const PostPage: NextPage<IPostPage> = ({
     promptUserWithPushNotificationsPermissionModal,
   ]);
 
-  // const handleUpdatePostStatus = useCallback(
-  //   (newStatus: number | string) => {
-  //     if (typeOfPost) {
-  //       let status;
-  //       if (typeof newStatus === 'number') {
-  //         status = switchPostStatus(typeOfPost, newStatus);
-  //       } else {
-  //         status = switchPostStatusString(typeOfPost, newStatus);
-  //       }
-  //       setPostStatus(status);
-  //     }
-  //   },
-  //   [typeOfPost]
-  // );
-  const handleUpdatePostStatus = useCallback(
-    (newStatus: number | string) => {
-      refetchPost();
-    },
-    [refetchPost]
-  );
-
   const isMyPost = useMemo(
     () =>
       user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
@@ -285,7 +264,7 @@ const PostPage: NextPage<IPostPage> = ({
       const res = await deleteMyPost(payload);
 
       if (!res.error) {
-        handleUpdatePostStatus('DELETED_BY_CREATOR');
+        await refetchPost();
         handleCloseDeletePostModal();
         if (document?.documentElement) {
           setTimeout(() => {
@@ -298,11 +277,7 @@ const PostPage: NextPage<IPostPage> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [
-    handleCloseDeletePostModal,
-    handleUpdatePostStatus,
-    postParsed?.postUuid,
-  ]);
+  }, [handleCloseDeletePostModal, refetchPost, postParsed?.postUuid]);
 
   const resetSetupIntentClientSecret = useCallback(() => {
     setStripeSetupIntentClientSecret(undefined);
@@ -514,20 +489,13 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Listen for Post status updates
   useEffect(() => {
-    const socketHandlerPostStatus = (data: any) => {
+    const socketHandlerPostStatus = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
       if (!decoded) return;
       if (decoded.postUuid === postParsed?.postUuid) {
-        if (decoded.auction) {
-          handleUpdatePostStatus(decoded.auction);
-        } else if (decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice);
-        } else {
-          if (decoded.crowdfunding)
-            handleUpdatePostStatus(decoded.crowdfunding);
-        }
+        await refetchPost();
       }
     };
 
@@ -579,7 +547,6 @@ const PostPage: NextPage<IPostPage> = ({
         postParsed={postParsed}
         typeOfPost={typeOfPost}
         postStatus={postStatus}
-        handleUpdatePostStatus={handleUpdatePostStatus}
         loadingRef={loadingRef}
         modalContainerRef={modalContainerRef}
         isMyPost={isMyPost}

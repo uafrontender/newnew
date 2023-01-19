@@ -46,7 +46,6 @@ const PostInnerContext = createContext<{
   handleReportClose: () => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
-  handleUpdatePostStatus: (newStatus: number | string) => void;
   handleReportOpen: () => void;
   resetSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
@@ -89,7 +88,6 @@ const PostInnerContext = createContext<{
   handleReportClose: () => {},
   handleSetIsFollowingDecision: (v: boolean) => {},
   handleGoBackInsidePost: () => {},
-  handleUpdatePostStatus: (newStatus: number | string) => {},
   handleReportOpen: () => {},
   resetSetupIntentClientSecret: () => {},
   handleCloseAndGoBack: () => {},
@@ -129,7 +127,6 @@ interface IPostContextProvider {
   handleOpenRecommendedPost: (newPost: newnewapi.Post) => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
-  handleUpdatePostStatus: (newStatus: number | string) => void;
   resetSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
   handleFollowDecision: () => Promise<void>;
@@ -162,7 +159,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleCloseAndGoBack,
   handleSetIsFollowingDecision,
   handleGoBackInsidePost,
-  handleUpdatePostStatus,
   resetSetupIntentClientSecret,
   handleFollowDecision,
   deletePostOpen,
@@ -244,7 +240,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleReportClose,
       handleSetIsFollowingDecision,
       handleGoBackInsidePost,
-      handleUpdatePostStatus,
       handleReportOpen,
       resetSetupIntentClientSecret,
       handleCloseAndGoBack,
@@ -282,7 +277,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleReportClose,
       handleSetIsFollowingDecision,
       handleGoBackInsidePost,
-      handleUpdatePostStatus,
       handleReportOpen,
       resetSetupIntentClientSecret,
       handleCloseAndGoBack,

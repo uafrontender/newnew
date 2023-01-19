@@ -74,13 +74,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       'tablet',
     ].includes(resizeMode);
 
-    const {
-      postParsed,
-      postStatus,
-      handleGoBackInsidePost,
-      handleUpdatePostStatus,
-      refetchPost,
-    } = usePostInnerState();
+    const { postParsed, postStatus, handleGoBackInsidePost, refetchPost } =
+      usePostInnerState();
     const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
     // Additional responses
@@ -180,11 +175,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data.auction) {
-          if (res.data.auction.status)
-            handleUpdatePostStatus(res.data.auction.status);
-        }
       } catch (err) {
         console.error(err);
       }
@@ -203,14 +193,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       [post.postUuid, refetchOptions]
     );
 
-    const handleOnResponseTimeExpired = () => {
-      handleUpdatePostStatus('FAILED');
+    const handleOnResponseTimeExpired = async () => {
+      await refetchPost();
     };
 
-    const handleOnVotingTimeExpired = () => {
-      if (!options || options.every((o) => o.supporterCount === 0)) {
-        handleUpdatePostStatus('FAILED');
-      }
+    const handleOnVotingTimeExpired = async () => {
+      await refetchPost();
     };
 
     useEffect(() => {
@@ -521,14 +509,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                   </div>
                   <AcOptionsTabModeration
                     postUuid={post.postUuid}
-                    postStatus={postStatus}
                     options={options}
                     winningOptionId={(winningOption?.id as number) ?? undefined}
                     optionsLoading={isOptionsLoading}
                     hasNextPage={!!hasNextOptionsPage}
                     fetchNextPage={fetchNextOptionsPage}
                     handleRemoveOption={handleRemoveOption}
-                    handleUpdatePostStatus={handleUpdatePostStatus}
                     handleUpdateWinningOption={handleUpdateWinningOption}
                   />
                 </>

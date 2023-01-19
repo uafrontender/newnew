@@ -135,12 +135,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const socketConnection = useContext(SocketContext);
 
-  const {
-    postParsed,
-    postStatus,
-    handleUpdatePostStatus,
-    handleSetIsConfirmToClosePost,
-  } = usePostInnerState();
+  const { postParsed, postStatus, refetchPost, handleSetIsConfirmToClosePost } =
+    usePostInnerState();
   const postUuid = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
 
   // Core response
@@ -437,7 +433,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         if (responseObj) handleUpdateResponseVideo(responseObj);
-        handleUpdatePostStatus('SUCCEEDED');
+        await refetchPost();
         setUploadedResponseVideoUrl('');
         setResponseUploadSuccess(true);
 
@@ -464,7 +460,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     postUuid,
     uploadedResponseVideoUrl,
     handleUpdateResponseVideo,
-    handleUpdatePostStatus,
+    refetchPost,
     showErrorToastPredefined,
   ]);
 
@@ -479,7 +475,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       if (res.data) {
         toast.success(t('postVideo.responseUploadedNonProcessed'));
-        handleUpdatePostStatus('PROCESSING_RESPONSE');
+        refetchPost();
         setUploadedResponseVideoUrl('');
       }
     } catch (err: any) {
@@ -496,7 +492,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     postUuid,
     uploadedResponseVideoUrl,
     t,
-    handleUpdatePostStatus,
+    refetchPost,
     showErrorToastPredefined,
   ]);
 
