@@ -339,7 +339,11 @@ const SBottomPart = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   padding: 10px 24px 24px;
   ${(props) => props.theme.media.tablet} {
-    position: relative;
+    position: absolute;
+    padding: 20px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     background: none;
     min-height: 80px;
   }
@@ -349,13 +353,6 @@ const SBottomTextarea = styled.div`
   display: flex;
   align-items: center;
   flex-direction: row;
-  ${(props) => props.theme.media.tablet} {
-    position: absolute;
-    padding: 20px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
 `;
 
 const STextArea = styled.div`
