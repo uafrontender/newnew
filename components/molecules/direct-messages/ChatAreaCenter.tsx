@@ -164,6 +164,7 @@ const SContainer = styled.div<ISContainer>`
   ${(props) => props.theme.media.tablet} {
     min-height: calc(100% - 160px);
     flex: 0;
+    padding-bottom: unset;
     padding: 0 24px;
     margin: 0;
   }
