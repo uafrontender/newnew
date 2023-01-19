@@ -95,14 +95,13 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
   const renderChatItem = useCallback(
     (chatroom: newnewapi.IChatRoom, index: number) => (
       <React.Fragment key={chatroom.id as number}>
-        {hasNextPage && index < chatrooms.length - 1 && (
+        {hasNextPage && index === chatrooms.length - 1 && (
           <SRef ref={scrollRef}>Loading...</SRef>
         )}
         <ChatlistItem chatRoom={chatroom} />
         {index < chatrooms.length - 1 && <SChatSeparator />}
       </React.Fragment>
     ),
-
     [chatrooms, hasNextPage, scrollRef]
   );
 
