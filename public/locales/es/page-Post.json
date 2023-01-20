@@ -295,6 +295,7 @@
       "title": "Próximamente",
       "subtitle_1": "Tu {{postType}} no está activo todavía.",
       "subtitle_2": "Comenzará en",
+      "toggleButton_NEED_TRANSLATION": "See options",
       "timer": {
         "days": "Días",
         "hours": "Horas",
