@@ -95,6 +95,8 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+        console.log(res.data.totalBundleEarnings?.usdCents);
+
         if (res.data.totalBundleEarnings?.usdCents) {
           setHasSoldBundles(true);
           saveStateLS('creatorHasSoldBundles', true);
@@ -104,13 +106,21 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         setHasSoldBundles(false);
       }
     }
-    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
-    if (localHasSoldBundles) {
-      setHasSoldBundles(true);
-      // TODO: should we show it only for creators who added a bank account?
-      // Reply to TODO: no, creator can sell bundles without verified connected stripe
-    } else if (user.userData?.options?.creatorStatus === 2) {
-      fetchMyBundlesEarnings();
+    if (user.loggedIn) {
+      const localHasSoldBundles = loadStateLS(
+        'creatorHasSoldBundles'
+      ) as boolean;
+      if (localHasSoldBundles) {
+        setHasSoldBundles(true);
+      } else if (
+        user.userData?.options?.creatorStatus !==
+        newnewapi.Me.CreatorStatus.NOT_CREATOR
+      ) {
+        fetchMyBundlesEarnings();
+      }
+    } else {
+      setHasSoldBundles(false);
+      saveStateLS('creatorHasSoldBundles', false);
     }
   }, [user.loggedIn]);
 
