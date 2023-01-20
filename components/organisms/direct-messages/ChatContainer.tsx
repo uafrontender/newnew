@@ -30,7 +30,7 @@ export const ChatContainer = () => {
       {hiddenMessagesArea !== false && <ChatSidebar />}
       {hiddenMessagesArea !== true && (
         <SContent>
-          {activeChatRoom && <ChatContent chatRoom={activeChatRoom!!} />}
+          {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
         </SContent>
       )}
     </SContainer>

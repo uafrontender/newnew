@@ -769,17 +769,17 @@ const OnboardingSectionDetails: React.FunctionComponent<
   function preventScroll(e: any) {
     e.preventDefault();
   }
-  const handleBlur = useCallback(() => {
-    if (isSafari() && isMobile)
-      document.body.removeEventListener('touchmove', preventScroll);
-  }, [isMobile]);
+  // const handleBlur = useCallback(() => {
+  //   if (isSafari() && isMobile)
+  //     document.body.removeEventListener('touchmove', preventScroll);
+  // }, [isMobile]);
 
-  const handleFocus = useCallback(() => {
-    if (isSafari() && isMobile)
-      document.body.addEventListener('touchmove', preventScroll, {
-        passive: false,
-      });
-  }, [isMobile]);
+  // const handleFocus = useCallback(() => {
+  //   if (isSafari() && isMobile)
+  //     document.body.addEventListener('touchmove', preventScroll, {
+  //       passive: false,
+  //     });
+  // }, [isMobile]);
 
   return (
     <>
@@ -795,8 +795,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.firstName.placeholder')}
               onChange={handleFirstnameInput}
               errorCaption={t('detailsSection.form.firstName.errors.tooShort')}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              // onFocus={handleFocus}
+              // onBlur={handleBlur}
             />
             <OnboardingInput
               id='settings_last_name_input'
@@ -806,8 +806,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.lastName.placeholder')}
               onChange={handleLastnameInput}
               errorCaption={t('detailsSection.form.lastName.errors.tooShort')}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              // onFocus={handleFocus}
+              // onBlur={handleBlur}
             />
           </SFieldPairContainer>
           <SFieldPairContainer>
@@ -849,8 +849,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.username.placeholder')}
               isValid={usernameError === ''}
               onChange={handleUpdateUsername}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              // onFocus={handleFocus}
+              // onBlur={handleBlur}
             />
             <OnboardingSectionNicknameInput
               type='text'
@@ -862,8 +862,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               )}
               isValid={nicknameError === ''}
               onChange={handleUpdateNickname}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              // onFocus={handleFocus}
+              // onBlur={handleBlur}
             />
           </SFieldPairContainer>
           <SFieldPairContainer marginBottom={34}>
