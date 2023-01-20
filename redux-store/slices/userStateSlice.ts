@@ -99,6 +99,7 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
         coverUrl: '',
         nickname: '',
         bio: '',
+        countryCode: '',
         options: {},
       };
       state.creatorData = {
