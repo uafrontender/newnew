@@ -104,6 +104,7 @@ const makeStore = () => {
       getDefaultMiddleware({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+          ignoredPaths: ['user.userData.dateOfBirth'],
         },
       }),
   });
