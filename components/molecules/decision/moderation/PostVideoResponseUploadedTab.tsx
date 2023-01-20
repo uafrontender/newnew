@@ -175,7 +175,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const handleCancelUploadAndClearLocalFile = useCallback(() => {
     handleCancelVideoUpload();
     setLocalFile(null);
-  }, [handleCancelVideoUpload]);
+    handleSetCurrentAdditionalResponseStep('regular');
+  }, [handleCancelVideoUpload, handleSetCurrentAdditionalResponseStep]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
