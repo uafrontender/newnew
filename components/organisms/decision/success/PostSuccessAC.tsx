@@ -13,17 +13,18 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 
 // Utils
-import Headline from '../../../atoms/Headline';
-import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
-
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { formatNumber } from '../../../../utils/format';
 import getDisplayname from '../../../../utils/getDisplayname';
-import assets from '../../../../constants/assets';
-import { fetchPostByUUID } from '../../../../api/endpoints/post';
+
+import Headline from '../../../atoms/Headline';
+import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 import PostTitleContent from '../../../atoms/PostTitleContent';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+
+import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -50,6 +51,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
 
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
+    const { refetchPost } = usePostInnerState();
+
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
       newnewapi.Auction.Option | undefined
@@ -60,17 +63,15 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
       'announcement'
     );
+
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
+
     const fetchPostLatestData = useCallback(async () => {
       try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: post.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
+        const res = await refetchPost();
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');

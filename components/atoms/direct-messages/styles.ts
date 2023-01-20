@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 import Text from '../Text';
@@ -69,11 +69,22 @@ export const SBottomActionButton = styled(Button)`
   }
 `;
 
-export const SChatItem = styled.div`
+interface ISChatItem {
+  isActiveChat?: boolean;
+}
+export const SChatItem = styled.div<ISChatItem>`
   cursor: pointer;
   display: flex;
   padding: 12px;
-  &.active,
+  ${(props) => {
+    if (props.isActiveChat) {
+      return css`
+        background: ${props.theme.colorsThemed.background.secondary};
+        border-radius: ${props.theme.borderRadius.medium};
+      `;
+    }
+    return css``;
+  }}
   &:hover {
     background: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: ${(props) => props.theme.borderRadius.medium};
@@ -152,7 +163,8 @@ export const SChatItemLastMessage = styled(Text)`
 
 export const SChatItemRight = styled.div`
   display: flex;
-  padding: 2px 0;
+  padding: 2px 0 0;
+  margin-bottom: -2px;
   align-items: flex-end;
   flex-direction: column;
   margin-left: auto;
@@ -191,4 +203,17 @@ export const SUserAvatar = styled.div`
     min-width: 100%;
     min-height: 100%;
   }
+`;
+
+export const SUnreadCount = styled.span`
+  background: ${({ theme }) => theme.colorsThemed.accent.pink};
+  border-radius: 50%;
+  color: ${({ theme }) => theme.colors.white};
+  padding: 0 6px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: 700;
+  font-size: 10px;
+  margin-left: 6px;
 `;

@@ -12,7 +12,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../../../redux-store/store';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -30,7 +30,7 @@ import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';

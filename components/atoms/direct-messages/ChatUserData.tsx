@@ -3,21 +3,22 @@ import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import InlineSVG from '../InlineSVG';
 import { SUserAlias } from './styles';
+import InlineSVG from '../InlineSVG';
 import getDisplayname from '../../../utils/getDisplayname';
 import { useAppSelector } from '../../../redux-store/store';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 
-interface IChatUserData {
+interface IFunctionProps {
+  isMyAnnouncement: boolean;
+  isAnnouncement: boolean;
   chatRoom: newnewapi.IChatRoom;
-  isAnnouncement?: boolean;
-  isMyAnnouncement?: boolean;
 }
-const ChatUserData: React.FC<IChatUserData> = ({
-  chatRoom,
-  isAnnouncement,
+
+const ChatUserData: React.FC<IFunctionProps> = ({
   isMyAnnouncement,
+  isAnnouncement,
+  chatRoom,
 }) => {
   const { t } = useTranslation('page-Chat');
   const user = useAppSelector((state) => state.user);
@@ -29,7 +30,7 @@ const ChatUserData: React.FC<IChatUserData> = ({
           {
             // eslint-disable-next-line no-nested-ternary
             isAnnouncement
-              ? `${t('announcement.beforeName')} ${
+              ? `${
                   isMyAnnouncement
                     ? getDisplayname(user.userData)
                     : getDisplayname(chatRoom.visavis?.user)
@@ -52,18 +53,18 @@ const ChatUserData: React.FC<IChatUserData> = ({
       {!isAnnouncement && (
         <Link href={`/${chatRoom?.visavis?.user?.username}`}>
           <a style={{ display: 'flex' }}>
-            <SUserAlias>{`@${chatRoom.visavis?.user?.username}`}</SUserAlias>
+            <SUserAlias>{`@${chatRoom?.visavis?.user?.username}`}</SUserAlias>
           </a>
         </Link>
       )}
       {isAnnouncement && (
         <SUserAlias>
           {`${
-            chatRoom.memberCount && chatRoom.memberCount > 0
+            chatRoom?.memberCount && chatRoom?.memberCount > 0
               ? chatRoom.memberCount
               : 0
           } ${
-            chatRoom.memberCount && chatRoom.memberCount > 1
+            chatRoom?.memberCount && chatRoom?.memberCount > 1
               ? t('newAnnouncement.members')
               : t('newAnnouncement.member')
           }`}

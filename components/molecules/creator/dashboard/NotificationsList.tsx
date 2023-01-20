@@ -149,11 +149,21 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (target.userProfile && target?.userProfile.userUsername)
         return `/direct-messages/${target.userProfile.userUsername}`;
 
-      if (target.postResponse && target?.postResponse.postUuid)
-        return `/p/${target.postResponse.postUuid}`;
+      if (
+        target.postResponse &&
+        (target?.postResponse.postShortId || target?.postResponse.postUuid)
+      )
+        return `/p/${
+          target?.postResponse.postShortId || target?.postResponse.postUuid
+        }`;
 
-      if (target.postAnnounce && target?.postAnnounce.postUuid)
-        return `/p/${target.postAnnounce.postUuid}`;
+      if (
+        target.postAnnounce &&
+        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
+      )
+        return `/p/${
+          target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
+        }`;
     }
     return '/direct-messages';
   };
@@ -266,9 +276,34 @@ export const NotificationsList: React.FC<IFunction> = ({
   // }, [notifications, newNotifications]);
 
   return (
-    <>
-      <SSectionContent ref={scrollRef}>
-        {loading === undefined ? (
+    <div ref={scrollRef}>
+      {loading === undefined ? (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      ) : !notifications && loading ? (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      ) : notifications && notifications.length < 1 ? (
+        <NoResults />
+      ) : (
+        notifications && notifications.map(renderNotificationItem)
+      )}
+      {hasMore && !loading && (
+        <SRef ref={scrollRefNotifications}>
           <Lottie
             width={64}
             height={64}
@@ -278,75 +313,13 @@ export const NotificationsList: React.FC<IFunction> = ({
               animationData: loadingAnimation,
             }}
           />
-        ) : !notifications && loading ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : notifications && notifications.length < 1 ? (
-          <NoResults />
-        ) : (
-          notifications && notifications.map(renderNotificationItem)
-        )}
-        {hasMore && !loading && (
-          <SRef ref={scrollRefNotifications}>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SRef>
-        )}
-      </SSectionContent>
-    </>
+        </SRef>
+      )}
+    </div>
   );
 };
 
 export default NotificationsList;
-
-const SSectionContent = styled.div`
-  height: calc(100% - 48px);
-  padding: 0 24px;
-  display: flex;
-  position: relative;
-  overflow-y: auto;
-  flex-direction: column;
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  scrollbar-width: none;
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-
-  &:hover {
-    scrollbar-width: thin;
-    &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
-    }
-  }
-`;
 
 const SNotificationItem = styled.div`
   cursor: pointer;
