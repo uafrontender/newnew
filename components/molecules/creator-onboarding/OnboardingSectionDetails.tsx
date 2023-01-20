@@ -11,7 +11,6 @@ import validator from 'validator';
 import { debounce, isEqual } from 'lodash';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
@@ -42,7 +41,6 @@ import OnboardingSectionUsernameInput from './OnboardingUsernameInput';
 import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import resizeImage from '../../../utils/resizeImage';
-import isSafari from '../../../utils/isSafari';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../utils/hooks/useErrorToasts';
