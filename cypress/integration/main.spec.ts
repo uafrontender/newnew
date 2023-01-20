@@ -3,7 +3,7 @@ import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 const VERIFICATION_CODE = '111111';
-const postShortIdRegex = /p\/(.{6})/;
+const postShortIdRegex = /p\/(.{1,14})/;
 
 context('Main flow', () => {
   const testSeed = Date.now();
