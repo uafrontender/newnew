@@ -765,22 +765,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
     setFieldsValid,
   ]);
 
-  // fix issue with gap while keyboard is active on iOS
-  function preventScroll(e: any) {
-    e.preventDefault();
-  }
-  // const handleBlur = useCallback(() => {
-  //   if (isSafari() && isMobile)
-  //     document.body.removeEventListener('touchmove', preventScroll);
-  // }, [isMobile]);
-
-  // const handleFocus = useCallback(() => {
-  //   if (isSafari() && isMobile)
-  //     document.body.addEventListener('touchmove', preventScroll, {
-  //       passive: false,
-  //     });
-  // }, [isMobile]);
-
   return (
     <>
       <SContainer isMobile={isMobile}>
@@ -795,8 +779,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.firstName.placeholder')}
               onChange={handleFirstnameInput}
               errorCaption={t('detailsSection.form.firstName.errors.tooShort')}
-              // onFocus={handleFocus}
-              // onBlur={handleBlur}
             />
             <OnboardingInput
               id='settings_last_name_input'
@@ -806,8 +788,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.lastName.placeholder')}
               onChange={handleLastnameInput}
               errorCaption={t('detailsSection.form.lastName.errors.tooShort')}
-              // onFocus={handleFocus}
-              // onBlur={handleBlur}
             />
           </SFieldPairContainer>
           <SFieldPairContainer>
@@ -849,8 +829,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.username.placeholder')}
               isValid={usernameError === ''}
               onChange={handleUpdateUsername}
-              // onFocus={handleFocus}
-              // onBlur={handleBlur}
             />
             <OnboardingSectionNicknameInput
               type='text'
@@ -862,8 +840,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
               )}
               isValid={nicknameError === ''}
               onChange={handleUpdateNickname}
-              // onFocus={handleFocus}
-              // onBlur={handleBlur}
             />
           </SFieldPairContainer>
           <SFieldPairContainer marginBottom={34}>
@@ -883,8 +859,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   : t('detailsSection.form.email.errors.invalidEmail')
               }
               onChange={handleEmailInput}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
             />
             <OnboardingCountrySelect
               width='100%'
