@@ -1,8 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-lonely-if */
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useTranslation } from 'react-i18next';
 
 // Utils
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
@@ -15,6 +17,8 @@ import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostScheduledSection from '../../../molecules/decision/common/PostScheduledSection';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
+import McOptionsTabModeration from '../../../molecules/decision/moderation/multiple_choice/McOptionsTabModeration';
+import useMcOptions from '../../../../utils/hooks/useMcOptions';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
@@ -30,6 +34,7 @@ interface IPostViewScheduled {
 
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
   React.memo(({ variant }) => {
+    const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -50,6 +55,34 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       [postParsed]
     );
     const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
+
+    // For Superpoll moderation
+    const [openedTab, setOpenedTab] = useState<'options' | 'hourglass'>(
+      'hourglass'
+    );
+
+    const {
+      processedOptions: options,
+      hasNextPage: hasNextOptionsPage,
+      fetchNextPage: fetchNextOptionsPage,
+      refetch: refetchOptions,
+    } = useMcOptions({
+      postUuid: post.postUuid,
+      userUuid: user.userData?.userUuid,
+      loggedInUser: user.loggedIn,
+    });
+
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.MultipleChoice.Option) => {
+        Mixpanel.track('Removed Option', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewScheduled',
+        });
+        refetchOptions();
+      },
+      [post.postUuid, refetchOptions]
+    );
 
     const [isFollowing, setIsFollowing] = useState(
       post.isFavoritedByMe ?? false
@@ -139,16 +172,53 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               ) : (
                 <PostTopInfoModeration hasWinner={false} />
               ))}
+            {variant === 'moderation' && postType === 'mc' ? (
+              <SToggleOptionsButton
+                noArrow={openedTab === 'hourglass'}
+                onClick={() =>
+                  setOpenedTab((curr) =>
+                    curr === 'hourglass' ? 'options' : 'hourglass'
+                  )
+                }
+              >
+                {openedTab === 'hourglass'
+                  ? t('postScheduled.moderation.toggleButton')
+                  : t('back')}
+              </SToggleOptionsButton>
+            ) : null}
           </div>
-          <PostScheduledSection
-            postType={postType}
-            timestampSeconds={new Date(
-              (post.startsAt?.seconds as number) * 1000
-            ).getTime()}
-            isFollowing={isFollowing}
-            variant={variant}
-            handleFollowDecision={handleFollowDecision}
-          />
+          {variant === 'moderation' && postType === 'mc' ? (
+            openedTab === 'hourglass' ? (
+              <PostScheduledSection
+                postType={postType}
+                timestampSeconds={new Date(
+                  (post.startsAt?.seconds as number) * 1000
+                ).getTime()}
+                isFollowing={isFollowing}
+                variant={variant}
+                handleFollowDecision={handleFollowDecision}
+              />
+            ) : (
+              <McOptionsTabModeration
+                post={postParsed as newnewapi.MultipleChoice}
+                options={options}
+                hasNextPage={!!hasNextOptionsPage}
+                fetchNextPage={fetchNextOptionsPage}
+                winningOptionId={undefined}
+                handleRemoveOption={handleRemoveOption}
+              />
+            )
+          ) : (
+            <PostScheduledSection
+              postType={postType}
+              timestampSeconds={new Date(
+                (post.startsAt?.seconds as number) * 1000
+              ).getTime()}
+              isFollowing={isFollowing}
+              variant={variant}
+              handleFollowDecision={handleFollowDecision}
+            />
+          )}
         </SActivitiesContainer>
       </SWrapper>
     );
@@ -217,3 +287,5 @@ const SActivitiesContainer = styled.div`
     width: 100%;
   }
 `;
+
+const SToggleOptionsButton = styled(GoBackButton)``;

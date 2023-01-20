@@ -295,6 +295,7 @@
       "title": "Coming soon",
       "subtitle_1": "Your {{postType}} is not active yet.",
       "subtitle_2": "It will start in",
+      "toggleButton": "See options",
       "timer": {
         "days": "Days",
         "hours": "Hours",
