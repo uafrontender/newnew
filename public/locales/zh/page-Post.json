@@ -295,6 +295,7 @@
       "title": "即將開始",
       "subtitle_1": "你的{{postType}}還沒有被啟動",
       "subtitle_2": "距離啓動時間：",
+      "toggleButton_NEED_TRANSLATION": "See options",
       "timer": {
         "days": "天",
         "hours": "小時",
