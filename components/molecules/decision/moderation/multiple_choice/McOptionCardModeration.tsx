@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable quotes */
 /* eslint-disable react/jsx-indent */
@@ -441,14 +439,6 @@ const SBiddersInfo = styled(Text)`
     justify-self: flex-end;
     padding-top: 4px;
   }
-`;
-
-const SSpanBiddersHighlighted = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SSpanBiddersRegular = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SEllipseButton = styled(Button)`
