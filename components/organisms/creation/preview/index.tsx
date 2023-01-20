@@ -375,6 +375,21 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     }
   }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
+  const userTimezone = useMemo(() => {
+    if (userData?.countryCode) {
+      if (userData?.countryCode.toLocaleLowerCase() === 'us') {
+        if (!userData.timeZone || !userData.timeZone.includes('America')) {
+          return '';
+        }
+      }
+    }
+
+    return new Date()
+      .toLocaleString('en', { timeZoneName: 'short' })
+      .split(' ')
+      .pop();
+  }, [userData]);
+
   const disabled =
     isSubmitting ||
     !titleIsValid ||
@@ -397,19 +412,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           key: 'startsAt',
           value: `${formatStartsAt().format(
             'MMM DD YYYY [at] hh:mm A'
-          )} ${new Date()
-            .toLocaleString('en', { timeZoneName: 'short' })
-            .split(' ')
-            .pop()}`,
+          )} ${userTimezone}`,
         },
         {
           key: 'expiresAt',
           value: `${formatExpiresAt(false).format(
             'MMM DD YYYY [at] hh:mm A'
-          )} ${new Date()
-            .toLocaleString('en', { timeZoneName: 'short' })
-            .split(' ')
-            .pop()}`,
+          )} ${userTimezone}`,
         },
         {
           key: 'comments',
@@ -436,6 +445,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       crowdfunding.targetBackerCount,
       userData?.options?.isOfferingBundles,
       formatExpiresAt,
+      userTimezone,
     ]
   );
   const handleGoBack = useCallback(() => {
