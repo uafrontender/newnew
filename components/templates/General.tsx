@@ -178,7 +178,10 @@ export const General: React.FC<IGeneral> = (props) => {
     setMobileChatOpened(true);
   }, [activeTab, setActiveTab, setMobileChatOpened, router]);
 
-  const chatButtonVisible = isMobile && withChat && hasSoldBundles;
+  const chatButtonVisible = useMemo(
+    () => isMobile && withChat && hasSoldBundles,
+    [isMobile, withChat, hasSoldBundles]
+  );
 
   const mobileNavigationVisible = useMemo(
     () => isMobile && scrollDirection !== 'down' && !noMobileNavigation,
