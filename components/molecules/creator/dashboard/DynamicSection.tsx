@@ -378,7 +378,7 @@ const SAnimatedContainer = styled.div<ISAnimatedContainer>`
   top: -20px;
 
   z-index: 5;
-  padding: ${(props) => (!props.isDashboardMessages ? '24px 0' : '0 0 24px')};
+  padding: ${(props) => (!props.isDashboardMessages ? '24px 0 0' : '0')};
   position: absolute;
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) =>
