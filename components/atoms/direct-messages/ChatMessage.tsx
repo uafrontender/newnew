@@ -16,7 +16,7 @@ interface IChatMessage {
   item: newnewapi.IChatMessage;
   prevElement: newnewapi.IChatMessage;
   nextElement: newnewapi.IChatMessage;
-  chatRoom: newnewapi.IChatRoom | null;
+  chatRoom: newnewapi.IChatRoom;
 }
 
 const ChatMessage: React.FC<IChatMessage> = ({
