@@ -53,6 +53,10 @@ const Chat: NextPage<IChat> = ({ username }) => {
     newnewapi.ChatRoom.Kind | undefined
   >();
 
+  const [filteredChatrooms, setFilteredChatroom] = useState<
+    newnewapi.IChatRoom[]
+  >([]);
+
   const { data } = useMyChatRooms({
     myRole,
     roomKind,
@@ -99,23 +103,60 @@ const Chat: NextPage<IChat> = ({ username }) => {
   }, [username]);
 
   useEffect(() => {
-    if (chatrooms.length === 1) {
-      setActiveTab(
-        chatrooms[0].myRole === newnewapi.ChatRoom.MyRole.CREATOR
-          ? newnewapi.ChatRoom.MyRole.CREATOR
-          : newnewapi.ChatRoom.MyRole.SUBSCRIBER
-      );
-      setActiveChatRoom(chatrooms[0]);
-      if (isMobileOrTablet) {
-        setHiddenMessagesArea(false);
+    if (chatrooms.length > 0) {
+      const usernameArr = username.split('-');
+      if (
+        chatrooms.length === 1 &&
+        myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
+        roomKind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
+      ) {
+        setActiveChatRoom(chatrooms[0]);
+        if (isMobileOrTablet) {
+          setHiddenMessagesArea(false);
+        }
+      } else {
+        const localChatrooms = chatrooms.filter(
+          (room) =>
+            room.visavis?.user?.username === usernameArr[0].toLowerCase()
+        );
+        setFilteredChatroom(localChatrooms);
       }
     }
-    // if we have 1 chatroom as creator and 1 as bundle ownder
-    if (chatrooms.length === 2) {
-      setMyRole(newnewapi.ChatRoom.MyRole.SUBSCRIBER);
+  }, [
+    chatrooms,
+    isMobileOrTablet,
+    myRole,
+    roomKind,
+    setActiveChatRoom,
+    setHiddenMessagesArea,
+    username,
+  ]);
+
+  useEffect(() => {
+    if (filteredChatrooms.length > 0) {
+      if (filteredChatrooms.length === 1) {
+        setActiveTab(
+          filteredChatrooms[0].myRole === newnewapi.ChatRoom.MyRole.CREATOR
+            ? newnewapi.ChatRoom.MyRole.CREATOR
+            : newnewapi.ChatRoom.MyRole.SUBSCRIBER
+        );
+        setActiveChatRoom(filteredChatrooms[0]);
+        if (isMobileOrTablet) {
+          setHiddenMessagesArea(false);
+        }
+      }
+      // if we have 1 chatroom as creator and 1 as bundle ownder
+      if (filteredChatrooms.length === 2) {
+        setMyRole(newnewapi.ChatRoom.MyRole.SUBSCRIBER);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatrooms]);
+  }, [
+    filteredChatrooms,
+    isMobileOrTablet,
+    setActiveChatRoom,
+    setHiddenMessagesArea,
+    setActiveTab,
+  ]);
 
   return (
     <>

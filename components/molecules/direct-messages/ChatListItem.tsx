@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/router';
 import {
-  SChatItemContainer,
   SChatItem,
   SChatItemContent,
   SChatItemContentWrapper,
@@ -68,7 +67,6 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   }, [router.asPath]);
 
   const chatRoute = useMemo(() => {
-    // if there is not visavis it's our announcement room
     let route = `/direct-messages/${
       chatRoom.visavis?.user?.username || user.userData?.username
     }`;
@@ -145,33 +143,28 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   }
 
   return (
-    <SChatItemContainer>
-      <SChatItem
-        onClick={handleItemClick}
-        isActiveChat={isActiveChat(chatRoom)}
-      >
-        {avatar}
-        <SChatItemContent>
-          <SChatItemContentWrapper>
-            <ChatName chat={chatRoom} />
-            <SChatItemTime variant={3} weight={600}>
-              {moment((chatRoom.updatedAt?.seconds as number) * 1000).fromNow()}
-            </SChatItemTime>
-          </SChatItemContentWrapper>
-          <SChatItemContentWrapper>
-            <SChatItemLastMessage variant={3} weight={600}>
-              {textTrim(lastMsg, 28)}
-            </SChatItemLastMessage>
-            <SChatItemRight>
-              {(chatRoom.unreadMessageCount as number) > 0 &&
-                activeChatRoom?.id !== chatRoom.id && (
-                  <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
-                )}
-            </SChatItemRight>
-          </SChatItemContentWrapper>
-        </SChatItemContent>
-      </SChatItem>
-    </SChatItemContainer>
+    <SChatItem onClick={handleItemClick} isActiveChat={isActiveChat(chatRoom)}>
+      {avatar}
+      <SChatItemContent>
+        <SChatItemContentWrapper>
+          <ChatName chat={chatRoom} />
+          <SChatItemTime variant={3} weight={600}>
+            {moment((chatRoom.updatedAt?.seconds as number) * 1000).fromNow()}
+          </SChatItemTime>
+        </SChatItemContentWrapper>
+        <SChatItemContentWrapper>
+          <SChatItemLastMessage variant={3} weight={600}>
+            {textTrim(lastMsg, 28)}
+          </SChatItemLastMessage>
+          <SChatItemRight>
+            {(chatRoom.unreadMessageCount as number) > 0 &&
+              activeChatRoom?.id !== chatRoom.id && (
+                <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
+              )}
+          </SChatItemRight>
+        </SChatItemContentWrapper>
+      </SChatItemContent>
+    </SChatItem>
   );
 };
 
