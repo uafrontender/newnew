@@ -52,12 +52,16 @@ const DashboardLayout: React.FunctionComponent<IChatLayout> = React.memo(
         {children}
       </SWrapper>
     ) : (
-      <SGeneral withChat>{children}</SGeneral>
+      <SGeneral withChat={withChat}>{children}</SGeneral>
     );
   }
 );
 
 export default DashboardLayout;
+
+DashboardLayout.defaultProps = {
+  withChat: false,
+};
 
 const SWrapper = styled.div`
   position: relative;
