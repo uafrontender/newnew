@@ -74,30 +74,36 @@ const BundleCard: React.FC<IBundleCard> = ({
           ]}
         />
       </SVotesLeft>
-      <AccessDescription>
-        <Trans
-          t={t}
-          i18nKey='bundle.access'
-          // @ts-ignore
-          components={[
-            <>
-              {formattedTimeLeft.map((time, index) => (
-                <React.Fragment key={time.unit}>
-                  {index > 0 ? t('bundle.and') : null}
-                  {t('bundle.unitPair', {
-                    amount: time.value,
-                    unit: t(`bundle.unit.${time.unit}`),
-                  })}
-                </React.Fragment>
-              ))}
-            </>,
-          ]}
-        />
-      </AccessDescription>
-      <BundleFeatures>
-        <BulletLine>{t('bundle.customOptions')}</BulletLine>
-        <BulletLine>{t('bundle.chat')}</BulletLine>
-      </BundleFeatures>
+      {formattedTimeLeft ? (
+        <>
+          <AccessDescription>
+            <Trans
+              t={t}
+              i18nKey='bundle.access'
+              // @ts-ignore
+              components={[
+                <>
+                  {formattedTimeLeft.map((time, index) => (
+                    <React.Fragment key={time.unit}>
+                      {index > 0 ? t('bundle.and') : null}
+                      {t('bundle.unitPair', {
+                        amount: time.value,
+                        unit: t(`bundle.unit.${time.unit}`),
+                      })}
+                    </React.Fragment>
+                  ))}
+                </>,
+              ]}
+            />
+          </AccessDescription>
+          <BundleFeatures>
+            <BulletLine>{t('bundle.customOptions')}</BulletLine>
+            <BulletLine>{t('bundle.chat')}</BulletLine>
+          </BundleFeatures>
+        </>
+      ) : (
+        <AccessDescription>{t('bundle.accessExpired')}</AccessDescription>
+      )}
     </SBundlesContainer>
   );
 };

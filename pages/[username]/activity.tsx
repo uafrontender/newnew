@@ -3,6 +3,7 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
+import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -21,6 +22,7 @@ import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import getDisplayname from '../../utils/getDisplayname';
+import assets from '../../constants/assets';
 
 interface IUserPageActivity {
   user: newnewapi.IUser;
@@ -68,50 +70,59 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   }, [inView, fetchNextPage]);
 
   return (
-    <div>
-      {isActivityPrivate ? (
-        <SMain>
-          <SAccountPrivate>
-            <SPrivateLock>
-              <InlineSvg
-                svg={LockIcon}
-                width='24px'
-                height='24px'
-                fill={theme.colorsThemed.text.secondary}
-              />
-            </SPrivateLock>
-            <SAccountPrivateText variant={1}>
-              {t('accountPrivate', {
-                username: getDisplayname(user),
-              })}
-            </SAccountPrivateText>
-          </SAccountPrivate>
-        </SMain>
-      ) : (
-        <SMain>
-          <SCardsSection>
-            {posts && (
-              <PostList
-                category=''
-                loading={isLoading || isFetchingNextPage}
-                collection={posts}
-                wrapperStyle={{
-                  left: 0,
-                }}
-              />
-            )}
-            {posts && posts.length === 0 && !isLoading && (
-              <NoContentCard>
-                <NoContentDescription>
-                  {t('Activity.noContent.description')}
-                </NoContentDescription>
-              </NoContentCard>
-            )}
-          </SCardsSection>
-          {hasNextPage && <div ref={loadingRef} />}
-        </SMain>
-      )}
-    </div>
+    <>
+      <Head>
+        <title>{getDisplayname(user)}</title>
+        <meta name='description' content={user.bio || ''} />
+        <meta property='og:title' content={getDisplayname(user)} />
+        <meta property='og:description' content={user.bio || ''} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
+      </Head>
+      <div>
+        {isActivityPrivate ? (
+          <SMain>
+            <SAccountPrivate>
+              <SPrivateLock>
+                <InlineSvg
+                  svg={LockIcon}
+                  width='24px'
+                  height='24px'
+                  fill={theme.colorsThemed.text.secondary}
+                />
+              </SPrivateLock>
+              <SAccountPrivateText variant={1}>
+                {t('accountPrivate', {
+                  username: getDisplayname(user),
+                })}
+              </SAccountPrivateText>
+            </SAccountPrivate>
+          </SMain>
+        ) : (
+          <SMain>
+            <SCardsSection>
+              {posts && (
+                <PostList
+                  category=''
+                  loading={isLoading || isFetchingNextPage}
+                  collection={posts}
+                  wrapperStyle={{
+                    left: 0,
+                  }}
+                />
+              )}
+              {posts && posts.length === 0 && !isLoading && (
+                <NoContentCard>
+                  <NoContentDescription>
+                    {t('Activity.noContent.description')}
+                  </NoContentDescription>
+                </NoContentCard>
+              )}
+            </SCardsSection>
+            {hasNextPage && <div ref={loadingRef} />}
+          </SMain>
+        )}
+      </div>
+    </>
   );
 };
 
