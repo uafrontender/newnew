@@ -59,7 +59,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         showErrorToastPredefined(undefined);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
