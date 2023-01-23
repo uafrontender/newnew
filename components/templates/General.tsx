@@ -1,13 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -162,7 +155,6 @@ export const General: React.FC<IGeneral> = (props) => {
   ]);
 
   useScrollPosition();
-  // useRefreshOnScrollTop();
   const { scrollDirection } = useScrollDirection();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -184,16 +176,10 @@ export const General: React.FC<IGeneral> = (props) => {
     setMobileChatOpened(true);
   }, [activeTab, setActiveTab, setMobileChatOpened, router]);
 
-  // const chatButtonVisible = isMobile && withChat && hasSoldBundles;
-
   const chatButtonVisible = useMemo(
     () => isMobile && withChat && hasSoldBundles,
     [isMobile, withChat, hasSoldBundles]
   );
-
-  // useEffect(() => {
-  //   console.log(hasSoldBundles);
-  // }, [chatButtonVisible]);
 
   const mobileNavigationVisible = useMemo(
     () => isMobile && scrollDirection !== 'down' && !noMobileNavigation,
