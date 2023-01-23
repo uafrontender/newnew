@@ -229,7 +229,7 @@
           },
           "whatsNew": "¿Cuál es tu correo electrónico nuevo?",
           "confirmEmail": "Confirma el nuevo correo electrónico",
-          "verifyNewEmail_NEED_TRANSLATION": "Confirm your new email",
+          "verifyNewEmail": "Confirma tu nuevo correo electrónico",
           "edit": "Editar"
         },
         "birthDateInput": {
