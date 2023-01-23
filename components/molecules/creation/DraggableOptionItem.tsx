@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TextArea from 'react-textarea-autosize';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -48,26 +48,36 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const { t } = useTranslation('page-Creation');
   const dragControls = useDragControls();
 
+  const clearValue = useCallback((rawValue: string): string => {
+    if (!rawValue.trim()) {
+      return '';
+    }
+
+    return rawValue.replaceAll('\n', '');
+  }, []);
+
   const handleInputChange = (e: any) => {
-    setValue(e.target.value.trim() ? e.target.value : '');
+    const clearedValue = clearValue(e.target.value);
+    setValue(clearedValue);
     handleChange(index, {
       ...item,
-      text: e.target.value.trim() ? e.target.value : '',
+      text: clearedValue,
     });
   };
   const handleInputBlur = async (e: any) => {
+    const clearedValue = clearValue(e.target.value);
     Mixpanel.track('Superpoll Option Text Change', {
       _stage: 'Creation',
-      _text: e.target.value,
+      _text: clearedValue,
     });
-    if (e.target.value.length < 1 && index > 1) {
+    if (clearedValue.length < 1 && index > 1) {
       handleChange(index, null);
       return;
     }
 
     setError(
       await validation(
-        e.target.value,
+        clearedValue,
         CREATION_OPTION_MIN,
         CREATION_OPTION_MAX,
         newnewapi.ValidateTextRequest.Kind.POST_OPTION,

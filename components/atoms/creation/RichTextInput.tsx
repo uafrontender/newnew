@@ -30,11 +30,20 @@ const RichTextInput: React.FC<IRichTextInput> = ({
 }) => {
   const [focused, setFocused] = useState(false);
 
+  const clearValue = useCallback((rawValue: string): string => {
+    if (!rawValue.trim()) {
+      return '';
+    }
+
+    return rawValue.replaceAll('\n', '');
+  }, []);
+
   const handleChange = useCallback(
     (e: any) => {
-      onChange(id, e.target.value);
+      const clearedValue = clearValue(e.target.value || '');
+      onChange(id, clearedValue);
     },
-    [id, onChange]
+    [id, clearValue, onChange]
   );
 
   const handleFocus = useCallback(() => {
@@ -42,10 +51,14 @@ const RichTextInput: React.FC<IRichTextInput> = ({
     onFocus(id);
   }, [id, onFocus]);
 
-  const handleBlur = useCallback(() => {
-    setFocused(false);
-    onBlur(id, value);
-  }, [id, value, onBlur]);
+  const handleBlur = useCallback(
+    (e: any) => {
+      const clearedValue = clearValue(e.target.value || '');
+      setFocused(false);
+      onBlur(id, clearedValue);
+    },
+    [id, clearValue, onBlur]
+  );
 
   const chunks = getChunks(value);
   const showPlaceholder = !value && !focused && !!placeholder;
@@ -145,7 +158,7 @@ const STextArea = styled(TextArea)<ISTextArea>`
 
   overflow: hidden;
   overflow-wrap: break-word;
-  white-space: pre-line;
+  white-space: pre-wrap;
   inset: 0;
 
   z-index: 1;
@@ -196,7 +209,7 @@ const SInputRenderer = styled.div`
   color: ${(props) => props.theme.colorsThemed.text.primary};
 
   overflow-wrap: break-word;
-  white-space: pre-line;
+  white-space: pre-wrap;
   overflow-x: auto;
   user-select: none;
   scrollbar-width: none;
