@@ -276,6 +276,7 @@ interface ISTextArea {
 }
 
 const STextArea = styled(TextArea)<ISTextArea>`
+  display: block;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
   border: none;
