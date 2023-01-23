@@ -138,7 +138,7 @@ interface ISContainer {
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
-  ${({ textareaFocused, iOS }) =>
+  /* ${({ textareaFocused, iOS }) =>
     !textareaFocused && iOS
       ? css`
           margin: 0 0 70px;
@@ -147,22 +147,29 @@ const SContainer = styled.div<ISContainer>`
       ? css`
           margin: 80px 0 0;
         `
-      : ''};
+      : ''}; */
   display: flex;
   overflow-y: auto;
   flex-direction: column-reverse;
   padding: 0 12px;
-  ${({ isDeviceAndroid }) =>
+  /* ${({ isDeviceAndroid }) =>
     isDeviceAndroid
       ? css`
           padding-bottom: 82px;
         `
-      : null}
-  position: relative;
-  height: calc(100vh - 300px);
-  min-height: calc(100vh - 300px);
+      : null} */
+  /* position: relative; */
+  /* height: calc(100vh - 300px);
+  min-height: calc(100vh - 300px); */
+  position: fixed;
+  top: 80px;
+  bottom: 80px;
+  left: 0;
+  right: 0;
   ${(props) => props.theme.media.tablet} {
+    position: static;
     min-height: calc(100% - 160px);
+    height: calc(100vh - 160px);
     flex: 0;
     padding-bottom: unset;
     padding: 0 24px;
