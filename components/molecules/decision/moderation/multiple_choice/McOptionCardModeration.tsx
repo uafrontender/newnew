@@ -170,44 +170,11 @@ const McOptionCardModeration: React.FunctionComponent<
                 isCreatorsBid
                 isSuggestedByMe={false}
                 isSupportedByMe={false}
-                optionCreator={
-                  option.creator ? getDisplayname(option.creator) : undefined
-                }
-                optionCreatorUsername={
-                  option.creator
-                    ? (option.creator.username as string)
-                    : undefined
-                }
-                firstVoter={
-                  option.firstVoter
-                    ? getDisplayname(option.firstVoter)
-                    : undefined
-                }
-                firstVoterUsername={
-                  option.firstVoter
-                    ? (option.firstVoter.username as string)
-                    : undefined
-                }
-                whiteListedSupporter={
-                  option.whitelistSupporter
-                    ? getDisplayname(option.whitelistSupporter)
-                    : undefined
-                }
-                whiteListedSupporterUsername={
-                  option.whitelistSupporter
-                    ? (option.whitelistSupporter.username as string)
-                    : undefined
-                }
+                optionCreator={option.creator || undefined}
+                firstVoter={option.firstVoter || undefined}
+                whiteListedSupporter={option.whitelistSupporter || undefined}
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubstracted}
-                amIVerified={false}
-                isOptionCreatorVerified={
-                  option.creator?.options?.isVerified ?? false
-                }
-                isFirstVoterVerified={
-                  option.firstVoter?.options?.isVerified ?? false
-                }
-                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
