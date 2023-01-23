@@ -66,8 +66,6 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
     );
   }
 
-  console.log(user);
-
   if (user?.options?.isVerified)
     return (
       <Link href={`/${user?.username}`}>
