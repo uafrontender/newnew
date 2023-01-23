@@ -127,7 +127,7 @@ const SInputContainer = styled.div<ISInputContainer>`
   position: relative;
   width: 100%;
   height: auto;
-  min-height: 48px;
+  min-height: 44px;
   padding: 10.5px 18.5px 10.5px 18.5px;
 
   border-radius: 16px;
@@ -141,6 +141,10 @@ const SInputContainer = styled.div<ISInputContainer>`
   }};
 
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
+
+  ${({ theme }) => theme.media.tablet} {
+    min-height: 48px;
+  }
 `;
 
 interface ISTextArea {
