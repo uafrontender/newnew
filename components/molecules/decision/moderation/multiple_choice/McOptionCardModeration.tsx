@@ -405,6 +405,8 @@ const SBiddersInfo = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
     padding-top: 4px;
+
+    text-align: right;
   }
 `;
 
