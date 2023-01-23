@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppSelector } from '../../../redux-store/store';
+import ChatContent from './ChatContent';
 
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
-const ChatContent = dynamic(() => import('./ChatContent'));
 
 export const ChatContainer = () => {
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -30,7 +30,7 @@ export const ChatContainer = () => {
       {hiddenMessagesArea !== false && <ChatSidebar />}
       {hiddenMessagesArea !== true && (
         <SContent>
-          {activeChatRoom && <ChatContent chatRoom={activeChatRoom!!} />}
+          {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
         </SContent>
       )}
     </SContainer>

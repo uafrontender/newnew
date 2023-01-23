@@ -216,7 +216,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
-    "beforeName": "El anuncios de",
+    "beforeName": "El anuncios de ",
     "suffix": "",
     "afterName": ""
   },
