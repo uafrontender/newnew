@@ -261,7 +261,11 @@ const SLeftPart = styled.div<ISLeftPart>`
   }
 `;
 
-const STextArea = styled(TextArea)`
+interface ISTextArea {
+  value: string;
+}
+
+const STextArea = styled(TextArea)<ISTextArea>`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
   border: none;
@@ -270,16 +274,35 @@ const STextArea = styled(TextArea)`
   background: transparent;
   margin-right: 12px;
 
+  &&& {
+    height: ${({ value }) => (!value ? '24px!important' : undefined)};
+  }
+
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
+  }
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
   }
 
   font-size: 14px;
   line-height: 20px;
 
+  // Prevents size changes on initial rendering
+  &&& {
+    height: ${({ value }) => (!value ? '20px!important' : undefined)};
+  }
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
+
+    // Prevents size changes on initial rendering
+    &&& {
+      height: ${({ value }) => (!value ? '24px!important' : undefined)};
+    }
   }
 `;
 
