@@ -6,7 +6,7 @@ interface FormattedTimeLeft {
 // This is a very specific formatter to display bundle time left
 // A month here is always 30 days
 // And it is done the way it is, to fit the format requirements
-function formatTimeLeft(timeLeft: number): FormattedTimeLeft[] {
+function formatTimeLeft(timeLeft: number): FormattedTimeLeft[] | undefined {
   const daysLeft = Math.ceil(timeLeft / 1000 / 60 / 60 / 24);
   const monthsLeft = Math.floor(daysLeft / 30);
   const yearsLeft = Math.floor(monthsLeft / 12);
@@ -39,7 +39,11 @@ function formatTimeLeft(timeLeft: number): FormattedTimeLeft[] {
     return [{ value: daysLeft, unit: 'days' }];
   }
 
-  return [{ value: 1, unit: 'day' }];
+  if (daysLeft === 1) {
+    return [{ value: 1, unit: 'day' }];
+  }
+
+  return undefined;
 }
 
 export default formatTimeLeft;

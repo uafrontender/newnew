@@ -52,6 +52,8 @@ const getPayWithCardErrorMessage = (
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
+    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
+      return 'errors.optionNotUnique';
     default:
       return 'errors.requestFailed';
   }

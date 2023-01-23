@@ -3,6 +3,7 @@ import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
+import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -27,6 +28,7 @@ import {
 import getDisplayname from '../../utils/getDisplayname';
 import Button from '../../components/atoms/Button';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import assets from '../../constants/assets';
 
 interface IUserPageIndex {
   user: newnewapi.IUser;
@@ -79,74 +81,83 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
   }, [inView, fetchNextPage]);
 
   return (
-    <div>
-      {!isCreator && isActivityPrivate ? (
-        <SMain>
-          <SAccountPrivate>
-            <SPrivateLock>
-              <InlineSvg
-                svg={LockIcon}
-                width='24px'
-                height='24px'
-                fill={theme.colorsThemed.text.secondary}
-              />
-            </SPrivateLock>
-            <SAccountPrivateText variant={1}>
-              {t('accountPrivate', {
-                username: getDisplayname(user),
-              })}
-            </SAccountPrivateText>
-          </SAccountPrivate>
-        </SMain>
-      ) : (
-        <SMain>
-          <SCardsSection>
-            {posts && (
-              <PostList
-                category=''
-                loading={isLoading || isFetchingNextPage}
-                collection={posts}
-                wrapperStyle={{
-                  left: 0,
-                }}
-              />
-            )}
-            {user.options?.isCreator &&
-              posts &&
-              posts.length === 0 &&
-              !isLoading && (
-                <NoContentCard>
-                  <NoContentDescription>
-                    {t('CreatorsDecisions.noContent.description')}
-                  </NoContentDescription>
-                </NoContentCard>
+    <>
+      <Head>
+        <title>{getDisplayname(user)}</title>
+        <meta name='description' content={user.bio || ''} />
+        <meta property='og:title' content={getDisplayname(user)} />
+        <meta property='og:description' content={user.bio || ''} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
+      </Head>
+      <div>
+        {!isCreator && isActivityPrivate ? (
+          <SMain>
+            <SAccountPrivate>
+              <SPrivateLock>
+                <InlineSvg
+                  svg={LockIcon}
+                  width='24px'
+                  height='24px'
+                  fill={theme.colorsThemed.text.secondary}
+                />
+              </SPrivateLock>
+              <SAccountPrivateText variant={1}>
+                {t('accountPrivate', {
+                  username: getDisplayname(user),
+                })}
+              </SAccountPrivateText>
+            </SAccountPrivate>
+          </SMain>
+        ) : (
+          <SMain>
+            <SCardsSection>
+              {posts && (
+                <PostList
+                  category=''
+                  loading={isLoading || isFetchingNextPage}
+                  collection={posts}
+                  wrapperStyle={{
+                    left: 0,
+                  }}
+                />
               )}
-            {user.options &&
-              !user.options.isCreator &&
-              posts &&
-              posts.length === 0 &&
-              !isLoading && (
-                <NoContentCard>
-                  <NoContentDescription>
-                    {t('UserProfile.noContent.description', {
-                      username: getDisplayname(user),
-                    })}
-                  </NoContentDescription>
-                  <NoContentSuggestion>
-                    {t('UserProfile.noContent.suggestion')}
-                  </NoContentSuggestion>
-                  <Link href='/'>
-                    <SButton view='primaryGrad'>
-                      {t('UserProfile.noContent.button')}
-                    </SButton>
-                  </Link>
-                </NoContentCard>
-              )}
-          </SCardsSection>
-          {hasNextPage && <div ref={loadingRef} />}
-        </SMain>
-      )}
-    </div>
+              {user.options?.isCreator &&
+                posts &&
+                posts.length === 0 &&
+                !isLoading && (
+                  <NoContentCard>
+                    <NoContentDescription>
+                      {t('CreatorsDecisions.noContent.description')}
+                    </NoContentDescription>
+                  </NoContentCard>
+                )}
+              {user.options &&
+                !user.options.isCreator &&
+                posts &&
+                posts.length === 0 &&
+                !isLoading && (
+                  <NoContentCard>
+                    <NoContentDescription>
+                      {t('UserProfile.noContent.description', {
+                        username: getDisplayname(user),
+                      })}
+                    </NoContentDescription>
+                    <NoContentSuggestion>
+                      {t('UserProfile.noContent.suggestion')}
+                    </NoContentSuggestion>
+                    <Link href='/'>
+                      <SButton view='primaryGrad'>
+                        {t('UserProfile.noContent.button')}
+                      </SButton>
+                    </Link>
+                  </NoContentCard>
+                )}
+            </SCardsSection>
+            {hasNextPage && <div ref={loadingRef} />}
+          </SMain>
+        )}
+      </div>
+    </>
   );
 };
 
