@@ -109,14 +109,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       const localHasSoldBundles = loadStateLS(
         'creatorHasSoldBundles'
       ) as boolean;
-
       if (localHasSoldBundles) {
         setHasSoldBundles(true);
       } else if (
         user.userData?.options?.creatorStatus !==
         newnewapi.Me.CreatorStatus.NOT_CREATOR
       ) {
-        console.log('fetch');
         fetchMyBundlesEarnings();
       }
     } else {
