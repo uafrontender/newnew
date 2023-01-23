@@ -120,7 +120,7 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
             winningOption.supporterCount > 1 ? (
               <>
                 {' & '}
-                {formatNumber(winningOption.supporterCount, true)}{' '}
+                {formatNumber(winningOption.supporterCount - 1, true)}{' '}
                 {t('mcPostSuccess.others')}
               </>
             ) : null}{' '}
