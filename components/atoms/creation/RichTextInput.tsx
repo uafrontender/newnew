@@ -149,6 +149,7 @@ interface ISTextArea {
 
 const STextArea = styled(TextArea)<ISTextArea>`
   position: relative;
+  display: block;
   width: 100%;
   resize: none;
   border: none;
