@@ -497,8 +497,15 @@ const SOptionInfo = styled(Text)<{
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
 
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
+    padding-top: 4px;
+
+    text-align: right;
   }
 `;
 
