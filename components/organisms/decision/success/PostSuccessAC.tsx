@@ -25,6 +25,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -43,7 +44,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const { t } = useTranslation('page-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -223,67 +223,11 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                   <SSeparator />
                   {winningOption && (
                     <>
-                      <SWinningBidCreator>
-                        <SCreator>
-                          <Link
-                            href={`/${
-                              winningOption.creator?.uuid ===
-                                user.userData?.userUuid ||
-                              winningOption.isSupportedByMe
-                                ? 'profile'
-                                : winningOption.creator?.username
-                            }`}
-                          >
-                            <SCreatorImage
-                              src={
-                                winningOption.creator?.uuid ===
-                                  user.userData?.userUuid ||
-                                winningOption.isSupportedByMe
-                                  ? user.userData?.avatarUrl ?? ''
-                                  : winningOption.creator?.avatarUrl ?? ''
-                              }
-                            />
-                          </Link>
-                          <SWinningBidCreatorText>
-                            <SSpan>
-                              <Link
-                                href={`/${
-                                  winningOption.creator?.uuid ===
-                                    user.userData?.userUuid ||
-                                  winningOption.isSupportedByMe
-                                    ? 'profile'
-                                    : winningOption.creator?.username
-                                }`}
-                              >
-                                {winningOption.creator?.uuid ===
-                                  user.userData?.userUuid ||
-                                winningOption.isSupportedByMe
-                                  ? winningOption.supporterCount > 1
-                                    ? t('me')
-                                    : t('my')
-                                  : getDisplayname(winningOption.creator!!)}
-                              </Link>
-                            </SSpan>
-                            {winningOption.creator?.options?.isVerified && (
-                              <SInlineSVG
-                                svg={VerificationCheckmark}
-                                fill='none'
-                              />
-                            )}
-                            {winningOption.supporterCount > 1 ? (
-                              <>
-                                {' & '}
-                                {formatNumber(
-                                  winningOption.supporterCount - 1,
-                                  true
-                                )}{' '}
-                                {t('acPostSuccess.others')}
-                              </>
-                            ) : null}{' '}
-                            {t('acPostSuccess.bid')}
-                          </SWinningBidCreatorText>
-                        </SCreator>
-                      </SWinningBidCreator>
+                      <WinningOptionCreator
+                        type='ac'
+                        postCreator={post.creator!!}
+                        winningOptionAc={winningOption}
+                      />
                       {winningOption.totalAmount?.usdCents && (
                         <SWinningOptionAmount variant={4}>
                           {`$${formatNumber(
@@ -570,42 +514,6 @@ const SPostTitle = styled(Headline)`
   }
 `;
 
-// Winning option info
-const SWinningBidCreator = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-
-  margin-top: 32px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
-
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`;
-
-const SWinningBidCreatorText = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  white-space: pre;
-
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-
-  ${({ theme }) => theme.media.laptop} {
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -790,16 +698,3 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SSpan = styled.span`
-  a {
-    cursor: pointer;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
-`;
