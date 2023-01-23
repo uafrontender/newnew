@@ -423,7 +423,13 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;;
+    justify-content: flex-start;
+
+    margin-bottom: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: initial;
   }
 `;
 
