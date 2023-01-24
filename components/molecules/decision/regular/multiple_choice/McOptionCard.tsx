@@ -303,7 +303,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   // Custom amount
   const customPaymentAmountInCents = useMemo(() => {
     const biggestGroup =
-      appConstants.mcVoteOffers[appConstants.mcVoteOffers.length - 1];
+      appConstants?.mcVoteOffers && appConstants?.mcVoteOffers.length > 2
+        ? appConstants?.mcVoteOffers[appConstants.mcVoteOffers.length - 1]
+        : undefined;
 
     if (
       !biggestGroup ||
