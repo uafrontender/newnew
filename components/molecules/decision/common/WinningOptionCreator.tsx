@@ -75,10 +75,11 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
               winningOption.supporterCount > 1 ? (
                 <>
                   {' & '}
-                  {formatNumber(winningOption.supporterCount - 1, true)}{' '}
+                  {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
                   {t('mcPostSuccess.others')}
                 </>
-              ) : null}{' '}
+              ) : null}
+              &nbsp;
               {t('mcPostSuccess.voted')}
             </SWinningBidCreatorText>
           </SCreator>
@@ -108,10 +109,11 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
             winningOption.supporterCount > 1 ? (
               <>
                 {' & '}
-                {formatNumber(winningOption.supporterCount - 1, true)}{' '}
+                {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
                 {t('acPostSuccess.others')}
               </>
-            ) : null}{' '}
+            ) : null}
+            &nbsp;
             {t('acPostSuccess.bid')}
           </SWinningBidCreatorText>
         </SCreator>
@@ -199,10 +201,11 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
             winningOption.supporterCount > 1 ? (
               <>
                 {' & '}
-                {formatNumber(winningOption.supporterCount - 1, true)}{' '}
+                {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
                 {t('mcPostSuccess.others')}
               </>
-            ) : null}{' '}
+            ) : null}
+            &nbsp;
             {t('mcPostSuccess.voted')}
           </SWinningBidCreatorText>
         </SCreator>
@@ -279,12 +282,14 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
             {winningOption.supporterCount &&
             winningOption.supporterCount > 1 ? (
               <>
-                {' & '}
-                {formatNumber(winningOption.supporterCount - 1, true)}{' '}
+                {` & `}
+                {formatNumber(winningOption.supporterCount - 1, true)}
+                &nbsp;
                 {t('acPostSuccess.others')}
               </>
-            ) : null}{' '}
-            {t('acPostSuccess.bid')}
+            ) : null}
+            &nbsp;
+            <span>{t('acPostSuccess.bid')}</span>
           </SWinningBidCreatorText>
         </SCreator>
       </SWinningBidCreator>
@@ -337,7 +342,7 @@ const SWinningBidCreatorText = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  white-space: pre;
+  /* white-space: pre; */
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
