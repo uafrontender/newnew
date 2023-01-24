@@ -976,7 +976,7 @@ export const CreationSecondStepContent: React.FC<
 
       if (available) {
         dispatch(setCreationFileProcessingLoading(false));
-        setCreationFileProcessingProgress(100);
+        dispatch(setCreationFileProcessingProgress(100));
       } else {
         dispatch(setCreationFileUploadError(true));
         showErrorToastPredefined(undefined);
