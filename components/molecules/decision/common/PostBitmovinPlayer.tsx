@@ -88,16 +88,6 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   const playerRef: any = useRef();
   const player = useRef<PlayerAPI | null>(null);
 
-  useEffect(() => {
-    if (!player.current?.isPlaying()) {
-      try {
-        player.current?.play();
-      } catch (err) {
-        handleSetIsPaused(true);
-      }
-    }
-  }, [handleSetIsPaused]);
-
   const handlePlaybackFinished = useCallback(() => {
     player?.current?.play();
   }, []);
@@ -160,7 +150,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           ?.load(playerSource)
           .then(() => {
             if (cancel) return;
-            player.current?.play();
+            player.current?.play().catch(() => {
+              handleSetIsPaused(true);
+            });
             setLoaded(true);
             setIsLoading(false);
           })
@@ -178,7 +170,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     return () => {
       cancel = true;
     };
-  }, [playerSource]);
+  }, [playerSource, handleSetIsPaused]);
 
   useEffect(() => {
     player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
