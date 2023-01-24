@@ -19,7 +19,9 @@ const BecomeCreatorSection = () => {
 
   const handleClickCreateNow = () => {
     Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Homepage',
       _button: 'Create now',
+      _target: user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create',
     });
     router.push(user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create');
   };

@@ -9,6 +9,7 @@ import Button from '../../atoms/Button';
 import { useAppDispatch } from '../../../redux-store/store';
 import { deleteMyAccount } from '../../../api/endpoints/user';
 import { logoutUserClearCookiesAndRedirect } from '../../../redux-store/slices/userStateSlice';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IConfirmDeleteAccountModal {
   isVisible: boolean;
@@ -36,6 +37,10 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
     }
   }
   const handleConfirmClick = () => {
+    Mixpanel.track('Confirm Delete Account Button Clicked', {
+      _stage: 'Settings',
+      _component: 'ConfirmDeleteMyAccountModal',
+    });
     deleteUser();
   };
   return (

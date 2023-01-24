@@ -203,11 +203,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               pressedBgColor={theme.colorsThemed.social.google.pressed}
               textWidth={textWidth}
               setTextWidth={handleTextWidthChange}
-              onClick={() =>
+              onClick={() => {
+                Mixpanel.track('Sign In With Google Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/google${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
               {t('signUpOptions.google')}
             </SignInButton>
