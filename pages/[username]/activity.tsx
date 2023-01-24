@@ -72,9 +72,16 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   return (
     <>
       <Head>
-        <title>{getDisplayname(user)}</title>
+        <title>
+          {t('Profile.meta.title', { displayName: getDisplayname(user) })}
+        </title>
         <meta name='description' content={user.bio || ''} />
-        <meta property='og:title' content={getDisplayname(user)} />
+        <meta
+          property='og:title'
+          content={t('Profile.meta.title', {
+            displayName: getDisplayname(user),
+          })}
+        />
         <meta property='og:description' content={user.bio || ''} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
