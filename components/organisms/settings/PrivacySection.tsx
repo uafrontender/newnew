@@ -19,6 +19,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getUserByUsername } from '../../../api/endpoints/user';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -145,7 +146,13 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 </SLink>
               </Link>
               <SUnblockButton
-                onClick={() => changeUserBlockedStatus(user.uuid, false)}
+                onClick={() => {
+                  Mixpanel.track('Unblock user', {
+                    _stage: 'Settings',
+                    _userUuid: user.uuid,
+                  });
+                  changeUserBlockedStatus(user.uuid, false);
+                }}
                 view='secondary'
               >
                 {t('Settings.sections.privacy.blockedUsers.button.unblock')}
@@ -158,14 +165,25 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           {t('Settings.sections.privacy.closeAccount.title')}
         </SHidingSubsectionTitle>
         <SCloseAccountButton
-          onClick={() => setIsConfirmDeleteMyAccountVisible(true)}
+          onClick={() => {
+            Mixpanel.track('Delete Account Button Clicked', {
+              _stage: 'Settings',
+            });
+            setIsConfirmDeleteMyAccountVisible(true);
+          }}
           view='secondary'
         >
           {t('Settings.sections.privacy.closeAccount.button.delete')}
         </SCloseAccountButton>
         <ConfirmDeleteAccountModal
           isVisible={isConfirmDeleteMyAccountVisible}
-          closeModal={() => setIsConfirmDeleteMyAccountVisible(false)}
+          closeModal={() => {
+            Mixpanel.track('Close Confirm Delete Account Modal', {
+              _stage: 'Settings',
+            });
+
+            setIsConfirmDeleteMyAccountVisible(false);
+          }}
         />
       </SCloseAccountSubsection>
     </SWrapper>

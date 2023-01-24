@@ -14,6 +14,7 @@ import Toggle from '../../atoms/Toggle';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
@@ -53,6 +54,12 @@ const SettingsNotificationsSection = () => {
   const updateMyNotificationState = async (
     item: newnewapi.INotificationState
   ) => {
+    Mixpanel.track('Update My Notification State', {
+      _stage: 'Settings',
+      _source: item.notificationSource,
+      _isEnabled: item.isEnabled,
+    });
+
     if (isLoading) return;
     try {
       const payload = new newnewapi.UpdateMyNotificationsStateRequest({
@@ -87,8 +94,18 @@ const SettingsNotificationsSection = () => {
     });
   };
 
-  const turnOnNotification = () => {
+  const turnOnPushNotifications = () => {
+    Mixpanel.track('Turn On Push Notifications', {
+      _stage: 'Settings',
+    });
     requestPermission();
+  };
+
+  const turnOffPushNotification = () => {
+    Mixpanel.track('Turn Off Push Notifications', {
+      _stage: 'Settings',
+    });
+    unsubscribe();
   };
 
   return (
@@ -137,7 +154,11 @@ const SettingsNotificationsSection = () => {
               <Toggle
                 title={t('Settings.sections.notifications.push')}
                 checked={isSubscribed}
-                onChange={isSubscribed ? unsubscribe : turnOnNotification}
+                onChange={
+                  isSubscribed
+                    ? turnOffPushNotification
+                    : turnOnPushNotifications
+                }
               />
             </SSubsection>
           )}

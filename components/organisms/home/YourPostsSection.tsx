@@ -13,6 +13,7 @@ import Lottie from '../../atoms/Lottie';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useMyPosts from '../../../utils/hooks/useMyPosts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
@@ -48,6 +49,12 @@ const YourPostsSection = () => {
   const handleSetStatusFilter = (
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
   ) => {
+    Mixpanel.track('Posts Filter Set', {
+      _stage: 'Homepage',
+      _component: 'YourPostsSection',
+      _filter: newStatusFilter,
+    });
+
     if (statusFilter === newStatusFilter) {
       setStatusFilter(null);
     } else {
@@ -62,7 +69,18 @@ const YourPostsSection = () => {
         <SHeadline>{t('createFirstPost.title')}</SHeadline>
         <Link href='/creation'>
           <a>
-            <Button>{tCommon('button.createDecision')}</Button>
+            <Button
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Homepage',
+                  _component: 'YourPostSection',
+                  _button: 'Create Now',
+                  _target: '/creation',
+                });
+              }}
+            >
+              {tCommon('button.createDecision')}
+            </Button>
           </a>
         </Link>
       </SCreateFirstContainer>
@@ -118,7 +136,18 @@ const YourPostsSection = () => {
               <SHint variant='subtitle'>{t('noPosts')}</SHint>
               <Link href='/creation'>
                 <a>
-                  <Button>{tCommon('button.createDecision')}</Button>
+                  <Button
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _stage: 'Homepage',
+                        _component: 'YourPostSection',
+                        _button: 'Create Now',
+                        _target: '/creation',
+                      });
+                    }}
+                  >
+                    {tCommon('button.createDecision')}
+                  </Button>
                 </a>
               </Link>
             </>
