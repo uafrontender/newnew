@@ -19,8 +19,9 @@ export const Mixpanel = {
   track: (name: string, props?: Dict) => {
     mixpanel.track(name, props);
   },
-  track_links: (query: Query, name: string, callback) => {
-    mixpanel.track_links(query, name, (e) => {
+  // TODO: replace any
+  track_links: (query: Query, name: string, callback?: (e: any) => any) => {
+    mixpanel.track_links(query, name, (e: any) => {
       const callbackObj = callback ? callback(e) : {};
 
       return {
