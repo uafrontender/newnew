@@ -1,7 +1,6 @@
 import { newnewapi } from 'newnew-api';
 import Long from 'long';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
-import Long from 'long';
 
 const BASE_URL_CHAT = `${BASE_URL}/reporting`;
 

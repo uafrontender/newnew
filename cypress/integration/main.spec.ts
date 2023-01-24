@@ -2,6 +2,9 @@ import createStorage from './utils/createStorage';
 import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
+import { fetchProtobufProtectedIntercepted } from '../../api/apiConfigs';
+import { newnewapi } from 'newnew-api';
+
 const VERIFICATION_CODE = '111111';
 const postShortIdRegex = /p\/([^\/]{1,14})/;
 
@@ -415,7 +418,7 @@ context('Main flow', () => {
     });
   });
 
-  describe.only('Guest willing to buy a bundle', () => {
+  describe('Guest willing to buy a bundle', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -535,7 +538,7 @@ context('Main flow', () => {
     });
   });
 
-  describe.only('User willing to contribute', () => {
+  describe('User willing to contribute', () => {
     const USER_EMAIL = `test_user_${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -632,7 +635,7 @@ context('Main flow', () => {
     });
   });
 
-  describe.only('User willing to buy a bundle', () => {
+  describe('User willing to buy a bundle', () => {
     const USER_EMAIL = `test_user_${testSeed}3@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -751,7 +754,7 @@ context('Main flow', () => {
     });
   });
 
-  describe.only('User willing to add card first', () => {
+  describe('User willing to add card first', () => {
     const USER_EMAIL = `test_user_${testSeed}4@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -872,7 +875,7 @@ context('Main flow', () => {
     });
   });
 
-  describe('Creator willing to respond', () => {
+  describe.only('Creator willing to respond', () => {
     const defaultStorage = {
       userTutorialsProgress:
         '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
@@ -910,15 +913,41 @@ context('Main flow', () => {
       });
     });
 
-    it('can wait for a post to end', () => {
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
-      cy.url().should('include', '/p/');
+    it('[system call - end posts]', () => {
+      /* cy.request(
+        'POST',
+        `https://api-dev.newnew.co/dev/update_post_internal_fields?post_uuid=${eventShortId}`,
+        {}
+      ); */
+      cy.wait(5000);
+      cy.getCookie('accessToken');
+      cy.getCookie('refreshToken');
+      cy.getCookies().then((cookies) => {
+        console.log(cookies);
+        const accessToken = cookies.find(
+          (cookie) => cookie.name === 'accessToken'
+        )!.value;
+        const refreshToken = cookies.find(
+          (cookie) => cookie.name === 'refreshToken'
+        )!.value;
+        fetchProtobufProtectedIntercepted<
+          newnewapi.EmptyRequest,
+          newnewapi.EmptyResponse
+        >(
+          newnewapi.EmptyRequest,
+          newnewapi.EmptyResponse,
+          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${eventShortId}`,
+          'post',
+          new newnewapi.EmptyRequest(),
+          undefined,
+          {
+            accessToken,
+            refreshToken,
+          }
+        );
+      });
 
-      cy.dGet('#post-tab-response', {
-        timeout: 120000,
-      }).click();
-
-      cy.dGet('#upload-button');
+      cy.wait(25000);
     });
 
     // TODO: check more numbers
