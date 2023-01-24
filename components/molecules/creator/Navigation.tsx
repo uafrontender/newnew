@@ -69,7 +69,7 @@ export const Navigation = () => {
     (item: NavigationItem) => {
       const active = router.route.includes(item.url);
       return (
-        <Link href={item.url} key={item.url}>
+        <Link key={item.id} href={item.url}>
           <SItem id={item.id} active={active}>
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
