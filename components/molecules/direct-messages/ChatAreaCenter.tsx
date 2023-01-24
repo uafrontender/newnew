@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import getDisplayname from '../../../utils/getDisplayname';
@@ -10,7 +10,6 @@ import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
 import { SocketContext } from '../../../contexts/socketContext';
-import isAndroid from '../../../utils/isAndroid';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -105,11 +104,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer
-      isDeviceAndroid={isAndroid()}
-      iOS={isIOS()}
-      textareaFocused={textareaFocused}
-    >
+    <SContainer textareaFocused={textareaFocused}>
       {hasWelcomeMessage && (
         <WelcomeMessage userAlias={getDisplayname(chatRoom.visavis?.user)} />
       )}
@@ -133,34 +128,13 @@ export default ChatAreaCenter;
 
 interface ISContainer {
   textareaFocused: boolean;
-  iOS: boolean;
-  isDeviceAndroid: boolean;
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
-  /* ${({ textareaFocused, iOS }) =>
-    !textareaFocused && iOS
-      ? css`
-          margin: 0 0 70px;
-        `
-      : textareaFocused && iOS
-      ? css`
-          margin: 80px 0 0;
-        `
-      : ''}; */
   display: flex;
   overflow-y: auto;
   flex-direction: column-reverse;
   padding: 0 12px;
-  /* ${({ isDeviceAndroid }) =>
-    isDeviceAndroid
-      ? css`
-          padding-bottom: 82px;
-        `
-      : null} */
-  /* position: relative; */
-  /* height: calc(100vh - 300px);
-  min-height: calc(100vh - 300px); */
   position: fixed;
   top: 80px;
   bottom: 80px;
