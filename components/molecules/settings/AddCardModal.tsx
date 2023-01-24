@@ -26,6 +26,7 @@ import CardSetupCompleteModal from '../../organisms/settings/CardSetupCompleteMo
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IAddCardForm {
   onCancel: () => void;
@@ -70,6 +71,11 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
 
   const handleSubmit = async () => {
     try {
+      Mixpanel.track('Add Card Button Clicked', {
+        _stage: 'Settings',
+        _component: 'AddCardModal',
+      });
+
       await handleConfirmSetup();
     } catch (err: any) {
       console.error(err);
@@ -93,13 +99,6 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recaptchaErrorMessage]);
-
-  useEffect(() => {
-    // fix recaptcha challenge overlay issue
-    if (isRecaptchaV2Required) {
-      document.body.style.top = '0';
-    }
-  }, [isRecaptchaV2Required]);
 
   useEffect(
     () => () => {

@@ -13,6 +13,7 @@ import { sendVerificationNewEmail } from '../../../api/endpoints/user';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailStepTwoModal {
   onComplete: (email: string) => void;
@@ -49,6 +50,11 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
     async (e: React.FormEvent) => {
       e.preventDefault();
       try {
+        Mixpanel.track('Set New Email', {
+          _stage: 'Settings',
+          _newEmail: newEmail,
+        });
+
         setIsLoading(true);
         const sendVerificationCodePayload =
           new newnewapi.SendVerificationEmailRequest({

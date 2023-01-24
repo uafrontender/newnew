@@ -5,7 +5,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
-import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
@@ -20,21 +19,20 @@ import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
+import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 
 import { formatNumber } from '../../../../../utils/format';
 import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import getDisplayname from '../../../../../utils/getDisplayname';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 
 // Icons
 import BidIconLight from '../../../../../public/images/decision/bid-icon-light.png';
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
-import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
-import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
-import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
-import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -143,74 +141,20 @@ const AcOptionCardModeration: React.FunctionComponent<
             </SOptionInfo>
             <SBiddersInfo variant={3}>
               {!option.whitelistSupporter ? (
-                option.creator?.username ? (
-                  <Link href={`/${option.creator?.username}`}>
-                    <SSpanBiddersHighlighted
-                      className='spanHighlighted'
-                      onClick={(e) => e.stopPropagation()}
-                      style={{
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {getDisplayname(option.creator!!)}
-                      {option.creator.options?.isVerified && (
-                        <SInlineSvgVerificationIcon
-                          svg={
-                            !isWinner
-                              ? VerificationCheckmark
-                              : VerificationCheckmarkInverted
-                          }
-                          width='16px'
-                          height='16px'
-                          fill='none'
-                        />
-                      )}
-                    </SSpanBiddersHighlighted>
-                  </Link>
-                ) : (
-                  <SSpanBiddersHighlighted
-                    className='spanHighlighted'
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {getDisplayname(option.creator!!)}
-                    {option.creator?.options?.isVerified && (
-                      <SInlineSvgVerificationIcon
-                        svg={
-                          !isWinner
-                            ? VerificationCheckmark
-                            : VerificationCheckmarkInverted
-                        }
-                        width='16px'
-                        height='16px'
-                        fill='none'
-                      />
-                    )}
-                  </SSpanBiddersHighlighted>
-                )
+                <OptionCardUsernameSpan
+                  type='otherUser'
+                  user={option.creator!!}
+                  isBlue={!!isWinner}
+                />
               ) : (
-                <Link href={`/${option.whitelistSupporter?.username}`}>
-                  <SSpanBiddersHighlighted
-                    className='spanHighlighted'
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {getDisplayname(option.whitelistSupporter!!)}
-                    {option.whitelistSupporter.options?.isVerified && (
-                      <SInlineSvgVerificationIcon
-                        svg={
-                          !isWinner
-                            ? VerificationCheckmark
-                            : VerificationCheckmarkInverted
-                        }
-                        width='16px'
-                        height='16px'
-                        fill='none'
-                      />
-                    )}
-                  </SSpanBiddersHighlighted>
-                </Link>
+                <OptionCardUsernameSpan
+                  type='otherUser'
+                  user={{
+                    ...option.whitelistSupporter,
+                    options: { ...option.whitelistSupporter, isVerified: true },
+                  }}
+                  isBlue={!!isWinner}
+                />
               )}
               {option.supporterCount > 1 ? (
                 <>
@@ -347,51 +291,21 @@ const AcOptionCardModeration: React.FunctionComponent<
           </SBidAmount>
           <SOptionInfo variant={3}>{option.title}</SOptionInfo>
           <SBiddersInfo variant={3}>
-            {option.creator?.username ? (
-              <>
-                <Link href={`/${option.creator?.username}`}>
-                  <SSpanBiddersHighlighted
-                    className='spanHighlighted'
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {getDisplayname(option.creator)}
-                  </SSpanBiddersHighlighted>
-                </Link>
-                {option.creator?.options?.isVerified && (
-                  <SInlineSvgVerificationIcon
-                    svg={
-                      !isWinner
-                        ? VerificationCheckmark
-                        : VerificationCheckmarkInverted
-                    }
-                    width='16px'
-                    height='16px'
-                    fill='none'
-                  />
-                )}
-              </>
+            {!option.whitelistSupporter ? (
+              <OptionCardUsernameSpan
+                type='otherUser'
+                user={option.creator!!}
+                isBlue={!!isWinner}
+              />
             ) : (
-              <SSpanBiddersHighlighted
-                className='spanHighlighted'
-                onClick={(e) => e.stopPropagation()}
-              >
-                {getDisplayname(option.creator)}
-                {option.creator?.options?.isVerified && (
-                  <SInlineSvgVerificationIcon
-                    svg={
-                      !isWinner
-                        ? VerificationCheckmark
-                        : VerificationCheckmarkInverted
-                    }
-                    width='16px'
-                    height='16px'
-                    fill='none'
-                  />
-                )}
-              </SSpanBiddersHighlighted>
+              <OptionCardUsernameSpan
+                type='otherUser'
+                user={{
+                  ...option.whitelistSupporter,
+                  options: { ...option.whitelistSupporter, isVerified: true },
+                }}
+                isBlue={!!isWinner}
+              />
             )}
             {option.supporterCount > 1 ? (
               <>
@@ -583,8 +497,15 @@ const SOptionInfo = styled(Text)<{
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
 
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
+    padding-top: 4px;
+
+    text-align: right;
   }
 `;
 
@@ -782,15 +703,4 @@ const SBidDetailsModal = styled.div`
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
   }
-`;
-
-const SInlineSvgVerificationIcon = styled(InlineSvg)`
-  display: inline-flex;
-  margin-left: 3px;
-
-  position: relative;
-  top: 3px;
-
-  height: 16px;
-  width: 16px;
 `;

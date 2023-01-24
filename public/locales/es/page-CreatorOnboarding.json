@@ -112,8 +112,8 @@
       "back": "Regresar",
       "submit": "Hecho"
     },
-    "agreedToTosCheckbox": "He leído y acepto",
-    "linkText_NEED_TRANSLATION": "NewNew's terms"
+    "agreedToTosCheckbox": "He leído y acepto los",
+    "linkText": "Términos de NewNew"
   },
   "aboutSection": {
     "meta": {
@@ -158,7 +158,7 @@
       "requestSetupLink": "Conectar con Stripe",
       "stripeConnectedLink": "¡Stripe conectado!",
       "stripeConnecting": "Conectando...",
-      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
+      "requireInformation": "Stripe requiere información"
     }
   },
   "subRateSection": {

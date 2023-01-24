@@ -111,7 +111,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                     // @ts-ignore
                     components={[
                       <>
-                        {formattedTimeLeft.map((time, index) => (
+                        {formattedTimeLeft?.map((time, index) => (
                           <>
                             {index > 0 ? t('modal.creatorsBundle.and') : null}
                             {t('modal.creatorsBundle.unitPair', {

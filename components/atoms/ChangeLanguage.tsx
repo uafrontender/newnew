@@ -13,6 +13,7 @@ import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IChangeLanguage {}
 
@@ -44,6 +45,11 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
 
   const renderItem = (item: string) => {
     const handleItemClick = () => {
+      Mixpanel.track('Language Changed', {
+        _component: 'ChangeLanguage',
+        _language: item,
+      });
+
       setCookie('preferredLocale', item, {
         // Expire in 10 years
         maxAge: 10 * 365 * 24 * 60 * 60,
