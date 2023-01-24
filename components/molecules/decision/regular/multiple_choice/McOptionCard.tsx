@@ -301,10 +301,35 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   // Custom amount
-  const customPaymentAmountInCents = useMemo(
-    () => (parseInt(customSupportVotesAmount) || 0) * appConstants.mcVotePrice,
-    [appConstants, customSupportVotesAmount]
-  );
+  const customPaymentAmountInCents = useMemo(() => {
+    const biggestGroup =
+      appConstants.mcVoteOffers[appConstants.mcVoteOffers.length - 1];
+
+    if (
+      !biggestGroup ||
+      !biggestGroup?.price?.usdCents ||
+      !biggestGroup?.amountOfVotes
+    )
+      return 0;
+
+    // Mirrored from BE `get_price_for_votes`
+    // price per vote for the number of votes in the biggest group
+    const basePricePerVote =
+      Math.round(
+        (biggestGroup.price.usdCents / biggestGroup.amountOfVotes) * 10
+      ) / 1000;
+
+    /**
+     * 0.013 up to 2000 votes (round($25.00/2000) and then 0.10 (appConstants.mcVotePrice)
+     * for every vote over 2000 that I purchase, so 2100 votes is 2000x$0.013 and 100x$0.010
+     */
+    const price =
+      basePricePerVote * biggestGroup.amountOfVotes * 100 +
+      (parseInt(customSupportVotesAmount) - biggestGroup.amountOfVotes) *
+        appConstants.mcVotePrice;
+
+    return price;
+  }, [appConstants, customSupportVotesAmount]);
 
   const customPaymentFeeInCents = useMemo(
     () =>
