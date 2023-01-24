@@ -27,6 +27,7 @@ import {
   TColorMode,
 } from '../../redux-store/slices/uiStateSlice';
 import { I18nNamespaces } from '../../@types/i18next';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IFooter {}
 
@@ -102,6 +103,10 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
   const handleSetColorMode = useCallback(
     (mode: TColorMode) => {
+      Mixpanel.track('Color mode switched', {
+        _component: 'Footer',
+        _colorMode: mode,
+      });
       dispatch(setColorMode(mode));
     },
     [dispatch]

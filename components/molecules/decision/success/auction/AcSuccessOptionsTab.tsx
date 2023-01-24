@@ -127,7 +127,11 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
 
 export default AcSuccessOptionsTab;
 
-const SWrapper = styled.div``;
+const SWrapper = styled.div`
+  ${({ theme }) => theme.media.tablet} {
+    padding: 16px;
+  }
+`;
 
 const SSeparator = styled.div`
   margin: 16px auto;

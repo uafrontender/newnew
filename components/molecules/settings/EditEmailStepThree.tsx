@@ -18,6 +18,7 @@ import { setUserData } from '../../../redux-store/slices/userStateSlice';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 import { useAppDispatch } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailStepThreeModal {
   onComplete: () => void;
@@ -54,6 +55,11 @@ const EditEmailStepThreeModal = ({
 
   const resendVerificationCode = useCallback(async () => {
     try {
+      Mixpanel.track('Resend Verification Code For New Email', {
+        _stage: 'Settings',
+        _newEmail: newEmail,
+      });
+
       setIsCodeLoading(true);
       setTimerStartTime(Date.now());
       const sendVerificationCodePayload =
@@ -86,6 +92,11 @@ const EditEmailStepThreeModal = ({
   const handleSetMyEmail = useCallback(
     async (verificationCode: string) => {
       try {
+        Mixpanel.track('Confirm New Email', {
+          _stage: 'Settings',
+          _newEmail: newEmail,
+        });
+
         setIsSubmitting(true);
 
         const setMyEmailPayload = new newnewapi.SetMyEmailRequest({
