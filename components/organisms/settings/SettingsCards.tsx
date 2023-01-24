@@ -16,6 +16,7 @@ import assets from '../../../constants/assets';
 import { useCards } from '../../../contexts/cardsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import useHorizontalDraggableScroll from '../../../utils/hooks/useHorizontalDraggableScroll';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ISettingsCards {}
 
@@ -23,8 +24,16 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const { cards, isCardsLoading, handleSetCards, fetchCards } = useCards();
-  const [isAddCardModal, setIsAddCardModal] = useState(false);
   const user = useAppSelector((state) => state.user);
+
+  const [isAddCardModal, setIsAddCardModal] = useState(false);
+
+  const openAddCardModal = () => {
+    Mixpanel.track('Open Add Card Modal', {
+      _stage: 'Settings',
+    });
+    setIsAddCardModal(true);
+  };
 
   useEffect(() => {
     fetchCards();
@@ -96,14 +105,14 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           <>
             <SButtonSecondaryDesktop
               view='secondary'
-              onClick={() => setIsAddCardModal(true)}
+              onClick={openAddCardModal}
             >
               {t('Settings.sections.cards.button.addCard')}
             </SButtonSecondaryDesktop>
             <SButtonSecondaryMobile
               view='secondary'
               iconOnly
-              onClick={() => setIsAddCardModal(true)}
+              onClick={openAddCardModal}
             >
               <InlineSVG
                 svg={addIconFilled}
@@ -128,11 +137,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   {t('Settings.sections.cards.hint')}
                 </SSubText>
 
-                <SButton
-                  id='add-new-card'
-                  size='sm'
-                  onClick={() => setIsAddCardModal(true)}
-                >
+                <SButton id='add-new-card' size='sm' onClick={openAddCardModal}>
                   {t('Settings.sections.cards.button.addNewCard')}
                 </SButton>
               </>
@@ -192,7 +197,12 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
       <AddCardModal
         show={isAddCardModal}
-        closeModal={() => setIsAddCardModal(false)}
+        closeModal={() => {
+          Mixpanel.track('Close Add Card Modal', {
+            _stage: 'Settings',
+          });
+          setIsAddCardModal(false);
+        }}
       />
     </SSettingsContainer>
   );

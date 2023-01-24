@@ -19,9 +19,14 @@ export const Mixpanel = {
   track: (name: string, props?: Dict) => {
     mixpanel.track(name, props);
   },
-  track_links: (query: Query, name: string) => {
-    mixpanel.track_links(query, name, {
-      referrer: document.referrer,
+  track_links: (query: Query, name: string, callback) => {
+    mixpanel.track_links(query, name, (e) => {
+      const callbackObj = callback ? callback(e) : {};
+
+      return {
+        referrer: document.referrer,
+        ...(callbackObj || {}),
+      };
     });
   },
   people: {
