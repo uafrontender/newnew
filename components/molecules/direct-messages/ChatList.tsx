@@ -100,7 +100,6 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
         )}
         <ChatlistItem chatRoom={chatroom} />
         {index < chatrooms.length - 1 && <SChatSeparator />}
-        {index === chatrooms.length - 1 && <SChatItemFakeContainer />}
       </React.Fragment>
     ),
     [chatrooms, hasNextPage, scrollRef]
@@ -127,7 +126,11 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
           }}
         />
       ) : chatrooms.length > 0 ? (
-        chatrooms.map(renderChatItem)
+        <>
+          {chatrooms.map(renderChatItem)}
+          <SChatItemFakeContainer />
+          <SChatItemFakeContainer />
+        </>
       ) : (
         <NoResults text={searchChatroom} />
       )}

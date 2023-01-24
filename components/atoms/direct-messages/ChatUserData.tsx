@@ -30,7 +30,7 @@ const ChatUserData: React.FC<IFunctionProps> = ({
           {
             // eslint-disable-next-line no-nested-ternary
             isAnnouncement
-              ? `${
+              ? `${t('announcement.beforeName')}${
                   isMyAnnouncement
                     ? getDisplayname(user.userData)
                     : getDisplayname(chatRoom.visavis?.user)

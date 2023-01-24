@@ -229,7 +229,7 @@
           },
           "whatsNew": "你的新電子郵件地址是什麼？",
           "confirmEmail": "確認新電子郵件",
-          "verifyNewEmail_NEED_TRANSLATION": "Confirm your new email",
+          "verifyNewEmail": "確認你的新電子郵件",
           "edit": "編輯"
         },
         "birthDateInput": {

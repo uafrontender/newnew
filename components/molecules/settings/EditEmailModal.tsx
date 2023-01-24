@@ -10,6 +10,7 @@ import EditEmailStepThree from './EditEmailStepThree';
 import EditEmailSuccess from './EditEmailSuccess';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailModal {
   show: boolean;
@@ -52,6 +53,9 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
   }, [show]);
 
   const handleClose = useCallback(() => {
+    Mixpanel.track('Close Edit Email Modal', {
+      _stage: 'Settings',
+    });
     onClose();
   }, [onClose]);
 
