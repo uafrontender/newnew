@@ -46,6 +46,7 @@ import { AuthLayoutContext } from '../templates/AuthLayout';
 import isSafari from '../../utils/isSafari';
 import { Mixpanel } from '../../utils/mixpanel';
 import { I18nNamespaces } from '../../@types/i18next';
+import { loadStateLS, removeStateLS } from '../../utils/localStorage';
 
 export interface ISignupMenu {
   goal?: string;
@@ -96,6 +97,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     setIsSubmitLoading(true);
     setSubmitError('');
     try {
+      const localHasSoldBundles = loadStateLS(
+        'creatorHasSoldBundles'
+      ) as boolean;
+      if (localHasSoldBundles) {
+        removeStateLS('creatorHasSoldBundles');
+      }
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
         useCase:
@@ -196,11 +203,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               pressedBgColor={theme.colorsThemed.social.google.pressed}
               textWidth={textWidth}
               setTextWidth={handleTextWidthChange}
-              onClick={() =>
+              onClick={() => {
+                Mixpanel.track('Sign In With Google Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/google${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
               {t('signUpOptions.google')}
             </SignInButton>

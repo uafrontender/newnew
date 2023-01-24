@@ -13,6 +13,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
+import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import {
   useAppDispatch,
@@ -21,7 +22,7 @@ import {
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 
@@ -49,17 +50,40 @@ import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOpti
 import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
+const addOptionErrorMessage = (
+  status?: newnewapi.CreateCustomMcOptionResponse.Status
+) => {
+  console.log(status);
+  switch (status) {
+    // TODO: Cover CANNOT_CREATE_MULTIPLE_OPTIONS = 3;
+    case newnewapi.CreateCustomMcOptionResponse.Status
+      .NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'errors.notAllowedToCreateNewOption';
+    case newnewapi.CreateCustomMcOptionResponse.Status.NOT_UNIQUE:
+      return 'errors.optionNotUnique';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
-  postLoading: boolean;
   postStatus: TPostStatusStringified;
   postCreatorName: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
-  optionsLoading: boolean;
-  pagingToken: string | undefined | null;
+  canAddCustomOption: boolean;
   bundle?: newnewapi.IBundle;
-  handleLoadOptions: (token?: string) => void;
+  hasNextPage: boolean;
+  fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<
+    InfiniteQueryObserverResult<
+      {
+        mcOptions: newnewapi.MultipleChoice.IOption[];
+        paging: newnewapi.IPagingResponse | null | undefined;
+      },
+      unknown
+    >
+  >;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
   ) => void;
@@ -68,21 +92,20 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
-  postLoading,
   postStatus,
   postCreatorName,
   postDeadline,
   options,
-  optionsLoading,
-  pagingToken,
+  canAddCustomOption,
   bundle,
-  handleLoadOptions,
+  hasNextPage,
+  fetchNextPage,
   handleRemoveOption,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -201,35 +224,35 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
         res.error
       ) {
-        throw new Error(res.error?.message ?? 'Request failed');
+        throw new Error(t(addOptionErrorMessage(res.data?.status)));
       }
 
       const optionFromResponse = (res.data
         .option as newnewapi.MultipleChoice.Option)!!;
       optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      setPaymentSuccessValue(1);
+    } catch (err: any) {
+      console.error(err);
+      showErrorToastCustom(err.message);
+    } finally {
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setLoadingModalOpen(false);
-      setPaymentSuccessValue(1);
-    } catch (err) {
-      console.error(err);
-      setLoadingModalOpen(false);
-      showErrorToastPredefined(undefined);
     }
   }, [
     post.postUuid,
     newOptionText,
+    t,
     handleAddOrUpdateOptionFromResponse,
-    showErrorToastPredefined,
+    showErrorToastCustom,
   ]);
 
   useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadOptions(pagingToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+  }, [inView, fetchNextPage]);
 
   const goToNextStep = () => {
     if (
@@ -326,21 +349,23 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
             />
           ))}
-          {!isMobile ? (
-            <SLoaderDiv ref={loadingRef} />
-          ) : pagingToken ? (
-            <SLoadMoreBtn
-              onClick={() => {
-                Mixpanel.track('Click Load More', {
-                  _stage: 'Post',
-                  _postUuid: post.postUuid,
-                  _component: 'McOptionsTab',
-                });
-                handleLoadOptions(pagingToken);
-              }}
-            >
-              {t('loadMoreButton')}
-            </SLoadMoreBtn>
+          {hasNextPage ? (
+            !isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : (
+              <SLoadMoreBtn
+                onClick={() => {
+                  Mixpanel.track('Click Load More', {
+                    _stage: 'Post',
+                    _postUuid: post.postUuid,
+                    _component: 'McOptionsTab',
+                  });
+                  fetchNextPage();
+                }}
+              >
+                {t('loadMoreButton')}
+              </SLoadMoreBtn>
+            )
           ) : null}
         </SBidsContainer>
         {user.userTutorialsProgress.remainingMcSteps && (
@@ -422,7 +447,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  if (bundle) {
+                  if (canAddCustomOption) {
                     setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);
@@ -474,7 +499,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
                   });
-                  if (bundle) {
+                  if (canAddCustomOption) {
                     setConfirmCustomOptionModalOpen(true);
                   } else {
                     setBuyBundleModalOpen(true);

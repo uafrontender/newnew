@@ -83,6 +83,11 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
         _stage: 'Creation',
         _button: 'New Post',
       });
+    } else {
+      Mixpanel.track('Navigation Item Clicked', {
+        _component: 'BottomNavigation',
+        _target: item.url,
+      });
     }
   };
 
@@ -193,6 +198,7 @@ const SCaption = styled(Caption)<ISTitle>`
 
 const SSVGContainer = styled.div`
   position: relative;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SIndicatorContainer = styled.div`

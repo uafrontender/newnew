@@ -63,7 +63,7 @@
   },
   "emptyInbox": {
     "title": "收件箱為空",
-    "text": "開啓新的對話後，對話會列在此處"
+    "text": "你與某位Bundle所有者的對話開始後，對話將在此處列出"
   },
   "newAnnouncement": {
     "title": "新公告",
@@ -85,8 +85,8 @@
   },
   "userTypes": {
     "all": "所有的",
-    "subscribers": "Bundle所有者",
-    "subscribing": "創作者"
+    "bundleOwners": "Bundle所有者",
+    "creators": "創作者"
   },
   "dates": {
     "now": "現在",

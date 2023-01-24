@@ -16,6 +16,7 @@ import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import getDisplayname from '../../../utils/getDisplayname';
+import PostTitleContent from '../../atoms/PostTitleContent';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -65,7 +66,6 @@ const Notification: React.FC<newnewapi.INotification> = ({
     setIsUnread(false);
   }, [id]);
 
-  // TODO: support for postShortId in routing target
   useEffect(() => {
     if (url === '/direct-messages' && target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1)
@@ -75,11 +75,25 @@ const Notification: React.FC<newnewapi.INotification> = ({
         setUrl(`/direct-messages/${target.userProfile.userUsername}`);
       }
 
-      if (target.postResponse && target?.postResponse.postUuid)
-        setUrl(`/p/${target.postResponse.postUuid}`);
+      if (
+        target.postResponse &&
+        (target?.postResponse.postShortId || target?.postResponse.postUuid)
+      )
+        setUrl(
+          `/p/${
+            target?.postResponse.postShortId || target?.postResponse.postUuid
+          }`
+        );
 
-      if (target.postAnnounce && target?.postAnnounce.postUuid)
-        setUrl(`/p/${target.postAnnounce.postUuid}`);
+      if (
+        target.postAnnounce &&
+        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
+      )
+        setUrl(
+          `/p/${
+            target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
+          }`
+        );
     }
   }, [url, target]);
 
@@ -128,7 +142,11 @@ const Notification: React.FC<newnewapi.INotification> = ({
     }
 
     if (content.relatedPost?.title) {
-      return <STitleText>{content.relatedPost.title}</STitleText>;
+      return (
+        <STitleText>
+          <PostTitleContent>{content.relatedPost.title}</PostTitleContent>
+        </STitleText>
+      );
     }
 
     return <STitleText>{t('title.newMessage')}</STitleText>;
@@ -270,7 +288,7 @@ const STitle = styled.div`
 const STitleText = styled.div`
   display: block;
   overflow: hidden;
-  white-space: nowrap;
+  white-space: pre;
   text-overflow: ellipsis;
 `;
 

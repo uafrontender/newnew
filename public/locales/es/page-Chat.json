@@ -63,7 +63,7 @@
   },
   "emptyInbox": {
     "title": "Su bandeja de entrada está vacía",
-    "text": "Una vez que inicies una nueva conversación, la verás listada aquí"
+    "text": "Cuando inicies una conversación con el dueño de un Bundle, lo verás listado aquí"
   },
   "newAnnouncement": {
     "title": "Nuevo anuncio",
@@ -77,7 +77,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
-    "beforeName": "El anuncios de",
+    "beforeName": "El anuncios de ",
     "suffix": "",
     "afterName": "",
     "topMessageStart": "Solamente",
@@ -85,8 +85,8 @@
   },
   "userTypes": {
     "all": "Todos",
-    "subscribers": "Poseedores de bundles",
-    "subscribing": "Creadores"
+    "bundleOwners": "Poseedores de bundles",
+    "creators": "Creadores"
   },
   "dates": {
     "now": "ahora",

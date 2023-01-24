@@ -9,7 +9,7 @@ import UserAvatar from '../UserAvatar';
 import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 import UserEllipseMenu from '../profile/UserEllipseMenu';
-import ReportModal, { ReportData } from '../chat/ReportModal';
+import ReportModal, { ReportData } from '../direct-messages/ReportModal';
 import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';

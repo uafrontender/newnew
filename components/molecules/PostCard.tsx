@@ -53,7 +53,7 @@ import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
 import PostCardEllipseMenu from './PostCardEllipseMenu';
 import getDisplayname from '../../utils/getDisplayname';
-import ReportModal, { ReportData } from './chat/ReportModal';
+import ReportModal, { ReportData } from './direct-messages/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
 import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
@@ -339,32 +339,9 @@ export const PostCard: React.FC<ICard> = React.memo(
             fetch(decoded.coverImageUrl as string)
               .then((res) => res.blob())
               .then((blobFromFetch) => {
-                const reader = new FileReader();
+                const url = URL.createObjectURL(blobFromFetch);
 
-                reader.onloadend = () => {
-                  if (!reader.result) return;
-
-                  const byteCharacters = atob(
-                    reader.result.slice(
-                      (reader.result as string).indexOf(',') + 1
-                    ) as string
-                  );
-
-                  const byteNumbers = new Array(byteCharacters.length);
-
-                  // eslint-disable-next-line no-plusplus
-                  for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                  }
-
-                  const byteArray = new Uint8Array(byteNumbers);
-                  const blob = new Blob([byteArray], { type: 'video/mp4' });
-                  const url = URL.createObjectURL(blob);
-
-                  setCoverImageUrl(url);
-                };
-
-                reader.readAsDataURL(blobFromFetch);
+                setCoverImageUrl(url);
               })
               .catch((err) => {
                 console.error(err);

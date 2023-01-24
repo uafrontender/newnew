@@ -43,14 +43,13 @@ import PrivacySection from '../../../components/organisms/settings/PrivacySectio
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
-import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
 
   const { showErrorToastPredefined } = useErrorToasts();
-  const { pauseNotification } = usePushNotifications();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -84,6 +83,10 @@ const MyProfileSettingsIndex = () => {
 
   const handleSetColorMode = useCallback(
     (mode: TColorMode) => {
+      Mixpanel.track('Color Mode Set', {
+        _stage: 'Profile Settings',
+        _mode: mode,
+      });
       dispatch(setColorMode(mode));
     },
     [dispatch]
@@ -91,8 +94,10 @@ const MyProfileSettingsIndex = () => {
 
   const handleLogout = useCallback(async () => {
     try {
+      Mixpanel.track('Logout', {
+        _stage: 'Profile Settings',
+      });
       setIsLogoutLoading(true);
-      await pauseNotification();
       const payload = new newnewapi.EmptyRequest({});
       const res = await logout(payload);
 
@@ -123,12 +128,17 @@ const MyProfileSettingsIndex = () => {
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie, pauseNotification]);
+  }, [dispatch, setIsLogoutLoading, removeCookie]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 
   const handleToggleAccountPrivate = async () => {
     try {
+      Mixpanel.track('Set profile privacy', {
+        _stage: 'Privacy Profile Settings',
+        _isActivityPrivate: !userData?.options?.isActivityPrivate,
+      });
+
       const updateMePayload = new newnewapi.UpdateMeRequest({
         isActivityPrivate: !userData?.options?.isActivityPrivate,
       });
@@ -271,7 +281,14 @@ const MyProfileSettingsIndex = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SMain>
-        <SGoBackButton onClick={() => router.back()}>
+        <SGoBackButton
+          onClick={() => {
+            Mixpanel.track('Back button Clicked', {
+              _stage: 'Settings',
+            });
+            router.back();
+          }}
+        >
           {isMobile ? t('Settings.heading') : t('Settings.button.back')}
         </SGoBackButton>
         {!isMobile ? (

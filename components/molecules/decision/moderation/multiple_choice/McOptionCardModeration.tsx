@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable quotes */
 /* eslint-disable react/jsx-indent */
@@ -12,7 +10,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../../../redux-store/store';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -30,7 +28,7 @@ import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
@@ -172,44 +170,11 @@ const McOptionCardModeration: React.FunctionComponent<
                 isCreatorsBid
                 isSuggestedByMe={false}
                 isSupportedByMe={false}
-                optionCreator={
-                  option.creator ? getDisplayname(option.creator) : undefined
-                }
-                optionCreatorUsername={
-                  option.creator
-                    ? (option.creator.username as string)
-                    : undefined
-                }
-                firstVoter={
-                  option.firstVoter
-                    ? getDisplayname(option.firstVoter)
-                    : undefined
-                }
-                firstVoterUsername={
-                  option.firstVoter
-                    ? (option.firstVoter.username as string)
-                    : undefined
-                }
-                whiteListedSupporter={
-                  option.whitelistSupporter
-                    ? getDisplayname(option.whitelistSupporter)
-                    : undefined
-                }
-                whiteListedSupporterUsername={
-                  option.whitelistSupporter
-                    ? (option.whitelistSupporter.username as string)
-                    : undefined
-                }
+                optionCreator={option.creator || undefined}
+                firstVoter={option.firstVoter || undefined}
+                whiteListedSupporter={option.whitelistSupporter || undefined}
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubstracted}
-                amIVerified={false}
-                isOptionCreatorVerified={
-                  option.creator?.options?.isVerified ?? false
-                }
-                isFirstVoterVerified={
-                  option.firstVoter?.options?.isVerified ?? false
-                }
-                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -440,15 +405,9 @@ const SBiddersInfo = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
     padding-top: 4px;
+
+    text-align: right;
   }
-`;
-
-const SSpanBiddersHighlighted = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SSpanBiddersRegular = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SEllipseButton = styled(Button)`

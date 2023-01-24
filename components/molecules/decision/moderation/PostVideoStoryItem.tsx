@@ -27,11 +27,11 @@ const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
   return (
     <SVideoStoryItem
       id={`storyItem_${index}`}
-      key={`key_${video.uuid}_${index}`}
+      key={`key_${video?.uuid}_${index}`}
     >
       {isVisible ? (
         <PostBitmovinPlayer
-          id={`id_${video.uuid ?? index}`}
+          id={`id_${video?.uuid ?? index}`}
           resources={video}
           muted={isMuted}
           showPlayButton

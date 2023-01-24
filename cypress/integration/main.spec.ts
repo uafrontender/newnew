@@ -3,7 +3,7 @@ import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 const VERIFICATION_CODE = '111111';
-const postShortIdRegex = /p\/(.{6})(\/|$)/;
+const postShortIdRegex = /p\/([^\/]{1,14})/;
 
 // TODO: Need a way to end post at any time by request
 context('Main flow', () => {
@@ -167,6 +167,8 @@ context('Main flow', () => {
       cy.wait(2000);
       cy.dGet('#auction').click();
       cy.url().should('include', '/creation/auction');
+      // Waiting for an element to be attached to the DOM
+      cy.wait(2000);
 
       cy.dGet('#title').type(`CI post ${Date.now()}`);
       cy.dGet('#minimalBid').clear().type('10');
@@ -218,6 +220,8 @@ context('Main flow', () => {
       cy.wait(2000);
       cy.dGet('#multiple-choice').click();
       cy.url().should('include', '/creation/multiple-choice');
+      // Waiting for an element to be attached to the DOM
+      cy.wait(2000);
 
       cy.dGet('#title').type(`CI post ${Date.now()}`);
 

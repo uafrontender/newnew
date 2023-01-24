@@ -16,47 +16,43 @@ import {
   voteWithBundleVotes,
   voteOnPost,
 } from '../../../../../api/endpoints/multiple_choice';
-
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
+import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
+import { formatNumber } from '../../../../../utils/format';
+import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
+import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
+import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
+import { Mixpanel } from '../../../../../utils/mixpanel';
+import { reportSuperpollOption } from '../../../../../api/endpoints/report';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import LoadingModal from '../../../LoadingModal';
 import PaymentModal from '../../../checkout/PaymentModal';
 import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
-
-import { formatNumber } from '../../../../../utils/format';
-
-// Icons
-import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
-import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
-import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
-import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
-
+import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
-import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
-import getDisplayname from '../../../../../utils/getDisplayname';
 import UseBundleVotesModal from './UseBundleVotesModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
-import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import Headline from '../../../../atoms/Headline';
-import assets from '../../../../../constants/assets';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
-import { reportSuperpollOption } from '../../../../../api/endpoints/report';
-import InlineSvg from '../../../../atoms/InlineSVG';
-import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
-import { Mixpanel } from '../../../../../utils/mixpanel';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
-import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
-import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
-import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import InlineSvg from '../../../../atoms/InlineSVG';
+
+// Icons
+import assets from '../../../../../constants/assets';
+import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
+import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -305,10 +301,37 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   // Custom amount
-  const customPaymentAmountInCents = useMemo(
-    () => (parseInt(customSupportVotesAmount) || 0) * appConstants.mcVotePrice,
-    [appConstants, customSupportVotesAmount]
-  );
+  const customPaymentAmountInCents = useMemo(() => {
+    const biggestGroup =
+      appConstants?.mcVoteOffers && appConstants?.mcVoteOffers.length > 2
+        ? appConstants?.mcVoteOffers[appConstants.mcVoteOffers.length - 1]
+        : undefined;
+
+    if (
+      !biggestGroup ||
+      !biggestGroup?.price?.usdCents ||
+      !biggestGroup?.amountOfVotes
+    )
+      return 0;
+
+    // Mirrored from BE `get_price_for_votes`
+    // price per vote for the number of votes in the biggest group
+    const basePricePerVote =
+      Math.round(
+        (biggestGroup.price.usdCents / biggestGroup.amountOfVotes) * 10
+      ) / 1000;
+
+    /**
+     * 0.013 up to 2000 votes (round($25.00/2000) and then 0.10 (appConstants.mcVotePrice)
+     * for every vote over 2000 that I purchase, so 2100 votes is 2000x$0.013 and 100x$0.010
+     */
+    const price =
+      basePricePerVote * biggestGroup.amountOfVotes * 100 +
+      (parseInt(customSupportVotesAmount) - biggestGroup.amountOfVotes) *
+        appConstants.mcVotePrice;
+
+    return price;
+  }, [appConstants, customSupportVotesAmount]);
 
   const customPaymentFeeInCents = useMemo(
     () =>
@@ -585,45 +608,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 isCreatorsBid={isCreatorsBid}
                 isSuggestedByMe={isSuggestedByMe}
                 isSupportedByMe={!!option.isSupportedByMe}
-                optionCreator={
-                  option.creator ? getDisplayname(option.creator) : undefined
-                }
-                optionCreatorUsername={
-                  option.creator
-                    ? (option.creator.username as string)
-                    : undefined
-                }
-                firstVoter={
-                  option.firstVoter
-                    ? getDisplayname(option.firstVoter)
-                    : undefined
-                }
-                firstVoterUsername={
-                  option.firstVoter
-                    ? (option.firstVoter.username as string)
-                    : undefined
-                }
-                whiteListedSupporter={
-                  option.whitelistSupporter
-                    ? getDisplayname(option.whitelistSupporter)
-                    : undefined
-                }
-                whiteListedSupporterUsername={
-                  option.whitelistSupporter
-                    ? (option.whitelistSupporter.username as string)
-                    : undefined
-                }
+                optionCreator={option.creator || undefined}
+                firstVoter={option.firstVoter || undefined}
+                whiteListedSupporter={option.whitelistSupporter || undefined}
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubtracted}
-                amISubscribed={!!bundle}
-                amIVerified={user.userData?.options?.isVerified ?? false}
-                isOptionCreatorVerified={
-                  option.creator?.options?.isVerified ?? false
-                }
-                isFirstVoterVerified={
-                  option.firstVoter?.options?.isVerified ?? false
-                }
-                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -829,7 +818,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleCloseSupportForm();
           }}
           handleSetVoteOfferAndOpenModal={handleSetVoteOfferAndOpenModal}
-          handleOpenBundleVotesModal={handleOpenBundleVotesModal}
+          handleOpenBundleVotesModal={
+            bundle?.votesLeft ? handleOpenBundleVotesModal : undefined
+          }
           handleOpenCustomAmountModal={handleOpenCustomAmountModal}
         >
           <SSelectVotesModalCard isBlue={isBlue}>
@@ -855,45 +846,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   isCreatorsBid={isCreatorsBid}
                   isSuggestedByMe={isSuggestedByMe}
                   isSupportedByMe={!!option.isSupportedByMe}
-                  optionCreator={
-                    option.creator ? getDisplayname(option.creator) : undefined
-                  }
-                  optionCreatorUsername={
-                    option.creator
-                      ? (option.creator.username as string)
-                      : undefined
-                  }
-                  firstVoter={
-                    option.firstVoter
-                      ? getDisplayname(option.firstVoter)
-                      : undefined
-                  }
-                  firstVoterUsername={
-                    option.firstVoter
-                      ? (option.firstVoter.username as string)
-                      : undefined
-                  }
-                  whiteListedSupporter={
-                    option.whitelistSupporter
-                      ? getDisplayname(option.whitelistSupporter)
-                      : undefined
-                  }
-                  whiteListedSupporterUsername={
-                    option.whitelistSupporter
-                      ? (option.whitelistSupporter.username as string)
-                      : undefined
-                  }
+                  optionCreator={option.creator || undefined}
+                  firstVoter={option.firstVoter || undefined}
+                  whiteListedSupporter={option.whitelistSupporter || undefined}
                   supporterCount={option.supporterCount}
                   supporterCountSubtracted={supporterCountSubtracted}
-                  amISubscribed={!!bundle}
-                  amIVerified={user.userData?.options?.isVerified ?? false}
-                  isOptionCreatorVerified={
-                    option.creator?.options?.isVerified ?? false
-                  }
-                  isFirstVoterVerified={
-                    option.firstVoter?.options?.isVerified ?? false
-                  }
-                  isWhitelistSupporterVerified={!!option.whitelistSupporter}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -980,17 +937,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   isSupportedByMe: boolean;
   supporterCount: number;
   supporterCountSubtracted: number;
-  optionCreator?: string;
-  optionCreatorUsername?: string;
-  firstVoter?: string;
-  firstVoterUsername?: string;
-  whiteListedSupporter?: string;
-  whiteListedSupporterUsername?: string;
-  amISubscribed?: boolean;
-  amIVerified?: boolean;
-  isOptionCreatorVerified?: boolean;
-  isFirstVoterVerified?: boolean;
-  isWhitelistSupporterVerified?: boolean;
+  optionCreator?: newnewapi.IUser;
+  firstVoter?: newnewapi.IUser;
+  whiteListedSupporter?: newnewapi.IUser;
 }> = ({
   isBlue,
   isCreatorsBid,
@@ -999,19 +948,10 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   supporterCount,
   supporterCountSubtracted,
   optionCreator,
-  optionCreatorUsername,
   firstVoter,
-  firstVoterUsername,
   whiteListedSupporter,
-  whiteListedSupporterUsername,
-  amISubscribed,
-  amIVerified,
-  isOptionCreatorVerified,
-  isFirstVoterVerified,
-  isWhitelistSupporterVerified,
 }) => {
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
 
   if (isCreatorsBid && !isSupportedByMe) {
     return (
@@ -1019,53 +959,20 @@ export const RenderSupportersInfo: React.FunctionComponent<{
         {supporterCount > 0 ? (
           <>
             {whiteListedSupporter ? (
-              <Link href={`/${whiteListedSupporterUsername}`}>
-                <SSpanBiddersHighlighted
-                  onClick={(e) => e.stopPropagation()}
-                  className='spanHighlighted'
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  {whiteListedSupporter}
-                  {isWhitelistSupporterVerified && (
-                    <SInlineSvgVerificationIcon
-                      svg={
-                        !isBlue
-                          ? VerificationCheckmark
-                          : VerificationCheckmarkInverted
-                      }
-                      width='14px'
-                      height='14px'
-                      fill='none'
-                    />
-                  )}
-                </SSpanBiddersHighlighted>
-              </Link>
+              <OptionCardUsernameSpan
+                type='otherUser'
+                user={{
+                  ...whiteListedSupporter,
+                  options: { ...whiteListedSupporter, isVerified: true },
+                }}
+                isBlue={isBlue}
+              />
             ) : firstVoter ? (
-              <Link href={`/${firstVoterUsername}`}>
-                <SSpanBiddersHighlighted
-                  onClick={(e) => e.stopPropagation()}
-                  className='spanHighlighted'
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  {firstVoter}
-                  {isFirstVoterVerified && (
-                    <SInlineSvgVerificationIcon
-                      svg={
-                        !isBlue
-                          ? VerificationCheckmark
-                          : VerificationCheckmarkInverted
-                      }
-                      width='14px'
-                      height='14px'
-                      fill='none'
-                    />
-                  )}
-                </SSpanBiddersHighlighted>
-              </Link>
+              <OptionCardUsernameSpan
+                type='otherUser'
+                user={firstVoter}
+                isBlue={isBlue}
+              />
             ) : null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -1090,23 +997,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <Link
-              href={`/profile${
-                user.userData?.options?.isCreator ? '/my-posts' : ''
-              }`}
-            >
-              <SSpanBiddersHighlighted
-                className='spanHighlighted'
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                style={{
-                  cursor: 'pointer',
-                }}
-              >
-                {supporterCountSubtracted > 0 ? t('me') : t('I')}
-              </SSpanBiddersHighlighted>
-            </Link>
+            <OptionCardUsernameSpan
+              type='me'
+              usernameText={supporterCountSubtracted > 0 ? t('me') : t('I')}
+              isBlue={isBlue}
+            />
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
@@ -1129,57 +1024,20 @@ export const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         {!whiteListedSupporter ? (
-          <Link href={`/${optionCreatorUsername}`}>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              {optionCreator}
-              {isOptionCreatorVerified && (
-                <SInlineSvgVerificationIcon
-                  svg={
-                    !isBlue
-                      ? VerificationCheckmark
-                      : VerificationCheckmarkInverted
-                  }
-                  width='14px'
-                  height='14px'
-                  fill='none'
-                />
-              )}
-            </SSpanBiddersHighlighted>
-          </Link>
+          <OptionCardUsernameSpan
+            type='otherUser'
+            user={optionCreator}
+            isBlue={isBlue}
+          />
         ) : (
-          <Link href={`/${whiteListedSupporterUsername}`}>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              {whiteListedSupporter}
-              {isWhitelistSupporterVerified && (
-                <SInlineSvgVerificationIcon
-                  svg={
-                    !isBlue
-                      ? VerificationCheckmark
-                      : VerificationCheckmarkInverted
-                  }
-                  width='14px'
-                  height='14px'
-                  fill='none'
-                />
-              )}
-            </SSpanBiddersHighlighted>
-          </Link>
+          <OptionCardUsernameSpan
+            type='otherUser'
+            user={{
+              ...whiteListedSupporter,
+              options: { ...whiteListedSupporter, isVerified: true },
+            }}
+            isBlue={isBlue}
+          />
         )}
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -1203,76 +1061,27 @@ export const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         {!whiteListedSupporter ? (
-          <Link href={`/${optionCreatorUsername}`}>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              {optionCreator}
-              {isOptionCreatorVerified && (
-                <SInlineSvgVerificationIcon
-                  svg={
-                    !isBlue
-                      ? VerificationCheckmark
-                      : VerificationCheckmarkInverted
-                  }
-                  width='14px'
-                  height='14px'
-                  fill='none'
-                />
-              )}
-            </SSpanBiddersHighlighted>
-          </Link>
+          <OptionCardUsernameSpan
+            type='otherUser'
+            user={optionCreator}
+            isBlue={isBlue}
+          />
         ) : (
-          <Link href={`/${whiteListedSupporterUsername}`}>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              {whiteListedSupporter}
-              {isWhitelistSupporterVerified && (
-                <SInlineSvgVerificationIcon
-                  svg={
-                    !isBlue
-                      ? VerificationCheckmark
-                      : VerificationCheckmarkInverted
-                  }
-                  width='14px'
-                  height='14px'
-                  fill='none'
-                />
-              )}
-            </SSpanBiddersHighlighted>
-          </Link>
+          <OptionCardUsernameSpan
+            type='otherUser'
+            user={{
+              ...whiteListedSupporter,
+              options: { ...whiteListedSupporter, isVerified: true },
+            }}
+            isBlue={isBlue}
+          />
         )}
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          style={{
-            cursor: 'pointer',
-          }}
-        >
-          {', '}
-          <Link
-            href={`/profile${
-              user.userData?.options?.isCreator ? '/my-posts' : ''
-            }`}
-          >
-            {`${t('me')}`}
-          </Link>
-        </SSpanBiddersHighlighted>
+        {', '}
+        <OptionCardUsernameSpan
+          type='me'
+          usernameText={`${t('me')}`}
+          isBlue={isBlue}
+        />
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1294,19 +1103,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && isSuggestedByMe) {
     return (
       <>
-        <Link href={`/${optionCreatorUsername}`}>
-          <SSpanBiddersHighlighted
-            className='spanHighlighted'
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            style={{
-              cursor: 'pointer',
-            }}
-          >
-            {supporterCount > 1 ? t('me') : t('I')}
-          </SSpanBiddersHighlighted>
-        </Link>
+        <OptionCardUsernameSpan
+          type='me'
+          usernameText={supporterCount > 1 ? t('me') : t('I')}
+          isBlue={isBlue}
+        />
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1689,12 +1490,4 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
-`;
-
-const SInlineSvgVerificationIcon = styled(InlineSvg)`
-  display: inline-flex;
-  margin-left: 3px;
-
-  position: relative;
-  top: 3px;
 `;

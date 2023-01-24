@@ -1,4 +1,5 @@
 import { newnewapi } from 'newnew-api';
+import Long from 'long';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 import Long from 'long';
 

@@ -6,10 +6,11 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -19,21 +20,27 @@ import AcOptionCardModeration from './AcOptionCardModeration';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
-import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { selectWinningOption } from '../../../../../api/endpoints/auction';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 
 interface IAcOptionsTabModeration {
   postUuid: string;
-  postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
-  optionsLoading: boolean;
-  pagingToken: string | undefined | null;
   winningOptionId?: number;
-  handleLoadBids: (token?: string) => void;
+  optionsLoading: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<
+    InfiniteQueryObserverResult<
+      {
+        acOptions: newnewapi.MultipleChoice.IOption[];
+        paging: newnewapi.IPagingResponse | null | undefined;
+      },
+      unknown
+    >
+  >;
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateWinningOption: (winningOption: newnewapi.Auction.Option) => void;
 }
 
@@ -41,14 +48,12 @@ const AcOptionsTabModeration: React.FunctionComponent<
   IAcOptionsTabModeration
 > = ({
   postUuid,
-  postStatus,
   options,
   optionsLoading,
-  pagingToken,
   winningOptionId,
-  handleLoadBids,
+  hasNextPage,
+  fetchNextPage,
   handleRemoveOption,
-  handleUpdatePostStatus,
   handleUpdateWinningOption,
 }) => {
   const { t } = useTranslation('page-Post');
@@ -57,6 +62,8 @@ const AcOptionsTabModeration: React.FunctionComponent<
     resizeMode
   );
   const { showErrorToastPredefined } = useErrorToasts();
+
+  const { postStatus, refetchPost } = usePostInnerState();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -84,7 +91,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
       const res = await selectWinningOption(payload);
 
       if (res.data) {
-        handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
+        await refetchPost();
         handleUpdateWinningOption(winningOption);
       }
     } catch (err) {
@@ -94,11 +101,10 @@ const AcOptionsTabModeration: React.FunctionComponent<
   };
 
   useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadBids(pagingToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+  }, [inView, fetchNextPage]);
 
   return (
     <>
@@ -167,22 +173,24 @@ const AcOptionsTabModeration: React.FunctionComponent<
                 handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
               />
             ))}
-            {!isMobile ? (
-              <SLoaderDiv ref={loadingRef} />
-            ) : pagingToken ? (
-              <SLoadMoreBtn
-                view='secondary'
-                onClickCapture={() => {
-                  Mixpanel.track('Click Load More', {
-                    _stage: 'Post',
-                    _postUuid: postUuid,
-                    _component: 'AcOptionsTabModeration',
-                  });
-                }}
-                onClick={() => handleLoadBids(pagingToken)}
-              >
-                {t('loadMoreButton')}
-              </SLoadMoreBtn>
+            {hasNextPage ? (
+              !isMobile ? (
+                <SLoaderDiv ref={loadingRef} />
+              ) : (
+                <SLoadMoreBtn
+                  view='secondary'
+                  onClickCapture={() => {
+                    Mixpanel.track('Click Load More', {
+                      _stage: 'Post',
+                      _postUuid: postUuid,
+                      _component: 'AcOptionsTabModeration',
+                    });
+                  }}
+                  onClick={() => fetchNextPage()}
+                >
+                  {t('loadMoreButton')}
+                </SLoadMoreBtn>
+              )
             ) : null}
           </SBidsContainer>
         )}

@@ -916,6 +916,10 @@ const SActionsDiv = styled.div`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
+  svg {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  }
+
   margin-left: 4px;
   padding: 8px;
 

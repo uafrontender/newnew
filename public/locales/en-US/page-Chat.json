@@ -63,7 +63,7 @@
   },
   "emptyInbox": {
     "title": "Your inbox is empty",
-    "text": "Once you start a new conversation, you’ll see it listed here"
+    "text": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
   },
   "newAnnouncement": {
     "title": "New announcement",
@@ -86,8 +86,8 @@
   },
   "userTypes": {
     "all": "All",
-    "subscribers": "Bundle Owners",
-    "subscribing": "Creators"
+    "bundleOwners": "Bundle Owners",
+    "creators": "Creators"
   },
   "dates": {
     "now": "now",

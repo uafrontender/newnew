@@ -22,6 +22,7 @@ import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import { Mixpanel } from '../../../utils/mixpanel';
+import useComponentScrollRestoration from '../../../utils/hooks/useComponentScrollRestoration';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -299,6 +300,11 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         onReachEnd();
       }
     }, [canScrollRight, onReachEnd, collection?.length]);
+
+    useComponentScrollRestoration(
+      scrollContainerRef.current ?? undefined,
+      `${category}-scrollContainer`
+    );
 
     return (
       <SWrapper name={category} {...restProps}>

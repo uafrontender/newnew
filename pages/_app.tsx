@@ -19,7 +19,6 @@ import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
 import { useRouter } from 'next/router';
 import moment from 'moment-timezone';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import countries from 'i18n-iso-countries';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
@@ -29,6 +28,7 @@ import Error from './_error';
 
 // Global CSS configurations
 import ResizeMode from '../HOC/ResizeMode';
+import withRecaptchaProvider from '../HOC/withRecaptcha';
 import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
@@ -64,11 +64,12 @@ import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
 import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
 import { Mixpanel } from '../utils/mixpanel';
-import ReCaptchaBadgeModal from '../components/organisms/ReCaptchaBadgeModal';
+
 import { OverlayModeProvider } from '../contexts/overlayModeContext';
 import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
+import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -215,38 +216,22 @@ const MyApp = (props: IMyApp): ReactElement => {
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
         <QueryClientProvider client={queryClient}>
-          <GoogleReCaptchaProvider
-            reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
-            language={locale}
-            scriptProps={{
-              async: false,
-              defer: false,
-              appendTo: 'head',
-              nonce: undefined,
-            }}
-            container={{
-              element: 'recaptchaBadge',
-              parameters: {
-                badge: 'bottomleft',
-                theme: 'dark',
-              },
-            }}
-          >
-            <LanguageWrapper>
-              <AppConstantsContextProvider>
-                <SocketContextProvider>
-                  <ChannelsContextProvider>
-                    <PersistanceProvider store={store}>
-                      <SyncUserWrapper>
-                        <NotificationsProvider>
-                          <ModalNotificationsContextProvider>
-                            <PushNotificationContextProvider>
-                              <BlockedUsersProvider>
-                                <FollowingsContextProvider>
-                                  <CardsContextProvider>
-                                    <BundlesContextProvider>
-                                      <ChatsProvider>
-                                        <OverlayModeProvider>
+          <LanguageWrapper>
+            <AppConstantsContextProvider>
+              <SocketContextProvider>
+                <ChannelsContextProvider>
+                  <PersistanceProvider store={store}>
+                    <SyncUserWrapper>
+                      <NotificationsProvider>
+                        <ModalNotificationsContextProvider>
+                          <PushNotificationContextProvider>
+                            <BlockedUsersProvider>
+                              <FollowingsContextProvider>
+                                <CardsContextProvider>
+                                  <BundlesContextProvider>
+                                    <ChatsProvider>
+                                      <OverlayModeProvider>
+                                        <MultipleBeforePopStateContextProvider>
                                           <ResizeMode>
                                             <GlobalTheme
                                               initialTheme={colorMode}
@@ -275,31 +260,27 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                       />
                                                     )}
                                                     <PushNotificationModalContainer />
-                                                    {/* {isRestoringScroll ? (
-                                                      <ScrollRestorationAnimationContainer />
-                                                    ) : null} */}
                                                   </ErrorBoundary>
                                                 </VideoProcessingWrapper>
-                                                <ReCaptchaBadgeModal />
                                               </>
                                             </GlobalTheme>
                                           </ResizeMode>
-                                        </OverlayModeProvider>
-                                      </ChatsProvider>
-                                    </BundlesContextProvider>
-                                  </CardsContextProvider>
-                                </FollowingsContextProvider>
-                              </BlockedUsersProvider>
-                            </PushNotificationContextProvider>
-                          </ModalNotificationsContextProvider>
-                        </NotificationsProvider>
-                      </SyncUserWrapper>
-                    </PersistanceProvider>
-                  </ChannelsContextProvider>
-                </SocketContextProvider>
-              </AppConstantsContextProvider>
-            </LanguageWrapper>
-          </GoogleReCaptchaProvider>
+                                        </MultipleBeforePopStateContextProvider>
+                                      </OverlayModeProvider>
+                                    </ChatsProvider>
+                                  </BundlesContextProvider>
+                                </CardsContextProvider>
+                              </FollowingsContextProvider>
+                            </BlockedUsersProvider>
+                          </PushNotificationContextProvider>
+                        </ModalNotificationsContextProvider>
+                      </NotificationsProvider>
+                    </SyncUserWrapper>
+                  </PersistanceProvider>
+                </ChannelsContextProvider>
+              </SocketContextProvider>
+            </AppConstantsContextProvider>
+          </LanguageWrapper>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </CookiesProvider>
@@ -309,9 +290,17 @@ const MyApp = (props: IMyApp): ReactElement => {
 
 const MyAppWithTranslation = appWithTranslation(MyApp);
 
-const MyAppWithTranslationAndRedux = wrapper.withRedux(MyAppWithTranslation);
+const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
+  MyAppWithTranslation as React.FunctionComponent
+);
 
-MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
+const MyAppWithTranslationAndRecaptchaProviderAndRedux = wrapper.withRedux(
+  MyAppWithTranslationAndRecaptchaProvider
+);
+
+MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
+  appContext: any
+) => {
   const appProps = await App.getInitialProps(appContext);
 
   if (appContext.ctx?.req.cookies?.timezone) {
@@ -335,7 +324,7 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
   };
 };
 
-export default MyAppWithTranslationAndRedux;
+export default MyAppWithTranslationAndRecaptchaProviderAndRedux;
 
 // Preload assets
 const PRE_FETCH_LINKS_COMMON = (
