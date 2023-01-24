@@ -108,11 +108,11 @@ export const unsubscribeFromEmailNotifications = (
   signal?: RequestInit['signal']
 ) => {
   return fetchProtobuf<
-    newnewapi.SubscribeSmsNotificationsRequest,
-    newnewapi.SubscribeSmsNotificationsResponse
+    newnewapi.UnsubscribeFromEmailNotificationsRequest,
+    newnewapi.EmptyResponse
   >(
-    newnewapi.SubscribeSmsNotificationsRequest,
-    newnewapi.SubscribeSmsNotificationsResponse,
+    newnewapi.UnsubscribeFromEmailNotificationsRequest,
+    newnewapi.EmptyResponse,
     `${BASE_URL_NOTIFICATION}/unsubscribe_from_email_notifications`,
     'post',
     payload,
