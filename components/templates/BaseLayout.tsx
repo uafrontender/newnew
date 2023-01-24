@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { useOverlayMode } from '../../contexts/overlayModeContext';
+// import { Mixpanel } from '../../utils/mixpanel';
 
 interface IBaseLayout {
   id?: string;
@@ -41,6 +42,17 @@ const BaseLayout: React.FunctionComponent<IBaseLayout> = React.memo(
       },
       []
     );
+
+    // TODO: Breaks navigation, fix and return tracking
+    /* useEffect(() => {
+      Mixpanel.track_links(
+        'a',
+        'Navigation Item Clicked',
+        (e: HTMLLinkElement) => ({
+          _target: e?.getAttribute('href'),
+        })
+      );
+    }, []); */
 
     return (
       <SWrapper

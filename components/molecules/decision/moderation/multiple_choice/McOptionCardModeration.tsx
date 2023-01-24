@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable quotes */
 /* eslint-disable react/jsx-indent */
@@ -172,44 +170,11 @@ const McOptionCardModeration: React.FunctionComponent<
                 isCreatorsBid
                 isSuggestedByMe={false}
                 isSupportedByMe={false}
-                optionCreator={
-                  option.creator ? getDisplayname(option.creator) : undefined
-                }
-                optionCreatorUsername={
-                  option.creator
-                    ? (option.creator.username as string)
-                    : undefined
-                }
-                firstVoter={
-                  option.firstVoter
-                    ? getDisplayname(option.firstVoter)
-                    : undefined
-                }
-                firstVoterUsername={
-                  option.firstVoter
-                    ? (option.firstVoter.username as string)
-                    : undefined
-                }
-                whiteListedSupporter={
-                  option.whitelistSupporter
-                    ? getDisplayname(option.whitelistSupporter)
-                    : undefined
-                }
-                whiteListedSupporterUsername={
-                  option.whitelistSupporter
-                    ? (option.whitelistSupporter.username as string)
-                    : undefined
-                }
+                optionCreator={option.creator || undefined}
+                firstVoter={option.firstVoter || undefined}
+                whiteListedSupporter={option.whitelistSupporter || undefined}
                 supporterCount={option.supporterCount}
                 supporterCountSubtracted={supporterCountSubstracted}
-                amIVerified={false}
-                isOptionCreatorVerified={
-                  option.creator?.options?.isVerified ?? false
-                }
-                isFirstVoterVerified={
-                  option.firstVoter?.options?.isVerified ?? false
-                }
-                isWhitelistSupporterVerified={!!option.whitelistSupporter}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -440,15 +405,9 @@ const SBiddersInfo = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
     padding-top: 4px;
+
+    text-align: right;
   }
-`;
-
-const SSpanBiddersHighlighted = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SSpanBiddersRegular = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SEllipseButton = styled(Button)`

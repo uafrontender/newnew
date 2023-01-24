@@ -32,6 +32,7 @@ import OptionEllipseMenu from '../../common/OptionEllipseMenu';
 import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import AcConfirmDeleteOptionModal from '../../moderation/auction/AcConfirmDeleteOptionModal';
+import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 
 // Utils
 import { formatNumber } from '../../../../../utils/format';
@@ -48,6 +49,7 @@ import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupInten
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -55,9 +57,6 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
-import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
-import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -73,6 +72,8 @@ const getPayWithCardErrorMessage = (
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
+    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
+      return 'errors.optionNotUnique';
     default:
       return 'errors.requestFailed';
   }
@@ -457,106 +458,38 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
             {!option.whitelistSupporter ||
             option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
-              option.creator?.username ? (
-                <Link href={`/${option.creator?.username}`}>
-                  <SSpanBiddersHighlighted
-                    className='spanHighlighted'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {isMyBid
-                      ? option.supporterCount > 1
-                        ? t('me')
-                        : t('my')
-                      : getDisplayname(option.creator!!)}
-                    {option.creator.options?.isVerified && (
-                      <SInlineSvgVerificationIcon
-                        svg={
-                          !isBlue
-                            ? VerificationCheckmark
-                            : VerificationCheckmarkInverted
-                        }
-                        width='14px'
-                        height='14px'
-                        fill='none'
-                      />
-                    )}
-                  </SSpanBiddersHighlighted>
-                </Link>
+              isMyBid ? (
+                <OptionCardUsernameSpan
+                  type='me'
+                  usernameText={option.supporterCount > 1 ? t('me') : t('my')}
+                  isBlue={isBlue}
+                />
               ) : (
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  {isMyBid
-                    ? option.supporterCount > 1
-                      ? t('me')
-                      : t('my')
-                    : getDisplayname(option.creator!!)}
-                  {user.userData?.options?.isVerified && (
-                    <SInlineSvgVerificationIcon
-                      svg={
-                        !isBlue
-                          ? VerificationCheckmark
-                          : VerificationCheckmarkInverted
-                      }
-                      width='14px'
-                      height='14px'
-                      fill='none'
-                    />
-                  )}
-                </SSpanBiddersHighlighted>
+                <OptionCardUsernameSpan
+                  type='otherUser'
+                  user={option.creator!!}
+                  isBlue={isBlue}
+                />
               )
             ) : (
-              <Link href={`/${option.whitelistSupporter?.username}`}>
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  {getDisplayname(option.whitelistSupporter!!)}
-                  <SInlineSvgVerificationIcon
-                    svg={
-                      !isBlue
-                        ? VerificationCheckmark
-                        : VerificationCheckmarkInverted
-                    }
-                    width='14px'
-                    height='14px'
-                    fill='none'
-                  />
-                </SSpanBiddersHighlighted>
-              </Link>
+              <OptionCardUsernameSpan
+                type='otherUser'
+                user={{
+                  ...option.whitelistSupporter,
+                  options: { ...option.whitelistSupporter, isVerified: true },
+                }}
+                isBlue={isBlue}
+              />
             )}
             {(isSupportedByMe && !isMyBid) ||
             (isSupportedByMe &&
               !!option.whitelistSupporter &&
               option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
-              <Link
-                href={`/profile${
-                  user.userData?.options?.isCreator ? '/my-posts' : ''
-                }`}
-              >
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >{`, ${t('me')}`}</SSpanBiddersHighlighted>
-              </Link>
+              <OptionCardUsernameSpan
+                type='me'
+                usernameText={`, ${t('me')}`}
+                isBlue={isBlue}
+              />
             ) : null}
             {option.supporterCount >
             ((isSupportedByMe && !isMyBid) ||
@@ -1255,12 +1188,4 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
-`;
-
-const SInlineSvgVerificationIcon = styled(InlineSvg)`
-  display: inline-flex;
-  margin-left: 3px;
-
-  position: relative;
-  top: 3px;
 `;

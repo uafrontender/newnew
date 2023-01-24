@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "Email confirmation",
-    "description_NEED_TRANSLATION": "Confirm email"
+    "title": "郵件確認",
+    "description": "確認電子郵件"
   },
   "heading": {
-    "mainHeading_NEED_TRANSLATION": "Confirm your email",
+    "mainHeading": "確認你的電子郵件",
     "subHeading": "請輸入我們發送的代碼"
   },
   "expired": {

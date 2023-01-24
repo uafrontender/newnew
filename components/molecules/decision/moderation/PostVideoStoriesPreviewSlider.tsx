@@ -73,7 +73,7 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
       >
         {videos.map((video, i, arr) => (
           <PostVideoThumbnailItem
-            key={video.uuid ?? i}
+            key={video?.uuid ?? i}
             index={i}
             video={video}
             isNonUploadedYet={
@@ -81,7 +81,7 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
             }
             handleClick={() => handleChangeCurrentActive(i)}
             handleDeleteVideo={() =>
-              handleDeleteAdditionalVideo?.(video.uuid!!)
+              handleDeleteAdditionalVideo?.(video?.uuid!!)
             }
             handleDeleteUnuploadedAdditonalResponse={() =>
               handleDeleteUnuploadedAdditonalResponse?.()

@@ -13,7 +13,6 @@ interface IMcConfirmCustomOptionModal {
   closeModal: () => void;
 }
 
-// TODO: Change UI
 const McConfirmCustomOptionModal: React.FC<IMcConfirmCustomOptionModal> = ({
   isVisible,
   handleAddCustomOption,
