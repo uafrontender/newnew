@@ -74,7 +74,7 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
               {winningOption.supporterCount &&
               winningOption.supporterCount > 1 ? (
                 <>
-                  {' & '}
+                  {` & `}
                   {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
                   {t('mcPostSuccess.others')}
                 </>
@@ -108,7 +108,7 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
             {winningOption.supporterCount &&
             winningOption.supporterCount > 1 ? (
               <>
-                {' & '}
+                {` & `}
                 {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
                 {t('acPostSuccess.others')}
               </>
@@ -200,7 +200,7 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
             {winningOption.supporterCount &&
             winningOption.supporterCount > 1 ? (
               <>
-                {' & '}
+                {` & `}
                 {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
                 {t('mcPostSuccess.others')}
               </>
@@ -342,7 +342,7 @@ const SWinningBidCreatorText = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  /* white-space: pre; */
+  white-space: pre;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
