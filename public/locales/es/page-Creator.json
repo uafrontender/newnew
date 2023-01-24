@@ -195,7 +195,7 @@
     },
     "emptyInbox": {
       "title": "Tu bandeja de entrada está vacía",
-      "text": "Cuando inicies una nueva conversación, la verás listada aquí"
+      "text": "Cuando inicies una conversación con el dueño de un Bundle, lo verás listado aquí"
     },
     "default": {
       "searchPlaceholder": "Buscar"
@@ -216,7 +216,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
-    "beforeName": "El anuncio de",
+    "beforeName": "El anuncios de ",
     "suffix": "",
     "afterName": ""
   },
@@ -238,7 +238,7 @@
       "stripeConnectedLink": "¡Stripe conectado!",
       "back": "Cerrar",
       "stripeConnecting": "Conectando...",
-      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
+      "requireInformation": "Stripe requiere información"
     }
   },
   "noNotifications": "Las nuevas notificaciones que recibas\naparecerán aquí"

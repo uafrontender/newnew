@@ -18,7 +18,6 @@ import styled, { useTheme } from 'styled-components';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import RichTextArea from '../../../atoms/creation/RichTextArea';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
@@ -75,6 +74,7 @@ import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
+import RichTextInput from '../../../atoms/creation/RichTextInput';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -703,7 +703,7 @@ export const CreationSecondStepContent: React.FC<
           <SInputLabel htmlFor='title'>
             {t('secondStep.input.label')}
           </SInputLabel>
-          <RichTextArea
+          <RichTextInput
             id='title'
             value={post?.title}
             error={titleError}
@@ -976,6 +976,7 @@ export const CreationSecondStepContent: React.FC<
 
       if (available) {
         dispatch(setCreationFileProcessingLoading(false));
+        dispatch(setCreationFileProcessingProgress(100));
       } else {
         dispatch(setCreationFileUploadError(true));
         showErrorToastPredefined(undefined);

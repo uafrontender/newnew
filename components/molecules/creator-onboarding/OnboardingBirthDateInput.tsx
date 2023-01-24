@@ -214,7 +214,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
               {value?.day && value.month && value.year
                 ? `${value?.day} ${months.find((o) => o.value === value?.month)
                     ?.name!!} ${value?.year}`
-                : 'Set your date of birth'}
+                : t('detailsSection.form.dateOfBirth.captions.instruction')}
             </span>
             <SInlineSVG
               svg={ArrowDown}

@@ -4,8 +4,10 @@
 /* eslint-disable padded-blocks */
 import React, { useEffect, useState } from 'react';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+
 import Caption from '../../atoms/Caption';
 import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
@@ -17,6 +19,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getUserByUsername } from '../../../api/endpoints/user';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -126,7 +129,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 <img alt={user.username} src={user.avatarUrl} />
               </SAvatar>
               <SNickname variant={3}>
-                {getDisplayname(user)}
+                <SNicknameText>{getDisplayname(user)}</SNicknameText>
                 {user.options?.isVerified && (
                   <SInlineSVG
                     svg={VerificationCheckmark}
@@ -137,9 +140,19 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 )}
               </SNickname>
 
-              <SUsername variant={2}>{`@${user.username}`}</SUsername>
+              <Link href={`/${user.username}`}>
+                <SLink>
+                  <SUsername variant={2}>{`@${user.username}`}</SUsername>
+                </SLink>
+              </Link>
               <SUnblockButton
-                onClick={() => changeUserBlockedStatus(user.uuid, false)}
+                onClick={() => {
+                  Mixpanel.track('Unblock user', {
+                    _stage: 'Settings',
+                    _userUuid: user.uuid,
+                  });
+                  changeUserBlockedStatus(user.uuid, false);
+                }}
                 view='secondary'
               >
                 {t('Settings.sections.privacy.blockedUsers.button.unblock')}
@@ -152,14 +165,25 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           {t('Settings.sections.privacy.closeAccount.title')}
         </SHidingSubsectionTitle>
         <SCloseAccountButton
-          onClick={() => setIsConfirmDeleteMyAccountVisible(true)}
+          onClick={() => {
+            Mixpanel.track('Delete Account Button Clicked', {
+              _stage: 'Settings',
+            });
+            setIsConfirmDeleteMyAccountVisible(true);
+          }}
           view='secondary'
         >
           {t('Settings.sections.privacy.closeAccount.button.delete')}
         </SCloseAccountButton>
         <ConfirmDeleteAccountModal
           isVisible={isConfirmDeleteMyAccountVisible}
-          closeModal={() => setIsConfirmDeleteMyAccountVisible(false)}
+          closeModal={() => {
+            Mixpanel.track('Close Confirm Delete Account Modal', {
+              _stage: 'Settings',
+            });
+
+            setIsConfirmDeleteMyAccountVisible(false);
+          }}
         />
       </SCloseAccountSubsection>
     </SWrapper>
@@ -249,6 +273,13 @@ const SNickname = styled(Text)`
   display: flex;
   align-items: center;
   grid-area: nickname;
+  overflow: hidden;
+`;
+
+const SNicknameText = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const SInlineSVG = styled(InlineSvg)`
@@ -257,15 +288,23 @@ const SInlineSVG = styled(InlineSvg)`
   margin-left: 6px;
 `;
 
+const SLink = styled.a`
+  overflow: hidden;
+`;
+
 const SUsername = styled(Caption)`
   grid-area: username;
   position: relative;
-  top: -6px;
+  top: -3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
+  cursor: pointer;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SUnblockButton = styled(Button)`
+  margin-left: 12px;
   grid-area: unblock;
   justify-self: right;
 `;

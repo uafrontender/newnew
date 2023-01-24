@@ -89,7 +89,9 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ goal }) => {
 
 export default VerifyEmail;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<IVerifyEmail> = async (
+  context
+) => {
   const { to } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,

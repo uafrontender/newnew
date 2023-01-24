@@ -33,7 +33,19 @@ export const Mobile: React.FC = React.memo(() => {
             }
           >
             <a>
-              <UserAvatar withClick avatarUrl={user.userData?.avatarUrl} />
+              <UserAvatar
+                withClick
+                avatarUrl={user.userData?.avatarUrl}
+                onClick={() =>
+                  Mixpanel.track('My Avatar Clicked', {
+                    _target: user.loggedIn
+                      ? user.userData?.options?.isCreator
+                        ? '/profile/my-posts'
+                        : '/profile'
+                      : '/sign-up',
+                  })
+                }
+              />
             </a>
           </Link>
         </SItemWithMargin>
@@ -51,6 +63,7 @@ export const Mobile: React.FC = React.memo(() => {
                       onClick={() => {
                         Mixpanel.track('Navigation Item Clicked', {
                           _button: 'New Post',
+                          _target: '/creation',
                         });
                       }}
                     >
@@ -63,7 +76,18 @@ export const Mobile: React.FC = React.memo(() => {
               <SItemWithMargin>
                 <Link href='/creator-onboarding'>
                   <a>
-                    <SButton view='primaryGrad' withDim withShrink withShadow>
+                    <SButton
+                      view='primaryGrad'
+                      withDim
+                      withShrink
+                      withShadow
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Create Now',
+                          _target: '/creator-onboarding',
+                        });
+                      }}
+                    >
                       {t('button.createOnNewnew')}
                     </SButton>
                   </a>

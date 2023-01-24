@@ -138,7 +138,7 @@
     "cannotLeavePageMsg": "¿Estás seguro de que quieres cerrar esta página? El progreso de la carga se perderá",
     "floatingUploadResponseButton": "Hacer un video de respuesta",
     "setThumbnail": "Establecer una miniatura",
-    "changeThumbnail_NEED_TRANSLATION": "Change thumbnail",
+    "changeThumbnail": "Cambiar miniatura",
     "responseUploadedNonProcessed": "¡Éxito! Tu respuesta estará disponible una vez que el video haya sido procesado",
     "uploadResponseForm": {
       "fileUpload": {
@@ -295,12 +295,17 @@
       "title": "Próximamente",
       "subtitle_1": "Tu {{postType}} no está activo todavía.",
       "subtitle_2": "Comenzará en",
+      "toggleButton_NEED_TRANSLATION": "See options",
       "timer": {
         "days": "Días",
         "hours": "Horas",
         "minutes": "Minutos",
         "seconds": "Segundos"
       }
+    },
+    "loading": {
+      "title": "Casi listo...",
+      "subtitle": "¡Queda poco!"
     }
   },
   "acPost": {
@@ -438,12 +443,8 @@
         "button": "Votar"
       },
       "actionSection": {
-        "votesAmount": {
-          "placeholder": {
-            "votes": "votos",
-            "vote": "voto"
-          }
-        },
+        "votesAmount": "# de votos (mínimo {{minAmount}} votos)",
+        "totalAmountCustomVotesPayment": "Total",
         "suggestionPlaceholder": "Agregar tu propia opción",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
@@ -659,6 +660,7 @@
     "hero": {
       "title": "¡Los votos ya han sido conteados!",
       "body": "{{creator}} tiene {{time}} para realizar esta opción. ¡Mantente atento!",
+      "bodyNoResponse": "{{creator}} tiene {{time}} para responder. ¡Permanece atento!",
       "expires": {
         "days": "días",
         "days_singular": "día",
@@ -817,6 +819,7 @@
     "alreadyVoted": "Ya has votado",
     "mcVoteCountTooSmall": "El número de votos es demasiado pequeño",
     "notAllowedToCreateNewOption": "No se permite crear una nueva opción",
+    "optionNotUnique_NEED_TRANSLATION": "Option already exists",
     "cfCancelled": "El Goal ha sido cancelado",
     "cfFinished": "El Goal ya ha concluido",
     "cfNotStarted": "El Goal no ha comenzado todavía",

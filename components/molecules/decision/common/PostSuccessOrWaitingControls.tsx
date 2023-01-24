@@ -21,6 +21,7 @@ interface IPostSuccessOrWaitingControls {
   isFollowingDecision: boolean;
   isMobile: boolean;
   postUuid: string;
+  postShortId: string;
   shareMenuOpen: boolean;
   handleCloseAndGoBack: () => void;
   handleEllipseMenuClose: () => void;
@@ -38,6 +39,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
   isFollowingDecision,
   isMobile,
   postUuid,
+  postShortId,
   shareMenuOpen,
   typeOfPost,
   handleCloseAndGoBack,
@@ -99,7 +101,8 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
       {/* Share menu */}
       {!isMobile && postUuid && (
         <PostShareEllipseMenu
-          postId={postUuid}
+          postUuid={postUuid}
+          postShortId={postShortId}
           isVisible={shareMenuOpen}
           onClose={handleShareClose}
           anchorElement={shareButtonRef.current as HTMLElement}
@@ -109,7 +112,8 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
         <PostShareEllipseModal
           isOpen={shareMenuOpen}
           zIndex={11}
-          postId={postUuid}
+          postUuid={postUuid}
+          postShortId={postShortId}
           onClose={handleShareClose}
         />
       )}

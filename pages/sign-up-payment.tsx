@@ -136,7 +136,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
 export default EmailAuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  IEmailAuthRedirectPage
+> = async (context) => {
   const { stripe_setup_intent_client_secret } = context.query;
 
   if (

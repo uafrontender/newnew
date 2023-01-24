@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -11,13 +11,9 @@ import FilterButton from '../../atoms/FilterButton';
 import Text from '../../atoms/Text';
 import Lottie from '../../atoms/Lottie';
 
-import { getMyPosts } from '../../../api/endpoints/user';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../utils/hooks/usePagination';
-
 import logoAnimation from '../../../public/animations/mobile_logo.json';
+import useMyPosts from '../../../utils/hooks/useMyPosts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
@@ -26,42 +22,39 @@ const YourPostsSection = () => {
   const [statusFilter, setStatusFilter] =
     useState<newnewapi.GetRelatedToMePostsRequest.StatusFilter | null>(null);
 
-  const fetchCreatorPosts = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IPost>> => {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
-        statusFilter:
-          statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
-        paging,
-        // ...(statusFilterValue
-        //   ? { sorting: newnewapi.PostSorting.NEWEST_FIRST }
-        //   : {}),
-      });
+  const {
+    data,
+    isLoading: loading,
+    hasNextPage,
+    fetchNextPage,
+    isFetched: initialLoadDone,
+  } = useMyPosts({
+    relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+    limit: 6,
+    statusFilter:
+      statusFilter || newnewapi.GetRelatedToMePostsRequest.StatusFilter.ALL,
+  });
 
-      const postsResponse = await getMyPosts(payload);
-
-      if (!postsResponse.data || postsResponse.error) {
-        throw new Error('Request failed');
-      }
-
-      return {
-        nextData: postsResponse.data.posts,
-        nextPageToken: postsResponse.data.paging?.nextPageToken,
-      };
-    },
-    [statusFilter]
+  const posts = useMemo(
+    () => (data ? data.pages.map((page) => page.posts).flat() : []),
+    [data]
   );
 
-  const {
-    data: posts,
-    loading,
-    loadMore,
-    initialLoadDone,
-  } = usePagination<newnewapi.IPost>(fetchCreatorPosts, 10);
+  const loadMore = useCallback(() => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage]);
 
   const handleSetStatusFilter = (
     newStatusFilter: newnewapi.GetRelatedToMePostsRequest.StatusFilter
   ) => {
+    Mixpanel.track('Posts Filter Set', {
+      _stage: 'Homepage',
+      _component: 'YourPostsSection',
+      _filter: newStatusFilter,
+    });
+
     if (statusFilter === newStatusFilter) {
       setStatusFilter(null);
     } else {
@@ -76,7 +69,18 @@ const YourPostsSection = () => {
         <SHeadline>{t('createFirstPost.title')}</SHeadline>
         <Link href='/creation'>
           <a>
-            <Button>{tCommon('button.createDecision')}</Button>
+            <Button
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Homepage',
+                  _component: 'YourPostSection',
+                  _button: 'Create Now',
+                  _target: '/creation',
+                });
+              }}
+            >
+              {tCommon('button.createDecision')}
+            </Button>
           </a>
         </Link>
       </SCreateFirstContainer>
@@ -132,7 +136,18 @@ const YourPostsSection = () => {
               <SHint variant='subtitle'>{t('noPosts')}</SHint>
               <Link href='/creation'>
                 <a>
-                  <Button>{tCommon('button.createDecision')}</Button>
+                  <Button
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _stage: 'Homepage',
+                        _component: 'YourPostSection',
+                        _button: 'Create Now',
+                        _target: '/creation',
+                      });
+                    }}
+                  >
+                    {tCommon('button.createDecision')}
+                  </Button>
                 </a>
               </Link>
             </>

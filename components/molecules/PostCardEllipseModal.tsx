@@ -12,11 +12,13 @@ import { useAppSelector } from '../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../atoms/EllipseModal';
 import { Mixpanel } from '../../utils/mixpanel';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;
   zIndex: number;
   postUuid: string;
+  postShortId: string;
   postType: TPostType;
   postCreator: newnewapi.User;
   handleReportOpen: () => void;
@@ -30,6 +32,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   zIndex,
   postCreator,
   postUuid,
+  postShortId,
   postType,
   handleReportOpen,
   onClose,
@@ -40,6 +43,9 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
+
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -56,7 +62,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
 
   const handleCopyLink = useCallback(() => {
     if (window) {
-      const url = `${window.location.origin}/p/${postUuid}`;
+      const url = `${window.location.origin}/p/${postShortId || postUuid}`;
       Mixpanel.track('Copied Link Post Modal', {
         _stage: 'Post',
         _postUuid: postUuid,
@@ -73,7 +79,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           console.log(err);
         });
     }
-  }, [postUuid, onClose]);
+  }, [postShortId, postUuid, onClose]);
 
   // Following
   const [isFollowingDecision, setIsFollowingDecision] = useState(false);
@@ -90,7 +96,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuid}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${postShortId || postUuid}`
           )}`
         );
         return;
@@ -111,6 +117,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           handleRemovePostFromState?.();
         } else {
           handleAddPostToState?.();
+          promptUserWithPushNotificationsPermissionModal();
         }
       }
     } catch (err) {
@@ -123,9 +130,11 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
     user._persist?.rehydrated,
     isFollowingDecision,
     router,
+    postShortId,
     handleRemovePostFromState,
     handleAddPostToState,
     showErrorToastPredefined,
+    promptUserWithPushNotificationsPermissionModal,
   ]);
 
   useEffect(() => {

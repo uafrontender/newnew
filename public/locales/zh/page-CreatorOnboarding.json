@@ -112,7 +112,8 @@
       "back": "返回",
       "submit": "完成"
     },
-    "agreedToTosCheckbox": "我已閱讀並同意"
+    "agreedToTosCheckbox": "我已閱讀並同意",
+    "linkText": "NewNew條款"
   },
   "aboutSection": {
     "meta": {
@@ -157,7 +158,7 @@
       "requestSetupLink": "與Stripe綁定",
       "stripeConnectedLink": "Stripe已綁定！",
       "stripeConnecting": "連接中......",
-      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
+      "requireInformation": "Stripe需要資訊"
     }
   },
   "subRateSection": {

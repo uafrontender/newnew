@@ -20,7 +20,7 @@ export interface SubscriptionToCreator {
 
 export interface SubscriptionToPost {
   type: 'post';
-  postId: string;
+  postUuid: string;
   postTitle: string;
 }
 

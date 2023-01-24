@@ -17,6 +17,7 @@ import {
 import { useAppSelector } from '../../../redux-store/store';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailStepOneModal {
   onComplete: () => void;
@@ -77,6 +78,10 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   }, [user.userData?.email]);
 
   const resendVerificationCode = async () => {
+    Mixpanel.track('Resend Verification Code', {
+      _stage: 'Settings',
+    });
+
     setIsCodeLoading(true);
     setTimerStartTime(Date.now());
     await requestVerificationCode();
@@ -93,6 +98,11 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const handleConfirmMyEmail = useCallback(
     async (verificationCode: string) => {
       try {
+        Mixpanel.track('Confirm My Current Email', {
+          _stage: 'Settings',
+          _currentEmail: user.userData?.email,
+        });
+
         setIsSubmitting(true);
 
         const confirmMyEmailPayload = new newnewapi.ConfirmMyEmailRequest({
@@ -122,7 +132,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         setIsSubmitting(false);
       }
     },
-    [onComplete, t]
+    [onComplete, t, user.userData?.email]
   );
 
   const handleTryAgain = () => {

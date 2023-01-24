@@ -1,4 +1,5 @@
 import { newnewapi } from 'newnew-api';
+import Long from 'long';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 const BASE_URL_CHAT = `${BASE_URL}/reporting`;
@@ -38,7 +39,7 @@ export const reportUser = (
 };
 
 export const reportPost = (
-  postId: string,
+  postUuid: string,
   reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
@@ -47,7 +48,7 @@ export const reportPost = (
     message,
     content: {
       postAnnounce: {
-        postUuid: postId,
+        postUuid,
       },
     },
   });

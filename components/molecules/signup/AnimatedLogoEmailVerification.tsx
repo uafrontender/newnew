@@ -36,7 +36,7 @@ const SAnimatedLogoEmailVerification = styled.div`
   margin-top: 148px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-top: 276px;
+    margin-top: calc(50vh - 200px);
   }
 
   ${({ theme }) => theme.media.laptopL} {

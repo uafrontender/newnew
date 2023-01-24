@@ -28,6 +28,8 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
+import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -49,7 +51,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -179,7 +180,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             responseViewed={responseViewed}
@@ -197,10 +198,17 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
               <>
                 <WaitingForResponseBox
                   title={t('mcPostAwaiting.hero.title')}
-                  body={t('mcPostAwaiting.hero.body', {
-                    creator: getDisplayname(post.creator),
-                    time: waitingTime,
-                  })}
+                  body={
+                    winningOption
+                      ? t('mcPostAwaiting.hero.body', {
+                          creator: getDisplayname(post.creator),
+                          time: waitingTime,
+                        })
+                      : t('mcPostAwaiting.hero.bodyNoResponse', {
+                          creator: getDisplayname(post.creator),
+                          time: waitingTime,
+                        })
+                  }
                 />
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
@@ -233,73 +241,24 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                         </a>
                       </Link>
                     </SCreator>
-                    <STotal>
-                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
-                      <span>{t('mcPostSuccess.inTotalVotes')}</span>
-                    </STotal>
+                    {post.totalVotes && post.totalVotes > 0 ? (
+                      <STotal>
+                        {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                        <span>{t('mcPostSuccess.inTotalVotes')}</span>
+                      </STotal>
+                    ) : null}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>
                     <PostTitleContent>{post.title}</PostTitleContent>
                   </SPostTitle>
                   <SSeparator />
-                  {winningOption && (
+                  {winningOption ? (
                     <>
-                      <SWinningBidCreator>
-                        <SCreator>
-                          <Link
-                            href={`/${
-                              winningOption.creator?.uuid !== post.creator?.uuid
-                                ? winningOption.creator?.username!!
-                                : winningOption.firstVoter?.username!!
-                            }`}
-                          >
-                            <SCreatorImage
-                              src={
-                                winningOption.creator?.uuid !==
-                                post.creator?.uuid
-                                  ? winningOption.creator?.avatarUrl!!
-                                  : winningOption.firstVoter?.avatarUrl!!
-                              }
-                            />
-                          </Link>
-                          <SWinningBidCreatorText>
-                            <SSpan>
-                              <Link
-                                href={`/${
-                                  winningOption.creator?.uuid !==
-                                  post.creator?.uuid
-                                    ? winningOption.creator?.username!!
-                                    : winningOption.firstVoter?.username!!
-                                }`}
-                              >
-                                {winningOption.creator?.uuid ===
-                                  user.userData?.userUuid ||
-                                winningOption.isSupportedByMe
-                                  ? winningOption.supporterCount > 1
-                                    ? t('me')
-                                    : t('I')
-                                  : getDisplayname(
-                                      winningOption.creator?.uuid !==
-                                        post.creator?.uuid
-                                        ? winningOption.creator!!
-                                        : winningOption.firstVoter!!
-                                    )}
-                              </Link>
-                            </SSpan>
-                            {winningOption.supporterCount > 1 ? (
-                              <>
-                                {' & '}
-                                {formatNumber(
-                                  winningOption.supporterCount,
-                                  true
-                                )}{' '}
-                                {t('mcPostSuccess.others')}
-                              </>
-                            ) : null}{' '}
-                            {t('mcPostSuccess.voted')}
-                          </SWinningBidCreatorText>
-                        </SCreator>
-                      </SWinningBidCreator>
+                      <WinningOptionCreator
+                        type='mc'
+                        postCreator={post.creator!!}
+                        winningOptionMc={winningOption}
+                      />
                       <SWinningOptionAmount variant={4}>
                         {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
                         {winningOption.voteCount > 1
@@ -336,8 +295,13 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                         </SWinningOptionDetailsTitle>
                       </SWinningOptionDetails>
                     </>
+                  ) : (
+                    <McWaitingOptionsSection post={post} />
                   )}
                 </SMainSectionWrapper>
+                {/* {!winningOption ? (
+                  <McWaitingOptionsSection post={post} />
+                ) : null} */}
               </>
             ) : (
               <McSuccessOptionsTab
@@ -361,6 +325,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>
@@ -411,8 +376,12 @@ const SActivitiesContainer = styled.div<{
   margin-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    flex-direction: column;
+
     margin-top: 0px;
     min-height: 506px;
+    height: 100%;
 
     background-color: ${({ theme }) =>
       theme.name === 'dark'
@@ -423,9 +392,6 @@ const SActivitiesContainer = styled.div<{
   ${({ theme }) => theme.media.laptop} {
     min-height: unset;
     height: 728px;
-    display: flex;
-    flex-direction: column;
-    /* justify-content: space-between; */
   }
 `;
 
@@ -438,6 +404,7 @@ const SMainSectionWrapper = styled.div`
     padding-right: 16px;
 
     height: calc(100% - 260px);
+    height: 100%;
 
     display: flex;
     flex-direction: column;
@@ -556,40 +523,6 @@ const SPostTitle = styled(Headline)`
   }
 `;
 
-// Winning option info
-const SWinningBidCreator = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-
-  margin-top: 32px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
-
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`;
-
-const SWinningBidCreatorText = styled.span`
-  position: relative;
-  top: -6px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-
-  ${({ theme }) => theme.media.laptop} {
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -696,16 +629,3 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SSpan = styled.span`
-  a {
-    cursor: pointer;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
-`;

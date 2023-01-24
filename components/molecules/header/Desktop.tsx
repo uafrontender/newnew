@@ -18,11 +18,7 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-interface IDesktop {
-  hasSoldBundles: boolean;
-}
-
-export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
+export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
@@ -30,7 +26,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
 
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles } = useBundles();
+  const { bundles, hasSoldBundles } = useBundles();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -45,6 +41,10 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
   const handlerCopy = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
+
+      Mixpanel.track('Copied My Link', {
+        _stage: 'Header',
+      });
 
       copyPostUrlToClipboard(url)
         .then(() => {
@@ -110,6 +110,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                       onClick={() => {
                         Mixpanel.track('Navigation Item Clicked', {
                           _button: 'Dashboard',
+                          _target: '/creator/dashboard',
                         });
                       }}
                     >
@@ -129,6 +130,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                       onClick={() => {
                         Mixpanel.track('Navigation Item Clicked', {
                           _button: 'Bundles',
+                          _target: '/bundles',
                         });
                       }}
                     >
@@ -150,13 +152,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
             {user.userData?.options?.isCreator && (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creation'>
                     <a>
                       <Button
                         id='create'
@@ -165,6 +161,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                         onClick={() => {
                           Mixpanel.track('Navigation Item Clicked', {
                             _button: 'New Post',
+                            _target: '/creation',
                           });
                         }}
                       >
@@ -179,6 +176,11 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile/my-posts',
+                          });
+                        }}
                       />
                     </a>
                   </Link>
@@ -188,15 +190,20 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
             {!user.userData?.options?.isCreator && (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creator-onboarding'>
                     <a>
-                      <Button withDim withShadow withShrink view='primaryGrad'>
+                      <Button
+                        withDim
+                        withShadow
+                        withShrink
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Create now',
+                            _target: '/creator-onboarding',
+                          });
+                        }}
+                      >
                         {t('button.createOnNewnew')}
                       </Button>
                     </a>
@@ -208,6 +215,11 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile',
+                          });
+                        }}
                       />
                     </a>
                   </Link>
@@ -226,6 +238,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
                         _button: 'Sign in',
+                        _target: '/sign-up',
                       });
                     }}
                   >
@@ -246,6 +259,7 @@ export const Desktop: React.FC<IDesktop> = React.memo(({ hasSoldBundles }) => {
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
                         _button: 'Create now',
+                        _target: '/sign-up?to=create',
                       });
                     }}
                   >

@@ -101,6 +101,10 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, []);
 
   const markNotificationAsRead = useCallback(async (notificationId: number) => {
+    if (!notificationId) {
+      return;
+    }
+
     try {
       const payload = new newnewapi.MarkAsReadRequest({
         notificationIds: [notificationId],
@@ -110,7 +114,12 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      setUnreadNotifications(null);
+
+      setUnreadNotifications((curr) => {
+        const arr = curr ? [...curr] : [];
+        const result = arr.filter((item) => item !== notificationId);
+        return result;
+      });
     } catch (err) {
       console.error(err);
     }
@@ -128,6 +137,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     }
   }, [inView, loading, hasMore, loadMore]);
 
+  // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2)
@@ -139,11 +149,21 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (target.userProfile && target?.userProfile.userUsername)
         return `/direct-messages/${target.userProfile.userUsername}`;
 
-      if (target.postResponse && target?.postResponse.postUuid)
-        return `/p/${target.postResponse.postUuid}`;
+      if (
+        target.postResponse &&
+        (target?.postResponse.postShortId || target?.postResponse.postUuid)
+      )
+        return `/p/${
+          target?.postResponse.postShortId || target?.postResponse.postUuid
+        }`;
 
-      if (target.postAnnounce && target?.postAnnounce.postUuid)
-        return `/p/${target.postAnnounce.postUuid}`;
+      if (
+        target.postAnnounce &&
+        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
+      )
+        return `/p/${
+          target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
+        }`;
     }
     return '/direct-messages';
   };
@@ -256,9 +276,34 @@ export const NotificationsList: React.FC<IFunction> = ({
   // }, [notifications, newNotifications]);
 
   return (
-    <>
-      <SSectionContent ref={scrollRef}>
-        {loading === undefined ? (
+    <div ref={scrollRef}>
+      {loading === undefined ? (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      ) : !notifications && loading ? (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      ) : notifications && notifications.length < 1 ? (
+        <NoResults />
+      ) : (
+        notifications && notifications.map(renderNotificationItem)
+      )}
+      {hasMore && !loading && (
+        <SRef ref={scrollRefNotifications}>
           <Lottie
             width={64}
             height={64}
@@ -268,75 +313,13 @@ export const NotificationsList: React.FC<IFunction> = ({
               animationData: loadingAnimation,
             }}
           />
-        ) : !notifications && loading ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : notifications && notifications.length < 1 ? (
-          <NoResults />
-        ) : (
-          notifications && notifications.map(renderNotificationItem)
-        )}
-        {hasMore && !loading && (
-          <SRef ref={scrollRefNotifications}>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SRef>
-        )}
-      </SSectionContent>
-    </>
+        </SRef>
+      )}
+    </div>
   );
 };
 
 export default NotificationsList;
-
-const SSectionContent = styled.div`
-  height: calc(100% - 48px);
-  padding: 0 24px;
-  display: flex;
-  position: relative;
-  overflow-y: auto;
-  flex-direction: column;
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  scrollbar-width: none;
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-
-  &:hover {
-    scrollbar-width: thin;
-    &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
-    }
-  }
-`;
 
 const SNotificationItem = styled.div`
   cursor: pointer;
@@ -393,7 +376,9 @@ const SRef = styled.span`
 
 const SInlineSvg = styled(InlineSvg)`
   display: inline-flex;
-  transform: translateY(4px);
+  transform: translateY(6px);
   margin-left: 2px;
-  margin-top: -2px;
+  margin-top: -6px;
+  width: 20px;
+  height: 20px;
 `;

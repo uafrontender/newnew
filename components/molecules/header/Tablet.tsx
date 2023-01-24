@@ -22,18 +22,14 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-interface ITablet {
-  hasSoldBundles: boolean;
-}
-
-export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
+export const Tablet: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { bundles } = useBundles();
+  const { bundles, hasSoldBundles } = useBundles();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -48,7 +44,14 @@ export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
             {user.userData?.options?.isCreator && (
               <Link href='/creator/dashboard'>
                 <a>
-                  <SDashboardButton>
+                  <SDashboardButton
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Dashboard',
+                        _target: '/creator/dashboard',
+                      });
+                    }}
+                  >
                     <SNavText variant={3} weight={600}>
                       {t('button.dashboard')}
                     </SNavText>
@@ -66,6 +69,7 @@ export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
                       onClick={() => {
                         Mixpanel.track('Navigation Item Clicked', {
                           _button: 'Bundles',
+                          _target: '/bundles',
                         });
                       }}
                     >
@@ -125,6 +129,7 @@ export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
                         onClick={() => {
                           Mixpanel.track('Navigation Item Clicked', {
                             _button: 'New Post',
+                            _target: '/creation',
                           });
                         }}
                       >
@@ -156,6 +161,12 @@ export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
                       <Button
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Create now',
+                            _target: '/creator-onboarding',
+                          });
+                        }}
                       >
                         {t('button.createOnNewnew')}
                       </Button>
@@ -163,17 +174,16 @@ export const Tablet: React.FC<ITablet> = React.memo(({ hasSoldBundles }) => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
+                  <Link href='/profile'>
                     <a>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile',
+                          });
+                        }}
                       />
                     </a>
                   </Link>

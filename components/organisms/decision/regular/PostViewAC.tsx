@@ -19,11 +19,7 @@ import { useRouter } from 'next/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../../api/endpoints/post';
-import {
-  fetchCurrentBidsForPost,
-  placeBidOnAuction,
-} from '../../../../api/endpoints/auction';
+import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostTimer from '../../../molecules/decision/common/PostTimer';
@@ -41,8 +37,10 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import getDisplayname from '../../../../utils/getDisplayname';
-import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
+import useAcOptions from '../../../../utils/hooks/useAcOptions';
+// import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const AcOptionsTab = dynamic(
@@ -70,13 +68,11 @@ const getPayWithCardErrorMessage = (
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
+    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
+      return 'errors.optionNotUnique';
     default:
       return 'errors.requestFailed';
   }
-};
-
-export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
-  isHighest: boolean;
 };
 
 interface IPostViewAC {}
@@ -99,6 +95,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
   const router = useRouter();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -106,8 +104,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     saveCard,
     stripeSetupIntentClientSecret,
     handleGoBackInsidePost,
-    handleUpdatePostStatus,
     resetSetupIntentClientSecret,
+    refetchPost,
   } = usePostInnerState();
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
@@ -135,186 +133,53 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Total amount
-  const [totalAmount, setTotalAmount] = useState(
-    post.totalAmount?.usdCents ?? 0
+  const totalAmount = useMemo(
+    () => post.totalAmount?.usdCents ?? 0,
+    [post.totalAmount?.usdCents]
   );
 
   // Options
-  const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-    post.optionCount ?? ''
+  const numberOfOptions = useMemo(
+    () => post.optionCount ?? '',
+    [post.optionCount]
   );
-  const [optionsNextPageToken, setOptionsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const [loadingOptionsError, setLoadingOptionsError] = useState('');
-  const [triedLoading, setTriedLoading] = useState(false);
 
-  // const currLocation = `/p/${post.postUuid}`;
+  const {
+    processedOptions: options,
+    hasNextPage: hasNextOptionsPage,
+    fetchNextPage: fetchNextOptionsPage,
+    isLoading: isOptionsLoading,
+    refetch: refetchOptions,
+  } = useAcOptions(
+    {
+      postUuid: post.postUuid,
+      userUuid: user.userData?.userUuid,
+      loggedInUser: user.loggedIn,
+    },
+    {
+      onError: (err: any) => {
+        showErrorToastCustom((err as Error).message);
+      },
+    }
+  );
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-  const sortOptions = useCallback(
-    (unsortedArr: TAcOptionWithHighestField[]) => {
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < unsortedArr.length; i++) {
-        // eslint-disable-next-line no-param-reassign
-        unsortedArr[i].isHighest = false;
-      }
-
-      const highestOption = unsortedArr.sort(
-        (a, b) =>
-          (b?.totalAmount?.usdCents as number) -
-          (a?.totalAmount?.usdCents as number)
-      )[0];
-
-      unsortedArr.forEach((option, i) => {
-        if (i > 0) {
-          // eslint-disable-next-line no-param-reassign
-          option.isHighest = false;
-        }
-      });
-
-      const optionsByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            .sort((a, b) => {
-              return (b.id as number) - (a.id as number);
-            })
-        : [];
-
-      const optionsSupportedByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.isSupportedByMe)
-            .sort((a, b) => {
-              return (b.id as number) - (a.id as number);
-            })
-        : [];
-
-      const optionsByVipUsers = unsortedArr
-        .filter((o) => o.isCreatedBySubscriber)
-        .sort((a, b) => {
-          return (b.id as number) - (a.id as number);
-        });
-
-      const workingArrSorted = unsortedArr.sort((a, b) => {
-        // Sort the rest by newest first
-        return (b.id as number) - (a.id as number);
-      });
-
-      const joinedArr = [
-        ...(highestOption &&
-        (highestOption.creator?.uuid === user.userData?.userUuid ||
-          highestOption.isSupportedByMe)
-          ? [highestOption]
-          : []),
-        ...optionsByUser,
-        ...optionsSupportedByUser,
-        ...optionsByVipUsers,
-        ...(highestOption &&
-        highestOption.creator?.uuid !== user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...workingArrSorted,
-      ];
-
-      const workingSortedUnique =
-        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
-
-      const highestOptionIdx = (
-        workingSortedUnique as TAcOptionWithHighestField[]
-      ).findIndex((o) => o.id === highestOption.id);
-
-      if (workingSortedUnique[highestOptionIdx]) {
-        (
-          workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
-        ).isHighest = true;
-      }
-
-      return workingSortedUnique;
-    },
-    [user.userData?.userUuid]
-  );
-
-  const fetchBids = useCallback(
-    async (pageToken?: string) => {
-      if (optionsLoading || loadingModalOpen) return;
-      try {
-        setOptionsLoading(true);
-        setLoadingOptionsError('');
-
-        const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
-          postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.options) {
-          setOptions((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.options as TAcOptionWithHighestField[]),
-            ];
-
-            return sortOptions(workingArr);
-          });
-          setOptionsNextPageToken(res.data.paging?.nextPageToken);
-        }
-
-        setOptionsLoading(false);
-      } catch (err) {
-        setOptionsLoading(false);
-        setLoadingOptionsError((err as Error).message);
-        console.error(err);
-      } finally {
-        setTriedLoading(true);
-      }
-    },
-    [optionsLoading, loadingModalOpen, post.postUuid, sortOptions]
-  );
-
   const handleRemoveOption = useCallback(
-    (optionToRemove: newnewapi.Auction.Option) => {
-      setOptions((curr) => {
-        const workingArr = [...curr];
-        const workingArrUnsorted = [
-          ...workingArr.filter((o) => o.id !== optionToRemove.id),
-        ];
-        return sortOptions(workingArrUnsorted);
-      });
+    async (optionToRemove: newnewapi.Auction.Option) => {
+      await refetchOptions();
     },
-    [setOptions, sortOptions]
+    [refetchOptions]
   );
 
   const fetchPostLatestData = useCallback(async () => {
     try {
-      const fetchPostPayload = new newnewapi.GetPostRequest({
-        postUuid: post.postUuid,
-      });
-
-      const res = await fetchPostByUUID(fetchPostPayload);
+      const res = await refetchPost();
 
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data.auction) {
-        setTotalAmount(res.data.auction.totalAmount?.usdCents as number);
-        setNumberOfOptions(res.data.auction.optionCount as number);
-        if (res.data.auction.status)
-          handleUpdatePostStatus(res.data.auction.status);
-      }
     } catch (err) {
       console.error(err);
     }
@@ -322,114 +187,31 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   }, []);
 
   const handleAddOrUpdateOptionFromResponse = useCallback(
-    (newOption: newnewapi.Auction.Option) => {
-      setOptions((curr) => {
-        const workingArr = [...curr];
-        let workingArrUnsorted;
-        const idx = workingArr.findIndex((op) => op.id === newOption?.id);
-        if (idx === -1) {
-          workingArrUnsorted = [
-            ...workingArr,
-            newOption as TAcOptionWithHighestField,
-          ];
-        } else {
-          workingArr[idx].supporterCount = newOption?.supporterCount as number;
-          workingArr[idx].totalAmount =
-            newOption?.totalAmount as newnewapi.IMoneyAmount;
-          workingArr[idx].isSupportedByMe = newOption?.isSupportedByMe;
-          workingArrUnsorted = workingArr;
-        }
-
-        return sortOptions(workingArrUnsorted);
-      });
+    async (newOption: newnewapi.Auction.Option) => {
+      await refetchOptions();
     },
-    [setOptions, sortOptions]
+    [refetchOptions]
   );
 
-  const handleOnVotingTimeExpired = () => {
-    if (options && options.some((o) => o.supporterCount > 0)) {
-      handleUpdatePostStatus('WAITING_FOR_DECISION');
-    } else {
-      handleUpdatePostStatus('FAILED');
-    }
+  const handleOnVotingTimeExpired = async () => {
+    await refetchPost();
   };
 
-  const subscription: SubscriptionToPost = useMemo(
+  /* const subscription: SubscriptionToPost = useMemo(
     () => ({
       type: 'post',
-      postId: post.postUuid,
+      postUuid: post.postUuid,
       postTitle: post.title,
     }),
     [post]
-  );
-
-  // Mark post as viewed if logged in
-  useEffect(() => {
-    async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-        return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-
-        if (res.error) throw new Error('Failed to mark post as viewed');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [post, user.loggedIn, user.userData?.userUuid]);
+  ); */
 
   useEffect(() => {
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      setOptions([]);
-      setOptionsNextPageToken('');
-      fetchBids();
-    });
-    return () => {
-      clearTimeout(timer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.postUuid]);
-
-  useEffect(() => {
-    const socketHandlerOptionCreatedOrUpdated = (data: any) => {
+    const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
       if (decoded.option && decoded.postUuid === post.postUuid) {
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          let workingArrUnsorted;
-          const idx = workingArr.findIndex(
-            (op) => op.id === decoded.option?.id
-          );
-          if (idx === -1) {
-            workingArrUnsorted = [
-              ...workingArr,
-              decoded.option as TAcOptionWithHighestField,
-            ];
-          } else {
-            workingArr[idx].supporterCount = decoded.option
-              ?.supporterCount as number;
-            workingArr[idx].totalAmount = decoded.option
-              ?.totalAmount as newnewapi.IMoneyAmount;
-            workingArrUnsorted = workingArr;
-          }
-
-          return sortOptions(workingArrUnsorted);
-        });
+        await refetchOptions();
       }
     };
 
@@ -438,26 +220,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
       if (decoded.optionId) {
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          return workingArr.filter((o) => o.id !== decoded.optionId);
-        });
+        await refetchOptions();
 
         await fetchPostLatestData();
       }
     };
 
-    const socketHandlerPostData = (data: any) => {
+    const socketHandlerPostData = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostUpdated.decode(arr);
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
-        if (decoded.post?.auction?.totalAmount?.usdCents)
-          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents);
-        if (decoded.post?.auction?.optionCount)
-          setNumberOfOptions(decoded.post?.auction?.optionCount);
+        await fetchPostLatestData();
       }
     };
 
@@ -481,13 +257,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    socketConnection,
-    post,
-    user.userData?.userUuid,
-    setOptions,
-    sortOptions,
-  ]);
+  }, [socketConnection, post, user.userData?.userUuid]);
 
   const isBidMadeAfterRedirect = useRef(false);
 
@@ -560,7 +330,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       } finally {
         router.replace(
           `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postUuid
+            post.postShortId ? post.postShortId : post.postUuid
           }`,
           undefined,
           { shallow: true }
@@ -598,13 +368,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       );
     }
   };
-
-  useEffect(() => {
-    if (loadingOptionsError) {
-      showErrorToastCustom(loadingOptionsError);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadingOptionsError]);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   useEffect(() => {
@@ -671,7 +434,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             )}
           </SExpiresSection>
           <PostTopInfo
-            subscription={subscription}
+            /* subscription={subscription} */
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -708,7 +471,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           </SExpiresSection>
         )}
         <PostVideo
-          postId={post.postUuid}
+          postUuid={post.postUuid}
           announcement={post.announcement!!}
           response={post.response ?? undefined}
           responseViewed={responseViewed}
@@ -718,7 +481,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         />
         {isMobile && (
           <PostTopInfo
-            subscription={subscription}
+            /* subscription={subscription} */
             amountInBids={totalAmount}
             hasWinner={!!post.winningOptionId}
           />
@@ -759,7 +522,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   )}
                 </SExpiresSection>
                 <PostTopInfo
-                  subscription={subscription}
+                  /* subscription={subscription} */
                   amountInBids={totalAmount}
                   hasWinner={!!post.winningOptionId}
                 />
@@ -774,7 +537,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             </PostVotingTab>
           </div>
           <AcOptionsTab
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             postStatus={postStatus}
             postText={post.title}
             postCreatorName={getDisplayname(post.creator)}
@@ -784,10 +548,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               .subtract(3, 'days')
               .calendar()}
             options={options}
-            optionsLoading={optionsLoading}
-            pagingToken={optionsNextPageToken}
-            triedLoading={triedLoading}
-            handleLoadBids={fetchBids}
+            optionsLoading={isOptionsLoading}
+            hasNextPage={!!hasNextOptionsPage}
+            fetchNextPage={fetchNextOptionsPage}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }
@@ -795,7 +558,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           />
           {postStatus === 'voting' && (
             <AcAddNewOption
-              postId={post.postUuid}
+              postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               postStatus={postStatus}
               postText={post.title}
               postCreator={getDisplayname(post.creator)}
@@ -828,9 +592,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             closeModal={() => {
               Mixpanel.track('Close Payment Success Modal', {
                 _stage: 'Post',
-                _post: post.postUuid,
+                _postUuid: post.postUuid,
               });
               setPaymentSuccessModalOpen(false);
+              promptUserWithPushNotificationsPermissionModal();
             }}
           >
             {t('paymentSuccessModal.ac', {
@@ -858,6 +623,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           </SCommentsHeadline>
           <CommentsBottomSection
             postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}
@@ -899,15 +665,27 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   position: relative;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    'back timer'
+    'endsOn endsOn';
   justify-content: center;
   flex-wrap: wrap;
 
   width: 100%;
   margin-bottom: 6px;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 `;
 
 const SEndDate = styled.div`
+  grid-area: endsOn;
   width: 100%;
   text-align: center;
   padding: 8px 0px;
@@ -919,9 +697,10 @@ const SEndDate = styled.div`
 `;
 
 const SGoBackButton = styled(GoBackButton)`
-  position: absolute;
-  left: 0;
-  top: 4px;
+  grid-area: back;
+  position: relative;
+  top: -4px;
+  left: -8px;
 `;
 
 const SActivitiesContainer = styled.div`

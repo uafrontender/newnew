@@ -46,8 +46,8 @@
     "lottie-web": "5.9.4",
     "mixpanel-browser": "2.45.0",
     "moment": "2.29.1",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#438a0b2842192a9fdee22ca7b1489650b8392918",
     "moment-timezone": "0.5.39",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#ceea92daa39f0075996f6a7b12fa93b95bccc418",
     "next": "12.1.6",
     "next-i18next": "13.0.0",
     "next-redux-wrapper": "7.0.5",
@@ -68,6 +68,7 @@
     "react-i18next": "12.0.0",
     "react-intersection-observer": "9.2.2",
     "react-loading-skeleton": "3.0.1",
+    "react-query": "3.39.2",
     "react-redux": "8.0.2",
     "react-scroll": "1.8.7",
     "react-textarea-autosize": "8.3.4",
@@ -121,12 +122,13 @@
     "eslint-plugin-react-hooks": "4.5.0",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
+    "long": "5.2.1",
     "pre-commit": "1.2.2",
     "prettier": "2.7.1",
     "raw-loader": "4.0.2",
     "typescript": "4.7.3"
   },
   "overrides": {
-    "@types/react": "18.0.14"
+    "@types/react": "18.0.27"
   }
 }

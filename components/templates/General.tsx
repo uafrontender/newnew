@@ -1,11 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState } from 'react';
-import Head from 'next/head';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -19,10 +20,8 @@ import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
-// import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
-import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
@@ -30,14 +29,13 @@ import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
-import { loadStateLS } from '../../utils/localStorage';
+import ChatContainer from '../organisms/direct-messages/ChatContainer';
 
 interface IGeneral {
   className?: string;
   withChat?: boolean;
-  specialStatusBarColor?: string;
   restrictMaxWidth?: boolean;
-  noMobieNavigation?: boolean;
+  noMobileNavigation?: boolean;
   noPaddingMobile?: boolean;
   children: React.ReactNode;
 }
@@ -46,9 +44,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const {
     className,
     withChat,
-    specialStatusBarColor,
     restrictMaxWidth,
-    noMobieNavigation,
+    noMobileNavigation,
     noPaddingMobile,
     children,
   } = props;
@@ -60,8 +57,14 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles } = useBundles();
-  const { unreadCount, setMobileChatOpened, mobileChatOpened } = useGetChats();
+  const { bundles, hasSoldBundles } = useBundles();
+  const {
+    unreadCount,
+    setMobileChatOpened,
+    mobileChatOpened,
+    activeTab,
+    setActiveTab,
+  } = useGetChats();
 
   const hasMounted = useHasMounted();
 
@@ -116,23 +119,22 @@ export const General: React.FC<IGeneral> = (props) => {
               url: '/',
             },
             {
+              key: 'notifications',
+              url: '/notifications',
+              counter: unreadNotificationCount,
+            },
+            {
               key: 'add',
               url: '/creator-onboarding',
             },
-            bundles && bundles.length > 0
-              ? {
-                  key: 'bundles',
-                  url: '/bundles',
-                }
-              : {
-                  key: 'notifications',
-                  url: '/notifications',
-                  counter: unreadNotificationCount,
-                },
           ] as TBottomNavigationItem[]
         ).concat(
-          user.userData?.options?.isCreator || (bundles && bundles.length > 0)
+          bundles && bundles.length > 0
             ? [
+                {
+                  key: 'bundles',
+                  url: '/bundles',
+                },
                 {
                   key: 'dms',
                   url: '/direct-messages',
@@ -168,20 +170,23 @@ export const General: React.FC<IGeneral> = (props) => {
     'tablet',
   ].includes(resizeMode);
 
-  const openChat = () => {
+  const openChat = useCallback(() => {
+    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
+      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    }
+    router.push(`/creator/dashboard?tab=chat`);
     setMobileChatOpened(true);
-  };
+  }, [activeTab, setActiveTab, setMobileChatOpened, router]);
 
-  const closeChat = () => {
-    setMobileChatOpened(false);
-  };
+  const chatButtonVisible = useMemo(
+    () => isMobile && withChat && hasSoldBundles,
+    [isMobile, withChat, hasSoldBundles]
+  );
 
-  const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
-
-  const chatButtonVisible = isMobile && withChat && localHasSoldBundles;
-
-  const mobileNavigationVisible =
-    isMobile && scrollDirection !== 'down' && !noMobieNavigation;
+  const mobileNavigationVisible = useMemo(
+    () => isMobile && scrollDirection !== 'down' && !noMobileNavigation,
+    [isMobile, scrollDirection, noMobileNavigation]
+  );
 
   return (
     <SBaseLayout
@@ -189,26 +194,16 @@ export const General: React.FC<IGeneral> = (props) => {
       className={className}
       containerRef={wrapperRef}
       withBanner={!!banner?.show}
-      noPaddingTop={!!noMobieNavigation}
+      noPaddingTop={!!noMobileNavigation}
     >
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <Head>
-          <meta
-            name='theme-color'
-            content={
-              specialStatusBarColor
-                ? specialStatusBarColor
-                : theme.colorsThemed.statusBar.background
-            }
-          />
-        </Head>
         <Header
           visible={!isMobile || mobileNavigationVisible || globalSearchActive}
         />
-        <SContent noPaddingTop={!!noMobieNavigation}>
+        <SContent noPaddingTop={!!noMobileNavigation}>
           <Container
             {...(restrictMaxWidth
               ? {}
@@ -244,16 +239,16 @@ export const General: React.FC<IGeneral> = (props) => {
           </>
         )}
         {chatButtonVisible && (
-          <ChatContainer
+          <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
             zIndex={moreMenuMobileOpen ? 9 : 10}
           >
             {!mobileChatOpened ? (
               <FloatingMessages withCounter openChat={openChat} />
             ) : (
-              <MobileDashBoardChat closeChat={closeChat} />
+              <ChatContainer />
             )}
-          </ChatContainer>
+          </SChatContainer>
         )}
         {!isMobileOrTablet && !router.route.includes('direct-messages') && (
           <ReportBugButton
@@ -278,7 +273,6 @@ export default General;
 
 General.defaultProps = {
   withChat: false,
-  specialStatusBarColor: undefined,
   restrictMaxWidth: undefined,
 };
 
@@ -292,7 +286,6 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   transition: padding ease 0.5s;
   padding-top: ${(props) =>
     !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
-  padding-bottom: 56px;
   flex-direction: column;
   justify-content: space-between;
 
@@ -357,7 +350,7 @@ interface IChatContainer {
   zIndex: number;
 }
 
-const ChatContainer = styled.div<IChatContainer>`
+const SChatContainer = styled.div<IChatContainer>`
   right: 16px;
   bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
   z-index: ${(props) => props.zIndex};

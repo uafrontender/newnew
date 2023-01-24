@@ -16,6 +16,7 @@ import CardEllipseModal from './CardEllipseModal';
 
 // Icons
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const getCardBrandName = (cardBrand: newnewapi.Card.CardBrand) => {
   switch (cardBrand) {
@@ -91,6 +92,11 @@ const Card: React.FunctionComponent<ICard> = ({
 
   const handelSetPrimaryCard = async () => {
     try {
+      Mixpanel.track('Set Primary Card', {
+        _stage: 'Settings',
+        _cardUuid: cardId,
+      });
+
       const payload = new newnewapi.SetPrimaryCardRequest({
         cardUuid: cardId,
       });
@@ -109,6 +115,11 @@ const Card: React.FunctionComponent<ICard> = ({
 
   const handleDeleteCard = async () => {
     try {
+      Mixpanel.track('Delete Card', {
+        _stage: 'Settings',
+        _cardUuid: cardId,
+      });
+
       const payload = new newnewapi.DeleteCardRequest({
         cardUuid: cardId,
       });
@@ -195,10 +206,6 @@ const SCard = styled.div<{
   background: ${({ background }) => `url(${background})`};
   background-repeat: no-repeat;
   background-size: cover;
-
-  ${({ theme }) => theme.media.mobileM} {
-    min-width: 320px;
-  }
 `;
 
 const SLabel = styled.div`

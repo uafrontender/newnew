@@ -3,50 +3,49 @@ import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import InlineSVG from '../../../atoms/InlineSVG';
-
-import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
-import useDebounce from '../../../../utils/hooks/useDebounce';
-
+// import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
+import { useGetChats } from '../../../../contexts/chatContext';
 
-interface ISearchInput {
-  passInputValue: (searchString: string) => void;
-}
-const SearchInput: React.FC<ISearchInput> = React.memo(({ passInputValue }) => {
+const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const theme = useTheme();
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
-  const [searchValue, setSearchValue] = useState('');
-
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const { searchChatroom, setSearchChatroom } = useGetChats();
 
   const handleSearchClick = useCallback(() => {
     setIsSearchActive((prevState) => !prevState);
   }, []);
 
-  const handleSearchClose = () => {
-    setSearchValue('');
+  const handleSearchClose = useCallback(() => {
+    setSearchChatroom('');
     setIsSearchActive(false);
-  };
+  }, [setSearchChatroom]);
 
-  const handleInputChange = (e: any) => {
-    setSearchValue(e.target.value);
-  };
+  const handleInputChange = useCallback(
+    (e: any) => {
+      setSearchChatroom(e.target.value);
+    },
+    [setSearchChatroom]
+  );
 
-  const handleKeyDown = (e: any) => {
-    if (e.keyCode === 13 && searchValue) {
-      passInputValue(searchValue);
-      closeSearch();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: any) => {
+      if (e.keyCode === 13 && searchChatroom) {
+        handleSearchClose();
+      }
+    },
+    [handleSearchClose, searchChatroom]
+  );
 
-  useOnClickOutside(inputContainerRef, () => {
-    if (isSearchActive) {
-      handleSearchClose();
-    }
-  });
+  // useOnClickOutside(inputContainerRef, () => {
+  //   if (isSearchActive) {
+  //     handleSearchClose();
+  //   }
+  // });
 
   useEffect(() => {
     setTimeout(() => {
@@ -57,17 +56,6 @@ const SearchInput: React.FC<ISearchInput> = React.memo(({ passInputValue }) => {
       }
     }, 1000);
   }, [isSearchActive]);
-
-  const debouncedSearchValue = useDebounce(searchValue, 500);
-
-  useEffect(() => {
-    if (passInputValue) passInputValue(debouncedSearchValue);
-  }, [debouncedSearchValue, passInputValue]);
-
-  function closeSearch() {
-    handleSearchClose();
-    setSearchValue('');
-  }
 
   return (
     <SContainer ref={inputContainerRef} active={isSearchActive}>
@@ -84,7 +72,7 @@ const SearchInput: React.FC<ISearchInput> = React.memo(({ passInputValue }) => {
         />
         <SInput
           ref={inputRef}
-          value={searchValue}
+          value={searchChatroom}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder={t('search.placeholder')}

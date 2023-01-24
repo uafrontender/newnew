@@ -1,12 +1,14 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
+// TODO: Re-enable SMS related logic once new SMS service is integrated
+// TODO: Move SMS related logic to a component once new SMS service is integrated
 import React, {
   useCallback,
   useMemo,
   useState,
   useRef,
-  useEffect,
-  useContext,
+  // useEffect,
+  // useContext,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -28,8 +30,8 @@ import PostShareEllipseModal from './PostShareEllipseModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 
-import NotificationIconFilled from '../../../../public/images/svg/icons/filled/Notifications.svg';
-import NotificationIconOutlined from '../../../../public/images/svg/icons/outlined/Notifications.svg';
+// import NotificationIconFilled from '../../../../public/images/svg/icons/filled/Notifications.svg';
+// import NotificationIconOutlined from '../../../../public/images/svg/icons/outlined/Notifications.svg';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
@@ -41,19 +43,20 @@ import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { I18nNamespaces } from '../../../../@types/i18next';
-import getGuestId from '../../../../utils/getGuestId';
-import {
+/* import getGuestId from '../../../../utils/getGuestId';
+ import {
   getGuestSmsNotificationsSubscriptionStatus,
   getSmsNotificationsSubscriptionStatus,
   subscribeGuestToSmsNotifications,
   subscribeToSmsNotifications,
   unsubscribeFromSmsNotifications,
   unsubscribeGuestFromSmsNotifications,
-} from '../../../../api/endpoints/phone';
+} from '../../../../api/endpoints/phone'; 
 import SmsNotificationModal, {
   SubscriptionToPost,
-} from '../../profile/SmsNotificationModal';
+} from '../../profile/SmsNotificationModal'; 
 import { SocketContext } from '../../../../contexts/socketContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import Tooltip from '../../../atoms/Tooltip';
@@ -61,7 +64,7 @@ import Tooltip from '../../../atoms/Tooltip';
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
 
-const getSmsNotificationSubscriptionErrorMessage = (
+ const getSmsNotificationSubscriptionErrorMessage = (
   status?: newnewapi.SmsNotificationsStatus
 ) => {
   switch (status) {
@@ -70,7 +73,7 @@ const getSmsNotificationSubscriptionErrorMessage = (
     default:
       return 'smsNotifications.error.requestFailed';
   }
-};
+}; */
 
 const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.common.ac.darkAcAnimated,
@@ -85,7 +88,7 @@ const LIGHT_IMAGES: Record<string, () => string> = {
 };
 
 interface IPostTopInfo {
-  subscription: SubscriptionToPost;
+  // subscription: SubscriptionToPost;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
@@ -94,7 +97,7 @@ interface IPostTopInfo {
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
-  subscription,
+  //  subscription,
   totalVotes,
   totalPledges,
   targetPledges,
@@ -107,12 +110,15 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const socketConnection = useContext(SocketContext);
-  const { showErrorToastCustom } = useErrorToasts();
+  // const socketConnection = useContext(SocketContext);
+  // const { showErrorToastCustom } = useErrorToasts();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet'].includes(resizeMode);
+  // const isTablet = ['tablet'].includes(resizeMode);
+
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   const {
     postParsed,
@@ -125,7 +131,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     handleCloseAndGoBack,
   } = usePostInnerState();
 
-  const postId = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postUuid = useMemo(() => postParsed?.postUuid ?? '', [postParsed]);
+  const postShortId = useMemo(
+    () => postParsed?.postShortId ?? '',
+    [postParsed]
+  );
   const title = useMemo(() => postParsed?.title ?? '', [postParsed]);
   const creator = useMemo(() => postParsed?.creator!!, [postParsed]);
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
@@ -169,25 +179,25 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     () => postType === 'ac' && postStatus === 'waiting_for_decision',
     [postType, postStatus]
   );
-  const [notificationTooltipVisible, setNotificationTooltipVisible] =
+  /* const [notificationTooltipVisible, setNotificationTooltipVisible] =
     useState(false);
 
   const [subscribedToSmsNotifications, setSubscribedToSmsNotifications] =
     useState(false);
   const [smsNotificationModalOpen, setSmsNotificationModalOpen] =
-    useState(false);
+    useState(false); */
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const handleCloseSmsNotificationModal = useCallback(
+  /* const handleCloseSmsNotificationModal = useCallback(
     () => setSmsNotificationModalOpen(false),
     []
-  );
+  ); */
 
   const handleOpenShareMenu = () => {
     Mixpanel.track('Opened Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(true);
@@ -196,16 +206,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseShareMenu = useCallback(() => {
     Mixpanel.track('Close Share Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setShareMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleOpenEllipseMenu = () => {
     Mixpanel.track('Open Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(true);
@@ -213,17 +223,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleCloseEllipseMenu = useCallback(() => {
     Mixpanel.track('Close Ellipse Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     setEllipseMenuOpen(false);
-  }, [postId]);
+  }, [postUuid]);
 
   const handleFollowDecision = useCallback(async () => {
     try {
       Mixpanel.track('Favorite Post', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'PostTopInfo',
       });
 
@@ -240,7 +250,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         markAs: !isFollowingDecision
           ? newnewapi.MarkPostRequest.Kind.FAVORITE
           : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-        postUuid: postId,
+        postUuid,
       });
 
       const res = await markPost(markAsFavoritePayload);
@@ -248,13 +258,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       if (!res.error) {
         handleSetIsFollowingDecision(!isFollowingDecision);
       }
+
+      if (!isFollowingDecision) {
+        promptUserWithPushNotificationsPermissionModal();
+      }
     } catch (err) {
       console.error(err);
     }
   }, [
     handleSetIsFollowingDecision,
+    promptUserWithPushNotificationsPermissionModal,
     isFollowingDecision,
-    postId,
+    postUuid,
     router,
     user.loggedIn,
     user._persist?.rehydrated,
@@ -263,7 +278,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleSeeNewFailedBox = useCallback(() => {
     Mixpanel.track('See New Failde Box', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
     if (router.pathname === '/') {
@@ -272,17 +287,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       router.push('/');
     }
     // }
-  }, [router, postId, handleCloseAndGoBack]);
+  }, [router, postUuid, handleCloseAndGoBack]);
 
   // TODO: Add a hook for handling sms notifications status
-  const submitPhoneSmsNotificationsRequest = useCallback(
+  /* const submitPhoneSmsNotificationsRequest = useCallback(
     async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
       try {
         if (!user.loggedIn) {
           const guestId = getGuestId();
 
           const res = await subscribeGuestToSmsNotifications(
-            { postUuid: subscription.postId },
+            { postUuid: subscription.postUuid },
             guestId,
             phoneNumber
           );
@@ -312,7 +327,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           localStorage.setItem(SAVED_PHONE_NUMBER_KEY, phoneNumber.number);
         } else {
           const res = await subscribeToSmsNotifications(
-            { postUuid: subscription.postId },
+            { postUuid: subscription.postUuid },
             phoneNumber
           );
 
@@ -342,13 +357,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         throw err;
       }
     },
-    [user.loggedIn, showErrorToastCustom, subscription.postId, t]
-  );
+    [user.loggedIn, showErrorToastCustom, subscription.postUuid, t]
+  ); 
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     Mixpanel.track('Opened SMS Notification Menu', {
       _stage: 'Post',
-      _postUuid: postId,
+      _postUuid: postUuid,
       _component: 'PostTopInfo',
     });
 
@@ -356,7 +371,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       if (!user.loggedIn) {
         const guestId = getGuestId();
         const res = await unsubscribeGuestFromSmsNotifications(
-          { postUuid: subscription.postId },
+          { postUuid: subscription.postUuid },
           guestId
         );
 
@@ -366,7 +381,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         }
       } else {
         const res = await unsubscribeFromSmsNotifications({
-          postUuid: subscription.postId,
+          postUuid: subscription.postUuid,
         });
 
         if (!res.data || res.error) {
@@ -390,7 +405,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } else if (user.userData?.options?.isPhoneNumberConfirmed) {
       try {
         const res = await subscribeToSmsNotifications({
-          postUuid: subscription.postId,
+          postUuid: subscription.postUuid,
         });
 
         if (
@@ -417,11 +432,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       setSmsNotificationModalOpen(true);
     }
   }, [
-    postId,
+    postUuid,
     subscribedToSmsNotifications,
     user.loggedIn,
     user.userData?.options?.isPhoneNumberConfirmed,
-    subscription.postId,
+    subscription.postUuid,
     showErrorToastCustom,
     tCommon,
     submitPhoneSmsNotificationsRequest,
@@ -433,11 +448,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     if (!user.loggedIn) {
-      console.log('POLL');
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
         const res = await getGuestSmsNotificationsSubscriptionStatus(
-          { postUuid: subscription.postId },
+          { postUuid: subscription.postUuid },
           guestId
         );
         console.log(res.data);
@@ -470,7 +484,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         });
     } else {
       getSmsNotificationsSubscriptionStatus({
-        postUuid: subscription.postId,
+        postUuid: subscription.postUuid,
       }).then((res) => {
         if (!res.data || res.error) {
           console.error('Unable to get sms notifications status');
@@ -484,7 +498,12 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     return () => {};
-  }, [user._persist?.rehydrated, user.loggedIn, subscription.postId, tCommon]);
+  }, [
+    user._persist?.rehydrated,
+    user.loggedIn,
+    subscription.postUuid,
+    tCommon,
+  ]);
 
   useEffect(() => {
     const handleSubscribedToSms = async (data: any) => {
@@ -493,7 +512,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!decoded) return;
 
-      if (decoded.object?.postUuid === subscription.postId) {
+      if (decoded.object?.postUuid === subscription.postUuid) {
         setSubscribedToSmsNotifications(true);
       }
     };
@@ -504,7 +523,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!decoded) return;
 
-      if (decoded.object?.postUuid === subscription.postId) {
+      if (decoded.object?.postUuid === subscription.postUuid) {
         setSubscribedToSmsNotifications(false);
       }
 
@@ -534,9 +553,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         );
       }
     };
-  }, [user.loggedIn, subscription.postId, socketConnection]);
+  }, [user.loggedIn, subscription.postUuid, socketConnection]); 
 
-  const notificationButtonRef: any = useRef();
+  const notificationButtonRef: any = useRef(); */
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
 
@@ -564,7 +583,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator avatar', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -583,7 +602,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               onClickCapture={() => {
                 Mixpanel.track('Click on creator username', {
                   _stage: 'Post',
-                  _postUuid: postId,
+                  _postUuid: postUuid,
                   _component: 'PostTopInfo',
                 });
               }}
@@ -605,12 +624,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </Link>
         </SCreatorCard>
         <SActionsDiv>
+          {/*
           {notificationTooltipVisible && !isMobile && !isTablet && (
             <Tooltip target={notificationButtonRef}>
               {t('postTopInfo.notifyMe')}
             </Tooltip>
           )}
-          <SButton
+           <SButton
             view='transparent'
             iconOnly
             withDim
@@ -630,7 +650,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               width='20px'
               height='20px'
             />
-          </SButton>
+            </SButton> */}
           <SButtonEnabling
             view='transparent'
             iconOnly
@@ -659,16 +679,17 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               height='20px'
             />
           </SButtonEnabling>
-          <SmsNotificationModal
+          {/* <SmsNotificationModal
             show={smsNotificationModalOpen}
             subscription={subscription}
             onSubmit={submitPhoneSmsNotificationsRequest}
             onClose={handleCloseSmsNotificationModal}
-          />
+          /> */}
           {/* Share menu */}
           {!isMobile && (
             <PostShareEllipseMenu
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               isVisible={shareMenuOpen}
               onClose={handleCloseShareMenu}
               anchorElement={shareButtonRef.current}
@@ -678,7 +699,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareEllipseModal
               isOpen={shareMenuOpen}
               zIndex={11}
-              postId={postId}
+              postUuid={postUuid}
+              postShortId={postShortId}
               onClose={handleCloseShareMenu}
             />
           ) : null}
@@ -889,10 +911,14 @@ const SActionsDiv = styled.div`
   justify-content: flex-end;
 `;
 
-const SButton = styled(Button)`
+/* const SButton = styled(Button)`
   background: none;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  svg {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  }
 
   margin-left: 4px;
   padding: 8px;
@@ -905,7 +931,7 @@ const SButton = styled(Button)`
     background: ${({ theme, view }) =>
       view ? theme.colorsThemed.button.background[view] : ''};
   }
-`;
+`; */
 
 const SButtonEnabling = styled(Button)`
   background: none;

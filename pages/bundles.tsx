@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import { NextPage, NextPageContext } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -128,7 +128,9 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
 
 export default BundlesPage;
 
-export const getServerSideProps = async (context: NextPageContext) => {
+export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
+  context
+) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-Bundles', 'modal-PaymentModal'],
@@ -143,7 +145,8 @@ export const getServerSideProps = async (context: NextPageContext) => {
     props: {
       ...translationContext,
       // eslint-disable-next-line camelcase, object-shorthand
-      ...(setup_intent_client_secret
+      ...(setup_intent_client_secret &&
+      !Array.isArray(setup_intent_client_secret)
         ? {
             stripeSetupIntentClientSecretFromRedirect:
               // eslint-disable-next-line camelcase
@@ -151,7 +154,7 @@ export const getServerSideProps = async (context: NextPageContext) => {
           }
         : {}),
       // eslint-disable-next-line camelcase, object-shorthand
-      ...(save_card
+      ...(save_card && !Array.isArray(save_card)
         ? {
             // eslint-disable-next-line camelcase
             saveCardFromRedirect: save_card === 'true',

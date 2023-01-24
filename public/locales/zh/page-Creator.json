@@ -195,7 +195,7 @@
     },
     "emptyInbox": {
       "title": "收件箱為空",
-      "text": "開啓新的對話後，對話會列在此處"
+      "text": "你與某位Bundle所有者的對話開始後，對話將在此處列出"
     },
     "default": {
       "searchPlaceholder": "搜索"
@@ -238,7 +238,7 @@
       "stripeConnectedLink": "Stripe已綁定！",
       "back": "關閉",
       "stripeConnecting": "連接中......",
-      "requireInformation_NEED_TRANSLATION": "Stripe requires info"
+      "requireInformation": "Stripe需要資訊"
     }
   },
   "noNotifications": "你收到的任何新通知\n都會出現在這裡"

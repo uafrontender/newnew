@@ -13,7 +13,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '../../../../../redux-store/store';
-import { TAcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -29,9 +29,10 @@ import TutorialTooltip, {
 import Headline from '../../../../atoms/Headline';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import AcConfirmDeleteOptionModal from '../../moderation/auction/AcConfirmDeleteOptionModal';
+import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 
 // Utils
 import { formatNumber } from '../../../../../utils/format';
@@ -47,6 +48,8 @@ import {
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
+import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 // Icons
 import assets from '../../../../../constants/assets';
@@ -54,9 +57,6 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../../../../public/images/svg/icons/filled/Verification.svg';
-import VerificationCheckmarkInverted from '../../../../../public/images/svg/icons/filled/VerificationInverted.svg';
-import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -72,6 +72,8 @@ const getPayWithCardErrorMessage = (
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
+    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
+      return 'errors.optionNotUnique';
     default:
       return 'errors.requestFailed';
   }
@@ -80,7 +82,8 @@ const getPayWithCardErrorMessage = (
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   votingAllowed: boolean;
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreatorName: string;
   postDeadline: string;
   postText: string;
@@ -99,7 +102,8 @@ interface IAcOptionCard {
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
   votingAllowed,
-  postId,
+  postUuid,
+  postShortId,
   postCreatorName,
   postDeadline,
   postText,
@@ -124,6 +128,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   );
   const { appConstants } = useGetAppConstants();
   const { showErrorToastPredefined } = useErrorToasts();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -256,7 +262,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const placeBidRequest = useMemo(
     () =>
       new newnewapi.PlaceBidRequest({
-        postUuid: postId,
+        postUuid,
         amount: new newnewapi.MoneyAmount({
           usdCents: paymentAmountInCents,
         }),
@@ -265,13 +271,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         }),
         optionId: option.id,
       }),
-    [postId, paymentAmountInCents, option.id, paymentFeeInCents]
+    [postUuid, paymentAmountInCents, option.id, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+      postShortId || postUuid
+    }`,
   });
 
   const handlePayWithCard = useCallback(
@@ -293,7 +301,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'AcOptionsCard',
         _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
@@ -343,7 +351,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     },
     [
       setupIntent,
-      postId,
+      postUuid,
       router,
       handleAddOrUpdateOptionFromResponse,
       paymentAmountInCents,
@@ -450,94 +458,38 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
             {!option.whitelistSupporter ||
             option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
-              option.creator?.username ? (
-                <Link href={`/${option.creator?.username}`}>
-                  <SSpanBiddersHighlighted
-                    className='spanHighlighted'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {isMyBid
-                      ? option.supporterCount > 1
-                        ? t('me')
-                        : t('my')
-                      : getDisplayname(option.creator!!)}
-                    {!isMyBid && option.creator.options?.isVerified && (
-                      <SInlineSvgVerificationIcon
-                        svg={
-                          !isBlue
-                            ? VerificationCheckmark
-                            : VerificationCheckmarkInverted
-                        }
-                        width='14px'
-                        height='14px'
-                        fill='none'
-                      />
-                    )}
-                  </SSpanBiddersHighlighted>
-                </Link>
+              isMyBid ? (
+                <OptionCardUsernameSpan
+                  type='me'
+                  usernameText={option.supporterCount > 1 ? t('me') : t('my')}
+                  isBlue={isBlue}
+                />
               ) : (
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  {isMyBid
-                    ? option.supporterCount > 1
-                      ? t('me')
-                      : t('my')
-                    : getDisplayname(option.creator!!)}
-                </SSpanBiddersHighlighted>
+                <OptionCardUsernameSpan
+                  type='otherUser'
+                  user={option.creator!!}
+                  isBlue={isBlue}
+                />
               )
             ) : (
-              <Link href={`/${option.whitelistSupporter?.username}`}>
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  {getDisplayname(option.whitelistSupporter!!)}
-                  <SInlineSvgVerificationIcon
-                    svg={
-                      !isBlue
-                        ? VerificationCheckmark
-                        : VerificationCheckmarkInverted
-                    }
-                    width='14px'
-                    height='14px'
-                    fill='none'
-                  />
-                </SSpanBiddersHighlighted>
-              </Link>
+              <OptionCardUsernameSpan
+                type='otherUser'
+                user={{
+                  ...option.whitelistSupporter,
+                  options: { ...option.whitelistSupporter, isVerified: true },
+                }}
+                isBlue={isBlue}
+              />
             )}
             {(isSupportedByMe && !isMyBid) ||
             (isSupportedByMe &&
               !!option.whitelistSupporter &&
               option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
-              <Link
-                href={`/profile${
-                  user.userData?.options?.isCreator ? '/my-posts' : ''
-                }`}
-              >
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >{`, ${t('me')}`}</SSpanBiddersHighlighted>
-              </Link>
+              <OptionCardUsernameSpan
+                type='me'
+                usernameText={`, ${t('me')}`}
+                isBlue={isBlue}
+              />
             ) : null}
             {option.supporterCount >
             ((isSupportedByMe && !isMyBid) ||
@@ -573,7 +525,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             onClickCapture={() => {
               Mixpanel.track('Boost Click', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'AcOptionCard',
               });
             }}
@@ -596,7 +548,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             onClickCapture={() => {
               Mixpanel.track('Boost Click', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'AcOptionCard',
               });
             }}
@@ -730,7 +682,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
           setupIntent={setupIntent}
-          redirectUrl={`p/${postId}`}
+          redirectUrl={`p/${postShortId || postUuid}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           bottomCaption={
@@ -788,7 +740,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         postType='ac'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator: postCreatorName,
@@ -1233,12 +1188,4 @@ const SEllipseButtonMobile = styled(Button)`
   &:focus:enabled {
     background: transparent;
   }
-`;
-
-const SInlineSvgVerificationIcon = styled(InlineSvg)`
-  display: inline-flex;
-  margin-left: 3px;
-
-  position: relative;
-  top: 3px;
 `;

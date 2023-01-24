@@ -19,6 +19,7 @@ import { updateMe } from '../../../api/endpoints/user';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const maxDate = new Date();
 
@@ -49,6 +50,11 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     }, []);
 
     const handleDateInput = useCallback((value: Date) => {
+      Mixpanel.track('Set Date Of Birth', {
+        _stage: 'Settings',
+        _date: value ? value.toString() : value,
+      });
+
       if (value === null) {
         setDateInEdit(undefined);
         return;
@@ -59,18 +65,26 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     }, []);
 
     const handleResetModifications = () => {
+      Mixpanel.track('Cancel Button Clicked', {
+        _stage: 'Settings',
+      });
+
       setDateInEdit(currentDate ?? undefined);
       setDateError('');
     };
 
     const handleSaveModifications = async () => {
       try {
+        Mixpanel.track('Save Changes Button Clicked', {
+          _stage: 'Settings',
+        });
+
         setIsLoading(true);
 
         if (
           wasDateModified &&
           dateInEdit &&
-          dateInEdit.getMonth() &&
+          dateInEdit.getMonth() + 1 &&
           dateInEdit.getFullYear() &&
           dateInEdit.getDate()
         ) {
@@ -136,6 +150,10 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
               'Settings.sections.personalInformation.emailInput.placeholder'
             )}
             onEditButtonClick={() => {
+              Mixpanel.track('Open Edit Email Modal', {
+                _stage: 'Settings',
+              });
+
               router.push(
                 '/profile/settings?editEmail=true',
                 '/profile/settings/edit-email'

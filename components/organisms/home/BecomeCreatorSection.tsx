@@ -19,7 +19,9 @@ const BecomeCreatorSection = () => {
 
   const handleClickCreateNow = () => {
     Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Homepage',
       _button: 'Create now',
+      _target: user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create',
     });
     router.push(user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create');
   };
@@ -80,6 +82,8 @@ const SHeadline = styled(Headline)`
   z-index: 1;
   font-size: 20px;
   line-height: 28px;
+  text-align: center;
+
   color: ${({ theme }) => theme.colors.white};
 
   ${({ theme }) => theme.media.tablet} {

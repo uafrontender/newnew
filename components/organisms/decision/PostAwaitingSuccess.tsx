@@ -14,7 +14,9 @@ import WaitingForResponseView from './awaiting';
 import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 import GoBackButton from '../../molecules/GoBackButton';
 
-const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
+const ReportModal = dynamic(
+  () => import('../../molecules/direct-messages/ReportModal')
+);
 
 interface IPostAwaitingSuccess {}
 
@@ -104,6 +106,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
               isFollowingDecision={isFollowingDecision}
               isMobile={isMobile}
               postUuid={postParsed?.postUuid ?? ''}
+              postShortId={postParsed?.postShortId ?? ''}
               shareMenuOpen={shareMenuOpen}
               typeOfPost={typeOfPost ?? 'ac'}
               handleCloseAndGoBack={handleCloseAndGoBack}

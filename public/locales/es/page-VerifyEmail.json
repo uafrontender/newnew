@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Verificación de correo electrónico",
-    "description": "Verificar correo electrónico"
+    "title": "Confirmación de correo electrónico",
+    "description": "Confirmar correo electrónico"
   },
   "heading": {
-    "mainHeading": "Verifica tu correo electrónico",
+    "mainHeading": "Confirma tu correo electrónico",
     "subHeading": "Por favor, introduce el código que hemos enviado a"
   },
   "expired": {

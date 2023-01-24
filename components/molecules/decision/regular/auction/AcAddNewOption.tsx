@@ -29,6 +29,7 @@ import TutorialTooltip, {
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
+import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
 import Headline from '../../../../atoms/Headline';
 import assets from '../../../../../constants/assets';
 import { Mixpanel } from '../../../../../utils/mixpanel';
@@ -51,13 +52,16 @@ const getPayWithCardErrorMessage = (
       return 'errors.biddingNotStarted';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
+    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
+      return 'errors.optionNotUnique';
     default:
       return 'errors.requestFailed';
   }
 };
 
 interface IAcAddNewOption {
-  postId: string;
+  postUuid: string;
+  postShortId: string;
   postCreator: string;
   postText: string;
   postDeadline: string;
@@ -70,7 +74,8 @@ interface IAcAddNewOption {
 }
 // empty change
 const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
-  postId,
+  postUuid,
+  postShortId,
   postCreator,
   postText,
   postDeadline,
@@ -92,6 +97,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   );
 
   const { appConstants } = useGetAppConstants();
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
@@ -198,7 +205,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   const placeBidRequest = useMemo(
     () =>
       new newnewapi.PlaceBidRequest({
-        postUuid: postId,
+        postUuid,
         amount: new newnewapi.MoneyAmount({
           usdCents: paymentAmountInCents,
         }),
@@ -207,13 +214,15 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         }),
         optionTitle: newBidText,
       }),
-    [postId, paymentAmountInCents, newBidText, paymentFeeInCents]
+    [postUuid, paymentAmountInCents, newBidText, paymentFeeInCents]
   );
 
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
+    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+      postShortId || postUuid
+    }`,
   });
 
   const handlePayWithCard = useCallback(
@@ -235,7 +244,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
       Mixpanel.track('PayWithCard', {
         _stage: 'Post',
-        _postUuid: postId,
+        _postUuid: postUuid,
         _component: 'AcOptionsTab',
         _paymentMethod: cardUuid ? 'Primary card' : 'New card',
       });
@@ -285,7 +294,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
     },
     [
       setupIntent,
-      postId,
+      postUuid,
       router,
       handleAddOrUpdateOptionFromResponse,
       paymentAmountInCents,
@@ -384,7 +393,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
             onClickCapture={() =>
               Mixpanel.track('SuggestNewMobile', {
                 _stage: 'Post',
-                _postUuid: postId,
+                _postUuid: postUuid,
                 _component: 'AcOptionsTab',
               })
             }
@@ -467,7 +476,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
-          redirectUrl={`p/${postId}`}
+          redirectUrl={`p/${postShortId || postUuid}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCard={handlePayWithCard}
           setupIntent={setupIntent}
@@ -523,7 +532,10 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         postType='ac'
         value={paymentSuccessValue}
         isVisible={paymentSuccessValue !== undefined}
-        closeModal={() => setPaymentSuccessValue(undefined)}
+        closeModal={() => {
+          setPaymentSuccessValue(undefined);
+          promptUserWithPushNotificationsPermissionModal();
+        }}
       >
         {t('paymentSuccessModal.ac', {
           postCreator,

@@ -13,17 +13,19 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 
 // Utils
-import Headline from '../../../atoms/Headline';
-import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
-
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { formatNumber } from '../../../../utils/format';
 import getDisplayname from '../../../../utils/getDisplayname';
-import assets from '../../../../constants/assets';
-import { fetchPostByUUID } from '../../../../api/endpoints/post';
+
+import Headline from '../../../atoms/Headline';
+import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
+import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 import PostTitleContent from '../../../atoms/PostTitleContent';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+
+import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -42,13 +44,14 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const { t } = useTranslation('page-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
 
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
+
+    const { refetchPost } = usePostInnerState();
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -60,17 +63,15 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
       'announcement'
     );
+
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
+
     const fetchPostLatestData = useCallback(async () => {
       try {
-        const fetchPostPayload = new newnewapi.GetPostRequest({
-          postUuid: post.postUuid,
-        });
-
-        const res = await fetchPostByUUID(fetchPostPayload);
+        const res = await refetchPost();
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
@@ -148,7 +149,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       <>
         <SWrapper>
           <PostVideoSuccess
-            postId={post.postUuid}
+            postUuid={post.postUuid}
             announcement={post.announcement!!}
             response={post.response ?? undefined}
             additionalResponses={post.additionalResponses}
@@ -193,12 +194,12 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                                 post.creator?.options?.isVerified ? (
                                   <SInlineSVG
                                     svg={VerificationCheckmark}
-                                    width='16px'
-                                    height='16px'
                                     fill='none'
                                   />
                                 ) : null,
-                                { creator: getDisplayname(post.creator) },
+                                {
+                                  creator: getDisplayname(post.creator),
+                                },
                               ]}
                             />
                           </SWantsToKnow>
@@ -222,61 +223,11 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                   <SSeparator />
                   {winningOption && (
                     <>
-                      <SWinningBidCreator>
-                        <SCreator>
-                          <Link
-                            href={`/${
-                              winningOption.creator?.uuid ===
-                                user.userData?.userUuid ||
-                              winningOption.isSupportedByMe
-                                ? 'profile'
-                                : winningOption.creator?.username
-                            }`}
-                          >
-                            <SCreatorImage
-                              src={
-                                winningOption.creator?.uuid ===
-                                  user.userData?.userUuid ||
-                                winningOption.isSupportedByMe
-                                  ? user.userData?.avatarUrl ?? ''
-                                  : winningOption.creator?.avatarUrl ?? ''
-                              }
-                            />
-                          </Link>
-                          <SWinningBidCreatorText>
-                            <SSpan>
-                              <Link
-                                href={`/${
-                                  winningOption.creator?.uuid ===
-                                    user.userData?.userUuid ||
-                                  winningOption.isSupportedByMe
-                                    ? 'profile'
-                                    : winningOption.creator?.username
-                                }`}
-                              >
-                                {winningOption.creator?.uuid ===
-                                  user.userData?.userUuid ||
-                                winningOption.isSupportedByMe
-                                  ? winningOption.supporterCount > 1
-                                    ? t('me')
-                                    : t('my')
-                                  : getDisplayname(winningOption.creator!!)}
-                              </Link>
-                            </SSpan>
-                            {winningOption.supporterCount > 1 ? (
-                              <>
-                                {' & '}
-                                {formatNumber(
-                                  winningOption.supporterCount - 1,
-                                  true
-                                )}{' '}
-                                {t('acPostSuccess.others')}
-                              </>
-                            ) : null}{' '}
-                            {t('acPostSuccess.bid')}
-                          </SWinningBidCreatorText>
-                        </SCreator>
-                      </SWinningBidCreator>
+                      <WinningOptionCreator
+                        type='ac'
+                        postCreator={post.creator!!}
+                        winningOptionAc={winningOption}
+                      />
                       {winningOption.totalAmount?.usdCents && (
                         <SWinningOptionAmount variant={4}>
                           {`$${formatNumber(
@@ -356,6 +307,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             </SCommentsHeadline>
             <CommentsBottomSection
               postUuid={post.postUuid}
+              postShortId={post.postShortId ?? ''}
               commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>
@@ -437,7 +389,12 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;;
+    justify-content: flex-start;
+
+    margin-bottom: 16px;
+  }
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: initial;
   }
 `;
 
@@ -471,6 +428,9 @@ const SCreatorInfoDiv = styled.div`
 `;
 
 const SCreator = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   line-height: 24px;
 
   vertical-align: middle;
@@ -492,6 +452,7 @@ const SWantsToKnow = styled.span`
   display: inline-flex;
   align-items: center;
   top: -6px;
+  white-space: pre;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
@@ -506,7 +467,13 @@ const SWantsToKnow = styled.span`
 `;
 
 const SInlineSVG = styled(InlineSvg)`
-  margin-right: 2px;
+  height: 16px;
+  width: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 24px;
+    width: 24px;
+  }
 `;
 
 const STotal = styled.div`
@@ -549,40 +516,6 @@ const SPostTitle = styled(Headline)`
   margin-top: 8px;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
-  }
-`;
-
-// Winning option info
-const SWinningBidCreator = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-
-  margin-top: 32px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
-
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`;
-
-const SWinningBidCreatorText = styled.span`
-  position: relative;
-  top: -6px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-
-  ${({ theme }) => theme.media.laptop} {
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 24px;
   }
 `;
 
@@ -770,16 +703,3 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SSpan = styled.span`
-  a {
-    cursor: pointer;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
-`;

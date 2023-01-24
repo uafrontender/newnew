@@ -1,8 +1,6 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -10,8 +8,9 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import GoBackButton from '../../../GoBackButton';
-import { TMcOptionWithHighestField } from '../../../../organisms/decision/regular/PostViewMC';
-import { fetchCurrentOptionsForMCPost } from '../../../../../api/endpoints/multiple_choice';
+import useMcOptions, {
+  TMcOptionWithHighestField,
+} from '../../../../../utils/hooks/useMcOptions';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import McOptionCard from '../../regular/multiple_choice/McOptionCard';
 import Button from '../../../../atoms/Button';
@@ -35,14 +34,6 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
     resizeMode
   );
 
-  // Options
-  const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  const [optionsNextPageToken, setOptionsNextPageToken] = useState<
-    string | undefined | null
-  >('');
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 
@@ -50,130 +41,21 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
   const { showTopGradient, showBottomGradient } =
     useScrollGradients(containerRef);
 
-  const sortOptions = useCallback(
-    (unsortedArr: TMcOptionWithHighestField[]) => {
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < unsortedArr.length; i++) {
-        // eslint-disable-next-line no-param-reassign
-        unsortedArr[i].isHighest = false;
-      }
-
-      const highestOption = unsortedArr.sort(
-        (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
-      )[0];
-
-      const optionsByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            .sort((a, b) => (b?.voteCount as number) - (a?.voteCount as number))
-        : [];
-
-      const optionsSupportedByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.isSupportedByMe)
-            .sort((a, b) => (b?.voteCount as number) - (a?.voteCount as number))
-        : [];
-
-      const optionsByVipUsers = unsortedArr
-        .filter((o) => o.isCreatedBySubscriber)
-        .sort((a, b) => {
-          return (b.id as number) - (a.id as number);
-        });
-
-      const workingArrSorted = unsortedArr.sort(
-        (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
-      );
-
-      const joinedArr = [
-        ...(highestOption &&
-        highestOption.creator?.uuid === user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...optionsByUser,
-        ...optionsSupportedByUser,
-        ...optionsByVipUsers,
-        ...(highestOption &&
-        highestOption.creator?.uuid !== user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...workingArrSorted,
-      ];
-
-      const workingSortedUnique =
-        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
-
-      const highestOptionIdx = (
-        workingSortedUnique as TMcOptionWithHighestField[]
-      ).findIndex((o) => o.id === highestOption.id);
-
-      if (workingSortedUnique[highestOptionIdx]) {
-        workingSortedUnique[highestOptionIdx].isHighest = true;
-      }
-
-      return workingSortedUnique;
-    },
-    [user.userData?.userUuid]
-  );
-
-  const fetchOptions = useCallback(
-    async (pageToken?: string) => {
-      if (optionsLoading) return;
-      try {
-        setOptionsLoading(true);
-        setLoadingOptionsError('');
-
-        const getCurrentOptionsPayload = new newnewapi.GetMcOptionsRequest({
-          postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await fetchCurrentOptionsForMCPost(
-          getCurrentOptionsPayload
-        );
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.options) {
-          setOptions((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.options as TMcOptionWithHighestField[]),
-            ];
-
-            return sortOptions(workingArr);
-          });
-          setOptionsNextPageToken(res.data.paging?.nextPageToken);
-        }
-
-        setOptionsLoading(false);
-      } catch (err) {
-        setOptionsLoading(false);
-        setLoadingOptionsError((err as Error).message);
-        console.error(err);
-      }
-    },
-    [optionsLoading, setOptions, sortOptions, post]
-  );
-  useEffect(() => {
-    setOptions([]);
-    setOptionsNextPageToken('');
-    fetchOptions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.postUuid]);
+  const {
+    processedOptions: options,
+    hasNextPage: hasNextOptionsPage,
+    fetchNextPage: fetchNextOptionsPage,
+  } = useMcOptions({
+    postUuid: post.postUuid,
+    loggedInUser: user.loggedIn,
+    userUuid: user.userData?.userUuid,
+  });
 
   useEffect(() => {
-    if (inView && !optionsLoading && optionsNextPageToken) {
-      fetchOptions(optionsNextPageToken);
+    if (inView) {
+      fetchNextOptionsPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, optionsNextPageToken, optionsLoading]);
+  }, [inView, fetchNextOptionsPage]);
 
   return (
     <SWrapper>
@@ -206,7 +88,8 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             key={option.id.toString()}
             option={option as TMcOptionWithHighestField}
             creator={option.creator ?? post.creator!!}
-            postId={post.postUuid}
+            postUuid={post.postUuid}
+            postShortId={post.postShortId ?? ''}
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
@@ -218,22 +101,24 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
             handleAddOrUpdateOptionFromResponse={() => {}}
           />
         ))}
-        {!isMobile ? (
-          <SLoaderDiv ref={loadingRef} />
-        ) : optionsNextPageToken ? (
-          <SLoadMoreBtn
-            view='secondary'
-            onClickCapture={() => {
-              Mixpanel.track('Click Load More', {
-                _stage: 'Post',
-                _postUuid: post.postUuid,
-                _component: 'McSuccessOptionsTab',
-              });
-            }}
-            onClick={() => fetchOptions(optionsNextPageToken)}
-          >
-            {t('loadMoreButton')}
-          </SLoadMoreBtn>
+        {hasNextOptionsPage ? (
+          !isMobile ? (
+            <SLoaderDiv ref={loadingRef} />
+          ) : (
+            <SLoadMoreBtn
+              view='secondary'
+              onClickCapture={() => {
+                Mixpanel.track('Click Load More', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McSuccessOptionsTab',
+                });
+              }}
+              onClick={() => fetchNextOptionsPage()}
+            >
+              {t('loadMoreButton')}
+            </SLoadMoreBtn>
+          )
         ) : null}
       </SBidsContainer>
     </SWrapper>
@@ -242,13 +127,13 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 
 export default McSuccessOptionsTab;
 
-const SGoBackButton = styled(GoBackButton)`
+const SGoBackButton = styled(GoBackButton)``;
+
+const SWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
+    padding: 16px;
   }
 `;
-
-const SWrapper = styled.div``;
 
 const SSeparator = styled.div`
   margin: 16px auto;

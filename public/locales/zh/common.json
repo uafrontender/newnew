@@ -152,12 +152,12 @@
       }
     },
     "buyBundleSuccess": {
-      "votes_NEED_TRANSLATION": "<0>{{amount}}</0> votes unlocked",
+      "votes": "已解鎖<0>{{amount}}</0>投票",
       "for": "為",
       "access": "剩餘{{amount}} {{unit}}:",
       "customOptions": "添加定制Superpoll選項",
       "chat": "一對一私聊",
-      "button": "Sounds good!",
+      "button": "听起来不错!",
       "unit": {
         "month": "月",
         "months": "月"
@@ -225,11 +225,11 @@
   },
   "toastErrors": {
     "generic": "發生錯誤，請稍後再試",
-    "serverError_NEED_TRANSLATION": "A server-side error occurred, please try again later",
-    "recaptchaError_NEED_TRANSLATION": "Recaptcha failed, please try again later",
-    "usupportedImageFormatError_NEED_TRANSLATION": "Image format not supported, please try another image",
-    "processingLimitReachedError_NEED_TRANSLATION": "Please wait until you can upload more videos",
-    "invalidDateError_NEED_TRANSLATION": "Please check date and time"
+    "serverError": "發生伺服器端錯誤，請稍後再試",
+    "recaptchaError": "Recaptcha失敗，請稍後再試",
+    "usupportedImageFormatError": "圖片格式不支援，請嘗試其他圖片",
+    "processingLimitReachedError": "請等待，直到可以上傳更多的視頻",
+    "invalidDateError": "請檢查日期和時間"
   },
   "smsNotifications": {
     "title": "你的號碼是多少？",
@@ -266,5 +266,29 @@
     "minutesLeft": "分鐘",
     "secondsLeft": "秒",
     "endedOn": "結束於"
+  },
+  "pushNotification": {
+    "alert": {
+      "safari": {
+        "title": "開啟網頁通知",
+        "subtitle": " Safari > 首選項 > 通知。"
+      },
+      "nonSafari": {
+        "title": "點擊鎖可打開網路通知"
+      },
+      "windows": {
+        "subtitle": "或進入 開始 > 設置 > 系統 > 通知"
+      }
+    },
+    "requestModal": {
+      "title": "開啟通知",
+      "description": "開啟網頁通知以獲得有關NewNew上新帖子的提醒。",
+      "button": "開啟"
+    },
+    "successModal": {
+      "title": "好的！",
+      "description": "謝謝，我們將隨時向你通報NewNew上的新帖子。",
+      "button": "酷！"
+    }
   }
 }
