@@ -27,6 +27,7 @@ import {
   TColorMode,
 } from '../../redux-store/slices/uiStateSlice';
 import { I18nNamespaces } from '../../@types/i18next';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface IFooter {}
 
