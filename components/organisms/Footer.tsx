@@ -102,6 +102,10 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
   const handleSetColorMode = useCallback(
     (mode: TColorMode) => {
+      Mixpanel.track('Color mode switched', {
+        _component: 'Footer',
+        _colorMode: mode,
+      });
       dispatch(setColorMode(mode));
     },
     [dispatch]

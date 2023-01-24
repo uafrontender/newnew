@@ -19,6 +19,7 @@ import { checkCardStatus } from '../../../api/endpoints/card';
 import { useCards } from '../../../contexts/cardsContext';
 import assets from '../../../constants/assets';
 import Headline from '../../atoms/Headline';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
   switch (cardStatus) {
@@ -160,9 +161,18 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection?.connected]);
 
+  const handleCloseModal = () => {
+    Mixpanel.track('Close Add Card Complete Modal', {
+      _stage: 'Settings',
+      _component: 'CardSetupCompleteModal',
+    });
+
+    closeModal();
+  };
+
   return (
-    <Modal show={show} onClose={closeModal} overlaydim>
-      <SModalPaper onClose={closeModal} isCloseButton isMobileFullScreen>
+    <Modal show={show} onClose={handleCloseModal} overlaydim>
+      <SModalPaper onClose={handleCloseModal} isCloseButton isMobileFullScreen>
         <SModalContent>
           {/* Loading view */}
           {isProcessing && (
@@ -216,7 +226,13 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
             <SButton
               id='add-card-success'
               view='primaryGrad'
-              onClick={closeModal}
+              onClick={() => {
+                Mixpanel.track('Got It Button Clicked', {
+                  _stage: 'Settings',
+                  _component: 'CardSetupCompleteModal',
+                });
+                closeModal();
+              }}
             >
               {tCommon('gotIt')}
             </SButton>
