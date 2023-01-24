@@ -40,6 +40,85 @@ const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
     [winningOption.creator?.options?.isVerified]
   );
 
+  const renderWhitelistedCreator = useMemo(
+    () =>
+      winningOption.whitelistSupporter &&
+      winningOption.whitelistSupporter.uuid !== userData?.userUuid &&
+      winningOption.whitelistSupporter.uuid !== winningOption.creator?.uuid,
+    [
+      userData?.userUuid,
+      winningOption.creator?.uuid,
+      winningOption.whitelistSupporter,
+    ]
+  );
+
+  if (renderWhitelistedCreator) {
+    if (type === 'mc') {
+      return (
+        <SWinningBidCreator>
+          <SCreator>
+            <Link href={`/${winningOption?.whitelistSupporter?.username}`}>
+              <SCreatorImage
+                src={winningOption?.whitelistSupporter?.avatarUrl || ''}
+              />
+            </Link>
+            <SWinningBidCreatorText>
+              <SSpan>
+                <Link href={`/${winningOption?.whitelistSupporter?.username}`}>
+                  {getDisplayname(winningOption.whitelistSupporter)}
+                </Link>
+              </SSpan>
+              {winningOption.creator?.options?.isVerified && (
+                <SInlineSVG svg={VerificationCheckmark} fill='none' />
+              )}
+              {winningOption.supporterCount &&
+              winningOption.supporterCount > 1 ? (
+                <>
+                  {' & '}
+                  {formatNumber(winningOption.supporterCount - 1, true)}{' '}
+                  {t('mcPostSuccess.others')}
+                </>
+              ) : null}{' '}
+              {t('mcPostSuccess.voted')}
+            </SWinningBidCreatorText>
+          </SCreator>
+        </SWinningBidCreator>
+      );
+    }
+
+    // ac
+    return (
+      <SWinningBidCreator>
+        <SCreator>
+          <Link href={`/${winningOption?.whitelistSupporter?.username}`}>
+            <SCreatorImage
+              src={winningOption?.whitelistSupporter?.avatarUrl || ''}
+            />
+          </Link>
+          <SWinningBidCreatorText>
+            <SSpan>
+              <Link href={`/${winningOption?.whitelistSupporter?.username}`}>
+                {getDisplayname(winningOption.whitelistSupporter)}
+              </Link>
+            </SSpan>
+            {winningOption.creator?.options?.isVerified && (
+              <SInlineSVG svg={VerificationCheckmark} fill='none' />
+            )}
+            {winningOption.supporterCount &&
+            winningOption.supporterCount > 1 ? (
+              <>
+                {' & '}
+                {formatNumber(winningOption.supporterCount - 1, true)}{' '}
+                {t('acPostSuccess.others')}
+              </>
+            ) : null}{' '}
+            {t('acPostSuccess.bid')}
+          </SWinningBidCreatorText>
+        </SCreator>
+      </SWinningBidCreator>
+    );
+  }
+
   if (type === 'mc') {
     return (
       <SWinningBidCreator>
