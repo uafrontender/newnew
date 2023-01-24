@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -156,7 +155,6 @@ export const General: React.FC<IGeneral> = (props) => {
   ]);
 
   useScrollPosition();
-  // useRefreshOnScrollTop();
   const { scrollDirection } = useScrollDirection();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

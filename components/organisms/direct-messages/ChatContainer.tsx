@@ -82,7 +82,6 @@ const SContent = styled.div`
   ${(props) => props.theme.media.laptop} {
     height: 100%;
     width: calc(100% - 384px);
-    /* padding-bottom: 24px; */
     margin: 0 0 0 auto;
     border-radius: ${(props) => props.theme.borderRadius.large};
   }

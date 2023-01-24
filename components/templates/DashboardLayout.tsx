@@ -4,14 +4,14 @@ import { useGetChats } from '../../contexts/chatContext';
 import { useAppSelector } from '../../redux-store/store';
 import General from './General';
 
-interface IChatLayout {
+interface IDashboardLayout {
   id?: string;
   className?: string;
   withChat?: boolean;
   containerRef?: React.MutableRefObject<HTMLDivElement | null>;
   children: React.ReactNode;
 }
-const DashboardLayout: React.FunctionComponent<IChatLayout> = React.memo(
+const DashboardLayout: React.FunctionComponent<IDashboardLayout> = React.memo(
   ({ id, className, containerRef, children, withChat }) => {
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
