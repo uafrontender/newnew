@@ -89,14 +89,14 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   const player = useRef<PlayerAPI | null>(null);
 
   useEffect(() => {
-    document.body.addEventListener('touchstart', () => {
-      console.log('touchstart');
-      console.log(player.current?.isPlaying(), ' player.current?.isPlaying()');
-      if (!player.current?.isPlaying()) {
+    if (!player.current?.isPlaying()) {
+      try {
         player.current?.play();
+      } catch (err) {
+        handleSetIsPaused(true);
       }
-    });
-  }, [player]);
+    }
+  }, [handleSetIsPaused]);
 
   const handlePlaybackFinished = useCallback(() => {
     player?.current?.play();
