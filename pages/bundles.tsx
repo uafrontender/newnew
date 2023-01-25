@@ -4,7 +4,6 @@ import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { useEffectOnce } from 'react-use';
 import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
@@ -96,11 +95,13 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
     showErrorToastCustom,
   ]);
 
-  useEffectOnce(() => {
-    if (stripeSetupIntentClientSecret) {
+  // A Delay allows to cancel first request when the second full re-render happens
+  useEffect(() => {
+    const timer = setTimeout(() => {
       buyBundleAfterStripeRedirect();
-    }
-  });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [buyBundleAfterStripeRedirect]);
 
   useEffect(() => {
     if (
