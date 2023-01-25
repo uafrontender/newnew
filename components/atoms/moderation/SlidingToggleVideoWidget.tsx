@@ -22,6 +22,7 @@ const SlidingToggleVideoWidget: React.FunctionComponent<
   return (
     <SToggleVideoWidget style={{ ...(wrapperCSS || {}) }}>
       <SChangeTabBtn
+        id='post-tab-original'
         disabled={disabled}
         shouldView={openedTab === 'announcement'}
         onClickCapture={() => {
@@ -36,6 +37,7 @@ const SlidingToggleVideoWidget: React.FunctionComponent<
         {t('postVideoSuccess.tabs.announcement')}
       </SChangeTabBtn>
       <SChangeTabBtn
+        id='post-tab-response'
         disabled={disabled}
         shouldView={openedTab === 'response'}
         onClickCapture={() => {
