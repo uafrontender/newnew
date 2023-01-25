@@ -63,7 +63,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
     Mixpanel.track('Opened Share Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
-      _component: 'PostTopInfo',
+      _component: 'PostSuccessOrWaitingControls',
     });
     setShareMenuOpen(true);
   };
@@ -72,7 +72,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
     Mixpanel.track('Close Share Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
-      _component: 'PostTopInfo',
+      _component: 'PostSuccessOrWaitingControls',
     });
     setShareMenuOpen(false);
   }, [postUuid]);
@@ -81,7 +81,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
     Mixpanel.track('Open Ellipse Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
-      _component: 'PostTopInfo',
+      _component: 'PostSuccessOrWaitingControls',
     });
     setEllipseMenuOpen(true);
   };
@@ -90,7 +90,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
     Mixpanel.track('Close Ellipse Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
-      _component: 'PostTopInfo',
+      _component: 'PostSuccessOrWaitingControls',
     });
     setEllipseMenuOpen(false);
   }, [postUuid]);
@@ -100,7 +100,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
       Mixpanel.track('Favorite Post', {
         _stage: 'Post',
         _postUuid: postUuid,
-        _component: 'PostTopInfo',
+        _component: 'PostSuccessOrWaitingControls',
       });
 
       // Redirect only after the persist data is pulled
