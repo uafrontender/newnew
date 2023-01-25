@@ -393,6 +393,16 @@ const SContainer = styled.div<{
           width: 100%;
         `
       : null}
+
+  ${({ theme }) => theme.media.laptop} {
+    ${({ hiddenMargin }) =>
+      hiddenMargin
+        ? css`
+            position: absolute;
+            top: -56px;
+          `
+        : null}
+  }
 `;
 
 const SWrapper = styled.div<{

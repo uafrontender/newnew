@@ -639,6 +639,8 @@ const SActivitiesContainer = styled.div`
     height: 728px;
     max-height: 728px;
     width: 100%;
+
+    position: relative;
   }
 `;
 
