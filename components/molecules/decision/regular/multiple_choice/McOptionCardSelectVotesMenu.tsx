@@ -126,13 +126,14 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                       ? t('mcPost.optionsTab.optionCard.selectVotesMenu.vote')
                       : t('mcPost.optionsTab.optionCard.selectVotesMenu.votes')}
                   </SBoldSpan>{' '}
-                  <SOpaqueSpan>{`($${
+                  <SOpaqueSpan id={`vote-option-${id}-price`}>{`($${
                     (voteOffer.price?.usdCents || 0) / 100
                   })`}</SOpaqueSpan>
                 </Text>
               </SButton>
             ))}
             <SButton
+              id='vote-option-custom'
               onClickCapture={() => {
                 Mixpanel.track('Open Custom Votes Amount', {
                   _stage: 'Post',

@@ -49,7 +49,9 @@ const PostEarnings: React.FunctionComponent<IPostEarning> = ({
       <Text variant={2} weight={600}>
         {label}
       </Text>
-      <SAmountHeadline variant={1}>${amount}</SAmountHeadline>
+      <SAmountHeadline id='post-earnings' variant={1}>
+        ${amount}
+      </SAmountHeadline>
     </>
   );
 };
