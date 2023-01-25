@@ -2,13 +2,12 @@ import createStorage from './utils/createStorage';
 import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
-import { fetchProtobufProtectedIntercepted } from '../../api/apiConfigs';
+import { fetchProtobuf } from '../../api/apiConfigs';
 import { newnewapi } from 'newnew-api';
 
 const VERIFICATION_CODE = '111111';
 const postShortIdRegex = /p\/([^\/]{1,14})/;
 
-// TODO: Need a way to end post at any time by request
 context('Main flow', () => {
   const testSeed = Date.now();
 
@@ -17,30 +16,43 @@ context('Main flow', () => {
   let eventShortId = '';
   let superpollShortId = '';
   let payedToSuperpoll = [];
+  let payedToBid = [];
   let payedForBundles = 0;
   let winningBid: { text: string; amount: number } | undefined = undefined;
-  // let crowdfundingId = '';
 
   const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25];
   type SuperpollOption = typeof SUPERPOLL_OPTIONS[number];
 
   function voteOnSuperpoll(
     optionIndex: number | 'supported',
-    voteOptionPrice: SuperpollOption
+    voteOptionPrice: SuperpollOption | 'custom',
+    votesNumber?: number
   ) {
     const supportButtonSelector = `#support-button-${optionIndex}`;
     cy.dGet(supportButtonSelector).click();
 
-    const voteOptionIndex = SUPERPOLL_OPTIONS.indexOf(voteOptionPrice);
-    const votePriceSelector = `#vote-option-${voteOptionIndex}-price`;
-    cy.dGet(votePriceSelector).contains(voteOptionPrice);
+    if (voteOptionPrice === 'custom') {
+      const voteButtonSelector = `#vote-option-custom`;
+      cy.dGet(voteButtonSelector).click();
 
-    const voteButtonSelector = `#vote-option-${voteOptionIndex}`;
-    cy.dGet(voteButtonSelector).click();
-    cy.dGet('#confirm-vote').click();
+      // TODO: Add flow for custom vote
+    } else {
+      const voteOptionIndex = SUPERPOLL_OPTIONS.indexOf(voteOptionPrice);
+      const votePriceSelector = `#vote-option-${voteOptionIndex}-price`;
+      cy.dGet(votePriceSelector).contains(voteOptionPrice);
+      const voteButtonSelector = `#vote-option-${voteOptionIndex}`;
+      cy.dGet(voteButtonSelector).click();
+      cy.dGet('#confirm-vote').click();
+    }
 
     return () => {
-      payedToSuperpoll.push(voteOptionPrice);
+      if (voteOptionPrice === 'custom') {
+        // TODO: Calculate and add to the list
+        const customVotesPrice = 0;
+        payedToSuperpoll.push(customVotesPrice);
+      } else {
+        payedToSuperpoll.push(voteOptionPrice);
+      }
     };
   }
 
@@ -53,6 +65,7 @@ context('Main flow', () => {
       .click();
 
     return () => {
+      payedToBid.push(optionAmount);
       if (!winningBid || winningBid.amount < optionAmount) {
         winningBid = {
           text: optionText,
@@ -84,7 +97,7 @@ context('Main flow', () => {
     cy.task('log', `test seed is ${testSeed}`);
   });
 
-  describe.only('Creator', () => {
+  describe('Creator', () => {
     const defaultStorage = {
       userTutorialsProgress:
         '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
@@ -170,15 +183,14 @@ context('Main flow', () => {
       cy.wait(2000);
       cy.dGet('#auction').click();
       cy.url().should('include', '/creation/auction');
+
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
-
       cy.dGet('#title').type(`CI post ${Date.now()}`);
       cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
-
-      cy.dGet('#10-minutes').click();
+      cy.dGet('#1-hour').click();
 
       // IDEA: change to scheduled
       // IDEA: change scheduled at time
@@ -223,9 +235,9 @@ context('Main flow', () => {
       cy.wait(2000);
       cy.dGet('#multiple-choice').click();
       cy.url().should('include', '/creation/multiple-choice');
+
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
-
       cy.dGet('#title').type(`CI post ${Date.now()}`);
 
       cy.dGet('#option-0').type(`first option`);
@@ -237,8 +249,7 @@ context('Main flow', () => {
       // IDEA: move option around?
 
       cy.dGet('#expiresAt').click();
-      // TODO: might be too short, expand
-      cy.dGet('#5-minutes').click();
+      cy.dGet('#1-hour').click();
 
       cy.fixture('test.mp4', 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
@@ -268,49 +279,6 @@ context('Main flow', () => {
         });
     });
 
-    /* it('can create a crowdfunding', () => {
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
-
-      // Waiting for an element to be attached to the DOM
-      cy.wait(2000);
-      cy.dGet('#crowdfunding').click();
-      cy.url().should('include', '/creation/crowdfunding');
-
-      cy.dGet('#title').type(`CI post ${Date.now()}`);
-      cy.dGet('#targetBackerCount').clear().type('1');
-
-      // Needed to apply a value, make review button available
-      cy.focused().blur();
-
-      cy.fixture('test.mp4', 'binary')
-        .then(Cypress.Blob.binaryStringToBlob)
-        .then((fileContent) => {
-          cy.dGet('#file').attachFile({
-            fileContent,
-            fileName: 'test.mp4',
-            mimeType: 'video/mp4',
-            encoding: 'utf8',
-          });
-        });
-
-      cy.dGet('#review', {
-        timeout: 20000,
-      })
-        .should('be.enabled')
-        .click();
-      cy.url().should('include', '/creation/crowdfunding/preview');
-
-      cy.dGet('#publish').click();
-
-      cy.dGet('#see-post').click();
-      cy.url()
-        .should('include', '/p/')
-        .then((urlstring) => {
-          const chunks = urlstring.split('/');
-          crowdfundingId = chunks[chunks.length - 1];
-        });
-    }); */
-
     it('can enable bundles', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/dashboard`);
       // Waiting for an element to be attached to the DOM
@@ -324,7 +292,8 @@ context('Main flow', () => {
     });
   });
 
-  describe.only('Guest willing to contribute', () => {
+  // TODO: Add custom votes
+  describe('Guest willing to contribute', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
     const USER_CARD_EXPIRY = '1226';
@@ -418,6 +387,7 @@ context('Main flow', () => {
     });
   });
 
+  // TODO: Add custom votes
   describe('Guest willing to buy a bundle', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -538,6 +508,7 @@ context('Main flow', () => {
     });
   });
 
+  // TODO: Add custom votes
   describe('User willing to contribute', () => {
     const USER_EMAIL = `test_user_${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -635,6 +606,7 @@ context('Main flow', () => {
     });
   });
 
+  // TODO: Add custom votes
   describe('User willing to buy a bundle', () => {
     const USER_EMAIL = `test_user_${testSeed}3@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -754,6 +726,7 @@ context('Main flow', () => {
     });
   });
 
+  // TODO: Add custom votes
   describe('User willing to add card first', () => {
     const USER_EMAIL = `test_user_${testSeed}4@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -875,7 +848,7 @@ context('Main flow', () => {
     });
   });
 
-  describe.only('Creator willing to respond', () => {
+  describe('Creator willing to respond', () => {
     const defaultStorage = {
       userTutorialsProgress:
         '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
@@ -914,14 +887,8 @@ context('Main flow', () => {
     });
 
     it('[system call - end posts]', () => {
-      /* cy.request(
-        'POST',
-        `https://api-dev.newnew.co/dev/update_post_internal_fields?post_uuid=${eventShortId}`,
-        {}
-      ); */
-      cy.wait(5000);
-      cy.getCookie('accessToken');
-      cy.getCookie('refreshToken');
+      // Wait for cookies?
+      cy.wait(2000);
       cy.getCookies().then((cookies) => {
         console.log(cookies);
         const accessToken = cookies.find(
@@ -930,24 +897,40 @@ context('Main flow', () => {
         const refreshToken = cookies.find(
           (cookie) => cookie.name === 'refreshToken'
         )!.value;
-        fetchProtobufProtectedIntercepted<
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse
-        >(
+
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
           newnewapi.EmptyRequest,
           newnewapi.EmptyResponse,
           `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${eventShortId}`,
           'post',
           new newnewapi.EmptyRequest(),
-          undefined,
           {
-            accessToken,
-            refreshToken,
-          }
+            'x-auth-token': accessToken,
+            'x-from': 'web',
+          },
+          'cors',
+          'same-origin',
+          undefined
+        );
+
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+          newnewapi.EmptyRequest,
+          newnewapi.EmptyResponse,
+          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${superpollShortId}`,
+          'post',
+          new newnewapi.EmptyRequest(),
+          {
+            'x-auth-token': accessToken,
+            'x-from': 'web',
+          },
+          'cors',
+          'same-origin',
+          undefined
         );
       });
 
-      cy.wait(25000);
+      // Wait for dev BE to finish with post
+      cy.wait(30000);
     });
 
     // TODO: check more numbers
@@ -955,8 +938,8 @@ context('Main flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
-      // TODO: change to number
-      cy.dGet('#total-bids-amount').contains('$25');
+      const payedToBidTotal = payedToBid.reduce((acc, next) => acc + next);
+      cy.dGet('#total-bids-amount').contains(payedToBidTotal);
 
       cy.dGet('#select-option-0').click();
 

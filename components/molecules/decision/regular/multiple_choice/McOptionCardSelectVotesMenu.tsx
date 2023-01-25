@@ -133,6 +133,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
               </SButton>
             ))}
             <SButton
+              id='vote-option-custom'
               onClickCapture={() => {
                 Mixpanel.track('Open Custom Votes Amount', {
                   _stage: 'Post',
