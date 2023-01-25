@@ -519,14 +519,23 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                   />
                 </>
               ) : (
-                <PostResponseTabModeration
-                  postUuid={post.postUuid}
-                  postShortId={post.postShortId}
-                  postType='ac'
-                  postStatus={postStatus}
-                  postTitle={post.title}
-                  winningOptionAc={winningOption}
-                />
+                <>
+                  {!isMobileOrTablet && (
+                    <PostTopInfoModeration
+                      amountInBids={totalAmount}
+                      hasWinner={!!winningOptionId}
+                      hidden={openedTab === 'response'}
+                    />
+                  )}
+                  <PostResponseTabModeration
+                    postUuid={post.postUuid}
+                    postShortId={post.postShortId}
+                    postType='ac'
+                    postStatus={postStatus}
+                    postTitle={post.title}
+                    winningOptionAc={winningOption}
+                  />
+                </>
               )}
             </SActivitiesContainer>
             {isPopupVisible && (
@@ -642,6 +651,8 @@ const SActivitiesContainer = styled.div`
     height: 728px;
     max-height: 728px;
     width: 100%;
+
+    position: relative;
   }
 `;
 

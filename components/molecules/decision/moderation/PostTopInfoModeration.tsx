@@ -163,70 +163,72 @@ const PostTopInfoModeration: React.FunctionComponent<
     };
   }, []);
 
-  if (hidden) return null;
-
   return (
-    <SContainer>
-      <SWrapper showWinnerOption={showWinnerOption}>
-        {postType === 'ac' && amountInBids ? (
-          <SBidsAmount>
-            <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
-            {t('acPost.postTopInfo.inBids')}
-          </SBidsAmount>
+    <SContainer hiddenMargin={!!hidden}>
+      <SWrapper showWinnerOption={showWinnerOption} hiddenMargin={!!hidden}>
+        {!hidden ? (
+          <>
+            {postType === 'ac' && amountInBids ? (
+              <SBidsAmount>
+                <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
+                {t('acPost.postTopInfo.inBids')}
+              </SBidsAmount>
+            ) : null}
+            {postType === 'mc' && totalVotes ? (
+              <SBidsAmount>
+                <span>{formatNumber(totalVotes, true)}</span>{' '}
+                {totalVotes > 1
+                  ? t('mcPost.postTopInfo.votes')
+                  : t('mcPost.postTopInfo.vote')}
+              </SBidsAmount>
+            ) : null}
+            <SCreatorCard>
+              <Link href='/profile/my-posts'>
+                <a
+                  href='/profile/my-posts'
+                  onClickCapture={() => {
+                    Mixpanel.track('Click on own avatar', {
+                      _stage: 'Post',
+                      _postUuid: postUuid,
+                      _component: 'PostTopInfo',
+                    });
+                  }}
+                >
+                  <SAvatarArea>
+                    <img
+                      src={creator.avatarUrl ?? ''}
+                      alt={creator.username ?? ''}
+                    />
+                  </SAvatarArea>
+                </a>
+              </Link>
+              <Link href='/profile/my-posts'>
+                <a
+                  href='/profile/my-posts'
+                  onClickCapture={() => {
+                    Mixpanel.track('Click on own username', {
+                      _stage: 'Post',
+                      _postUuid: postUuid,
+                      _component: 'PostTopInfo',
+                    });
+                  }}
+                >
+                  <SUsername className='username'>
+                    {t('me')}
+                    {creator.options?.isVerified && (
+                      <SInlineSVG
+                        svg={VerificationCheckmark}
+                        width='16px'
+                        height='16px'
+                        fill='none'
+                      />
+                    )}
+                  </SUsername>
+                </a>
+              </Link>
+            </SCreatorCard>
+          </>
         ) : null}
-        {postType === 'mc' && totalVotes ? (
-          <SBidsAmount>
-            <span>{formatNumber(totalVotes, true)}</span>{' '}
-            {totalVotes > 1
-              ? t('mcPost.postTopInfo.votes')
-              : t('mcPost.postTopInfo.vote')}
-          </SBidsAmount>
-        ) : null}
-        <SCreatorCard>
-          <Link href='/profile/my-posts'>
-            <a
-              href='/profile/my-posts'
-              onClickCapture={() => {
-                Mixpanel.track('Click on own avatar', {
-                  _stage: 'Post',
-                  _postUuid: postUuid,
-                  _component: 'PostTopInfo',
-                });
-              }}
-            >
-              <SAvatarArea>
-                <img
-                  src={creator.avatarUrl ?? ''}
-                  alt={creator.username ?? ''}
-                />
-              </SAvatarArea>
-            </a>
-          </Link>
-          <Link href='/profile/my-posts'>
-            <a
-              href='/profile/my-posts'
-              onClickCapture={() => {
-                Mixpanel.track('Click on own username', {
-                  _stage: 'Post',
-                  _postUuid: postUuid,
-                  _component: 'PostTopInfo',
-                });
-              }}
-            >
-              <SUsername className='username'>
-                {t('me')}
-                {creator.options?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                    fill='none'
-                  />
-                )}
-              </SUsername>
-            </a>
-          </Link>
-        </SCreatorCard>
         <SActionsDiv>
           <SShareButton
             view='transparent'
@@ -300,22 +302,26 @@ const PostTopInfoModeration: React.FunctionComponent<
             />
           ) : null}
         </SActionsDiv>
-        <SPostTitle variant={5}>
-          <PostTitleContent>{title}</PostTitleContent>
-        </SPostTitle>
-        {showWinnerOption ? (
-          <SSelectWinnerOption
-            hidden={isMobile && overlayModeEnabled}
-            isScrolledDown={isScrolledDown}
-          >
-            <SHeadline variant={4}>
-              {t('acPostModeration.postTopInfo.selectWinner.title')}
-            </SHeadline>
-            <SText variant={3}>
-              {t('acPostModeration.postTopInfo.selectWinner.body')}
-            </SText>
-            <STrophyImg src={assets.decision.lightHourglassAnimated()} />
-          </SSelectWinnerOption>
+        {!hidden ? (
+          <>
+            <SPostTitle variant={5}>
+              <PostTitleContent>{title}</PostTitleContent>
+            </SPostTitle>
+            {showWinnerOption ? (
+              <SSelectWinnerOption
+                hidden={isMobile && overlayModeEnabled}
+                isScrolledDown={isScrolledDown}
+              >
+                <SHeadline variant={4}>
+                  {t('acPostModeration.postTopInfo.selectWinner.title')}
+                </SHeadline>
+                <SText variant={3}>
+                  {t('acPostModeration.postTopInfo.selectWinner.body')}
+                </SText>
+                <STrophyImg src={assets.decision.lightHourglassAnimated()} />
+              </SSelectWinnerOption>
+            ) : null}
+          </>
         ) : null}
       </SWrapper>
       {postStatus === 'failed' && (
@@ -375,14 +381,33 @@ PostTopInfoModeration.defaultProps = {
 
 export default PostTopInfoModeration;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  hiddenMargin: boolean;
+}>`
   grid-area: title;
 
-  margin-bottom: 24px;
+  margin-bottom: ${({ hiddenMargin }) => (hiddenMargin ? '0px' : '24px')};
+  ${({ hiddenMargin }) =>
+    hiddenMargin
+      ? css`
+          width: 100%;
+        `
+      : null}
+
+  ${({ theme }) => theme.media.laptop} {
+    ${({ hiddenMargin }) =>
+      hiddenMargin
+        ? css`
+            position: absolute;
+            top: -56px;
+          `
+        : null}
+  }
 `;
 
 const SWrapper = styled.div<{
   showWinnerOption: boolean;
+  hiddenMargin: boolean;
 }>`
   display: grid;
 
@@ -405,7 +430,7 @@ const SWrapper = styled.div<{
   height: fit-content;
 
   margin-top: 24px;
-  margin-bottom: 12px;
+  margin-bottom: ${({ hiddenMargin }) => (hiddenMargin ? '0px' : '12px')};
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
