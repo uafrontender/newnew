@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "title_NEED_TRANSLATION": "Unsubscribe from NewNew"
+  },
+  "success_NEED_TRANSLATION": {
+    "heading": "You have successfully unsubscribed",
+    "subheading": "Manage email notifications from your settings page."
+  },
+  "fail_NEED_TRANSLATION": {
+    "heading": "We were unable to unsubscribe you",
+    "subheading": "You can still manage email notifications from your settings page."
+  },
+  "error": {
+    "requestFailed": "La solicitud ha fallado"
+  }
+}
