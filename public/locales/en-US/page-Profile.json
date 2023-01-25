@@ -44,19 +44,27 @@
       "description": "Any creators you favorite\nwill be shown here"
     }
   },
-  "CreatorsDecisions": {
-    "noContent": {
-      "description": "Posts from the creator will be shown here"
-    }
-  },
-  "UserProfile": {
-    "noContent": {
-      "description": "{{username}} has no activity yet.",
-      "suggestion": "Explore what's new",
-      "button": "Explore"
+  "Profile": {
+    "meta": {
+      "title": "{{displayName}} - NewNew"
+    },
+    "user": {
+      "noContent": {
+        "description": "{{username}} has no activity yet.",
+        "suggestion": "Explore what's new",
+        "button": "Explore"
+      }
+    },
+    "creator": {
+      "noContent": {
+        "description": "Posts from the creator will be shown here"
+      }
     }
   },
   "Activity": {
+    "meta": {
+      "title": "{{displayName}} - NewNew"
+    },
     "noContent": {
       "description": "Any creators activity will be shown here"
     }
