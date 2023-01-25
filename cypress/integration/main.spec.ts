@@ -996,8 +996,12 @@ context('Main flow', () => {
       );
     });
 
-    /*it('can see correct earnings on dashboard', () => {
+    it('can see correct earnings on dashboard', () => {
       // TODO: Add it later
-    });*/
+      // TODO: ether need to add bank on Stripe (complicated)
+      // or make test creator account have a flag set
+      // Check earnings
+      // Check bundle earnings
+    });
   });
 });
