@@ -933,7 +933,6 @@ context('Main flow', () => {
       cy.wait(30000);
     });
 
-    // TODO: check more numbers
     it('can respond to an event', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
@@ -968,7 +967,6 @@ context('Main flow', () => {
       cy.dGet('#earned-amount').contains(calculateEarnings(winningBid.amount));
     });
 
-    // TODO: check more numbers
     it('can respond to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
