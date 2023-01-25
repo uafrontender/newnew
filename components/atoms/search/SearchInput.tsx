@@ -431,7 +431,8 @@ const SResultsDrop = styled.div`
   height: calc(100vh - 112px);
   top: 56px;
   padding: 16px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
