@@ -8,7 +8,7 @@
     "button": {
       "notifications": "Notificaciones",
       "directMessages": "Mensajes directos",
-      "markAllAsRead": "Marcar todos como leídos",
+      "markAllAsRead": "Marcar como leído",
       "minimize": "Minimizar",
       "new": "Nuevo",
       "earlier": "Anteriores"
@@ -176,7 +176,7 @@
     "newPost": "Nueva publicación"
   },
   "tabs": {
-    "chat": "Mensajes directos",
+    "chat": "Mensajes",
     "notifications": "Notificaciones"
   },
   "chat": {
