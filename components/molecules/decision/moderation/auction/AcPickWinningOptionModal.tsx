@@ -35,7 +35,11 @@ const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
             <SCancelButton view='secondary' onClick={closeModal}>
               {t('acPostModeration.optionsTab.selectWinner.button.cancel')}
             </SCancelButton>
-            <SConfirmButton view='primaryGrad' onClick={handleConfirm}>
+            <SConfirmButton
+              id='confirm-winning-bid'
+              view='primaryGrad'
+              onClick={handleConfirm}
+            >
               {t('acPostModeration.optionsTab.selectWinner.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
