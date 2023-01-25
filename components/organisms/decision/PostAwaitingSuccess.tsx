@@ -11,7 +11,6 @@ import getDisplayname from '../../../utils/getDisplayname';
 
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
-import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 import GoBackButton from '../../molecules/GoBackButton';
 
 const ReportModal = dynamic(
@@ -34,20 +33,11 @@ const PostAwaitingSuccess: React.FunctionComponent<
     postParsed,
     typeOfPost,
     postStatus,
-    isFollowingDecision,
     recommendedPosts,
     reportPostOpen,
     handleReportSubmit,
     handleReportClose,
     handleCloseAndGoBack,
-    ellipseMenuOpen,
-    shareMenuOpen,
-    handleEllipseMenuClose,
-    handleFollowDecision,
-    handleReportOpen,
-    handleShareClose,
-    handleOpenShareMenu,
-    handleOpenEllipseMenu,
   } = usePostInnerState();
 
   return (
@@ -100,24 +90,6 @@ const PostAwaitingSuccess: React.FunctionComponent<
               typeOfPost={typeOfPost}
             />
           ) : null}
-          {isMobile && (
-            <PostSuccessOrWaitingControls
-              ellipseMenuOpen={ellipseMenuOpen}
-              isFollowingDecision={isFollowingDecision}
-              isMobile={isMobile}
-              postUuid={postParsed?.postUuid ?? ''}
-              postShortId={postParsed?.postShortId ?? ''}
-              shareMenuOpen={shareMenuOpen}
-              typeOfPost={typeOfPost ?? 'ac'}
-              handleCloseAndGoBack={handleCloseAndGoBack}
-              handleEllipseMenuClose={handleEllipseMenuClose}
-              handleFollowDecision={handleFollowDecision}
-              handleReportOpen={handleReportOpen}
-              handleShareClose={handleShareClose}
-              handleOpenShareMenu={handleOpenShareMenu}
-              handleOpenEllipseMenu={handleOpenEllipseMenu}
-            />
-          )}
         </SPostContainer>
       ) : null}
       {postParsed?.creator && reportPostOpen && (

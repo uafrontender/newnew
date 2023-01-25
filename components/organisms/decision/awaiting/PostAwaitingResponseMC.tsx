@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 // Utils
 import Headline from '../../../atoms/Headline';
@@ -30,6 +31,7 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import InlineSvg from '../../../atoms/InlineSVG';
 import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
+import GoBackButton from '../../../molecules/GoBackButton';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -55,6 +57,8 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const { handleGoBackInsidePost } = usePostInnerState();
 
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -179,6 +183,11 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     return (
       <>
         <SWrapper>
+          {isMobile && (
+            <SGoBackMobileSection>
+              <SGoBackButton onClick={handleGoBackInsidePost} />
+            </SGoBackMobileSection>
+          )}
           <PostVideoSuccess
             postUuid={post.postUuid}
             announcement={post.announcement!!}
@@ -629,3 +638,17 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+// Go back mobile
+const SGoBackMobileSection = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: flex-start;
+
+  width: 100%;
+  height: 56px;
+  margin-bottom: 6px;
+`;
+
+const SGoBackButton = styled(GoBackButton)``;

@@ -26,6 +26,7 @@ import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
+import GoBackButton from '../../../molecules/GoBackButton';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -51,7 +52,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
 
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
-    const { refetchPost } = usePostInnerState();
+    const { refetchPost, handleGoBackInsidePost } = usePostInnerState();
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -148,6 +149,11 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     return (
       <>
         <SWrapper>
+          {isMobile && (
+            <SGoBackMobileSection>
+              <SGoBackButton onClick={handleGoBackInsidePost} />
+            </SGoBackMobileSection>
+          )}
           <PostVideoSuccess
             postUuid={post.postUuid}
             announcement={post.announcement!!}
@@ -703,3 +709,16 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+// Go back mobile
+const SGoBackMobileSection = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: flex-start;
+
+  width: 100%;
+  height: 56px;
+`;
+
+const SGoBackButton = styled(GoBackButton)``;

@@ -12,12 +12,15 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { formatNumber } from '../../../../utils/format';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import getDisplayname from '../../../../utils/getDisplayname';
+
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
-import getDisplayname from '../../../../utils/getDisplayname';
+import GoBackButton from '../../../molecules/GoBackButton';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -40,7 +43,12 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+
+    const { handleGoBackInsidePost } = usePostInnerState();
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -128,6 +136,11 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     return (
       <>
         <SWrapper>
+          {isMobile && (
+            <SGoBackMobileSection>
+              <SGoBackButton onClick={handleGoBackInsidePost} />
+            </SGoBackMobileSection>
+          )}
           <PostVideoSuccess
             postUuid={post.postUuid}
             announcement={post.announcement!!}
@@ -386,3 +399,16 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+// Go back mobile
+const SGoBackMobileSection = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: flex-start;
+
+  width: 100%;
+  height: 56px;
+`;
+
+const SGoBackButton = styled(GoBackButton)``;
