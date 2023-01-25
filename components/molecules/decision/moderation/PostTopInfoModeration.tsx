@@ -170,7 +170,9 @@ const PostTopInfoModeration: React.FunctionComponent<
           <>
             {postType === 'ac' && amountInBids ? (
               <SBidsAmount>
-                <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
+                <span id='total-bids-amount'>
+                  ${formatNumber(amountInBids / 100 ?? 0, true)}
+                </span>{' '}
                 {t('acPost.postTopInfo.inBids')}
               </SBidsAmount>
             ) : null}

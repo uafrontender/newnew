@@ -215,6 +215,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           </SShareButton>
         ) : readyToUploadAdditionalResponse ? (
           <SUploadButton
+            id='upload-button'
             className='uploadButton'
             disabled={!responseReadyToBeUploaded}
             loading={additionalResponseUploading}
@@ -268,6 +269,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         </SHeadline>
       </STextContentWrapper>
       <SUploadButton
+        id='upload-button'
         disabled={coreResponseUploading || !responseReadyToBeUploaded}
         onClick={handleUploadVideoProcessed}
       >

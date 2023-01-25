@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface IText {
+  id?: string;
   weight?: 500 | 600 | 700;
   variant?: 1 | 2 | 3 | 4 | 5 | 'subtitle';
   onClick?: (e: any) => void;
