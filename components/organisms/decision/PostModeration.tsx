@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -58,20 +57,6 @@ const PostModeration: React.FunctionComponent<IPostModeration> = () => {
 
   return (
     <>
-      {typeOfPost ? (
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-      ) : null}
       {!isMobile && (
         <SGoBackButtonContainer>
           <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>

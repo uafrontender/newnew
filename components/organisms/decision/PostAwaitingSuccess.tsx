@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -52,20 +51,6 @@ const PostAwaitingSuccess: React.FunctionComponent<
 
   return (
     <>
-      {typeOfPost ? (
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-      ) : null}
       {!isMobile && (
         <SGoBackButtonContainer>
           <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
