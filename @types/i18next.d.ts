@@ -18,6 +18,7 @@ import type pageProfile from '../public/locales/en-US/page-Profile.json';
 import type pageSearch from '../public/locales/en-US/page-Search.json';
 import type pageSeeMore from '../public/locales/en-US/page-SeeMore.json';
 import type pageSignUp from '../public/locales/en-US/page-SignUp.json';
+import type pageUnsubscribe from '../public/locales/en-US/page-Unsubscribe.json'
 import type pageVerifyEmail from '../public/locales/en-US/page-VerifyEmail.json';
 
 export interface I18nNamespaces {
@@ -40,6 +41,7 @@ export interface I18nNamespaces {
   'page-Search': typeof pageSearch,
   'page-SeeMore': typeof pageSeeMore,
   'page-SignUp': typeof pageSignUp,
+  'page-Unsubscribe': typeof pageUnsubscribe,
   'page-VerifyEmail': typeof pageVerifyEmail,
 }
 
