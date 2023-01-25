@@ -5,7 +5,7 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
-import { setPrimaryCard, deleteCard } from '../../../api/endpoints/card';
+import { deleteCard } from '../../../api/endpoints/card';
 
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -16,6 +16,7 @@ import CardEllipseModal from './CardEllipseModal';
 
 // Icons
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import { useCards } from '../../../contexts/cardsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const getCardBrandName = (cardBrand: newnewapi.Card.CardBrand) => {
@@ -62,7 +63,6 @@ interface ICard {
   backgroundImg: string;
   cardId: string;
   disabledForActions: boolean;
-  onChangePrimaryCard: (cardUuid: string) => void;
   onCardDelete: () => void;
 }
 
@@ -74,7 +74,6 @@ const Card: React.FunctionComponent<ICard> = ({
   cardId,
   disabledForActions,
   backgroundImg,
-  onChangePrimaryCard,
   onCardDelete,
 }) => {
   const { t } = useTranslation('page-Profile');
@@ -90,27 +89,14 @@ const Card: React.FunctionComponent<ICard> = ({
 
   const moreButtonRef = useRef<HTMLButtonElement>();
 
+  const { setPrimaryCardMutation } = useCards();
+
   const handelSetPrimaryCard = async () => {
-    try {
-      Mixpanel.track('Set Primary Card', {
-        _stage: 'Settings',
-        _cardUuid: cardId,
-      });
-
-      const payload = new newnewapi.SetPrimaryCardRequest({
-        cardUuid: cardId,
-      });
-      const response = await setPrimaryCard(payload);
-
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'An error occurred');
-      }
-
-      onChangePrimaryCard(cardId);
-    } catch (err: any) {
-      console.error(err);
-      showErrorToastCustom(err.message);
-    }
+    Mixpanel.track('Set Primary Card', {
+      _stage: 'Settings',
+      _cardUuid: cardId,
+    });
+    setPrimaryCardMutation?.mutate(cardId);
   };
 
   const handleDeleteCard = async () => {

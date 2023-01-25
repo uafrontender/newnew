@@ -23,7 +23,7 @@ interface ISettingsCards {}
 const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
-  const { cards, isCardsLoading, handleSetCards, fetchCards } = useCards();
+  const { cards, isCardsLoading, fetchCards } = useCards();
   const user = useAppSelector((state) => state.user);
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
@@ -38,28 +38,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   useEffect(() => {
     fetchCards();
   }, [fetchCards]);
-
-  const changePrimaryCard = (cardUuid: string) => {
-    if (cards) {
-      let newCardsList = cards;
-      const newPrimaryCard = cards.find(
-        (cardEl) => cardEl.cardUuid === cardUuid
-      );
-
-      newCardsList = cards.map((cardEl) => {
-        if (cardEl.cardUuid === newPrimaryCard?.cardUuid) {
-          return { ...cardEl, isPrimary: true };
-        }
-
-        return {
-          ...cardEl,
-          isPrimary: false,
-        };
-      }) as newnewapi.Card[];
-
-      handleSetCards(newCardsList);
-    }
-  };
 
   const cardsWithFirstPrimary = useMemo(
     () =>
@@ -186,7 +164,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                         ]
                   }
                   disabledForActions={!!user.userData?.options?.isWhiteListed}
-                  onChangePrimaryCard={changePrimaryCard}
                   onCardDelete={fetchCards}
                 />
               </SCardListItem>
