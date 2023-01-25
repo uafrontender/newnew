@@ -21,6 +21,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import GoBackButton from '../../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -152,6 +153,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
+          {isMobile ? <PostSuccessOrWaitingControls /> : null}
           <SActivitiesContainer>
             <WaitingForResponseBox
               title={t('acPostAwaiting.hero.title')}

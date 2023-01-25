@@ -32,6 +32,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -199,6 +200,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
+          {isMobile ? <PostSuccessOrWaitingControls /> : null}
           <SActivitiesContainer
             dimmedBackground={openedMainSection === 'main'}
             ref={activitiesContainerRef}

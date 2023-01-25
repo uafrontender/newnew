@@ -27,6 +27,7 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -170,6 +171,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
+          {isMobile ? <PostSuccessOrWaitingControls /> : null}
           <SActivitiesContainer
             dimmedBackground={openedMainSection === 'main'}
             ref={activitiesContainerRef}

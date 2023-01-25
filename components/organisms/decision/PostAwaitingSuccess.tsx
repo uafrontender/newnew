@@ -12,6 +12,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
 import GoBackButton from '../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -63,6 +64,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
           </SGoBackButton>
         </SGoBackButtonContainer>
       )}
+      {!isMobile ? <PostSuccessOrWaitingControls /> : null}
       {postParsed && typeOfPost ? (
         <SPostContainer
           id='post-container'
