@@ -83,9 +83,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
   return (
     <>
       <Head>
-        <title>{getDisplayname(user)}</title>
+        <title>
+          {t('Profile.meta.title', { displayName: getDisplayname(user) })}
+        </title>
         <meta name='description' content={user.bio || ''} />
-        <meta property='og:title' content={getDisplayname(user)} />
+        <meta
+          property='og:title'
+          content={t('Profile.meta.title', {
+            displayName: getDisplayname(user),
+          })}
+        />
         <meta property='og:description' content={user.bio || ''} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -127,7 +134,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
                 !isLoading && (
                   <NoContentCard>
                     <NoContentDescription>
-                      {t('CreatorsDecisions.noContent.description')}
+                      {t('Profile.creator.noContent.description')}
                     </NoContentDescription>
                   </NoContentCard>
                 )}
@@ -138,16 +145,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
                 !isLoading && (
                   <NoContentCard>
                     <NoContentDescription>
-                      {t('UserProfile.noContent.description', {
+                      {t('Profile.user.noContent.description', {
                         username: getDisplayname(user),
                       })}
                     </NoContentDescription>
                     <NoContentSuggestion>
-                      {t('UserProfile.noContent.suggestion')}
+                      {t('Profile.user.noContent.suggestion')}
                     </NoContentSuggestion>
                     <Link href='/'>
                       <SButton view='primaryGrad'>
-                        {t('UserProfile.noContent.button')}
+                        {t('Profile.user.noContent.button')}
                       </SButton>
                     </Link>
                   </NoContentCard>
