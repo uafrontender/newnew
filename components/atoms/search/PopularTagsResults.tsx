@@ -23,27 +23,25 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
           key={hashtag.text}
         >
           <a>
-            <SPost
+            <STag
               onClick={() => {
                 Mixpanel.track('Search Result Tag Clicked', {
                   _tagText: hashtag.text,
                 });
               }}
             >
-              <SLeftSide>
-                <SHashtagIcon>
-                  <InlineSvg
-                    svg={hashtagIcon}
-                    fill='#FFFFFF'
-                    width='20px'
-                    height='20px'
-                  />
-                </SHashtagIcon>
-                <STagData>
-                  <SCreatorUsername>#{hashtag.text}</SCreatorUsername>
-                </STagData>
-              </SLeftSide>
-            </SPost>
+              <SHashtagIcon>
+                <InlineSvg
+                  svg={hashtagIcon}
+                  fill='#FFFFFF'
+                  width='20px'
+                  height='20px'
+                />
+              </SHashtagIcon>
+              <STagData>
+                <STagText>#{hashtag.text}</STagText>
+              </STagData>
+            </STag>
           </a>
         </Link>
       ))}
@@ -66,7 +64,7 @@ const SBlockTitle = styled.strong`
   margin-bottom: 16px;
 `;
 
-const SPost = styled.div`
+const STag = styled.div`
   /* margin-bottom: 16px; */
   display: flex;
   font-size: 14px;
@@ -80,14 +78,11 @@ const SPost = styled.div`
   }
 `;
 
-const SLeftSide = styled.div`
-  display: flex;
-`;
-
 const STagData = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
 `;
 
 const SHashtagIcon = styled.div`
@@ -104,6 +99,8 @@ const SHashtagIcon = styled.div`
     props.theme.colorsThemed.button.background.quaternary};
 `;
 
-const SCreatorUsername = styled.span`
+const STagText = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
