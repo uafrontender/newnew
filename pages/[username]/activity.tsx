@@ -150,22 +150,53 @@ export default UserPageActivity;
 export const getServerSideProps: GetServerSideProps<
   Partial<IUserPageActivity>
 > = async (context) => {
-  const { username } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    [
-      'common',
-      'page-Profile',
-      'component-PostCard',
-      'page-Post',
-      'modal-PaymentModal',
-      'modal-ResponseSuccessModal',
-    ],
-    null,
-    SUPPORTED_LANGUAGES
-  );
+  try {
+    const { username } = context.query;
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Profile',
+        'component-PostCard',
+        'page-Post',
+        'modal-PaymentModal',
+        'modal-ResponseSuccessModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
+    );
 
-  if (!username || Array.isArray(username)) {
+    if (!username || Array.isArray(username)) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+
+    const getUserRequestPayload = new newnewapi.GetUserRequest({
+      username,
+    });
+
+    const res = await getUserByUsername(getUserRequestPayload);
+
+    if (!res.data || res.error) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: {
+        user: res.data.toJSON(),
+        ...translationContext,
+      },
+    };
+  } catch (err) {
     return {
       redirect: {
         destination: '/',
@@ -173,28 +204,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   }
-
-  const getUserRequestPayload = new newnewapi.GetUserRequest({
-    username,
-  });
-
-  const res = await getUserByUsername(getUserRequestPayload);
-
-  if (!res.data || res.error) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      user: res.data.toJSON(),
-      ...translationContext,
-    },
-  };
 };
 
 const SMain = styled.main`

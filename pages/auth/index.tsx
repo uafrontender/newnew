@@ -213,41 +213,57 @@ export default AuthRedirectPage;
 export const getServerSideProps: GetServerSideProps<IAuthRedirectPage> = async (
   context
 ) => {
-  const { provider } = context.query;
+  try {
+    const { provider } = context.query;
 
-  const { req } = context;
+    const { req } = context;
 
-  let body: any;
-  let bodyStringified: string;
-  let bodyParsed: TAppleResponseBody;
-  let idTokenDecoded: any;
+    let body: any;
+    let bodyStringified: string;
+    let bodyParsed: TAppleResponseBody;
+    let idTokenDecoded: any;
 
-  if (req.method === 'POST' && provider && provider === 'apple') {
-    body = await getRawBody(req, {
-      encoding: 'utf-8',
-    });
+    if (req.method === 'POST' && provider && provider === 'apple') {
+      body = await getRawBody(req, {
+        encoding: 'utf-8',
+      });
 
-    if (body) {
-      body = qs.parse(body);
-      if (body.user) {
-        body.user = JSON.parse(body.user);
-      }
+      if (body) {
+        body = qs.parse(body);
+        if (body.user) {
+          body.user = JSON.parse(body.user);
+        }
 
-      bodyStringified = JSON.stringify(body);
-      bodyParsed = JSON.parse(bodyStringified);
-      idTokenDecoded = jsonwebtoken.decode(bodyParsed.id_token);
-      if (idTokenDecoded && idTokenDecoded.sub) {
-        bodyParsed.sub = idTokenDecoded.sub;
+        bodyStringified = JSON.stringify(body);
+        bodyParsed = JSON.parse(bodyStringified);
+        idTokenDecoded = jsonwebtoken.decode(bodyParsed.id_token);
+        if (idTokenDecoded && idTokenDecoded.sub) {
+          bodyParsed.sub = idTokenDecoded.sub;
+        }
       }
     }
-  }
 
-  if (
-    !provider ||
-    Array.isArray(provider) ||
-    SUPPORTED_AUTH_PROVIDERS.indexOf(provider as string) === -1 ||
-    (provider === 'apple' && (!bodyParsed!! || !bodyParsed.sub))
-  ) {
+    if (
+      !provider ||
+      Array.isArray(provider) ||
+      SUPPORTED_AUTH_PROVIDERS.indexOf(provider as string) === -1 ||
+      (provider === 'apple' && (!bodyParsed!! || !bodyParsed.sub))
+    ) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: {
+        provider,
+        ...(bodyParsed! ? { body: bodyParsed } : {}),
+      },
+    };
+  } catch (err) {
     return {
       redirect: {
         destination: '/',
@@ -255,11 +271,4 @@ export const getServerSideProps: GetServerSideProps<IAuthRedirectPage> = async (
       },
     };
   }
-
-  return {
-    props: {
-      provider,
-      ...(bodyParsed! ? { body: bodyParsed } : {}),
-    },
-  };
 };
