@@ -6,6 +6,8 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { GetServerSideProps } from 'next';
+import { useUpdateEffect } from 'react-use';
+import { useRouter } from 'next/router';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
@@ -22,10 +24,17 @@ const DashboardSectionStripe = dynamic(
 );
 
 const GetPaid = () => {
+  const router = useRouter();
   const { t } = useTranslation('page-Creator');
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+
+  useUpdateEffect(() => {
+    if (!user?.userData?.options?.isCreator) {
+      router.replace('/');
+    }
+  }, [user?.userData?.options?.isCreator]);
 
   useEffect(() => {
     async function fetchOnboardingState() {
