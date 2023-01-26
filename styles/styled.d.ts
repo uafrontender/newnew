@@ -150,6 +150,9 @@ declare module 'styled-components' {
           danger: string;
           common: string;
         };
+        hoverShadow: {
+          danger: string;
+        };
         active: {
           primary: string;
           primaryGrad: string;

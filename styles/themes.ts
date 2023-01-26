@@ -165,6 +165,9 @@ export const lightTheme: DefaultTheme = {
         danger: '#F12C46',
         common: '#000000',
       },
+      hoverShadow: {
+        danger: '0px 15px 35px -10px rgba(255, 29, 106, 0.6)',
+      },
       active: {
         primary: '#0950DA',
         primaryGrad: '#0950DA',
@@ -404,6 +407,9 @@ export const darkTheme: DefaultTheme = {
         changeLanguage: '#1E1F29',
         danger: '#F12C46',
         common: '#000000',
+      },
+      hoverShadow: {
+        danger: '0px 15px 35px -10px rgba(255, 29, 106, 0.6)',
       },
       active: {
         primary: '#0950DA',

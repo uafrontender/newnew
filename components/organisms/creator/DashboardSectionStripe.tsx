@@ -129,6 +129,7 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
         <SButton
           view={stripeNeedAttention ? 'danger' : 'primaryGrad'}
           isConnectedToStripe={isConnectedToStripe || stripeProcessing}
+          stripeNeedAttention={stripeNeedAttention}
           style={{
             ...(isConnectedToStripe
               ? {
@@ -290,6 +291,7 @@ const SButtons = styled.div`
 
 const SButton = styled(Button)<{
   isConnectedToStripe?: boolean;
+  stripeNeedAttention?: boolean;
 }>`
   margin-bottom: 24px;
   font-size: 16px;
@@ -303,6 +305,17 @@ const SButton = styled(Button)<{
       margin-left: 10px;
     }
   }
+
+  ${({ stripeNeedAttention }) =>
+    stripeNeedAttention
+      ? css`
+          &&& {
+            &:hover {
+              box-shadow: none;
+            }
+          }
+        `
+      : ''};
 
   ${({ isConnectedToStripe }) =>
     isConnectedToStripe
