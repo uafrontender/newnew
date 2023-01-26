@@ -44,19 +44,27 @@
       "description": "所有你喜歡的創作者\n都在這裡顯示"
     }
   },
-  "CreatorsDecisions": {
-    "noContent": {
-      "description": "創作者的帖子會在這裡顯示"
-    }
-  },
-  "UserProfile": {
-    "noContent": {
-      "description": "{{username}} 還沒有活動。",
-      "suggestion": "探索新的內容",
-      "button": "探索"
+  "Profile": {
+    "meta": {
+      "title": "{{displayName}} - NewNew"
+    },
+    "user": {
+      "noContent": {
+        "description": "{{username}} 還沒有活動。",
+        "suggestion": "探索新的內容",
+        "button": "探索"
+      }
+    },
+    "creator": {
+      "noContent": {
+        "description": "創作者的帖子會在這裡顯示"
+      }
     }
   },
   "Activity": {
+    "meta": {
+      "title": "{{displayName}} - NewNew"
+    },
     "noContent": {
       "description": "創作者的所有活動都將在這裡顯示"
     }

@@ -127,13 +127,13 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 
 export default McSuccessOptionsTab;
 
-const SGoBackButton = styled(GoBackButton)`
+const SGoBackButton = styled(GoBackButton)``;
+
+const SWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
+    padding: 16px;
   }
 `;
-
-const SWrapper = styled.div``;
 
 const SSeparator = styled.div`
   margin: 16px auto;

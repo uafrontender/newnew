@@ -189,7 +189,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         if (res.error) throw new Error('Failed to delete video');
 
         setAdditionalResponses((curr) => {
-          const workingArray = curr.filter((video) => video.uuid !== videoUuid);
+          const workingArray = curr.filter(
+            (video) => video?.uuid !== videoUuid
+          );
           return workingArray;
         });
       } catch (err) {

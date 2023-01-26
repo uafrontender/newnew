@@ -6,7 +6,13 @@ import React, {
   useCallback,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import { Player, PlayerConfig, PlayerEvent } from 'bitmovin-player';
+import {
+  Player,
+  PlayerConfig,
+  PlayerEvent,
+  PlayerType,
+  StreamType,
+} from 'bitmovin-player';
 
 import Button from './Button';
 import InlineSVG from './InlineSVG';
@@ -54,6 +60,9 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
       playback: {
         autoplay: true,
+        preferredTech: [
+          { player: PlayerType.Html5, streaming: StreamType.Hls },
+        ],
       },
     }),
     []

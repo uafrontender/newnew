@@ -45,7 +45,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
     if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
         setSeconds(() => (timestampSeconds - Date.now()) / 1000);
-      }, 1000);
+      }, 300);
     }
     return () => clearInterval(interval.current);
   }, [isPageVisible, timestampSeconds]);

@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 // Utils
 import Headline from '../../../atoms/Headline';
@@ -29,6 +30,11 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
+import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
+import GoBackButton from '../../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
+import isBrowser from '../../../../utils/isBrowser';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -50,18 +56,28 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
 
+    const { handleGoBackInsidePost } = usePostInnerState();
+
+    const isPageVisible = usePageVisibility();
+
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
+    // Timer
+    const interval = useRef<number>();
+    const parsedResponseDeadline = useMemo(
+      () => (post.responseUploadDeadline?.seconds as number) * 1000,
+      [post.responseUploadDeadline?.seconds]
+    );
+    const [parsedTimeToDeadline, setParsedTimeToDeadliine] = useState(
+      (parsedResponseDeadline - Date.now()) / 1000
+    );
     const waitingTime = useMemo(() => {
-      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-      const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed);
+      const dhms = secondsToDHMS(parsedTimeToDeadline);
 
       let countdownsrt = `${dhms.days} ${t(
         dhms.days === '1'
@@ -106,7 +122,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       }
       countdownsrt = `${countdownsrt} `;
       return countdownsrt;
-    }, [post.responseUploadDeadline?.seconds, t]);
+    }, [parsedTimeToDeadline, t]);
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -131,6 +147,18 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const [openedMainSection, setOpenedMainSection] = useState<
       'main' | 'options'
     >('main');
+
+    // Update timer
+    useEffect(() => {
+      if (isBrowser() && isPageVisible) {
+        interval.current = window.setInterval(() => {
+          setParsedTimeToDeadliine(
+            () => (parsedResponseDeadline - Date.now()) / 1000
+          );
+        }, 300);
+      }
+      return () => clearInterval(interval.current);
+    }, [isPageVisible, parsedResponseDeadline]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -179,6 +207,11 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     return (
       <>
         <SWrapper>
+          {isMobile && (
+            <SGoBackMobileSection>
+              <SGoBackButton onClick={handleGoBackInsidePost} />
+            </SGoBackMobileSection>
+          )}
           <PostVideoSuccess
             postUuid={post.postUuid}
             announcement={post.announcement!!}
@@ -190,6 +223,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
+          {isMobile ? <PostSuccessOrWaitingControls /> : null}
           <SActivitiesContainer
             dimmedBackground={openedMainSection === 'main'}
             ref={activitiesContainerRef}
@@ -254,62 +288,11 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                   <SSeparator />
                   {winningOption ? (
                     <>
-                      <SWinningBidCreator>
-                        <SCreator>
-                          <Link
-                            href={`/${
-                              winningOption.creator?.uuid !== post.creator?.uuid
-                                ? winningOption.creator?.username!!
-                                : winningOption.firstVoter?.username!!
-                            }`}
-                          >
-                            <SCreatorImage
-                              src={
-                                winningOption.creator?.uuid !==
-                                post.creator?.uuid
-                                  ? winningOption.creator?.avatarUrl!!
-                                  : winningOption.firstVoter?.avatarUrl!!
-                              }
-                            />
-                          </Link>
-                          <SWinningBidCreatorText>
-                            <SSpan>
-                              <Link
-                                href={`/${
-                                  winningOption.creator?.uuid !==
-                                  post.creator?.uuid
-                                    ? winningOption.creator?.username!!
-                                    : winningOption.firstVoter?.username!!
-                                }`}
-                              >
-                                {winningOption.creator?.uuid ===
-                                  user.userData?.userUuid ||
-                                winningOption.isSupportedByMe
-                                  ? winningOption.supporterCount > 1
-                                    ? t('me')
-                                    : t('I')
-                                  : getDisplayname(
-                                      winningOption.creator?.uuid !==
-                                        post.creator?.uuid
-                                        ? winningOption.creator!!
-                                        : winningOption.firstVoter!!
-                                    )}
-                              </Link>
-                            </SSpan>
-                            {winningOption.supporterCount > 1 ? (
-                              <>
-                                {' & '}
-                                {formatNumber(
-                                  winningOption.supporterCount,
-                                  true
-                                )}{' '}
-                                {t('mcPostSuccess.others')}
-                              </>
-                            ) : null}{' '}
-                            {t('mcPostSuccess.voted')}
-                          </SWinningBidCreatorText>
-                        </SCreator>
-                      </SWinningBidCreator>
+                      <WinningOptionCreator
+                        type='mc'
+                        postCreator={post.creator!!}
+                        winningOptionMc={winningOption}
+                      />
                       <SWinningOptionAmount variant={4}>
                         {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
                         {winningOption.voteCount > 1
@@ -574,40 +557,6 @@ const SPostTitle = styled(Headline)`
   }
 `;
 
-// Winning option info
-const SWinningBidCreator = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-
-  margin-top: 32px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
-
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`;
-
-const SWinningBidCreatorText = styled.span`
-  position: relative;
-  top: -6px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-
-  ${({ theme }) => theme.media.laptop} {
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -715,15 +664,16 @@ const SCommentsHeadline = styled(Headline)`
 
 const SCommentsSection = styled.div``;
 
-const SSpan = styled.span`
-  a {
-    cursor: pointer;
+// Go back mobile
+const SGoBackMobileSection = styled.div`
+  position: relative;
 
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  display: flex;
+  justify-content: flex-start;
 
-    &:hover {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
+  width: 100%;
+  height: 56px;
+  margin-bottom: 6px;
 `;
+
+const SGoBackButton = styled(GoBackButton)``;

@@ -109,7 +109,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       >
         {videos.map((video, i) => (
           <PostVideoStoryItem
-            key={video.uuid ?? i}
+            key={video?.uuid ?? i}
             video={video}
             index={i}
             isVisible={currentVideo === i}

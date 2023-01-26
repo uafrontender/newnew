@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useUpdateEffect } from 'react-use';
+import { useRouter } from 'next/router';
 
 import General from '../../components/templates/General';
 import Content from '../../components/organisms/creator/DashboardBundles';
@@ -11,9 +13,18 @@ import Content from '../../components/organisms/creator/DashboardBundles';
 import { NextPageWithLayout } from '../_app';
 import assets from '../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import { useAppSelector } from '../../redux-store/store';
 
 export const Bundles = () => {
+  const router = useRouter();
   const { t } = useTranslation('page-Creator');
+  const { userData } = useAppSelector((state) => state.user);
+
+  useUpdateEffect(() => {
+    if (!userData?.options?.isCreator) {
+      router.replace('/');
+    }
+  }, [userData?.options?.isCreator]);
 
   return (
     <>
