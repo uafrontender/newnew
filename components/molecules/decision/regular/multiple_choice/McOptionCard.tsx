@@ -334,8 +334,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     return price;
   }, [appConstants, customSupportVotesAmount]);
 
-  console.log(appConstants);
-
   const customPaymentFeeInCents = useMemo(
     () =>
       getCustomerPaymentFee(
