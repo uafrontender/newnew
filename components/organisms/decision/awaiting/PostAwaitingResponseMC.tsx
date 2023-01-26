@@ -33,6 +33,8 @@ import McWaitingOptionsSection from '../../../molecules/decision/waiting/multipl
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
+import isBrowser from '../../../../utils/isBrowser';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -61,12 +63,21 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
 
     const { handleGoBackInsidePost } = usePostInnerState();
 
+    const isPageVisible = usePageVisibility();
+
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
+    // Timer
+    const interval = useRef<number>();
+    const parsedResponseDeadline = useMemo(
+      () => (post.responseUploadDeadline?.seconds as number) * 1000,
+      [post.responseUploadDeadline?.seconds]
+    );
+    const [parsedTimeToDeadline, setParsedTimeToDeadliine] = useState(
+      (parsedResponseDeadline - Date.now()) / 1000
+    );
     const waitingTime = useMemo(() => {
-      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-      const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed);
+      const dhms = secondsToDHMS(parsedTimeToDeadline);
 
       let countdownsrt = `${dhms.days} ${t(
         dhms.days === '1'
@@ -111,7 +122,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       }
       countdownsrt = `${countdownsrt} `;
       return countdownsrt;
-    }, [post.responseUploadDeadline?.seconds, t]);
+    }, [parsedTimeToDeadline, t]);
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -136,6 +147,18 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const [openedMainSection, setOpenedMainSection] = useState<
       'main' | 'options'
     >('main');
+
+    // Update timer
+    useEffect(() => {
+      if (isBrowser() && isPageVisible) {
+        interval.current = window.setInterval(() => {
+          setParsedTimeToDeadliine(
+            () => (parsedResponseDeadline - Date.now()) / 1000
+          );
+        }, 300);
+      }
+      return () => clearInterval(interval.current);
+    }, [isPageVisible, parsedResponseDeadline]);
 
     // Scroll to comments if hash is present
     useEffect(() => {

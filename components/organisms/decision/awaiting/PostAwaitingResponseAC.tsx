@@ -1,7 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -22,6 +28,8 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import InlineSvg from '../../../atoms/InlineSVG';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -51,10 +59,20 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
 
     const { handleGoBackInsidePost } = usePostInnerState();
 
+    const isPageVisible = usePageVisibility();
+
+    // Timer
+    const interval = useRef<number>();
+    const parsedResponseDeadline = useMemo(
+      () => (post.responseUploadDeadline?.seconds as number) * 1000,
+      [post.responseUploadDeadline?.seconds]
+    );
+    const [parsedTimeToDeadline, setParsedTimeToDeadliine] = useState(
+      (parsedResponseDeadline - Date.now()) / 1000
+    );
+
     const waitingTime = useMemo(() => {
-      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-      const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed);
+      const dhms = secondsToDHMS(parsedTimeToDeadline);
 
       let countdownsrt = `${dhms.days} ${t(
         dhms.days === '1'
@@ -99,7 +117,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       }
       countdownsrt = `${countdownsrt} `;
       return countdownsrt;
-    }, [post.responseUploadDeadline?.seconds, t]);
+    }, [parsedTimeToDeadline, t]);
 
     // Video
     // Open video tab
@@ -114,6 +132,18 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
+
+    // Update timer
+    useEffect(() => {
+      if (isBrowser() && isPageVisible) {
+        interval.current = window.setInterval(() => {
+          setParsedTimeToDeadliine(
+            () => (parsedResponseDeadline - Date.now()) / 1000
+          );
+        }, 300);
+      }
+      return () => clearInterval(interval.current);
+    }, [isPageVisible, parsedResponseDeadline]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
