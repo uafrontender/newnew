@@ -95,6 +95,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
+  const [isSubmitNewThumbnailLoading, setIsSubmitNewThumbnailLoading] =
+    useState(false);
+
   const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
 
   const handleCloseEllipseMenu = useCallback(
@@ -149,6 +152,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   );
 
   const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
+    setIsSubmitNewThumbnailLoading(true);
     try {
       Mixpanel.track('Submit New Thumbnail', {
         _stage: 'Post',
@@ -176,6 +180,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     } catch (err) {
       console.error(err);
       showErrorToastCustom(t('postVideoThumbnailEdit.toast.error'));
+    } finally {
+      setIsSubmitNewThumbnailLoading(false);
     }
   };
 
@@ -378,6 +384,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         open={showThumbnailEdit}
         value={announcement}
         thumbnails={thumbnails}
+        isLoading={isSubmitNewThumbnailLoading}
         handleClose={handleCloseThumbnailEditClick}
         handleSubmit={handleSubmitNewThumbnail}
       />
