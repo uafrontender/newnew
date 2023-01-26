@@ -191,7 +191,7 @@ export const getServerSideProps: GetServerSideProps<
     if (!res.data || res.error) {
       return {
         redirect: {
-          destination: '/',
+          destination: '/404',
           permanent: false,
         },
       };
@@ -206,7 +206,7 @@ export const getServerSideProps: GetServerSideProps<
   } catch (err) {
     return {
       redirect: {
-        destination: '/',
+        destination: '/404',
         permanent: false,
       },
     };
