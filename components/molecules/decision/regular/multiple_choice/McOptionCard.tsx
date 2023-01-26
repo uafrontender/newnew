@@ -229,13 +229,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [customSupportVotesAmount, setCustomSupportVotesAmount] = useState('');
   const minCustomVotesAmount = useMemo(
     () =>
-      appConstants.mcVoteOffers &&
-      !!appConstants.mcVoteOffers?.length &&
-      appConstants.mcVoteOffers.length > 0
+      appConstants?.mcVoteOffers &&
+      !!appConstants?.mcVoteOffers?.length &&
+      appConstants?.mcVoteOffers?.length > 2
         ? appConstants.mcVoteOffers[appConstants.mcVoteOffers.length - 1]
             .amountOfVotes!! + 1
         : 2000,
-    [appConstants.mcVoteOffers]
+    [appConstants?.mcVoteOffers]
   );
 
   const handleOpenSupportForm = () => {
@@ -290,9 +290,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     () =>
       getCustomerPaymentFee(
         paymentAmountInCents,
-        parseFloat(appConstants.customerFee)
+        parseFloat(appConstants?.customerFee || '0.0225')
       ),
-    [paymentAmountInCents, appConstants.customerFee]
+    [paymentAmountInCents, appConstants?.customerFee]
   );
 
   const paymentWithFeeInCents = useMemo(
@@ -310,7 +310,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     if (
       !biggestGroup ||
       !biggestGroup?.price?.usdCents ||
-      !biggestGroup?.amountOfVotes
+      !biggestGroup?.amountOfVotes ||
+      !appConstants?.mcVotePrice
     )
       return 0;
 
@@ -337,9 +338,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     () =>
       getCustomerPaymentFee(
         customPaymentAmountInCents,
-        parseFloat(appConstants.customerFee)
+        parseFloat(appConstants?.customerFee || '0.0225')
       ),
-    [customPaymentAmountInCents, appConstants.customerFee]
+    [customPaymentAmountInCents, appConstants?.customerFee]
   );
 
   const customPaymentWithFeeInCents = useMemo(
@@ -756,11 +757,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handlePayWithCard={handlePayWithCard}
             redirectUrl={`p/${postShortId || postUuid}`}
             bottomCaption={
-              (!appConstants.minHoldAmount?.usdCents ||
-                paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents ||
+              (!appConstants?.minHoldAmount?.usdCents ||
+                paymentWithFeeInCents > appConstants?.minHoldAmount?.usdCents ||
                 (customPaymentWithFeeInCents &&
                   customPaymentWithFeeInCents >
-                    appConstants.minHoldAmount?.usdCents)) && (
+                    appConstants?.minHoldAmount?.usdCents)) && (
                 <SPaymentSign variant='subtitle'>
                   {t('mcPost.paymentModalFooter.body', {
                     creator: postCreatorName,
@@ -813,7 +814,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         <McOptionCardSelectVotesModal
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
-          availableVotes={appConstants.mcVoteOffers as newnewapi.McVoteOffer[]}
+          availableVotes={
+            appConstants?.mcVoteOffers
+              ? (appConstants?.mcVoteOffers as newnewapi.McVoteOffer[])
+              : []
+          }
           handleClose={() => {
             handleCloseSupportForm();
           }}
@@ -863,7 +868,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           top={selectVotesMenuTop}
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
-          availableVotes={appConstants.mcVoteOffers as newnewapi.McVoteOffer[]}
+          availableVotes={
+            appConstants?.mcVoteOffers
+              ? (appConstants?.mcVoteOffers as newnewapi.McVoteOffer[])
+              : []
+          }
           handleClose={() => {
             handleCloseSupportForm();
             setSelectVotesMenuTop(undefined);
