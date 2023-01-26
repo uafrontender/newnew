@@ -12,7 +12,9 @@ import {
   PlayerAPI,
   PlayerConfig,
   PlayerEvent,
+  PlayerType,
   SourceConfig,
+  StreamType,
 } from 'bitmovin-player';
 
 import Lottie from '../../../atoms/Lottie';
@@ -53,6 +55,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
         // NB! Need to be initially muted in order to comply with autoplay policies
         // when opening the link from URL
         muted: true,
+        preferredTech: [
+          { player: PlayerType.Html5, streaming: StreamType.Hls },
+        ],
       },
     }),
     []
