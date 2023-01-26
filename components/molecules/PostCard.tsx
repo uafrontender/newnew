@@ -384,7 +384,9 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     useEffect(() => {
       if (hovered) {
-        videoRef.current?.play();
+        videoRef.current?.play().catch(() => {
+          console.error("Auto play doesn't allowed");
+        });
       } else {
         videoRef.current?.pause();
       }

@@ -121,6 +121,12 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     setInit(true);
   }, [innerRef, playerConfig]);
 
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleSetIsPaused = useCallback((stateValue: boolean) => {
+    setIsPaused(stateValue);
+  }, []);
+
   const loadSource = useCallback(() => {
     if (!isLoading && !loaded) {
       setIsLoading(true);
@@ -130,9 +136,11 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           setLoaded(true);
           setIsLoading(false);
 
-          // TODO: Handle the error as it can can fail due to...
+          // Catch error in case of low power mode and show play button
           // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
-          player.current?.play();
+          player.current?.play().catch(() => {
+            handleSetIsPaused(true);
+          });
 
           if (setDuration) {
             setDuration(player.current?.getDuration());
@@ -147,7 +155,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
         }
       );
     }
-  }, [isLoading, loaded, playerSource, setDuration]);
+  }, [isLoading, loaded, playerSource, setDuration, handleSetIsPaused]);
 
   const subscribe = useCallback(() => {
     if (player.current?.handlePlaybackFinished) {
@@ -202,12 +210,6 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       }
     }
   }, [player, isMuted, loaded]);
-
-  const [isPaused, setIsPaused] = useState(false);
-
-  const handleSetIsPaused = useCallback((stateValue: boolean) => {
-    setIsPaused(stateValue);
-  }, []);
 
   useEffect(() => {
     player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));

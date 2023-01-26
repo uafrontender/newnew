@@ -152,9 +152,9 @@ const OnboardingSectionAbout: React.FunctionComponent<
         newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
           .CONNECTED_ALL_GOOD
       ) {
-        router.push('/creator/dashboard');
+        router.replace('/creator/dashboard');
       } else {
-        router.push('/creator-onboarding-stripe');
+        router.replace('/creator-onboarding-stripe');
       }
 
       setLoadingModalOpen(false);
