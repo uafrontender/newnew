@@ -50,6 +50,7 @@ import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import usePost from '../../utils/hooks/usePost';
+import getDisplayname from '../../utils/getDisplayname';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -571,7 +572,14 @@ const PostPage: NextPage<IPostPage> = ({
         refetchPost={refetchPost}
       >
         <Head>
-          <title>{typeOfPost ? t(`meta.${typeOfPost}.title`) : ''}</title>
+          <title>
+            {typeOfPost
+              ? t(`meta.${typeOfPost}.title`, {
+                  displayName: getDisplayname(user.userData),
+                  postTitle: postParsed.title,
+                })
+              : ''}
+          </title>
           <meta
             name='description'
             content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}

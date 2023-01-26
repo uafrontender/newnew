@@ -1,6 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable camelcase */
-/* eslint-disable react/jsx-pascal-case */
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -20,37 +17,43 @@ const PostResponseTabModerationHeader: React.FunctionComponent<
     <SHeaderHeadline variant={3} successVariant={successVariant}>
       {title}
     </SHeaderHeadline>
-    <SCoin_1
+    <SCoin1
+      key='response-published-coin-1'
       className='headerDiv__coinImage'
       src={assets.decision.gold}
       alt='coin'
       draggable={false}
     />
-    <SCoin_2
+    <SCoin2
+      key='response-published-coin-2'
       className='headerDiv__coinImage'
       src={assets.decision.gold}
       alt='coin'
       draggable={false}
     />
-    <SCoin_3
+    <SCoin3
+      key='response-published-coin-3'
       className='headerDiv__coinImage'
       src={assets.decision.gold}
       alt='coin'
       draggable={false}
     />
-    <SCoin_4
+    <SCoin4
+      key='response-published-coin-4'
       className='headerDiv__coinImage'
       src={assets.decision.gold}
       alt='coin'
       draggable={false}
     />
-    <SCoin_5
+    <SCoin5
+      key='response-published-coin-5'
       className='headerDiv__coinImage'
       src={assets.decision.gold}
       alt='coin'
       draggable={false}
     />
-    <SCoin_6
+    <SCoin6
+      key='response-published-coin-6'
       className='headerDiv__coinImage'
       src={assets.decision.gold}
       alt='coin'
@@ -113,7 +116,7 @@ const SHeaderHeadline = styled(Headline)<{
   }
 `;
 
-const SCoin_1 = styled.img`
+const SCoin1 = styled.img`
   width: 56px;
   bottom: -32px;
   left: 5px;
@@ -125,7 +128,7 @@ const SCoin_1 = styled.img`
   }
 `;
 
-const SCoin_2 = styled.img`
+const SCoin2 = styled.img`
   width: 86px;
   top: -48px;
   left: 15%;
@@ -137,7 +140,7 @@ const SCoin_2 = styled.img`
   }
 `;
 
-const SCoin_3 = styled.img`
+const SCoin3 = styled.img`
   width: 98px;
   top: 10%;
   right: 5%;
@@ -148,7 +151,7 @@ const SCoin_3 = styled.img`
   }
 `;
 
-const SCoin_4 = styled.img`
+const SCoin4 = styled.img`
   width: 56px;
   top: 16%;
   right: 25%;
@@ -160,7 +163,7 @@ const SCoin_4 = styled.img`
   }
 `;
 
-const SCoin_5 = styled.img`
+const SCoin5 = styled.img`
   width: 84px;
   bottom: -28px;
   right: 25%;
@@ -172,7 +175,8 @@ const SCoin_5 = styled.img`
   }
 `;
 
-const SCoin_6 = styled.img`
+// THIS
+const SCoin6 = styled.img`
   width: 32px;
   top: 16px;
   right: 35%;
