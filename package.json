@@ -14,11 +14,10 @@
     "dev:ci:win": "cross-env NODE_ENV='test' npm run dev",
     "cypress": "cypress run --browser chrome --config \"video=true\"",
     "cypress:open": "cypress open --browser chrome --config \"video=true\"",
-    "cypress:ci": "cypress run --browser chrome ",
+    "cypress:ci": "cypress run --browser chrome",
     "cypress:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
     "jest": "jest",
     "test": "npm run jest && npm run cypress:ci",
-    "e2e": "cypress open",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/"

@@ -1,7 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -12,12 +18,18 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { formatNumber } from '../../../../utils/format';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import getDisplayname from '../../../../utils/getDisplayname';
+
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
-import getDisplayname from '../../../../utils/getDisplayname';
+import GoBackButton from '../../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../../utils/isBrowser';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -40,12 +52,27 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+
+    const { handleGoBackInsidePost } = usePostInnerState();
+
+    const isPageVisible = usePageVisibility();
+
+    // Timer
+    const interval = useRef<number>();
+    const parsedResponseDeadline = useMemo(
+      () => (post.responseUploadDeadline?.seconds as number) * 1000,
+      [post.responseUploadDeadline?.seconds]
+    );
+    const [parsedTimeToDeadline, setParsedTimeToDeadliine] = useState(
+      (parsedResponseDeadline - Date.now()) / 1000
+    );
 
     const waitingTime = useMemo(() => {
-      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-      const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed);
+      const dhms = secondsToDHMS(parsedTimeToDeadline);
 
       let countdownsrt = `${dhms.days} ${t(
         dhms.days === '1'
@@ -90,7 +117,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
       }
       countdownsrt = `${countdownsrt} `;
       return countdownsrt;
-    }, [post.responseUploadDeadline?.seconds, t]);
+    }, [parsedTimeToDeadline, t]);
 
     // Video
     // Open video tab
@@ -105,6 +132,18 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
+
+    // Update timer
+    useEffect(() => {
+      if (isBrowser() && isPageVisible) {
+        interval.current = window.setInterval(() => {
+          setParsedTimeToDeadliine(
+            () => (parsedResponseDeadline - Date.now()) / 1000
+          );
+        }, 300);
+      }
+      return () => clearInterval(interval.current);
+    }, [isPageVisible, parsedResponseDeadline]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -128,6 +167,11 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
     return (
       <>
         <SWrapper>
+          {isMobile && (
+            <SGoBackMobileSection>
+              <SGoBackButton onClick={handleGoBackInsidePost} />
+            </SGoBackMobileSection>
+          )}
           <PostVideoSuccess
             postUuid={post.postUuid}
             announcement={post.announcement!!}
@@ -139,6 +183,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
+          {isMobile ? <PostSuccessOrWaitingControls /> : null}
           <SActivitiesContainer>
             <WaitingForResponseBox
               title={t('acPostAwaiting.hero.title')}
@@ -386,3 +431,16 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+// Go back mobile
+const SGoBackMobileSection = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: flex-start;
+
+  width: 100%;
+  height: 56px;
+`;
+
+const SGoBackButton = styled(GoBackButton)``;

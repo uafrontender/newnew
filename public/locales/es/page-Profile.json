@@ -44,19 +44,27 @@
       "description": "Los creadores que marques como favoritos\n aparecerán aquí"
     }
   },
-  "CreatorsDecisions": {
-    "noContent": {
-      "description": "Las publicaciones del creador se mostrarán aquí"
-    }
-  },
-  "UserProfile": {
-    "noContent": {
-      "description": "{{username}} aún no tiene actividad.",
-      "suggestion": "Explore lo nuevo",
-      "button": "Explorar"
+  "Profile": {
+    "meta": {
+      "title": "{{displayName}} - NewNew"
+    },
+    "user": {
+      "noContent": {
+        "description": "{{username}} aún no tiene actividad.",
+        "suggestion": "Explore lo nuevo",
+        "button": "Explorar"
+      }
+    },
+    "creator": {
+      "noContent": {
+        "description": "Las publicaciones del creador se mostrarán aquí"
+      }
     }
   },
   "Activity": {
+    "meta": {
+      "title": "{{displayName}} - NewNew"
+    },
     "noContent": {
       "description": "Cualquier actividad del creador se mostrará aquí"
     }

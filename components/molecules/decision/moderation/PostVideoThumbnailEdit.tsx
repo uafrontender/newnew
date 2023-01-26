@@ -25,6 +25,7 @@ interface IPostVideoThumbnailEdit {
   open: boolean;
   value: any;
   thumbnails: any;
+  isLoading: boolean;
   handleClose: () => void;
   handleSubmit: (value: any) => void;
 }
@@ -33,6 +34,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   open,
   value,
   thumbnails,
+  isLoading,
   handleClose,
   handleSubmit,
 }) => {
@@ -309,7 +311,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
         </SModalTopContent>
         {isMobile ? (
           <SModalButtonContainer>
-            <Button view='primaryGrad' onClick={onSubmit}>
+            <Button view='primaryGrad' disabled={isLoading} onClick={onSubmit}>
               {t('postVideoThumbnailEdit.submit')}
             </Button>
           </SModalButtonContainer>
@@ -318,7 +320,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
             <Button view='secondary' onClick={handleClose}>
               {t('postVideoThumbnailEdit.cancel')}
             </Button>
-            <Button view='primaryGrad' onClick={onSubmit}>
+            <Button view='primaryGrad' disabled={isLoading} onClick={onSubmit}>
               {t('postVideoThumbnailEdit.submit')}
             </Button>
           </SButtonsWrapper>

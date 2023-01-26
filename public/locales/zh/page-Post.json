@@ -1,15 +1,15 @@
 {
   "meta": {
     "ac": {
-      "title": "NewNew Bid",
+      "title": "{{postTitle}} - NewNew Bid",
       "description": "賺錢，與朋友一起出價競拍，支持NewNew上的創作者"
     },
     "mc": {
-      "title": "NewNew Superpoll",
+      "title": "{{postTitle}} - NewNew Superpoll",
       "description": "賺錢，與朋友一起投票，支持NewNew上的創作者"
     },
     "cf": {
-      "title": "NewNew Goal",
+      "title": "{{postTitle}} - NewNew Goal",
       "description": "賺錢，與朋友一起在眾籌活動中認捐，支持NewNew上的創作者"
     }
   },
