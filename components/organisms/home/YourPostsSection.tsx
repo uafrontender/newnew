@@ -218,12 +218,16 @@ const SCreateFirstContainer = styled.div`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 16px;
-  max-width: 587px;
+  max-width: 320px;
 
   text-align: center;
 
   font-size: 24px;
   line-height: 32px;
+
+  ${({ theme }) => theme.media.mobileL} {
+    max-width: 587px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
