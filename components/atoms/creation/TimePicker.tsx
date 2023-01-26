@@ -124,6 +124,10 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       return;
     }
 
+    if (e.clientY === clientY) {
+      return;
+    }
+
     scrollContainerRef.current.scrollTop = scrollY - e.clientY + clientY;
     setClientY(e.clientY);
     setScrollY(scrollY - e.clientY + clientY);
