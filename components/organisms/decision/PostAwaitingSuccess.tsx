@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -11,8 +10,8 @@ import getDisplayname from '../../../utils/getDisplayname';
 
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
-import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 import GoBackButton from '../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -34,38 +33,15 @@ const PostAwaitingSuccess: React.FunctionComponent<
     postParsed,
     typeOfPost,
     postStatus,
-    isFollowingDecision,
     recommendedPosts,
     reportPostOpen,
     handleReportSubmit,
     handleReportClose,
     handleCloseAndGoBack,
-    ellipseMenuOpen,
-    shareMenuOpen,
-    handleEllipseMenuClose,
-    handleFollowDecision,
-    handleReportOpen,
-    handleShareClose,
-    handleOpenShareMenu,
-    handleOpenEllipseMenu,
   } = usePostInnerState();
 
   return (
     <>
-      {typeOfPost ? (
-        <Head>
-          <title>{t(`meta.${typeOfPost}.title`)}</title>
-          <meta
-            name='description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-          <meta property='og:title' content={t(`meta.${typeOfPost}.title`)} />
-          <meta
-            property='og:description'
-            content={t(`meta.${typeOfPost}.description`)}
-          />
-        </Head>
-      ) : null}
       {!isMobile && (
         <SGoBackButtonContainer>
           <SGoBackButton longArrow onClick={() => handleCloseAndGoBack()}>
@@ -73,6 +49,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
           </SGoBackButton>
         </SGoBackButtonContainer>
       )}
+      {!isMobile ? <PostSuccessOrWaitingControls /> : null}
       {postParsed && typeOfPost ? (
         <SPostContainer
           id='post-container'
@@ -100,24 +77,6 @@ const PostAwaitingSuccess: React.FunctionComponent<
               typeOfPost={typeOfPost}
             />
           ) : null}
-          {isMobile && (
-            <PostSuccessOrWaitingControls
-              ellipseMenuOpen={ellipseMenuOpen}
-              isFollowingDecision={isFollowingDecision}
-              isMobile={isMobile}
-              postUuid={postParsed?.postUuid ?? ''}
-              postShortId={postParsed?.postShortId ?? ''}
-              shareMenuOpen={shareMenuOpen}
-              typeOfPost={typeOfPost ?? 'ac'}
-              handleCloseAndGoBack={handleCloseAndGoBack}
-              handleEllipseMenuClose={handleEllipseMenuClose}
-              handleFollowDecision={handleFollowDecision}
-              handleReportOpen={handleReportOpen}
-              handleShareClose={handleShareClose}
-              handleOpenShareMenu={handleOpenShareMenu}
-              handleOpenEllipseMenu={handleOpenEllipseMenu}
-            />
-          )}
         </SPostContainer>
       ) : null}
       {postParsed?.creator && reportPostOpen && (

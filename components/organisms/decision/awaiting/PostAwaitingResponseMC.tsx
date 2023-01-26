@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 // Utils
 import Headline from '../../../atoms/Headline';
@@ -30,6 +31,10 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import InlineSvg from '../../../atoms/InlineSVG';
 import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
+import GoBackButton from '../../../molecules/GoBackButton';
+import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
+import isBrowser from '../../../../utils/isBrowser';
+import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -56,12 +61,23 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       resizeMode
     );
 
+    const { handleGoBackInsidePost } = usePostInnerState();
+
+    const isPageVisible = usePageVisibility();
+
     const activitiesContainerRef = useRef<HTMLDivElement | null>(null);
 
+    // Timer
+    const interval = useRef<number>();
+    const parsedResponseDeadline = useMemo(
+      () => (post.responseUploadDeadline?.seconds as number) * 1000,
+      [post.responseUploadDeadline?.seconds]
+    );
+    const [parsedTimeToDeadline, setParsedTimeToDeadliine] = useState(
+      (parsedResponseDeadline - Date.now()) / 1000
+    );
     const waitingTime = useMemo(() => {
-      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-      const parsed = (end - Date.now()) / 1000;
-      const dhms = secondsToDHMS(parsed);
+      const dhms = secondsToDHMS(parsedTimeToDeadline);
 
       let countdownsrt = `${dhms.days} ${t(
         dhms.days === '1'
@@ -106,7 +122,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       }
       countdownsrt = `${countdownsrt} `;
       return countdownsrt;
-    }, [post.responseUploadDeadline?.seconds, t]);
+    }, [parsedTimeToDeadline, t]);
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
@@ -131,6 +147,18 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     const [openedMainSection, setOpenedMainSection] = useState<
       'main' | 'options'
     >('main');
+
+    // Update timer
+    useEffect(() => {
+      if (isBrowser() && isPageVisible) {
+        interval.current = window.setInterval(() => {
+          setParsedTimeToDeadliine(
+            () => (parsedResponseDeadline - Date.now()) / 1000
+          );
+        }, 300);
+      }
+      return () => clearInterval(interval.current);
+    }, [isPageVisible, parsedResponseDeadline]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -179,6 +207,11 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     return (
       <>
         <SWrapper>
+          {isMobile && (
+            <SGoBackMobileSection>
+              <SGoBackButton onClick={handleGoBackInsidePost} />
+            </SGoBackMobileSection>
+          )}
           <PostVideoSuccess
             postUuid={post.postUuid}
             announcement={post.announcement!!}
@@ -190,6 +223,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             handleToggleMuted={() => handleToggleMutedMode()}
             handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
+          {isMobile ? <PostSuccessOrWaitingControls /> : null}
           <SActivitiesContainer
             dimmedBackground={openedMainSection === 'main'}
             ref={activitiesContainerRef}
@@ -629,3 +663,17 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+// Go back mobile
+const SGoBackMobileSection = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: flex-start;
+
+  width: 100%;
+  height: 56px;
+  margin-bottom: 6px;
+`;
+
+const SGoBackButton = styled(GoBackButton)``;

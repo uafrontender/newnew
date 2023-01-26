@@ -173,7 +173,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           {t('postVideo.uploadResponseForm.fileUpload.title_2')}
         </SHeadline>
         <SButton
-          id='upload-response-btn'
+          id='upload-response-button'
           view='primaryGrad'
           onClick={handleButtonClick}
         >

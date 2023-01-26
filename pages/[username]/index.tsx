@@ -83,9 +83,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
   return (
     <>
       <Head>
-        <title>{getDisplayname(user)}</title>
+        <title>
+          {t('Profile.meta.title', { displayName: getDisplayname(user) })}
+        </title>
         <meta name='description' content={user.bio || ''} />
-        <meta property='og:title' content={getDisplayname(user)} />
+        <meta
+          property='og:title'
+          content={t('Profile.meta.title', {
+            displayName: getDisplayname(user),
+          })}
+        />
         <meta property='og:description' content={user.bio || ''} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
@@ -127,7 +134,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
                 !isLoading && (
                   <NoContentCard>
                     <NoContentDescription>
-                      {t('CreatorsDecisions.noContent.description')}
+                      {t('Profile.creator.noContent.description')}
                     </NoContentDescription>
                   </NoContentCard>
                 )}
@@ -138,16 +145,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
                 !isLoading && (
                   <NoContentCard>
                     <NoContentDescription>
-                      {t('UserProfile.noContent.description', {
+                      {t('Profile.user.noContent.description', {
                         username: getDisplayname(user),
                       })}
                     </NoContentDescription>
                     <NoContentSuggestion>
-                      {t('UserProfile.noContent.suggestion')}
+                      {t('Profile.user.noContent.suggestion')}
                     </NoContentSuggestion>
                     <Link href='/'>
                       <SButton view='primaryGrad'>
-                        {t('UserProfile.noContent.button')}
+                        {t('Profile.user.noContent.button')}
                       </SButton>
                     </Link>
                   </NoContentCard>
@@ -186,22 +193,53 @@ export default UserPageIndex;
 export const getServerSideProps: GetServerSideProps<
   Partial<IUserPageIndex>
 > = async (context) => {
-  const { username } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    [
-      'common',
-      'page-Profile',
-      'component-PostCard',
-      'page-Post',
-      'modal-PaymentModal',
-      'modal-ResponseSuccessModal',
-    ],
-    null,
-    SUPPORTED_LANGUAGES
-  );
+  try {
+    const { username } = context.query;
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Profile',
+        'component-PostCard',
+        'page-Post',
+        'modal-PaymentModal',
+        'modal-ResponseSuccessModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
+    );
 
-  if (!username || Array.isArray(username)) {
+    if (!username || Array.isArray(username)) {
+      return {
+        redirect: {
+          destination: '/404',
+          permanent: false,
+        },
+      };
+    }
+
+    const getUserRequestPayload = new newnewapi.GetUserRequest({
+      username,
+    });
+
+    const res = await getUserByUsername(getUserRequestPayload);
+
+    if (!res.data || res.error) {
+      return {
+        redirect: {
+          destination: '/404',
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: {
+        user: res.data.toJSON(),
+        ...translationContext,
+      },
+    };
+  } catch (err) {
     return {
       redirect: {
         destination: '/404',
@@ -209,28 +247,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   }
-
-  const getUserRequestPayload = new newnewapi.GetUserRequest({
-    username,
-  });
-
-  const res = await getUserByUsername(getUserRequestPayload);
-
-  if (!res.data || res.error) {
-    return {
-      redirect: {
-        destination: '/404',
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      user: res.data.toJSON(),
-      ...translationContext,
-    },
-  };
 };
 
 const SMain = styled.main`

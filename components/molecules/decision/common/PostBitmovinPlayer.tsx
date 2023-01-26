@@ -12,7 +12,9 @@ import {
   PlayerAPI,
   PlayerConfig,
   PlayerEvent,
+  PlayerType,
   SourceConfig,
+  StreamType,
 } from 'bitmovin-player';
 
 import Lottie from '../../../atoms/Lottie';
@@ -53,6 +55,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
         // NB! Need to be initially muted in order to comply with autoplay policies
         // when opening the link from URL
         muted: true,
+        preferredTech: [
+          { player: PlayerType.Html5, streaming: StreamType.Hls },
+        ],
       },
     }),
     []
@@ -150,7 +155,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           ?.load(playerSource)
           .then(() => {
             if (cancel) return;
-            player.current?.play();
+            player.current?.play().catch(() => {
+              handleSetIsPaused(true);
+            });
             setLoaded(true);
             setIsLoading(false);
           })
@@ -168,7 +175,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     return () => {
       cancel = true;
     };
-  }, [playerSource]);
+  }, [playerSource, handleSetIsPaused]);
 
   useEffect(() => {
     player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));

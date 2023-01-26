@@ -367,7 +367,7 @@ const SortingContainer = styled.div<ISortingContainer>`
     props.bottomNavigationVisible
       ? `${props.withCookie ? 128 : 72}`
       : `${props.withCookie ? 72 : 16}`}px;
-  z-index: 10;
+  z-index: 9;
   position: fixed;
   transform: translateX(-50%);
   transition: bottom ease 0.5s;

@@ -142,6 +142,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const submitMessage = useCallback(async () => {
     if (chatRoom && messageTextValid) {
       const tmpMsgText = messageText.trim();
+
       if (tmpMsgText.length > 0) {
         try {
           setSendingMessage(true);
@@ -168,7 +169,9 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, [chatRoom, messageTextValid, messageText, setJustSentMessage]);
 
   const handleSubmit = useCallback(() => {
-    if (!sendingMessage) submitMessage();
+    if (!sendingMessage) {
+      submitMessage();
+    }
   }, [sendingMessage, submitMessage]);
 
   const handleChange = useCallback(

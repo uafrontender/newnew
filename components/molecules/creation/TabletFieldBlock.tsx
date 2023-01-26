@@ -89,7 +89,8 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
             </SInputContent>
           </SInputWrapper>
         ) : (
-          <DropdownSelect<number>
+          <DropdownSelect<string>
+            id={id}
             closeOnSelect
             width={isTablet ? '200px' : '208px'}
             label={t(`secondStep.field.${id}.value` as any, {

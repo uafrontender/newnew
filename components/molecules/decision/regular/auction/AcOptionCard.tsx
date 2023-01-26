@@ -594,7 +594,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       >
         {!isMobile && isSupportFormOpen && (
           <>
-            <BidAmountTextInput
+            <SBidAmountTextInput
               value={supportBidAmount}
               inputAlign='left'
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
@@ -1056,14 +1056,14 @@ const SSupportBidForm = styled(motion.div)`
   gap: 16px;
 
   width: 100%;
+`;
 
-  div {
-    display: flex;
+const SBidAmountTextInput = styled(BidAmountTextInput)`
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+  input {
     width: 100%;
-    flex-grow: 1;
-    input {
-      width: 100%;
-    }
   }
 `;
 
