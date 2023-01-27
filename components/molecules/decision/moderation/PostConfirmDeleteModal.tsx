@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
 import { TPostType } from '../../../../utils/switchPostType';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IPostConfirmDeleteModal {
+  postUuid: string;
   postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
@@ -13,6 +15,7 @@ interface IPostConfirmDeleteModal {
 }
 
 const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
+  postUuid,
   postType,
   isVisible,
   closeModal,
@@ -20,8 +23,26 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
 }) => {
   const { t } = useTranslation('page-Post');
 
+  const closeModalMixpanel = useCallback(() => {
+    Mixpanel.track('Close Confrim Delete Post Modal', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostConfirmDeleteModal',
+    });
+    closeModal();
+  }, [closeModal, postUuid]);
+
+  const handleConfirmDeleteMixpanel = useCallback(() => {
+    Mixpanel.track('Confirm Deleting Post', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostConfirmDeleteModal',
+    });
+    handleConfirmDelete();
+  }, [handleConfirmDelete, postUuid]);
+
   return (
-    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={12} onClose={closeModalMixpanel}>
       <SContainer>
         <SModal>
           <SModalTitle>
@@ -33,10 +54,10 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
             {t('deletePostModal.body', { postType: t(`postType.${postType}`) })}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={closeModal}>
+            <SCancelButton onClick={closeModalMixpanel}>
               {t('deletePostModal.button.cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmDelete}>
+            <SConfirmButton onClick={handleConfirmDeleteMixpanel}>
               {t('deletePostModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>

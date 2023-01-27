@@ -122,7 +122,10 @@ const FileUpload: React.FC<IFileUpload> = ({
     playerRef.current.play();
   }, []);
 
-  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+  const handleOpenEllipseMenu = useCallback(() => {
+    Mixpanel.track('Open Ellipse menu', { _stage: 'Creation' });
+    setShowEllipseMenu(true);
+  }, []);
 
   const handleCloseEllipseMenu = useCallback(
     () => setShowEllipseMenu(false),

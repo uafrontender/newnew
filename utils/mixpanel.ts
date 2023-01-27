@@ -17,6 +17,7 @@ export const Mixpanel = {
     mixpanel.alias(id);
   },
   track: (name: string, props?: Dict) => {
+    console.log(`tracked: ${name}`)
     mixpanel.track(name, props);
   },
   // TODO: replace any

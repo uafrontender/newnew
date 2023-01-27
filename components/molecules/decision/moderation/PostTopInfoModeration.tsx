@@ -1,6 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -137,6 +143,25 @@ const PostTopInfoModeration: React.FunctionComponent<
     () => postType === 'ac' && postStatus === 'waiting_for_decision',
     [postType, postStatus]
   );
+
+  const handleOpenEllipseMenuMixpanel = useCallback(() => {
+    Mixpanel.track('Open Ellipse Menu', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostTopInfoModeration',
+    });
+    handleOpenEllipseMenu();
+  }, [handleOpenEllipseMenu, postUuid]);
+
+  const handleOpenShareMenuMixpanel = useCallback(() => {
+    Mixpanel.track('Open Share Menu', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostTopInfoModeration',
+    });
+    handleOpenShareMenu();
+  }, [handleOpenShareMenu, postUuid]);
+
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
 
@@ -240,7 +265,7 @@ const PostTopInfoModeration: React.FunctionComponent<
             style={{
               padding: '8px',
             }}
-            onClick={() => handleOpenShareMenu()}
+            onClick={() => handleOpenShareMenuMixpanel()}
             ref={shareButtonRef}
           >
             <InlineSvg
@@ -253,7 +278,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           <SMoreButton
             view='transparent'
             iconOnly
-            onClick={() => handleOpenEllipseMenu()}
+            onClick={() => handleOpenEllipseMenuMixpanel()}
             ref={moreButtonRef}
           >
             <InlineSvg
@@ -285,6 +310,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenuModeration
+              postUuid={postUuid}
               postType={typeOfPost as TPostType}
               isVisible={ellipseMenuOpen}
               canDeletePost={postStatus !== 'succeeded'}
@@ -295,6 +321,7 @@ const PostTopInfoModeration: React.FunctionComponent<
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModalModeration
+              postUuid={postUuid}
               postType={typeOfPost as TPostType}
               zIndex={11}
               canDeletePost={postStatus !== 'succeeded'}
@@ -365,6 +392,7 @@ const PostTopInfoModeration: React.FunctionComponent<
       )}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
+        postUuid={postUuid}
         postType={typeOfPost as TPostType}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
