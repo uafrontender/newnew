@@ -1304,11 +1304,15 @@ const SButtonFirst = styled(Button)`
     }
   }
 
-  &:hover,
-  &:active,
-  &:focus {
-    span {
-      color: #ffffff;
+  &&& {
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: none;
+
+      span {
+        color: #ffffff;
+      }
     }
   }
 `;

@@ -106,19 +106,22 @@ const SButton = styled(Button)<ISButton>`
     padding: 12px 24px;
     margin-left: 10px;
   }
-  &:focus,
-  &:active,
-  &:hover {
-    background: ${(props) =>
-      !props.enabled
-        ? props.theme.colorsThemed.accent.yellow
-        : props.theme.colorsThemed.background.tertiary} !important;
-    color: ${(props) =>
-      !props.enabled
-        ? props.theme.colors.darkGray
-        : props.theme.name === 'light'
-        ? props.theme.colorsThemed.text.primary
-        : props.theme.colors.white} !important;
+  &&& {
+    &:focus,
+    &:active,
+    &:hover {
+      background: ${(props) =>
+        !props.enabled
+          ? props.theme.colorsThemed.accent.yellow
+          : props.theme.colorsThemed.background.tertiary} !important;
+      color: ${(props) =>
+        !props.enabled
+          ? props.theme.colors.darkGray
+          : props.theme.name === 'light'
+          ? props.theme.colorsThemed.text.primary
+          : props.theme.colors.white} !important;
+      box-shadow: none;
+    }
   }
 `;
 
