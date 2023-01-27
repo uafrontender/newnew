@@ -35,7 +35,6 @@ import BackButton from '../molecules/profile/BackButton';
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import { reportUser } from '../../api/endpoints/report';
@@ -44,6 +43,7 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
+import DisplayName from '../DisplayName';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -267,15 +267,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
-                {getDisplayname(user)}
-                {user.options?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='32px'
-                    height='32px'
-                    fill='none'
-                  />
-                )}
+                <DisplayName user={user} />
               </SUsername>
               {isGenderPronounsDefined(user.genderPronouns) && (
                 <SGenderPronouns variant={2}>
@@ -637,8 +629,4 @@ const SProfileLayout = styled.div`
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
   }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-left: 4px;
 `;
