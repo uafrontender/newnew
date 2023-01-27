@@ -17,6 +17,7 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import { markAsRead } from '../../../api/endpoints/notification';
 import getDisplayname from '../../../utils/getDisplayname';
 import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -155,7 +156,15 @@ const Notification: React.FC<newnewapi.INotification> = ({
   return (
     <Link href={url}>
       <a>
-        <SWrapper>
+        <SWrapper
+          onClick={() => {
+            Mixpanel.track('Notification Clicked', {
+              _stage: 'Notifications',
+              _target: url,
+              _component: 'Notification',
+            });
+          }}
+        >
           {content?.relatedUser?.uuid !== user.userData?.userUuid ? (
             <SAvatarHolder>
               <SUserAvatar
@@ -182,7 +191,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
                 <InlineSvg
                   clickable
                   svg={mobileLogo}
-                  fill='#fff'
+                  fill={theme.colors.white}
                   width={isMobile ? '24px' : '48px'}
                   height={isMobile ? '24px' : '48px'}
                 />
