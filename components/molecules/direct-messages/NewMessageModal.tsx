@@ -37,6 +37,7 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import getDisplayname from '../../../utils/getDisplayname';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -211,9 +212,23 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     (chat: newnewapi.IVisavisListItem, index: number) => {
       const handleItemClick = () => {
         if (!isDashboard) {
+          Mixpanel.track('Chat Item Clicked', {
+            _stage: 'Direct Messages',
+            _component: 'NewMessageModal',
+            _isDashboard: false,
+            _target: `/direct-messages/${chat.user?.username}`,
+          });
+
           router.push(`/direct-messages/${chat.user?.username}`);
           closeModal();
         } else {
+          Mixpanel.track('Chat Item Clicked', {
+            _stage: 'Direct Messages',
+            _component: 'NewMessageModal',
+            _isDashboard: true,
+            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+            _usernameQuery: chat.user?.username,
+          });
           setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
           chat.user?.username && setUsernameQuery(chat.user?.username);
         }
