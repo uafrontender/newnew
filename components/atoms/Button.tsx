@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // @ts-nocheck
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
@@ -37,6 +38,7 @@ interface IButton {
   withShrink?: boolean;
   withProgress?: boolean;
   customDebounce?: number;
+  loadingAnimationColor?: 'white' | 'blue';
 }
 
 // Arguable optimization, depends on unstable onClick, but works according to profiling (1.8% => 0%)
@@ -50,6 +52,7 @@ const Button = React.memo(
         withRipple,
         withProgress,
         customDebounce,
+        loadingAnimationColor,
         onClick,
         ...rest
       } = props;
@@ -178,10 +181,13 @@ const Button = React.memo(
                 options={{
                   loop: true,
                   autoplay: true,
-                  animationData:
-                    props.view === 'primary' || props.view === 'primaryGrad'
-                      ? logoAnimationWhite
-                      : logoAnimation,
+                  animationData: loadingAnimationColor
+                    ? loadingAnimationColor === 'blue'
+                      ? logoAnimation
+                      : logoAnimationWhite
+                    : props.view === 'primary' || props.view === 'primaryGrad'
+                    ? logoAnimationWhite
+                    : logoAnimation,
                 }}
               />
             </SLoader>

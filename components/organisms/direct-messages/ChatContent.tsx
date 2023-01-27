@@ -27,6 +27,7 @@ import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
+import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 /* Components */
 import Button from '../../atoms/Button';
@@ -281,10 +282,14 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
               withShadow
               view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
-              disabled={!messageTextValid || messageText.length < 1}
+              loading={sendingMessage}
+              loadingAnimationColor='blue'
+              disabled={
+                sendingMessage || !messageTextValid || messageText.length < 1
+              }
             >
               <SInlineSVG
-                svg={sendIcon}
+                svg={!sendingMessage ? sendIcon : ''}
                 fill={
                   messageTextValid && messageText.length > 0
                     ? theme.colors.white
