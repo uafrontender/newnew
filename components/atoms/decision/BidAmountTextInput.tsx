@@ -26,6 +26,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
   bottomPlaceholder,
   placeholder,
   style,
+  ...otherProps
 }) => {
   const inputRef = useRef<HTMLInputElement>();
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +69,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
   }, [autofocus]);
 
   return (
-    <SWrapper>
+    <SWrapper {...otherProps}>
       <SInput
         id={id}
         ref={(el) => {

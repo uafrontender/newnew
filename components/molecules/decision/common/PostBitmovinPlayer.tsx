@@ -155,7 +155,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           ?.load(playerSource)
           .then(() => {
             if (cancel) return;
-            player.current?.play();
+            player.current?.play().catch(() => {
+              handleSetIsPaused(true);
+            });
             setLoaded(true);
             setIsLoading(false);
           })
@@ -173,7 +175,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     return () => {
       cancel = true;
     };
-  }, [playerSource]);
+  }, [playerSource, handleSetIsPaused]);
 
   useEffect(() => {
     player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
