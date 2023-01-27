@@ -1314,6 +1314,7 @@ const SSupportButton = styled(Button)<{
   &:focus:enabled {
     color: ${({ theme }) => theme.colors.dark};
     background: #ffffff;
+    box-shadow: none;
   }
 
   ${({ isBlue }) =>

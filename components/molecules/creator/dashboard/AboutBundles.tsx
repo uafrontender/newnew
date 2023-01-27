@@ -93,7 +93,11 @@ const SButton = styled(Button)`
     margin-top: 24px;
   }
   &:hover {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
+    &&& {
+      background: ${(props) => props.theme.colorsThemed.accent.yellow};
+      box-shadow: ${(props) =>
+        props.theme.colorsThemed.button.hoverShadow.brandYellow};
+    }
   }
 `;
 

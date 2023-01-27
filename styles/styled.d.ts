@@ -151,7 +151,9 @@ declare module 'styled-components' {
           common: string;
         };
         hoverShadow: {
+          primary: string;
           danger: string;
+          brandYellow: string;
         };
         active: {
           primary: string;

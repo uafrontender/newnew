@@ -166,7 +166,9 @@ export const lightTheme: DefaultTheme = {
         common: '#000000',
       },
       hoverShadow: {
+        primary: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
         danger: '0px 15px 35px -10px rgba(255, 29, 106, 0.6)',
+        brandYellow: '0px 15px 35px -10px rgba(255, 230, 4, 0.6)',
       },
       active: {
         primary: '#0950DA',
@@ -409,7 +411,9 @@ export const darkTheme: DefaultTheme = {
         common: '#000000',
       },
       hoverShadow: {
+        primary: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
         danger: '0px 15px 35px -10px rgba(255, 29, 106, 0.6)',
+        brandYellow: '0px 15px 35px -10px rgba(255, 230, 4, 0.6)',
       },
       active: {
         primary: '#0950DA',

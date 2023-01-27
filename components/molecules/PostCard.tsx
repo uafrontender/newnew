@@ -1268,6 +1268,12 @@ const SButton = styled(Button)<ISButtonSpan>`
       font-size: 16px;
     }
   }
+
+  &&& {
+    &:hover {
+      box-shadow: none;
+    }
+  }
 `;
 
 const SButtonFirst = styled(Button)`
