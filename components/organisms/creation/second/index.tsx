@@ -1023,7 +1023,7 @@ export const CreationSecondStepContent: React.FC<
       if (overlayModeEnabled) {
         playerRef.current.pause();
       } else {
-        playerRef.current.play();
+        playerRef.current.play().catch(() => {});
       }
     }
   }, [overlayModeEnabled, isDesktop]);
