@@ -63,9 +63,9 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     useGetChats();
 
   useEffect(() => {
-    if (chatRoom.kind === 4) {
+    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
       setIsAnnouncement(true);
-      chatRoom.myRole === 2
+      chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
         ? setIsMyAnnouncement(true)
         : setIsMyAnnouncement(false);
     } else {

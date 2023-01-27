@@ -199,6 +199,20 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   }, [targetChatrooms]);
 
   const openMyAnnouncement = useCallback(() => {
+    Mixpanel.track('My Announcement Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'NewMessageModal',
+      _isDashboard: isDashboard,
+      ...(!isDashboard
+        ? {
+            _target: `/direct-messages/${user.userData?.username}-announcement`,
+          }
+        : {
+            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+            _username: user.userData?.username,
+          }),
+    });
+
     if (!isDashboard) {
       router.push(`/direct-messages/${user.userData?.username}-announcement`);
       closeModal();
@@ -211,24 +225,25 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
       const handleItemClick = () => {
-        if (!isDashboard) {
-          Mixpanel.track('Chat Item Clicked', {
-            _stage: 'Direct Messages',
-            _component: 'NewMessageModal',
-            _isDashboard: false,
-            _target: `/direct-messages/${chat.user?.username}`,
-          });
+        Mixpanel.track('Chat Item Clicked', {
+          _stage: 'Direct Messages',
+          _component: 'NewMessageModal',
+          _isDashboard: isDashboard,
+          ...(!isDashboard
+            ? {
+                _target: `/direct-messages/${chat.user?.username}`,
+                _visavis: chat.user?.username,
+              }
+            : {
+                _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+                _visavis: chat.user?.username,
+              }),
+        });
 
+        if (!isDashboard) {
           router.push(`/direct-messages/${chat.user?.username}`);
           closeModal();
         } else {
-          Mixpanel.track('Chat Item Clicked', {
-            _stage: 'Direct Messages',
-            _component: 'NewMessageModal',
-            _isDashboard: true,
-            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-            _usernameQuery: chat.user?.username,
-          });
           setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
           chat.user?.username && setUsernameQuery(chat.user?.username);
         }

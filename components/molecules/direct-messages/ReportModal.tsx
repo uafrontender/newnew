@@ -16,6 +16,7 @@ import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import Button from '../../atoms/Button';
 import CheckMark from '../CheckMark';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -119,6 +120,13 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         .filter(([key, value]) => value)
         .map(([key, value]) => key);
 
+      Mixpanel.track('Submit Report Form', {
+        _stage: 'Direct Messages',
+        _component: 'ReportModal',
+        _reasons: reasonsList,
+        _message: message,
+      });
+
       if (reasonsList.length > 0 && message.length >= 15) {
         setIsSubmitting(true);
         await onSubmit({
@@ -131,6 +139,11 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     };
 
     const handleClose = () => {
+      Mixpanel.track('Close Report Modal', {
+        _stage: 'Direct Messages',
+        _component: 'ReportModal',
+      });
+
       dispatch({ type: 'clear' });
       setMessage('');
       setReportSent(false);
