@@ -22,7 +22,8 @@ export type TView =
   | 'changeLanguage'
   | 'transparent'
   | 'danger'
-  | 'common';
+  | 'common'
+  | 'brandYellow';
 type TSize = 'sm' | 'lg';
 
 interface IButton {

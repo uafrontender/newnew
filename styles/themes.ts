@@ -134,6 +134,7 @@ export const lightTheme: DefaultTheme = {
         changeLanguage: '#2C2C33',
         danger: '#FFFFFF',
         common: '#2C2C33',
+        brandYellow: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -149,6 +150,7 @@ export const lightTheme: DefaultTheme = {
         changeLanguage: 'rgba(0, 21, 128, 0.06)',
         danger: '#F12C46',
         common: '#FFFFFF',
+        brandYellow: '#FFE604',
       },
       hover: {
         primary: '#1D6AFF',
@@ -164,6 +166,7 @@ export const lightTheme: DefaultTheme = {
         changeLanguage: '#E2E7F3',
         danger: '#F12C46',
         common: '#000000',
+        brandYellow: '#FFE604',
       },
       hoverShadow: {
         primary: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
@@ -182,6 +185,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#D4DBED',
         danger: '#F12C46',
+        brandYellow: '#F0DA13',
       },
       ripple: {
         primary: '#0045CC',
@@ -379,6 +383,7 @@ export const darkTheme: DefaultTheme = {
         changeLanguage: '#FFFFFF',
         danger: '#FFFFFF',
         common: '#2C2C33',
+        brandYellow: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -394,6 +399,7 @@ export const darkTheme: DefaultTheme = {
         changeLanguage: '#14151F',
         danger: '#F12C46',
         common: '#FFFFFF',
+        brandYellow: '#FFE604',
       },
       hover: {
         primary: '#1D6AFF',
@@ -409,6 +415,7 @@ export const darkTheme: DefaultTheme = {
         changeLanguage: '#1E1F29',
         danger: '#F12C46',
         common: '#000000',
+        brandYellow: '#FFE604',
       },
       hoverShadow: {
         primary: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
@@ -427,6 +434,7 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#282933',
         danger: '#F12C46',
+        brandYellow: '#F0DA13',
       },
       ripple: {
         primary: '#0045CC',

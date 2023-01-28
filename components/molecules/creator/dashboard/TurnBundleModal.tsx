@@ -9,6 +9,7 @@ import Button from '../../../atoms/Button';
 import votes from '../../../../public/images/dashboard/double-votes.png';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ITurnBundleModal {
   show: boolean;
@@ -48,7 +49,15 @@ const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
               </SText>
               <SButton
                 id='turn-on-bundles-modal-button'
-                onClick={onToggleBundles}
+                onClick={() => {
+                  Mixpanel.track(
+                    isBundlesEnabled ? 'Turn Off Bundles' : 'Turn On Bundles',
+                    {
+                      _stage: 'Dashboard',
+                    }
+                  );
+                  onToggleBundles();
+                }}
                 enabled={isBundlesEnabled}
                 disabled={isBundlesEnabled === undefined}
               >
@@ -104,8 +113,10 @@ const SButton = styled(Button)<ISButton>`
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
+    // TODO: Is margin needed?
     margin-left: 10px;
   }
+
   &&& {
     &:focus,
     &:active,

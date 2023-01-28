@@ -121,6 +121,7 @@ declare module 'styled-components' {
           changeLanguage: string;
           danger: string;
           common: string;
+          brandYellow: string;
         };
         background: {
           primary: string;
@@ -135,6 +136,7 @@ declare module 'styled-components' {
           changeLanguage: string;
           danger: string;
           common: string;
+          brandYellow: string;
         };
         hover: {
           primary: string;
@@ -149,6 +151,7 @@ declare module 'styled-components' {
           changeLanguage: string;
           danger: string;
           common: string;
+          brandYellow: string;
         };
         hoverShadow: {
           primary: string;
@@ -167,6 +170,7 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          brandYellow: string;
         };
         ripple: {
           primary: string;

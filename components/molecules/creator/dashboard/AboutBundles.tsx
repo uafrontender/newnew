@@ -6,6 +6,7 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 import TicketSet from '../../../atoms/bundles/TicketSet';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 export const AboutBundles: React.FC = () => {
   const { t } = useTranslation('page-Creator');
@@ -22,7 +23,19 @@ export const AboutBundles: React.FC = () => {
         </SDescriptionWrapper>
         <Link href='/creator/bundles'>
           <a>
-            <SButton>{t('dashboard.aboutBundles.button')}</SButton>
+            <SButton
+              view='brandYellow'
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Dashboard',
+                  _button: 'Tell me more',
+                  _component: 'AboutBundles',
+                  _target: '/creator/bundles',
+                });
+              }}
+            >
+              {t('dashboard.aboutBundles.button')}
+            </SButton>
           </a>
         </Link>
       </SContent>
@@ -84,20 +97,10 @@ const SButton = styled(Button)`
   padding: 16px 20px;
   margin-top: 16px;
 
-  background: ${(props) => props.theme.colorsThemed.accent.yellow};
-  color: #2c2c33;
-
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
     margin-top: 24px;
-  }
-  &:hover {
-    &&& {
-      background: ${(props) => props.theme.colorsThemed.accent.yellow};
-      box-shadow: ${(props) =>
-        props.theme.colorsThemed.button.hoverShadow.brandYellow};
-    }
   }
 `;
 
