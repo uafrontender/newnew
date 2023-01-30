@@ -261,6 +261,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
 
   useEffect(() => {
     const tabsWidthUpdated = tabRefs.current.reduce((acc, tabEl) => {
+      if (!tabEl) {
+        return acc;
+      }
+
       const w = tabEl.getBoundingClientRect().width;
       return w + acc;
     }, 0);
