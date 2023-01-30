@@ -10,9 +10,7 @@ interface IHighlightedButton {
   onClick?: () => void;
 }
 
-// This component is a result of Button not supporting yellow buttons
-// And design not following Button specs
-// TODO: Refactor buttons
+// Remove some styles as now yellow button exits in Button component but not removed component completely because paddings are different
 const HighlightedButton: React.FC<IHighlightedButton> = ({
   id,
   className,
