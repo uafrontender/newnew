@@ -54,7 +54,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
             )} ${t('modal.blockUser.messageSecondPart')}`}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={closeModal}>
+            <SCancelButton view='secondary' onClick={closeModal}>
               {t('modal.blockUser.button.cancel')}
             </SCancelButton>
             <SConfirmButton view='danger' onClick={handleConfirmClick}>
@@ -122,19 +122,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`

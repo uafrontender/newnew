@@ -14,6 +14,7 @@ import Lottie from '../../atoms/Lottie';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useMyPosts from '../../../utils/hooks/useMyPosts';
 import { Mixpanel } from '../../../utils/mixpanel';
+import switchPostType from '../../../utils/switchPostType';
 
 const YourPostsSection = () => {
   const { t: tCommon } = useTranslation('common');
@@ -38,6 +39,20 @@ const YourPostsSection = () => {
   const posts = useMemo(
     () => (data ? data.pages.map((page) => page.posts).flat() : []),
     [data]
+  );
+
+  console.log(
+    posts.map((el, index) => ({
+      index: switchPostType(el)[0].announcement?.thumbnailUrl,
+    })),
+    'posts'
+  );
+
+  console.log(
+    new Set(
+      posts.map((el) => switchPostType(el)[0].announcement?.thumbnailUrl)
+    ),
+    'SET'
   );
 
   const loadMore = useCallback(() => {

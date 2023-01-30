@@ -213,7 +213,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             </STextAreaWrapper>
             <SModalButtons>
               {!isMobile && (
-                <SCancelButton onClick={handleClose}>
+                <SCancelButton view='secondary' onClick={handleClose}>
                   {t('modal.reportUser.button.cancel')}
                 </SCancelButton>
               )}
@@ -274,19 +274,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`
