@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -50,6 +51,7 @@ const StaticPostCard = ({
         <SImageHolder id='animatedPart'>
           <SThumnailHolder
             className='thumnailHolder'
+            layout='fill'
             src={coverImageUrl ?? ''}
             alt='Post'
             draggable={false}
@@ -108,7 +110,7 @@ interface ISWrapper {
   maxWidthTablet?: string;
 }
 
-const SThumnailHolder = styled.img``;
+const SThumnailHolder = styled(Image)``;
 
 const SWrapper = styled.div<ISWrapper>`
   width: ${(props) => props.width};
