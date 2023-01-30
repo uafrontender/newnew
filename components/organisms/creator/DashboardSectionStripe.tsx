@@ -18,6 +18,7 @@ import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 import GoBackButton from '../../molecules/GoBackButton';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -148,6 +149,11 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
               !stripeProcessing &&
               !stripeNeedAttention
             ) {
+              Mixpanel.track('Redirect to Stripe', {
+                _button: getStripeButtonTextKey(stripeConnectStatus),
+                _stage: 'Dashboard',
+                _component: 'DashboardSectionStripe',
+              });
               handleRedirectToStripeSetup();
             }
           }}
@@ -163,6 +169,11 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
           <SButtonUpdate
             view='transparent'
             onClick={() => {
+              Mixpanel.track('Redirect to Stripe', {
+                _button: 'Update payment info',
+                _stage: 'Dashboard',
+                _component: 'DashboardSectionStripe',
+              });
               handleRedirectToStripeSetup();
             }}
           >

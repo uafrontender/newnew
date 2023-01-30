@@ -29,6 +29,7 @@ import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { getRoom } from '../../../../api/endpoints/chat';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -107,18 +108,48 @@ export const DynamicSection = () => {
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
   const handleChatClick = useCallback(() => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard?tab=chat',
+      _button: 'DMs',
+      _component: 'DynamicSection',
+    });
+
     router.push('/creator/dashboard?tab=chat');
   }, [router]);
+
   const handleNotificationsClick = useCallback(() => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard?tab=notifications',
+      _button: 'Notifications',
+      _component: 'DynamicSection',
+    });
     router.push('/creator/dashboard?tab=notifications');
   }, [router]);
+
   const handleMinimizeClick = useCallback(() => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard',
+      _button: 'Minimize',
+      _component: 'DynamicSection',
+    });
     router.push('/creator/dashboard');
   }, [router]);
+
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
+
   const handleMarkAllAsRead = useCallback(() => {
+    Mixpanel.track('Mark All As Read Button Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard',
+      _button: 'Mark all as read',
+      _component: 'DynamicSection',
+    });
+
     setMarkReadNotifications(true);
     setTimeout(() => {
       setMarkReadNotifications(false);
