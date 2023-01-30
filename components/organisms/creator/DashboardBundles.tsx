@@ -318,4 +318,8 @@ const SLoader = styled(Loader)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+
+  ${(props) => props.theme.media.laptopL} {
+    transform: translate(calc(-50% - 218px), -50%);
+  }
 `;
