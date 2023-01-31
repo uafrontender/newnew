@@ -223,10 +223,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     handleSetSupportedBid(option.id.toString());
   };
 
-  const handleCloseSupportForm = () => {
+  const handleCloseSupportForm = useCallback(() => {
+    Mixpanel.track('Close Support Option Form', {
+      _stage: 'Post',
+      _component: 'AcOptionCard',
+    });
     setIsSupportFormOpen(false);
     handleSetSupportedBid('');
-  };
+  }, [handleSetSupportedBid]);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -236,6 +240,35 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   >();
 
   // Handlers
+  const handleClickOptionBodyOpenEllipseMenu = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      Mixpanel.track('Click Option Body Open Ellipse Menu', {
+        _stage: 'Post',
+        _postUuid: postUuid,
+        _optionId: option?.id,
+        _component: 'AcOptionCard',
+      });
+      if (!isMobile && !isEllipseMenuOpen && !disabled && !isSupportFormOpen) {
+        setIsEllipseMenuOpen(true);
+        handleSetScrollBlocked?.();
+
+        setOptionMenuXY({
+          x: e.clientX,
+          y: e.clientY,
+        });
+      }
+    },
+    [
+      disabled,
+      handleSetScrollBlocked,
+      isEllipseMenuOpen,
+      isMobile,
+      isSupportFormOpen,
+      option?.id,
+      postUuid,
+    ]
+  );
+
   const handleTogglePaymentModalOpen = () => {
     setPaymentModalOpen(true);
   };
@@ -407,25 +440,20 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       <SContainer
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
-        onClick={(e) => {
-          if (
-            !isMobile &&
-            !isEllipseMenuOpen &&
-            !disabled &&
-            !isSupportFormOpen
-          ) {
-            setIsEllipseMenuOpen(true);
-            handleSetScrollBlocked?.();
-
-            setOptionMenuXY({
-              x: e.clientX,
-              y: e.clientY,
-            });
-          }
-        }}
+        onClick={(e) => handleClickOptionBodyOpenEllipseMenu(e)}
       >
         {isMobile && (
-          <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+          <SEllipseButtonMobile
+            onClickCapture={() => {
+              Mixpanel.track('Click Option Ellipse Button Open Ellipse Modal', {
+                _stage: 'Post',
+                _postUuid: postUuid,
+                _optionId: option?.id,
+                _component: 'AcOptionCard',
+              });
+            }}
+            onClick={() => setIsEllipseMenuOpen(true)}
+          >
             <InlineSvg
               svg={MoreIcon}
               width='16px'
@@ -615,7 +643,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   : parseInt(supportBidAmount) < minAmount
               }
               onClickCapture={() => {
-                Mixpanel.track('Submit Boost', {
+                Mixpanel.track('Open Payment Form', {
                   _stage: 'Post',
                   _component: 'AcOptionCard',
                 });
@@ -628,7 +656,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               view='transparent'
               iconOnly
               onClickCapture={() => {
-                Mixpanel.track('Cancel Boost', {
+                Mixpanel.track('Close Support Option Form', {
                   _stage: 'Post',
                   _component: 'AcOptionCard',
                 });
