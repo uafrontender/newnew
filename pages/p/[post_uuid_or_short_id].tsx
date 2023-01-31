@@ -673,6 +673,10 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       comment_content,
       save_card,
     } = context.query;
+    context.res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=5, stale-while-revalidate=10'
+    );
     const translationContext = await serverSideTranslations(
       context.locale!!,
       [
