@@ -564,7 +564,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         )}
         {index === 0 &&
           !isMyBid &&
-          user?.userTutorialsProgress.remainingAcSteps && (
+          user?.userTutorialsProgress.remainingAcSteps &&
+          votingAllowed && (
             <STutorialTooltipHolder>
               <TutorialTooltip
                 isTooltipVisible={

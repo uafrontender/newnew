@@ -368,20 +368,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             )
           ) : null}
         </SBidsContainer>
-        {user.userTutorialsProgress.remainingMcSteps && (
-          <STutorialTooltipHolder>
-            <TutorialTooltip
-              isTooltipVisible={
-                user.userTutorialsProgress.remainingMcSteps[0] ===
-                newnewapi.McTutorialStep.MC_ALL_OPTIONS
-              }
-              closeTooltip={goToNextStep}
-              title={t('tutorials.mc.peopleBids.title')}
-              text={t('tutorials.mc.peopleBids.text')}
-              dotPosition={DotPositionEnum.BottomLeft}
-            />
-          </STutorialTooltipHolder>
-        )}
+        {user.userTutorialsProgress.remainingMcSteps &&
+          postStatus === 'voting' && (
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user.userTutorialsProgress.remainingMcSteps[0] ===
+                  newnewapi.McTutorialStep.MC_ALL_OPTIONS
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.mc.peopleBids.title')}
+                text={t('tutorials.mc.peopleBids.text')}
+                dotPosition={DotPositionEnum.BottomLeft}
+              />
+            </STutorialTooltipHolder>
+          )}
       </STabContainer>
       {/* Suggest new form */}
       {!optionCreatedByMe &&
