@@ -125,8 +125,13 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
           {chatrooms.length > 0 ? (
             <>
               {chatrooms.map(renderChatItem)}
-              <SChatItemFakeContainer />
-              <SChatItemFakeContainer />
+              {/* TODO: Remove this for dynamic section */}
+              {isMobileOrTablet && (
+                <>
+                  <SChatItemFakeContainer />
+                  <SChatItemFakeContainer />
+                </>
+              )}
             </>
           ) : (
             <EmptyInbox />
