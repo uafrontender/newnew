@@ -201,12 +201,14 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
                 progress: responseFileUploadProgress,
               })}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => handleCancelUploadAndClearLocalFile()}
-            >
-              {t('postVideo.uploadResponseForm.button.cancel')}
-            </SLoadingBottomBlockButton>
+            {responseFileUploadProgress !== 100 ? (
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={() => handleCancelUploadAndClearLocalFile()}
+              >
+                {t('postVideo.uploadResponseForm.button.cancel')}
+              </SLoadingBottomBlockButton>
+            ) : null}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={responseFileUploadProgress} />

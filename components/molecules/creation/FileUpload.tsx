@@ -321,12 +321,14 @@ const FileUpload: React.FC<IFileUpload> = ({
                 progress: progressUpload,
               })}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => handleCancelUploadAndClearLocalFile()}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
+            {progressUpload !== 100 ? (
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={() => handleCancelUploadAndClearLocalFile()}
+              >
+                {t('secondStep.button.cancel')}
+              </SLoadingBottomBlockButton>
+            ) : null}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={progressUpload} />
