@@ -60,7 +60,10 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   );
 
   const isDashboard = useMemo(() => {
-    if (router.asPath.includes('/creator/dashboard?tab=chat')) {
+    if (
+      router.asPath.includes('/creator/dashboard?tab=chat') ||
+      router.asPath.includes('/creator/bundles?tab=chat')
+    ) {
       return true;
     }
     return false;
@@ -108,9 +111,15 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
       _stage: 'Direct Messages',
       _component: 'ChatListItem',
       _isDashboard: isDashboard,
+      // eslint-disable-next-line no-nested-ternary
       ...(!isDashboard
         ? {
             _target: chatRoute,
+          }
+        : router.asPath.includes('/creator/bundles')
+        ? {
+            _target: `/creator/bundles?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
+            _activeChatRoom: chatRoom,
           }
         : {
             _target: `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
@@ -119,6 +128,10 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     });
     if (!isDashboard) {
       router.push(chatRoute);
+    } else if (router.asPath.includes('/creator/bundles')) {
+      router.push(
+        `/creator/bundles?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
+      );
     } else {
       router.push(
         `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
