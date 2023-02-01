@@ -517,7 +517,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       const res = await uploadAdditionalPostResponse(payload);
 
       if (!res.error) {
-        const updatedData = await refetchPost();
+        // const updatedData = await refetchPost();
+
+        const updatedData = res;
         let additionalResponsesFromBe: newnewapi.IVideoUrls[] = [];
 
         if (
@@ -567,7 +569,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   }, [
     handleAddAdditonalResponse,
     postUuid,
-    refetchPost,
     showErrorToastPredefined,
     uploadedResponseVideoUrl,
   ]);
