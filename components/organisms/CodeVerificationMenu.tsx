@@ -38,11 +38,13 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 export interface ICodeVerificationMenu {
   expirationTime: number;
   redirectUserTo?: string;
+  onBack: () => void;
 }
 
 const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   expirationTime,
   redirectUserTo,
+  onBack,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
@@ -148,13 +150,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         resumePushNotification();
 
         if (data.redirectUrl) {
-          router.push(data.redirectUrl);
+          router.replace(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router.push('/creator/dashboard');
+          router.replace('/creator/dashboard');
         } else if (redirectUserTo) {
-          router.push(redirectUserTo);
+          router.replace(redirectUserTo);
         } else {
-          router.push('/');
+          router.replace('/');
         }
       } catch (err: any) {
         setSubmitError(err?.message ?? 'generic_error');
@@ -238,7 +240,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             Mixpanel.track('Go Back Clicked', {
               _stage: 'Sign Up',
             });
-            router.back();
+            onBack();
           }}
         >
           {!isMobileOrTablet ? t('backButton') : ''}
@@ -257,7 +259,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             Mixpanel.track('Go Back Clicked', {
               _stage: 'Sign Up',
             });
-            router.back();
+            onBack();
           }}
         />
         <AnimatedLogoEmailVerification
