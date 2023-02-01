@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
+import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
+import { usePostInnerState } from '../../../contexts/postInnerContext';
 
 import Button from '../Button';
 import InlineSvg from '../InlineSVG';
@@ -26,16 +28,28 @@ const PostVideoEditStoryButton: React.FunctionComponent<
     'tablet',
   ].includes(resizeMode);
 
+  const { postParsed } = usePostInnerState();
+
+  const handleClickPostVideoStoryButton = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      Mixpanel.track('Click post video story button', {
+        _stage: 'Post',
+        _postUuid: postParsed?.postUuid,
+        _component: 'PostVideoEditStoryButton',
+      });
+      e.stopPropagation();
+      handleClick();
+    },
+    [handleClick, postParsed?.postUuid]
+  );
+
   return (
     <SPostVideoEditStoryButton
       id='edit-story-button'
       buttonActive={active}
       iconOnly
       view='transparent'
-      onClick={(e) => {
-        e.stopPropagation();
-        handleClick();
-      }}
+      onClick={handleClickPostVideoStoryButton}
       style={{
         ...(bottomOverriden
           ? {
