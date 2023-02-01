@@ -161,6 +161,10 @@ export const HowItWorks = () => {
 export default HowItWorks;
 
 export const getServerSideProps = async (context: NextPageContext) => {
+  context.res?.setHeader(
+    'Cache-Control',
+    'public, s-maxage=30, stale-while-revalidate=35'
+  );
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-HowItWorks'],
