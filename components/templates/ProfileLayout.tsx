@@ -44,6 +44,7 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
+import { Mixpanel } from '../../utils/mixpanel';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -318,6 +319,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   padding: '8px',
                 }}
                 onClick={() => handleCopyLink()}
+                onClickCapture={() => {
+                  Mixpanel.track('Copied Link User', {
+                    _stage: 'Profile',
+                    _postUuid: user.uuid,
+                    _component: 'Profile layout',
+                  });
+                }}
               >
                 {isCopiedUrl ? (
                   t('profileLayout.buttons.copied')
@@ -334,7 +342,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
             {creatorsBundle && (
               <CustomLink href={`/direct-messages/${user.username}`}>
-                <SSendButton view='brandYellow'>
+                <SSendButton
+                  view='brandYellow'
+                  onClickCapture={() => {
+                    Mixpanel.track('Send Message Button Clicked', {
+                      _stage: 'Profile',
+                      _creatorUuid: user.uuid,
+                      _component: 'Profile layout',
+                    });
+                  }}
+                >
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
               </CustomLink>

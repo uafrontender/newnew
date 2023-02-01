@@ -71,7 +71,17 @@ export const Navigation = () => {
       const active = router.route.includes(item.url);
       return (
         <Link key={item.url} href={item.url}>
-          <SItem id={item.id} active={active}>
+          <SItem
+            id={item.id}
+            active={active}
+            onClickCapture={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _stage: 'Dashboard',
+                _component: 'Navigation',
+                _target: item.url,
+              });
+            }}
+          >
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
               fill={
@@ -100,11 +110,12 @@ export const Navigation = () => {
       <Link href='/creation'>
         <a>
           <Button
-            onClick={() => {
+            onClickCapture={() => {
               Mixpanel.track('Navigation Item Clicked', {
                 _button: 'Make a decision',
                 _stage: 'Dashboard',
                 _component: 'Navigation',
+                _target: '/creation',
               });
             }}
           >
