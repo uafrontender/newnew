@@ -72,13 +72,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const [emailError, setEmailError] = useState('');
 
   const elements = useElements();
-  const { cards } = useCards();
+  const { primaryCard } = useCards();
   const stripe = useStripe();
-
-  const primaryCard = useMemo(
-    () => cards?.find((card) => card.isPrimary),
-    [cards]
-  );
 
   useEffect(() => {
     if (!selectedPaymentMethod && primaryCard) {

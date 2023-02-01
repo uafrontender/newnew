@@ -5,7 +5,6 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
-import { deleteCard } from '../../../api/endpoints/card';
 
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -63,7 +62,6 @@ interface ICard {
   backgroundImg: string;
   cardId: string;
   disabledForActions: boolean;
-  onCardDelete: () => void;
 }
 
 const Card: React.FunctionComponent<ICard> = ({
@@ -74,7 +72,6 @@ const Card: React.FunctionComponent<ICard> = ({
   cardId,
   disabledForActions,
   backgroundImg,
-  onCardDelete,
 }) => {
   const { t } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
@@ -89,7 +86,7 @@ const Card: React.FunctionComponent<ICard> = ({
 
   const moreButtonRef = useRef<HTMLButtonElement>();
 
-  const { setPrimaryCardMutation } = useCards();
+  const { setPrimaryCardMutation, removeCardMutation } = useCards();
 
   const handelSetPrimaryCard = async () => {
     Mixpanel.track('Set Primary Card', {
@@ -106,15 +103,7 @@ const Card: React.FunctionComponent<ICard> = ({
         _cardUuid: cardId,
       });
 
-      const payload = new newnewapi.DeleteCardRequest({
-        cardUuid: cardId,
-      });
-      const response = await deleteCard(payload);
-
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'An error occurred');
-      }
-      onCardDelete();
+      removeCardMutation?.mutate(cardId);
     } catch (err: any) {
       console.error(err);
       showErrorToastCustom(err.message);

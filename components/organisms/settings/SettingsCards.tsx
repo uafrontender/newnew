@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -23,7 +23,7 @@ interface ISettingsCards {}
 const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
-  const { cards, isCardsLoading, fetchCards } = useCards();
+  const { cards, isCardsLoading } = useCards();
   const user = useAppSelector((state) => state.user);
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
@@ -34,10 +34,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
     });
     setIsAddCardModal(true);
   };
-
-  useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
 
   const cardsWithFirstPrimary = useMemo(
     () =>
@@ -164,7 +160,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                         ]
                   }
                   disabledForActions={!!user.userData?.options?.isWhiteListed}
-                  onCardDelete={fetchCards}
                 />
               </SCardListItem>
             ))}

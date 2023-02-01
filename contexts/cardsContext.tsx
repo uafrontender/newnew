@@ -4,25 +4,36 @@ import {
   useMutation,
   useQuery,
   UseMutationResult,
-  QueryClient,
+  useQueryClient,
 } from 'react-query';
 
-import { getCards, setPrimaryCard } from '../api/endpoints/card';
+import { deleteCard, getCards, setPrimaryCard } from '../api/endpoints/card';
 import { useAppSelector } from '../redux-store/store';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { SocketContext } from './socketContext';
 
 export const CardsContext = createContext<{
   cards: newnewapi.ICard[] | undefined;
   isCardsLoading: boolean;
-  addCardMutation: UseMutationResult | undefined;
-  setPrimaryCardMutation: UseMutationResult | undefined;
+  addCardMutation:
+    | UseMutationResult<unknown, unknown, newnewapi.ICard>
+    | undefined;
+  setPrimaryCardMutation:
+    | UseMutationResult<void, unknown, string, unknown>
+    | undefined;
+  removeCardMutation:
+    | UseMutationResult<newnewapi.EmptyResponse, unknown, string, unknown>
+    | undefined;
   fetchCards: () => void;
+  primaryCard: newnewapi.ICard | undefined;
 }>({
   cards: undefined,
   isCardsLoading: false,
   addCardMutation: undefined,
   fetchCards: () => {},
   setPrimaryCardMutation: undefined,
+  removeCardMutation: undefined,
+  primaryCard: undefined,
 });
 
 interface ICardsContextProvider {
@@ -32,11 +43,13 @@ interface ICardsContextProvider {
 const CardsContextProvider: React.FC<ICardsContextProvider> = ({
   children,
 }) => {
-  const queryClient = new QueryClient();
+  const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
 
   const socketConnection = useContext(SocketContext);
 
   const user = useAppSelector((state) => state.user);
+
+  const queryClient = useQueryClient();
 
   const query = useQuery(
     ['private', 'getCards'],
@@ -66,12 +79,10 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
         throw new Error(response.error?.message || 'An error occurred');
       }
     },
-    // 💡 response of the mutation is passed to onSuccess
     onSuccess: (_, cardUuid: string) => {
       queryClient.setQueryData(
         ['private', 'getCards'],
-        (old: newnewapi.ICard[] | undefined) => {
-          console.log(old, 'old');
+        (old: newnewapi.ICard[] | undefined, ...other) => {
           if (!old) {
             return [];
           }
@@ -93,6 +104,13 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
         }
       );
     },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
   });
 
   const addCardMutation = useMutation({
@@ -100,12 +118,39 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
       new Promise((res) => {
         res(card);
       }),
-    // 💡 response of the mutation is passed to onSuccess
     onSuccess: (_, card: newnewapi.ICard) => {
       queryClient.setQueryData(
         ['private', 'getCards'],
-        (old: newnewapi.ICard[] | undefined) => [...(old || []), card]
+        (old: newnewapi.ICard[] | undefined) =>
+          old?.find((el) => el.cardUuid === card.cardUuid)
+            ? old
+            : [...(old || []), card]
       );
+    },
+  });
+
+  const removeCardMutation = useMutation({
+    mutationFn: async (cardUuid: string) => {
+      const payload = new newnewapi.DeleteCardRequest({
+        cardUuid,
+      });
+      const response = await deleteCard(payload);
+
+      if (!response.data || response.error) {
+        throw new Error(response.error?.message || 'An error occurred');
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['private', 'getCards']);
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
     },
   });
 
@@ -116,7 +161,7 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
       if (!decoded) return;
 
       if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
-        query.refetch();
+        addCardMutation.mutate(decoded.card);
       }
     };
 
@@ -129,22 +174,31 @@ const CardsContextProvider: React.FC<ICardsContextProvider> = ({
         socketConnection?.off('CardStatusChanged', handleCardAdded);
       }
     };
-  }, [socketConnection?.connected, socketConnection, query]);
+  }, [socketConnection?.connected, socketConnection, addCardMutation]);
+
+  const primaryCard = useMemo(
+    () => query.data?.find((card) => card.isPrimary),
+    [query.data]
+  );
 
   const contextValue = useMemo(
     () => ({
       cards: query.data || [],
       isCardsLoading: query.isLoading,
+      primaryCard,
       setPrimaryCardMutation,
       addCardMutation,
+      removeCardMutation,
       fetchCards: query.refetch,
     }),
     [
       setPrimaryCardMutation,
+      primaryCard,
       query.isLoading,
       query.data,
       query.refetch,
       addCardMutation,
+      removeCardMutation,
     ]
   );
 
