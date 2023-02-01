@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -70,12 +68,15 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [promptUserWithPushNotificationsPermissionModal, router]);
 
   useEffect(() => {
-    if (user.creatorData?.isLoaded) {
+    if (
+      user.creatorData?.isLoaded &&
       user.userData?.bio &&
       user.userData?.bio.length > 0 &&
       user.creatorData?.options?.isCreatorConnectedToStripe
-        ? setIsToDosCompleted(true)
-        : setIsToDosCompleted(false);
+    ) {
+      setIsToDosCompleted(true);
+    } else if (user.creatorData?.isLoaded) {
+      setIsToDosCompleted(false);
     }
   }, [user.creatorData, user.userData?.bio]);
 
@@ -212,25 +213,15 @@ export const Dashboard: React.FC = React.memo(() => {
         )}
         {!user.userData?.options?.isWhiteListed && (
           <SBlock>
-            {!isEarningsLoading ? (
-              isToDosCompleted !== undefined ? (
-                isToDosCompleted ? (
-                  <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
-                ) : (
-                  <FinishProfileSetup />
-                )
+            {!isEarningsLoading &&
+              (isToDosCompleted ? (
+                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
               ) : (
-                <Lottie
-                  width={64}
-                  height={64}
-                  options={{
-                    loop: true,
-                    autoplay: true,
-                    animationData: loadingAnimation,
-                  }}
-                />
-              )
-            ) : (
+                <FinishProfileSetup />
+              ))}
+
+            {/* Loader */}
+            {(isEarningsLoading || isToDosCompleted === undefined) && (
               <Lottie
                 width={64}
                 height={64}
