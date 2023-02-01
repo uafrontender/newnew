@@ -18,6 +18,7 @@ import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
 import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -162,6 +163,14 @@ export const Dashboard: React.FC = React.memo(() => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
+        {user.creatorData?.options.stripeConnectStatus &&
+          user.creatorData.options.stripeConnectStatus ===
+            newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+              .CONNECTED_NEEDS_ATTENTION && (
+            <SBlock>
+              <StripeIssueBanner />
+            </SBlock>
+          )}
         {!user.creatorData?.isLoaded ? (
           <SBlock>
             <Lottie
