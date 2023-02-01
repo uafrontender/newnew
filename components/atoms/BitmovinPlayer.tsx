@@ -33,6 +33,7 @@ interface IBitmovinPlayer {
   setCurrentTime?: (time: number) => void;
   withMuteControl?: boolean;
   showPlayButton?: boolean;
+  playButtonSize?: 'default' | 'small';
 }
 
 export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
@@ -48,6 +49,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     setDuration,
     setCurrentTime,
     showPlayButton,
+    playButtonSize,
   } = props;
   const theme = useTheme();
   const [init, setInit] = useState(false);
@@ -81,6 +83,12 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const playerRef: any = useRef();
   const player: any = useRef(null);
 
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleSetIsPaused = useCallback((stateValue: boolean) => {
+    setIsPaused(stateValue);
+  }, []);
+
   const handleTimeChange = useCallback(
     (e: any) => {
       if (setCurrentTime) {
@@ -90,15 +98,19 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       if (player.current?.getCurrentTime() >= thumbnails.endTime) {
         player.current?.pause();
         player.current?.seek(thumbnails.startTime);
-        player.current?.play();
+        player.current?.play().catch(() => {
+          handleSetIsPaused(true);
+        });
       }
     },
-    [setCurrentTime, thumbnails]
+    [setCurrentTime, thumbnails, handleSetIsPaused]
   );
 
   const handlePlaybackFinished = useCallback(() => {
-    player.current?.play();
-  }, []);
+    player.current?.play().catch(() => {
+      handleSetIsPaused(true);
+    });
+  }, [handleSetIsPaused]);
 
   const toggleThumbnailVideoMuted = useCallback(() => {
     setIsMuted(!isMuted);
@@ -120,12 +132,6 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
 
     setInit(true);
   }, [innerRef, playerConfig]);
-
-  const [isPaused, setIsPaused] = useState(false);
-
-  const handleSetIsPaused = useCallback((stateValue: boolean) => {
-    setIsPaused(stateValue);
-  }, []);
 
   const loadSource = useCallback(() => {
     if (!isLoading && !loaded) {
@@ -229,7 +235,9 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
               if (player.current?.isPlaying()) {
                 player.current?.pause();
               } else {
-                player.current?.play();
+                player.current?.play().catch(() => {
+                  handleSetIsPaused(true);
+                });
               }
             }
           }}
@@ -241,10 +249,13 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
                 if (player.current?.isPlaying()) {
                   player.current?.pause();
                 } else {
-                  player.current?.play();
+                  player.current?.play().catch(() => {
+                    handleSetIsPaused(true);
+                  });
                 }
               }
             }}
+            size={playButtonSize}
           >
             <InlineSVG
               svg={PlayIcon}
@@ -288,6 +299,7 @@ BitmovinPlayer.defaultProps = {
   setDuration: () => {},
   setCurrentTime: () => {},
   showPlayButton: false,
+  playButtonSize: 'default',
 };
 
 interface ISContent {
@@ -375,19 +387,20 @@ const SModalSoundIcon = styled.div<ISModalSoundIcon>`
   }
 `;
 
-const SPlayPseudoButton = styled.button`
+const SPlayPseudoButton = styled.button<{ size?: 'default' | 'small' }>`
   position: absolute;
-  top: calc(50% - 32px);
-  left: calc(50% - 32px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  width: 64px;
-  height: 64px;
+  width: ${({ size }) => (size === 'small' ? '40px' : '64px')};
+  height: ${({ size }) => (size === 'small' ? '40px' : '64px')};
   background: rgba(11, 10, 19, 0.65);
-  border-radius: 21px;
+  border-radius: ${({ size }) => (size === 'small' ? '10px' : '21px')};
   border: transparent;
 
   cursor: pointer;

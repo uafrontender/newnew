@@ -17,6 +17,7 @@ import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { formatNumber } from '../../../../utils/format';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import Lottie from '../../../atoms/Lottie';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IFunctionProps {
   hasMyPosts: boolean;
@@ -187,6 +188,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
   );
 
   const handleChangeFilter = (e: any) => {
+    Mixpanel.track('Earning Filter Changed', {
+      _stage: 'Dashboard',
+      _value: e,
+    });
+
     if (filter !== e) {
       setIsLoading(null);
       setFilter(e);
