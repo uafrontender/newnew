@@ -104,7 +104,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
                 </STextHolder>
                 <SButton
                   id='turn-on-bundles-button'
-                  view={isBundlesEnabled ? 'quaternary' : 'brandYellow'}
+                  view={isSellingBundles ? 'quaternary' : 'brandYellow'}
                   onClick={toggleTurnBundleModalOpen}
                   enabled={isSellingBundles}
                   disabled={isSellingBundles === undefined}
