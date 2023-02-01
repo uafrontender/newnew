@@ -14,19 +14,7 @@ import SignupMenu from '../components/organisms/SignupMenu';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { I18nNamespaces } from '../@types/i18next';
-
-// Sign up reasons
-export const signupReasons = [
-  'comment',
-  'bid',
-  'pledge',
-  'subscribe',
-  'follow-decision',
-  'follow-creator',
-  'session_expired',
-  'report',
-] as const;
-export type SignupReason = typeof signupReasons[number];
+import { SignupReason, signupReasons } from '../utils/signUpReasons';
 
 interface ISignUp {
   reason?: SignupReason;
