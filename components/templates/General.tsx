@@ -56,7 +56,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles, hasSoldBundles } = useBundles();
+  const { bundles, directMessagesAvailable } = useBundles();
   const {
     unreadCount,
     setMobileChatOpened,
@@ -177,8 +177,8 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [activeTab, setActiveTab, setMobileChatOpened, router]);
 
   const chatButtonVisible = useMemo(
-    () => isMobile && withChat && hasSoldBundles,
-    [isMobile, withChat, hasSoldBundles]
+    () => isMobile && withChat && directMessagesAvailable,
+    [isMobile, withChat, directMessagesAvailable]
   );
 
   const mobileNavigationVisible = useMemo(
