@@ -299,7 +299,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         return;
       }
 
-      Mixpanel.track('PayWithCard', {
+      Mixpanel.track('Pay With Card', {
         _stage: 'Post',
         _postUuid: postUuid,
         _component: 'AcOptionsCard',
@@ -667,6 +667,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 view='primaryGrad'
                 size='sm'
                 disabled={!supportBidAmount}
+                onClickCapture={() => {
+                  Mixpanel.track('Submit Boost', {
+                    _stage: 'Post',
+                    _component: 'AcOptionCard',
+                  });
+                }}
                 onClick={() => handleTogglePaymentModalOpen()}
               >
                 {t('acPost.optionsTab.optionCard.raiseBidButton')}
