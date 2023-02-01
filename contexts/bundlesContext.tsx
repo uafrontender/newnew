@@ -7,21 +7,27 @@ import React, {
   useCallback,
   useContext,
 } from 'react';
-import { getMyBundleEarnings, getMyBundles } from '../api/endpoints/bundles';
+import {
+  getBundleStatus,
+  getMyBundleEarnings,
+  getMyBundles,
+  setBundleStatus,
+} from '../api/endpoints/bundles';
 import { useAppSelector } from '../redux-store/store';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { loadStateLS, saveStateLS } from '../utils/localStorage';
 import { SocketContext } from './socketContext';
 
 export const BundlesContext = createContext<{
   bundles: newnewapi.ICreatorBundle[] | undefined;
-  bundlesLoading: boolean;
-  hasSoldBundles: boolean;
-  handleSetBundles: (newPacks: newnewapi.ICreatorBundle[]) => void;
+  directMessagesAvailable: boolean;
+  isSellingBundles: boolean;
+  toggleIsSellingBundles: () => Promise<void>;
 }>({
   bundles: undefined,
-  bundlesLoading: false,
-  hasSoldBundles: false,
-  handleSetBundles: (newPacks: newnewapi.ICreatorBundle[]) => {},
+  directMessagesAvailable: false,
+  isSellingBundles: false,
+  toggleIsSellingBundles: async () => {},
 });
 
 interface IBundleContextProvider {
@@ -32,96 +38,124 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   children,
 }) => {
   const user = useAppSelector((state) => state.user);
-  // Socket
   const socketConnection = useContext(SocketContext);
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const [bundles, setBundles] = useState<
     newnewapi.ICreatorBundle[] | undefined
   >(undefined);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSoldBundles, setHasSoldBundles] = useState<boolean>(false);
+  const [isSellingBundles, setIsSellingBundles] = useState(false);
+  const [isSellingBundlesStatusLoaded, setIsSellingBundlesStatusLoaded] =
+    useState(false);
+  const [busyTogglingSellingBundles, setBusyTogglingSellingBundles] =
+    useState(false);
+  const [hasSoldBundles, setHasSoldBundles] = useState(false);
 
-  const handleSetBundles = useCallback(
-    (newBundles: newnewapi.ICreatorBundle[]) => {
-      setBundles(newBundles);
-    },
-    []
-  );
+  const fetchBundles = useCallback(async () => {
+    const payload = new newnewapi.EmptyRequest({});
+    const res = await getMyBundles(payload);
 
-  const contextValue = useMemo(
-    () => ({
-      bundles,
-      bundlesLoading: isLoading,
-      hasSoldBundles,
-      handleSetBundles,
-    }),
-    [bundles, isLoading, handleSetBundles]
-  );
+    if (!res.data || res.error)
+      throw new Error(res.error?.message ?? 'Request failed');
 
-  // Load bundles
+    return res.data.creatorBundles;
+  }, []);
+
+  const fetchIsSellingBundles = useCallback(async () => {
+    const payload = new newnewapi.EmptyRequest();
+
+    const res = await getBundleStatus(payload);
+
+    if (!res.data || res.error) {
+      throw new Error('Request failed');
+    }
+
+    return res.data.bundleStatus === newnewapi.CreatorBundleStatus.ENABLED;
+  }, []);
+
+  const fetchHasSoldBundles = useCallback(async () => {
+    // Do we really need it?
+    // Optimized by using state stored in LS
+    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
+    if (localHasSoldBundles) {
+      return true;
+    } else {
+      const payload = new newnewapi.GetMyBundleEarningsRequest();
+      const res = await getMyBundleEarnings(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      const earnings = res.data.totalBundleEarnings?.usdCents ?? 0;
+      return earnings > 0;
+    }
+  }, []);
+
+  // Load data
   useEffect(() => {
-    async function fetchBundles() {
-      if (!user.loggedIn) {
-        setBundles(undefined);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyBundles(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        setBundles(res.data.creatorBundles);
-
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err);
-        setIsLoading(false);
-      }
+    // Wait fo user data to load
+    if (!user._persist?.rehydrated) {
+      return;
     }
 
-    fetchBundles();
-
-    // if creator did not sell any bundle we should
-    // hide navigation link to direct messages
-    async function fetchMyBundlesEarnings() {
-      try {
-        const payload = new newnewapi.GetMyBundleEarningsRequest();
-        const res = await getMyBundleEarnings(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data.totalBundleEarnings?.usdCents) {
-          setHasSoldBundles(true);
-          saveStateLS('creatorHasSoldBundles', true);
-        }
-      } catch (err) {
-        console.error(err);
-        setHasSoldBundles(false);
-      }
-    }
     if (user.loggedIn) {
-      const localHasSoldBundles = loadStateLS(
-        'creatorHasSoldBundles'
-      ) as boolean;
-      if (localHasSoldBundles) {
-        setHasSoldBundles(true);
-      } else if (
+      fetchBundles()
+        .then((creatorBundles) => {
+          setBundles(creatorBundles);
+        })
+        .catch((err) => {
+          console.error(err);
+          showErrorToastPredefined();
+          setBundles(undefined);
+        });
+
+      if (
         user.userData?.options?.creatorStatus !==
         newnewapi.Me.CreatorStatus.NOT_CREATOR
       ) {
-        fetchMyBundlesEarnings();
+        fetchIsSellingBundles()
+          .then((creatorIsSellingBundles) => {
+            setIsSellingBundles(creatorIsSellingBundles);
+            setIsSellingBundlesStatusLoaded(true);
+          })
+          .catch((err) => {
+            console.error(err);
+            showErrorToastPredefined();
+            setIsSellingBundles(false);
+            setIsSellingBundlesStatusLoaded(false);
+          });
+
+        fetchHasSoldBundles()
+          .then((creatorHasSoldBundles) => {
+            setHasSoldBundles(creatorHasSoldBundles);
+            saveStateLS('creatorHasSoldBundles', creatorHasSoldBundles);
+          })
+          .catch((err) => {
+            console.error(err);
+            showErrorToastPredefined();
+            setHasSoldBundles(false);
+            saveStateLS('creatorHasSoldBundles', false);
+          });
+      } else {
+        setIsSellingBundles(false);
+        setHasSoldBundles(false);
       }
     } else {
+      // Clear state
+      setBundles(undefined);
+      setIsSellingBundles(false);
+      setIsSellingBundlesStatusLoaded(false);
       setHasSoldBundles(false);
       saveStateLS('creatorHasSoldBundles', false);
     }
-  }, [user.loggedIn]);
+  }, [
+    user._persist?.rehydrated,
+    user.loggedIn,
+    user.userData?.options?.creatorStatus,
+    fetchBundles,
+    fetchIsSellingBundles,
+    fetchHasSoldBundles,
+  ]);
 
   // Listen for socket updates
   useEffect(() => {
@@ -165,8 +199,60 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         socketConnection?.off('CreatorBundleChanged', handleBundleChanged);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, user.loggedIn]);
+
+  const toggleIsSellingBundles = useCallback(async () => {
+    if (busyTogglingSellingBundles || !isSellingBundlesStatusLoaded) {
+      throw new Error('Busy or status is not loaded yet');
+    }
+
+    setBusyTogglingSellingBundles(true);
+
+    try {
+      const payload = new newnewapi.SetBundleStatusRequest({
+        bundleStatus: isSellingBundles
+          ? newnewapi.CreatorBundleStatus.DISABLED
+          : newnewapi.CreatorBundleStatus.ENABLED,
+      });
+
+      const res = await setBundleStatus(payload);
+
+      if (!res.data || res.error) {
+        throw new Error('Request failed');
+      }
+
+      setIsSellingBundles(!isSellingBundles);
+    } catch (err) {
+      console.error(err);
+      showErrorToastPredefined(undefined);
+      throw err;
+    } finally {
+      setBusyTogglingSellingBundles(false);
+    }
+  }, [
+    busyTogglingSellingBundles,
+    isSellingBundlesStatusLoaded,
+    isSellingBundles,
+  ]);
+
+  // A single place to set up the rules for all elements navigating to DM views
+  const directMessagesAvailable = useMemo(
+    () => (bundles && bundles.length > 0) || isSellingBundles || hasSoldBundles,
+    [bundles, isSellingBundles, hasSoldBundles]
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      bundles,
+      // This has no WS update, could cause troubles with other tabs
+      directMessagesAvailable,
+      // This has no WS update, could cause troubles with other tabs
+      isSellingBundles,
+      // Could cause troubles if used on different tabs
+      toggleIsSellingBundles,
+    }),
+    [bundles, directMessagesAvailable, isSellingBundles, toggleIsSellingBundles]
+  );
 
   return (
     <BundlesContext.Provider value={contextValue}>

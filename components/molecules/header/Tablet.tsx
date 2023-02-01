@@ -29,7 +29,7 @@ export const Tablet: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { bundles, hasSoldBundles } = useBundles();
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -87,7 +87,7 @@ export const Tablet: React.FC = React.memo(() => {
                 </Link>
               </SItemWithMargin>
             )}
-            {(hasSoldBundles || (bundles && bundles.length > 0)) && (
+            {directMessagesAvailable && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
