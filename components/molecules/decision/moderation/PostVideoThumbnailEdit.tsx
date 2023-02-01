@@ -25,6 +25,7 @@ interface IPostVideoThumbnailEdit {
   open: boolean;
   value: any;
   thumbnails: any;
+  isLoading: boolean;
   handleClose: () => void;
   handleSubmit: (value: any) => void;
 }
@@ -33,6 +34,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   open,
   value,
   thumbnails,
+  isLoading,
   handleClose,
   handleSubmit,
 }) => {
@@ -142,6 +144,10 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   }, [getTime, videoDuration]);
 
   const handleVideoSelectDragStart = useCallback(() => {
+    if (progressRef.current) {
+      return;
+    }
+
     const { left, width } = progressRef.current.getBoundingClientRect();
     const initialPoint = window.innerWidth / 2 - 36;
     const percentage = ((initialPoint - left) * 100) / width;
@@ -188,7 +194,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
       if (playerRef.current.getCurrentTime() >= videoThumbs.current.endTime) {
         playerRef.current.pause();
         playerRef.current.seek(videoThumbs.current.startTime);
-        playerRef.current.play();
+        playerRef.current.play().catch(() => {});
       }
     };
     playerRef.current.pause();
@@ -196,7 +202,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     playerRef.current.handleTimeChange = handleTimeChange;
 
     playerRef.current.seek(videoThumbs.current.startTime);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {});
   }, [getTime, videoDuration, setCurrentTime]);
 
   const getInitialXPosition = useCallback(() => {
@@ -309,7 +315,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
         </SModalTopContent>
         {isMobile ? (
           <SModalButtonContainer>
-            <Button view='primaryGrad' onClick={onSubmit}>
+            <Button view='primaryGrad' disabled={isLoading} onClick={onSubmit}>
               {t('postVideoThumbnailEdit.submit')}
             </Button>
           </SModalButtonContainer>
@@ -318,7 +324,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
             <Button view='secondary' onClick={handleClose}>
               {t('postVideoThumbnailEdit.cancel')}
             </Button>
-            <Button view='primaryGrad' onClick={onSubmit}>
+            <Button view='primaryGrad' disabled={isLoading} onClick={onSubmit}>
               {t('postVideoThumbnailEdit.submit')}
             </Button>
           </SButtonsWrapper>

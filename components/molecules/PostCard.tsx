@@ -384,7 +384,9 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     useEffect(() => {
       if (hovered) {
-        videoRef.current?.play();
+        videoRef.current?.play().catch(() => {
+          console.error("Autoplay doesn't allowed");
+        });
       } else {
         videoRef.current?.pause();
       }
@@ -1016,6 +1018,7 @@ const SText = styled(Text)`
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
 `;
 
 const SWrapperOutside = styled.div<ISWrapper>`
@@ -1123,6 +1126,7 @@ const SBottomContentOutside = styled.div`
   padding: 8px 10px 0 10px;
   display: flex;
   flex-direction: column;
+  word-break: break-word;
 `;
 
 const STextOutside = styled(Text)`
@@ -1268,6 +1272,12 @@ const SButton = styled(Button)<ISButtonSpan>`
       font-size: 16px;
     }
   }
+
+  &&& {
+    &:hover {
+      box-shadow: none;
+    }
+  }
 `;
 
 const SButtonFirst = styled(Button)`
@@ -1296,11 +1306,15 @@ const SButtonFirst = styled(Button)`
     }
   }
 
-  &:hover,
-  &:active,
-  &:focus {
-    span {
-      color: #ffffff;
+  &&& {
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: none;
+
+      span {
+        color: #ffffff;
+      }
     }
   }
 `;

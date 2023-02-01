@@ -34,6 +34,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import TextArea from '../../atoms/direct-messages/TextArea';
 import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader';
 import { useGetChats } from '../../../contexts/chatContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -124,7 +125,13 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
   const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
-      if (!confirmBlockUser) setConfirmBlockUser(true);
+      if (!confirmBlockUser) {
+        Mixpanel.track('Block User Modal Opened', {
+          _stage: 'Direct Messages',
+          _component: 'ChatContent',
+        });
+        setConfirmBlockUser(true);
+      }
     } else {
       changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
     }
@@ -142,6 +149,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const submitMessage = useCallback(async () => {
     if (chatRoom && messageTextValid) {
       const tmpMsgText = messageText.trim();
+
       if (tmpMsgText.length > 0) {
         try {
           setSendingMessage(true);
@@ -168,8 +176,16 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, [chatRoom, messageTextValid, messageText, setJustSentMessage]);
 
   const handleSubmit = useCallback(() => {
-    if (!sendingMessage) submitMessage();
-  }, [sendingMessage, submitMessage]);
+    Mixpanel.track('Send Message Button Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'ChatContent',
+      _roomId: chatRoom.id,
+    });
+
+    if (!sendingMessage) {
+      submitMessage();
+    }
+  }, [sendingMessage, submitMessage, chatRoom.id]);
 
   const handleChange = useCallback(
     (id: string, value: string, isShiftEnter: boolean) => {
@@ -252,16 +268,20 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
         textareaFocused={textareaFocused}
       />
       <SBottomPart>
-        {(isVisavisBlocked === true || confirmBlockUser) &&
-          chatRoom.visavis && (
-            <BlockedUser
-              confirmBlockUser={confirmBlockUser}
-              isBlocked={isVisavisBlocked}
-              user={chatRoom.visavis}
-              onUserBlock={onUserBlock}
-              closeModal={() => setConfirmBlockUser(false)}
-            />
-          )}
+        {(isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis && (
+          <BlockedUser
+            confirmBlockUser={confirmBlockUser}
+            isBlocked={isVisavisBlocked}
+            user={chatRoom.visavis}
+            onUserBlock={onUserBlock}
+            closeModal={() => {
+              Mixpanel.track('Close Block User Modal', {
+                _stage: 'Direct Messages',
+              });
+              setConfirmBlockUser(false);
+            }}
+          />
+        )}
         {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>

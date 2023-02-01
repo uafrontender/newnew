@@ -50,6 +50,7 @@ import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import usePost from '../../utils/hooks/usePost';
+import getDisplayname from '../../utils/getDisplayname';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -399,6 +400,18 @@ const PostPage: NextPage<IPostPage> = ({
     [setRecommendedPosts, recommendedPostsLoading, postParsed]
   );
 
+  // Refetch Post if user authenticated
+  useEffect(() => {
+    if (user.loggedIn) {
+      refetchPost();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
+
+  useEffect(() => {
+    setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
+  }, [postParsed?.isFavoritedByMe]);
+
   // Comment ID from URL
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -571,7 +584,14 @@ const PostPage: NextPage<IPostPage> = ({
         refetchPost={refetchPost}
       >
         <Head>
-          <title>{typeOfPost ? t(`meta.${typeOfPost}.title`) : ''}</title>
+          <title>
+            {typeOfPost
+              ? t(`meta.${typeOfPost}.title`, {
+                  displayName: getDisplayname(user.userData),
+                  postTitle: postParsed.title,
+                })
+              : ''}
+          </title>
           <meta
             name='description'
             content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}
@@ -657,49 +677,28 @@ export default PostPage;
 export const getServerSideProps: GetServerSideProps<IPostPage> = async (
   context
 ) => {
-  const {
-    post_uuid_or_short_id,
-    setup_intent_client_secret,
-    comment_id,
-    comment_content,
-    save_card,
-  } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    [
-      'common',
-      'page-Post',
-      'modal-ResponseSuccessModal',
-      'component-PostCard',
-      'modal-PaymentModal',
-    ],
-    null,
-    SUPPORTED_LANGUAGES
-  );
-
-  if (!post_uuid_or_short_id || Array.isArray(post_uuid_or_short_id)) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-
-  if (!context.req.url?.startsWith('/_next')) {
-    // console.log('I am from direct link, making SSR request');
-
-    const getPostPayload = new newnewapi.GetPostRequest({
-      postUuid: post_uuid_or_short_id,
-    });
-
-    const res = await fetchPostByUUID(
-      getPostPayload,
-      undefined,
-      context.req.cookies?.accessToken ?? undefined
+  try {
+    const {
+      post_uuid_or_short_id,
+      setup_intent_client_secret,
+      comment_id,
+      comment_content,
+      save_card,
+    } = context.query;
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      [
+        'common',
+        'page-Post',
+        'modal-ResponseSuccessModal',
+        'component-PostCard',
+        'modal-PaymentModal',
+      ],
+      null,
+      SUPPORTED_LANGUAGES
     );
 
-    if (!res.data || res.error) {
+    if (!post_uuid_or_short_id || Array.isArray(post_uuid_or_short_id)) {
       return {
         redirect: {
           destination: '/',
@@ -708,54 +707,117 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       };
     }
 
-    if (
-      validateUuid(post_uuid_or_short_id) &&
-      !!switchPostType(res.data)[0].postShortId
-    ) {
-      let queryString = '';
-      const queryObject = {
-        ...(setup_intent_client_secret &&
-        !Array.isArray(setup_intent_client_secret)
-          ? {
-              setup_intent_client_secret,
-            }
-          : {}),
-        ...(comment_id && !Array.isArray(comment_id)
-          ? {
-              comment_id,
-            }
-          : {}),
-        ...(comment_content && !Array.isArray(comment_content)
-          ? {
-              comment_content,
-            }
-          : {}),
-        ...(save_card && !Array.isArray(save_card)
-          ? {
-              save_card,
-            }
-          : {}),
-      };
+    if (!context.req.url?.startsWith('/_next')) {
+      // console.log('I am from direct link, making SSR request');
 
-      if (Object.keys(queryObject).length !== 0) {
-        queryString = '?' + new URLSearchParams(queryObject as any).toString();
+      const getPostPayload = new newnewapi.GetPostRequest({
+        postUuid: post_uuid_or_short_id,
+      });
+
+      const res = await fetchPostByUUID(
+        getPostPayload,
+        undefined,
+        context.req.cookies?.accessToken ?? undefined
+      );
+
+      if (!res.data || res.error) {
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false,
+          },
+        };
+      }
+
+      if (
+        validateUuid(post_uuid_or_short_id) &&
+        !!switchPostType(res.data)[0].postShortId
+      ) {
+        let queryString = '';
+        const queryObject = {
+          ...(setup_intent_client_secret &&
+          !Array.isArray(setup_intent_client_secret)
+            ? {
+                setup_intent_client_secret,
+              }
+            : {}),
+          ...(comment_id && !Array.isArray(comment_id)
+            ? {
+                comment_id,
+              }
+            : {}),
+          ...(comment_content && !Array.isArray(comment_content)
+            ? {
+                comment_content,
+              }
+            : {}),
+          ...(save_card && !Array.isArray(save_card)
+            ? {
+                save_card,
+              }
+            : {}),
+        };
+
+        if (Object.keys(queryObject).length !== 0) {
+          queryString =
+            '?' + new URLSearchParams(queryObject as any).toString();
+        }
+
+        return {
+          redirect: {
+            destination: `/p/${
+              switchPostType(res.data)[0].postShortId
+            }${queryString}`,
+            permanent: true,
+          },
+        };
+      }
+
+      if (!context.req.cookies?.accessToken) {
+        // cache the response only if the post is found and no redirect applies
+        context.res.setHeader(
+          'Cache-Control',
+          'public, s-maxage=5, stale-while-revalidate=10'
+        );
       }
 
       return {
-        redirect: {
-          destination: `/p/${
-            switchPostType(res.data)[0].postShortId
-          }${queryString}`,
-          permanent: true,
+        props: {
+          postUuidOrShortId: post_uuid_or_short_id,
+          isServerSide: true,
+          post: res.data.toJSON() as newnewapi.IPost,
+          ...(setup_intent_client_secret &&
+          !Array.isArray(setup_intent_client_secret)
+            ? {
+                setup_intent_client_secret,
+              }
+            : {}),
+          ...(save_card && !Array.isArray(save_card)
+            ? {
+                save_card: save_card === 'true',
+              }
+            : {}),
+          ...(comment_id && !Array.isArray(comment_id)
+            ? {
+                comment_id,
+              }
+            : {}),
+          ...(comment_content && !Array.isArray(comment_content)
+            ? {
+                comment_content,
+              }
+            : {}),
+          ...translationContext,
         },
       };
     }
 
+    // console.log('I am from next router, no SSR needed');
+
     return {
       props: {
         postUuidOrShortId: post_uuid_or_short_id,
-        isServerSide: true,
-        post: res.data.toJSON() as newnewapi.IPost,
+        isServerSide: false,
         ...(setup_intent_client_secret &&
         !Array.isArray(setup_intent_client_secret)
           ? {
@@ -780,36 +842,12 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         ...translationContext,
       },
     };
+  } catch {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
   }
-
-  // console.log('I am from next router, no SSR needed');
-
-  return {
-    props: {
-      postUuidOrShortId: post_uuid_or_short_id,
-      isServerSide: false,
-      ...(setup_intent_client_secret &&
-      !Array.isArray(setup_intent_client_secret)
-        ? {
-            setup_intent_client_secret,
-          }
-        : {}),
-      ...(save_card && !Array.isArray(save_card)
-        ? {
-            save_card: save_card === 'true',
-          }
-        : {}),
-      ...(comment_id && !Array.isArray(comment_id)
-        ? {
-            comment_id,
-          }
-        : {}),
-      ...(comment_content && !Array.isArray(comment_content)
-        ? {
-            comment_content,
-          }
-        : {}),
-      ...translationContext,
-    },
-  };
 };

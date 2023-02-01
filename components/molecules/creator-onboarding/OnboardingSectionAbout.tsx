@@ -23,6 +23,7 @@ import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import isSafari from '../../../utils/isSafari';
 import { I18nNamespaces } from '../../../@types/i18next';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -129,6 +130,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
 
   const handleSubmit = useCallback(async () => {
     try {
+      Mixpanel.track('Submit Bio', {
+        _stage: 'Onboarding',
+        _button: 'Save Changes',
+        _component: 'OnboardingSectionAbout',
+      });
+
       setLoadingModalOpen(true);
 
       const updateBioPayload = new newnewapi.UpdateMeRequest({
@@ -152,9 +159,9 @@ const OnboardingSectionAbout: React.FunctionComponent<
         newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
           .CONNECTED_ALL_GOOD
       ) {
-        router.push('/creator/dashboard');
+        router.replace('/creator/dashboard');
       } else {
-        router.push('/creator-onboarding-stripe');
+        router.replace('/creator-onboarding-stripe');
       }
 
       setLoadingModalOpen(false);
@@ -228,7 +235,17 @@ const OnboardingSectionAbout: React.FunctionComponent<
         </STopContainer>
         <SControlsDiv>
           {!isMobile && (
-            <GoBackButton noArrow onClick={() => router.back()}>
+            <GoBackButton
+              noArrow
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Onboarding',
+                  _button: 'Close',
+                  _component: 'OnboardingSectionAbout',
+                });
+                router.back();
+              }}
+            >
               {t('aboutSection.button.back')}
             </GoBackButton>
           )}

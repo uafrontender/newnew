@@ -27,6 +27,7 @@ import usePagination, {
   Paging,
 } from '../utils/hooks/usePagination';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { Mixpanel } from '../utils/mixpanel';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -81,6 +82,10 @@ export const Notifications = () => {
 
   const handleMarkAllAsRead = useCallback(async () => {
     try {
+      Mixpanel.track('Mark All As Read Clicked', {
+        stage: 'Notifications',
+      });
+
       const payload = new newnewapi.EmptyRequest({});
       await markAllAsRead(payload);
 
@@ -174,6 +179,10 @@ export const Notifications = () => {
 export default Notifications;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=50, stale-while-revalidate=60'
+  );
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-Notifications'],

@@ -1,31 +1,38 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { GetServerSideProps } from 'next';
+import { useUpdateEffect } from 'react-use';
+import { useRouter } from 'next/router';
+import styled from 'styled-components';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import loadingAnimation from '../../public/animations/logo-loading-blue.json';
 import { getMyOnboardingState } from '../../api/endpoints/user';
 import CreatorStripeLayout from '../../components/templates/CreatorStripeLayout';
 import { NextPageWithLayout } from '../_app';
-import Lottie from '../../components/atoms/Lottie';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setCreatorData } from '../../redux-store/slices/userStateSlice';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import Loader from '../../components/atoms/Loader';
 
 const DashboardSectionStripe = dynamic(
   () => import('../../components/organisms/creator/DashboardSectionStripe')
 );
 
 const GetPaid = () => {
+  const router = useRouter();
   const { t } = useTranslation('page-Creator');
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+
+  useUpdateEffect(() => {
+    if (!user?.userData?.options?.isCreator) {
+      router.replace('/');
+    }
+  }, [user?.userData?.options?.isCreator]);
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -66,19 +73,7 @@ const GetPaid = () => {
           content={t('getPaid.meta.description')}
         />
       </Head>
-      {isLoading === false ? (
-        <DashboardSectionStripe />
-      ) : (
-        <Lottie
-          width={64}
-          height={64}
-          options={{
-            loop: true,
-            autoplay: true,
-            animationData: loadingAnimation,
-          }}
-        />
-      )}
+      {isLoading === false ? <DashboardSectionStripe /> : <SLoader size='md' />}
     </>
   );
 };
@@ -90,6 +85,13 @@ const GetPaid = () => {
 };
 
 export default GetPaid;
+
+const SLoader = styled(Loader)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(

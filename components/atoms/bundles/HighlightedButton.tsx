@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Button from '../Button';
 
 interface IHighlightedButton {
   id?: string;
@@ -9,9 +10,7 @@ interface IHighlightedButton {
   onClick?: () => void;
 }
 
-// This component is a result of Button not supporting yellow buttons
-// And design not following Button specs
-// TODO: Refactor buttons
+// Remove some styles as now yellow button exits in Button component but not removed component completely because paddings are different
 const HighlightedButton: React.FC<IHighlightedButton> = ({
   id,
   className,
@@ -19,44 +18,21 @@ const HighlightedButton: React.FC<IHighlightedButton> = ({
   children,
   onClick,
 }) => (
-  <SButton id={id} className={className} size={size} onClick={onClick}>
+  <SButton
+    id={id}
+    view='brandYellow'
+    className={className}
+    $size={size}
+    onClick={onClick}
+  >
     {children}
   </SButton>
 );
 
 export default HighlightedButton;
 
-const SButton = styled.button<{ size?: 'small' | 'normal' }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: ${({ size }) => (size === 'small' ? '8px 16px' : '12px 24px')};
+const SButton = styled(Button)<{ $size?: 'small' | 'normal' }>`
+  padding: ${({ $size }) => ($size === 'small' ? '8px 16px' : '12px 24px')};
   width: 100%;
-
-  font-size: ${({ size }) => (size === 'small' ? '14px' : '16px')};
-  line-height: 24px;
-  font-weight: 700;
-  white-space: nowrap;
-
-  color: ${({ theme }) => theme.colors.darkGray};
-  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  border: transparent;
-
-  cursor: pointer;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  &:focus,
-  &:hover,
-  &:active {
-    outline: none;
-  }
+  font-size: ${({ $size }) => ($size === 'small' ? '14px' : '16px')};
 `;

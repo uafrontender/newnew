@@ -164,6 +164,7 @@
       }
     },
     "creatorsBundle": {
+      "accessExpired": "Your benefits have now expired. Buy another bundle for custom options and chat",
       "votesLeft": "<0>{{amount}}</0> votes left",
       "for": "for ",
       "access": "<0/> left of:",

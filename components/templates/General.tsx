@@ -56,7 +56,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles, hasSoldBundles } = useBundles();
+  const { bundles, directMessagesAvailable } = useBundles();
   const {
     unreadCount,
     setMobileChatOpened,
@@ -177,8 +177,8 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [activeTab, setActiveTab, setMobileChatOpened, router]);
 
   const chatButtonVisible = useMemo(
-    () => isMobile && withChat && hasSoldBundles,
-    [isMobile, withChat, hasSoldBundles]
+    () => isMobile && withChat && directMessagesAvailable,
+    [isMobile, withChat, directMessagesAvailable]
   );
 
   const mobileNavigationVisible = useMemo(
@@ -367,7 +367,7 @@ const SortingContainer = styled.div<ISortingContainer>`
     props.bottomNavigationVisible
       ? `${props.withCookie ? 128 : 72}`
       : `${props.withCookie ? 72 : 16}`}px;
-  z-index: 10;
+  z-index: 9;
   position: fixed;
   transform: translateX(-50%);
   transition: bottom ease 0.5s;

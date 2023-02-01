@@ -1,5 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { useRef, useState, useEffect, ReactElement } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  ReactElement,
+  useMemo,
+} from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -80,18 +86,29 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     // const isLaptop = ['laptop'].includes(resizeMode);
     // const isDesktop = ['laptopL'].includes(resizeMode);
 
-    let collectionToRender = collection;
-    let renderShowMore = false;
-    let scrollStep = SCROLL_STEP.desktop;
+    const collectionToRender = useMemo(() => {
+      if (isMobile && collection?.length > 3) {
+        return collection.slice(0, 3);
+      }
 
-    if (isMobile && collection?.length > 3) {
-      renderShowMore = true;
-      collectionToRender = collection.slice(0, 3);
-    }
+      return collection;
+    }, [collection, isMobile]);
 
-    if (resizeMode === 'tablet' || resizeMode === 'laptop') {
-      scrollStep = SCROLL_STEP.tablet;
-    }
+    const renderShowMore = useMemo(() => {
+      if (isMobile && collection?.length > 3) {
+        return true;
+      }
+
+      return false;
+    }, [isMobile, collection?.length]);
+
+    const scrollStep = useMemo(() => {
+      if (resizeMode === 'tablet' || resizeMode === 'laptop') {
+        return SCROLL_STEP.tablet;
+      }
+
+      return SCROLL_STEP.desktop;
+    }, [resizeMode]);
 
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
