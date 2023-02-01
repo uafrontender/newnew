@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../../atoms/EllipseMenu';
 import { TPostType } from '../../../../utils/switchPostType';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IPostEllipseMenuModeration {
+  postUuid: string;
   postType: TPostType;
   isVisible: boolean;
   canDeletePost: boolean;
@@ -17,6 +19,7 @@ interface IPostEllipseMenuModeration {
 const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModeration> =
   React.memo(
     ({
+      postUuid,
       postType,
       isVisible,
       canDeletePost,
@@ -25,6 +28,16 @@ const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModerat
       anchorElement,
     }) => {
       const { t } = useTranslation('common');
+
+      const handleOpenDeletePostModalMixpanel = useCallback(() => {
+        Mixpanel.track('Open Delete Post Modal', {
+          _stage: 'Post',
+          _postUuid: postUuid,
+          _component: 'PostEllipseMenuModeration',
+        });
+        handleOpenDeletePostModal();
+        handleClose();
+      }, [handleOpenDeletePostModal, handleClose, postUuid]);
 
       return (
         <SEllipseMenu
@@ -35,10 +48,7 @@ const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModerat
           <SEllipseMenuButton
             variant={3}
             disabled={!canDeletePost}
-            onClick={() => {
-              handleOpenDeletePostModal();
-              handleClose();
-            }}
+            onClick={() => handleOpenDeletePostModalMixpanel()}
           >
             {t('ellipse.deleteDecision', {
               postType: t(`postType.${postType}`),

@@ -30,6 +30,7 @@ import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -196,6 +197,12 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   return (
     <SForm
       id='checkout-form'
+      onSubmitCapture={() => {
+        Mixpanel.track('Submit Checkout Form', {
+          _stage: 'Payment',
+          _component: 'CheckoutForm',
+        });
+      }}
       onSubmit={(e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (userData?.options?.isWhiteListed) {

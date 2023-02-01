@@ -48,6 +48,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
     additionalResponses,
     videoProcessing,
     responseFileProcessingProgress,
+    isDeletingAdditionalResponse,
     handleDeleteAdditionalResponse,
   } = usePostModerationResponsesContext();
   const value = useMemo(() => videoProcessing?.targetUrls, [videoProcessing]);
@@ -81,6 +82,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
                   soundBtnBottomOverriden + (!isEditingStories ? 72 : 24),
               }
             : {})}
+          isDeletingAdditionalResponse={isDeletingAdditionalResponse}
           handleDeleteAdditionalVideo={handleDeleteAdditionalResponse}
           handleDeleteUnuploadedAdditonalResponse={
             handleDeleteUnuploadedAdditonalResponse
