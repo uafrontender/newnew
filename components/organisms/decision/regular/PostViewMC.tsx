@@ -172,6 +172,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   // Bundle modal
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
+  const handleClickBuyBundlesButton = useCallback(() => {
+    Mixpanel.track('Click Buy Bundles Button', {
+      _stage: 'Post',
+      _postUuid: post.postUuid,
+      _component: 'PostViewMC',
+    });
+    setBuyBundleModalOpen(true);
+  }, [post.postUuid]);
+
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
@@ -619,10 +628,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             postType='mc'
             isVisible={paymentSuccessModalOpen}
             closeModal={() => {
-              Mixpanel.track('Close Payment Success Modal', {
-                _stage: 'Post',
-                _postUuid: post.postUuid,
-              });
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
             }}
@@ -662,9 +667,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           <SHighlightedButton
             id='buy-bundle-button'
             size='small'
-            onClick={() => {
-              setBuyBundleModalOpen(true);
-            }}
+            onClick={handleClickBuyBundlesButton}
           >
             {creatorsBundle?.bundle
               ? t('mcPost.optionsTab.actionSection.getBundles')
