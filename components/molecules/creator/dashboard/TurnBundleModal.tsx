@@ -9,6 +9,7 @@ import Button from '../../../atoms/Button';
 import votes from '../../../../public/images/dashboard/double-votes.png';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ITurnBundleModal {
   show: boolean;
@@ -48,7 +49,16 @@ const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
               </SText>
               <SButton
                 id='turn-on-bundles-modal-button'
-                onClick={onToggleBundles}
+                view={isBundlesEnabled ? 'quaternary' : 'brandYellow'}
+                onClick={() => {
+                  Mixpanel.track(
+                    isBundlesEnabled ? 'Turn Off Bundles' : 'Turn On Bundles',
+                    {
+                      _stage: 'Dashboard',
+                    }
+                  );
+                  onToggleBundles();
+                }}
                 enabled={isBundlesEnabled}
                 disabled={isBundlesEnabled === undefined}
               >
@@ -90,35 +100,12 @@ const SButton = styled(Button)<ISButton>`
   width: 100%;
   margin-left: 0;
   padding: 16px 20px;
-  background: ${(props) =>
-    !props.enabled
-      ? props.theme.colorsThemed.accent.yellow
-      : props.theme.colorsThemed.background.tertiary};
-  color: ${(props) =>
-    !props.enabled
-      ? props.theme.colors.darkGray
-      : props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
+    // TODO: Is margin needed?
     margin-left: 10px;
-  }
-  &:focus,
-  &:active,
-  &:hover {
-    background: ${(props) =>
-      !props.enabled
-        ? props.theme.colorsThemed.accent.yellow
-        : props.theme.colorsThemed.background.tertiary} !important;
-    color: ${(props) =>
-      !props.enabled
-        ? props.theme.colors.darkGray
-        : props.theme.name === 'light'
-        ? props.theme.colorsThemed.text.primary
-        : props.theme.colors.white} !important;
   }
 `;
 

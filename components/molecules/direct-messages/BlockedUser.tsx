@@ -12,6 +12,7 @@ import {
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
 import getDisplayname from '../../../utils/getDisplayname';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const BlockUserModal = dynamic(() => import('./BlockUserModal'));
 
@@ -57,7 +58,15 @@ const BlockedUser: React.FC<IBlockedUser> = ({
             withDim
             withShrink
             view='quaternary'
-            onClick={onUserBlock}
+            onClick={() => {
+              Mixpanel.track('Unblock User Button Clicked', {
+                _stage: 'Direct Messages',
+                _component: 'BlockedUser',
+                _userUuid: user.user?.uuid,
+              });
+
+              onUserBlock();
+            }}
           >
             {isAnnouncement
               ? t('groupBlocked.buttonText')
