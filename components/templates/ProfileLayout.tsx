@@ -334,7 +334,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
             {creatorsBundle && (
               <CustomLink href={`/direct-messages/${user.username}`}>
-                <SSendButton withShadow view='primaryGrad'>
+                <SSendButton view='brandYellow'>
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
               </CustomLink>
@@ -486,17 +486,7 @@ const SShareButton = styled(Button)`
 
 const SSendButton = styled(Button)`
   margin: 0 auto 16px;
-  background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
-
-  :after {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
-  }
-
-  &:hover {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
-    box-shadow: none !important;
-  }
 `;
 
 const SBioText = styled(Text)`

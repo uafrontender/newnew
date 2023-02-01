@@ -18,6 +18,7 @@ import GoBackButton from '../GoBackButton';
 import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -147,6 +148,12 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
             return;
           }
 
+          Mixpanel.track('Redirect to Stripe', {
+            _button: getStripeButtonTextKey(stripeConnectStatus),
+            _stage: 'Onboarding',
+            _component: 'OnboardingSectionStripe',
+          });
+
           handleRedirectToStripeSetup();
         }}
       >
@@ -161,7 +168,16 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
         {!isMobile && (
           <Link href='/creator/dashboard'>
             <a>
-              <GoBackButton noArrow onClick={() => {}}>
+              <GoBackButton
+                noArrow
+                onClick={() => {
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _stage: 'Onboarding',
+                    _component: 'OnboardingSectionStripe',
+                    _target: '/creator/dashboard',
+                  });
+                }}
+              >
                 {t('aboutSection.button.back')}
               </GoBackButton>
             </a>

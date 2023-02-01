@@ -12,6 +12,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ToDoItem {
   id: string;
@@ -72,7 +73,19 @@ export const YourToDos = () => {
         {!item.completed && item.id === 'complete-profile' && (
           <Link href='/creator-onboarding-about'>
             <a>
-              <SBottomActionButton withDim withShrink view='primaryGrad'>
+              <SBottomActionButton
+                withDim
+                withShrink
+                view='primaryGrad'
+                onClick={() => {
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _button: 'Add',
+                    _info: 'Add bio',
+                    _stage: 'Dashboard',
+                    _target: '/creator-onboarding-about',
+                  });
+                }}
+              >
                 {t('dashboard.toDos.completeProfileButton')}
               </SBottomActionButton>
             </a>
@@ -81,7 +94,19 @@ export const YourToDos = () => {
         {!item.completed && item.id === 'add-cash-out-method' && (
           <Link href='/creator/get-paid'>
             <a>
-              <SBottomActionButton withDim withShrink view='primaryGrad'>
+              <SBottomActionButton
+                withDim
+                withShrink
+                view='primaryGrad'
+                onClick={() => {
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _button: 'Add',
+                    _info: 'Add bank info',
+                    _stage: 'Dashboard',
+                    _target: '/creator/get-paid',
+                  });
+                }}
+              >
                 {t('dashboard.toDos.addCashOutMethodButton')}
               </SBottomActionButton>
             </a>

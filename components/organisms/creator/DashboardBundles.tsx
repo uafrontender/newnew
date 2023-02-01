@@ -10,6 +10,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
+import Loader from '../../atoms/Loader';
 import { useBundles } from '../../../contexts/bundlesContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
@@ -43,8 +45,16 @@ export const DashboardBundles: React.FC = React.memo(() => {
   const [successModalOpen, setSuccessModalOpen] = useState(false);
 
   const toggleTurnBundleModalOpen = useCallback(() => {
+    Mixpanel.track(
+      turnBundleModalOpen
+        ? 'Turn bundle Modal Closed'
+        : 'Turn bundle Modal Opened',
+      {
+        _stage: 'Dashboard',
+      }
+    );
     setTurnBundleModalOpen((prevState) => !prevState);
-  }, []);
+  }, [turnBundleModalOpen]);
 
   const onToggleBundles = useCallback(async () => {
     toggleIsSellingBundles()
@@ -78,8 +88,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
           {!isMobile && <DynamicSection />}
         </STitleBlock>
         {isSellingBundles === undefined ? (
-          // TODO: add a spinner
-          <div>Loading</div>
+          <SLoader size='md' />
         ) : (
           <>
             {isSellingBundles && (
@@ -95,6 +104,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
                 </STextHolder>
                 <SButton
                   id='turn-on-bundles-button'
+                  view={isSellingBundles ? 'quaternary' : 'brandYellow'}
                   onClick={toggleTurnBundleModalOpen}
                   enabled={isSellingBundles}
                   disabled={isSellingBundles === undefined}
@@ -152,6 +162,7 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
+  position: relative;
   min-height: calc(100vh - 120px);
 
   ${(props) => props.theme.media.tablet} {
@@ -239,35 +250,11 @@ const SButton = styled(Button)<ISButton>`
   width: 100%;
   margin-left: 0;
   padding: 16px 20px;
-  background: ${(props) =>
-    !props.enabled
-      ? props.theme.colorsThemed.accent.yellow
-      : props.theme.colorsThemed.background.tertiary};
-  color: ${(props) =>
-    !props.enabled
-      ? props.theme.colors.darkGray
-      : props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
     margin-left: 10px;
-  }
-  &:focus,
-  &:active,
-  &:hover {
-    background: ${(props) =>
-      !props.enabled
-        ? props.theme.colorsThemed.accent.yellow
-        : props.theme.colorsThemed.background.tertiary} !important;
-    color: ${(props) =>
-      !props.enabled
-        ? props.theme.colors.darkGray
-        : props.theme.name === 'light'
-        ? props.theme.colorsThemed.text.primary
-        : props.theme.colors.white} !important;
   }
 `;
 
@@ -276,4 +263,15 @@ const SBundles = styled.div`
   flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: -16px;
+`;
+
+const SLoader = styled(Loader)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  ${(props) => props.theme.media.laptopL} {
+    transform: translate(calc(-50% - 218px), -50%);
+  }
 `;
