@@ -126,7 +126,10 @@ const FileUpload: React.FC<IFileUpload> = ({
     });
   }, []);
 
-  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+  const handleOpenEllipseMenu = useCallback(() => {
+    Mixpanel.track('Open Ellipse menu', { _stage: 'Creation' });
+    setShowEllipseMenu(true);
+  }, []);
 
   const handleCloseEllipseMenu = useCallback(
     () => setShowEllipseMenu(false),
@@ -328,12 +331,14 @@ const FileUpload: React.FC<IFileUpload> = ({
                 progress: progressUpload,
               })}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => handleCancelUploadAndClearLocalFile()}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
+            {progressUpload !== 100 ? (
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={() => handleCancelUploadAndClearLocalFile()}
+              >
+                {t('secondStep.button.cancel')}
+              </SLoadingBottomBlockButton>
+            ) : null}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={progressUpload} />

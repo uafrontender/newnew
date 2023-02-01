@@ -26,7 +26,7 @@ const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(
 const SWelcomeMessage = styled.div`
   position: absolute;
   left: 0;
-  top: 48px;
+  top: 50%;
   right: 0;
   padding: 0 20px;
   font-size: 14px;

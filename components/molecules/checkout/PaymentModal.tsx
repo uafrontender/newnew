@@ -16,6 +16,7 @@ import Lottie from '../../atoms/Lottie';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IPaymentModal {
   isOpen: boolean;
@@ -85,9 +86,25 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           }}
         >
           {isMobile ? (
-            <SGoBackButton onClick={() => onClose()} />
+            <SGoBackButton
+              onClickCapture={() => {
+                Mixpanel.track('Click Close Button Mobile', {
+                  _stage: 'Post',
+                  _component: 'PaymentModal',
+                });
+              }}
+              onClick={() => onClose()}
+            />
           ) : (
-            <SCloseButton onClick={() => onClose()}>
+            <SCloseButton
+              onClickCapture={() => {
+                Mixpanel.track('Click Close Button Desktop', {
+                  _stage: 'Post',
+                  _component: 'PaymentModal',
+                });
+              }}
+              onClick={() => onClose()}
+            >
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}

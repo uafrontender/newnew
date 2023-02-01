@@ -81,7 +81,7 @@ const defaultUIState: ICreationStateInterface = {
     },
   },
   auction: {
-    minimalBid: 5,
+    minimalBid: 2,
   },
   crowdfunding: {
     targetBackerCount: undefined,

@@ -53,6 +53,12 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
           <SCancelButton
             view='transparent'
             iconOnly
+            onClickCapture={() => {
+              Mixpanel.track('Click Close Button', {
+                _stage: 'Post',
+                _component: 'McOptionCardSelectVotesModal',
+              });
+            }}
             onClick={() => handleClose()}
           >
             <InlineSvg
@@ -68,6 +74,13 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
           {availableVotes.map((voteOffer) => (
             <SButton
               key={voteOffer.amountOfVotes}
+              onClickCapture={() => {
+                Mixpanel.track('Click Vote Offer Button', {
+                  _stage: 'Post',
+                  _amountOfVotes: voteOffer.amountOfVotes,
+                  _component: 'McOptionCardSelectVotesModal',
+                });
+              }}
               onClick={() => handleSetVoteOfferAndOpenModal(voteOffer)}
             >
               <Text variant={3}>
@@ -83,7 +96,15 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
               </Text>
             </SButton>
           ))}
-          <SButton onClick={() => handleOpenCustomAmountModal()}>
+          <SButton
+            onClickCapture={() => {
+              Mixpanel.track('Click Custom Votes Button', {
+                _stage: 'Post',
+                _component: 'McOptionCardSelectVotesModal',
+              });
+            }}
+            onClick={() => handleOpenCustomAmountModal()}
+          >
             <Text variant={3}>
               {t('mcPost.optionsTab.optionCard.selectVotesMenu.custom')}
             </Text>

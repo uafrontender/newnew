@@ -104,7 +104,7 @@ const CommentsBottomSection: React.FunctionComponent<
   const handleAddComment = useCallback(
     async (content: string, parentMsgId?: number) => {
       try {
-        Mixpanel.track('Added Comment', {
+        Mixpanel.track('Submit New Comment', {
           _stage: 'Post',
           _postUuid: postUuid,
         });
