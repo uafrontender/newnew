@@ -29,6 +29,8 @@ import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { getRoom } from '../../../../api/endpoints/chat';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { useBundles } from '../../../../contexts/bundlesContext';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -63,6 +65,7 @@ export const DynamicSection = () => {
   } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+  const { directMessagesAvailable } = useBundles();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -81,21 +84,32 @@ export const DynamicSection = () => {
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
   } = router;
-  const tabs: Tab[] = useMemo(
-    () => [
+  // TODO: Fix a bug with redirect to main dashboard page
+  // TODO: Check what happens if DM tab was open and then disappeared
+  const tabs: Tab[] = useMemo(() => {
+    if (directMessagesAvailable) {
+      return [
+        {
+          url: '/creator/dashboard?tab=notifications',
+          counter: unreadNotificationCount,
+          nameToken: 'notifications',
+        },
+        {
+          url: '/creator/dashboard?tab=chat',
+          counter: unreadCountForCreator,
+          nameToken: 'chat',
+        },
+      ];
+    }
+
+    return [
       {
         url: '/creator/dashboard?tab=notifications',
         counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
-      {
-        url: '/creator/dashboard?tab=chat',
-        counter: unreadCountForCreator,
-        nameToken: 'chat',
-      },
-    ],
-    [unreadCountForCreator, unreadNotificationCount]
-  );
+    ];
+  }, [directMessagesAvailable, unreadCountForCreator, unreadNotificationCount]);
 
   const isDashboardMessages = useMemo(() => {
     if (router.asPath.includes('creator/dashboard?tab=direct-messages')) {
@@ -107,18 +121,48 @@ export const DynamicSection = () => {
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
   const handleChatClick = useCallback(() => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard?tab=chat',
+      _button: 'DMs',
+      _component: 'DynamicSection',
+    });
+
     router.push('/creator/dashboard?tab=chat');
   }, [router]);
+
   const handleNotificationsClick = useCallback(() => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard?tab=notifications',
+      _button: 'Notifications',
+      _component: 'DynamicSection',
+    });
     router.push('/creator/dashboard?tab=notifications');
   }, [router]);
+
   const handleMinimizeClick = useCallback(() => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard',
+      _button: 'Minimize',
+      _component: 'DynamicSection',
+    });
     router.push('/creator/dashboard');
   }, [router]);
+
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
+
   const handleMarkAllAsRead = useCallback(() => {
+    Mixpanel.track('Mark All As Read Button Clicked', {
+      _stage: 'Dashboard',
+      _target: '/creator/dashboard',
+      _button: 'Mark all as read',
+      _component: 'DynamicSection',
+    });
+
     setMarkReadNotifications(true);
     setTimeout(() => {
       setMarkReadNotifications(false);

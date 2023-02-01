@@ -14,6 +14,7 @@ import cashOutIcon from '../../../public/images/svg/icons/filled/CashOut.svg';
 import stripeTitleIcon from '../../../public/images/svg/icons/filled/StripeTitle.svg';
 import { getExpressDashboardLoginLink } from '../../../api/endpoints/stripe';
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ICashOut {
   nextCashOutAmount: newnewapi.IMoneyAmount;
@@ -100,7 +101,15 @@ const CashOut: React.FC<ICashOut> = ({
                   </a>
                 )}
                 <a href='https://creatorpayouts.newnew.co/' target='_blank'>
-                  <SButtonLearnMore>
+                  <SButtonLearnMore
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _stage: 'Dashboard',
+                        _button: 'Learn More',
+                        _target: 'https://creatorpayouts.newnew.co/',
+                      });
+                    }}
+                  >
                     {t('dashboard.earnings.cashOut.submit')}
                   </SButtonLearnMore>
                 </a>
@@ -124,7 +133,16 @@ const CashOut: React.FC<ICashOut> = ({
       </SCashOutTopBlock>
       {!stripeLink ? (
         <a href='https://creatorpayouts.newnew.co/' target='_blank'>
-          <SButton view='common'>
+          <SButton
+            view='common'
+            onClick={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _stage: 'Dashboard',
+                _button: 'Learn More',
+                _target: 'https://creatorpayouts.newnew.co/',
+              });
+            }}
+          >
             {t('dashboard.earnings.cashOut.submit')}
           </SButton>
         </a>

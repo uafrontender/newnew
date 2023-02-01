@@ -9,6 +9,7 @@ import Text from '../Text';
 import money from '../../../public/images/svg/icons/filled/Money.svg';
 import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const FinishProfileSetup = () => {
   const { t } = useTranslation('page-Creator');
@@ -79,7 +80,20 @@ export const FinishProfileSetup = () => {
         }
       >
         <a>
-          <SButton view='common'>
+          <SButton
+            view='common'
+            onClick={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _button: 'Add',
+                _stage: 'Dashboard',
+                _target: !isAccountDetailsCompleted
+                  ? '/creator-onboarding-about'
+                  : !isCreatorConnectedToStripe
+                  ? '/creator/get-paid'
+                  : '',
+              });
+            }}
+          >
             {t('dashboard.earnings.toDosIssue.button')}
           </SButton>
         </a>

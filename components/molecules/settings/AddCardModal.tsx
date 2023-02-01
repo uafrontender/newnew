@@ -275,8 +275,6 @@ const SModalPaper = styled(ModalPaper)`
   min-height: 200px;
 
   & > div {
-    overflow-x: hidden;
-
     &:not(:first-child) {
       height: 100%;
     }
@@ -291,6 +289,10 @@ const SForm = styled.form`
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  & > div:first-child {
+    overflow-x: hidden;
+  }
 `;
 
 const SModalButtons = styled.div`

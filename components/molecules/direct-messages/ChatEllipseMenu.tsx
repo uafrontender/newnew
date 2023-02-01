@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import Text from '../../atoms/Text';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IChatEllipseMenu {
   user: newnewapi.IVisavisUser;
@@ -34,16 +35,34 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   const router = useRouter();
 
   const blockUserHandler = () => {
+    Mixpanel.track(
+      userBlocked ? 'Unblock User Button Clicked' : 'Block User Button Clicked',
+      {
+        _stage: 'Direct Messages',
+        _component: 'ChatEllipseMenu',
+        _userUuid: user.user?.uuid,
+      }
+    );
     onUserBlock();
     handleClose();
   };
 
   const reportUserHandler = () => {
+    Mixpanel.track('Report Button Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'ChatEllipseMenu',
+      _userUuid: user.user?.uuid,
+    });
     onUserReport();
     handleClose();
   };
 
   const viewUserProfile = () => {
+    Mixpanel.track('View Profile Button Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'ChatEllipseMenu',
+      _target: `/${user.user?.username}`,
+    });
     router.push(`/${user.user?.username}`);
   };
 
@@ -54,7 +73,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
       anchorElement={anchorElement}
       zIndex={21}
     >
-      {myRole === 2 && !isAnnouncement && (
+      {myRole === newnewapi.ChatRoom.MyRole.CREATOR && !isAnnouncement && (
         <EllipseMenuButton onClick={viewUserProfile}>
           <Text variant={2}>{t('ellipse.view')}</Text>
         </EllipseMenuButton>

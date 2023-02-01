@@ -261,6 +261,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
 
   useEffect(() => {
     const tabsWidthUpdated = tabRefs.current.reduce((acc, tabEl) => {
+      // This can be undefined if tab element was removed from DOM
+      if (!tabEl) {
+        return acc;
+      }
+
       const w = tabEl.getBoundingClientRect().width;
       return w + acc;
     }, 0);
