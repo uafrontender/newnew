@@ -405,8 +405,12 @@ const PostPage: NextPage<IPostPage> = ({
     if (user.loggedIn) {
       refetchPost();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
+  }, [postParsed?.isFavoritedByMe]);
 
   // Comment ID from URL
   useEffect(() => {
@@ -769,8 +773,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         };
       }
 
-
-      if (!context.req.cookies?.accessToken){
+      if (!context.req.cookies?.accessToken) {
         // cache the response only if the post is found and no redirect applies
         context.res.setHeader(
           'Cache-Control',
