@@ -112,7 +112,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                 id={`vote-option-${id}`}
                 key={voteOffer.amountOfVotes}
                 onClickCapture={() => {
-                  Mixpanel.track('Selected Votes Amount', {
+                  Mixpanel.track('Select Votes Amount', {
                     _stage: 'Post',
                     _component: 'McOptionCardSelectVotesMenu',
                   });

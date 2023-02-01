@@ -320,10 +320,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }}
                 onClick={() => handleCopyLink()}
                 onClickCapture={() => {
-                  Mixpanel.track('Copied Link User', {
+                  Mixpanel.track('Copy Link User', {
                     _stage: 'Profile',
                     _postUuid: user.uuid,
-                    _component: 'Profile layout',
+                    _component: 'ProfileLayout',
                   });
                 }}
               >
@@ -348,7 +348,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     Mixpanel.track('Send Message Button Clicked', {
                       _stage: 'Profile',
                       _creatorUuid: user.uuid,
-                      _component: 'Profile layout',
+                      _component: 'ProfileLayout',
                     });
                   }}
                 >
