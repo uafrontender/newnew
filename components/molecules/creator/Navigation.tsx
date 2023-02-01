@@ -14,6 +14,7 @@ import bundlesFilledIcon from '../../../public/images/svg/icons/filled/Bundles.s
 import bundlesOutlinedIcon from '../../../public/images/svg/icons/outlined/Bundles.svg';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface NavigationItem {
   id?: string;
@@ -98,7 +99,17 @@ export const Navigation = () => {
       {collection.map(renderItem)}
       <Link href='/creation'>
         <a>
-          <Button>{t('navigation.newPost')}</Button>
+          <Button
+            onClick={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _button: 'Make a decision',
+                _stage: 'Dashboard',
+                _component: 'Navigation',
+              });
+            }}
+          >
+            {t('navigation.newPost')}
+          </Button>
         </a>
       </Link>
     </SContainer>

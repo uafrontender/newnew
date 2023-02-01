@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
@@ -21,6 +20,7 @@ import ChatName from '../../atoms/direct-messages/ChatName';
 import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const MyAvatarMassupdate = dynamic(
   () => import('../../atoms/direct-messages/MyAvatarMassupdate')
@@ -104,6 +104,19 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   }, [chatRoom, activeChatRoom, markAsRead]);
 
   const handleItemClick = useCallback(async () => {
+    Mixpanel.track('Chat Item Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'ChatListItem',
+      _isDashboard: isDashboard,
+      ...(!isDashboard
+        ? {
+            _target: chatRoute,
+          }
+        : {
+            _target: `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
+            _activeChatRoom: chatRoom,
+          }),
+    });
     if (!isDashboard) {
       router.push(chatRoute);
     } else {
@@ -128,14 +141,14 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     </SUserAvatar>
   );
 
-  if (chatRoom.kind === 4) {
+  if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
     avatar = <MyAvatarMassupdate />;
   }
 
   let lastMsg = chatRoom.lastMessage?.content?.text;
 
   if (!lastMsg) {
-    if (chatRoom.kind === 4) {
+    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
       lastMsg = textTrim(t('newAnnouncement.created'));
     } else {
       lastMsg = textTrim(t('chat.noMessagesFirstLine'));

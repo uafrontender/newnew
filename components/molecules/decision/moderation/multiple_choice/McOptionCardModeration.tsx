@@ -527,6 +527,7 @@ const SEllipseButton = styled(Button)`
   &:focus:enabled {
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
+    box-shadow: none;
   }
 
   span {

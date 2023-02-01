@@ -37,6 +37,7 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import getDisplayname from '../../../utils/getDisplayname';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -198,6 +199,20 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   }, [targetChatrooms]);
 
   const openMyAnnouncement = useCallback(() => {
+    Mixpanel.track('My Announcement Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'NewMessageModal',
+      _isDashboard: isDashboard,
+      ...(!isDashboard
+        ? {
+            _target: `/direct-messages/${user.userData?.username}-announcement`,
+          }
+        : {
+            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+            _username: user.userData?.username,
+          }),
+    });
+
     if (!isDashboard) {
       router.push(`/direct-messages/${user.userData?.username}-announcement`);
       closeModal();
@@ -210,6 +225,21 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
       const handleItemClick = () => {
+        Mixpanel.track('Chat Item Clicked', {
+          _stage: 'Direct Messages',
+          _component: 'NewMessageModal',
+          _isDashboard: isDashboard,
+          ...(!isDashboard
+            ? {
+                _target: `/direct-messages/${chat.user?.username}`,
+                _visavis: chat.user?.username,
+              }
+            : {
+                _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+                _visavis: chat.user?.username,
+              }),
+        });
+
         if (!isDashboard) {
           router.push(`/direct-messages/${chat.user?.username}`);
           closeModal();

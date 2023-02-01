@@ -730,6 +730,7 @@ const SButtonContent = styled.div`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 18px;
+  word-break: break-word;
 `;
 
 const SHeadlineMobile = styled(Caption)`

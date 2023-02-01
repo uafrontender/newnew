@@ -23,7 +23,8 @@ export type TView =
   | 'changeLanguage'
   | 'transparent'
   | 'danger'
-  | 'common';
+  | 'common'
+  | 'brandYellow';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
@@ -397,6 +398,8 @@ const SButton = styled.button<ISButton>`
               background: ${props.theme.colorsThemed.button.hover[
                 props.view ?? 'primary'
               ]};
+              box-shadow: ${({ theme, view }) =>
+                theme.colorsThemed.button.hoverShadow[view] || 'initial'};
             `;
           }
         }

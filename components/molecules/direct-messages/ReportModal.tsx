@@ -16,6 +16,7 @@ import Modal from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import Button from '../../atoms/Button';
 import CheckMark from '../CheckMark';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -119,6 +120,13 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         .filter(([key, value]) => value)
         .map(([key, value]) => key);
 
+      Mixpanel.track('Submit Report Form', {
+        _stage: 'Direct Messages',
+        _component: 'ReportModal',
+        _reasons: reasonsList,
+        _message: message,
+      });
+
       if (reasonsList.length > 0 && message.length >= 15) {
         setIsSubmitting(true);
         await onSubmit({
@@ -131,6 +139,11 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     };
 
     const handleClose = () => {
+      Mixpanel.track('Close Report Modal', {
+        _stage: 'Direct Messages',
+        _component: 'ReportModal',
+      });
+
       dispatch({ type: 'clear' });
       setMessage('');
       setReportSent(false);
@@ -200,7 +213,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             </STextAreaWrapper>
             <SModalButtons>
               {!isMobile && (
-                <SCancelButton onClick={handleClose}>
+                <SCancelButton view='secondary' onClick={handleClose}>
                   {t('modal.reportUser.button.cancel')}
                 </SCancelButton>
               )}
@@ -261,19 +274,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`

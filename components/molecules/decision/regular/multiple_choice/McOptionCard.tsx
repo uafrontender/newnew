@@ -1339,6 +1339,7 @@ const SSupportButton = styled(Button)<{
   &:focus:enabled {
     color: ${({ theme }) => theme.colors.dark};
     background: #ffffff;
+    box-shadow: none;
   }
 
   ${({ isBlue }) =>
@@ -1523,5 +1524,6 @@ const SEllipseButtonMobile = styled(Button)`
   &:hover:enabled,
   &:focus:enabled {
     background: transparent;
+    box-shadow: none;
   }
 `;
