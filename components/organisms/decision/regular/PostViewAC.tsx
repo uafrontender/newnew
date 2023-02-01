@@ -277,7 +277,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         return;
       }
 
-      Mixpanel.track('MakeBidAfterStripeRedirect', {
+      Mixpanel.track('Make Bid After Stripe Redirect', {
         _stage: 'Post',
         _postUuid: post.postUuid,
         _component: 'PostViewAC',
