@@ -590,10 +590,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             postType='ac'
             isVisible={paymentSuccessModalOpen}
             closeModal={() => {
-              Mixpanel.track('Close Payment Success Modal', {
-                _stage: 'Post',
-                _postUuid: post.postUuid,
-              });
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
             }}

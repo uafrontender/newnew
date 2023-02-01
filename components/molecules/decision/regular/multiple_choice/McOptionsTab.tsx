@@ -392,6 +392,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SActionSection>
             <SAddOptionButtonDesktop
               id='add-option-button'
+              onClickCapture={() => {
+                Mixpanel.track('Click Add Own Option Button', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+              }}
               onClick={() => setSuggestNewMobileOpen(true)}
             >
               <InlineSvg

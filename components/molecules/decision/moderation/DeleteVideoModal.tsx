@@ -1,33 +1,60 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IDeleteVideoModal {
   isVisible: boolean;
+  isLoading: boolean;
   closeModal: () => void;
   handleConfirmDelete: () => void;
 }
 
 const DeleteVideoModal: React.FC<IDeleteVideoModal> = ({
   isVisible,
+  isLoading,
   closeModal,
   handleConfirmDelete,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { postParsed } = usePostInnerState();
+
+  const handleCloseModalMixpanel = useCallback(() => {
+    Mixpanel.track('Click close delete additional video modal', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _component: 'DeleteVideoModal',
+    });
+    closeModal();
+  }, [closeModal, postParsed?.postUuid]);
+
+  const handleConfirmDeleteMixpanel = useCallback(() => {
+    Mixpanel.track('Click cofirm delete additional video', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _component: 'DeleteVideoModal',
+    });
+    handleConfirmDelete();
+  }, [handleConfirmDelete, postParsed?.postUuid]);
 
   return (
-    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={12} onClose={handleCloseModalMixpanel}>
       <SContainer>
         <SModal>
           <SModalTitle>{t('deleteVideoModal.title')}</SModalTitle>
           <SModalMessage>{t('deleteVideoModal.body')}</SModalMessage>
           <SModalButtons>
-            <SCancelButton view='secondary' onClick={closeModal}>
+            <SCancelButton view='secondary' onClick={handleCloseModalMixpanel}>
               {t('deleteVideoModal.button.cancel')}
             </SCancelButton>
-            <SConfirmButton view='danger' onClick={handleConfirmDelete}>
+            <SConfirmButton
+              view='danger'
+              disabled={isLoading}
+              onClick={handleConfirmDeleteMixpanel}
+            >
               {t('deleteVideoModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
