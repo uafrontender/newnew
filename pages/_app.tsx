@@ -88,10 +88,28 @@ interface IMyApp extends AppProps {
 const queryClient = new QueryClient();
 
 // Loader
+const NO_LOADER_ROUTES = [
+  '/creator/dashboard?tab=chat',
+  '/creator/dashboard?tab=notifications',
+];
+
 NProgress.configure({ showSpinner: false, trickleSpeed: 300, speed: 500 });
-Router.events.on('routeChangeStart', () => NProgress.start());
-Router.events.on('routeChangeComplete', () => NProgress.done());
-Router.events.on('routeChangeError', () => NProgress.done());
+
+Router.events.on('routeChangeStart', (url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.start();
+  }
+});
+Router.events.on('routeChangeComplete', (url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.done();
+  }
+});
+Router.events.on('routeChangeError', (err, url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.done();
+  }
+});
 
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
