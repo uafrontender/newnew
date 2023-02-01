@@ -1,15 +1,15 @@
 {
   "meta": {
     "ac": {
-      "title": "{{postTitle}} - NewNew Bid",
+      "title": "{{postTitle}} - {{displayName}} - NewNew Bid",
       "description": "Gana dinero, haz ofertas en subastas con amigos y apoya creadores en NewNew"
     },
     "mc": {
-      "title": "{{postTitle}} - NewNew Superpoll",
+      "title": "{{postTitle}} - {{displayName}} - NewNew Superpoll",
       "description": "Gana dinero, vota con tus amigos y apoya creadores en NewNew"
     },
     "cf": {
-      "title": "{{postTitle}} - NewNew Goal",
+      "title": "{{postTitle}} - {{displayName}} - NewNew Goal",
       "description": "Gana dinero, participa en campañas de crowdfunding con amigos y apoya creadores en NewNew"
     }
   },
