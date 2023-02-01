@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -9,14 +9,10 @@ import Headline from '../../atoms/Headline';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-import {
-  getBundleStatus,
-  setBundleStatus,
-} from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
+import { useBundles } from '../../../contexts/bundlesContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -39,7 +35,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { appConstants } = useGetAppConstants();
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { isSellingBundles, toggleIsSellingBundles } = useBundles();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -47,11 +43,6 @@ export const DashboardBundles: React.FC = React.memo(() => {
 
   const [turnBundleModalOpen, setTurnBundleModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  const [isBundlesEnabled, setIsBundlesEnabled] = useState<boolean | undefined>(
-    undefined
-  );
 
   const toggleTurnBundleModalOpen = useCallback(() => {
     Mixpanel.track(
@@ -65,38 +56,16 @@ export const DashboardBundles: React.FC = React.memo(() => {
     setTurnBundleModalOpen((prevState) => !prevState);
   }, [turnBundleModalOpen]);
 
-  const toggleIsBundlesEnabled = useCallback(async () => {
-    if (busy) {
-      return;
-    }
-
-    setBusy(true);
-
-    try {
-      const payload = new newnewapi.SetBundleStatusRequest({
-        bundleStatus: isBundlesEnabled
-          ? newnewapi.CreatorBundleStatus.DISABLED
-          : newnewapi.CreatorBundleStatus.ENABLED,
+  const onToggleBundles = useCallback(async () => {
+    toggleIsSellingBundles()
+      .then(() => {
+        setTurnBundleModalOpen(false);
+        setSuccessModalOpen(true);
+      })
+      .catch((err) => {
+        console.error(err);
       });
-
-      const res = await setBundleStatus(payload);
-
-      // TODO: add translation
-      if (!res.data || res.error) {
-        throw new Error('Request failed');
-      }
-
-      setIsBundlesEnabled(!isBundlesEnabled);
-      setTurnBundleModalOpen(false);
-      setSuccessModalOpen(true);
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-    } finally {
-      setBusy(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busy, isBundlesEnabled]);
+  }, [toggleIsSellingBundles]);
 
   const renderListItem = useCallback(
     (item: newnewapi.IBundleOffer, index: number) => (
@@ -104,28 +73,11 @@ export const DashboardBundles: React.FC = React.memo(() => {
         key={`superpoll-bundle-${index + 1}`}
         id={index + 1}
         bundleOffer={item}
-        isBundlesEnabled={!!isBundlesEnabled}
+        isBundlesEnabled={!!isSellingBundles}
       />
     ),
-    [isBundlesEnabled]
+    [isSellingBundles]
   );
-
-  const fetchBundleStatus = useCallback(async () => {
-    const payload = new newnewapi.EmptyRequest();
-
-    const res = await getBundleStatus(payload);
-
-    // TODO: add translation
-    if (!res.data || res.error) throw new Error('Request failed');
-
-    setIsBundlesEnabled(
-      res.data.bundleStatus === newnewapi.CreatorBundleStatus.ENABLED
-    );
-  }, []);
-
-  useEffect(() => {
-    fetchBundleStatus();
-  }, [fetchBundleStatus]);
 
   return (
     <SContainer>
@@ -135,12 +87,12 @@ export const DashboardBundles: React.FC = React.memo(() => {
           <STitle variant={4}>{t('myBundles.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        {isBundlesEnabled === undefined ? (
+        {isSellingBundles === undefined ? (
           <SLoader size='md' />
         ) : (
           <>
-            {isBundlesEnabled && (
-              <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+            {isSellingBundles && (
+              <BundlesEarnings isBundlesEnabled={isSellingBundles} />
             )}
             <SBlock>
               <SHeaderLine>
@@ -154,10 +106,10 @@ export const DashboardBundles: React.FC = React.memo(() => {
                   id='turn-on-bundles-button'
                   view={isBundlesEnabled ? 'quaternary' : 'brandYellow'}
                   onClick={toggleTurnBundleModalOpen}
-                  enabled={isBundlesEnabled}
-                  disabled={isBundlesEnabled === undefined}
+                  enabled={isSellingBundles}
+                  disabled={isSellingBundles === undefined}
                 >
-                  {isBundlesEnabled
+                  {isSellingBundles
                     ? t('myBundles.buttonTurnOff')
                     : t('myBundles.buttonTurnOn')}
                 </SButton>
@@ -166,8 +118,8 @@ export const DashboardBundles: React.FC = React.memo(() => {
                 {appConstants.bundleOffers?.map(renderListItem)}
               </SBundles>
             </SBlock>
-            {!isBundlesEnabled && (
-              <BundlesEarnings isBundlesEnabled={isBundlesEnabled} />
+            {!isSellingBundles && (
+              <BundlesEarnings isBundlesEnabled={isSellingBundles} />
             )}
           </>
         )}
@@ -176,8 +128,8 @@ export const DashboardBundles: React.FC = React.memo(() => {
         <TurnBundleModal
           show
           zIndex={1001}
-          isBundlesEnabled={isBundlesEnabled}
-          onToggleBundles={toggleIsBundlesEnabled}
+          isBundlesEnabled={isSellingBundles}
+          onToggleBundles={onToggleBundles}
           onClose={toggleTurnBundleModalOpen}
         />
       )}
@@ -185,7 +137,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
         <SuccessBundleModal
           show
           zIndex={1002}
-          isBundlesEnabled={isBundlesEnabled}
+          isBundlesEnabled={isSellingBundles}
           onClose={() => setSuccessModalOpen(false)}
         />
       )}

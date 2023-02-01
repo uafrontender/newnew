@@ -1018,6 +1018,7 @@ const SText = styled(Text)`
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
 `;
 
 const SWrapperOutside = styled.div<ISWrapper>`
@@ -1125,6 +1126,7 @@ const SBottomContentOutside = styled.div`
   padding: 8px 10px 0 10px;
   display: flex;
   flex-direction: column;
+  word-break: break-word;
 `;
 
 const STextOutside = styled(Text)`

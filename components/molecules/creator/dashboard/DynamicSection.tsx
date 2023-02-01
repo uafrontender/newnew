@@ -30,6 +30,7 @@ import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { getRoom } from '../../../../api/endpoints/chat';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import { useBundles } from '../../../../contexts/bundlesContext';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -64,6 +65,7 @@ export const DynamicSection = () => {
   } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+  const { directMessagesAvailable } = useBundles();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -82,21 +84,32 @@ export const DynamicSection = () => {
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
   } = router;
-  const tabs: Tab[] = useMemo(
-    () => [
+  // TODO: Fix a bug with redirect to main dashboard page
+  // TODO: Check what happens if DM tab was open and then disappeared
+  const tabs: Tab[] = useMemo(() => {
+    if (directMessagesAvailable) {
+      return [
+        {
+          url: '/creator/dashboard?tab=notifications',
+          counter: unreadNotificationCount,
+          nameToken: 'notifications',
+        },
+        {
+          url: '/creator/dashboard?tab=chat',
+          counter: unreadCountForCreator,
+          nameToken: 'chat',
+        },
+      ];
+    }
+
+    return [
       {
         url: '/creator/dashboard?tab=notifications',
         counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
-      {
-        url: '/creator/dashboard?tab=chat',
-        counter: unreadCountForCreator,
-        nameToken: 'chat',
-      },
-    ],
-    [unreadCountForCreator, unreadNotificationCount]
-  );
+    ];
+  }, [directMessagesAvailable, unreadCountForCreator, unreadNotificationCount]);
 
   const isDashboardMessages = useMemo(() => {
     if (router.asPath.includes('creator/dashboard?tab=direct-messages')) {
