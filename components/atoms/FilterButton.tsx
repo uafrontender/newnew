@@ -16,7 +16,7 @@ export const FilterButton: React.FC<IFilterButton> = ({
   view,
   onClick,
 }) => (
-  <STab
+  <SButton
     size='sm'
     view='secondary'
     filterView={view}
@@ -24,7 +24,7 @@ export const FilterButton: React.FC<IFilterButton> = ({
     onClick={onClick}
   >
     {children}
-  </STab>
+  </SButton>
 );
 
 export default FilterButton;
@@ -34,7 +34,7 @@ interface ISButton {
   filterView: 'primary' | 'secondary';
 }
 
-const STab = styled(Button)<ISButton>`
+const SButton = styled(Button)<ISButton>`
   min-width: 96px;
   padding: 8px;
   cursor: pointer;

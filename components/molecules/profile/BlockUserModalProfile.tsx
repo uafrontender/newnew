@@ -37,10 +37,10 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
             {t('modal.blockUser.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={closeModal}>
+            <SCancelButton view='secondary' onClick={closeModal}>
               {t('modal.blockUser.button.cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmClick}>
+            <SConfirmButton view='danger' onClick={handleConfirmClick}>
               {t('modal.blockUser.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
@@ -102,19 +102,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`
@@ -123,8 +110,4 @@ const SConfirmButton = styled(Button)`
   font-size: 14px;
   margin-left: auto;
   flex-shrink: 0;
-  background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  &:hover {
-    background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  }
 `;
