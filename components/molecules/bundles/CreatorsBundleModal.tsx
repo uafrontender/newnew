@@ -103,31 +103,44 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   )}
                 </SForLine>
               </SUserInfo>
+              {/* TODO: NEEDS TO HAVE A STATE FOR EXPIRED BUNDLE! */}
               <SBundleInfo>
-                <AccessDescription>
-                  <Trans
-                    t={t}
-                    i18nKey='modal.creatorsBundle.access'
-                    // @ts-ignore
-                    components={[
-                      <>
-                        {formattedTimeLeft?.map((time, index) => (
+                {formattedTimeLeft ? (
+                  <>
+                    <AccessDescription>
+                      <Trans
+                        t={t}
+                        i18nKey='modal.creatorsBundle.access'
+                        // @ts-ignore
+                        components={[
                           <>
-                            {index > 0 ? t('modal.creatorsBundle.and') : null}
-                            {t('modal.creatorsBundle.unitPair', {
-                              amount: time.value,
-                              unit: t(`modal.creatorsBundle.unit.${time.unit}`),
-                            })}
-                          </>
-                        ))}
-                      </>,
-                    ]}
-                  />
-                </AccessDescription>
-                <BulletLine>
-                  {t('modal.creatorsBundle.customOptions')}
-                </BulletLine>
-                <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
+                            {formattedTimeLeft?.map((time, index) => (
+                              <>
+                                {index > 0
+                                  ? t('modal.creatorsBundle.and')
+                                  : null}
+                                {t('modal.creatorsBundle.unitPair', {
+                                  amount: time.value,
+                                  unit: t(
+                                    `modal.creatorsBundle.unit.${time.unit}`
+                                  ),
+                                })}
+                              </>
+                            ))}
+                          </>,
+                        ]}
+                      />
+                    </AccessDescription>
+                    <BulletLine>
+                      {t('modal.creatorsBundle.customOptions')}
+                    </BulletLine>
+                    <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
+                  </>
+                ) : (
+                  <AccessDescription>
+                    {t('modal.creatorsBundle.accessExpired')}
+                  </AccessDescription>
+                )}
               </SBundleInfo>
               {creatorBundle.creator?.options?.isOfferingBundles &&
                 !isBlocked && (
