@@ -400,6 +400,18 @@ const PostPage: NextPage<IPostPage> = ({
     [setRecommendedPosts, recommendedPostsLoading, postParsed]
   );
 
+  // Refetch Post if user authenticated
+  useEffect(() => {
+    if (user.loggedIn) {
+      refetchPost();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
+
+  useEffect(() => {
+    setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
+  }, [postParsed?.isFavoritedByMe]);
+
   // Comment ID from URL
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -673,10 +685,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       comment_content,
       save_card,
     } = context.query;
-    context?.res?.setHeader(
-      'Cache-Control',
-      'public, s-maxage=5, stale-while-revalidate=10'
-    );
     const translationContext = await serverSideTranslations(
       context.locale!!,
       [
@@ -763,6 +771,14 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
             permanent: true,
           },
         };
+      }
+
+      if (!context.req.cookies?.accessToken) {
+        // cache the response only if the post is found and no redirect applies
+        context.res.setHeader(
+          'Cache-Control',
+          'public, s-maxage=5, stale-while-revalidate=10'
+        );
       }
 
       return {
