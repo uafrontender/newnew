@@ -1187,5 +1187,6 @@ const SEllipseButtonMobile = styled(Button)`
   &:hover:enabled,
   &:focus:enabled {
     background: transparent;
+    box-shadow: none;
   }
 `;

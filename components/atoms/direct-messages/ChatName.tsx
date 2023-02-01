@@ -20,13 +20,23 @@ const ChatName: React.FC<IChatName> = ({ chat }) => {
   const user = useAppSelector((state) => state.user);
 
   const visaviName =
-    chat.kind === 4 && chat.myRole === 2
+    chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
+    chat.myRole === newnewapi.ChatRoom.MyRole.CREATOR
       ? getDisplayname(user.userData)
       : getDisplayname(chat.visavis?.user);
 
-  const beforeName = chat.kind === 4 ? t('announcement.beforeName') : '';
-  const suffix = chat.kind === 4 ? t('announcement.suffix') : '';
-  const afterName = chat.kind === 4 ? t('announcement.afterName') : '';
+  const beforeName =
+    chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
+      ? t('announcement.beforeName')
+      : '';
+  const suffix =
+    chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
+      ? t('announcement.suffix')
+      : '';
+  const afterName =
+    chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
+      ? t('announcement.afterName')
+      : '';
 
   return (
     <SChatItemInfo>
@@ -42,8 +52,8 @@ const ChatName: React.FC<IChatName> = ({ chat }) => {
           {`${visaviName}${suffix}`}
         </SChatItemText>
         {(chat.visavis?.user?.options?.isVerified ||
-          (chat.kind === 4 &&
-            chat.myRole === 2 &&
+          (chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
+            chat.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
             user.userData?.options?.isVerified)) && (
           <SVerificationSVG
             svg={VerificationCheckmark}
