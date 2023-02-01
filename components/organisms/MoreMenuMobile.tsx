@@ -35,7 +35,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const user = useAppSelector((state) => state.user);
   const containerRef = useRef<HTMLDivElement>();
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
-  const { bundles, hasSoldBundles } = useBundles();
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
   const { unreadCount } = useGetChats();
@@ -112,7 +112,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
               </SButton>
               {/* If there are bundles, notifications are moved to more menu */}
               {/* TODO: Refactor the menu to make it work with the collection, auto split navigation items */}
-              {(hasSoldBundles || (bundles && bundles.length > 0)) && (
+              {directMessagesAvailable && (
                 <SButton
                   onClick={() =>
                     router.route.includes('direct-messages')
