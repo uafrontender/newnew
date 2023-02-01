@@ -184,7 +184,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
       if (playerRef.current.getCurrentTime() >= videoThumbs.current.endTime) {
         playerRef.current.pause();
         playerRef.current.seek(videoThumbs.current.startTime);
-        playerRef.current.play();
+        playerRef.current.play().catch(() => {});
       }
     };
     playerRef.current.pause();
@@ -192,7 +192,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     playerRef.current.handleTimeChange = handleTimeChange;
 
     playerRef.current.seek(videoThumbs.current.startTime);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {});
   }, [getTime, videoDuration, setCurrentTime]);
 
   const getInitialXPosition = useCallback(() => {
