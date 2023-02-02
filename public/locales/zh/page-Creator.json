@@ -36,7 +36,9 @@
         "text": "添加個人簡介和銀行資訊以支取你的收入",
         "textBio": "添加個人簡介和銀行資訊以支取你的收入",
         "textBank": "添加個人簡介和銀行資訊以支取你的收入",
-        "button": "添加"
+        "button": "添加",
+        "stripeIssue_NEED_TRANSLATION": "There's an issue with your Stripe account",
+        "stripeIssueButton_NEED_TRANSLATION": "See Stripe account"
       },
       "makeDecision": {
         "text": "發佈一個帖子。開始賺取收入。",

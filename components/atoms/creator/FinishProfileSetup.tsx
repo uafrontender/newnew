@@ -152,4 +152,10 @@ const SButton = styled(Button)`
     margin-top: unset;
     margin-left: 16px;
   }
+
+  &:hover:enabled {
+    background-color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colorsThemed.button.color.common};
+    box-shadow: ${({ theme }) => theme.shadows.lightBlue};
+  }
 `;

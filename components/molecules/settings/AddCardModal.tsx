@@ -291,7 +291,7 @@ const SForm = styled.form`
   height: 100%;
 
   & > div:first-child {
-    overflow-x: hidden;
+    overflow: hidden;
   }
 `;
 
