@@ -34,8 +34,6 @@ const useMyChatRooms = (
 
       const chatroomResponse = await getMyRooms(payload);
 
-      console.log(chatroomResponse, payload, 'chatroomResponse');
-
       if (!chatroomResponse.data || chatroomResponse.error) {
         throw new Error('Request failed');
       }
