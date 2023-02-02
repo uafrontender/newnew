@@ -85,7 +85,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('myBundles.title')}</STitle>
-          {!isMobile && <DynamicSection />}
+          {!isMobile && <DynamicSection baseUrl='/creator/bundles' />}
         </STitleBlock>
         {isSellingBundles === undefined ? (
           <SLoader size='md' />

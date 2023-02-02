@@ -179,7 +179,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   }, [searchValue, chatRooms]);
 
   const isDashboard = useMemo(() => {
-    if (router.asPath.includes('/creator/dashboard')) {
+    if (
+      router.asPath.includes('/creator/dashboard') ||
+      router.asPath.includes('/creator/bundles')
+    ) {
       return true;
     }
     return false;
@@ -189,9 +192,16 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     // TODO: visavilist should include only creators on dashboard
     if (isDashboard && targetChatrooms.length === 1) {
       setActiveChatRoom(targetChatrooms[0]);
-      router.push(
-        `/creator/dashboard?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
-      );
+      if (router.asPath.includes('/creator/bundles')) {
+        router.push(
+          `/creator/bundles?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
+        );
+      } else {
+        router.push(
+          `/creator/dashboard?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
+        );
+      }
+
       if (mobileChatOpened) setHiddenMessagesArea(false);
       closeModal();
     }

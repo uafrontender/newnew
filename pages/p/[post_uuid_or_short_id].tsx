@@ -587,7 +587,7 @@ const PostPage: NextPage<IPostPage> = ({
           <title>
             {typeOfPost
               ? t(`meta.${typeOfPost}.title`, {
-                  displayName: getDisplayname(user.userData),
+                  displayName: getDisplayname(postParsed.creator),
                   postTitle: postParsed.title,
                 })
               : ''}
@@ -596,7 +596,17 @@ const PostPage: NextPage<IPostPage> = ({
             name='description'
             content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}
           />
-          <meta property='og:title' content={postParsed?.title} />
+          <meta
+            property='og:title'
+            content={
+              typeOfPost
+                ? t(`meta.${typeOfPost}.title`, {
+                    displayName: getDisplayname(postParsed.creator),
+                    postTitle: postParsed.title,
+                  })
+                : ''
+            }
+          />
           <meta
             property='og:url'
             content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuidOrShortId}`}
