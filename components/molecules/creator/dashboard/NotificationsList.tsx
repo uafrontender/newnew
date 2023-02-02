@@ -85,6 +85,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     data: notifications,
     loading,
     hasMore,
+    initialLoadDone,
     loadMore,
   } = usePagination(loadData, 6);
 
@@ -277,17 +278,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 
   return (
     <div ref={scrollRef}>
-      {loading === undefined ? (
-        <Lottie
-          width={64}
-          height={64}
-          options={{
-            loop: true,
-            autoplay: true,
-            animationData: loadingAnimation,
-          }}
-        />
-      ) : !notifications && loading ? (
+      {!notifications?.length && (loading || !initialLoadDone) ? (
         <Lottie
           width={64}
           height={64}
@@ -302,7 +293,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       ) : (
         notifications && notifications.map(renderNotificationItem)
       )}
-      {hasMore && !loading && (
+      {hasMore && !loading && initialLoadDone && (
         <SRef ref={scrollRefNotifications}>
           <Lottie
             width={64}
