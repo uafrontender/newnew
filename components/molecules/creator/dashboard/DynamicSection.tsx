@@ -47,7 +47,11 @@ const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 const Indicator = dynamic(() => import('../../../atoms/Indicator'));
 const Tabs = dynamic(() => import('../../Tabs'));
 
-export const DynamicSection = () => {
+interface IDynamicSection {
+  baseUrl: string;
+}
+
+export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
@@ -84,18 +88,16 @@ export const DynamicSection = () => {
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
   } = router;
-  // TODO: Fix a bug with redirect to main dashboard page
-  // TODO: Check what happens if DM tab was open and then disappeared
   const tabs: Tab[] = useMemo(() => {
     if (directMessagesAvailable) {
       return [
         {
-          url: '/creator/dashboard?tab=notifications',
+          url: `${baseUrl}?tab=notifications`,
           counter: unreadNotificationCount,
           nameToken: 'notifications',
         },
         {
-          url: '/creator/dashboard?tab=chat',
+          url: `${baseUrl}?tab=chat`,
           counter: unreadCountForCreator,
           nameToken: 'chat',
         },
@@ -104,12 +106,17 @@ export const DynamicSection = () => {
 
     return [
       {
-        url: '/creator/dashboard?tab=notifications',
+        url: `${baseUrl}?tab=notifications`,
         counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
     ];
-  }, [directMessagesAvailable, unreadCountForCreator, unreadNotificationCount]);
+  }, [
+    directMessagesAvailable,
+    baseUrl,
+    unreadCountForCreator,
+    unreadNotificationCount,
+  ]);
 
   const isDashboardMessages = useMemo(() => {
     if (router.asPath.includes('creator/dashboard?tab=direct-messages')) {
@@ -123,33 +130,33 @@ export const DynamicSection = () => {
   const handleChatClick = useCallback(() => {
     Mixpanel.track('Navigation Item Clicked', {
       _stage: 'Dashboard',
-      _target: '/creator/dashboard?tab=chat',
+      _target: `${baseUrl}?tab=chat`,
       _button: 'DMs',
       _component: 'DynamicSection',
     });
 
-    router.push('/creator/dashboard?tab=chat');
-  }, [router]);
+    router.push(`${baseUrl}?tab=chat`);
+  }, [baseUrl, router]);
 
   const handleNotificationsClick = useCallback(() => {
     Mixpanel.track('Navigation Item Clicked', {
       _stage: 'Dashboard',
-      _target: '/creator/dashboard?tab=notifications',
+      _target: `${baseUrl}?tab=notifications`,
       _button: 'Notifications',
       _component: 'DynamicSection',
     });
-    router.push('/creator/dashboard?tab=notifications');
-  }, [router]);
+    router.push(`${baseUrl}?tab=notifications`);
+  }, [baseUrl, router]);
 
   const handleMinimizeClick = useCallback(() => {
     Mixpanel.track('Navigation Item Clicked', {
       _stage: 'Dashboard',
-      _target: '/creator/dashboard',
+      _target: baseUrl,
       _button: 'Minimize',
       _component: 'DynamicSection',
     });
-    router.push('/creator/dashboard');
-  }, [router]);
+    router.push(baseUrl);
+  }, [baseUrl, router]);
 
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
@@ -158,7 +165,7 @@ export const DynamicSection = () => {
   const handleMarkAllAsRead = useCallback(() => {
     Mixpanel.track('Mark All As Read Button Clicked', {
       _stage: 'Dashboard',
-      _target: '/creator/dashboard',
+      _target: baseUrl,
       _button: 'Mark all as read',
       _component: 'DynamicSection',
     });
@@ -167,7 +174,7 @@ export const DynamicSection = () => {
     setTimeout(() => {
       setMarkReadNotifications(false);
     }, 1500);
-  }, []);
+  }, [baseUrl]);
 
   const handleBulkMessageClick = useCallback(() => {
     setShowNewMessageModal(true);
@@ -197,7 +204,7 @@ export const DynamicSection = () => {
 
   useEffect(() => {
     if (
-      router.asPath.includes('/creator/dashboard?tab=direct-messages') &&
+      router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
       !activeChatRoom
     ) {
       if (router.query.roomID) {
@@ -213,7 +220,7 @@ export const DynamicSection = () => {
             }
             setActiveChatRoom(res.data);
           } catch (err) {
-            router.push(`/creator/dashboard?tab=chat`);
+            router.push(`${baseUrl}?tab=chat`);
             console.error(err);
           }
         })();
@@ -223,9 +230,19 @@ export const DynamicSection = () => {
   }, [router, activeChatRoom]);
 
   useEffect(() => {
-    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR)
+    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
       setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    }
   }, [activeTab, setActiveTab]);
+
+  useEffect(() => {
+    if (
+      !directMessagesAvailable &&
+      (tab === 'chat' || tab === 'direct-messages')
+    ) {
+      router.replace(`${baseUrl}?tab=notifications`);
+    }
+  }, [directMessagesAvailable, tab, baseUrl, router]);
 
   return (
     <STopButtons>
@@ -463,6 +480,10 @@ const SSectionTopLine = styled.div<ISSectionTopLine>`
   padding: 0 24px ${(props) => (props.tab === 'transactions' ? 0 : '8px')} 24px;
   align-items: center;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.laptop} {
+    min-height: 52px;
+  }
 `;
 
 const SSectionTopLineButtons = styled.div`

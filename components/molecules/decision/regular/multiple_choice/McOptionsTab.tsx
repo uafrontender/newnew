@@ -205,11 +205,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handleAddNewOption = useCallback(async () => {
     setConfirmCustomOptionModalOpen(false);
     setLoadingModalOpen(true);
-    Mixpanel.track('Add Free Option', {
+
+    Mixpanel.track('Custom Option Used', {
       _stage: 'Post',
       _postUuid: post.postUuid,
       _component: 'McOptionsTab',
     });
+
     try {
       const payload = new newnewapi.CreateCustomMcOptionRequest({
         postUuid: post.postUuid,
@@ -391,6 +393,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SActionSection>
             <SAddOptionButtonDesktop
               id='add-option-button'
+              onClickCapture={() => {
+                Mixpanel.track('Click Add Own Option Button', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+              }}
               onClick={() => setSuggestNewMobileOpen(true)}
             >
               <InlineSvg
@@ -443,7 +452,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
+                  Mixpanel.track('Click Add Custom Option', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
@@ -495,7 +504,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
+                  Mixpanel.track('Click Add Custom Option', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',

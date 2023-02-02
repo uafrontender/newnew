@@ -140,6 +140,13 @@ const SContainer = styled.div<ISContainer>`
   bottom: 80px;
   left: 0;
   right: 0;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+
   ${(props) => props.theme.media.tablet} {
     position: static;
     min-height: calc(100% - 160px);
@@ -148,13 +155,8 @@ const SContainer = styled.div<ISContainer>`
     padding-bottom: unset;
     padding: 0 24px;
     margin: 0;
+    overscroll-behavior: auto;
   }
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  overscroll-behavior: contain;
 `;
 
 const SRef = styled.span`

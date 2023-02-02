@@ -8,6 +8,7 @@ interface IHighlightedButton {
   size?: 'small' | 'normal';
   children: string;
   onClick?: () => void;
+  onClickCapture?: () => void;
 }
 
 // Remove some styles as now yellow button exits in Button component but not removed component completely because paddings are different
@@ -17,6 +18,7 @@ const HighlightedButton: React.FC<IHighlightedButton> = ({
   size = 'normal',
   children,
   onClick,
+  onClickCapture,
 }) => (
   <SButton
     id={id}
@@ -24,6 +26,7 @@ const HighlightedButton: React.FC<IHighlightedButton> = ({
     className={className}
     $size={size}
     onClick={onClick}
+    onClickCapture={onClickCapture}
   >
     {children}
   </SButton>

@@ -19,6 +19,7 @@ import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import { formatNumber } from '../../../../utils/format';
 import copyToClipboard from '../../../../utils/copyToClipboard';
 import PostEarnings from '../../../atoms/moderation/PostEarnings';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IPostResponseTabModeration {
   postUuid: string;
@@ -121,6 +122,12 @@ const PostResponseTabModeration: React.FunctionComponent<
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
   const handleCopyLink = useCallback(() => {
+    Mixpanel.track('Click copy link', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostResponseTabModeration',
+    });
+
     if (window) {
       const url = `${window.location.origin}/p/${postShortId || postUuid}`;
 
@@ -136,6 +143,24 @@ const PostResponseTabModeration: React.FunctionComponent<
         });
     }
   }, [postShortId, postUuid]);
+
+  const handleUploadVideoProcessedMixpanel = useCallback(() => {
+    Mixpanel.track('Click upload response response', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostResponseTabModeration',
+    });
+    handleUploadVideoProcessed();
+  }, [handleUploadVideoProcessed, postUuid]);
+
+  const handleUploadAdditionalVideoProcessedMixpanel = useCallback(() => {
+    Mixpanel.track('Click upload additional response', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostResponseTabModeration',
+    });
+    handleUploadAdditionalVideoProcessed();
+  }, [handleUploadAdditionalVideoProcessed, postUuid]);
 
   useEffect(() => {
     async function loadEarnedAmount() {
@@ -219,7 +244,7 @@ const PostResponseTabModeration: React.FunctionComponent<
             className='uploadButton'
             disabled={!responseReadyToBeUploaded}
             loading={additionalResponseUploading}
-            onClick={handleUploadAdditionalVideoProcessed}
+            onClick={handleUploadAdditionalVideoProcessedMixpanel}
           >
             {t('postResponseTabModeration.awaiting.postResponseBtn')}
           </SUploadButton>
@@ -271,7 +296,7 @@ const PostResponseTabModeration: React.FunctionComponent<
       <SUploadButton
         id='upload-button'
         disabled={coreResponseUploading || !responseReadyToBeUploaded}
-        onClick={handleUploadVideoProcessed}
+        onClick={handleUploadVideoProcessedMixpanel}
       >
         {t('postResponseTabModeration.awaiting.postResponseBtn')}
       </SUploadButton>

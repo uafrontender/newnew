@@ -225,7 +225,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 handleAddOrUpdateOptionFromResponse
               }
               handleRemoveOption={() => {
-                Mixpanel.track('Removed Option', {
+                Mixpanel.track('Remove Option', {
                   _stage: 'Post',
                   _postUuid: postUuid,
                   _component: 'AcOptionsTab',

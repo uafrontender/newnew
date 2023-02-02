@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -7,6 +7,8 @@ import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
 import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 interface IBlockUserModalPost {
   user: newnewapi.IUser;
@@ -22,10 +24,19 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
   const { t } = useTranslation('page-Post');
   const { changeUserBlockedStatus } = useGetBlockedUsers();
 
-  const handleConfirmClick = () => {
+  const { postParsed } = usePostInnerState();
+
+  const handleConfirmClick = useCallback(() => {
+    Mixpanel.track('Confirm User Blocked', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _blockedUserUuid: user.uuid,
+      _component: 'BlockUserModalPost',
+    });
     changeUserBlockedStatus(user.uuid, true);
     closeModal();
-  };
+  }, [changeUserBlockedStatus, closeModal, postParsed?.postUuid, user.uuid]);
+
   return (
     <Modal additionalz={15} show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
