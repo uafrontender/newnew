@@ -162,7 +162,7 @@ export const Dashboard: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('dashboard.title')}</STitle>
-          {!isMobile && <DynamicSection />}
+          {!isMobile && <DynamicSection baseUrl='/creator/dashboard' />}
         </STitleBlock>
         {user.creatorData?.options.stripeConnectStatus &&
           user.creatorData.options.stripeConnectStatus ===

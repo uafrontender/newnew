@@ -94,7 +94,10 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         return;
       }
 
-      Mixpanel.track('Buy bundle click');
+      Mixpanel.track('Pay With Card', {
+        _component: 'BundlePaymentModal',
+        _paymentMethod: cardUuid ? 'Primary card' : 'New card',
+      });
 
       try {
         const stripeContributionRequest =

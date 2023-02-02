@@ -7,6 +7,7 @@ import BuyBundleModal from '../bundles/BuyBundleModal';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 import CreatorsBundleModal from '../bundles/CreatorsBundleModal';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface ISeeBundlesButton {
   className?: string;
@@ -39,6 +40,13 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
           onClick={() => {
             setCreatorsBundleModalOpen(true);
           }}
+          onClickCapture={() => {
+            Mixpanel.track('Open Creators Bundle', {
+              _stage: 'Profile',
+              _creatorUuid: user.uuid,
+              _component: 'SeeBundlesButton',
+            });
+          }}
         >
           <SBundleIcon
             src={theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src}
@@ -54,6 +62,13 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
           onClick={() => {
             setBuyBundleModalOpen(true);
           }}
+          onClickCapture={() => {
+            Mixpanel.track('Open Buy Creators Bundle Modal', {
+              _stage: 'Profile',
+              _creatorUuid: user.uuid,
+              _component: 'SeeBundlesButton',
+            });
+          }}
         >
           {t('profileLayout.buttons.buyBundles')}
         </SButton>
@@ -64,6 +79,11 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
           show={creatorsBundleModalOpen}
           creatorBundle={creatorBundle}
           onBuyMore={() => {
+            Mixpanel.track('Open Buy Creators Bundle Modal', {
+              _stage: 'Profile',
+              _creatorUuid: user.uuid,
+              _component: 'SeeBundlesButton',
+            });
             setBuyBundleModalOpen(true);
           }}
           onClose={() => {

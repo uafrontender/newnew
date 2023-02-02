@@ -11,7 +11,7 @@ import React, {
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
@@ -27,6 +27,7 @@ import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
+import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 /* Components */
 import Button from '../../atoms/Button';
@@ -254,7 +255,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, []);
 
   return (
-    <SContainer>
+    <SContainer isTextareaHidden={isTextareaHidden}>
       <ChatContentHeader
         chatRoom={chatRoom}
         isVisavisBlocked={isVisavisBlocked}
@@ -298,10 +299,14 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
               withShadow
               view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
-              disabled={!messageTextValid || messageText.length < 1}
+              loading={sendingMessage}
+              loadingAnimationColor='blue'
+              disabled={
+                sendingMessage || !messageTextValid || messageText.length < 1
+              }
             >
               <SInlineSVG
-                svg={sendIcon}
+                svg={!sendingMessage ? sendIcon : ''}
                 fill={
                   messageTextValid && messageText.length > 0
                     ? theme.colors.white
@@ -338,7 +343,9 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
 export default ChatContent;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  isTextareaHidden: boolean;
+}>`
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -350,6 +357,13 @@ const SContainer = styled.div`
   ${(props) => props.theme.media.tablet} {
     padding: 0;
     flex-shrink: unset;
+
+    ${({ isTextareaHidden }) =>
+      isTextareaHidden
+        ? css`
+            padding-bottom: 60px;
+          `
+        : null}
   }
 `;
 

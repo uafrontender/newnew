@@ -60,7 +60,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
 
   const handleOpenShareMenu = () => {
-    Mixpanel.track('Opened Share Menu', {
+    Mixpanel.track('Open Share Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
       _component: 'PostSuccessOrWaitingControls',

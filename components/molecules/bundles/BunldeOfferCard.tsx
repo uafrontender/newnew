@@ -6,6 +6,7 @@ import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
 import TicketSet from '../../atoms/bundles/TicketSet';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IBundleOfferCard {
   className?: string;
@@ -50,7 +51,16 @@ const BundleOfferCard: React.FC<IBundleOfferCard> = ({
         <BulletLine>{t('modal.buyBundle.customOptions')}</BulletLine>
         <BulletLine>{t('modal.buyBundle.chat')}</BulletLine>
       </BundleFeatures>
-      <BuyButton id={`buy-bundle-${bundleLevel}-button`} onClick={onClick}>
+      <BuyButton
+        id={`buy-bundle-${bundleLevel}-button`}
+        onClick={onClick}
+        onClickCapture={() => {
+          Mixpanel.track('Buy Bundle', {
+            _component: 'BundlePaymentModal',
+            _bundlePrice: bundleOffer.price,
+          });
+        }}
+      >
         {t('modal.buyBundle.buy', {
           amount: bundleOffer.price!.usdCents! / 100,
         })}
