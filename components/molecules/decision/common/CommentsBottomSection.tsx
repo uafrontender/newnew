@@ -104,7 +104,7 @@ const CommentsBottomSection: React.FunctionComponent<
   const handleAddComment = useCallback(
     async (content: string, parentMsgId?: number) => {
       try {
-        Mixpanel.track('Submit New Comment', {
+        Mixpanel.track('Add Comment', {
           _stage: 'Post',
           _postUuid: postUuid,
         });
@@ -140,7 +140,7 @@ const CommentsBottomSection: React.FunctionComponent<
     async (comment: TCommentWithReplies) => {
       setIsDeletingComment(true);
       try {
-        Mixpanel.track('Deleted Comment', {
+        Mixpanel.track('Delete Comment', {
           _stage: 'Post',
           _postUuid: postUuid,
           _messageId: comment.id,

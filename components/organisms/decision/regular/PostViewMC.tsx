@@ -343,7 +343,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
       isVoteMadeAfterRedirect.current = true;
 
-      Mixpanel.track('MakeVoteAfterStripeRedirect', {
+      Mixpanel.track('Make Vote After Stripe Redirect', {
         _stage: 'Post',
         _postUuid: post.postUuid,
         _component: 'PostViewMC',
