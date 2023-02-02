@@ -199,6 +199,7 @@ export const lightTheme: DefaultTheme = {
     },
   },
   shadows: {
+    lightBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.35)',
     mediumBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.25)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey:
@@ -448,6 +449,7 @@ export const darkTheme: DefaultTheme = {
     },
   },
   shadows: {
+    lightBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.35)',
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey:
