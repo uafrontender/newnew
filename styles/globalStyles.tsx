@@ -67,6 +67,20 @@ const GlobalStyle = createGlobalStyle`
   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .iti__flag {background-image: url("../../flags.png");}
   }
+
+  #nprogress .bar {
+    background: repeating-linear-gradient(to right, #1D6AFF 0%, rgba(29, 180, 255, 0.85) 50%, #1D6AFF 100%);
+    background-size: 200% auto;
+    background-position: 0 100%;
+    animation: gradient 2s infinite;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+  }
+
+  @keyframes gradient {
+    0%   { background-position: 0 0; }
+    100% { background-position: -200% 0; }
+  }
 `;
 
 export default GlobalStyle;
