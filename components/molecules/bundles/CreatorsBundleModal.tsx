@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
-import ModalPaper from '../../organisms/ModalPaper';
+import ModalPaper, { SContent } from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
@@ -161,6 +161,11 @@ export default CreatorsBundleModal;
 const SModalPaper = styled(ModalPaper)`
   width: 100%;
   padding: 32px 48px;
+
+  ${SContent} {
+    padding: 32px 48px;
+    margin: -32px -48px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     max-width: 500px;
