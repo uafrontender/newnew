@@ -1,25 +1,34 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import Image from 'next/image';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import emptyFolder from '../../../../../public/images/notifications/no-results.png';
+import Text from '../../../../atoms/Text';
+
+import assets from '../../../../../constants/assets';
 
 const NoResults: React.FC = React.memo(() => {
   // TODO: add this line from page-Creator to page-Notification for other languages as well
   const { t } = useTranslation('page-Creator');
+  const theme = useTheme();
 
   return (
     <SContainer>
       <SWrapper>
         <Image
-          src={emptyFolder}
+          src={
+            theme.name === 'dark'
+              ? assets.floatingAssets.darkSubMC
+              : assets.floatingAssets.lightSubMC
+          }
           alt={t('noNotifications')}
-          width={110}
-          height={110}
+          width={theme.name === 'dark' ? 110 : 54}
+          height={theme.name === 'dark' ? 110 : 74}
         />
-        <SText>{t('noNotifications')}</SText>
+        <SText variant={3} weight={600}>
+          {t('noNotifications')}
+        </SText>
       </SWrapper>
     </SContainer>
   );
@@ -47,11 +56,8 @@ const SWrapper = styled.div`
   padding: 20px 10px;
 `;
 
-const SText = styled.p`
+const SText = styled(Text)`
   margin: 20px auto 0;
-  font-size: 20px;
-  font-weight: bold;
-  line-height: 28px;
   text-align: center;
   white-space: pre-line;
 `;
