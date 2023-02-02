@@ -94,6 +94,7 @@ const usePostComments = (
         console.error(error);
       },
       ...(options || {}),
+      refetchOnWindowFocus: false,
     } as Omit<
       UseInfiniteQueryOptions<{
         comments: newnewapi.IChatMessage[];
