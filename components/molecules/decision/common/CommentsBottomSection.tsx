@@ -86,12 +86,12 @@ const CommentsBottomSection: React.FunctionComponent<
   const {
     processedComments: comments,
     addCommentMutation,
+    removeCommentMutation,
     handleOpenCommentProgrammatically,
     fetchNextPage,
     isLoading,
     isFetchingNextPage,
     hasNextPage,
-    refetch,
   } = usePostComments({
     loggedInUser: user.loggedIn,
     commentsRoomId,
@@ -153,7 +153,7 @@ const CommentsBottomSection: React.FunctionComponent<
         const res = await deleteMessage(payload);
 
         if (!res.error) {
-          refetch();
+          removeCommentMutation?.mutate(comment);
         }
       } catch (err) {
         console.error(err);
@@ -199,7 +199,7 @@ const CommentsBottomSection: React.FunctionComponent<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageDeleted.decode(arr);
       if (decoded.deletedMessage) {
-        refetch();
+        removeCommentMutation?.mutate(decoded.deletedMessage);
       }
     };
 

@@ -182,6 +182,54 @@ const usePostComments = (
     },
   });
 
+  const removeCommentMutation = useMutation({
+    mutationFn: (card: newnewapi.IChatMessage) =>
+      new Promise((res) => {
+        res(card);
+      }),
+    onSuccess: (_, deletedComment) => {
+      queryClient.setQueryData(
+        [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                comments: newnewapi.IChatMessage[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const msgIndex = workingData.pages[k].comments.findIndex(
+                (c) => c.id === deletedComment?.id
+              );
+
+              if (msgIndex !== -1) {
+                workingData.pages[k].comments = workingData.pages[
+                  k
+                ].comments.filter((c) => c.id !== deletedComment.id);
+                break;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
+  });
+
   useEffect(() => {
     if (flatComments) {
       setProcessedComments(() => processComments(flatComments));
@@ -192,6 +240,7 @@ const usePostComments = (
     processedComments,
     handleOpenCommentProgrammatically,
     addCommentMutation,
+    removeCommentMutation,
     ...query,
   };
 };
