@@ -190,7 +190,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   useEffect(() => {
     // TODO: visavilist should include only creators on dashboard
-    if (isDashboard && targetChatrooms.length === 1) {
+    if (showModal && isDashboard && targetChatrooms.length === 1) {
       setActiveChatRoom(targetChatrooms[0]);
       if (router.asPath.includes('/creator/bundles')) {
         router.push(
@@ -206,7 +206,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       closeModal();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetChatrooms]);
+  }, [showModal, targetChatrooms]);
 
   const openMyAnnouncement = useCallback(() => {
     Mixpanel.track('My Announcement Clicked', {
@@ -255,7 +255,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           closeModal();
         } else {
           setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-          chat.user?.username && setUsernameQuery(chat.user?.username);
+          if (chat.user?.username) {
+            setUsernameQuery(chat.user?.username);
+          }
         }
       };
 
