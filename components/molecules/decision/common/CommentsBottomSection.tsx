@@ -85,6 +85,7 @@ const CommentsBottomSection: React.FunctionComponent<
 
   const {
     processedComments: comments,
+    addCommentMutation,
     handleOpenCommentProgrammatically,
     fetchNextPage,
     isLoading,
@@ -123,7 +124,7 @@ const CommentsBottomSection: React.FunctionComponent<
         const res = await sendMessage(payload);
 
         if (res.data?.message) {
-          await refetch();
+          addCommentMutation?.mutate(res.data.message);
         }
       } catch (err) {
         console.error(err);
@@ -186,8 +187,11 @@ const CommentsBottomSection: React.FunctionComponent<
     const socketHandlerMessageCreated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      if (decoded.newMessage!!.sender?.uuid !== user.userData?.userUuid) {
-        refetch();
+      if (
+        decoded?.newMessage &&
+        decoded.newMessage!!.sender?.uuid !== user.userData?.userUuid
+      ) {
+        addCommentMutation?.mutate(decoded.newMessage);
       }
     };
 

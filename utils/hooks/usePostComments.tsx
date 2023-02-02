@@ -1,9 +1,18 @@
+/* eslint-disable no-plusplus */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
-import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useMutation,
+  useQueryClient,
+} from 'react-query';
+import { cloneDeep, uniqBy } from 'lodash';
 
 import { getMessages } from '../../api/endpoints/chat';
 import { TCommentWithReplies } from '../../components/interfaces/tcomment';
+import useErrorToasts from './useErrorToasts';
 
 interface IUsePostComments {
   loggedInUser: boolean;
@@ -16,7 +25,7 @@ const processComments = (
   let lastParentIdx;
   const goalArr: TCommentWithReplies[] = [];
 
-  const workingArr = [...commentsRaw];
+  const workingArr = uniqBy(commentsRaw, 'id');
 
   workingArr.forEach((rawItem, i) => {
     const workingItem = { ...rawItem };
@@ -55,6 +64,9 @@ const usePostComments = (
     'queryKey' | 'queryFn'
   >
 ) => {
+  const queryClient = useQueryClient();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
+
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
     async ({ pageParam }) => {
@@ -97,10 +109,6 @@ const usePostComments = (
     [query?.data]
   );
 
-  // const processedComments = useMemo(
-  //   () => processComments(flatComments),
-  //   [flatComments]
-  // );
   const [processedComments, setProcessedComments] = useState(() =>
     flatComments ? processComments(flatComments) : []
   );
@@ -113,13 +121,79 @@ const usePostComments = (
     });
   }, []);
 
+  const addCommentMutation = useMutation({
+    mutationFn: (card: newnewapi.IChatMessage) =>
+      new Promise((res) => {
+        res(card);
+      }),
+    onSuccess: (_, newComment) => {
+      queryClient.setQueryData(
+        [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                comments: newnewapi.IChatMessage[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+            if (!newComment?.parentId) {
+              workingData.pages = workingData.pages.map((page, i: number) => {
+                if (i === 0) {
+                  // eslint-disable-next-line no-param-reassign
+                  page.comments = [newComment, ...page.comments];
+                }
+                return page;
+              });
+
+              return workingData;
+            }
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const parentMsgIndex = workingData.pages[k].comments.findIndex(
+                (c) => c.id === newComment?.parentId
+              );
+
+              if (parentMsgIndex !== -1) {
+                workingData.pages[k].comments = [
+                  ...workingData.pages[k].comments.slice(0, parentMsgIndex + 1),
+                  newComment,
+                  ...workingData.pages[k].comments.slice(parentMsgIndex + 1),
+                ];
+                break;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+    },
+  });
+
   useEffect(() => {
     if (flatComments) {
       setProcessedComments(() => processComments(flatComments));
     }
   }, [flatComments]);
 
-  return { processedComments, handleOpenCommentProgrammatically, ...query };
+  return {
+    processedComments,
+    handleOpenCommentProgrammatically,
+    addCommentMutation,
+    ...query,
+  };
 };
 
 export default usePostComments;
