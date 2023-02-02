@@ -129,8 +129,15 @@ const SModal = styled.div<{
   }
 `;
 
-const SContent = styled.div`
-  overflow: auto;
+export const SContent = styled.div`
+  overflow-y: scroll;
+  padding: 16px;
+  margin: -16px;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 24px;
+    margin: -24px;
+  }
 
   /* Hide scrollbar */
   ::-webkit-scrollbar {
