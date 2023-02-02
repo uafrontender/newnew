@@ -507,7 +507,7 @@ const SChatButton = styled(Button)`
 `;
 
 const SSectionContent = styled.div`
-  height: calc(100% - 48px);
+  height: calc(100% - 52px);
   padding: 0 24px;
   display: flex;
   position: relative;
