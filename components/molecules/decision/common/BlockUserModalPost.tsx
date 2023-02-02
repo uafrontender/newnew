@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -7,6 +7,8 @@ import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
 import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
 import getDisplayname from '../../../../utils/getDisplayname';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 interface IBlockUserModalPost {
   user: newnewapi.IUser;
@@ -22,10 +24,19 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
   const { t } = useTranslation('page-Post');
   const { changeUserBlockedStatus } = useGetBlockedUsers();
 
-  const handleConfirmClick = () => {
+  const { postParsed } = usePostInnerState();
+
+  const handleConfirmClick = useCallback(() => {
+    Mixpanel.track('Confirm User Blocked', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _blockedUserUuid: user.uuid,
+      _component: 'BlockUserModalPost',
+    });
     changeUserBlockedStatus(user.uuid, true);
     closeModal();
-  };
+  }, [changeUserBlockedStatus, closeModal, postParsed?.postUuid, user.uuid]);
+
   return (
     <Modal additionalz={15} show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
@@ -36,10 +47,10 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
             {t('blockUserModal.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={closeModal}>
+            <SCancelButton view='secondary' onClick={closeModal}>
               {t('blockUserModal.button.cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmClick}>
+            <SConfirmButton view='danger' onClick={handleConfirmClick}>
               {t('blockUserModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
@@ -99,19 +110,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`
@@ -120,8 +118,4 @@ const SConfirmButton = styled(Button)`
   font-size: 14px;
   margin-left: auto;
   flex-shrink: 0;
-  background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  &:hover {
-    background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  }
 `;

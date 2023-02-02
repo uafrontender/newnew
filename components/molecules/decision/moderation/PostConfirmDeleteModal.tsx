@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
 import { TPostType } from '../../../../utils/switchPostType';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IPostConfirmDeleteModal {
+  postUuid: string;
   postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
@@ -13,6 +15,7 @@ interface IPostConfirmDeleteModal {
 }
 
 const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
+  postUuid,
   postType,
   isVisible,
   closeModal,
@@ -20,8 +23,26 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
 }) => {
   const { t } = useTranslation('page-Post');
 
+  const closeModalMixpanel = useCallback(() => {
+    Mixpanel.track('Close Confrim Delete Post Modal', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostConfirmDeleteModal',
+    });
+    closeModal();
+  }, [closeModal, postUuid]);
+
+  const handleConfirmDeleteMixpanel = useCallback(() => {
+    Mixpanel.track('Confirm Deleting Post', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostConfirmDeleteModal',
+    });
+    handleConfirmDelete();
+  }, [handleConfirmDelete, postUuid]);
+
   return (
-    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={12} onClose={closeModalMixpanel}>
       <SContainer>
         <SModal>
           <SModalTitle>
@@ -33,10 +54,10 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
             {t('deletePostModal.body', { postType: t(`postType.${postType}`) })}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={closeModal}>
+            <SCancelButton view='secondary' onClick={closeModalMixpanel}>
               {t('deletePostModal.button.cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmDelete}>
+            <SConfirmButton view='danger' onClick={handleConfirmDeleteMixpanel}>
               {t('deletePostModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
@@ -94,19 +115,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`
@@ -115,8 +123,4 @@ const SConfirmButton = styled(Button)`
   font-size: 14px;
   margin-left: auto;
   flex-shrink: 0;
-  background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  &:hover {
-    background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  }
 `;

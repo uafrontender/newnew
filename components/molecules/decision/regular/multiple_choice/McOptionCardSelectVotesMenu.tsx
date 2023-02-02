@@ -112,8 +112,9 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
                 id={`vote-option-${id}`}
                 key={voteOffer.amountOfVotes}
                 onClickCapture={() => {
-                  Mixpanel.track('Selected Votes Amount', {
+                  Mixpanel.track('Select Votes Amount', {
                     _stage: 'Post',
+                    _amountOfVotes: voteOffer.amountOfVotes,
                     _component: 'McOptionCardSelectVotesMenu',
                   });
                 }}
@@ -135,7 +136,7 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<
             <SButton
               id='vote-option-custom'
               onClickCapture={() => {
-                Mixpanel.track('Open Custom Votes Amount', {
+                Mixpanel.track('Click Custom Votes Button', {
                   _stage: 'Post',
                   _component: 'McOptionCardSelectVotesMenu',
                 });

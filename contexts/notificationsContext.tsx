@@ -5,6 +5,7 @@ import React, {
   useContext,
   useMemo,
   useState,
+  useCallback,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
@@ -29,24 +30,16 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const socketConnection = useContext(SocketContext);
 
-  const contextValue = useMemo(
-    () => ({
-      unreadNotificationCount,
-      notificationsLoading,
-      fetchNotificationCount,
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotificationCount, fetchNotificationCount, notificationsLoading]
-  );
-
-  async function fetchNotificationCount() {
+  const fetchNotificationCount = useCallback(async () => {
     if (!user.loggedIn) return;
     try {
       setNotificationsLoading(true);
       const payload = new newnewapi.EmptyRequest();
       const res = await getUnreadNotificationCount(payload);
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
+
       if (
         res.data.unreadNotificationCount !== undefined &&
         res.data.unreadNotificationCount > 0
@@ -60,11 +53,11 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
       setNotificationsLoading(false);
       setUnreadNotificationCount(0);
     }
-  }
+  }, [user.loggedIn]);
 
   useEffect(() => {
     fetchNotificationCount();
-  }, [user.loggedIn]);
+  }, [fetchNotificationCount, user.userData?.userUuid]);
 
   useEffect(() => {
     const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {
@@ -85,6 +78,15 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
+
+  const contextValue = useMemo(
+    () => ({
+      unreadNotificationCount,
+      notificationsLoading,
+      fetchNotificationCount,
+    }),
+    [unreadNotificationCount, fetchNotificationCount, notificationsLoading]
+  );
 
   return (
     <NotificationsContext.Provider value={contextValue}>

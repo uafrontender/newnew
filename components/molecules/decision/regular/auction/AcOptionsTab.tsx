@@ -225,7 +225,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 handleAddOrUpdateOptionFromResponse
               }
               handleRemoveOption={() => {
-                Mixpanel.track('Removed Option', {
+                Mixpanel.track('Remove Option', {
                   _stage: 'Post',
                   _postUuid: postUuid,
                   _component: 'AcOptionsTab',
@@ -256,23 +256,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             )
           ) : null}
         </SBidsContainer>
-        {user?.userTutorialsProgress.remainingAcSteps && (
-          <STutorialTooltipHolder>
-            <TutorialTooltip
-              isTooltipVisible={
-                options.length > 0 &&
-                user.userTutorialsProgress.remainingAcSteps[0] ===
-                  newnewapi.AcTutorialStep.AC_ALL_BIDS
-              }
-              closeTooltip={() =>
-                goToNextStep(newnewapi.AcTutorialStep.AC_ALL_BIDS)
-              }
-              title={t('tutorials.ac.peopleBids.title')}
-              text={t('tutorials.ac.peopleBids.text')}
-              dotPosition={DotPositionEnum.BottomLeft}
-            />
-          </STutorialTooltipHolder>
-        )}
+        {user?.userTutorialsProgress.remainingAcSteps &&
+          postStatus === 'voting' && (
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  options.length > 0 &&
+                  user.userTutorialsProgress.remainingAcSteps[0] ===
+                    newnewapi.AcTutorialStep.AC_ALL_BIDS
+                }
+                closeTooltip={() =>
+                  goToNextStep(newnewapi.AcTutorialStep.AC_ALL_BIDS)
+                }
+                title={t('tutorials.ac.peopleBids.title')}
+                text={t('tutorials.ac.peopleBids.text')}
+                dotPosition={DotPositionEnum.BottomLeft}
+              />
+            </STutorialTooltipHolder>
+          )}
       </STabContainer>
     </>
   );

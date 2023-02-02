@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable arrow-body-style */
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -12,11 +12,14 @@ import DeleteVideoModal from './DeleteVideoModal';
 
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import Tooltip from '../../../atoms/Tooltip';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 interface IPostVideoThumbnailItem {
   index: number;
   video: newnewapi.IVideoUrls;
   isNonUploadedYet: boolean;
+  isDeletingAdditionalResponse: boolean;
   handleClick: () => void;
   handleDeleteVideo: () => void;
   handleDeleteUnuploadedAdditonalResponse: () => void;
@@ -29,10 +32,12 @@ const PostVideoThumbnailItem: React.FunctionComponent<
   video,
   isNonUploadedYet,
   handleClick,
+  isDeletingAdditionalResponse,
   handleDeleteVideo,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { postParsed } = usePostInnerState();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = [
     'mobile',
@@ -49,11 +54,37 @@ const PostVideoThumbnailItem: React.FunctionComponent<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const handleClickDeleteButtonMixpanel = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      Mixpanel.track('Click video delete thumbnail item', {
+        _stage: 'Post',
+        _postUuid: postParsed?.postUuid,
+        _videoIndex: `postVideoThumbnailItem_${index}`,
+        _videoUuid: video?.uuid ? video?.uuid : 'Newly added video',
+        _component: 'PostVideoThumbnailItem',
+      });
+      e.stopPropagation();
+      setIsDeleteModalOpen(true);
+    },
+    [index, postParsed?.postUuid, video?.uuid]
+  );
+
+  const handleClickCardMixpanel = useCallback(() => {
+    Mixpanel.track('Click video thumbnail item', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _videoIndex: `postVideoThumbnailItem_${index}`,
+      _videoUuid: video?.uuid ? video?.uuid : 'Newly added video',
+      _component: 'PostVideoThumbnailItem',
+    });
+    handleClick();
+  }, [handleClick, index, postParsed?.postUuid, video?.uuid]);
+
   return (
     <>
       <SContainer
         id={`postVideoThumbnailItem_${index}`}
-        onClick={() => handleClick()}
+        onClick={() => handleClickCardMixpanel()}
       >
         <SWrapper>
           <SImg src={video.thumbnailImageUrl ?? ''} />
@@ -63,10 +94,7 @@ const PostVideoThumbnailItem: React.FunctionComponent<
             ref={(el) => {
               deleteButtonRef.current = el!!;
             }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDeleteModalOpen(true);
-            }}
+            onClick={handleClickDeleteButtonMixpanel}
             onMouseEnter={() => setHelperVisible(true)}
             onMouseLeave={() => setHelperVisible(false)}
           >
@@ -86,6 +114,7 @@ const PostVideoThumbnailItem: React.FunctionComponent<
       </SContainer>
       <DeleteVideoModal
         isVisible={isDeleteModalOpen}
+        isLoading={isDeletingAdditionalResponse}
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={() => {
           if (isNonUploadedYet) {

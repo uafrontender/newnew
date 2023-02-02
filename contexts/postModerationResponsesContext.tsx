@@ -46,6 +46,7 @@ interface IPostModerationResponsesContext {
   additionalResponseUploading: boolean;
   readyToUploadAdditionalResponse: boolean;
   handleUploadAdditionalVideoProcessed: () => Promise<void>;
+  isDeletingAdditionalResponse: boolean;
   handleDeleteAdditionalResponse: (videoUuid: string) => Promise<void>;
   // File uploading
   videoProcessing?: TVideoProcessingData;
@@ -87,6 +88,7 @@ const PostModerationResponsesContext =
     additionalResponseUploading: false,
     readyToUploadAdditionalResponse: false,
     handleUploadAdditionalVideoProcessed: (() => {}) as () => Promise<void>,
+    isDeletingAdditionalResponse: false,
     handleDeleteAdditionalResponse: ((videoUuid: string) => {}) as (
       videoUuid: string
     ) => Promise<void>,
@@ -170,6 +172,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const [readyToUploadAdditionalResponse, setReadyToUploadAdditionalResponse] =
     useState(false);
 
+  const [isDeletingAdditionalResponse, setIsDeletingAdditionalResponse] =
+    useState(false);
+
   const handleAddAdditonalResponse = useCallback(
     (newVideo: newnewapi.IVideoUrls) => {
       setAdditionalResponses((curr) => [...curr, newVideo]);
@@ -179,6 +184,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const handleDeleteAdditionalResponse = useCallback(
     async (videoUuid: string) => {
+      setIsDeletingAdditionalResponse(true);
       try {
         const req = new newnewapi.DeleteAdditionalPostResponseRequest({
           videoUuid,
@@ -197,6 +203,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       } catch (err) {
         console.error(err);
         showErrorToastPredefined(undefined);
+      } finally {
+        setIsDeletingAdditionalResponse(false);
       }
     },
     [showErrorToastPredefined]
@@ -509,7 +517,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       const res = await uploadAdditionalPostResponse(payload);
 
       if (!res.error) {
-        const updatedData = await refetchPost();
+        // const updatedData = await refetchPost();
+
+        const updatedData = res;
         let additionalResponsesFromBe: newnewapi.IVideoUrls[] = [];
 
         if (
@@ -559,7 +569,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   }, [
     handleAddAdditonalResponse,
     postUuid,
-    refetchPost,
     showErrorToastPredefined,
     uploadedResponseVideoUrl,
   ]);
@@ -697,6 +706,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       additionalResponses,
       additionalResponseUploading,
       readyToUploadAdditionalResponse,
+      isDeletingAdditionalResponse,
       handleDeleteAdditionalResponse,
       videoProcessing,
       uploadedResponseVideoUrl,
@@ -729,6 +739,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       additionalResponses,
       additionalResponseUploading,
       readyToUploadAdditionalResponse,
+      isDeletingAdditionalResponse,
       handleDeleteAdditionalResponse,
       videoProcessing,
       uploadedResponseVideoUrl,

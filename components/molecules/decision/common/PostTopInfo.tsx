@@ -195,7 +195,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   ); */
 
   const handleOpenShareMenu = () => {
-    Mixpanel.track('Opened Share Menu', {
+    Mixpanel.track('Open Share Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
       _component: 'PostTopInfo',
@@ -361,7 +361,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   ); 
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
-    Mixpanel.track('Opened SMS Notification Menu', {
+    Mixpanel.track('Open SMS Notification Menu', {
       _stage: 'Post',
       _postUuid: postUuid,
       _component: 'PostTopInfo',

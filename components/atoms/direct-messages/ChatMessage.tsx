@@ -30,7 +30,10 @@ const ChatMessage: React.FC<IChatMessage> = ({
   const router = useRouter();
 
   const isDashboard = useMemo(() => {
-    if (router.asPath.includes('/creator/dashboard')) {
+    if (
+      router.asPath.includes('/creator/dashboard') ||
+      router.asPath.includes('/creator/bundles')
+    ) {
       return true;
     }
     return false;

@@ -37,6 +37,7 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import getDisplayname from '../../../utils/getDisplayname';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -178,7 +179,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   }, [searchValue, chatRooms]);
 
   const isDashboard = useMemo(() => {
-    if (router.asPath.includes('/creator/dashboard')) {
+    if (
+      router.asPath.includes('/creator/dashboard') ||
+      router.asPath.includes('/creator/bundles')
+    ) {
       return true;
     }
     return false;
@@ -186,18 +190,39 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   useEffect(() => {
     // TODO: visavilist should include only creators on dashboard
-    if (isDashboard && targetChatrooms.length === 1) {
+    if (showModal && isDashboard && targetChatrooms.length === 1) {
       setActiveChatRoom(targetChatrooms[0]);
-      router.push(
-        `/creator/dashboard?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
-      );
+      if (router.asPath.includes('/creator/bundles')) {
+        router.push(
+          `/creator/bundles?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
+        );
+      } else {
+        router.push(
+          `/creator/dashboard?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
+        );
+      }
+
       if (mobileChatOpened) setHiddenMessagesArea(false);
       closeModal();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetChatrooms]);
+  }, [showModal, targetChatrooms]);
 
   const openMyAnnouncement = useCallback(() => {
+    Mixpanel.track('My Announcement Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'NewMessageModal',
+      _isDashboard: isDashboard,
+      ...(!isDashboard
+        ? {
+            _target: `/direct-messages/${user.userData?.username}-announcement`,
+          }
+        : {
+            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+            _username: user.userData?.username,
+          }),
+    });
+
     if (!isDashboard) {
       router.push(`/direct-messages/${user.userData?.username}-announcement`);
       closeModal();
@@ -210,12 +235,29 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
       const handleItemClick = () => {
+        Mixpanel.track('Chat Item Clicked', {
+          _stage: 'Direct Messages',
+          _component: 'NewMessageModal',
+          _isDashboard: isDashboard,
+          ...(!isDashboard
+            ? {
+                _target: `/direct-messages/${chat.user?.username}`,
+                _visavis: chat.user?.username,
+              }
+            : {
+                _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+                _visavis: chat.user?.username,
+              }),
+        });
+
         if (!isDashboard) {
           router.push(`/direct-messages/${chat.user?.username}`);
           closeModal();
         } else {
           setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-          chat.user?.username && setUsernameQuery(chat.user?.username);
+          if (chat.user?.username) {
+            setUsernameQuery(chat.user?.username);
+          }
         }
       };
 

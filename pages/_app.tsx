@@ -17,11 +17,13 @@ import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import moment from 'moment-timezone';
 import countries from 'i18n-iso-countries';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 // Custom error page
 import Error from './_error';
@@ -84,6 +86,30 @@ interface IMyApp extends AppProps {
 }
 
 const queryClient = new QueryClient();
+
+// Loader
+const NO_LOADER_ROUTES = [
+  '/creator/dashboard?tab=chat',
+  '/creator/dashboard?tab=notifications',
+];
+
+NProgress.configure({ showSpinner: false, trickleSpeed: 300, speed: 500 });
+
+Router.events.on('routeChangeStart', (url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.start();
+  }
+});
+Router.events.on('routeChangeComplete', (url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.done();
+  }
+});
+Router.events.on('routeChangeError', (err, url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.done();
+  }
+});
 
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;

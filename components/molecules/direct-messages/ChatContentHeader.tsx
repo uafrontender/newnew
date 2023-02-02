@@ -63,9 +63,9 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     useGetChats();
 
   useEffect(() => {
-    if (chatRoom.kind === 4) {
+    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
       setIsAnnouncement(true);
-      chatRoom.myRole === 2
+      chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
         ? setIsMyAnnouncement(true)
         : setIsMyAnnouncement(false);
     } else {
@@ -85,7 +85,10 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   }, []);
 
   const isDashboard = useMemo(() => {
-    if (router.asPath.includes('/creator/dashboard')) {
+    if (
+      router.asPath.includes('/creator/dashboard') ||
+      router.asPath.includes('/creator/bundles')
+    ) {
       return true;
     }
     return false;
@@ -95,7 +98,12 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     setHiddenMessagesArea(true);
     if (isDashboard) {
       router.query = {};
-      router.push(`/creator/dashboard?tab=chat`);
+      if (router.asPath.includes('/creator/bundles')) {
+        router.push(`/creator/bundles?tab=chat`);
+      } else {
+        router.push(`/creator/dashboard?tab=chat`);
+      }
+
       setActiveChatRoom(null);
     } else if (isMobileOrTablet) {
       router.push(`/direct-messages`);

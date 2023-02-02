@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -18,6 +16,7 @@ import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
 import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -69,12 +68,15 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [promptUserWithPushNotificationsPermissionModal, router]);
 
   useEffect(() => {
-    if (user.creatorData?.isLoaded) {
+    if (
+      user.creatorData?.isLoaded &&
       user.userData?.bio &&
       user.userData?.bio.length > 0 &&
       user.creatorData?.options?.isCreatorConnectedToStripe
-        ? setIsToDosCompleted(true)
-        : setIsToDosCompleted(false);
+    ) {
+      setIsToDosCompleted(true);
+    } else if (user.creatorData?.isLoaded) {
+      setIsToDosCompleted(false);
     }
   }, [user.creatorData, user.userData?.bio]);
 
@@ -160,8 +162,16 @@ export const Dashboard: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('dashboard.title')}</STitle>
-          {!isMobile && <DynamicSection />}
+          {!isMobile && <DynamicSection baseUrl='/creator/dashboard' />}
         </STitleBlock>
+        {user.creatorData?.options.stripeConnectStatus &&
+          user.creatorData.options.stripeConnectStatus ===
+            newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+              .CONNECTED_NEEDS_ATTENTION && (
+            <SBlock>
+              <StripeIssueBanner />
+            </SBlock>
+          )}
         {!user.creatorData?.isLoaded ? (
           <SBlock>
             <Lottie
@@ -203,25 +213,15 @@ export const Dashboard: React.FC = React.memo(() => {
         )}
         {!user.userData?.options?.isWhiteListed && (
           <SBlock>
-            {!isEarningsLoading ? (
-              isToDosCompleted !== undefined ? (
-                isToDosCompleted ? (
-                  <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
-                ) : (
-                  <FinishProfileSetup />
-                )
+            {!isEarningsLoading &&
+              (isToDosCompleted ? (
+                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
               ) : (
-                <Lottie
-                  width={64}
-                  height={64}
-                  options={{
-                    loop: true,
-                    autoplay: true,
-                    animationData: loadingAnimation,
-                  }}
-                />
-              )
-            ) : (
+                <FinishProfileSetup />
+              ))}
+
+            {/* Loader */}
+            {(isEarningsLoading || isToDosCompleted === undefined) && (
               <Lottie
                 width={64}
                 height={64}

@@ -50,12 +50,12 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
           <SModalTitle>{t('modal.deleteMyAccount.title')}</SModalTitle>
           <SModalMessage>{t('modal.deleteMyAccount.body')}</SModalMessage>
           <SModalButtons>
-            <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.deleteMyAccount.button.confirm')}
-            </SConfirmButton>
-            <SCancelButton onClick={closeModal}>
+            <SCancelButton view='secondary' onClick={closeModal}>
               {t('modal.deleteMyAccount.button.cancel')}
             </SCancelButton>
+            <SConfirmButton view='danger' onClick={handleConfirmClick}>
+              {t('modal.deleteMyAccount.button.confirm')}
+            </SConfirmButton>
           </SModalButtons>
         </SModal>
       </SContainer>
@@ -126,8 +126,7 @@ const SModalMessage = styled.p`
 
 const SModalButtons = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 16px;
 `;
@@ -136,29 +135,10 @@ const SCancelButton = styled(Button)`
   padding: 12px 24px;
   line-height: 24px;
   font-size: 14px;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colorsThemed.text.secondary};
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
-
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? `${props.theme.colors.dark} !important`
-        : `${props.theme.colorsThemed.background.quaternary} !important`};
-    color: ${(props) => props.theme.colors.white};
-  }
 `;
 
 const SConfirmButton = styled(Button)`
   padding: 12px 24px;
   line-height: 24px;
   font-size: 14px;
-  background-color: ${(props) => props.theme.colorsThemed.accent.error};
-
-  &:hover {
-    background-color: ${(props) =>
-      `${props.theme.colorsThemed.accent.error} !important`};
-  }
 `;

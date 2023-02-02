@@ -17,7 +17,6 @@ import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import ShareMenu from './ShareMenu';
-import { useAppSelector } from '../../redux-store/store';
 import { useBundles } from '../../contexts/bundlesContext';
 
 interface IMoreMenuMobile {
@@ -32,10 +31,9 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('common');
-  const user = useAppSelector((state) => state.user);
   const containerRef = useRef<HTMLDivElement>();
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
-  const { bundles, hasSoldBundles } = useBundles();
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
   const { unreadCount } = useGetChats();
@@ -65,8 +63,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         >
           {!shareMenuOpen ? (
             <>
-              {(user.userData?.options?.isCreator ||
-                (bundles && bundles?.length > 0)) && (
+              {directMessagesAvailable && (
                 <SButton
                   onClick={() =>
                     router.route.includes('direct-messages')
@@ -110,9 +107,9 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                   height='24px'
                 />
               </SButton>
-              {/* If there are bundles, notifications are moved to more menu */}
+              {/* If user purchased bundles, notifications are moved to more menu */}
               {/* TODO: Refactor the menu to make it work with the collection, auto split navigation items */}
-              {(hasSoldBundles || (bundles && bundles.length > 0)) && (
+              {bundles && bundles.length > 0 && (
                 <SButton
                   onClick={() =>
                     router.route.includes('direct-messages')

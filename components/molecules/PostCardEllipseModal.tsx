@@ -63,7 +63,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const handleCopyLink = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/p/${postShortId || postUuid}`;
-      Mixpanel.track('Copied Link Post Modal', {
+      Mixpanel.track('Copy Link Post Modal', {
         _stage: 'Post',
         _postUuid: postUuid,
       });

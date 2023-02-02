@@ -7,7 +7,7 @@ import { newnewapi } from 'newnew-api';
 import Modal from '../Modal';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
-import ModalPaper from '../ModalPaper';
+import ModalPaper, { SContent } from '../ModalPaper';
 
 // Assets
 import pensiveIcon from '../../../public/images/png/emoji/pensive.png';
@@ -225,7 +225,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           {!isProcessing && (
             <SButton
               id='add-card-success'
-              view='primaryGrad'
+              view='primary'
               onClick={() => {
                 Mixpanel.track('Got It Button Clicked', {
                   _stage: 'Settings',
@@ -257,8 +257,10 @@ const SModalPaper = styled(ModalPaper)`
     height: 344px;
     padding: 52px;
 
-    & > div {
-      height: 100%;
+    ${SContent} {
+      padding: 52px;
+      margin: -52px;
+      height: 344px;
     }
   }
 `;
