@@ -56,7 +56,7 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
       return;
     }
 
-    Mixpanel.track('BuyBundleAfterStripeRedirect');
+    Mixpanel.track('Buy Bundle After Stripe Redirect');
 
     try {
       const stripeContributionRequest = new newnewapi.StripeContributionRequest(

@@ -59,6 +59,7 @@ import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
+import { Mixpanel } from '../../utils/mixpanel';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -957,7 +958,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </ProfileGeneralContent>
             <SControlsWrapper>
               {!isMobile ? (
-                <Button view='secondary' onClick={() => handleClose()}>
+                <Button
+                  view='secondary'
+                  onClick={() => handleClose()}
+                  onClickCapture={() => {
+                    Mixpanel.track('Click Cancel Editing Profile Button', {
+                      _stage: 'MyProfile',
+                      _component: 'EditProfileMenu',
+                    });
+                  }}
+                >
                   {t('editProfileMenu.button.cancel')}
                 </Button>
               ) : null}
@@ -971,6 +981,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => handleUpdateUserData()}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Profile Changes Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.save')}
               </Button>
@@ -1058,6 +1074,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 view='secondary'
                 disabled={updateProfileImageLoading}
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Cancel Profile Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.cancel')}
               </Button>
@@ -1065,6 +1087,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 withShadow
                 disabled={updateProfileImageLoading}
                 onClick={completeProfileImageCropAndSave}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Profile Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.save')}
               </Button>
