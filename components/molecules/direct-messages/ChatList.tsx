@@ -6,12 +6,13 @@ import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
-import Lottie from '../../atoms/Lottie';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppSelector } from '../../../redux-store/store';
+import Loader from '../../atoms/Loader';
+import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
 
 const NoResults = dynamic(
   () => import('../../atoms/direct-messages/NoResults')
@@ -52,6 +53,7 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
     activeChatRoom,
     justSentMessage,
   } = useGetChats();
+
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
       myRole: activeTab,
@@ -118,24 +120,29 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
           : {}
       }
     >
-      {isLoading ? (
-        <Lottie
-          width={64}
-          height={64}
-          options={{
-            loop: true,
-            autoplay: true,
-            animationData: loadingAnimation,
-          }}
-        />
-      ) : chatrooms.length > 0 ? (
+      {/* Loading state */}
+      {isLoading && <Loader size='md' isStatic />}
+
+      {!isLoading && (
         <>
-          {chatrooms.map(renderChatItem)}
-          <SChatItemFakeContainer />
-          <SChatItemFakeContainer />
+          {chatrooms.length > 0 ? (
+            <>
+              {chatrooms.map(renderChatItem)}
+              {/* TODO: Remove this for dynamic section */}
+              {isMobileOrTablet && (
+                <>
+                  <SChatItemFakeContainer />
+                  <SChatItemFakeContainer />
+                </>
+              )}
+            </>
+          ) : (
+            <EmptyInbox />
+          )}
+
+          {/* No Search Results */}
+          {searchChatroom && <NoResults text={searchChatroom} />}
         </>
-      ) : (
-        <NoResults text={searchChatroom} />
       )}
     </SChatlist>
   );
