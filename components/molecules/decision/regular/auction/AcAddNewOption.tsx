@@ -134,7 +134,9 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    if (isAPIValidateLoading) return;
+    if (isAPIValidateLoading) {
+      return;
+    }
     setPaymentModalOpen(true);
   };
 
@@ -242,7 +244,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         return;
       }
 
-      Mixpanel.track('PayWithCard', {
+      Mixpanel.track('Pay With Card', {
         _stage: 'Post',
         _postUuid: postUuid,
         _component: 'AcOptionsTab',

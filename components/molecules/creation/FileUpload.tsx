@@ -105,6 +105,8 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const [showFullPreview, setShowFullPreview] = useState(false);
 
+  const [showPlayButton, setShowPlayButton] = useState(false);
+
   const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Select File Clicked', { _stage: 'Creation' });
     inputRef.current?.click();
@@ -119,10 +121,15 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseFullPreviewClick = useCallback(() => {
     Mixpanel.track('Close Full Preview', { _stage: 'Creation' });
     setShowFullPreview(false);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
-  const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
+  const handleOpenEllipseMenu = useCallback(() => {
+    Mixpanel.track('Open Ellipse menu', { _stage: 'Creation' });
+    setShowEllipseMenu(true);
+  }, []);
 
   const handleCloseEllipseMenu = useCallback(
     () => setShowEllipseMenu(false),
@@ -139,7 +146,9 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseThumbnailEditClick = useCallback(() => {
     Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
     setShowThumbnailEdit(false);
-    playerRef.current?.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
@@ -152,7 +161,9 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseCoverImageEditClick = useCallback(() => {
     Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
     setCoverImageModalOpen(false);
-    playerRef.current?.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
@@ -164,7 +175,9 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseDeleteVideoClick = useCallback(() => {
     Mixpanel.track('Close Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(false);
-    playerRef.current?.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
@@ -318,12 +331,14 @@ const FileUpload: React.FC<IFileUpload> = ({
                 progress: progressUpload,
               })}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => handleCancelUploadAndClearLocalFile()}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
+            {progressUpload !== 100 ? (
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={() => handleCancelUploadAndClearLocalFile()}
+              >
+                {t('secondStep.button.cancel')}
+              </SLoadingBottomBlockButton>
+            ) : null}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={progressUpload} />
@@ -394,6 +409,8 @@ const FileUpload: React.FC<IFileUpload> = ({
               resources={value}
               thumbnails={thumbnails}
               borderRadius='8px'
+              showPlayButton={showPlayButton}
+              playButtonSize='small'
             />
           </SPlayerWrapper>
           <SButtonsContainer>
@@ -446,6 +463,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     handleDeleteVideoShow,
     isDesktop,
     handleFullPreview,
+    showPlayButton,
   ]);
 
   return (

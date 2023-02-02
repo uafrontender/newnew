@@ -16,6 +16,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 const ResponseTimer = dynamic(
   () => import('../../../atoms/dashboard/ResponseTimer')
@@ -154,7 +155,21 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                     }`}
                   >
                     <a>
-                      <SListDecideButton view='primary'>
+                      <SListDecideButton
+                        view='primary'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _stage: 'Dashboard',
+                            _button: 'Response Now',
+                            _target: `/p/${
+                              data.postShortId
+                                ? data.postShortId
+                                : data.postUuid
+                            }`,
+                            _postUuid: data.postUuid,
+                          });
+                        }}
+                      >
                         {t('dashboard.expirationPosts.decide.desktop')}
                       </SListDecideButton>
                     </a>

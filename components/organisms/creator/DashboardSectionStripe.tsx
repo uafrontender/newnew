@@ -18,6 +18,7 @@ import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 import GoBackButton from '../../molecules/GoBackButton';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -129,6 +130,7 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
         <SButton
           view={stripeNeedAttention ? 'danger' : 'primaryGrad'}
           isConnectedToStripe={isConnectedToStripe || stripeProcessing}
+          stripeNeedAttention={stripeNeedAttention}
           style={{
             ...(isConnectedToStripe
               ? {
@@ -147,6 +149,11 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
               !stripeProcessing &&
               !stripeNeedAttention
             ) {
+              Mixpanel.track('Redirect to Stripe', {
+                _button: getStripeButtonTextKey(stripeConnectStatus),
+                _stage: 'Dashboard',
+                _component: 'DashboardSectionStripe',
+              });
               handleRedirectToStripeSetup();
             }
           }}
@@ -162,6 +169,11 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
           <SButtonUpdate
             view='transparent'
             onClick={() => {
+              Mixpanel.track('Redirect to Stripe', {
+                _button: 'Update payment info',
+                _stage: 'Dashboard',
+                _component: 'DashboardSectionStripe',
+              });
               handleRedirectToStripeSetup();
             }}
           >
@@ -290,6 +302,7 @@ const SButtons = styled.div`
 
 const SButton = styled(Button)<{
   isConnectedToStripe?: boolean;
+  stripeNeedAttention?: boolean;
 }>`
   margin-bottom: 24px;
   font-size: 16px;
@@ -303,6 +316,17 @@ const SButton = styled(Button)<{
       margin-left: 10px;
     }
   }
+
+  ${({ stripeNeedAttention }) =>
+    stripeNeedAttention
+      ? css`
+          &&& {
+            &:hover {
+              box-shadow: none;
+            }
+          }
+        `
+      : ''};
 
   ${({ isConnectedToStripe }) =>
     isConnectedToStripe

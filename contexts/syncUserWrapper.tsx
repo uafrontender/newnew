@@ -28,7 +28,7 @@ import {
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
-import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
+import { loadStateLS, saveStateLS } from '../utils/localStorage';
 import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
 
 interface ISyncUserWrapper {
@@ -61,7 +61,6 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
     ) {
       setCreatorDataSteps(0);
-      removeStateLS('userTutorialsProgress');
       userWasLoggedIn.current = false;
       queryClient.removeQueries({ queryKey: ['private'] });
     }

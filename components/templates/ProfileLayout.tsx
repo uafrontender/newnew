@@ -44,6 +44,7 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
+import { Mixpanel } from '../../utils/mixpanel';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -318,6 +319,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   padding: '8px',
                 }}
                 onClick={() => handleCopyLink()}
+                onClickCapture={() => {
+                  Mixpanel.track('Copy Link User', {
+                    _stage: 'Profile',
+                    _postUuid: user.uuid,
+                    _component: 'ProfileLayout',
+                  });
+                }}
               >
                 {isCopiedUrl ? (
                   t('profileLayout.buttons.copied')
@@ -334,7 +342,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
             {creatorsBundle && (
               <CustomLink href={`/direct-messages/${user.username}`}>
-                <SSendButton withShadow view='primaryGrad'>
+                <SSendButton
+                  view='brandYellow'
+                  onClickCapture={() => {
+                    Mixpanel.track('Send Message Button Clicked', {
+                      _stage: 'Profile',
+                      _creatorUuid: user.uuid,
+                      _component: 'ProfileLayout',
+                    });
+                  }}
+                >
                   {t('profileLayout.buttons.sendMessage')}
                 </SSendButton>
               </CustomLink>
@@ -486,17 +503,7 @@ const SShareButton = styled(Button)`
 
 const SSendButton = styled(Button)`
   margin: 0 auto 16px;
-  background: ${(props) => props.theme.colorsThemed.accent.yellow};
   color: #2c2c33;
-
-  :after {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
-  }
-
-  &:hover {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
-    box-shadow: none !important;
-  }
 `;
 
 const SBioText = styled(Text)`

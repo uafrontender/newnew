@@ -400,6 +400,18 @@ const PostPage: NextPage<IPostPage> = ({
     [setRecommendedPosts, recommendedPostsLoading, postParsed]
   );
 
+  // Refetch Post if user authenticated
+  useEffect(() => {
+    if (user.loggedIn) {
+      refetchPost();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
+
+  useEffect(() => {
+    setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
+  }, [postParsed?.isFavoritedByMe]);
+
   // Comment ID from URL
   useEffect(() => {
     if (commentIdFromUrl) {
@@ -575,7 +587,7 @@ const PostPage: NextPage<IPostPage> = ({
           <title>
             {typeOfPost
               ? t(`meta.${typeOfPost}.title`, {
-                  displayName: getDisplayname(user.userData),
+                  displayName: getDisplayname(postParsed.creator),
                   postTitle: postParsed.title,
                 })
               : ''}
@@ -584,7 +596,17 @@ const PostPage: NextPage<IPostPage> = ({
             name='description'
             content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}
           />
-          <meta property='og:title' content={postParsed?.title} />
+          <meta
+            property='og:title'
+            content={
+              typeOfPost
+                ? t(`meta.${typeOfPost}.title`, {
+                    displayName: getDisplayname(postParsed.creator),
+                    postTitle: postParsed.title,
+                  })
+                : ''
+            }
+          />
           <meta
             property='og:url'
             content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuidOrShortId}`}
@@ -759,6 +781,14 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
             permanent: true,
           },
         };
+      }
+
+      if (!context.req.cookies?.accessToken) {
+        // cache the response only if the post is found and no redirect applies
+        context.res.setHeader(
+          'Cache-Control',
+          'public, s-maxage=5, stale-while-revalidate=10'
+        );
       }
 
       return {
