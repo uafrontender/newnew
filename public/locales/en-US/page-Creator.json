@@ -36,7 +36,9 @@
         "text": "Add a bio and your bank info to withdraw your earnings",
         "textBio": "Add a bio to withdraw your earnings",
         "textBank": "Add your bank info to withdraw your earnings",
-        "button": "Add"
+        "button": "Add",
+        "stripeIssue": "There's an issue with your Stripe account",
+        "stripeIssueButton": "See Stripe account"
       },
       "makeDecision": {
         "text": "Make a post. Start earning.",

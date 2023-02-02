@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import Modal from '../../../organisms/Modal';
-import ModalPaper from '../../../organisms/ModalPaper';
+import ModalPaper, { SContent } from '../../../organisms/ModalPaper';
 import Button from '../../../atoms/Button';
 import logo from '../../../../public/images/dashboard/logo-modal.png';
 import Headline from '../../../atoms/Headline';
@@ -60,9 +60,19 @@ const SModalPaper = styled(ModalPaper)`
   padding: 24px;
   margin: 16px;
 
+  ${SContent} {
+    padding: 24px;
+    margin: -24px;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     padding: 32px;
     max-width: 500px;
+
+    ${SContent} {
+      padding: 32px;
+      margin: -32px;
+    }
   }
 `;
 
