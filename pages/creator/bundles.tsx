@@ -52,7 +52,7 @@ export default Bundles;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'page-Creator'],
+    ['common', 'page-Creator', 'page-Chat'],
     null,
     SUPPORTED_LANGUAGES
   );
