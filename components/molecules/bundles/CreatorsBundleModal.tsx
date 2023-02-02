@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useMemo } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,6 +19,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import getCurrentBundleLevel from '../../../utils/getCurrentBundleLevel';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -31,6 +32,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
   ({ show, creatorBundle, onBuyMore, onClose }) => {
     const { t } = useTranslation('common');
     const router = useRouter();
+    const theme = useTheme();
 
     const timeLeft =
       (creatorBundle.bundle!.accessExpiresAt!.seconds as number) * 1000 -
@@ -47,6 +49,10 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
       [creator?.uuid, usersIBlocked, usersBlockedMe]
     );
 
+    const currentBundleLevel = creatorBundle.bundle?.votesLeft
+      ? getCurrentBundleLevel(creatorBundle.bundle.votesLeft)
+      : 0;
+
     return (
       <>
         <Modal show={show} onClose={onClose}>
@@ -56,7 +62,14 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
             isCloseButton
           >
             <Content>
-              <BundleIcon src={assets.common.vote} alt='votes' />
+              <SBundleIcon
+                src={
+                  theme.name === 'light'
+                    ? assets.bundles.lightVotes[currentBundleLevel].animated()
+                    : assets.bundles.darkVotes[currentBundleLevel].animated()
+                }
+                alt='Bundle votes'
+              />
               <SVotesAvailable>
                 <Trans
                   t={t}
@@ -173,7 +186,7 @@ const Content = styled.div`
   align-items: center;
 `;
 
-const BundleIcon = styled.img`
+const SBundleIcon = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 30px;
