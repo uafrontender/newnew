@@ -125,7 +125,7 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
 
       {!isLoading && (
         <>
-          {chatrooms.length > 0 ? (
+          {chatrooms.length > 0 && (
             <>
               {chatrooms.map(renderChatItem)}
               {/* TODO: Remove this for dynamic section */}
@@ -136,12 +136,15 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
                 </>
               )}
             </>
-          ) : (
-            <EmptyInbox />
           )}
 
+          {/* Empty inbox */}
+          {chatrooms.length === 0 && !searchChatroom && <EmptyInbox />}
+
           {/* No Search Results */}
-          {searchChatroom && <NoResults text={searchChatroom} />}
+          {chatrooms.length === 0 && searchChatroom && (
+            <NoResults text={searchChatroom} />
+          )}
         </>
       )}
     </SChatlist>
