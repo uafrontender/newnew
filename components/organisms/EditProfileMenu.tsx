@@ -188,15 +188,25 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     bioError: '',
   });
 
+  const validateUsernameAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
   const validateUsernameViaAPI = useCallback(
     async (text: string) => {
+      if (validateUsernameAbortControllerRef.current) {
+        validateUsernameAbortControllerRef.current?.abort();
+      }
+      validateUsernameAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateUsernameRequest({
           username: text,
         });
 
-        const res = await validateUsernameTextField(payload);
+        const res = await validateUsernameTextField(
+          payload,
+          validateUsernameAbortControllerRef.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
@@ -242,8 +252,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     [validateUsernameViaAPI]
   );
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(
     async (kind: newnewapi.ValidateTextRequest.Kind, text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -251,7 +266,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           text: text.trim(),
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
 
