@@ -65,12 +65,17 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       processedOptions: options,
       hasNextPage: hasNextOptionsPage,
       fetchNextPage: fetchNextOptionsPage,
-      refetch: refetchOptions,
-    } = useMcOptions({
-      postUuid: post.postUuid,
-      userUuid: user.userData?.userUuid,
-      loggedInUser: user.loggedIn,
-    });
+      removeMcOptionMutation,
+    } = useMcOptions(
+      {
+        postUuid: post.postUuid,
+        userUuid: user.userData?.userUuid,
+        loggedInUser: user.loggedIn,
+      },
+      {
+        refetchOnWindowFocus: false,
+      }
+    );
 
     const handleRemoveOption = useCallback(
       (optionToRemove: newnewapi.MultipleChoice.Option) => {
@@ -79,9 +84,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
           _postUuid: post.postUuid,
           _component: 'PostViewScheduled',
         });
-        refetchOptions();
+        removeMcOptionMutation?.mutate(optionToRemove);
       },
-      [post.postUuid, refetchOptions]
+      [post.postUuid, removeMcOptionMutation]
     );
 
     const [isFollowing, setIsFollowing] = useState(
