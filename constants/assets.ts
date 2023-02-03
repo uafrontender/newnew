@@ -4,7 +4,6 @@ const APP_ASSETS_DOMAIN = 'd2ttpqwdet9svd.cloudfront.net';
 const APP_ASSETS_ORIGIN = `https://${APP_ASSETS_DOMAIN}`;
 
 const assets = {
-  // TODO: unused, remove
   bundles: {
     lightBundles: `${APP_ASSETS_ORIGIN}/bundles/lightBundles.png`,
     darkBundles: `${APP_ASSETS_ORIGIN}/bundles/darkBundles.png`,
