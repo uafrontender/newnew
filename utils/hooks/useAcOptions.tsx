@@ -1,8 +1,17 @@
+/* eslint-disable no-plusplus */
 import { newnewapi } from 'newnew-api';
 import { useMemo } from 'react';
-import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
+import { cloneDeep, uniqBy } from 'lodash';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useMutation,
+  useQueryClient,
+} from 'react-query';
 
 import { fetchCurrentBidsForPost } from '../../api/endpoints/auction';
+import useErrorToasts from './useErrorToasts';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -69,7 +78,7 @@ const sortOptions = (
   ];
 
   const workingSortedUnique =
-    joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+    joinedArr.length > 0 ? uniqBy(joinedArr, 'id') : [];
 
   const highestOptionIdx = (
     workingSortedUnique as TAcOptionWithHighestField[]
@@ -94,6 +103,9 @@ const useAcOptions = (
     'queryKey' | 'queryFn'
   >
 ) => {
+  const queryClient = useQueryClient();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
+
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getAcOptions', params],
     async ({ pageParam }) => {
@@ -148,7 +160,117 @@ const useAcOptions = (
     );
   }, [query.data, params.userUuid]);
 
-  return { processedOptions, ...query };
+  const addOrUpdateAcOptionMutation = useMutation({
+    mutationFn: (option: newnewapi.Auction.IOption) =>
+      new Promise((res) => {
+        res(option);
+      }),
+    onSuccess: (_, newOrUpdatedOption) => {
+      queryClient.setQueryData(
+        [params.loggedInUser ? 'private' : 'public', 'getAcOptions', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                acOptions: newnewapi.Auction.IOption[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            let optionExists = false;
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const optionIndex = workingData.pages[k].acOptions.findIndex(
+                (o) => o.id === newOrUpdatedOption.id
+              );
+
+              if (optionIndex !== -1) {
+                workingData.pages[k].acOptions[optionIndex] =
+                  newOrUpdatedOption;
+                optionExists = true;
+                break;
+              }
+            }
+
+            if (!optionExists) {
+              workingData.pages[0].acOptions = [
+                newOrUpdatedOption,
+                ...workingData.pages[0].acOptions,
+              ];
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+    },
+  });
+
+  const removeAcOptionMutation = useMutation({
+    mutationFn: (option: newnewapi.Auction.IOption) =>
+      new Promise((res) => {
+        res(option);
+      }),
+    onSuccess: (_, deletedOption) => {
+      queryClient.setQueryData(
+        [params.loggedInUser ? 'private' : 'public', 'getAcOptions', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                acOptions: newnewapi.Auction.IOption[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const optionIndex = workingData.pages[k].acOptions.findIndex(
+                (o) => o.id === deletedOption.id
+              );
+
+              if (optionIndex !== -1) {
+                workingData.pages[k].acOptions = workingData.pages[
+                  k
+                ].acOptions.filter((o) => o.id !== deletedOption.id);
+                break;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+    },
+  });
+
+  return {
+    processedOptions,
+    addOrUpdateAcOptionMutation,
+    removeAcOptionMutation,
+    ...query,
+  };
 };
 
 export default useAcOptions;
