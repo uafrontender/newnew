@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { useCards } from '../../../contexts/cardsContext';
+import useCards from '../../../utils/hooks/useCards';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 

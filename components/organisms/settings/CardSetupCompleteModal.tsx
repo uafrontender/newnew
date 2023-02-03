@@ -16,7 +16,7 @@ import partingIcon from '../../../public/images/png/emoji/partying.png';
 // Utils
 import { SocketContext } from '../../../contexts/socketContext';
 import { checkCardStatus } from '../../../api/endpoints/card';
-import { useCards } from '../../../contexts/cardsContext';
+import useCards from '../../../utils/hooks/useCards';
 import assets from '../../../constants/assets';
 import Headline from '../../atoms/Headline';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -50,7 +50,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
-  const { handleSetCard } = useCards();
+  const { addCardMutation } = useCards();
   const socketConnection = useContext(SocketContext);
   const theme = useTheme();
 
@@ -104,7 +104,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
           response.data.cardStatus === newnewapi.CardStatus.ADDED &&
           response.data.card
         ) {
-          handleSetCard(response.data.card);
+          addCardMutation?.mutate(response.data.card);
           setIsCardAdded(true);
         }
 
@@ -122,7 +122,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     return () => {
       controller.abort();
     };
-  }, [clientSecret, setupIntentId, isStatusChecked, t, handleSetCard]);
+  }, [clientSecret, setupIntentId, isStatusChecked, t, addCardMutation]);
 
   useEffect(() => {
     const handleCardAdded = (data: any) => {
@@ -144,7 +144,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         setIsError(true);
       }
       if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
-        handleSetCard(decoded.card);
+        addCardMutation?.mutate(decoded.card);
         setIsCardAdded(true);
       }
     };

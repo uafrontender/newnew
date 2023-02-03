@@ -54,7 +54,6 @@ import SyncUserWrapper from '../contexts/syncUserWrapper';
 import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
-import CardsContextProvider from '../contexts/cardsContext';
 import PushNotificationContextProvider from '../contexts/pushNotificationsContext';
 
 // Images to be prefetched
@@ -254,49 +253,44 @@ const MyApp = (props: IMyApp): ReactElement => {
                             <PushNotificationContextProvider>
                               <BlockedUsersProvider>
                                 <FollowingsContextProvider>
-                                  <CardsContextProvider>
-                                    <BundlesContextProvider>
-                                      <ChatsProvider>
-                                        <OverlayModeProvider>
-                                          <MultipleBeforePopStateContextProvider>
-                                            <ResizeMode>
-                                              <GlobalTheme
-                                                initialTheme={colorMode}
-                                                themeFromCookie={
-                                                  themeFromCookie
-                                                }
-                                              >
-                                                <>
-                                                  <ToastContainer containerId='toast-container' />
-                                                  <VideoProcessingWrapper>
-                                                    {!pageProps.error ? (
-                                                      getLayout(
-                                                        <Component
-                                                          {...pageProps}
-                                                        />
-                                                      )
-                                                    ) : (
-                                                      <Error
-                                                        title={
-                                                          pageProps.error
-                                                            ?.message
-                                                        }
-                                                        statusCode={
-                                                          pageProps.error
-                                                            ?.statusCode ?? 500
-                                                        }
+                                  <BundlesContextProvider>
+                                    <ChatsProvider>
+                                      <OverlayModeProvider>
+                                        <MultipleBeforePopStateContextProvider>
+                                          <ResizeMode>
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
                                                       />
-                                                    )}
-                                                    <PushNotificationModalContainer />
-                                                  </VideoProcessingWrapper>
-                                                </>
-                                              </GlobalTheme>
-                                            </ResizeMode>
-                                          </MultipleBeforePopStateContextProvider>
-                                        </OverlayModeProvider>
-                                      </ChatsProvider>
-                                    </BundlesContextProvider>
-                                  </CardsContextProvider>
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                  <PushNotificationModalContainer />
+                                                </VideoProcessingWrapper>
+                                              </>
+                                            </GlobalTheme>
+                                          </ResizeMode>
+                                        </MultipleBeforePopStateContextProvider>
+                                      </OverlayModeProvider>
+                                    </ChatsProvider>
+                                  </BundlesContextProvider>
                                 </FollowingsContextProvider>
                               </BlockedUsersProvider>
                             </PushNotificationContextProvider>
