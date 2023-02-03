@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 import assets from '../../../../../constants/assets';
 import ModalPaper from '../../../../organisms/ModalPaper';
 import { formatNumber } from '../../../../../utils/format';
-import getCurrentBundleLevel from '../../../../../utils/getCurrentBundleLevel';
 
 interface IUseBundleVotesModal {
   show: boolean;
@@ -24,7 +23,6 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   handleVoteWithBundleVotes,
   onClose,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const [votesToUse, setVotesToUse] = useState<number | undefined>(
     bundleVotesLeft
@@ -37,22 +35,11 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
     }
   }, [show, bundleVotesLeft]);
 
-  const currentBundleLevel = getCurrentBundleLevel(bundleVotesLeft);
-
-  console.log(currentBundleLevel);
-
   return (
     <Modal show={show} overlaydim additionalz={12} onClose={onClose}>
       <SModalPaper onClose={onClose} isCloseButton>
         <SContainer>
-          <SBundleIcon
-            src={
-              theme.name === 'light'
-                ? assets.bundles.lightVotes[currentBundleLevel].animated()
-                : assets.bundles.darkVotes[currentBundleLevel].animated()
-            }
-            alt='Bundle votes'
-          />
+          <SBundleIcon src={assets.common.vote} alt='votes' />
           <SVotesAvailable>
             <Trans
               t={t}

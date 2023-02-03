@@ -15,7 +15,7 @@ import AnimatedBackground from '../../atoms/AnimationBackground';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../atoms/InlineSVG';
 import getDisplayname from '../../../utils/getDisplayname';
-import getCurrentBundleLevel from '../../../utils/getCurrentBundleLevel';
+import getBundleOfferLevel from '../../../utils/getCurrentBundleLevel';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -35,7 +35,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
 
     const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
-    const bundleOfferLevel = getCurrentBundleLevel(bundleOffer.votesAmount!);
+    const bundleOfferLevel = getBundleOfferLevel(bundleOffer.votesAmount!);
 
     return (
       <>
