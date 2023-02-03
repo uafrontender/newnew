@@ -72,6 +72,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
             <SInput
               id='bundle-votes-number'
               value={votesToUse}
+              inputMode='numeric'
               onChange={(e: any) => {
                 if (e.target.value === '') {
                   setVotesToUse(undefined);

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, {
   useEffect,
   createContext,
@@ -95,31 +94,30 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
 
   const socketConnection = useContext(SocketContext);
 
-  const setData = useCallback(
-    (data: newnewapi.TotalUnreadMessageCounts) => {
-      setUnreadCountForCreator(data.unreadCountForCreator);
-      setUnreadCountForUser(data.unreadCountForUser);
-      setUnreadCount(data.unreadCountForCreator + data.unreadCountForUser);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  const setData = useCallback((data: newnewapi.TotalUnreadMessageCounts) => {
+    setUnreadCountForCreator(data.unreadCountForCreator);
+    setUnreadCountForUser(data.unreadCountForUser);
+    setUnreadCount(data.unreadCountForCreator + data.unreadCountForUser);
+  }, []);
+
   useEffect(() => {
     async function getUnread() {
       if (!user.loggedIn) return;
       try {
         const payload = new newnewapi.EmptyRequest();
         const res = await getTotalUnreadMessageCounts(payload);
-        if (!res.data || res.error)
+
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
+
         setData(res.data);
       } catch (err) {
         console.error(err);
       }
     }
     getUnread();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+  }, [user.loggedIn, setData]);
 
   useEffect(() => {
     if (!user.loggedIn) return;
@@ -138,7 +136,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
         socketHandlerMessageCreated
       );
     }
-  }, [socketConnection, user.loggedIn]);
+  }, [socketConnection, user.loggedIn, setData]);
 
   useEffect(() => {
     if (!user.loggedIn) return;
@@ -194,15 +192,19 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   }, [user.userData?.options?.creatorStatus, user.loggedIn]);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+
     if (justSentMessage) {
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         setJustSentMessage(false);
       }, 500);
-
-      return () => {
-        clearTimeout(timer);
-      };
     }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, [justSentMessage]);
 
   const contextValue = useMemo(
@@ -225,7 +227,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       setHiddenMessagesArea,
       setSearchChatroom,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       unreadCount,
       unreadCountForUser,
@@ -240,7 +241,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       justSentMessage,
       setJustSentMessage,
       setActiveTab,
-      setData,
       setActiveChatRoom,
       setMobileChatOpened,
       setHiddenMessagesArea,

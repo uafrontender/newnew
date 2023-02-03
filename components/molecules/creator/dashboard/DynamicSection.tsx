@@ -55,7 +55,6 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
@@ -117,13 +116,6 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     unreadCountForCreator,
     unreadNotificationCount,
   ]);
-
-  const isDashboardMessages = useMemo(() => {
-    if (router.asPath.includes('creator/dashboard?tab=direct-messages')) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
 
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
@@ -227,7 +219,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, activeChatRoom]);
+  }, [baseUrl, router, activeChatRoom]);
 
   useEffect(() => {
     if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
@@ -300,7 +292,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       >
         <SAnimatedContainer
           ref={containerRef}
-          isDashboardMessages={isDashboardMessages}
+          isDashboardMessages={tab === 'direct-messages'}
         >
           {tab === 'direct-messages' ? (
             activeChatRoom && (
@@ -321,8 +313,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
                   />
                 </STabsWrapper>
                 <SSectionTopLineButtons>
-                  {tab === 'notifications' ||
-                  !user.userData?.options?.isOfferingBundles ? (
+                  {tab === 'notifications' ? (
                     <>
                       {unreadNotificationCount > 0 && (
                         <STopLineButton
@@ -507,7 +498,7 @@ const SChatButton = styled(Button)`
 `;
 
 const SSectionContent = styled.div`
-  height: calc(100% - 48px);
+  height: calc(100% - 52px);
   padding: 0 24px;
   display: flex;
   position: relative;

@@ -184,6 +184,7 @@ declare module 'styled-components' {
       };
     };
     shadows: {
+      lightBlue: string;
       mediumBlue: string;
       intenseBlue: string;
       mediumGrey: string;

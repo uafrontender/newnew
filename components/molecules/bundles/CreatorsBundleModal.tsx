@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useMemo } from 'react';
+import React, { useMemo, Fragment } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
-import ModalPaper from '../../organisms/ModalPaper';
+import ModalPaper, { SContent } from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
@@ -91,7 +91,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   avatarUrl={creatorBundle?.creator?.avatarUrl ?? ''}
                 />
                 <SForLine>
-                  {t('modal.creatorsBundle.for')}
+                  <span>{t('modal.creatorsBundle.for')}</span>
                   <Link href={`/${creatorBundle?.creator?.username}`}>
                     <SUserName
                       onClick={() => {
@@ -116,7 +116,6 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   )}
                 </SForLine>
               </SUserInfo>
-              {/* TODO: NEEDS TO HAVE A STATE FOR EXPIRED BUNDLE! */}
               <SBundleInfo>
                 {formattedTimeLeft ? (
                   <>
@@ -128,7 +127,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                         components={[
                           <>
                             {formattedTimeLeft?.map((time, index) => (
-                              <>
+                              <Fragment key={index}>
                                 {index > 0
                                   ? t('modal.creatorsBundle.and')
                                   : null}
@@ -138,7 +137,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                                     `modal.creatorsBundle.unit.${time.unit}`
                                   ),
                                 })}
-                              </>
+                              </Fragment>
                             ))}
                           </>,
                         ]}
@@ -174,6 +173,11 @@ export default CreatorsBundleModal;
 const SModalPaper = styled(ModalPaper)`
   width: 100%;
   padding: 32px 48px;
+
+  ${SContent} {
+    padding: 32px 48px;
+    margin: -32px -48px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     max-width: 500px;
@@ -226,7 +230,7 @@ const SUserAvatar = styled(UserAvatar)`
   margin-right: 8px;
 `;
 
-const SForLine = styled.p`
+const SForLine = styled.div`
   display: inline-flex;
   white-space: pre;
   overflow: hidden;
@@ -236,7 +240,7 @@ const SForLine = styled.p`
   line-height: 24px;
 `;
 
-const SUserName = styled.p`
+const SUserName = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;

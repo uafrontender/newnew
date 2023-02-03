@@ -5,7 +5,7 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import Modal from '../../organisms/Modal';
-import ModalPaper from '../../organisms/ModalPaper';
+import ModalPaper, { SContent } from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
 import { formatNumber } from '../../../utils/format';
@@ -119,9 +119,19 @@ const SModalPaper = styled(ModalPaper)`
   padding: 24px;
   margin: 16px;
 
+  ${SContent} {
+    padding: 24px;
+    margin: -24px;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     padding: 32px;
     max-width: 500px;
+
+    ${SContent} {
+      padding: 32px;
+      margin: -32px;
+    }
   }
 `;
 

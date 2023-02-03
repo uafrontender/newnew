@@ -433,7 +433,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         return;
       }
 
-      Mixpanel.track('PayWithCard', {
+      Mixpanel.track('Pay With Card', {
         _stage: 'Post',
         _postUuid: postUuid,
         _component: 'McOptionCard',
@@ -506,6 +506,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     async (votesCount: number) => {
       setBundleVotesModalOpen(false);
       setLoadingModalOpen(true);
+
+      Mixpanel.track('Use Bundle Votes', {
+        _stage: 'Post',
+        _postUuid: postUuid,
+        _component: 'McOptionCard',
+      });
 
       try {
         const payload = new newnewapi.VoteOnPostRequest({
