@@ -6,8 +6,8 @@ const APP_ASSETS_ORIGIN = `https://${APP_ASSETS_DOMAIN}`;
 const assets = {
   // TODO: unused, remove
   bundles: {
-    lightBundles: `${APP_ASSETS_ORIGIN}/bundles/lightBundles`,
-    darkBundles: `${APP_ASSETS_ORIGIN}/bundles/darkBundles`,
+    lightBundles: `${APP_ASSETS_ORIGIN}/bundles/lightBundles.png`,
+    darkBundles: `${APP_ASSETS_ORIGIN}/bundles/darkBundles.png`,
     lightVotes: [
       {
         static: `${APP_ASSETS_ORIGIN}/bundles/light100votesStatic.png`,
