@@ -70,7 +70,8 @@
     "text": "Solo tú puedes enviar mensajes al grupo.",
     "created": "Tú creaste el anuncio",
     "member": "miembro",
-    "members": "miembros"
+    "members": "miembros",
+    "noAnnouncement_NEED_TRANSLATION": "No announcements here yet..."
   },
   "default": {
     "searchPlaceholder": "Buscar"

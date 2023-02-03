@@ -162,7 +162,7 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
 
   if (!lastMsg) {
     if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
-      lastMsg = textTrim(t('newAnnouncement.created'));
+      lastMsg = textTrim(t('newAnnouncement.noAnnouncement'));
     } else {
       lastMsg = textTrim(t('chat.noMessagesFirstLine'));
     }
