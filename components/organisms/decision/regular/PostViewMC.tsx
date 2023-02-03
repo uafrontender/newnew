@@ -201,6 +201,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       onError: (err) => {
         showErrorToastCustom((err as Error).message);
       },
+      refetchOnWindowFocus: user.loggedIn,
     }
   );
 
