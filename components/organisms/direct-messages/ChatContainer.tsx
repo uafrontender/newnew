@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppSelector } from '../../../redux-store/store';
+import SelectChat from '../../atoms/direct-messages/SelectChat';
 import ChatContent from './ChatContent';
 
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
@@ -31,6 +32,7 @@ export const ChatContainer = () => {
       {hiddenMessagesArea !== true && (
         <SContent>
           {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
+          {!activeChatRoom && <SelectChat />}
         </SContent>
       )}
     </SContainer>
