@@ -145,7 +145,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       processedOptions: options,
       hasNextPage: hasNextOptionsPage,
       fetchNextPage: fetchNextOptionsPage,
-      refetch: refetchOptions,
+      addOrUpdateMcOptionMutation,
+      removeMcOptionMutation,
     } = useMcOptions({
       postUuid: post.postUuid,
       userUuid: user.userData?.userUuid,
@@ -159,9 +160,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           _postUuid: post.postUuid,
           _component: 'PostModerationMC',
         });
-        refetchOptions();
+        removeMcOptionMutation?.mutate(optionToRemove);
       },
-      [post.postUuid, refetchOptions]
+      [post.postUuid, removeMcOptionMutation]
     );
 
     const fetchPostLatestData = useCallback(async () => {
@@ -230,7 +231,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
         if (decoded.option && decoded.postUuid === post.postUuid) {
-          await refetchOptions();
+          addOrUpdateMcOptionMutation?.mutate(decoded.option);
         }
       };
 
@@ -239,7 +240,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         const decoded = newnewapi.McOptionDeleted.decode(arr);
 
         if (decoded.optionId) {
-          await refetchOptions();
+          removeMcOptionMutation?.mutate({
+            id: decoded.optionId,
+          });
           await fetchPostLatestData();
         }
       };

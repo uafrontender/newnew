@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
 import { Trans, useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import Modal from '../../organisms/Modal';
@@ -15,6 +15,7 @@ import AnimatedBackground from '../../atoms/AnimationBackground';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../atoms/InlineSVG';
 import getDisplayname from '../../../utils/getDisplayname';
+import getBundleOfferLevel from '../../../utils/getCurrentBundleLevel';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -27,20 +28,29 @@ interface IBuyBundleModal {
 const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
   ({ show, creator, bundleOffer, zIndex, onClose }) => {
     const { t } = useTranslation('common');
+    const theme = useTheme();
 
     const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
     const monthsOfAccess = Math.floor(daysOfAccess / 30);
 
     const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
+    const bundleOfferLevel = getBundleOfferLevel(bundleOffer.votesAmount!);
+
     return (
       <>
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
-          <AnimatedBackground src={assets.common.vote} alt='vote' />
+          <AnimatedBackground src={assets.decision.votes} alt='vote' />
           <SModalPaper onClose={onClose}>
             <Content>
-              {/* TODO: add set of tickets (need bundles level in api interfaces) */}
-              <BundleIcon src={assets.common.vote} alt='votes' />
+              <SBundleIcon
+                src={
+                  theme.name === 'light'
+                    ? assets.bundles.lightVotes[bundleOfferLevel].animated()
+                    : assets.bundles.darkVotes[bundleOfferLevel].animated()
+                }
+                alt='Bundle votes'
+              />
               <SVotesAvailable>
                 <Trans
                   t={t}
@@ -131,7 +141,7 @@ const Content = styled.div`
   align-items: center;
 `;
 
-const BundleIcon = styled.img`
+const SBundleIcon = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 30px;

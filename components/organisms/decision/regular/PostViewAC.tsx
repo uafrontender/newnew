@@ -149,7 +149,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
     isLoading: isOptionsLoading,
-    refetch: refetchOptions,
+    addOrUpdateAcOptionMutation,
+    removeAcOptionMutation,
   } = useAcOptions(
     {
       postUuid: post.postUuid,
@@ -160,6 +161,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       onError: (err: any) => {
         showErrorToastCustom((err as Error).message);
       },
+      refetchOnWindowFocus: user.loggedIn,
     }
   );
 
@@ -169,9 +171,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
   const handleRemoveOption = useCallback(
     async (optionToRemove: newnewapi.Auction.Option) => {
-      await refetchOptions();
+      removeAcOptionMutation?.mutate(optionToRemove);
     },
-    [refetchOptions]
+    [removeAcOptionMutation]
   );
 
   const fetchPostLatestData = useCallback(async () => {
@@ -188,9 +190,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
   const handleAddOrUpdateOptionFromResponse = useCallback(
     async (newOption: newnewapi.Auction.Option) => {
-      await refetchOptions();
+      addOrUpdateAcOptionMutation?.mutate(newOption);
     },
-    [refetchOptions]
+    [addOrUpdateAcOptionMutation]
   );
 
   const handleOnVotingTimeExpired = async () => {
@@ -211,7 +213,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
       if (decoded.option && decoded.postUuid === post.postUuid) {
-        await refetchOptions();
+        addOrUpdateAcOptionMutation?.mutate(decoded.option);
       }
     };
 
@@ -220,7 +222,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
       if (decoded.optionId) {
-        await refetchOptions();
+        removeAcOptionMutation?.mutate({
+          id: decoded.optionId,
+        });
 
         await fetchPostLatestData();
       }

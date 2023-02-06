@@ -1,19 +1,27 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
-import TicketSet from '../../../atoms/bundles/TicketSet';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import assets from '../../../../constants/assets';
 
 export const AboutBundles: React.FC = () => {
   const { t } = useTranslation('page-Creator');
+  const theme = useTheme();
 
   return (
     <SContainer>
-      <STicketSet size={100} shift={30} numberOFTickets={2} />
+      <SBundlesImage
+        src={
+          theme.name === 'light'
+            ? assets.bundles.lightBundles
+            : assets.bundles.darkBundles
+        }
+        alt={t('dashboard.aboutBundles.title')}
+      />
       <SContent>
         <STitle variant={6}>{t('dashboard.aboutBundles.title')}</STitle>
         <SDescriptionWrapper>
@@ -65,8 +73,13 @@ const SContainer = styled.div`
   }
 `;
 
-const STicketSet = styled(TicketSet)`
+const SBundlesImage = styled.img`
+  width: 120px;
+  height: 120px;
+
   ${(props) => props.theme.media.tablet} {
+    width: 148px;
+    height: 148px;
     margin-left: auto;
   }
 `;
