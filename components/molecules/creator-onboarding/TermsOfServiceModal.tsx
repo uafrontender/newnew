@@ -6,7 +6,7 @@ import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import Modal from '../../organisms/Modal';
-import mockToS from './mockToS';
+import TermsOfServiceHtml from './TermsOfServiceHtml';
 
 interface ITermsOfServiceModal {
   isOpen: boolean;
@@ -89,7 +89,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
                 containerRef.current = el!!;
               }}
               dangerouslySetInnerHTML={{
-                __html: mockToS,
+                __html: TermsOfServiceHtml,
               }}
             />
           </SContainer>
@@ -112,7 +112,7 @@ const Container = styled.div`
 const Content = styled.div`
   max-width: 688px;
   max-height: 733px;
-  padding: 40px;
+  padding: 40px 0px;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -128,12 +128,15 @@ const SContainer = styled.div`
   overflow: hidden;
 `;
 
-const SHeading = styled(Headline)``;
+const SHeading = styled(Headline)`
+  padding: 0 40px;
+`;
 
 const SSubheading = styled(Caption)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-size: 14px;
 
+  padding: 0 40px;
   margin-top: 4px;
   margin-bottom: 24px;
 
@@ -212,13 +215,14 @@ const STosText = styled.div`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
+  padding: 0 40px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   ${({ theme }) => theme.media.laptop} {
     // Remove scrollbar on laptop
-    margin-right: -18px;
-    padding-right: 18px;
+    margin-right: -58px;
+    padding-right: 58px;
   }
 `;
 
