@@ -71,7 +71,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
     (item: newnewapi.IBundleOffer, index: number) => (
       <SuperpollBundle
         key={`superpoll-bundle-${index + 1}`}
-        id={index + 1}
+        id={index}
         bundleOffer={item}
         isBundlesEnabled={!!isSellingBundles}
       />

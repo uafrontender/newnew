@@ -93,7 +93,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   return (
     <Modal show={isVisible} additionalz={14} onClose={handleCloseModalMixpanel}>
       {postType === 'mc' ? (
-        <AnimatedBackground src={assets.common.vote} alt='vote' />
+        <AnimatedBackground src={assets.decision.votes} alt='vote' />
       ) : (
         <AnimatedBackground src={assets.decision.gold} alt='coin' />
       )}

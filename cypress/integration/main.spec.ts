@@ -17,6 +17,7 @@ context('Main flow', () => {
   let superpollShortId = '';
   let payedToSuperpoll = [];
   let payedToBid = [];
+  // TODO: Calculate to check bundle earnings
   let payedForBundles = 0;
   let winningBid: { text: string; amount: number } | undefined = undefined;
 
@@ -32,14 +33,23 @@ context('Main flow', () => {
     cy.dGet(supportButtonSelector).click();
 
     if (voteOptionPrice === 'custom') {
-      const voteButtonSelector = `#vote-option-custom`;
-      cy.dGet(voteButtonSelector).click();
+      cy.dGet('#vote-option-custom').click();
+      cy.dGet('#custom-votes-input').type(votesNumber.toString());
+      cy.dGet('#custom-votes-submit').click();
+      const customVotesPriceInCents = 2000 * 1.3 + (votesNumber - 2000) * 1;
 
-      // TODO: Add flow for custom vote
+      const fee = customVotesPriceInCents * 0.0225;
+      const sumToPay = getDollarsFromCentsNumber(customVotesPriceInCents + fee);
+
+      cy.dGet('#custom-votes-price')
+        .invoke('text')
+        .should('contain', sumToPay.toString());
     } else {
       const voteOptionIndex = SUPERPOLL_OPTIONS.indexOf(voteOptionPrice);
       const votePriceSelector = `#vote-option-${voteOptionIndex}-price`;
-      cy.dGet(votePriceSelector).contains(voteOptionPrice);
+      cy.dGet(votePriceSelector)
+        .invoke('text')
+        .should('contain', voteOptionPrice);
       const voteButtonSelector = `#vote-option-${voteOptionIndex}`;
       cy.dGet(voteButtonSelector).click();
       cy.dGet('#confirm-vote').click();
@@ -47,11 +57,10 @@ context('Main flow', () => {
 
     return () => {
       if (voteOptionPrice === 'custom') {
-        // TODO: Calculate and add to the list
-        const customVotesPrice = 0;
-        payedToSuperpoll.push(customVotesPrice);
+        const customContribution = 2000 * 1.3 + (votesNumber - 2000) * 1;
+        payedToSuperpoll.push(customContribution);
       } else {
-        payedToSuperpoll.push(voteOptionPrice);
+        payedToSuperpoll.push(voteOptionPrice * 100);
       }
     };
   }
@@ -65,27 +74,34 @@ context('Main flow', () => {
       .click();
 
     return () => {
-      payedToBid.push(optionAmount);
-      if (!winningBid || winningBid.amount < optionAmount) {
+      const optionAmountInCents = optionAmount * 100;
+      payedToBid.push(optionAmountInCents);
+      if (!winningBid || winningBid.amount < optionAmountInCents) {
         winningBid = {
           text: optionText,
-          amount: optionAmount,
+          amount: optionAmountInCents,
         };
       }
     };
   }
 
-  function calculateEarnings(rawAmount: number): number {
-    const rawAmountInCents = rawAmount * 100;
+  function calculateEarnings(rawAmountInCents: number): number {
     const feesInCents = Math.ceil(0.129 * rawAmountInCents) + 30;
-    return (rawAmountInCents - feesInCents) / 100;
+    return rawAmountInCents - feesInCents;
   }
 
   function calculateSuperpollEarnings(contributions: number[]): number {
     const earnings = contributions.map((contribution) =>
       calculateEarnings(contribution)
     );
-    return Math.ceil(earnings.reduce((acc, next) => acc + next) * 100) / 100;
+    return earnings.reduce((acc, next) => acc + next);
+  }
+
+  function getDollarsFromCentsNumber(amountInCents: number): number {
+    const amountInDollars = Math.ceil(amountInCents) / 100;
+    // Round up small decimal point error
+    const roundedAmountInDollars = Math.round(amountInDollars * 100) / 100;
+    return roundedAmountInDollars;
   }
 
   Cypress.on('uncaught:exception', (err, runnable) => {
@@ -292,7 +308,6 @@ context('Main flow', () => {
     });
   });
 
-  // TODO: Add custom votes
   describe('Guest willing to contribute', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -328,7 +343,7 @@ context('Main flow', () => {
       cy.setCookie('accessToken', '');
       cy.setCookie('refreshToken', '');
       storage.restart();
-      cy.log(localStorage.getItem('remainingAcSteps'));
+
       cy.reload();
       cy.wait(2000);
 
@@ -389,9 +404,29 @@ context('Main flow', () => {
 
       cy.dGet('#support-button-supported').click();
     });
+
+    it('can make a custom contribution to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 'custom', 2100);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.dGet('#support-button-supported').click();
+    });
   });
 
-  // TODO: Add custom votes
   describe('Guest willing to buy a bundle', () => {
     let USER_EMAIL;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -427,7 +462,7 @@ context('Main flow', () => {
       cy.setCookie('accessToken', '');
       cy.setCookie('refreshToken', '');
       storage.restart();
-      cy.log(localStorage.getItem('remainingAcSteps'));
+
       cy.reload();
       cy.wait(2000);
 
@@ -494,6 +529,25 @@ context('Main flow', () => {
       cy.dGet('#support-button-suggested').click();
     });
 
+    it('can make a custom contribution to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 'custom', 2901);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
+
     it('can contribute to the same superpoll with the card payment', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
@@ -514,7 +568,6 @@ context('Main flow', () => {
     });
   });
 
-  // TODO: Add custom votes
   describe('User willing to contribute', () => {
     const USER_EMAIL = `test_user_${testSeed}2@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -594,11 +647,11 @@ context('Main flow', () => {
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
-    it('can enter another post page and contribute to a superpoll', () => {
+    it('can enter another post page and make a custom contribution to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
 
-      const onSuccess = voteOnSuperpoll(1, 2);
+      const onSuccess = voteOnSuperpoll(1, 'custom', 3856);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -614,9 +667,27 @@ context('Main flow', () => {
 
       cy.dGet('#support-button-supported').click();
     });
+
+    it('can contribute to the same superpoll with the card payment', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 2);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
   });
 
-  // TODO: Add custom votes
   describe('User willing to buy a bundle', () => {
     const USER_EMAIL = `test_user_${testSeed}3@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -736,9 +807,27 @@ context('Main flow', () => {
           onSuccess();
         });
     });
+
+    it('can make a custom contribution to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 'custom', 13678);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
   });
 
-  // TODO: Add custom votes
   describe('User willing to add card first', () => {
     const USER_EMAIL = `test_user_${testSeed}4@newnew.co`;
     const USER_CARD_NUMBER = '5200828282828210';
@@ -860,6 +949,25 @@ context('Main flow', () => {
         timeout: 15000,
       }).click();
     });
+
+    it('can make a custom contribution to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 'custom', 4234);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
   });
 
   describe('Creator willing to respond', () => {
@@ -901,17 +1009,9 @@ context('Main flow', () => {
     });
 
     it('[system call - end posts]', () => {
-      // Wait for cookies?
+      // Wait for cookies
       cy.wait(2000);
-      cy.getCookies().then((cookies) => {
-        console.log(cookies);
-        const accessToken = cookies.find(
-          (cookie) => cookie.name === 'accessToken'
-        )!.value;
-        const refreshToken = cookies.find(
-          (cookie) => cookie.name === 'refreshToken'
-        )!.value;
-
+      cy.getCookie('accessToken').then((cookie) => {
         fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
           newnewapi.EmptyRequest,
           newnewapi.EmptyResponse,
@@ -919,7 +1019,7 @@ context('Main flow', () => {
           'post',
           new newnewapi.EmptyRequest(),
           {
-            'x-auth-token': accessToken,
+            'x-auth-token': cookie.value,
             'x-from': 'web',
           },
           'cors',
@@ -934,7 +1034,7 @@ context('Main flow', () => {
           'post',
           new newnewapi.EmptyRequest(),
           {
-            'x-auth-token': accessToken,
+            'x-auth-token': cookie.value,
             'x-from': 'web',
           },
           'cors',
@@ -952,17 +1052,32 @@ context('Main flow', () => {
       cy.url().should('include', '/p/');
 
       const payedToBidTotal = payedToBid.reduce((acc, next) => acc + next);
-      cy.dGet('#total-bids-amount').contains(payedToBidTotal);
+      cy.dGet('#total-bids-amount')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(payedToBidTotal).toString()
+        );
 
       cy.dGet('#select-option-0').click();
 
-      cy.dGet('#bid-details').contains(winningBid.amount.toString());
-      cy.dGet('#bid-details').contains(winningBid.text);
+      cy.dGet('#bid-details')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(winningBid.amount).toString()
+        );
+      cy.dGet('#bid-details').invoke('text').should('contain', winningBid.text);
 
       cy.dGet('#confirm-winning-bid').click();
 
       cy.dGet('#post-tab-response').click();
-      cy.dGet('#post-earnings').contains(winningBid.amount);
+      cy.dGet('#post-earnings')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(winningBid.amount).toString()
+        );
 
       cy.dGet('#upload-response-button').should('be.enabled');
 
@@ -978,7 +1093,14 @@ context('Main flow', () => {
         });
 
       cy.dGet('#upload-button').click();
-      cy.dGet('#earned-amount').contains(calculateEarnings(winningBid.amount));
+      cy.dGet('#earned-amount')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(
+            calculateEarnings(winningBid.amount)
+          ).toString()
+        );
     });
 
     it('can respond to a superpoll', () => {
@@ -988,7 +1110,13 @@ context('Main flow', () => {
       const payedToSuperpollTotal = payedToSuperpoll.reduce(
         (acc, next) => acc + next
       );
-      cy.dGet('#post-earnings').contains(payedToSuperpollTotal);
+
+      cy.dGet('#post-earnings')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(payedToSuperpollTotal).toString()
+        );
 
       cy.dGet('#upload-response-button').should('be.enabled');
 
@@ -1005,17 +1133,22 @@ context('Main flow', () => {
 
       cy.dGet('#upload-button').click();
 
-      cy.dGet('#earned-amount').contains(
-        calculateSuperpollEarnings(payedToSuperpoll)
-      );
+      cy.dGet('#earned-amount')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(
+            calculateSuperpollEarnings(payedToSuperpoll)
+          ).toString()
+        );
     });
 
-    it('can see correct earnings on dashboard', () => {
+    /* it('can see correct earnings on dashboard', () => {
       // TODO: Add it later
-      // TODO: ether need to add bank on Stripe (complicated)
+      // TODO: Ether need to add bank on Stripe (complicated)
       // or make test creator account have a flag set
       // Check earnings
       // Check bundle earnings
-    });
+    }); */
   });
 });

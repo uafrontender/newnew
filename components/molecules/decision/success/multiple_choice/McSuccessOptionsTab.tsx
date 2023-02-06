@@ -45,11 +45,16 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
     processedOptions: options,
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
-  } = useMcOptions({
-    postUuid: post.postUuid,
-    loggedInUser: user.loggedIn,
-    userUuid: user.userData?.userUuid,
-  });
+  } = useMcOptions(
+    {
+      postUuid: post.postUuid,
+      loggedInUser: user.loggedIn,
+      userUuid: user.userData?.userUuid,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   useEffect(() => {
     if (inView) {

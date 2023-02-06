@@ -24,7 +24,7 @@ import CheckMark from '../CheckMark';
 import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 import { formatNumber } from '../../../utils/format';
-import { useCards } from '../../../contexts/cardsContext';
+import useCards from '../../../utils/hooks/useCards';
 import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
@@ -73,13 +73,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const [emailError, setEmailError] = useState('');
 
   const elements = useElements();
-  const { cards } = useCards();
+  const { primaryCard } = useCards();
   const stripe = useStripe();
-
-  const primaryCard = useMemo(
-    () => cards?.find((card) => card.isPrimary),
-    [cards]
-  );
 
   useEffect(() => {
     if (!selectedPaymentMethod && primaryCard) {

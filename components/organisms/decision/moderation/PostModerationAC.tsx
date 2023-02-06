@@ -154,7 +154,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       hasNextPage: hasNextOptionsPage,
       fetchNextPage: fetchNextOptionsPage,
       isLoading: isOptionsLoading,
-      refetch: refetchOptions,
+      addOrUpdateAcOptionMutation,
+      removeAcOptionMutation,
     } = useAcOptions(
       {
         postUuid: post.postUuid,
@@ -188,9 +189,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           _postUuid: post.postUuid,
           _component: 'PostModerationAC',
         });
-        await refetchOptions();
+        removeAcOptionMutation?.mutate(optionToRemove);
       },
-      [post.postUuid, refetchOptions]
+      [post.postUuid, removeAcOptionMutation]
     );
 
     const handleOnResponseTimeExpired = async () => {
@@ -228,7 +229,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
         if (decoded.option && decoded.postUuid === post.postUuid) {
-          await refetchOptions();
+          addOrUpdateAcOptionMutation?.mutate(decoded.option);
         }
       };
 
@@ -237,7 +238,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
         if (decoded.optionId) {
-          await refetchOptions();
+          removeAcOptionMutation?.mutate({
+            id: decoded.optionId,
+          });
 
           await fetchPostLatestData();
         }

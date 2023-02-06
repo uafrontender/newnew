@@ -1,10 +1,4 @@
-import React, {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -68,39 +62,46 @@ const Chat: NextPage<IChat> = ({ username }) => {
     [data]
   );
 
-  const parseUsername = useCallback(() => {
-    if (!username.includes('-')) {
-      if (username === user.userData?.username) {
-        router.push('/direct-messages');
-      } else {
-        setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-        setUsernameQuery(username);
-        setMyRole(undefined);
-      }
-    } else {
-      const usernameArr = username.split('-');
-      setUsernameQuery(usernameArr[0]);
-      if (usernameArr[1] === 'bundle') {
-        setMyRole(newnewapi.ChatRoom.MyRole.CREATOR);
-        setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-      }
-      if (usernameArr[1] === 'announcement') {
-        setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE);
-        if (usernameArr[0] === user.userData?.username) {
-          setMyRole(newnewapi.ChatRoom.MyRole.CREATOR);
-        } else {
-          setMyRole(newnewapi.ChatRoom.MyRole.SUBSCRIBER);
-        }
-      }
+  useEffect(() => {
+    if (
+      username &&
+      !username.includes('-') &&
+      username === user.userData?.username
+    ) {
+      router.push('/direct-messages');
     }
-  }, [username, router, user.userData?.username]);
+  }, [router, username, user.userData?.username]);
 
   useEffect(() => {
+    const parseUsername = () => {
+      if (!username.includes('-')) {
+        if (username !== user.userData?.username) {
+          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
+          setUsernameQuery(username);
+          setMyRole(undefined);
+        }
+      } else {
+        const usernameArr = username.split('-');
+        setUsernameQuery(usernameArr[0]);
+        if (usernameArr[1] === 'bundle') {
+          setMyRole(newnewapi.ChatRoom.MyRole.CREATOR);
+          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
+        }
+        if (usernameArr[1] === 'announcement') {
+          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE);
+          if (usernameArr[0] === user.userData?.username) {
+            setMyRole(newnewapi.ChatRoom.MyRole.CREATOR);
+          } else {
+            setMyRole(newnewapi.ChatRoom.MyRole.SUBSCRIBER);
+          }
+        }
+      }
+    };
+
     if (username) {
       parseUsername();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [username]);
+  }, [username, user.userData?.username]);
 
   useEffect(() => {
     if (chatrooms.length > 0) {
