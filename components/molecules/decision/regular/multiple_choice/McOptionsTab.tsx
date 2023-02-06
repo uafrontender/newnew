@@ -157,7 +157,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Handlers
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(async (text: string) => {
+    if (validateTextAbortControllerRef.current) {
+      validateTextAbortControllerRef.current?.abort();
+    }
+    validateTextAbortControllerRef.current = new AbortController();
     setIsAPIValidateLoading(true);
     try {
       const payload = new newnewapi.ValidateTextRequest({
@@ -166,7 +171,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         text,
       });
 
-      const res = await validateText(payload);
+      const res = await validateText(
+        payload,
+        validateTextAbortControllerRef?.current?.signal
+      );
 
       if (!res.data?.status) throw new Error('An error occurred');
 

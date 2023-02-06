@@ -40,11 +40,16 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
     processedOptions: options,
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
-  } = useAcOptions({
-    postUuid: post.postUuid,
-    userUuid: user.userData?.userUuid,
-    loggedInUser: user.loggedIn,
-  });
+  } = useAcOptions(
+    {
+      postUuid: post.postUuid,
+      userUuid: user.userData?.userUuid,
+      loggedInUser: user.loggedIn,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();

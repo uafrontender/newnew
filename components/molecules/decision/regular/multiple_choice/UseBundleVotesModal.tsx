@@ -39,7 +39,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
     <Modal show={show} overlaydim additionalz={12} onClose={onClose}>
       <SModalPaper onClose={onClose} isCloseButton>
         <SContainer>
-          <BundleIcon src={assets.common.vote} alt='votes' />
+          <SBundleIcon src={assets.decision.votes} alt='votes' />
           <SVotesAvailable>
             <Trans
               t={t}
@@ -121,7 +121,7 @@ const SContainer = styled.div`
   align-items: center;
 `;
 
-const BundleIcon = styled.img`
+const SBundleIcon = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 30px;
