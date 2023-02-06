@@ -100,6 +100,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               minAmount={minAmount}
             />
             <SVoteButton
+              id='custom-votes-submit'
               view='primary'
               disabled={
                 !customSupportVotesAmount ||
