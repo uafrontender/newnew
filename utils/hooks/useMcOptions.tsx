@@ -174,8 +174,10 @@ const useMcOptions = (
               );
 
               if (optionIndex !== -1) {
-                workingData.pages[k].mcOptions[optionIndex] =
-                  newOrUpdatedOption;
+                workingData.pages[k].mcOptions[optionIndex] = {
+                  ...workingData.pages[k].mcOptions[optionIndex],
+                  ...newOrUpdatedOption,
+                };
                 optionExists = true;
                 break;
               }

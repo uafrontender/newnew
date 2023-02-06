@@ -188,8 +188,10 @@ const useAcOptions = (
               );
 
               if (optionIndex !== -1) {
-                workingData.pages[k].acOptions[optionIndex] =
-                  newOrUpdatedOption;
+                workingData.pages[k].acOptions[optionIndex] = {
+                  ...workingData.pages[k].acOptions[optionIndex],
+                  ...newOrUpdatedOption,
+                };
                 optionExists = true;
                 break;
               }
