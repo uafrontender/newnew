@@ -48,6 +48,7 @@ const VotesAmountInputModal: React.FunctionComponent<
   return (
     <SWrapper>
       <SInput
+        id='custom-votes-input'
         ref={(el) => {
           inputRef.current = el!!;
         }}
@@ -59,7 +60,7 @@ const VotesAmountInputModal: React.FunctionComponent<
         })}
         onChange={handleOnChange}
       />
-      <SBottomPlaceholder>
+      <SBottomPlaceholder id='custom-votes-price'>
         {value && customPaymentWithFeeInCents
           ? `${t(
               'mcPost.optionsTab.actionSection.totalAmountCustomVotesPayment'
