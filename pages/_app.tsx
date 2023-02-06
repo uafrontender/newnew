@@ -415,6 +415,7 @@ const PRE_FETCH_LINKS_COMMON = (
     />
     {/* Common */}
     <link rel='prefetch' href={assets.common.vote} as='image' />
+    <link rel='prefetch' href={assets.decision.votes} as='image' />
   </>
 );
 
