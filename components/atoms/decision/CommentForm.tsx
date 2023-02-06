@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -93,7 +94,14 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
     const [commentToSend, setCommentToSend] = useState('');
 
+    const validateTextAbortControllerRef = useRef<
+      AbortController | undefined
+    >();
     const validateTextViaAPI = useCallback(async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -101,7 +109,10 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           text,
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
 
