@@ -1,11 +1,11 @@
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
-import TicketSet from '../../atoms/bundles/TicketSet';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
+import assets from '../../../constants/assets';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IBundleOfferCard {
@@ -21,6 +21,7 @@ const BundleOfferCard: React.FC<IBundleOfferCard> = ({
   bundleOffer,
   onClick,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('common');
   const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
   const monthsOfAccess = Math.floor(daysOfAccess / 30);
@@ -29,7 +30,14 @@ const BundleOfferCard: React.FC<IBundleOfferCard> = ({
 
   return (
     <SBundleContainer className={className}>
-      <STicketSet numberOFTickets={bundleLevel + 1} size={36} shift={11} />
+      <SBundleIcon
+        src={
+          theme.name === 'light'
+            ? assets.bundles.lightVotes[bundleLevel].animated()
+            : assets.bundles.darkVotes[bundleLevel].animated()
+        }
+        alt='Bundle votes'
+      />
       <SVotesNumber>
         <Trans
           t={t}
@@ -82,7 +90,9 @@ const SBundleContainer = styled.div`
   overflow: hidden;
 `;
 
-const STicketSet = styled(TicketSet)`
+const SBundleIcon = styled.img`
+  height: 36px;
+  width: 36px;
   margin-bottom: 16px;
 `;
 

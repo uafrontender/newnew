@@ -4,7 +4,86 @@ const APP_ASSETS_DOMAIN = 'd2ttpqwdet9svd.cloudfront.net';
 const APP_ASSETS_ORIGIN = `https://${APP_ASSETS_DOMAIN}`;
 
 const assets = {
-  // TODO: unused, remove
+  bundles: {
+    lightBundles: `${APP_ASSETS_ORIGIN}/bundles/lightBundles.png`,
+    darkBundles: `${APP_ASSETS_ORIGIN}/bundles/darkBundles.png`,
+    lightVotes: [
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/light100votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/light100votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/light100votesAnimated.webp`;
+        },
+      },
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/light4500votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/light4500votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/light4500votesAnimated.webp`;
+        },
+      },
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/light10000votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/light10000votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/light10000votesAnimated.webp`;
+        },
+      },
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/light20000votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/light20000votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/light20000votesAnimated.webp`;
+        },
+      },
+    ],
+    darkVotes: [
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/dark100votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/dark100votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/dark100votesAnimated.webp`;
+        },
+      },
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/dark4500votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/dark4500votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/dark4500votesAnimated.webp`;
+        },
+      },
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/dark10000votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/dark10000votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/dark10000votesAnimated.webp`;
+        },
+      },
+      {
+        static: `${APP_ASSETS_ORIGIN}/bundles/dark20000votesStatic.png`,
+        animated: () => {
+          if (isSafari()) {
+            return `${APP_ASSETS_ORIGIN}/bundles/dark20000votesAnimated.png`;
+          }
+          return `${APP_ASSETS_ORIGIN}/bundles/dark20000votesAnimated.webp`;
+        },
+      },
+    ],
+  },
   creation: {
     darkCfStatic: `${APP_ASSETS_ORIGIN}/creation/CF-static.png`,
     darkCfAnimated: () => {
