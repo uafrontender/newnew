@@ -22,7 +22,7 @@
     "unitPair": "{{amount}} {{unit}}",
     "and": " y las ",
     "customOptions": "añadir opciones personalizadas a las superpolls",
-    "chat": "chat privado 1 a 1",
+    "chat": "chat privado 1-a-1",
     "expiation": "los votos nunca caducan",
     "unit": {
       "day": "día",

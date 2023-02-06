@@ -1106,7 +1106,7 @@ context('Main flow', () => {
     it('can respond to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
-      cy.task('log', payedToSuperpoll);
+
       const payedToSuperpollTotal = payedToSuperpoll.reduce(
         (acc, next) => acc + next
       );
