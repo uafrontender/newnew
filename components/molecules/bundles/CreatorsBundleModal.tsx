@@ -56,7 +56,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
             isCloseButton
           >
             <Content>
-              <BundleIcon src={assets.common.vote} alt='votes' />
+              <SBundleIcon src={assets.common.vote} alt='votes' />
               <SVotesAvailable>
                 <Trans
                   t={t}
@@ -177,7 +177,7 @@ const Content = styled.div`
   align-items: center;
 `;
 
-const BundleIcon = styled.img`
+const SBundleIcon = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 30px;
