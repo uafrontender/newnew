@@ -122,7 +122,7 @@ const SBundlesContainer = styled.div<{ small: boolean; holder?: boolean }>`
   overflow: hidden;
 
   ${({ theme }) => theme.media.tablet} {
-    max-width: 300px;
+    max-width: 400px;
   }
 `;
 

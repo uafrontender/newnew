@@ -6,8 +6,8 @@ import { newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import BulletCheckmark from '../../../atoms/BulletCheckmark';
-import TicketSet from '../../../atoms/bundles/TicketSet';
 import { formatNumber } from '../../../../utils/format';
+import assets from '../../../../constants/assets';
 
 interface IFunctionProps {
   id: number;
@@ -35,7 +35,14 @@ export const SuperpollBundle: React.FC<IFunctionProps> = ({
           </SVotesQty>{' '}
           {t('myBundles.bundlesSet.votes')}
         </SVotes>
-        <TicketSet size={36} shift={11} numberOFTickets={id} />
+        <SBundleIcon
+          src={
+            theme.name === 'light'
+              ? assets.bundles.lightVotes[id].animated()
+              : assets.bundles.darkVotes[id].animated()
+          }
+          alt='Bundle votes'
+        />
       </SHeader>
       {monthsOfAccess === 1 ? (
         <SText variant={3}>
@@ -115,6 +122,11 @@ const SHeader = styled.div`
 const SVotes = styled.strong`
   font-size: 24px;
   font-weight: bold;
+`;
+
+const SBundleIcon = styled.img`
+  width: 36x;
+  height: 36px;
 `;
 
 interface ISSVotesQty {
