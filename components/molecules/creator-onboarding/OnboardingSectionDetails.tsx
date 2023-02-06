@@ -3,7 +3,13 @@
 /* eslint-disable react/no-danger */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -210,10 +216,16 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // API validations
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+  const validateUsernameAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
   const validateUsernameViaAPI = useCallback(
     async (text: string) => {
       setIsAPIValidateLoading(true);
-
+      if (validateUsernameAbortControllerRef.current) {
+        validateUsernameAbortControllerRef.current?.abort();
+      }
+      validateUsernameAbortControllerRef.current = new AbortController();
       try {
         // skip validation if username is equal to current username
         if (text === user.userData?.username) {
@@ -226,7 +238,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
           username: text,
         });
 
-        const res = await validateUsernameTextField(payload);
+        const res = await validateUsernameTextField(
+          payload,
+          validateUsernameAbortControllerRef?.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
@@ -262,8 +277,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
     [validateUsernameViaAPI]
   );
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateNicknameViaAPI = useCallback(
     async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -271,7 +291,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
           text,
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
 
