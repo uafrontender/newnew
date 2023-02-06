@@ -41,12 +41,17 @@ const AcWaitingOptionsSection: React.FunctionComponent<
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
     isLoading: isOptionsLoading,
-    refetch: refetchOptions,
-  } = useAcOptions({
-    postUuid: post.postUuid,
-    userUuid: user.userData?.userUuid,
-    loggedInUser: user.loggedIn,
-  });
+    removeAcOptionMutation,
+  } = useAcOptions(
+    {
+      postUuid: post.postUuid,
+      userUuid: user.userData?.userUuid,
+      loggedInUser: user.loggedIn,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   // Scroll block
   const [isScrollBlocked, setIsScrollBlocked] = useState(false);
@@ -62,9 +67,9 @@ const AcWaitingOptionsSection: React.FunctionComponent<
 
   const handleRemoveOption = useCallback(
     async (optionToRemove: newnewapi.Auction.Option) => {
-      await refetchOptions();
+      removeAcOptionMutation?.mutate(optionToRemove);
     },
-    [refetchOptions]
+    [removeAcOptionMutation]
   );
 
   useEffect(() => {
