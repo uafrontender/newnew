@@ -39,7 +39,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
     <Modal show={show} overlaydim additionalz={12} onClose={onClose}>
       <SModalPaper onClose={onClose} isCloseButton>
         <SContainer>
-          <SBundleIcon src={assets.common.vote} alt='votes' />
+          <SBundleIcon src={assets.decision.votes} alt='votes' />
           <SVotesAvailable>
             <Trans
               t={t}

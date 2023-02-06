@@ -40,7 +40,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
     return (
       <>
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
-          <AnimatedBackground src={assets.common.vote} alt='vote' />
+          <AnimatedBackground src={assets.decision.votes} alt='vote' />
           <SModalPaper onClose={onClose}>
             <Content>
               <SBundleIcon

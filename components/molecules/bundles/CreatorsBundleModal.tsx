@@ -56,7 +56,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
             isCloseButton
           >
             <Content>
-              <SBundleIcon src={assets.common.vote} alt='votes' />
+              <SBundleIcon src={assets.decision.votes} alt='votes' />
               <SVotesAvailable>
                 <Trans
                   t={t}
