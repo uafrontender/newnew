@@ -184,11 +184,15 @@ const MyApp = (props: IMyApp): ReactElement => {
 
   useEffect(() => {
     if (user.loggedIn && user.userData?.username) {
-      Mixpanel.identify(user.userData.username);
+      Mixpanel.identify(user.userData.userUuid);
       Mixpanel.people.set({
         $name: user.userData.username,
         $email: user.userData.email,
         newnewId: user.userData.userUuid,
+        isCreator: user.userData.options?.isCreator,
+      });
+      Mixpanel.register({
+        isCreator: user.userData.options?.isCreator,
       });
       Mixpanel.track('Session started!');
     }
