@@ -123,6 +123,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   );
 
   const handlePlaybackFinished = useCallback(() => {
+    // If not available set to some super high number
+    setPlaybackTime(player?.current?.getDuration() ?? 10000);
     player.current?.play().catch(() => {
       handleSetIsPaused(true);
     });

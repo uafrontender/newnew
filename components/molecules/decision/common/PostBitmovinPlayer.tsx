@@ -27,6 +27,10 @@ import logoAnimation from '../../../../public/animations/mobile_logo.json';
 import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
 import PlayerScrubber from '../../../atoms/PlayerScrubber';
 
+type TPlayerAPIEnhanced = PlayerAPI & {
+  handleSetPlaybackTime: PlayerEventCallback;
+};
+
 interface IPostBitmovinPlayer {
   id: string;
   muted?: boolean;
@@ -100,9 +104,11 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   );
 
   const playerRef: any = useRef();
-  const player = useRef<PlayerAPI | null>(null);
+  const player = useRef<TPlayerAPIEnhanced | null>(null);
 
   const handlePlaybackFinished = useCallback(() => {
+    // If not available set to some super high number
+    setPlaybackTime(player?.current?.getDuration() ?? 10000);
     player?.current?.play().catch(() => {
       handleSetIsPaused(true);
     });
@@ -128,7 +134,10 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   }, []);
 
   const setupPlayer = useCallback(() => {
-    player.current = new Player(playerRef.current, playerConfig);
+    player.current = new Player(
+      playerRef.current,
+      playerConfig
+    ) as TPlayerAPIEnhanced;
 
     // setInit(true);
   }, [playerConfig]);
@@ -145,7 +154,16 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     player?.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     // @ts-ignore
     player.current.handlePlaybackFinished = handlePlaybackFinished;
-  }, [handlePlaybackFinished]);
+
+    if (player.current?.handleSetPlaybackTime) {
+      player.current?.off(
+        PlayerEvent.TimeChanged,
+        player.current?.handleSetPlaybackTime
+      );
+    }
+    player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
+    player.current!!.handleSetPlaybackTime = handleSetPlaybackTime;
+  }, [handlePlaybackFinished, handleSetPlaybackTime]);
 
   useEffect(() => {
     if (process.browser && typeof window !== 'undefined') {
@@ -203,7 +221,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   useEffect(() => {
     player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
     player.current?.on(PlayerEvent.Play, () => handleSetIsPaused(false));
-    player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
+    // player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerSource]);
