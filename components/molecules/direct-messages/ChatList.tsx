@@ -13,6 +13,7 @@ import { useGetChats } from '../../../contexts/chatContext';
 import { useAppSelector } from '../../../redux-store/store';
 import Loader from '../../atoms/Loader';
 import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 
 const NoResults = dynamic(
   () => import('../../atoms/direct-messages/NoResults')
@@ -54,10 +55,12 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
     justSentMessage,
   } = useGetChats();
 
+  const searchChatroomDebounced = useDebouncedValue(searchChatroom, 500);
+
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
       myRole: activeTab,
-      searchQuery: searchChatroom,
+      searchQuery: searchChatroomDebounced,
     });
 
   const chatrooms = useMemo(
