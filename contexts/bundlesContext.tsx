@@ -108,7 +108,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         })
         .catch((err) => {
           console.error(err);
-          showErrorToastPredefined();
+          if (
+            err.message !== 'Refresh token invalid' &&
+            err.message !== 'No token'
+          ) {
+            showErrorToastPredefined();
+          }
           setBundles(undefined);
         });
 
@@ -123,7 +128,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
           })
           .catch((err) => {
             console.error(err);
-            showErrorToastPredefined();
+            if (
+              err.message !== 'Refresh token invalid' &&
+              err.message !== 'No token'
+            ) {
+              showErrorToastPredefined();
+            }
             setIsSellingBundles(false);
             setIsSellingBundlesStatusLoaded(false);
           });
@@ -135,7 +145,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
           })
           .catch((err) => {
             console.error(err);
-            showErrorToastPredefined();
+            if (
+              err.message !== 'Refresh token invalid' &&
+              err.message !== 'No token'
+            ) {
+              showErrorToastPredefined();
+            }
             setHasSoldBundles(false);
             saveStateLS('creatorHasSoldBundles', false);
           });
