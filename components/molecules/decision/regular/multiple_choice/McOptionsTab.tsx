@@ -143,8 +143,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
-  // Mobile modal for new option
-  const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
+  // Modal for new option
+  const [suggestNewOptionModalOpen, setSuggestNewOptionModalOpen] =
+    useState(false);
   // Payment modal
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [confirmCustomOptionModalOpen, setConfirmCustomOptionModalOpen] =
@@ -210,6 +211,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [setNewOptionText, validateTextViaAPIDebounced]
   );
 
+  const handleSuggestNewOptionModalClosed = useCallback(() => {
+    setNewOptionText('');
+    setSuggestNewOptionModalOpen(false);
+  }, []);
+
   const handleAddNewOption = useCallback(async () => {
     setConfirmCustomOptionModalOpen(false);
     setLoadingModalOpen(true);
@@ -246,8 +252,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       console.error(err);
       showErrorToastCustom(err.message);
     } finally {
-      setNewOptionText('');
-      setSuggestNewMobileOpen(false);
+      handleSuggestNewOptionModalClosed();
       setLoadingModalOpen(false);
     }
   }, [
@@ -255,8 +260,25 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     newOptionText,
     t,
     handleAddOrUpdateOptionFromResponse,
+    handleSuggestNewOptionModalClosed,
     showErrorToastCustom,
   ]);
+
+  const handleAddOptionButtonClicked = useCallback(() => {
+    if (canAddCustomOption) {
+      setConfirmCustomOptionModalOpen(true);
+    } else {
+      setBuyBundleModalOpen(true);
+    }
+  }, [canAddCustomOption]);
+
+  const handleAddOptionButtonClickCaptured = useCallback(() => {
+    Mixpanel.track('Click Add Custom Option', {
+      _stage: 'Post',
+      _postUuid: post.postUuid,
+      _component: 'McOptionsTab',
+    });
+  }, [post.postUuid]);
 
   useEffect(() => {
     if (inView) {
@@ -408,7 +430,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   _component: 'McOptionsTab',
                 });
               }}
-              onClick={() => setSuggestNewMobileOpen(true)}
+              onClick={() => setSuggestNewOptionModalOpen(true)}
             >
               <InlineSvg
                 svg={AddOptionIcon}
@@ -440,14 +462,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       (post.creator?.options?.isOfferingBundles || bundle) ? (
         isMobile ? (
           <OptionActionMobileModal
-            isOpen={suggestNewMobileOpen}
-            onClose={() => setSuggestNewMobileOpen(false)}
+            isOpen={suggestNewOptionModalOpen}
+            onClose={handleSuggestNewOptionModalClosed}
             zIndex={12}
           >
             <SSuggestNewContainer>
               <SuggestionTextArea
                 value={newOptionText}
-                autofocus={suggestNewMobileOpen}
+                autofocus={suggestNewOptionModalOpen}
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
                 )}
@@ -459,18 +481,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
-                onClick={() => {
-                  Mixpanel.track('Click Add Custom Option', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'McOptionsTab',
-                  });
-                  if (canAddCustomOption) {
-                    setConfirmCustomOptionModalOpen(true);
-                  } else {
-                    setBuyBundleModalOpen(true);
-                  }
-                }}
+                onClick={handleAddOptionButtonClicked}
+                onClickCapture={handleAddOptionButtonClickCaptured}
               >
                 {t('mcPost.optionsTab.actionSection.placeABidButton')}
               </SAddOptionButton>
@@ -478,13 +490,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           </OptionActionMobileModal>
         ) : (
           <Modal
-            show={suggestNewMobileOpen}
-            onClose={() => setSuggestNewMobileOpen(false)}
+            show={suggestNewOptionModalOpen}
+            onClose={handleSuggestNewOptionModalClosed}
             overlaydim
             additionalz={12}
           >
             <SSuggestNewContainer>
-              <SCloseButton onClick={() => setSuggestNewMobileOpen(false)}>
+              <SCloseButton onClick={handleSuggestNewOptionModalClosed}>
                 <InlineSvg
                   svg={CloseIcon}
                   fill={theme.colorsThemed.text.primary}
@@ -498,7 +510,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               <SuggestionTextArea
                 id='add-option-input'
                 value={newOptionText}
-                autofocus={suggestNewMobileOpen}
+                autofocus={suggestNewOptionModalOpen}
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholder'
                 )}
@@ -511,18 +523,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
-                onClick={() => {
-                  Mixpanel.track('Click Add Custom Option', {
-                    _stage: 'Post',
-                    _postUuid: post.postUuid,
-                    _component: 'McOptionsTab',
-                  });
-                  if (canAddCustomOption) {
-                    setConfirmCustomOptionModalOpen(true);
-                  } else {
-                    setBuyBundleModalOpen(true);
-                  }
-                }}
+                onClick={handleAddOptionButtonClicked}
+                onClickCapture={handleAddOptionButtonClickCaptured}
               >
                 {t('mcPost.optionsTab.optionCard.placeABidButton')}
               </SAddOptionButton>
@@ -555,7 +557,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile &&
-      !suggestNewMobileOpen &&
+      !suggestNewOptionModalOpen &&
       !optionCreatedByMe &&
       postStatus === 'voting' &&
       (post.creator?.options?.isOfferingBundles || bundle) ? (
@@ -563,7 +565,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SActionButton
             id='action-button-mobile'
             view='primaryGrad'
-            onClick={() => setSuggestNewMobileOpen(true)}
+            onClick={() => setSuggestNewOptionModalOpen(true)}
             onClickCapture={() =>
               Mixpanel.track('SuggestNewMobile', {
                 _stage: 'Post',
@@ -595,6 +597,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           show
           creator={post.creator}
           additionalZ={13}
+          onSuccess={() => {
+            if (newOptionText && newOptionTextValid) {
+              setConfirmCustomOptionModalOpen(true);
+            }
+          }}
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}
