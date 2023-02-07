@@ -153,6 +153,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     user.loggedIn,
     user.userData?.options?.creatorStatus,
     fetchBundles,
+    showErrorToastPredefined,
     fetchIsSellingBundles,
     fetchHasSoldBundles,
   ]);

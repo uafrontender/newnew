@@ -21,10 +21,11 @@ interface IBuyBundleModal {
   creator: newnewapi.IUser;
   additionalZ?: number;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, additionalZ, onClose }) => {
+  ({ show, creator, additionalZ, onClose, onSuccess }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const { appConstants } = useGetAppConstants();
@@ -94,7 +95,13 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
                 }
               : {})}
             onClose={() => setBundleToBuy(undefined)}
-            onCloseSuccessModal={() => onClose()}
+            onCloseSuccessModal={() => {
+              if (onSuccess) {
+                onSuccess();
+              }
+
+              onClose();
+            }}
           />
         )}
       </>

@@ -54,7 +54,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
       try {
         setIsLoading(true);
 
-        if (!email_address || !token) throw new Error('No token');
+        if (!email_address || !token) {
+          throw new Error('No token on email verification');
+        }
 
         const requestPayload = new newnewapi.EmailSignInRequest({
           emailAddress: email_address,
