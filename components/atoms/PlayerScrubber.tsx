@@ -58,7 +58,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
     if (sliderRef.current) {
       sliderRef.current.style.setProperty(
         '--sx',
-        `calc(0.5 * 10px + ${(progress - 0) / 100} * (100% - 10px))`
+        `calc(${progress / 100} * 100%)`
       );
     }
   }, [progress]);
