@@ -52,7 +52,9 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
       try {
         setIsLoading(true);
 
-        if (!oauth_token || !oauth_verifier) throw new Error('No token');
+        if (!oauth_token || !oauth_verifier) {
+          throw new Error('No token on twitter verification');
+        }
 
         const requestPayload = new newnewapi.TwitterSignInRequest({
           oauthToken: oauth_token,

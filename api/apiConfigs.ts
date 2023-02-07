@@ -282,7 +282,9 @@ export async function fetchProtobufProtectedIntercepted<
     serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
 
   try {
-    if (!accessToken && !refreshToken) throw new Error('No token');
+    if (!accessToken && !refreshToken) {
+      throw new Error('No token on request');
+    }
     if (!accessToken && refreshToken) throw new Error('Access token invalid');
 
     // Try to make request if access and refresh tokens are present
