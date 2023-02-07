@@ -101,6 +101,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             index={i}
             minAmount={0}
             votingAllowed={false}
+            optionBeingSupported=''
             handleSetSupportedBid={() => {}}
             handleAddOrUpdateOptionFromResponse={() => {}}
           />
