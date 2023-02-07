@@ -283,7 +283,7 @@ export async function fetchProtobufProtectedIntercepted<
 
   try {
     if (!accessToken && !refreshToken) {
-      throw new Error('No token on request');
+      throw new Error('No token');
     }
     if (!accessToken && refreshToken) throw new Error('Access token invalid');
 
