@@ -25,7 +25,7 @@ const SuccessBundleModal: React.FC<IFunction> = React.memo(
       <>
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
           {isBundlesEnabled ? (
-            <AnimatedBackground src={assets.common.vote} alt='vote' />
+            <AnimatedBackground src={assets.decision.votes} alt='vote' />
           ) : null}
           <SModalPaper onClose={onClose}>
             <Content id='success-bundle-modal'>

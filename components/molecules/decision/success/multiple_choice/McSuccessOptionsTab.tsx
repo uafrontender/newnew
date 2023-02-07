@@ -45,11 +45,16 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
     processedOptions: options,
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
-  } = useMcOptions({
-    postUuid: post.postUuid,
-    loggedInUser: user.loggedIn,
-    userUuid: user.userData?.userUuid,
-  });
+  } = useMcOptions(
+    {
+      postUuid: post.postUuid,
+      loggedInUser: user.loggedIn,
+      userUuid: user.userData?.userUuid,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   useEffect(() => {
     if (inView) {
@@ -63,26 +68,25 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
         {t('acPostSuccess.optionsTab.backButton')}
       </SGoBackButton>
       {!isMobile && <SSeparator />}
+      {!isMobile ? (
+        <>
+          <GradientMask
+            gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+            positionTop={60}
+            active={showTopGradient}
+          />
+          <GradientMask
+            gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+            positionBottom={0}
+            active={showBottomGradient}
+          />
+        </>
+      ) : null}
       <SBidsContainer
         ref={(el) => {
           containerRef.current = el!!;
         }}
-        heightDelta={isMobile ? 24 : 60}
       >
-        {!isMobile ? (
-          <>
-            <GradientMask
-              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-              positionTop
-              active={showTopGradient}
-            />
-            <GradientMask
-              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
-              positionBottom={0}
-              active={showBottomGradient}
-            />
-          </>
-        ) : null}
         {options.map((option, i) => (
           <McOptionCard
             key={option.id.toString()}
@@ -130,6 +134,8 @@ export default McSuccessOptionsTab;
 const SGoBackButton = styled(GoBackButton)``;
 
 const SWrapper = styled.div`
+  height: 100%;
+  position: relative;
   ${({ theme }) => theme.media.tablet} {
     padding: 16px;
   }
@@ -145,9 +151,7 @@ const SSeparator = styled.div`
     ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
-const SBidsContainer = styled.div<{
-  heightDelta: number;
-}>`
+const SBidsContainer = styled.div`
   position: relative;
 
   width: 100%;
@@ -160,7 +164,7 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 10px)`};
+    height: calc(100% - 60px);
     padding-right: 12px;
     margin-right: -14px;
     width: calc(100% + 14px);
@@ -191,10 +195,6 @@ const SBidsContainer = styled.div<{
         background: ${({ theme }) => theme.colorsThemed.background.outlines2};
       }
     }
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
   }
 `;
 

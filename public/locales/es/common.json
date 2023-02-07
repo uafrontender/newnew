@@ -137,7 +137,7 @@
       "votes": "<0>{{amount}}</0> votos",
       "access": "además obtén {{amount}} {{unit}} de:",
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
-      "chat": "chat privado 1 a 1",
+      "chat": "chat privado 1-a-1",
       "buy": "Comprar por ${{amount}}",
       "terms": "*los votos de los bundles nunca expiran",
       "unit": {
@@ -156,7 +156,7 @@
       "for": "para <0>{{creator}}</0>",
       "access": "Quedan {{amount}} {{unit}} de:",
       "customOptions": "añadir opciones personalizadas a la superpoll",
-      "chat": "chat privado 1 a 1",
+      "chat": "chat privado 1-a-1",
       "button": "¡Suena bien!",
       "unit": {
         "month": "mes",
@@ -171,7 +171,7 @@
       "unitPair": "{{amount}} {{unit}}",
       "and": " y las ",
       "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
-      "chat": "chat privado 1 a 1",
+      "chat": "chat privado 1-a-1",
       "buyButton": "Comprar más votos",
       "unit": {
         "day": "día",
@@ -213,7 +213,7 @@
     "sortingtype-num_bids-mc": "Número de votos",
     "sortingtype-num_bids-cf": "Número de patrocinadores",
     "sortingtype-newest": "Más reciente",
-    "bid": "Oferta",
+    "bid": "Bid",
     "bid-lowest": "Más baja",
     "bid-highest": "Más alta",
     "time": "Tiempo",

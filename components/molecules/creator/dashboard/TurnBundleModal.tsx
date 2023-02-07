@@ -1,15 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import Modal from '../../../organisms/Modal';
 import ModalPaper, { SContent } from '../../../organisms/ModalPaper';
 import Button from '../../../atoms/Button';
-import votes from '../../../../public/images/dashboard/double-votes.png';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import assets from '../../../../constants/assets';
 
 interface ITurnBundleModal {
   show: boolean;
@@ -22,21 +22,21 @@ interface ITurnBundleModal {
 const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
   ({ show, isBundlesEnabled, zIndex, onClose, onToggleBundles }) => {
     const { t } = useTranslation('page-Creator');
+    const theme = useTheme();
 
     return (
       <>
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
           <SModalPaper onClose={onClose} isCloseButton>
             <Content>
-              {/* TODO: replace with TicketSet component, remove icon */}
-              <SImgHolder>
-                <img
-                  src={votes.src}
-                  alt={t('dashboard.aboutBundles.title')}
-                  width={188}
-                  height={144}
-                />
-              </SImgHolder>
+              <SBundlesImage
+                src={
+                  theme.name === 'light'
+                    ? assets.bundles.lightBundles
+                    : assets.bundles.darkBundles
+                }
+                alt={t('dashboard.aboutBundles.title')}
+              />
               <STitle variant={4}>
                 {isBundlesEnabled === true
                   ? t('myBundles.modals.turnoff.title')
@@ -119,7 +119,9 @@ const SButton = styled(Button)<ISButton>`
   }
 `;
 
-const SImgHolder = styled.div`
+const SBundlesImage = styled.img`
+  width: 200px;
+  height: 200px;
   margin: 38px 0 30px;
 `;
 

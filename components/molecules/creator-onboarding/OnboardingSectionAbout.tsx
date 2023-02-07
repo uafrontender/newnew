@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -74,8 +80,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateBioViaApi = useCallback(
     async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -83,7 +94,10 @@ const OnboardingSectionAbout: React.FunctionComponent<
           text,
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
 

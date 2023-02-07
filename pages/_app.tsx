@@ -419,6 +419,7 @@ const PRE_FETCH_LINKS_COMMON = (
     />
     {/* Common */}
     <link rel='prefetch' href={assets.common.vote} as='image' />
+    <link rel='prefetch' href={assets.decision.votes} as='image' />
   </>
 );
 
@@ -478,6 +479,11 @@ const PRE_FETCH_LINKS_DARK = (
     <link rel='prefetch' href={assets.common.ac.darkAcStatic} as='image' />
     <link rel='prefetch' href={assets.common.mc.darkMcStatic} as='image' />
     {/* <link rel='prefetch' href={assets.creation.darkCfStatic} as='image' /> */}
+    {/* Bundle assets (static is not used yet, preload when used) */}
+    <link rel='prefetch' href={assets.bundles.darkBundles} as='image' />
+    {assets.bundles.darkVotes.map((asset) => (
+      <link rel='prefetch' href={asset.animated()} as='image' />
+    ))}
   </>
 );
 
@@ -541,5 +547,10 @@ const PRE_FETCH_LINKS_LIGHT = (
     <link rel='prefetch' href={assets.common.ac.lightAcStatic} as='image' />
     <link rel='prefetch' href={assets.common.mc.lightMcStatic} as='image' />
     {/* <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' /> */}
+    {/* Bundle assets (static is not used yet, preload when used) */}
+    <link rel='prefetch' href={assets.bundles.lightBundles} as='image' />
+    {assets.bundles.lightVotes.map((asset) => (
+      <link rel='prefetch' href={asset.animated()} as='image' />
+    ))}
   </>
 );
