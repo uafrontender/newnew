@@ -149,12 +149,14 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               resources={response}
               muted={isMuted}
               showPlayButton
+              videoDurationWithTime
             />
           ) : (
             <PostVideoResponsesSlider
               isDeletingAdditionalResponse={false}
               videos={[response, ...additionalResponses]}
               isMuted={isMuted}
+              videoDurationWithTime
             />
           )}
           <PostVideoSoundButton
@@ -171,6 +173,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             resources={announcement}
             muted={isMuted}
             showPlayButton
+            videoDurationWithTime
           />
           <PostVideoSoundButton
             postUuid={postUuid}

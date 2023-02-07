@@ -242,12 +242,14 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       <SMobileContainer onClick={preventClick}>
         <SContent>
           <SPlayerWrapper>
+            {/* It seems like the video here is intentionally a 3-seconds one */}
             {open ? (
               fileProcessing.progress === 100 ? (
                 <BitmovinPlayer
                   id='published-modal'
                   muted={false}
                   resources={videoProcessing?.targetUrls}
+                  // Restricts the playback time
                   thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
                   showPlayButton
