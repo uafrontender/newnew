@@ -2,7 +2,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -175,6 +175,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
           <SActivitiesContainer
             dimmedBackground={openedMainSection === 'main'}
             ref={activitiesContainerRef}
+            openedTab={openedMainSection}
           >
             {openedMainSection === 'main' ? (
               <>
@@ -390,6 +391,7 @@ const SWrapper = styled.div`
 
 const SActivitiesContainer = styled.div<{
   dimmedBackground: boolean;
+  openedTab: 'main' | 'options';
 }>`
   grid-area: activities;
 
@@ -403,6 +405,12 @@ const SActivitiesContainer = styled.div<{
   ${({ theme }) => theme.media.tablet} {
     margin-top: 0px;
     min-height: 506px;
+    ${({ openedTab }) =>
+      openedTab === 'options'
+        ? css`
+            height: 506px;
+          `
+        : null}
 
     background-color: ${({ theme }) =>
       theme.name === 'dark'
