@@ -1288,6 +1288,7 @@ export const CreationSecondStepContent: React.FC<
                           borderRadius='16px'
                           mutePosition='left'
                           showPlayButton
+                          withScrubber
                         />
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>
