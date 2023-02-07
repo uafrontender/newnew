@@ -26,7 +26,7 @@ export const Desktop: React.FC = React.memo(() => {
 
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
-  const { bundles, hasSoldBundles } = useBundles();
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -42,7 +42,7 @@ export const Desktop: React.FC = React.memo(() => {
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
 
-      Mixpanel.track('Copied My Link', {
+      Mixpanel.track('Copy My Link', {
         _stage: 'Header',
       });
 
@@ -74,7 +74,7 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {(hasSoldBundles || (bundles && bundles.length > 0)) && (
+            {directMessagesAvailable && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{

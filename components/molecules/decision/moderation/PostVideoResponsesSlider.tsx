@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -12,12 +18,15 @@ import arrowIconRight from '../../../../public/images/svg/icons/outlined/Chevron
 import InlineSvg from '../../../atoms/InlineSVG';
 import PostVideoStoriesPreviewSlider from './PostVideoStoriesPreviewSlider';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
   dotsBottom?: number;
   isMuted?: boolean;
   isEditingStories?: boolean;
+  isDeletingAdditionalResponse: boolean;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
   handleDeleteUnuploadedAdditonalResponse?: () => void;
 }
@@ -29,9 +38,11 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   dotsBottom,
   isMuted,
   isEditingStories,
+  isDeletingAdditionalResponse,
   handleDeleteAdditionalVideo,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
+  const { postParsed } = usePostInnerState();
   const { videoProcessing } = usePostModerationResponsesContext();
   const uploadedFile = useMemo(
     () => videoProcessing?.targetUrls,
@@ -44,23 +55,59 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
   const [hovered, setHovered] = useState(false);
 
-  const scrollSliderTo = (to: number) => {
-    const containerWidth = containerRef.current?.getBoundingClientRect().width;
-    let scrollTo = to;
+  const scrollSliderTo = useCallback(
+    (to: number) => {
+      const containerWidth =
+        containerRef.current?.getBoundingClientRect().width;
+      let scrollTo = to;
 
-    if (to < 0) {
-      scrollTo = 0;
-    } else if (scrollTo > (videosLength || 0) - 1) {
-      scrollTo = (videosLength || 0) - 1;
-    }
+      if (to < 0) {
+        scrollTo = 0;
+      } else if (scrollTo > (videosLength || 0) - 1) {
+        scrollTo = (videosLength || 0) - 1;
+      }
 
-    if (containerWidth) {
-      containerRef.current?.scrollTo({
-        left: containerWidth * scrollTo,
-        behavior: 'smooth',
+      if (containerWidth) {
+        containerRef.current?.scrollTo({
+          left: containerWidth * scrollTo,
+          behavior: 'smooth',
+        });
+      }
+    },
+    [videosLength]
+  );
+
+  const handleClickDotScroll = useCallback(
+    (i: number) => {
+      Mixpanel.track('Click Video Responses Slider Dot', {
+        _stage: 'Post',
+        _postUuid: postParsed?.postUuid,
+        _videoIndex: `postVideoThumbnailItem_${i}`,
+        _component: 'PostVideoResponsesSlider',
       });
-    }
-  };
+      if (currentVideo === i) return;
+      scrollSliderTo(i);
+    },
+    [currentVideo, postParsed?.postUuid, scrollSliderTo]
+  );
+
+  const handleScrollLeft = useCallback(() => {
+    Mixpanel.track('Click scroll left arrow', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _component: 'PostVideoResponsesSlider',
+    });
+    scrollSliderTo(currentVideo - 1);
+  }, [currentVideo, postParsed?.postUuid, scrollSliderTo]);
+
+  const handleScrollRight = useCallback(() => {
+    Mixpanel.track('Click scroll right arrow', {
+      _stage: 'Post',
+      _postUuid: postParsed?.postUuid,
+      _component: 'PostVideoResponsesSlider',
+    });
+    scrollSliderTo(currentVideo + 1);
+  }, [currentVideo, postParsed?.postUuid, scrollSliderTo]);
 
   useEffect(() => {
     const handleScroll = (e: Event) => {
@@ -131,10 +178,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           <SDot
             key={item.uuid ?? i}
             active={currentVideo === i}
-            onClick={() => {
-              if (currentVideo === i) return;
-              scrollSliderTo(i);
-            }}
+            onClick={() => handleClickDotScroll(i)}
           />
         ))}
       </SDotsContainer>
@@ -149,7 +193,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
               }
             : {}),
         }}
-        onClick={() => scrollSliderTo(currentVideo - 1)}
+        onClick={handleScrollLeft}
       >
         <InlineSvg
           svg={arrowIconLeft}
@@ -169,7 +213,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
               }
             : {}),
         }}
-        onClick={() => scrollSliderTo(currentVideo + 1)}
+        onClick={handleScrollRight}
       >
         <InlineSvg
           svg={arrowIconRight}
@@ -184,6 +228,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           currentActive={currentVideo}
           offsetBottom={dotsBottom ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
+          isDeletingAdditionalResponse={isDeletingAdditionalResponse}
           handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
           handleDeleteUnuploadedAdditonalResponse={
             handleDeleteUnuploadedAdditonalResponse

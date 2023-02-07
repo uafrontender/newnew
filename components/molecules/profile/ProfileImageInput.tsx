@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 
 import EditIcon from '../../../public/images/svg/icons/filled/Edit.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -53,6 +54,12 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
         view='transparent'
         disabled={disabled}
         onClick={() => imageInputRef.current?.click()}
+        onClickCapture={() => {
+          Mixpanel.track('Click Edit Profile Image Button', {
+            _stage: 'MyProfile',
+            _component: 'MyProfileLayout',
+          });
+        }}
       >
         <InlineSvg svg={EditIcon} width='20px' height='20px' />
       </SEditButton>

@@ -158,6 +158,37 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     y: 0,
   });
 
+  const handleClickOptionBodyOpenEllipseMenu = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      Mixpanel.track('Click Option Body Open Ellipse Menu', {
+        _stage: 'Post',
+        _postUuid: postUuid,
+        _optionId: option?.id,
+        _component: 'McOptionCard',
+      });
+      if (!isMobile && !isEllipseMenuOpen) {
+        setIsEllipseMenuOpen(true);
+        handleSetScrollBlocked?.();
+
+        setOptionMenuXY({
+          x: e.clientX,
+          y: e.clientY,
+        });
+      }
+    },
+    [handleSetScrollBlocked, isEllipseMenuOpen, isMobile, option?.id, postUuid]
+  );
+
+  const handleClickOptionEllipseButtonOpenEllipseModal = useCallback(() => {
+    Mixpanel.track('Click Option Ellipse Button Open Ellipse Modal', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _optionId: option?.id,
+      _component: 'McOptionCard',
+    });
+    setIsEllipseMenuOpen(true);
+  }, [option?.id, postUuid]);
+
   // Report modal
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
@@ -402,7 +433,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         return;
       }
 
-      Mixpanel.track('PayWithCard', {
+      Mixpanel.track('Pay With Card', {
         _stage: 'Post',
         _postUuid: postUuid,
         _component: 'McOptionCard',
@@ -475,6 +506,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     async (votesCount: number) => {
       setBundleVotesModalOpen(false);
       setLoadingModalOpen(true);
+
+      Mixpanel.track('Use Bundle Votes', {
+        _stage: 'Post',
+        _postUuid: postUuid,
+        _component: 'McOptionCard',
+      });
 
       try {
         const payload = new newnewapi.VoteOnPostRequest({
@@ -563,20 +600,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={false}
           $isBlue={isBlue}
-          onClick={(e) => {
-            if (!isMobile && !isEllipseMenuOpen) {
-              setIsEllipseMenuOpen(true);
-              handleSetScrollBlocked?.();
-
-              setOptionMenuXY({
-                x: e.clientX,
-                y: e.clientY,
-              });
-            }
-          }}
+          onClick={(e) => handleClickOptionBodyOpenEllipseMenu(e)}
         >
           {isMobile && (
-            <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+            <SEllipseButtonMobile
+              onClick={() => handleClickOptionEllipseButtonOpenEllipseModal()}
+            >
               <InlineSvg
                 svg={MoreIcon}
                 width='16px'
@@ -623,9 +652,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view='primary'
                 isBlue={isBlue}
                 onClickCapture={() => {
-                  Mixpanel.track('Vote Click', {
+                  Mixpanel.track('Click Support Button Mobile', {
                     _stage: 'Post',
                     _postUuid: postUuid,
+                    _optionId: option?.id,
                     _component: 'McOptionCard',
                   });
                 }}
@@ -669,9 +699,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view='secondary'
                 isBlue={isBlue}
                 onClickCapture={() => {
-                  Mixpanel.track('Vote Click', {
+                  Mixpanel.track('Click Support Button Desktop', {
                     _stage: 'Post',
                     _postUuid: postUuid,
+                    _optionId: option?.id,
                     _component: 'McOptionCard',
                   });
                 }}
@@ -1314,6 +1345,7 @@ const SSupportButton = styled(Button)<{
   &:focus:enabled {
     color: ${({ theme }) => theme.colors.dark};
     background: #ffffff;
+    box-shadow: none;
   }
 
   ${({ isBlue }) =>
@@ -1498,5 +1530,6 @@ const SEllipseButtonMobile = styled(Button)`
   &:hover:enabled,
   &:focus:enabled {
     background: transparent;
+    box-shadow: none;
   }
 `;

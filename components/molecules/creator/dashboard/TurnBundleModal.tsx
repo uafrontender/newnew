@@ -1,14 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import Modal from '../../../organisms/Modal';
-import ModalPaper from '../../../organisms/ModalPaper';
+import ModalPaper, { SContent } from '../../../organisms/ModalPaper';
 import Button from '../../../atoms/Button';
-import votes from '../../../../public/images/dashboard/double-votes.png';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import assets from '../../../../constants/assets';
 
 interface ITurnBundleModal {
   show: boolean;
@@ -21,21 +22,21 @@ interface ITurnBundleModal {
 const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
   ({ show, isBundlesEnabled, zIndex, onClose, onToggleBundles }) => {
     const { t } = useTranslation('page-Creator');
+    const theme = useTheme();
 
     return (
       <>
         <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
           <SModalPaper onClose={onClose} isCloseButton>
             <Content>
-              {/* TODO: replace with TicketSet component, remove icon */}
-              <SImgHolder>
-                <img
-                  src={votes.src}
-                  alt={t('dashboard.aboutBundles.title')}
-                  width={188}
-                  height={144}
-                />
-              </SImgHolder>
+              <SBundlesImage
+                src={
+                  theme.name === 'light'
+                    ? assets.bundles.lightBundles
+                    : assets.bundles.darkBundles
+                }
+                alt={t('dashboard.aboutBundles.title')}
+              />
               <STitle variant={4}>
                 {isBundlesEnabled === true
                   ? t('myBundles.modals.turnoff.title')
@@ -48,7 +49,16 @@ const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
               </SText>
               <SButton
                 id='turn-on-bundles-modal-button'
-                onClick={onToggleBundles}
+                view={isBundlesEnabled ? 'quaternary' : 'brandYellow'}
+                onClick={() => {
+                  Mixpanel.track(
+                    isBundlesEnabled ? 'Turn Off Bundles' : 'Turn On Bundles',
+                    {
+                      _stage: 'Dashboard',
+                    }
+                  );
+                  onToggleBundles();
+                }}
                 enabled={isBundlesEnabled}
                 disabled={isBundlesEnabled === undefined}
               >
@@ -71,9 +81,19 @@ const SModalPaper = styled(ModalPaper)`
   padding: 24px;
   margin: 16px;
 
+  ${SContent} {
+    padding: 24px;
+    margin: -24px;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     padding: 32px;
     max-width: 500px;
+
+    ${SContent} {
+      padding: 32px;
+      margin: -32px;
+    }
   }
 `;
 
@@ -90,39 +110,18 @@ const SButton = styled(Button)<ISButton>`
   width: 100%;
   margin-left: 0;
   padding: 16px 20px;
-  background: ${(props) =>
-    !props.enabled
-      ? props.theme.colorsThemed.accent.yellow
-      : props.theme.colorsThemed.background.tertiary};
-  color: ${(props) =>
-    !props.enabled
-      ? props.theme.colors.darkGray
-      : props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
+    // TODO: Is margin needed?
     margin-left: 10px;
-  }
-  &:focus,
-  &:active,
-  &:hover {
-    background: ${(props) =>
-      !props.enabled
-        ? props.theme.colorsThemed.accent.yellow
-        : props.theme.colorsThemed.background.tertiary} !important;
-    color: ${(props) =>
-      !props.enabled
-        ? props.theme.colors.darkGray
-        : props.theme.name === 'light'
-        ? props.theme.colorsThemed.text.primary
-        : props.theme.colors.white} !important;
   }
 `;
 
-const SImgHolder = styled.div`
+const SBundlesImage = styled.img`
+  width: 200px;
+  height: 200px;
   margin: 38px 0 30px;
 `;
 

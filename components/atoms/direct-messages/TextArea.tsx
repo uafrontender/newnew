@@ -37,7 +37,10 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   const { mobileChatOpened } = useGetChats();
 
   const isDashboard = useMemo(() => {
-    if (router.asPath.includes('/creator/dashboard')) {
+    if (
+      router.asPath.includes('/creator/dashboard') ||
+      router.asPath.includes('/creator/bundles')
+    ) {
       return true;
     }
     return false;

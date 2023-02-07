@@ -59,6 +59,7 @@ import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
+import { Mixpanel } from '../../utils/mixpanel';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -187,15 +188,25 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     bioError: '',
   });
 
+  const validateUsernameAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
   const validateUsernameViaAPI = useCallback(
     async (text: string) => {
+      if (validateUsernameAbortControllerRef.current) {
+        validateUsernameAbortControllerRef.current?.abort();
+      }
+      validateUsernameAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateUsernameRequest({
           username: text,
         });
 
-        const res = await validateUsernameTextField(payload);
+        const res = await validateUsernameTextField(
+          payload,
+          validateUsernameAbortControllerRef.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
@@ -241,8 +252,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     [validateUsernameViaAPI]
   );
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(
     async (kind: newnewapi.ValidateTextRequest.Kind, text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -250,7 +266,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           text: text.trim(),
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
 
@@ -957,7 +976,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </ProfileGeneralContent>
             <SControlsWrapper>
               {!isMobile ? (
-                <Button view='secondary' onClick={() => handleClose()}>
+                <Button
+                  view='secondary'
+                  onClick={() => handleClose()}
+                  onClickCapture={() => {
+                    Mixpanel.track('Click Cancel Editing Profile Button', {
+                      _stage: 'MyProfile',
+                      _component: 'EditProfileMenu',
+                    });
+                  }}
+                >
                   {t('editProfileMenu.button.cancel')}
                 </Button>
               ) : null}
@@ -971,6 +999,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => handleUpdateUserData()}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Profile Changes Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.save')}
               </Button>
@@ -1058,6 +1092,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 view='secondary'
                 disabled={updateProfileImageLoading}
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Cancel Profile Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.cancel')}
               </Button>
@@ -1065,6 +1105,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 withShadow
                 disabled={updateProfileImageLoading}
                 onClick={completeProfileImageCropAndSave}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Profile Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.save')}
               </Button>

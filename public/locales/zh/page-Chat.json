@@ -70,7 +70,8 @@
     "text": "只有你能向該組群發訊息。",
     "created": "你創建了公告",
     "member": "成員",
-    "members": "成員"
+    "members": "成員",
+    "noAnnouncement_NEED_TRANSLATION": "No announcements here yet..."
   },
   "default": {
     "searchPlaceholder": "搜索"

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -11,6 +11,7 @@ import assets from '../../../../constants/assets';
 import AnimatedBackground from '../../../atoms/AnimationBackground';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import { formatNumber } from '../../../../utils/format';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IPaymentSuccessModal {
   postType: TPostType;
@@ -30,6 +31,14 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const theme = useTheme();
+
+  const handleCloseModalMixpanel = useCallback(() => {
+    Mixpanel.track('Close Payment Success Modal', {
+      _stage: 'Payment',
+      _component: 'PaymentSuccessModal',
+    });
+    closeModal();
+  }, [closeModal]);
 
   function getModalImage(type: TPostType) {
     switch (type) {
@@ -82,9 +91,9 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   }
 
   return (
-    <Modal show={isVisible} additionalz={14} onClose={closeModal}>
+    <Modal show={isVisible} additionalz={14} onClose={handleCloseModalMixpanel}>
       {postType === 'mc' ? (
-        <AnimatedBackground src={assets.common.vote} alt='vote' />
+        <AnimatedBackground src={assets.decision.votes} alt='vote' />
       ) : (
         <AnimatedBackground src={assets.decision.gold} alt='coin' />
       )}
@@ -106,7 +115,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
           <SModalMessage>{children}</SModalMessage>
           <SDoneButton
             id='paymentSuccess'
-            onClick={closeModal}
+            onClick={handleCloseModalMixpanel}
             view='primaryGrad'
           >
             {t('paymentSuccessModal.doneButton')}

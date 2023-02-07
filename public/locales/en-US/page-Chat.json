@@ -65,12 +65,14 @@
     "title": "Your inbox is empty",
     "text": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
   },
+  "selectChat": "Select a chat to start messaging",
   "newAnnouncement": {
     "title": "New announcement",
     "text": "Only you can send messages to the group.",
     "created": "You created the announcement",
     "member": "member",
-    "members": "members"
+    "members": "members",
+    "noAnnouncement": "No announcements here yet..."
   },
   "default": {
     "searchPlaceholder": "Search"

@@ -24,12 +24,13 @@ import CheckMark from '../CheckMark';
 import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 import { formatNumber } from '../../../utils/format';
-import { useCards } from '../../../contexts/cardsContext';
+import useCards from '../../../utils/hooks/useCards';
 import { useAppSelector } from '../../../redux-store/store';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -72,13 +73,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const [emailError, setEmailError] = useState('');
 
   const elements = useElements();
-  const { cards } = useCards();
+  const { primaryCard } = useCards();
   const stripe = useStripe();
-
-  const primaryCard = useMemo(
-    () => cards?.find((card) => card.isPrimary),
-    [cards]
-  );
 
   useEffect(() => {
     if (!selectedPaymentMethod && primaryCard) {
@@ -196,6 +192,12 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   return (
     <SForm
       id='checkout-form'
+      onSubmitCapture={() => {
+        Mixpanel.track('Submit Checkout Form', {
+          _stage: 'Payment',
+          _component: 'CheckoutForm',
+        });
+      }}
       onSubmit={(e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (userData?.options?.isWhiteListed) {

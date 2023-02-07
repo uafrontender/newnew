@@ -33,6 +33,7 @@ import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
+import { Mixpanel } from '../../../../../utils/mixpanel';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -81,13 +82,96 @@ const McOptionCardModeration: React.FunctionComponent<
     return option.supporterCount - 1;
   }, [option.supporterCount]);
 
+  // Ellipse menu
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const handleOpenEllipseMenuBlockScroll = useCallback(() => {
+    Mixpanel.track('Open Ellipse Menu Block Scroll', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsEllipseMenuOpen(true);
+    handleSetScrollBlocked?.();
+  }, [handleSetScrollBlocked, option?.id]);
+
+  const handleOpenEllipseMenu = useCallback(() => {
+    Mixpanel.track('Open Ellipse Menu', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsEllipseMenuOpen(true);
+  }, [option?.id]);
+
+  const handleCloseEllipseMenuUnblockScroll = useCallback(() => {
+    Mixpanel.track('Close Ellipse Menu Unblock Scroll', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsEllipseMenuOpen(false);
+    handleUnsetScrollBlocked?.();
+  }, [handleUnsetScrollBlocked, option?.id]);
+
+  const handleCloseEllipseMenu = useCallback(() => {
+    Mixpanel.track('Close Ellipse Menu', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsEllipseMenuOpen(false);
+  }, [option?.id]);
+
+  // Block user
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+
+  const handleOpenBlockModal = useCallback(() => {
+    Mixpanel.track('Open Block Modal', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsBlockModalOpen(true);
+  }, [option?.id]);
+
+  const handleCloseBlockModal = useCallback(() => {
+    Mixpanel.track('Close Block Modal', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsBlockModalOpen(false);
+  }, [option?.id]);
+
+  // Delete option
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleConfirmDelete = async () => {
+  const handleOpenDeleteModal = useCallback(() => {
+    Mixpanel.track('Open delete option modal', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsDeleteModalOpen(true);
+  }, [option?.id]);
+
+  const handleCloseDeleteModal = useCallback(() => {
+    Mixpanel.track('Close delete option modal', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsDeleteModalOpen(false);
+  }, [option?.id]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    Mixpanel.track('Confirm delete option', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+
     try {
       const payload = new newnewapi.DeleteMcOptionRequest({
         optionId: option.id,
@@ -103,18 +187,40 @@ const McOptionCardModeration: React.FunctionComponent<
       console.error(err);
       showErrorToastPredefined(undefined);
     }
-  };
+  }, [handleRemoveOption, option.id, showErrorToastPredefined]);
+
+  // Report option
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
+      Mixpanel.track('Submit report option', {
+        _stage: 'Post',
+        _optionId: option?.id,
+        _component: 'McOptionCardModeration',
+      });
       await reportSuperpollOption(option.id, reasons, message);
     },
     [option.id]
   );
 
+  const handleReportOpen = useCallback(() => {
+    Mixpanel.track('Open Report Modal', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
+    setIsReportModalOpen(true);
+  }, [option?.id]);
+
   const handleReportClose = useCallback(() => {
+    Mixpanel.track('Close Report Modal', {
+      _stage: 'Post',
+      _optionId: option?.id,
+      _component: 'McOptionCardModeration',
+    });
     setIsReportModalOpen(false);
-  }, []);
+  }, [option?.id]);
 
   const ellipseMenuButton: any = useRef();
 
@@ -180,10 +286,7 @@ const McOptionCardModeration: React.FunctionComponent<
           </SBidDetails>
           {!isMobile ? (
             <SEllipseButton
-              onClick={() => {
-                setIsEllipseMenuOpen(true);
-                handleSetScrollBlocked?.();
-              }}
+              onClick={handleOpenEllipseMenuBlockScroll}
               ref={ellipseMenuButton}
             >
               <InlineSvg
@@ -197,7 +300,7 @@ const McOptionCardModeration: React.FunctionComponent<
             <SEllipseButtonMobile
               ref={ellipseMenuButton}
               isWhite={!!isWinner}
-              onClick={() => setIsEllipseMenuOpen(true)}
+              onClick={handleOpenEllipseMenu}
             >
               {t('mcPost.optionsTab.optionCard.moreButton')}
             </SEllipseButtonMobile>
@@ -209,13 +312,10 @@ const McOptionCardModeration: React.FunctionComponent<
               canDeleteOptionInitial={canBeDeleted && !isWinner}
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
-              handleClose={() => {
-                setIsEllipseMenuOpen(false);
-                handleUnsetScrollBlocked?.();
-              }}
-              handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-              handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-              handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+              handleClose={handleCloseEllipseMenuUnblockScroll}
+              handleOpenReportOptionModal={handleReportOpen}
+              handleOpenBlockUserModal={handleOpenBlockModal}
+              handleOpenRemoveOptionModal={handleOpenDeleteModal}
               handleUnblockUser={() =>
                 changeUserBlockedStatus(option.creator?.uuid, false)
               }
@@ -228,7 +328,7 @@ const McOptionCardModeration: React.FunctionComponent<
       {/* Delete option */}
       <McConfirmDeleteOptionModal
         isVisible={isDeleteModalOpen}
-        closeModal={() => setIsDeleteModalOpen(false)}
+        closeModal={handleCloseDeleteModal}
         handleConfirmDelete={handleConfirmDelete}
       />
       {/* Ellipse modal */}
@@ -236,14 +336,14 @@ const McOptionCardModeration: React.FunctionComponent<
         <McOptionCardModerationEllipseModal
           isOpen={isEllipseMenuOpen}
           zIndex={16}
-          onClose={() => setIsEllipseMenuOpen(false)}
+          onClose={handleCloseEllipseMenu}
           isBySubscriber={!isCreatorsBid}
           isUserBlocked={isUserBlocked}
           canDeleteOptionInitial={canBeDeleted && !isWinner}
           optionId={option.id as number}
-          handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-          handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-          handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          handleOpenReportOptionModal={handleReportOpen}
+          handleOpenBlockUserModal={handleOpenBlockModal}
+          handleOpenRemoveOptionModal={handleOpenDeleteModal}
           handleUnblockUser={() =>
             changeUserBlockedStatus(option.creator?.uuid, false)
           }
@@ -254,7 +354,7 @@ const McOptionCardModeration: React.FunctionComponent<
         <BlockUserModalPost
           confirmBlockUser={isBlockModalOpen}
           user={option.creator!!}
-          closeModal={() => setIsBlockModalOpen(false)}
+          closeModal={handleCloseBlockModal}
         />
       )}
       {/* Report modal */}
@@ -427,6 +527,7 @@ const SEllipseButton = styled(Button)`
   &:focus:enabled {
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
+    box-shadow: none;
   }
 
   span {

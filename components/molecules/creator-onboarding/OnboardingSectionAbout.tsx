@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -23,6 +29,7 @@ import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import isSafari from '../../../utils/isSafari';
 import { I18nNamespaces } from '../../../@types/i18next';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -73,8 +80,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateBioViaApi = useCallback(
     async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -82,7 +94,10 @@ const OnboardingSectionAbout: React.FunctionComponent<
           text,
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
+        );
 
         if (!res.data?.status) throw new Error('An error occurred');
 
@@ -129,6 +144,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
 
   const handleSubmit = useCallback(async () => {
     try {
+      Mixpanel.track('Submit Bio', {
+        _stage: 'Onboarding',
+        _button: 'Save Changes',
+        _component: 'OnboardingSectionAbout',
+      });
+
       setLoadingModalOpen(true);
 
       const updateBioPayload = new newnewapi.UpdateMeRequest({
@@ -228,7 +249,17 @@ const OnboardingSectionAbout: React.FunctionComponent<
         </STopContainer>
         <SControlsDiv>
           {!isMobile && (
-            <GoBackButton noArrow onClick={() => router.back()}>
+            <GoBackButton
+              noArrow
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Onboarding',
+                  _button: 'Close',
+                  _component: 'OnboardingSectionAbout',
+                });
+                router.back();
+              }}
+            >
               {t('aboutSection.button.back')}
             </GoBackButton>
           )}

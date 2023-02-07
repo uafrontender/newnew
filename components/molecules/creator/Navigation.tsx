@@ -14,6 +14,7 @@ import bundlesFilledIcon from '../../../public/images/svg/icons/filled/Bundles.s
 import bundlesOutlinedIcon from '../../../public/images/svg/icons/outlined/Bundles.svg';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface NavigationItem {
   id?: string;
@@ -70,7 +71,17 @@ export const Navigation = () => {
       const active = router.route.includes(item.url);
       return (
         <Link key={item.url} href={item.url}>
-          <SItem id={item.id} active={active}>
+          <SItem
+            id={item.id}
+            active={active}
+            onClickCapture={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _stage: 'Dashboard',
+                _component: 'Navigation',
+                _target: item.url,
+              });
+            }}
+          >
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
               fill={
@@ -98,7 +109,18 @@ export const Navigation = () => {
       {collection.map(renderItem)}
       <Link href='/creation'>
         <a>
-          <Button>{t('navigation.newPost')}</Button>
+          <Button
+            onClickCapture={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _button: 'Make a decision',
+                _stage: 'Dashboard',
+                _component: 'Navigation',
+                _target: '/creation',
+              });
+            }}
+          >
+            {t('navigation.newPost')}
+          </Button>
         </a>
       </Link>
     </SContainer>

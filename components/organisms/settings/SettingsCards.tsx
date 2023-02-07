@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -13,7 +13,7 @@ import Lottie from '../../atoms/Lottie';
 import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import assets from '../../../constants/assets';
-import { useCards } from '../../../contexts/cardsContext';
+import useCards from '../../../utils/hooks/useCards';
 import { useAppSelector } from '../../../redux-store/store';
 import useHorizontalDraggableScroll from '../../../utils/hooks/useHorizontalDraggableScroll';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -23,7 +23,7 @@ interface ISettingsCards {}
 const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
-  const { cards, isCardsLoading, handleSetCards, fetchCards } = useCards();
+  const { cards, isCardsLoading } = useCards();
   const user = useAppSelector((state) => state.user);
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
@@ -33,32 +33,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
       _stage: 'Settings',
     });
     setIsAddCardModal(true);
-  };
-
-  useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
-
-  const changePrimaryCard = (cardUuid: string) => {
-    if (cards) {
-      let newCardsList = cards;
-      const newPrimaryCard = cards.find(
-        (cardEl) => cardEl.cardUuid === cardUuid
-      );
-
-      newCardsList = cards.map((cardEl) => {
-        if (cardEl.cardUuid === newPrimaryCard?.cardUuid) {
-          return { ...cardEl, isPrimary: true };
-        }
-
-        return {
-          ...cardEl,
-          isPrimary: false,
-        };
-      }) as newnewapi.Card[];
-
-      handleSetCards(newCardsList);
-    }
   };
 
   const cardsWithFirstPrimary = useMemo(
@@ -186,8 +160,6 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                         ]
                   }
                   disabledForActions={!!user.userData?.options?.isWhiteListed}
-                  onChangePrimaryCard={changePrimaryCard}
-                  onCardDelete={fetchCards}
                 />
               </SCardListItem>
             ))}

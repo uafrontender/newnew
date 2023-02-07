@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -134,12 +140,19 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    if (isAPIValidateLoading) return;
+    if (isAPIValidateLoading) {
+      return;
+    }
     setPaymentModalOpen(true);
   };
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(async (text: string) => {
     setIsAPIValidateLoading(true);
+    if (validateTextAbortControllerRef.current) {
+      validateTextAbortControllerRef.current?.abort();
+    }
+    validateTextAbortControllerRef.current = new AbortController();
     try {
       const payload = new newnewapi.ValidateTextRequest({
         // NB! temp
@@ -147,7 +160,10 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         text,
       });
 
-      const res = await validateText(payload);
+      const res = await validateText(
+        payload,
+        validateTextAbortControllerRef?.current?.signal
+      );
 
       if (!res.data?.status) throw new Error('An error occurred');
 
@@ -242,7 +258,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         return;
       }
 
-      Mixpanel.track('PayWithCard', {
+      Mixpanel.track('Pay With Card', {
         _stage: 'Post',
         _postUuid: postUuid,
         _component: 'AcOptionsTab',

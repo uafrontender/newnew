@@ -172,6 +172,15 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   // Bundle modal
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
+  const handleClickBuyBundlesButton = useCallback(() => {
+    Mixpanel.track('Click Buy Bundles Button', {
+      _stage: 'Post',
+      _postUuid: post.postUuid,
+      _component: 'PostViewMC',
+    });
+    setBuyBundleModalOpen(true);
+  }, [post.postUuid]);
+
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
@@ -180,7 +189,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     processedOptions: options,
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
-    refetch: refetchOptions,
+    addOrUpdateMcOptionMutation,
+    removeMcOptionMutation,
   } = useMcOptions(
     {
       postUuid: post.postUuid,
@@ -191,21 +201,22 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       onError: (err) => {
         showErrorToastCustom((err as Error).message);
       },
+      refetchOnWindowFocus: user.loggedIn,
     }
   );
 
   const handleAddOrUpdateOptionFromResponse = useCallback(
     async (newOrUpdatedption: newnewapi.MultipleChoice.Option) => {
-      await refetchOptions();
+      addOrUpdateMcOptionMutation?.mutate(newOrUpdatedption);
     },
-    [refetchOptions]
+    [addOrUpdateMcOptionMutation]
   );
 
   const handleRemoveOption = useCallback(
     async (optionToRemove: newnewapi.MultipleChoice.Option) => {
-      await refetchOptions();
+      removeMcOptionMutation?.mutate(optionToRemove);
     },
-    [refetchOptions]
+    [removeMcOptionMutation]
   );
 
   const fetchPostLatestData = useCallback(async () => {
@@ -267,7 +278,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
       if (decoded.option && decoded.postUuid === post.postUuid) {
-        refetchOptions();
+        addOrUpdateMcOptionMutation?.mutate(decoded.option);
       }
     };
 
@@ -276,7 +287,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       const decoded = newnewapi.McOptionDeleted.decode(arr);
 
       if (decoded.optionId) {
-        await refetchOptions();
+        removeMcOptionMutation?.mutate({
+          id: decoded.optionId,
+        });
         await fetchPostLatestData();
       }
     };
@@ -334,7 +347,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
       isVoteMadeAfterRedirect.current = true;
 
-      Mixpanel.track('MakeVoteAfterStripeRedirect', {
+      Mixpanel.track('Make Vote After Stripe Redirect', {
         _stage: 'Post',
         _postUuid: post.postUuid,
         _component: 'PostViewMC',
@@ -619,10 +632,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             postType='mc'
             isVisible={paymentSuccessModalOpen}
             closeModal={() => {
-              Mixpanel.track('Close Payment Success Modal', {
-                _stage: 'Post',
-                _postUuid: post.postUuid,
-              });
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
             }}
@@ -662,9 +671,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           <SHighlightedButton
             id='buy-bundle-button'
             size='small'
-            onClick={() => {
-              setBuyBundleModalOpen(true);
-            }}
+            onClick={handleClickBuyBundlesButton}
           >
             {creatorsBundle?.bundle
               ? t('mcPost.optionsTab.actionSection.getBundles')

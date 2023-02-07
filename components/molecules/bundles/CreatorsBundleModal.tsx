@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useMemo } from 'react';
+import React, { useMemo, Fragment } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
-import ModalPaper from '../../organisms/ModalPaper';
+import ModalPaper, { SContent } from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
@@ -56,7 +56,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
             isCloseButton
           >
             <Content>
-              <BundleIcon src={assets.common.vote} alt='votes' />
+              <SBundleIcon src={assets.decision.votes} alt='votes' />
               <SVotesAvailable>
                 <Trans
                   t={t}
@@ -78,7 +78,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   avatarUrl={creatorBundle?.creator?.avatarUrl ?? ''}
                 />
                 <SForLine>
-                  {t('modal.creatorsBundle.for')}
+                  <span>{t('modal.creatorsBundle.for')}</span>
                   <Link href={`/${creatorBundle?.creator?.username}`}>
                     <SUserName
                       onClick={() => {
@@ -104,30 +104,42 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 </SForLine>
               </SUserInfo>
               <SBundleInfo>
-                <AccessDescription>
-                  <Trans
-                    t={t}
-                    i18nKey='modal.creatorsBundle.access'
-                    // @ts-ignore
-                    components={[
-                      <>
-                        {formattedTimeLeft?.map((time, index) => (
+                {formattedTimeLeft ? (
+                  <>
+                    <AccessDescription>
+                      <Trans
+                        t={t}
+                        i18nKey='modal.creatorsBundle.access'
+                        // @ts-ignore
+                        components={[
                           <>
-                            {index > 0 ? t('modal.creatorsBundle.and') : null}
-                            {t('modal.creatorsBundle.unitPair', {
-                              amount: time.value,
-                              unit: t(`modal.creatorsBundle.unit.${time.unit}`),
-                            })}
-                          </>
-                        ))}
-                      </>,
-                    ]}
-                  />
-                </AccessDescription>
-                <BulletLine>
-                  {t('modal.creatorsBundle.customOptions')}
-                </BulletLine>
-                <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
+                            {formattedTimeLeft?.map((time, index) => (
+                              <Fragment key={index}>
+                                {index > 0
+                                  ? t('modal.creatorsBundle.and')
+                                  : null}
+                                {t('modal.creatorsBundle.unitPair', {
+                                  amount: time.value,
+                                  unit: t(
+                                    `modal.creatorsBundle.unit.${time.unit}`
+                                  ),
+                                })}
+                              </Fragment>
+                            ))}
+                          </>,
+                        ]}
+                      />
+                    </AccessDescription>
+                    <BulletLine>
+                      {t('modal.creatorsBundle.customOptions')}
+                    </BulletLine>
+                    <BulletLine>{t('modal.creatorsBundle.chat')}</BulletLine>
+                  </>
+                ) : (
+                  <AccessDescription>
+                    {t('modal.creatorsBundle.accessExpired')}
+                  </AccessDescription>
+                )}
               </SBundleInfo>
               {creatorBundle.creator?.options?.isOfferingBundles &&
                 !isBlocked && (
@@ -149,6 +161,11 @@ const SModalPaper = styled(ModalPaper)`
   width: 100%;
   padding: 32px 48px;
 
+  ${SContent} {
+    padding: 32px 48px;
+    margin: -32px -48px;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     max-width: 500px;
   }
@@ -160,7 +177,7 @@ const Content = styled.div`
   align-items: center;
 `;
 
-const BundleIcon = styled.img`
+const SBundleIcon = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 30px;
@@ -200,7 +217,7 @@ const SUserAvatar = styled(UserAvatar)`
   margin-right: 8px;
 `;
 
-const SForLine = styled.p`
+const SForLine = styled.div`
   display: inline-flex;
   white-space: pre;
   overflow: hidden;
@@ -210,7 +227,7 @@ const SForLine = styled.p`
   line-height: 24px;
 `;
 
-const SUserName = styled.p`
+const SUserName = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;

@@ -149,7 +149,7 @@ const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
 }) => {
   // const width = useMemo(() => Math.random() * 170, []);
   const width = useMemo(() => Math.random() * 170, []);
-  const speed = useMemo(() => Math.random() * index + 1 * 8, [index]);
+  const speed = useMemo(() => Math.random() * index + 1 * 4, [index]);
 
   return (
     <SIcon

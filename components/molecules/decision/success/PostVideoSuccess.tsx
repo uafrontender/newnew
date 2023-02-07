@@ -152,6 +152,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             />
           ) : (
             <PostVideoResponsesSlider
+              isDeletingAdditionalResponse={false}
               videos={[response, ...additionalResponses]}
               isMuted={isMuted}
             />

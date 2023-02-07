@@ -17,11 +17,13 @@ import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import moment from 'moment-timezone';
 import countries from 'i18n-iso-countries';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 // Custom error page
 import Error from './_error';
@@ -52,7 +54,6 @@ import SyncUserWrapper from '../contexts/syncUserWrapper';
 import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
-import CardsContextProvider from '../contexts/cardsContext';
 import PushNotificationContextProvider from '../contexts/pushNotificationsContext';
 
 // Images to be prefetched
@@ -84,6 +85,30 @@ interface IMyApp extends AppProps {
 }
 
 const queryClient = new QueryClient();
+
+// Loader
+const NO_LOADER_ROUTES = [
+  '/creator/dashboard?tab=chat',
+  '/creator/dashboard?tab=notifications',
+];
+
+NProgress.configure({ showSpinner: false, trickleSpeed: 300, speed: 500 });
+
+Router.events.on('routeChangeStart', (url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.start();
+  }
+});
+Router.events.on('routeChangeComplete', (url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.done();
+  }
+});
+Router.events.on('routeChangeError', (err, url) => {
+  if (!NO_LOADER_ROUTES.includes(url)) {
+    NProgress.done();
+  }
+});
 
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
@@ -228,49 +253,44 @@ const MyApp = (props: IMyApp): ReactElement => {
                             <PushNotificationContextProvider>
                               <BlockedUsersProvider>
                                 <FollowingsContextProvider>
-                                  <CardsContextProvider>
-                                    <BundlesContextProvider>
-                                      <ChatsProvider>
-                                        <OverlayModeProvider>
-                                          <MultipleBeforePopStateContextProvider>
-                                            <ResizeMode>
-                                              <GlobalTheme
-                                                initialTheme={colorMode}
-                                                themeFromCookie={
-                                                  themeFromCookie
-                                                }
-                                              >
-                                                <>
-                                                  <ToastContainer containerId='toast-container' />
-                                                  <VideoProcessingWrapper>
-                                                    {!pageProps.error ? (
-                                                      getLayout(
-                                                        <Component
-                                                          {...pageProps}
-                                                        />
-                                                      )
-                                                    ) : (
-                                                      <Error
-                                                        title={
-                                                          pageProps.error
-                                                            ?.message
-                                                        }
-                                                        statusCode={
-                                                          pageProps.error
-                                                            ?.statusCode ?? 500
-                                                        }
+                                  <BundlesContextProvider>
+                                    <ChatsProvider>
+                                      <OverlayModeProvider>
+                                        <MultipleBeforePopStateContextProvider>
+                                          <ResizeMode>
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
                                                       />
-                                                    )}
-                                                    <PushNotificationModalContainer />
-                                                  </VideoProcessingWrapper>
-                                                </>
-                                              </GlobalTheme>
-                                            </ResizeMode>
-                                          </MultipleBeforePopStateContextProvider>
-                                        </OverlayModeProvider>
-                                      </ChatsProvider>
-                                    </BundlesContextProvider>
-                                  </CardsContextProvider>
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                  <PushNotificationModalContainer />
+                                                </VideoProcessingWrapper>
+                                              </>
+                                            </GlobalTheme>
+                                          </ResizeMode>
+                                        </MultipleBeforePopStateContextProvider>
+                                      </OverlayModeProvider>
+                                    </ChatsProvider>
+                                  </BundlesContextProvider>
                                 </FollowingsContextProvider>
                               </BlockedUsersProvider>
                             </PushNotificationContextProvider>
@@ -395,6 +415,7 @@ const PRE_FETCH_LINKS_COMMON = (
     />
     {/* Common */}
     <link rel='prefetch' href={assets.common.vote} as='image' />
+    <link rel='prefetch' href={assets.decision.votes} as='image' />
   </>
 );
 
@@ -454,6 +475,11 @@ const PRE_FETCH_LINKS_DARK = (
     <link rel='prefetch' href={assets.common.ac.darkAcStatic} as='image' />
     <link rel='prefetch' href={assets.common.mc.darkMcStatic} as='image' />
     {/* <link rel='prefetch' href={assets.creation.darkCfStatic} as='image' /> */}
+    {/* Bundle assets (static is not used yet, preload when used) */}
+    <link rel='prefetch' href={assets.bundles.darkBundles} as='image' />
+    {assets.bundles.darkVotes.map((asset) => (
+      <link rel='prefetch' href={asset.animated()} as='image' />
+    ))}
   </>
 );
 
@@ -517,5 +543,10 @@ const PRE_FETCH_LINKS_LIGHT = (
     <link rel='prefetch' href={assets.common.ac.lightAcStatic} as='image' />
     <link rel='prefetch' href={assets.common.mc.lightMcStatic} as='image' />
     {/* <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' /> */}
+    {/* Bundle assets (static is not used yet, preload when used) */}
+    <link rel='prefetch' href={assets.bundles.lightBundles} as='image' />
+    {assets.bundles.lightVotes.map((asset) => (
+      <link rel='prefetch' href={asset.animated()} as='image' />
+    ))}
   </>
 );

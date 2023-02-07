@@ -144,6 +144,10 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
   }, [getTime, videoDuration]);
 
   const handleVideoSelectDragStart = useCallback(() => {
+    if (progressRef.current) {
+      return;
+    }
+
     const { left, width } = progressRef.current.getBoundingClientRect();
     const initialPoint = window.innerWidth / 2 - 36;
     const percentage = ((initialPoint - left) * 100) / width;
@@ -190,7 +194,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
       if (playerRef.current.getCurrentTime() >= videoThumbs.current.endTime) {
         playerRef.current.pause();
         playerRef.current.seek(videoThumbs.current.startTime);
-        playerRef.current.play();
+        playerRef.current.play().catch(() => {});
       }
     };
     playerRef.current.pause();
@@ -198,7 +202,7 @@ export const PostVideoThumbnailEdit: React.FC<IPostVideoThumbnailEdit> = ({
     playerRef.current.handleTimeChange = handleTimeChange;
 
     playerRef.current.seek(videoThumbs.current.startTime);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {});
   }, [getTime, videoDuration, setCurrentTime]);
 
   const getInitialXPosition = useCallback(() => {

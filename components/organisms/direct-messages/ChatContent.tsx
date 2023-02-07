@@ -11,7 +11,7 @@ import React, {
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
@@ -27,6 +27,7 @@ import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
+import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 /* Components */
 import Button from '../../atoms/Button';
@@ -34,6 +35,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import TextArea from '../../atoms/direct-messages/TextArea';
 import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader';
 import { useGetChats } from '../../../contexts/chatContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -124,7 +126,13 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
   const onUserBlock = useCallback(() => {
     if (!isVisavisBlocked) {
-      if (!confirmBlockUser) setConfirmBlockUser(true);
+      if (!confirmBlockUser) {
+        Mixpanel.track('Block User Modal Opened', {
+          _stage: 'Direct Messages',
+          _component: 'ChatContent',
+        });
+        setConfirmBlockUser(true);
+      }
     } else {
       changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
     }
@@ -169,10 +177,16 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, [chatRoom, messageTextValid, messageText, setJustSentMessage]);
 
   const handleSubmit = useCallback(() => {
+    Mixpanel.track('Send Message Button Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'ChatContent',
+      _roomId: chatRoom.id,
+    });
+
     if (!sendingMessage) {
       submitMessage();
     }
-  }, [sendingMessage, submitMessage]);
+  }, [sendingMessage, submitMessage, chatRoom.id]);
 
   const handleChange = useCallback(
     (id: string, value: string, isShiftEnter: boolean) => {
@@ -241,7 +255,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, []);
 
   return (
-    <SContainer>
+    <SContainer isTextareaHidden={isTextareaHidden}>
       <ChatContentHeader
         chatRoom={chatRoom}
         isVisavisBlocked={isVisavisBlocked}
@@ -255,16 +269,20 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
         textareaFocused={textareaFocused}
       />
       <SBottomPart>
-        {(isVisavisBlocked === true || confirmBlockUser) &&
-          chatRoom.visavis && (
-            <BlockedUser
-              confirmBlockUser={confirmBlockUser}
-              isBlocked={isVisavisBlocked}
-              user={chatRoom.visavis}
-              onUserBlock={onUserBlock}
-              closeModal={() => setConfirmBlockUser(false)}
-            />
-          )}
+        {(isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis && (
+          <BlockedUser
+            confirmBlockUser={confirmBlockUser}
+            isBlocked={isVisavisBlocked}
+            user={chatRoom.visavis}
+            onUserBlock={onUserBlock}
+            closeModal={() => {
+              Mixpanel.track('Close Block User Modal', {
+                _stage: 'Direct Messages',
+              });
+              setConfirmBlockUser(false);
+            }}
+          />
+        )}
         {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>
@@ -281,10 +299,14 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
               withShadow
               view={messageTextValid ? 'primaryGrad' : 'secondary'}
               onClick={handleSubmit}
-              disabled={!messageTextValid || messageText.length < 1}
+              loading={sendingMessage}
+              loadingAnimationColor='blue'
+              disabled={
+                sendingMessage || !messageTextValid || messageText.length < 1
+              }
             >
               <SInlineSVG
-                svg={sendIcon}
+                svg={!sendingMessage ? sendIcon : ''}
                 fill={
                   messageTextValid && messageText.length > 0
                     ? theme.colors.white
@@ -321,7 +343,9 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
 export default ChatContent;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  isTextareaHidden: boolean;
+}>`
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -333,6 +357,13 @@ const SContainer = styled.div`
   ${(props) => props.theme.media.tablet} {
     padding: 0;
     flex-shrink: unset;
+
+    ${({ isTextareaHidden }) =>
+      isTextareaHidden
+        ? css`
+            padding-bottom: 60px;
+          `
+        : null}
   }
 `;
 

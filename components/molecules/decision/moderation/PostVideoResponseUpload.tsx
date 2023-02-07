@@ -57,6 +57,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState<File | null>(null);
+  const [showPlayButton, setShowPlayButton] = useState(false);
 
   const handleButtonClick = useCallback(() => {
     Mixpanel.track('Post Video Response Upload', {
@@ -72,7 +73,10 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
 
   const handleCloseDeleteVideoClick = useCallback(() => {
     setShowVideoDelete(false);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
+    setShowPlayButton(true);
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
@@ -201,12 +205,14 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
                 progress: responseFileUploadProgress,
               })}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => handleCancelUploadAndClearLocalFile()}
-            >
-              {t('postVideo.uploadResponseForm.button.cancel')}
-            </SLoadingBottomBlockButton>
+            {responseFileUploadProgress !== 100 ? (
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={() => handleCancelUploadAndClearLocalFile()}
+              >
+                {t('postVideo.uploadResponseForm.button.cancel')}
+              </SLoadingBottomBlockButton>
+            ) : null}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={responseFileUploadProgress} />
@@ -291,6 +297,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               resources={value}
               thumbnails={{}}
               borderRadius='8px'
+              showPlayButton={showPlayButton}
             />
           </SPlayerWrapper>
           <SButtonsContainer>
@@ -325,6 +332,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     handleRetryVideoUpload,
     value,
     handleDeleteVideoShow,
+    showPlayButton,
   ]);
 
   return (

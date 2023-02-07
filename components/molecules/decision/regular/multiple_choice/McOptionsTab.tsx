@@ -157,7 +157,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
   // Handlers
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(async (text: string) => {
+    if (validateTextAbortControllerRef.current) {
+      validateTextAbortControllerRef.current?.abort();
+    }
+    validateTextAbortControllerRef.current = new AbortController();
     setIsAPIValidateLoading(true);
     try {
       const payload = new newnewapi.ValidateTextRequest({
@@ -166,7 +171,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         text,
       });
 
-      const res = await validateText(payload);
+      const res = await validateText(
+        payload,
+        validateTextAbortControllerRef?.current?.signal
+      );
 
       if (!res.data?.status) throw new Error('An error occurred');
 
@@ -205,11 +213,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handleAddNewOption = useCallback(async () => {
     setConfirmCustomOptionModalOpen(false);
     setLoadingModalOpen(true);
-    Mixpanel.track('Add Free Option', {
+
+    Mixpanel.track('Custom Option Used', {
       _stage: 'Post',
       _postUuid: post.postUuid,
       _component: 'McOptionsTab',
     });
+
     try {
       const payload = new newnewapi.CreateCustomMcOptionRequest({
         postUuid: post.postUuid,
@@ -368,20 +378,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             )
           ) : null}
         </SBidsContainer>
-        {user.userTutorialsProgress.remainingMcSteps && (
-          <STutorialTooltipHolder>
-            <TutorialTooltip
-              isTooltipVisible={
-                user.userTutorialsProgress.remainingMcSteps[0] ===
-                newnewapi.McTutorialStep.MC_ALL_OPTIONS
-              }
-              closeTooltip={goToNextStep}
-              title={t('tutorials.mc.peopleBids.title')}
-              text={t('tutorials.mc.peopleBids.text')}
-              dotPosition={DotPositionEnum.BottomLeft}
-            />
-          </STutorialTooltipHolder>
-        )}
+        {user.userTutorialsProgress.remainingMcSteps &&
+          postStatus === 'voting' && (
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user.userTutorialsProgress.remainingMcSteps[0] ===
+                  newnewapi.McTutorialStep.MC_ALL_OPTIONS
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.mc.peopleBids.title')}
+                text={t('tutorials.mc.peopleBids.text')}
+                dotPosition={DotPositionEnum.BottomLeft}
+              />
+            </STutorialTooltipHolder>
+          )}
       </STabContainer>
       {/* Suggest new form */}
       {!optionCreatedByMe &&
@@ -390,6 +401,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SActionSection>
             <SAddOptionButtonDesktop
               id='add-option-button'
+              onClickCapture={() => {
+                Mixpanel.track('Click Add Own Option Button', {
+                  _stage: 'Post',
+                  _postUuid: post.postUuid,
+                  _component: 'McOptionsTab',
+                });
+              }}
               onClick={() => setSuggestNewMobileOpen(true)}
             >
               <InlineSvg
@@ -442,7 +460,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
+                  Mixpanel.track('Click Add Custom Option', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',
@@ -494,7 +512,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => {
-                  Mixpanel.track('Click Add Free Option', {
+                  Mixpanel.track('Click Add Custom Option', {
                     _stage: 'Post',
                     _postUuid: post.postUuid,
                     _component: 'McOptionsTab',

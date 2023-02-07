@@ -148,6 +148,7 @@ const PostModerationControls: React.FunctionComponent<
       {/* Ellipse menu */}
       {!isMobile && (
         <PostEllipseMenuModeration
+          postUuid={postUuid}
           postType={typeOfPost as TPostType}
           isVisible={ellipseMenuOpen}
           canDeletePost={postStatus !== 'succeeded'}
@@ -158,6 +159,7 @@ const PostModerationControls: React.FunctionComponent<
       )}
       {isMobile && ellipseMenuOpen ? (
         <PostEllipseModalModeration
+          postUuid={postUuid}
           postType={typeOfPost as TPostType}
           zIndex={11}
           canDeletePost={postStatus !== 'succeeded'}
@@ -168,6 +170,7 @@ const PostModerationControls: React.FunctionComponent<
       ) : null}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
+        postUuid={postUuid}
         postType={typeOfPost as TPostType}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}

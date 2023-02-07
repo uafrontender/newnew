@@ -39,6 +39,7 @@ import getGenderPronouns, {
 } from '../../utils/genderPronouns';
 import getDisplayname from '../../utils/getDisplayname';
 import copyToClipboard from '../../utils/copyToClipboard';
+import { Mixpanel } from '../../utils/mixpanel';
 
 type TPageType =
   | 'activelyBidding'
@@ -324,6 +325,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             withDim
             iconOnly={isMobileOrTablet}
             onClick={() => handleOpenEditProfileMenu()}
+            onClickCapture={() => {
+              Mixpanel.track('Click Edit Profile Button', {
+                _stage: 'MyProfile',
+                _component: 'MyProfileLayout',
+              });
+            }}
           >
             <InlineSvg
               svg={EditIcon}
@@ -339,6 +346,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             withShrink
             iconOnly={isMobileOrTablet}
             onClick={() => router.push('/profile/settings')}
+            onClickCapture={() => {
+              Mixpanel.track('Click Settings Button', {
+                _stage: 'MyProfile',
+                _component: 'MyProfileLayout',
+              });
+            }}
           >
             <InlineSvg
               svg={SettingsIcon}
@@ -415,6 +428,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 padding: '8px',
               }}
               onClick={() => handleCopyLink()}
+              onClickCapture={() => {
+                Mixpanel.track('Copy Own Link', {
+                  _stage: 'MyProfile',
+                  _component: 'MyProfileLayout',
+                });
+              }}
             >
               {isCopiedUrl ? (
                 t('profileLayout.buttons.copied')

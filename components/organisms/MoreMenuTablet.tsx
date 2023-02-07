@@ -45,7 +45,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
 
-      Mixpanel.track('Copied My Link', {
+      Mixpanel.track('Copy My Link', {
         _component: 'MoreMenuTablet',
       });
 

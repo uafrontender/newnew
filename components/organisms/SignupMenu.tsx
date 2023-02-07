@@ -19,7 +19,7 @@ import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
 
 // Reason for signing up type
-import { SignupReason } from '../../pages/sign-up';
+import { SignupReason } from '../../utils/signUpReasons';
 
 // Components
 import AnimatedPresence from '../atoms/AnimatedPresence';
@@ -122,16 +122,26 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
       authLayoutContext.setShouldHeroUnmount(true);
 
+      const parameters = {
+        to: goal,
+        reason,
+        redirectUrl: redirectURL,
+      };
+      const queryString = Object.entries(parameters)
+        .filter(([key, value]) => value)
+        .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
+        .join('&');
+
       const verificationPath = `/verify-email${
-        goal === 'create' ? '?to=create' : ''
+        queryString ? `?${queryString}` : ''
       }`;
 
       if (!isSafari()) {
         setTimeout(() => {
-          router.push(verificationPath);
+          router.replace(verificationPath);
         }, 1000);
       } else {
-        router.push(verificationPath);
+        router.replace(verificationPath);
       }
     } catch (err: any) {
       setIsSubmitLoading(false);
