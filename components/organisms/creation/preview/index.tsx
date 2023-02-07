@@ -545,6 +545,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 withMuteControl
                 resources={videoProcessing?.targetUrls}
                 showPlayButton
+                withScrubber
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -586,6 +587,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 mutePosition='left'
                 borderRadius='16px'
                 showPlayButton
+                withScrubber
               />
             ) : (
               <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>

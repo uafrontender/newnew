@@ -62,6 +62,7 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
               resources={value}
               borderRadius={isMobile ? '0' : '16px'}
               showPlayButton
+              withScrubber
             />
           )}
         </SModalVideoWrapper>
