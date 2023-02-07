@@ -599,7 +599,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           additionalZ={13}
           onSuccess={() => {
             if (newOptionText && newOptionTextValid) {
-              setConfirmCustomOptionModalOpen(true);
+              handleAddNewOption();
             }
           }}
           onClose={() => {
