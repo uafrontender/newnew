@@ -20,6 +20,7 @@ import InlineSVG from './InlineSVG';
 import PlayIcon from '../../public/images/svg/icons/filled/Play.svg';
 import volumeOn from '../../public/images/svg/icons/filled/VolumeON.svg';
 import volumeOff from '../../public/images/svg/icons/filled/VolumeOFF1.svg';
+import PlayerScrubber from './PlayerScrubber';
 
 interface IBitmovinPlayer {
   id: string;
@@ -34,6 +35,7 @@ interface IBitmovinPlayer {
   withMuteControl?: boolean;
   showPlayButton?: boolean;
   playButtonSize?: 'default' | 'small';
+  withScrubber?: boolean;
 }
 
 export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
@@ -50,12 +52,16 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     setCurrentTime,
     showPlayButton,
     playButtonSize,
+    withScrubber,
   } = props;
   const theme = useTheme();
   const [init, setInit] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoading, setIsLoading] = useState(false);
+  const [playbackTime, setPlaybackTime] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
   const playerConfig = useMemo<PlayerConfig>(
     () => ({
       ui: false,
@@ -89,13 +95,23 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     setIsPaused(stateValue);
   }, []);
 
+  const handlePlayerScrubberChangeTime = useCallback((v: number) => {
+    setPlaybackTime(v);
+    player.current?.seek(v);
+  }, []);
+
   const handleTimeChange = useCallback(
     (e: any) => {
+      setPlaybackTime(e.time);
+
       if (setCurrentTime) {
         setCurrentTime(e.time);
       }
 
-      if (player.current?.getCurrentTime() >= thumbnails.endTime) {
+      if (
+        thumbnails &&
+        player.current?.getCurrentTime() >= thumbnails.endTime
+      ) {
         player.current?.pause();
         player.current?.seek(thumbnails.startTime);
         player.current?.play().catch(() => {
@@ -107,6 +123,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   );
 
   const handlePlaybackFinished = useCallback(() => {
+    // If not available set to some super high number
+    setPlaybackTime(player?.current?.getDuration() ?? 10000);
     player.current?.play().catch(() => {
       handleSetIsPaused(true);
     });
@@ -173,16 +191,15 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     player.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     player.current.handlePlaybackFinished = handlePlaybackFinished;
 
-    if (thumbnails?.endTime) {
-      if (player.current?.handleTimeChange) {
-        player.current?.off(
-          PlayerEvent.TimeChanged,
-          player.current?.handleTimeChange
-        );
-      }
-      player.current?.on(PlayerEvent.TimeChanged, handleTimeChange);
-      player.current.handleTimeChange = handleTimeChange;
+    if (player.current?.handleTimeChange) {
+      player.current?.off(
+        PlayerEvent.TimeChanged,
+        player.current?.handleTimeChange
+      );
     }
+    player.current?.on(PlayerEvent.TimeChanged, handleTimeChange);
+    player.current.handleTimeChange = handleTimeChange;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handlePlaybackFinished, handleTimeChange, thumbnails?.endTime]);
 
   useEffect(() => {
@@ -224,7 +241,11 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   }, [playerSource]);
 
   return (
-    <SContent borderRadius={borderRadius}>
+    <SContent
+      borderRadius={borderRadius}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <SImageBG src={resources.thumbnailImageUrl} />
       <SVideoWrapper borderRadius={borderRadius}>
         <SWrapper
@@ -282,6 +303,15 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           </Button>
         </SModalSoundIcon>
       )}
+      {withScrubber ? (
+        <PlayerScrubber
+          isHovered={isHovered}
+          currentTime={playbackTime}
+          videoDuration={player?.current?.getDuration() || 10}
+          withTime={false}
+          handleChangeTime={handlePlayerScrubberChangeTime}
+        />
+      ) : null}
     </SContent>
   );
 };

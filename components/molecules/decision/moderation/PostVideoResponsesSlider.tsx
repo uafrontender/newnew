@@ -27,6 +27,7 @@ interface IPostVideoResponsesSlider {
   isMuted?: boolean;
   isEditingStories?: boolean;
   isDeletingAdditionalResponse: boolean;
+  videoDurationWithTime?: boolean;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
   handleDeleteUnuploadedAdditonalResponse?: () => void;
 }
@@ -39,6 +40,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   isMuted,
   isEditingStories,
   isDeletingAdditionalResponse,
+  videoDurationWithTime,
   handleDeleteAdditionalVideo,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
@@ -161,6 +163,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
             index={i}
             isVisible={currentVideo === i}
             isMuted={isMuted}
+            videoDurationWithTime={videoDurationWithTime}
           />
         ))}
       </SContainer>
@@ -176,7 +179,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       >
         {videos.map((item, i) => (
           <SDot
-            key={item.uuid ?? i}
+            key={item?.uuid ?? i}
             active={currentVideo === i}
             onClick={() => handleClickDotScroll(i)}
           />

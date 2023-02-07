@@ -248,11 +248,13 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     <>
       <SContent>
         <SPlayerWrapper>
+          {/* It seems like the video here is intentionally a 3-seconds one */}
           {fileProcessing.progress === 100 ? (
             <BitmovinPlayer
               id='published'
               muted={false}
               resources={videoProcessing?.targetUrls}
+              // Restricts the playback time
               thumbnails={post.thumbnailParameters}
               showPlayButton
             />

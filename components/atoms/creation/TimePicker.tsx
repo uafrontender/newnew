@@ -456,8 +456,16 @@ const SScrollList = styled.div<ISScrollList>`
   max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 17px;
-  margin-right: -17px;
+  padding-right: 14px;
+  margin-right: -14px;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   ${(props) =>
     !props.noPadding &&
     css`
