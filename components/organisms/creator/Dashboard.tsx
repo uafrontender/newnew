@@ -84,8 +84,14 @@ export const Dashboard: React.FC = React.memo(() => {
     try {
       const payload = new newnewapi.PagedRequest();
       const res = await getMyUrgentPosts(payload);
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.posts) setExpirationPosts(res.data?.posts);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      if (res.data?.posts) {
+        setExpirationPosts(res.data?.posts);
+      }
       setIsLoadingExpirationPosts(false);
     } catch (err) {
       setIsLoadingExpirationPosts(false);
@@ -164,6 +170,27 @@ export const Dashboard: React.FC = React.memo(() => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection baseUrl='/creator/dashboard' />}
         </STitleBlock>
+
+        {isLoadingExpirationPosts ? (
+          <SBlock>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SBlock>
+        ) : (
+          expirationPosts.length > 0 && (
+            <SBlock>
+              <ExpirationPosts expirationPosts={expirationPosts} />
+            </SBlock>
+          )
+        )}
+
         {user.creatorData?.options.stripeConnectStatus &&
           user.creatorData.options.stripeConnectStatus ===
             newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
@@ -172,6 +199,7 @@ export const Dashboard: React.FC = React.memo(() => {
               <StripeIssueBanner />
             </SBlock>
           )}
+
         {!user.creatorData?.isLoaded ? (
           <SBlock>
             <Lottie
@@ -189,25 +217,6 @@ export const Dashboard: React.FC = React.memo(() => {
           !user.userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
               <YourToDos />
-            </SBlock>
-          )
-        )}
-        {isLoadingExpirationPosts ? (
-          <SBlock>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SBlock>
-        ) : (
-          expirationPosts.length > 0 && (
-            <SBlock>
-              <ExpirationPosts expirationPosts={expirationPosts} />
             </SBlock>
           )
         )}
