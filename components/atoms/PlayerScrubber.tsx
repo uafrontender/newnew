@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import 'moment-duration-format';
@@ -19,6 +25,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
   handleChangeTime,
 }) => {
   const sliderRef = useRef<HTMLInputElement>();
+  const [isChanging, setIsChanging] = useState(false);
   const progress = useMemo(
     () => (currentTime / videoDuration) * 100,
     [currentTime, videoDuration]
@@ -74,10 +81,15 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
         max={100}
         step={0.1}
         aria-labelledby='Video seek'
+        onTouchStart={() => setIsChanging(true)}
+        onTouchEnd={() => setIsChanging(false)}
+        onTouchCancel={() => setIsChanging(false)}
         onChange={handleChange}
       />
       {withTime ? (
-        <STime>{`${formattedCurrent} / ${formattedDuration}`}</STime>
+        <STime
+          show={isChanging}
+        >{`${formattedCurrent} / ${formattedDuration}`}</STime>
       ) : null}
     </SContainer>
   );
@@ -245,14 +257,20 @@ const SSlider = styled.input.attrs({ type: 'range' })`
   }
 `;
 
-const STime = styled.div`
-  display: none;
+const STime = styled.div<{
+  show: boolean;
+}>`
+  position: absolute;
+  bottom: 12px;
+  left: 4px;
+
+  font-size: 12px;
+  color: #ffffff;
+
+  display: ${({ show }) => (show ? 'block' : 'none')};
 
   ${({ theme }) => theme.media.laptop} {
-    position: absolute;
-    bottom: 12px;
-
-    font-size: 12px;
-    color: #ffffff;
+    display: block;
+    left: initial;
   }
 `;
