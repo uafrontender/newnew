@@ -15,6 +15,9 @@ import {
   PlayerType,
   SourceConfig,
   StreamType,
+  PlaybackEvent,
+  PlayerEventCallback,
+  PlayerEventBase,
 } from 'bitmovin-player';
 
 import Lottie from '../../../atoms/Lottie';
@@ -22,11 +25,17 @@ import InlineSvg from '../../../atoms/InlineSVG';
 
 import logoAnimation from '../../../../public/animations/mobile_logo.json';
 import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
+import PlayerScrubber from '../../../atoms/PlayerScrubber';
+
+type TPlayerAPIEnhanced = PlayerAPI & {
+  handleSetPlaybackTime: PlayerEventCallback;
+};
 
 interface IPostBitmovinPlayer {
   id: string;
   muted?: boolean;
   resources?: newnewapi.IVideoUrls;
+  videoDurationWithTime?: boolean;
   showPlayButton?: boolean;
 }
 
@@ -34,6 +43,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   id,
   muted,
   resources,
+  videoDurationWithTime,
   showPlayButton,
 }) => {
   // const [init, setInit] = useState(false);
@@ -41,6 +51,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const [isPaused, setIsPaused] = useState(false);
+
+  const [playbackTime, setPlaybackTime] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleSetIsPaused = useCallback((stateValue: boolean) => {
     setIsPaused(stateValue);
@@ -91,9 +104,11 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   );
 
   const playerRef: any = useRef();
-  const player = useRef<PlayerAPI | null>(null);
+  const player = useRef<TPlayerAPIEnhanced | null>(null);
 
   const handlePlaybackFinished = useCallback(() => {
+    // If not available set to some super high number
+    setPlaybackTime(player?.current?.getDuration() ?? 10000);
     player?.current?.play().catch(() => {
       handleSetIsPaused(true);
     });
@@ -106,8 +121,23 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     }
   }, [player]);
 
+  const handleSetPlaybackTime: PlayerEventCallback = useCallback(
+    (e: PlayerEventBase) => {
+      setPlaybackTime((e as PlaybackEvent).time);
+    },
+    []
+  );
+
+  const handlePlayerScrubberChangeTime = useCallback((v: number) => {
+    setPlaybackTime(v);
+    player.current?.seek(v);
+  }, []);
+
   const setupPlayer = useCallback(() => {
-    player.current = new Player(playerRef.current, playerConfig);
+    player.current = new Player(
+      playerRef.current,
+      playerConfig
+    ) as TPlayerAPIEnhanced;
 
     // setInit(true);
   }, [playerConfig]);
@@ -124,7 +154,16 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     player?.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     // @ts-ignore
     player.current.handlePlaybackFinished = handlePlaybackFinished;
-  }, [handlePlaybackFinished]);
+
+    if (player.current?.handleSetPlaybackTime) {
+      player.current?.off(
+        PlayerEvent.TimeChanged,
+        player.current?.handleSetPlaybackTime
+      );
+    }
+    player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
+    player.current!!.handleSetPlaybackTime = handleSetPlaybackTime;
+  }, [handlePlaybackFinished, handleSetPlaybackTime]);
 
   useEffect(() => {
     if (process.browser && typeof window !== 'undefined') {
@@ -182,11 +221,16 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   useEffect(() => {
     player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
     player.current?.on(PlayerEvent.Play, () => handleSetIsPaused(false));
+    // player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerSource]);
 
   return (
-    <SContent>
+    <SContent
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
       <SVideoWrapper>
         <SWrapper
@@ -241,6 +285,13 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           />
         </SLoader>
       )}
+      <PlayerScrubber
+        isHovered={isHovered}
+        currentTime={playbackTime}
+        videoDuration={player?.current?.getDuration() || 10}
+        withTime={videoDurationWithTime}
+        handleChangeTime={handlePlayerScrubberChangeTime}
+      />
     </SContent>
   );
 };

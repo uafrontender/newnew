@@ -219,10 +219,13 @@ const STosText = styled.div`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  ${({ theme }) => theme.media.laptop} {
-    // Remove scrollbar on laptop
-    margin-right: -58px;
-    padding-right: 58px;
+  ${({ theme }) => theme.media.tablet} {
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 `;
 
