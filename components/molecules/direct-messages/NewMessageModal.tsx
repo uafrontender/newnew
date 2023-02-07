@@ -38,6 +38,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -73,6 +74,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const router = useRouter();
 
   const [usernameQuery, setUsernameQuery] = useState('');
+  const usernameQueryDebounced = useDebouncedValue(usernameQuery, 500);
   const [roomKind, setRoomKind] = useState<newnewapi.ChatRoom.Kind>(
     newnewapi.ChatRoom.Kind.CREATOR_TO_ONE
   );
@@ -82,7 +84,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const { data } = useMyChatRooms({
     myRole: newnewapi.ChatRoom.MyRole.CREATOR,
     roomKind,
-    searchQuery: usernameQuery,
+    searchQuery: usernameQueryDebounced,
   });
 
   const targetChatrooms = useMemo(

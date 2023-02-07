@@ -24,6 +24,7 @@ import { selectWinningOption } from '../../../../../api/endpoints/auction';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
+import { usePostModerationResponsesContext } from '../../../../../contexts/postModerationResponsesContext';
 
 interface IAcOptionsTabModeration {
   postUuid: string;
@@ -64,6 +65,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
   const { showErrorToastPredefined } = useErrorToasts();
 
   const { postStatus, refetchPost } = usePostInnerState();
+  const { handleChangeTab } = usePostModerationResponsesContext();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -93,6 +95,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
       if (res.data) {
         await refetchPost();
         handleUpdateWinningOption(winningOption);
+        handleChangeTab('response');
       }
     } catch (err) {
       console.error(err);

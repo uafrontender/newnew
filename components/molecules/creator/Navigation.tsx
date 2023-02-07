@@ -12,6 +12,8 @@ import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
 import bundlesFilledIcon from '../../../public/images/svg/icons/filled/Bundles.svg';
 import bundlesOutlinedIcon from '../../../public/images/svg/icons/outlined/Bundles.svg';
+import myPostsOutlinedIcon from '../../../public/images/svg/icons/outlined/MyPosts.svg';
+import myPostsFilledIcon from '../../../public/images/svg/icons/filled/MyPosts.svg';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -37,6 +39,12 @@ export const Navigation = () => {
         label: t('navigation.dashboard'),
         iconFilled: dashboardFilledIcon,
         iconOutlined: dashboardOutlinedIcon,
+      },
+      {
+        url: '/profile/my-posts',
+        label: t('navigation.myPosts'),
+        iconFilled: myPostsFilledIcon,
+        iconOutlined: myPostsOutlinedIcon,
       },
       {
         id: 'bundles-navigation',

@@ -10,6 +10,7 @@
     "heading": "We were unable to unsubscribe you",
     "subheading": "You can still manage email notifications from your settings page."
   },
+  "confirm_NEED_TRANSLATION": "Ok",
   "error": {
     "requestFailed": "La solicitud ha fallado"
   }

@@ -22,11 +22,13 @@ export const BundlesContext = createContext<{
   bundles: newnewapi.ICreatorBundle[] | undefined;
   directMessagesAvailable: boolean;
   isSellingBundles: boolean;
+  hasSoldBundles: boolean;
   toggleIsSellingBundles: () => Promise<void>;
 }>({
   bundles: undefined,
   directMessagesAvailable: false,
   isSellingBundles: false,
+  hasSoldBundles: false,
   toggleIsSellingBundles: async () => {},
 });
 
@@ -77,18 +79,19 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     // Do we really need it?
     // Optimized by using state stored in LS
     const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
+
     if (localHasSoldBundles) {
       return true;
-    } else {
-      const payload = new newnewapi.GetMyBundleEarningsRequest();
-      const res = await getMyBundleEarnings(payload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      const earnings = res.data.totalBundleEarnings?.usdCents ?? 0;
-      return earnings > 0;
     }
+
+    const payload = new newnewapi.GetMyBundleEarningsRequest();
+    const res = await getMyBundleEarnings(payload);
+
+    if (!res.data || res.error)
+      throw new Error(res.error?.message ?? 'Request failed');
+
+    const earnings = res.data.totalBundleEarnings?.usdCents ?? 0;
+    return earnings > 0;
   }, []);
 
   // Load data
@@ -105,7 +108,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         })
         .catch((err) => {
           console.error(err);
-          showErrorToastPredefined();
+          if (
+            err.message !== 'Refresh token invalid' &&
+            err.message !== 'No token'
+          ) {
+            showErrorToastPredefined();
+          }
           setBundles(undefined);
         });
 
@@ -120,7 +128,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
           })
           .catch((err) => {
             console.error(err);
-            showErrorToastPredefined();
+            if (
+              err.message !== 'Refresh token invalid' &&
+              err.message !== 'No token'
+            ) {
+              showErrorToastPredefined();
+            }
             setIsSellingBundles(false);
             setIsSellingBundlesStatusLoaded(false);
           });
@@ -132,7 +145,12 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
           })
           .catch((err) => {
             console.error(err);
-            showErrorToastPredefined();
+            if (
+              err.message !== 'Refresh token invalid' &&
+              err.message !== 'No token'
+            ) {
+              showErrorToastPredefined();
+            }
             setHasSoldBundles(false);
             saveStateLS('creatorHasSoldBundles', false);
           });
@@ -153,6 +171,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     user.loggedIn,
     user.userData?.options?.creatorStatus,
     fetchBundles,
+    showErrorToastPredefined,
     fetchIsSellingBundles,
     fetchHasSoldBundles,
   ]);
@@ -184,9 +203,9 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
             updatedBundle,
             ...curr.slice(bundleIndex + 1),
           ];
-        } else {
-          return curr.concat(updatedBundle);
         }
+
+        return curr.concat(updatedBundle);
       });
     };
 
@@ -248,10 +267,17 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       directMessagesAvailable,
       // This has no WS update, could cause troubles with other tabs
       isSellingBundles,
+      hasSoldBundles,
       // Could cause troubles if used on different tabs
       toggleIsSellingBundles,
     }),
-    [bundles, directMessagesAvailable, isSellingBundles, toggleIsSellingBundles]
+    [
+      bundles,
+      directMessagesAvailable,
+      isSellingBundles,
+      hasSoldBundles,
+      toggleIsSellingBundles,
+    ]
   );
 
   return (

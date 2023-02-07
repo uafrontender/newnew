@@ -13,6 +13,7 @@ import ChatLayout from '../../../components/templates/ChatLayout';
 import ChatContainer from '../../../components/organisms/direct-messages/ChatContainer';
 import { useGetChats } from '../../../contexts/chatContext';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 
 interface IChat {
   username: string;
@@ -42,6 +43,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
     useGetChats();
 
   const [usernameQuery, setUsernameQuery] = useState('');
+  const usernameQueryDebounced = useDebouncedValue(usernameQuery, 500);
   const [myRole, setMyRole] = useState<newnewapi.ChatRoom.MyRole | undefined>();
   const [roomKind, setRoomKind] = useState<
     newnewapi.ChatRoom.Kind | undefined
@@ -54,7 +56,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
   const { data } = useMyChatRooms({
     myRole,
     roomKind,
-    searchQuery: usernameQuery,
+    searchQuery: usernameQueryDebounced,
   });
 
   const chatrooms = useMemo(
