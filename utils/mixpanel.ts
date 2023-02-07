@@ -6,9 +6,10 @@ const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || 'undefined';
 mixpanel.init(token, {
   // Use your project's URL, adding a slug for all Mixpanel requests
   api_host: `${process.env.NEXT_PUBLIC_APP_URL}/mp`,
-  debug: !isProd ? true : false,
+  debug: !isProd,
 });
 
+// eslint-disable-next-line import/prefer-default-export
 export const Mixpanel = {
   identify: (id: string) => {
     mixpanel.identify(id);
@@ -29,6 +30,9 @@ export const Mixpanel = {
         ...(callbackObj || {}),
       };
     });
+  },
+  register: (options: object) => {
+    mixpanel.register(options);
   },
   people: {
     set: (props: Dict) => {
