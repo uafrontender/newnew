@@ -5,19 +5,19 @@ import React, {
   useMemo,
   useState,
   useCallback,
+  useRef,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
-import { getMyRooms, getTotalUnreadMessageCounts } from '../api/endpoints/chat';
+import { getTotalUnreadMessageCounts } from '../api/endpoints/chat';
+import { useBundles } from './bundlesContext';
 
 interface IChatsContext {
   unreadCountForUser: number;
   unreadCountForCreator: number;
   unreadCount: number;
   mobileChatOpened: boolean;
-  hasChatsWithCreators: boolean;
-  hasChatsWithSubs: boolean;
   hiddenMessagesArea: boolean | null;
   activeChatRoom: newnewapi.IChatRoom | null;
   activeTab: newnewapi.ChatRoom.MyRole | undefined;
@@ -36,8 +36,6 @@ const ChatsContext = createContext<IChatsContext>({
   unreadCountForCreator: 0,
   unreadCount: 0,
   mobileChatOpened: false,
-  hasChatsWithCreators: false,
-  hasChatsWithSubs: false,
   hiddenMessagesArea: null,
   activeChatRoom: null,
   activeTab: undefined,
@@ -57,16 +55,15 @@ interface IChatsProvider {
 
 export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
+  const { bundles } = useBundles();
+
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
   const [unreadCountForCreator, setUnreadCountForCreator] = useState<number>(0);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mobileChatOpened, setMobileChatOpened] = useState<boolean>(false);
-  const [hasChatsWithCreators, setHasChatsWithCreators] =
-    useState<boolean>(false);
   const [hiddenMessagesArea, setHiddenMessagesArea] = useState<boolean | null>(
     null
   );
-  const [hasChatsWithSubs, setHasChatsWithSubs] = useState<boolean>(false);
   const [activeChatRoom, setActiveChatRoom] =
     useState<newnewapi.IChatRoom | null>(null);
   const [searchChatroom, setSearchChatroom] = useState<string>('');
@@ -117,10 +114,9 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       }
     }
     getUnread();
-  }, [user.loggedIn, setData]);
+  }, [user.loggedIn, setData, bundles?.length]);
 
   useEffect(() => {
-    if (!user.loggedIn) return;
     const socketHandlerMessageCreated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatUnreadCountsChanged.decode(arr);
@@ -130,66 +126,22 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       setData(decoded.chatUnreadCounts as newnewapi.TotalUnreadMessageCounts);
     };
 
-    if (socketConnection) {
+    if (user.loggedIn && socketConnection) {
       socketConnection?.on(
         'ChatUnreadCountsChanged',
         socketHandlerMessageCreated
       );
     }
-  }, [socketConnection, user.loggedIn, setData]);
 
-  useEffect(() => {
-    if (!user.loggedIn) return;
-    if (
-      user.userData?.options?.creatorStatus !==
-      newnewapi.Me.CreatorStatus.NOT_CREATOR
-    ) {
-      (async () => {
-        try {
-          const payload = new newnewapi.GetMyRoomsRequest({
-            paging: {
-              limit: 1,
-            },
-            myRole: newnewapi.ChatRoom.MyRole.CREATOR,
-          });
-
-          const res = await getMyRooms(payload);
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
-          }
-          if (res.data && res.data.rooms.length > 0) {
-            setHasChatsWithSubs(true);
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      })();
-    }
-  }, [user.userData?.options?.creatorStatus, user.loggedIn]);
-
-  useEffect(() => {
-    if (!user.loggedIn) return;
-    (async () => {
-      try {
-        const payload = new newnewapi.GetMyRoomsRequest({
-          paging: {
-            limit: 1,
-          },
-          myRole: newnewapi.ChatRoom.MyRole.SUBSCRIBER,
-        });
-
-        const res = await getMyRooms(payload);
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
-        }
-        if (res.data && res.data.rooms.length > 0) {
-          setHasChatsWithCreators(true);
-        }
-      } catch (err) {
-        console.error(err);
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'ChatUnreadCountsChanged',
+          socketHandlerMessageCreated
+        );
       }
-    })();
-  }, [user.userData?.options?.creatorStatus, user.loggedIn]);
+    };
+  }, [socketConnection, user.loggedIn, setData]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -207,14 +159,36 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     };
   }, [justSentMessage]);
 
+  const resetState = useCallback(() => {
+    setUnreadCountForUser(0);
+    setUnreadCountForCreator(0);
+    setUnreadCount(0);
+    setMobileChatOpened(false);
+    setHiddenMessagesArea(null);
+    setActiveChatRoom(null);
+    setSearchChatroom('');
+    setActiveTab(undefined);
+    setJustSentMessage(false);
+  }, []);
+
+  const userWasLoggedIn = useRef(false);
+
+  useEffect(() => {
+    if (userWasLoggedIn.current && !user.loggedIn) {
+      resetState();
+    }
+
+    if (user.loggedIn) {
+      userWasLoggedIn.current = true;
+    }
+  }, [user.loggedIn, resetState]);
+
   const contextValue = useMemo(
     () => ({
       unreadCountForUser,
       unreadCountForCreator,
       unreadCount,
       mobileChatOpened,
-      hasChatsWithCreators,
-      hasChatsWithSubs,
       hiddenMessagesArea,
       activeChatRoom,
       searchChatroom,
@@ -231,8 +205,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       unreadCount,
       unreadCountForUser,
       unreadCountForCreator,
-      hasChatsWithCreators,
-      hasChatsWithSubs,
       activeChatRoom,
       mobileChatOpened,
       hiddenMessagesArea,

@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useGetChats } from '../../../contexts/chatContext';
+import { useBundles } from '../../../contexts/bundlesContext';
 
-const ChatlistTabs = dynamic(
+const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatlistTabs')
 );
 const ChatList = dynamic(
@@ -15,26 +16,27 @@ const ChatToolbar = dynamic(
 );
 
 const ChatSidebar: React.FC = () => {
-  const {
-    hasChatsWithCreators,
-    hasChatsWithSubs,
-    searchChatroom,
-    activeTab,
-    setActiveTab,
-    mobileChatOpened,
-  } = useGetChats();
+  const { searchChatroom, activeTab, setActiveTab, mobileChatOpened } =
+    useGetChats();
+
+  const { bundles, isSellingBundles, hasSoldBundles } = useBundles();
 
   useEffect(() => {
-    if (
-      hasChatsWithCreators &&
-      hasChatsWithSubs &&
-      !activeTab &&
-      searchChatroom === ''
-    ) {
-      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    if (!activeTab && searchChatroom === '') {
+      if (bundles?.length && (isSellingBundles || hasSoldBundles)) {
+        setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+      } else {
+        setActiveTab(undefined);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasChatsWithCreators, hasChatsWithSubs, activeTab, searchChatroom]);
+  }, [
+    activeTab,
+    searchChatroom,
+    bundles?.length,
+    isSellingBundles,
+    hasSoldBundles,
+    setActiveTab,
+  ]);
 
   const changeActiveTab = useCallback(
     (tabName: newnewapi.ChatRoom.MyRole) => {
@@ -49,9 +51,10 @@ const ChatSidebar: React.FC = () => {
       {activeTab &&
         searchChatroom === '' &&
         !mobileChatOpened &&
-        hasChatsWithCreators &&
-        hasChatsWithSubs && (
-          <ChatlistTabs
+        bundles &&
+        bundles?.length > 0 &&
+        (isSellingBundles || hasSoldBundles) && (
+          <ChatListTabs
             activeTab={activeTab!!}
             changeActiveTab={changeActiveTab}
           />
