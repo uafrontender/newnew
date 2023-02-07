@@ -179,7 +179,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       >
         {videos.map((item, i) => (
           <SDot
-            key={item.uuid ?? i}
+            key={item?.uuid ?? i}
             active={currentVideo === i}
             onClick={() => handleClickDotScroll(i)}
           />
