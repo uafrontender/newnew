@@ -1021,9 +1021,9 @@ export const CreationSecondStepContent: React.FC<
   useEffect(() => {
     if (playerRef.current && isDesktop) {
       if (overlayModeEnabled) {
-        playerRef.current.pause().catch(() => {});
+        playerRef.current?.pause()?.catch(() => {});
       } else {
-        playerRef.current.play().catch(() => {});
+        playerRef.current?.play()?.catch(() => {});
       }
     }
   }, [overlayModeEnabled, isDesktop]);
