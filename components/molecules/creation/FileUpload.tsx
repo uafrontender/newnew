@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -14,14 +13,13 @@ import DeleteVideo from './DeleteVideo';
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
-import { loadVideo } from '../../../utils/loadVideo';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-// import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+
 import {
   removeUploadedFile,
   stopVideoProcessing,
@@ -59,6 +57,7 @@ interface IFileUpload {
   loadingProcessing: boolean;
   progressProcessing: number;
   thumbnails: TThumbnailParameters;
+  customCoverImageUrl?: string;
   onChange: (id: string, value: any) => void;
   handleCancelVideoUpload: () => void;
 }
@@ -78,6 +77,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   loadingProcessing,
   progressProcessing,
   thumbnails,
+  customCoverImageUrl,
   onChange,
   handleCancelVideoUpload,
 }) => {
@@ -403,6 +403,14 @@ const FileUpload: React.FC<IFileUpload> = ({
             }}
           />
           <SPlayerWrapper>
+            {customCoverImageUrl && (
+              <SThumbnailHolder
+                className='thumnailHolder'
+                src={customCoverImageUrl ?? ''}
+                alt='Post preview'
+                draggable={false}
+              />
+            )}
             <BitmovinPlayer
               id='small-thumbnail'
               innerRef={playerRef}
@@ -458,6 +466,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     handleRetryVideoUpload,
     value,
     thumbnails,
+    customCoverImageUrl,
     showEllipseMenu,
     handleOpenEllipseMenu,
     handleDeleteVideoShow,
@@ -587,13 +596,24 @@ const SFileBox = styled.div`
 `;
 
 const SPlayerWrapper = styled.div`
+  position: relative;
   width: 64px;
   height: 108px;
+  overflow: hidden;
+  border-radius: 8px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
     height: 124px;
   }
+`;
+
+const SThumbnailHolder = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: linear 0.3s;
+  z-index: 1;
 `;
 
 const SButtonsContainer = styled.div`

@@ -458,7 +458,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
-              <SThumnailHolder
+              <SThumbnailHolder
                 className='thumnailHolder'
                 src={
                   (coverImageUrl ||
@@ -570,7 +570,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
-            <SThumnailHolder
+            <SThumbnailHolder
               className='thumnailHolder'
               src={
                 (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
@@ -960,7 +960,7 @@ const SImageHolder = styled.div<ISWrapper>`
   }
 `;
 
-const SThumnailHolder = styled.img<{
+const SThumbnailHolder = styled.img<{
   hovered: boolean;
 }>`
   opacity: ${({ hovered }) => (hovered ? 0 : 1)};
