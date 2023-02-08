@@ -35,6 +35,7 @@ interface IPostVideoResponseUploadedTab {
   isEditingStories: boolean;
   handleToggleMuted: () => void;
   handleToggleEditingStories: () => void;
+  handleUnsetEditingStories: () => void;
 }
 
 const PostVideoResponseUploadedTab: React.FunctionComponent<
@@ -46,6 +47,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   soundBtnBottomOverriden,
   handleToggleMuted,
   handleToggleEditingStories,
+  handleUnsetEditingStories,
 }) => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
@@ -329,6 +331,13 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingProgress,
     handleSetReadyToUploadAdditionalResponse,
   ]);
+
+  useEffect(() => {
+    if (responses?.length && responses?.length < 2) {
+      handleUnsetEditingStories();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [responses]);
 
   return (
     <SContainer>
