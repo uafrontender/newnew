@@ -23,9 +23,9 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const isPageVisible = usePageVisibility();
     const hasMounted = useHasMounted();
 
-    const parsed = (endsAt - Date.now()) / 1000;
+    const parsed = Math.ceil((endsAt - Date.now()) / 1000);
     const hasStarted = Date.now() > startsAt;
-    const hasEnded = Date.now() > endsAt;
+    const hasEnded = Date.now() >= endsAt;
     const expirationDate = new Date(endsAt);
 
     const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
@@ -83,7 +83,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
       // be equal to seconds + milliseconds portion of the time left
       if (isBrowser() && isPageVisible && !hasEnded) {
         interval.current = window.setInterval(() => {
-          setSeconds(() => (endsAt - Date.now()) / 1000);
+          setSeconds(() => Math.ceil((endsAt - Date.now()) / 1000));
         }, 1000);
       }
       return () => clearInterval(interval.current);
