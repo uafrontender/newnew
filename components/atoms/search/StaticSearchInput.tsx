@@ -293,7 +293,14 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           </SInputWrapper>
 
           {!isMobileOrTablet && isResultsDropVisible && (
-            <SResultsDrop>
+            <SResultsDrop
+              noResults={
+                resultsPosts.length === 0 &&
+                resultsCreators.length === 0 &&
+                resultsHashtags.length === 0 &&
+                !isLoading
+              }
+            >
               {resultsPosts.length === 0 &&
               resultsCreators.length === 0 &&
               resultsHashtags.length === 0 ? (
@@ -433,7 +440,7 @@ const SContainer = styled.div<{
 `;
 
 // Desktop
-const SResultsDrop = styled.div`
+const SResultsDrop = styled.div<{ noResults: boolean }>`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   position: fixed;
   border-radius: 0;
@@ -444,6 +451,11 @@ const SResultsDrop = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
 
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
     padding: 16px;
@@ -451,7 +463,13 @@ const SResultsDrop = styled.div`
     width: 420px;
     margin-top: 0;
     border-radius: 16px;
-    height: auto;
+
+    ${({ noResults }) =>
+      noResults
+        ? css`
+            height: auto;
+          `
+        : null}
   }
 
   ${({ theme }) => theme.media.laptop} {
