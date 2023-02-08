@@ -613,7 +613,11 @@ const PostPage: NextPage<IPostPage> = ({
           />
           <meta
             property='og:image'
-            content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
+            content={
+              (postParsed?.announcement?.coverImageUrl ||
+                postParsed?.announcement?.thumbnailImageUrl) ??
+              ''
+            }
           />
         </Head>
         <AnimatePresence exitBeforeEnter>

@@ -37,8 +37,8 @@
         "textBio": "Añade una biografía para retirar tus ganancias",
         "textBank": "Añade tus datos bancarios para retirar tus ganancias",
         "button": "Añadir",
-        "stripeIssue_NEED_TRANSLATION": "There's an issue with your Stripe account",
-        "stripeIssueButton_NEED_TRANSLATION": "See Stripe account"
+        "stripeIssue": "Hay un problema con tu cuenta de Stripe",
+        "stripeIssueButton": "Ver cuenta de Stripe"
       },
       "makeDecision": {
         "text": "Haz una publicación. Empieza a ganar dinero.",

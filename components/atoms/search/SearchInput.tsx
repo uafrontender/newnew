@@ -31,6 +31,7 @@ import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -170,14 +171,24 @@ const SearchInput: React.FC = React.memo(() => {
     setResultsHashtags([]);
   };
 
+  const quickSearchAbortControllerRef = useRef<AbortController | undefined>();
+
   async function getQuickSearchResult(query: string) {
     try {
+      if (quickSearchAbortControllerRef.current) {
+        quickSearchAbortControllerRef.current?.abort();
+      }
+      quickSearchAbortControllerRef.current = new AbortController();
+
       setIsLoading(true);
       const payload = new newnewapi.QuickSearchRequest({
         query,
       });
 
-      const res = await quickSearch(payload);
+      const res = await quickSearch(
+        payload,
+        quickSearchAbortControllerRef?.current?.signal
+      );
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
@@ -192,17 +203,22 @@ const SearchInput: React.FC = React.memo(() => {
     }
   }
 
+  const debouncedSearchValue = useDebouncedValue(searchValue, 500);
+
   useEffect(() => {
-    const clearedSearchValue = getClearedSearchQuery(searchValue);
-    if (clearedSearchValue) {
+    const clearedSearchValue = getClearedSearchQuery(debouncedSearchValue);
+    if (clearedSearchValue?.length > 1) {
       getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
-    } else if (!clearedSearchValue && !isMobileOrTablet) {
+    } else if (
+      (!clearedSearchValue || clearedSearchValue.length === 1) &&
+      !isMobileOrTablet
+    ) {
       setIsResultsDropVisible(false);
       resetResults();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, isMobileOrTablet]);
+  }, [debouncedSearchValue, isMobileOrTablet]);
 
   function closeSearch() {
     handleSearchClose();
@@ -267,14 +283,6 @@ const SearchInput: React.FC = React.memo(() => {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={t('search.placeholder')}
-          />
-          <SRightInlineSVG
-            clickable
-            svg={closeIcon}
-            fill={theme.colorsThemed.text.primary}
-            width={isMobile ? '20px' : '24px'}
-            height={isMobile ? '20px' : '24px'}
-            onClick={handleCloseIconClick}
           />
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
@@ -574,16 +582,6 @@ const SInput = styled.input`
 `;
 
 const SLeftInlineSVG = styled(InlineSVG)`
-  min-width: 20px;
-  min-height: 20px;
-
-  ${({ theme }) => theme.media.tablet} {
-    min-width: 24px;
-    min-height: 24px;
-  }
-`;
-
-const SRightInlineSVG = styled(InlineSVG)`
   min-width: 20px;
   min-height: 20px;
 

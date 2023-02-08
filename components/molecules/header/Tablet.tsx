@@ -7,11 +7,11 @@ import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/search/SearchInput';
 import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
-import { useGetChats } from '../../../contexts/chatContext';
+import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 
+import { useGetChats } from '../../../contexts/chatContext';
 import { useAppSelector } from '../../../redux-store/store';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
@@ -37,8 +37,9 @@ export const Tablet: React.FC = React.memo(() => {
 
   return (
     <SContainer>
-      <Logo />
+      <Logo isShort />
       <SRightBlock>
+        {!user.loggedIn && <StaticSearchInput />}
         {user.loggedIn && (
           <>
             {user.userData?.options?.isCreator && (
@@ -59,6 +60,21 @@ export const Tablet: React.FC = React.memo(() => {
                 </a>
               </Link>
             )}
+            <SItemWithMargin
+              style={{
+                position: 'static',
+              }}
+            >
+              <StaticSearchInput
+                width={
+                  user.userData?.options?.isCreator &&
+                  bundles &&
+                  bundles.length > 0
+                    ? '200px'
+                    : undefined
+                }
+              />
+            </SItemWithMargin>
             {bundles && bundles.length > 0 && (
               <SItemWithMargin>
                 <Link href='/bundles'>
@@ -109,13 +125,7 @@ export const Tablet: React.FC = React.memo(() => {
             </SItemWithMargin>
           </>
         )}
-        <SItemWithMargin
-          style={{
-            position: 'static',
-          }}
-        >
-          <SearchInput />
-        </SItemWithMargin>
+
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (
@@ -251,7 +261,7 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 9px;
+  margin-left: 6px;
   position: relative;
 
   ${({ theme }) => theme.media.laptop} {
@@ -269,8 +279,7 @@ const SBundleIcon = styled.img`
 `;
 
 const SNavText = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  opacity: 0.5;
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
   transition: opacity ease 0.5s;
   cursor: pointer;
 `;

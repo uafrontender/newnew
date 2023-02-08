@@ -65,7 +65,7 @@ export default NavigationItem;
 const SNavItem = styled(Button)`
   position: relative;
   overflow: visible;
-  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background: ${({ theme }) => theme.colorsThemed.background.secondary};
 `;
 
 const SIndicatorContainer = styled.div`

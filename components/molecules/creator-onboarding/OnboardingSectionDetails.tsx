@@ -243,7 +243,10 @@ const OnboardingSectionDetails: React.FunctionComponent<
           validateUsernameAbortControllerRef?.current?.signal
         );
 
-        if (!res.data?.status) throw new Error('An error occurred');
+        if (!res.data?.status) {
+          throw new Error('An error occurred');
+        }
+
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
           setUsernameError(errorSwitchUsername(res.data?.status));
         } else {

@@ -38,7 +38,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
             .duration(currentTime, 'seconds')
             // @ts-ignore
             ?.format('mm:ss', { trim: false })
-        : '',
+        : '00:00',
     [currentTime]
   );
   const formattedDuration = useMemo(
@@ -141,23 +141,19 @@ const SSlider = styled.input.attrs({ type: 'range' })`
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
+    outline: none;
+    box-shadow: unset;
 
-    height: 8px;
-    width: 8px;
-    border-radius: 48px;
+    height: 48px;
+    width: 48px;
+    border-radius: 0px;
     background: transparent;
     border: transparent;
     cursor: pointer;
 
-    margin-top: -4px;
+    margin-top: -16px;
 
     transition: 0.1s ease-in-out;
-
-    ${({ theme }) => theme.media.tablet} {
-      height: 12px;
-      width: 12px;
-      background: #ffffff;
-    }
   }
 
   &:hover::-webkit-slider-thumb {
@@ -165,22 +161,22 @@ const SSlider = styled.input.attrs({ type: 'range' })`
   }
 
   &::-moz-range-thumb {
-    height: 12px;
-    width: 12px;
-    border-radius: 50%;
     border: transparent;
     background: transparent;
+    outline: none;
+    box-shadow: unset;
+
+    height: 48px;
+    width: 48px;
+    border-radius: 0px;
     cursor: pointer;
 
-    transition: 0.1s ease-in-out;
+    margin-top: -16px;
 
-    ${({ theme }) => theme.media.tablet} {
-      background: #ffffff;
-    }
+    transition: 0.1s ease-in-out;
   }
   &:hover::-moz-range-thumb {
     transform: scale(1.1);
-    margin-top: -4px;
   }
 
   &::-webkit-slider-runnable-track {
@@ -218,6 +214,11 @@ const SSlider = styled.input.attrs({ type: 'range' })`
     }
 
     ::-webkit-slider-thumb {
+      height: 12px;
+      width: 12px;
+      border-radius: 48px;
+      margin-top: -6px;
+      background: #ffffff;
       transform: scale(0);
     }
 
@@ -250,6 +251,10 @@ const SSlider = styled.input.attrs({ type: 'range' })`
 
     &::-moz-range-thumb {
       transform: scale(0);
+      background: #ffffff;
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
     }
     &:hover::-moz-range-thumb {
       transform: scale(1.1);
