@@ -294,9 +294,10 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
           {!isMobileOrTablet && isResultsDropVisible && (
             <SResultsDrop>
-              {resultsPosts.length === 0 &&
-              resultsCreators.length === 0 &&
-              resultsHashtags.length === 0 ? (
+              {(resultsPosts.length === 0 &&
+                resultsCreators.length === 0 &&
+                resultsHashtags.length === 0) ||
+              isLoading ? (
                 !isLoading ? (
                   <SNoResults>
                     <NoResults closeDrop={handleCloseIconClick} />
@@ -438,11 +439,17 @@ const SResultsDrop = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: calc(100vh - 112px);
+  max-height: calc(100vh - 112px);
+  height: auto;
   top: 56px;
   padding: 16px;
   overflow-y: auto;
   overflow-x: hidden;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
 
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
@@ -451,7 +458,6 @@ const SResultsDrop = styled.div`
     width: 420px;
     margin-top: 0;
     border-radius: 16px;
-    height: auto;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -595,7 +601,7 @@ const SButton = styled(Button)`
 `;
 
 const SBlock = styled.section`
-  height: 200px;
+  height: 300px;
   width: 100%;
   display: flex;
   align-items: center;
