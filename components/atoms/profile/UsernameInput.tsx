@@ -38,7 +38,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue =
-      (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
+      e.target.value[0] === '@' ? e.target.value.slice(1) : e.target.value;
 
     onChange(newValue);
   };

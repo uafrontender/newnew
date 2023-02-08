@@ -16,7 +16,7 @@
     "title": "Tus bundles actuales"
   },
   "bundle": {
-    "accessExpired_NEED_TRANSLATION": "Your benefits have now expired. Buy another bundle for custom options and chat",
+    "accessExpired": "Tus beneficios han caducado. Compra otro bundle para tener opciones personalizadas y acceder al chat",
     "votesLeft": "<0>{{amount}}</0> votos",
     "access": "y quedan <0/> de:",
     "unitPair": "{{amount}} {{unit}}",
