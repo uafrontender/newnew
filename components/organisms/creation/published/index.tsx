@@ -252,11 +252,10 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           {fileProcessing.progress === 100 ? (
             <BitmovinPlayer
               id='published'
-              muted={false}
+              muted
               resources={videoProcessing?.targetUrls}
-              // Restricts the playback time
-              thumbnails={post.thumbnailParameters}
               showPlayButton
+              withMuteControl
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
