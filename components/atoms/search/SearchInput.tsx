@@ -207,10 +207,13 @@ const SearchInput: React.FC = React.memo(() => {
 
   useEffect(() => {
     const clearedSearchValue = getClearedSearchQuery(debouncedSearchValue);
-    if (clearedSearchValue) {
+    if (clearedSearchValue?.length > 1) {
       getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
-    } else if (!clearedSearchValue && !isMobileOrTablet) {
+    } else if (
+      (!clearedSearchValue || clearedSearchValue.length === 1) &&
+      !isMobileOrTablet
+    ) {
       setIsResultsDropVisible(false);
       resetResults();
     }
