@@ -257,6 +257,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               // Restricts the playback time
               thumbnails={post.thumbnailParameters}
               showPlayButton
+              withMuteControl
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>

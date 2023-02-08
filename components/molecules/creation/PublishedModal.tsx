@@ -253,6 +253,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
                   showPlayButton
+                  withMuteControl
                 />
               ) : (
                 <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
