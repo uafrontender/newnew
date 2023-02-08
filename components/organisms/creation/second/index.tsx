@@ -118,11 +118,11 @@ export const CreationSecondStepContent: React.FC<
     crowdfunding,
     multiplechoice,
     videoProcessing,
+    customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { overlayModeEnabled } = useOverlayMode();
-
   const { appConstants } = useGetAppConstants();
 
   const cfFormattedDescription = useMemo(() => {
@@ -1021,7 +1021,7 @@ export const CreationSecondStepContent: React.FC<
   useEffect(() => {
     if (playerRef.current && isDesktop) {
       if (overlayModeEnabled) {
-        playerRef.current.pause();
+        playerRef.current.pause().catch(() => {});
       } else {
         playerRef.current.play().catch(() => {});
       }
@@ -1187,6 +1187,7 @@ export const CreationSecondStepContent: React.FC<
                 id='video'
                 value={videoProcessing?.targetUrls}
                 thumbnails={post.thumbnailParameters}
+                customCoverImageUrl={customCoverImageUrl}
                 etaUpload={fileUpload.eta}
                 errorUpload={fileUpload.error}
                 loadingUpload={fileUpload.loading}
