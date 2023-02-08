@@ -17,7 +17,8 @@ import { Mixpanel } from '../../utils/mixpanel';
 
 export const Logo: React.FunctionComponent<{
   style?: React.CSSProperties;
-}> = ({ style }) => {
+  isShort?: boolean;
+}> = ({ style, isShort }) => {
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
@@ -60,12 +61,13 @@ export const Logo: React.FunctionComponent<{
             }
           : {}),
       }}
+      isShort={isShort}
       onClick={handleClick}
     >
       <SAnimationWrapper>
         <Lottie
           width={isMobile ? 55 : 65}
-          height={isMobile ? 45 : 60}
+          height={isMobile ? 45 : 55}
           options={{
             loop: false,
             autoplay: true,
@@ -74,7 +76,7 @@ export const Logo: React.FunctionComponent<{
           isStopped={!loading}
         />
       </SAnimationWrapper>
-      {!isMobile && (
+      {!isMobile && !isShort && (
         <SInlineSVG
           svg={logoText}
           fill={theme.colorsThemed.text.primary}
@@ -103,8 +105,10 @@ Logo.defaultProps = {
 
 export default Logo;
 
-const SWrapper = styled.a`
-  width: 127px;
+const SWrapper = styled.a<{
+  isShort?: boolean;
+}>`
+  width: ${({ isShort }) => (isShort ? '45px' : '127px')};
   height: 40px;
   cursor: pointer;
   display: flex;
@@ -113,7 +117,7 @@ const SWrapper = styled.a`
   justify-content: flex-end;
 
   ${(props) => props.theme.media.tablet} {
-    width: 152px;
+    width: ${({ isShort }) => (isShort ? '55px' : '152px')};
     height: 48px;
   }
 `;
