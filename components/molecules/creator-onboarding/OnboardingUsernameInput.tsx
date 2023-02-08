@@ -47,8 +47,13 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
   };
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      return;
+    }
+
+    if (isValid) {
+      setErrorBordersShown(false);
+    }
   }, [focused, isValid]);
 
   const inputContainerRef = useRef(null);
@@ -307,13 +312,16 @@ const SErrorDiv = styled.div`
 `;
 
 const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  display: block;
+  width: 100%;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 
   margin-top: 16px;
 
-  text-align: center;
+  text-align: start;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
