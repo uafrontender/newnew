@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { GetServerSideProps, NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 
@@ -120,11 +119,11 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
 export default VerifyNewEmail;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<any> {
   const translationContext = await serverSideTranslations(
-    context.locale,
+    context.locale!!,
     ['common', 'page-VerifyEmail'],
     null,
     SUPPORTED_LANGUAGES

@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
-import type { NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -103,9 +103,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({ postsFilter }) => {
 
 export default MyProfileMyPosts;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale!!,
     [
