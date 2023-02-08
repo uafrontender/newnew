@@ -188,7 +188,14 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   // Editing stories
   const [isEditingStories, setIsEditingStories] = useState(false);
 
-  const handleToggleEditingStories = () => setIsEditingStories((curr) => !curr);
+  const handleToggleEditingStories = useCallback(
+    () => setIsEditingStories((curr) => !curr),
+    []
+  );
+  const handleUnsetEditingStories = useCallback(
+    () => setIsEditingStories(false),
+    []
+  );
 
   // Adjust sound button if needed
   useEffect(() => {
@@ -264,6 +271,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             soundBtnBottomOverriden={bottomOffset}
             handleToggleMuted={handleToggleMuted}
             handleToggleEditingStories={handleToggleEditingStories}
+            handleUnsetEditingStories={handleUnsetEditingStories}
           />
         ) : uploadedResponseVideoUrl &&
           videoProcessing?.targetUrls &&
