@@ -295,7 +295,7 @@
       "title": "Próximamente",
       "subtitle_1": "Tu {{postType}} no está activo todavía.",
       "subtitle_2": "Comenzará en",
-      "toggleButton_NEED_TRANSLATION": "See options",
+      "toggleButton": "Ver opciones",
       "timer": {
         "days": "Días",
         "hours": "Horas",
@@ -819,7 +819,7 @@
     "alreadyVoted": "Ya has votado",
     "mcVoteCountTooSmall": "El número de votos es demasiado pequeño",
     "notAllowedToCreateNewOption": "No se permite crear una nueva opción",
-    "optionNotUnique_NEED_TRANSLATION": "Option already exists",
+    "optionNotUnique": "Esta opción ya existe",
     "cfCancelled": "El Goal ha sido cancelado",
     "cfFinished": "El Goal ya ha concluido",
     "cfNotStarted": "El Goal no ha comenzado todavía",
