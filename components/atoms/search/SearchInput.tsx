@@ -31,6 +31,7 @@ import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -202,8 +203,10 @@ const SearchInput: React.FC = React.memo(() => {
     }
   }
 
+  const debouncedSearchValue = useDebouncedValue(searchValue, 500);
+
   useEffect(() => {
-    const clearedSearchValue = getClearedSearchQuery(searchValue);
+    const clearedSearchValue = getClearedSearchQuery(debouncedSearchValue);
     if (clearedSearchValue) {
       getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
@@ -212,7 +215,7 @@ const SearchInput: React.FC = React.memo(() => {
       resetResults();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, isMobileOrTablet]);
+  }, [debouncedSearchValue, isMobileOrTablet]);
 
   function closeSearch() {
     handleSearchClose();
