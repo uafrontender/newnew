@@ -482,7 +482,12 @@ const PRE_FETCH_LINKS_DARK = (
     {/* Bundle assets (static is not used yet, preload when used) */}
     <link rel='prefetch' href={assets.bundles.darkBundles} as='image' />
     {assets.bundles.darkVotes.map((asset) => (
-      <link rel='prefetch' href={asset.animated()} as='image' />
+      <link
+        key={asset.static}
+        rel='prefetch'
+        href={asset.animated()}
+        as='image'
+      />
     ))}
   </>
 );
@@ -549,8 +554,13 @@ const PRE_FETCH_LINKS_LIGHT = (
     {/* <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' /> */}
     {/* Bundle assets (static is not used yet, preload when used) */}
     <link rel='prefetch' href={assets.bundles.lightBundles} as='image' />
-    {assets.bundles.lightVotes.map((asset) => (
-      <link rel='prefetch' href={asset.animated()} as='image' />
+    {assets.bundles.lightVotes.map((asset, i) => (
+      <link
+        key={asset.static}
+        rel='prefetch'
+        href={asset.animated()}
+        as='image'
+      />
     ))}
   </>
 );
