@@ -598,7 +598,7 @@ export const CreationSecondStepContent: React.FC<
         // });
         dispatch(setCreationTitle(value.trim() ? value : ''));
       } else if (key === 'minimalBid') {
-        Mixpanel.track('Minimal Big Change', {
+        Mixpanel.track('Minimal Bid Change', {
           _stage: 'Creation',
           _value: value,
         });
