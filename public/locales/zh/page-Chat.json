@@ -65,6 +65,7 @@
     "title": "收件箱為空",
     "text": "你與某位Bundle所有者的對話開始後，對話將在此處列出"
   },
+  "selectChat_NEED_TRANSLATION": "Select a chat to start messaging",
   "newAnnouncement": {
     "title": "新公告",
     "text": "只有你能向該組群發訊息。",
