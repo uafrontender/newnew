@@ -124,6 +124,7 @@ const PostPage: NextPage<IPostPage> = ({
         router.replace('/404');
       },
       enabled: !post,
+      refetchOnWindowFocus: false,
     }
   );
 
