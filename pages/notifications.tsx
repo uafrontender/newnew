@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { ReactElement, useCallback, useEffect } from 'react';
+import React, { ReactElement, useState, useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -41,6 +41,7 @@ export const Notifications = () => {
   const { ref: scrollRef, inView } = useInView();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const [readAllToTime, setReadAllToTime] = useState<number | undefined>();
 
   // TODO: return a list of new notifications once WS message can be used
   // const [newNotifications, setNewNotifications] = useState<
@@ -86,14 +87,20 @@ export const Notifications = () => {
         stage: 'Notifications',
       });
 
+      const lastNotification = notifications[0];
+      if (lastNotification.createdAt?.seconds) {
+        setReadAllToTime((lastNotification.createdAt.seconds as number) * 1000);
+      }
+
       const payload = new newnewapi.EmptyRequest({});
       await markAllAsRead(payload);
 
       fetchNotificationCount();
     } catch (err) {
       console.error(err);
+      setReadAllToTime(undefined);
     }
-  }, [fetchNotificationCount]);
+  }, [notifications, fetchNotificationCount]);
 
   useEffect(() => {
     if (inView && !loading && hasMore) {
@@ -113,10 +120,18 @@ export const Notifications = () => {
   // }, [notifications, newNotifications]);
 
   const renderNotification = useCallback(
-    (item: newnewapi.INotification) => (
-      <Notification key={item.id as any} {...item} />
-    ),
-    []
+    (item: newnewapi.INotification) => {
+      const { id, isRead, ...rest } = item;
+      if (readAllToTime && item.createdAt?.seconds) {
+        const createdAtTime = (item.createdAt.seconds as number) * 1000;
+        if (readAllToTime >= createdAtTime) {
+          return <Notification key={id as any} isRead {...rest} />;
+        }
+      }
+
+      return <Notification key={id as any} isRead={isRead} {...rest} />;
+    },
+    [readAllToTime]
   );
 
   return (

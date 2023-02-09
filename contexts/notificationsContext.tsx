@@ -31,7 +31,10 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   const socketConnection = useContext(SocketContext);
 
   const fetchNotificationCount = useCallback(async () => {
-    if (!user.loggedIn) return;
+    if (!user.loggedIn) {
+      return;
+    }
+
     try {
       setNotificationsLoading(true);
       const payload = new newnewapi.EmptyRequest();
