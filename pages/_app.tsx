@@ -195,6 +195,8 @@ const MyApp = (props: IMyApp): ReactElement => {
         isCreator: user.userData.options?.isCreator,
       });
       Mixpanel.track('Session started!');
+    } else {
+      Mixpanel.track('Guest Session started!');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
