@@ -193,6 +193,7 @@ const MyApp = (props: IMyApp): ReactElement => {
       });
       Mixpanel.register({
         isCreator: user.userData.options?.isCreator,
+        username: user.userData.username,
       });
       Mixpanel.track('Session started!');
     } else {
