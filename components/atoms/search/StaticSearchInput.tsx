@@ -109,7 +109,13 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     };
 
     const handleInputChange = (e: any) => {
-      setSearchValue(e.target.value);
+      const onlySpacesRegex = /^\s+$/;
+
+      if (onlySpacesRegex.test(e.target.value)) {
+        setSearchValue('');
+      } else {
+        setSearchValue(e.target.value);
+      }
     };
 
     const handleKeyDown = (e: any) => {
