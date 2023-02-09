@@ -99,6 +99,12 @@ const Notification: React.FC<newnewapi.INotification> = ({
   }, [url, target]);
 
   useEffect(() => {
+    if (isRead) {
+      setIsUnread(false);
+    }
+  }, [isRead]);
+
+  useEffect(() => {
     if (inView && isUnread && !markAsReadTimeoutRef.current) {
       const MARK_AS_READ_DELAY = 3000;
       markAsReadTimeoutRef.current = setTimeout(() => {
