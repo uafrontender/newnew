@@ -65,6 +65,7 @@
     "title": "Su bandeja de entrada está vacía",
     "text": "Cuando inicies una conversación con el dueño de un Bundle, lo verás listado aquí"
   },
+  "selectChat_NEED_TRANSLATION": "Select a chat to start messaging",
   "newAnnouncement": {
     "title": "Nuevo anuncio",
     "text": "Solo tú puedes enviar mensajes al grupo.",
