@@ -216,8 +216,7 @@ const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsername
   line-height: 24px;
   font-weight: 500;
 
-  padding: 12px 40px 12px 20px;
-  padding-right: 32px;
+  padding: 12px 48px 12px 20px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
