@@ -137,7 +137,7 @@ export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
   );
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'page-Bundles', 'modal-PaymentModal'],
+    ['common', 'page-Bundles', 'modal-PaymentModal', 'page-Post'],
     null,
     SUPPORTED_LANGUAGES
   );
