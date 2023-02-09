@@ -125,11 +125,11 @@ export const Notifications = () => {
       if (readAllToTime && item.createdAt?.seconds) {
         const createdAtTime = (item.createdAt.seconds as number) * 1000;
         if (readAllToTime >= createdAtTime) {
-          return <Notification key={id as any} isRead {...rest} />;
+          return <Notification key={id as any} id={id} isRead {...rest} />;
         }
       }
 
-      return <Notification key={id as any} isRead={isRead} {...rest} />;
+      return <Notification key={id as any} id={id} isRead={isRead} {...rest} />;
     },
     [readAllToTime]
   );
