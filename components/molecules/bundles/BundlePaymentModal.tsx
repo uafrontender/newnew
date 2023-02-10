@@ -18,6 +18,21 @@ import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
 import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.BuyCreatorsBundleResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.BuyCreatorsBundleResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'errors.notEnoughMoney';
+    case newnewapi.BuyCreatorsBundleResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.BuyCreatorsBundleResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
@@ -34,6 +49,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   onCloseSuccessModal,
 }) => {
   const { t } = useTranslation('common');
+  const { t: tPost } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
   const router = useRouter();
   const { appConstants } = useGetAppConstants();
@@ -119,7 +135,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ?? t('modal.buyBundle.error.requestFailed')
+            res.error?.message ??
+              tPost(getPayWithCardErrorMessage(res.data?.status))
           );
         }
 
@@ -132,7 +149,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         setupIntent.destroy();
       }
     },
-    [setupIntent, router, t, showErrorToastCustom]
+    [setupIntent, router, tPost, showErrorToastCustom]
   );
 
   const paymentWithFeeInCents = useMemo(
