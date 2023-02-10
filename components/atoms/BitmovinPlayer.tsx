@@ -16,11 +16,12 @@ import {
 
 import Button from './Button';
 import InlineSVG from './InlineSVG';
+import PlayerScrubber from './PlayerScrubber';
 
 import PlayIcon from '../../public/images/svg/icons/filled/Play.svg';
 import volumeOn from '../../public/images/svg/icons/filled/VolumeON.svg';
 import volumeOff from '../../public/images/svg/icons/filled/VolumeOFF1.svg';
-import PlayerScrubber from './PlayerScrubber';
+import Loader from './Loader';
 
 interface IBitmovinPlayer {
   id: string;
@@ -158,13 +159,17 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       player.current?.load(playerSource).then(
         () => {
           setLoaded(true);
-          setIsLoading(false);
 
           // Catch error in case of low power mode and show play button
           // NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
-          player.current?.play().catch(() => {
-            handleSetIsPaused(true);
-          });
+          player.current
+            ?.play()
+            .then(() => {
+              setIsLoading(false);
+            })
+            .catch(() => {
+              handleSetIsPaused(true);
+            });
 
           if (setDuration) {
             setDuration(player.current?.getDuration());
@@ -287,6 +292,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           </SPlayPseudoButton>
         )}
       </SVideoWrapper>
+      {isLoading && <SLoader size={playButtonSize === 'small' ? 'xs' : 'md'} />}
       {withMuteControl && (
         <SModalSoundIcon position={mutePosition}>
           <Button
@@ -361,6 +367,14 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
   border-radius: ${(props) => props.borderRadius};
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
+`;
+
+const SLoader = styled(Loader)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
 `;
 
 const SWrapper = styled.div`
