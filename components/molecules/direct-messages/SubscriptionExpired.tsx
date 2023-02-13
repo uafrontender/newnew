@@ -59,6 +59,8 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         <BuyBundleModal
           show={buyBundleModalOpen}
           creator={user}
+          // Only authorized user can prolong a subscription so success path is irrelevant
+          successPath='/bundles'
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}
