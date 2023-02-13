@@ -49,6 +49,8 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOption.svg';
 import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBundleAfterStripeRedirect';
+import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
@@ -111,6 +113,65 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
+  );
+
+  const {
+    saveCard,
+    bundleStripeSetupIntentClientSecret,
+    customOptionTextFromRedirect,
+    resetBundleSetupIntentClientSecret,
+  } = usePostInnerState();
+
+  const onBundlePurchasedAfterRedirect = useCallback(async () => {
+    // Showing bundle purchased modal here would be nice, but we have no idea what offer user purchased.
+    // So, just adding an option and showing a success modal here.
+    // Also confirm custom vote modal is unnecessary as the user literally just payed for it.
+
+    if (!customOptionTextFromRedirect) {
+      return;
+    }
+
+    try {
+      const payload = new newnewapi.CreateCustomMcOptionRequest({
+        postUuid: post.postUuid,
+        optionText: customOptionTextFromRedirect,
+      });
+
+      const res = await createCustomOption(payload);
+
+      if (
+        !res.data ||
+        res.data.status !==
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
+        res.error
+      ) {
+        throw new Error(t(addOptionErrorMessage(res.data?.status)));
+      }
+
+      const optionFromResponse = (res.data
+        .option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByMe = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      setPaymentSuccessValue(1);
+    } catch (err: any) {
+      console.error(err);
+      showErrorToastCustom(err.message);
+    }
+
+    resetBundleSetupIntentClientSecret();
+  }, [
+    customOptionTextFromRedirect,
+    post.postUuid,
+    handleAddOrUpdateOptionFromResponse,
+    resetBundleSetupIntentClientSecret,
+    showErrorToastCustom,
+    t,
+  ]);
+
+  useBuyBundleAfterStripeRedirect(
+    bundleStripeSetupIntentClientSecret,
+    saveCard,
+    onBundlePurchasedAfterRedirect
   );
 
   // Scroll block
@@ -306,6 +367,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       );
     }
   };
+
+  const successPath = useMemo(
+    () =>
+      newOptionText && newOptionTextValid
+        ? `/p/${post.postShortId}?custom_option_text=${encodeURIComponent(
+            newOptionText
+          )}`
+        : `/p/${post.postShortId}`,
+    [newOptionText, newOptionTextValid, post.postShortId]
+  );
 
   return (
     <>
@@ -596,6 +667,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <BuyBundleModal
           show
           creator={post.creator}
+          successPath={successPath}
           additionalZ={13}
           onSuccess={() => {
             if (newOptionText && newOptionTextValid) {

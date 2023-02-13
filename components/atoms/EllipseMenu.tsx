@@ -187,6 +187,7 @@ const EllipseMenu: React.FunctionComponent<IEllipseMenu> = ({
 export default EllipseMenu;
 
 interface IEllipseMenuButton {
+  id?: string;
   tone?: 'neutral' | 'error';
   onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   children: React.ReactNode;
@@ -196,6 +197,7 @@ interface IEllipseMenuButton {
 }
 
 export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
+  id,
   onClick,
   children,
   tone,
@@ -205,6 +207,7 @@ export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
   ...rest
 }) => (
   <SButton
+    id={id}
     onClick={(e) => {
       if (onClick) {
         e.stopPropagation();

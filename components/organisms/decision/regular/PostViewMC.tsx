@@ -332,7 +332,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   useEffect(() => {
     const controller = new AbortController();
     const makeVoteAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
+      if (!stripeSetupIntentClientSecret || loadingModalOpen) {
+        return;
+      }
 
       if (!user._persist?.rehydrated) {
         return;
@@ -698,6 +700,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         <BuyBundleModal
           show
           creator={post.creator}
+          successPath={`/p/${post.postShortId}`}
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}

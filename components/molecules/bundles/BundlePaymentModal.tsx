@@ -36,6 +36,7 @@ const getPayWithCardErrorMessage = (
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  successPath: string;
   additionalZ?: number;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
@@ -44,6 +45,7 @@ interface IBundlePaymentModal {
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
+  successPath,
   additionalZ,
   onClose,
   onCloseSuccessModal,
@@ -87,10 +89,17 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [creator, bundleOffer, paymentFeeInCents]
   );
 
+  const successUrl = useMemo(() => {
+    if (successPath.includes('?')) {
+      return `${process.env.NEXT_PUBLIC_APP_URL}${successPath}&bundle=true`;
+    }
+    return `${process.env.NEXT_PUBLIC_APP_URL}${successPath}?bundle=true`;
+  }, [successPath]);
+
   const setupIntent = useStripeSetupIntent({
     purpose: buyCreatorsBundleRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/bundles`,
+    successUrl,
   });
 
   const handlePayWithCard = useCallback(
