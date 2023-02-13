@@ -188,21 +188,20 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
 
   useEffect(() => {
     let cancel = false;
-    async function load() {
+    function load() {
       setIsLoading(true);
-      // console.log(player.current);
       try {
-        await player?.current
+        player?.current
           ?.load(playerSource)
           .then(() => {
             if (cancel) return;
             player.current
               ?.play()
-              .then(() => {
-                setIsLoading(false);
-              })
               .catch(() => {
                 handleSetIsPaused(true);
+              })
+              .finally(() => {
+                setIsLoading(false);
               });
             setLoaded(true);
           })
