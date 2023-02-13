@@ -234,6 +234,7 @@ export const Bundles: React.FC = React.memo(() => {
         <BuyBundleModal
           show
           creator={offeredCreator}
+          successPath='/bundles'
           onClose={() => {
             setOfferedCreator(undefined);
             setShownCreatorBundle(undefined);
