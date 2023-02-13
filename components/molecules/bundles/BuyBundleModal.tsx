@@ -19,13 +19,14 @@ import getDisplayname from '../../../utils/getDisplayname';
 interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
+  successPath: string;
   additionalZ?: number;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, additionalZ, onClose, onSuccess }) => {
+  ({ show, creator, successPath, additionalZ, onClose, onSuccess }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const { appConstants } = useGetAppConstants();
@@ -94,6 +95,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
                   additionalZ: additionalZ + 1,
                 }
               : {})}
+            successPath={successPath}
             onClose={() => setBundleToBuy(undefined)}
             onCloseSuccessModal={() => {
               if (onSuccess) {

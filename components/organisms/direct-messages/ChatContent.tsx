@@ -226,7 +226,9 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   );
 
   const whatComponentToDisplay = useCallback(() => {
-    if (chatRoom.visavis?.user?.options?.isTombstone) return <AccountDeleted />;
+    if (chatRoom.visavis?.user?.options?.isTombstone) {
+      return <AccountDeleted />;
+    }
 
     if (isMessagingDisabled && chatRoom.visavis?.user)
       return <MessagingDisabled user={chatRoom.visavis.user} />;

@@ -94,6 +94,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
       <BuyBundleModal
         show={buyBundleModalOpen}
         creator={user}
+        successPath={`/${user.username}`}
         onClose={() => {
           setBuyBundleModalOpen(false);
           setCreatorsBundleModalOpen(false);

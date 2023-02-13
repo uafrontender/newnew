@@ -592,6 +592,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }}
       >
         <SContainer
+          id={
+            isBlue && isSuggestedByMe ? 'suggested-option-container' : undefined
+          }
           layout='position'
           transition={{
             type: 'spring',
@@ -600,7 +603,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={false}
           $isBlue={isBlue}
-          onClick={(e) => handleClickOptionBodyOpenEllipseMenu(e)}
+          onClick={(e: any) => handleClickOptionBodyOpenEllipseMenu(e)}
         >
           {isMobile && (
             <SEllipseButtonMobile
