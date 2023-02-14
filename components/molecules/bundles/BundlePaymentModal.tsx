@@ -180,7 +180,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
-        // TODO: fix redirect url (pass as prop?)
         redirectUrl='bundles'
         type={paymentSuccessModalOpen ? 'covered' : type}
         onClose={onClose}
