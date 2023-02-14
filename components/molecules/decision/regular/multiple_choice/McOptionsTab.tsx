@@ -247,6 +247,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       }
 
       setIsAPIValidateLoading(false);
+
+      return res.data?.status === newnewapi.ValidateTextResponse.Status.OK;
     } catch (err) {
       console.error(err);
       setIsAPIValidateLoading(false);
@@ -325,13 +327,30 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     showErrorToastCustom,
   ]);
 
+  const customOptionExists = useMemo(
+    () => options.findIndex((option) => option.text === newOptionText) > -1,
+    [newOptionText, options]
+  );
+
   const handleAddOptionButtonClicked = useCallback(() => {
     if (canAddCustomOption) {
       setConfirmCustomOptionModalOpen(true);
     } else {
-      setBuyBundleModalOpen(true);
+      if (customOptionExists) {
+        return;
+      }
+
+      // Make sure user can add the option before selling a bundle
+      validateTextViaAPI(newOptionText).then(() => {
+        setBuyBundleModalOpen(true);
+      });
     }
-  }, [canAddCustomOption]);
+  }, [
+    customOptionExists,
+    canAddCustomOption,
+    newOptionText,
+    validateTextViaAPI,
+  ]);
 
   const handleAddOptionButtonClickCaptured = useCallback(() => {
     Mixpanel.track('Click Add Custom Option', {
@@ -549,7 +568,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
               <SAddOptionButton
                 size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
+                disabled={
+                  !newOptionText || !newOptionTextValid || customOptionExists
+                }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
@@ -591,7 +612,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               <SAddOptionButton
                 id='add-option-submit'
                 size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
+                disabled={
+                  !newOptionText || !newOptionTextValid || customOptionExists
+                }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
