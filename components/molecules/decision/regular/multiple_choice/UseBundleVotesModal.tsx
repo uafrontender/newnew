@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import Button from '../../../../atoms/Button';
-import Modal from '../../../../organisms/Modal';
+import Modal, { ModalType } from '../../../../organisms/Modal';
 import assets from '../../../../../constants/assets';
 import ModalPaper from '../../../../organisms/ModalPaper';
 import { formatNumber } from '../../../../../utils/format';
@@ -12,6 +12,7 @@ interface IUseBundleVotesModal {
   show: boolean;
   optionText: string;
   bundleVotesLeft: number;
+  type?: ModalType;
   handleVoteWithBundleVotes: (voteCount: number) => void;
   onClose: () => void;
 }
@@ -20,6 +21,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   show,
   optionText,
   bundleVotesLeft,
+  type,
   handleVoteWithBundleVotes,
   onClose,
 }) => {
@@ -36,7 +38,7 @@ const UseBundleVotesModal: React.FC<IUseBundleVotesModal> = ({
   }, [show, bundleVotesLeft]);
 
   return (
-    <Modal show={show} overlaydim additionalz={12} onClose={onClose}>
+    <Modal show={show} type={type} additionalz={12} onClose={onClose}>
       <SModalPaper onClose={onClose} isCloseButton>
         <SContainer>
           <SBundleIcon src={assets.decision.votes} alt='votes' />

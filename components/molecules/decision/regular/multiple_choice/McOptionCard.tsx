@@ -535,9 +535,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
         setIsSupportMenuOpen(false);
+        setPaymentModalOpen(false);
         setLoadingModalOpen(false);
         handleSetPaymentSuccessValue(votesCount);
-        setIsSupportMenuOpen(false);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
@@ -747,7 +747,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {isConfirmVoteModalOpen ? (
           <McOptionConfirmVoteModal
             zIndex={11}
-            isOpen={isConfirmVoteModalOpen}
+            show={isConfirmVoteModalOpen}
+            type={paymentModalOpen ? 'covered' : 'initial'}
             isAmountPredefined={isAmountPredefined || !!supportVoteOffer}
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
@@ -770,6 +771,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {bundle?.votesLeft ? (
           <UseBundleVotesModal
             show={bundleVotesModalOpen}
+            type='initial' // following on Mobile?
             bundleVotesLeft={bundle.votesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
@@ -781,6 +783,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
+            type='following'
             amount={
               !isAmountPredefined
                 ? customPaymentWithFeeInCents

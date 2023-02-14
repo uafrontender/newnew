@@ -230,7 +230,11 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
 
   return (
     <>
-      <Modal show={show} onClose={handleClose} overlaydim>
+      <Modal
+        show={show}
+        type={isCardSetupCompleted && stripeSetupIntent ? 'covered' : 'initial'}
+        onClose={handleClose}
+      >
         <SModalPaper
           title={t('Settings.sections.cards.button.addNewCard')}
           onClose={handleClose}
@@ -258,6 +262,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
       {isCardSetupCompleted && stripeSetupIntent && (
         <CardSetupCompleteModal
           show={isCardSetupCompleted}
+          type='following'
           closeModal={handleCloseCardSetupCompleteModal}
           clientSecret={stripeSetupIntent.client_secret}
           setupIntentId={stripeSetupIntent.id}

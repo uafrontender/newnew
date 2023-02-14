@@ -533,7 +533,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       (post.creator?.options?.isOfferingBundles || bundle) ? (
         isMobile ? (
           <OptionActionMobileModal
-            isOpen={suggestNewOptionModalOpen}
+            show={suggestNewOptionModalOpen}
+            type={confirmCustomOptionModalOpen ? 'covered' : 'initial'}
             onClose={handleSuggestNewOptionModalClosed}
             zIndex={12}
           >
@@ -562,8 +563,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ) : (
           <Modal
             show={suggestNewOptionModalOpen}
+            type={confirmCustomOptionModalOpen ? 'covered' : 'initial'}
             onClose={handleSuggestNewOptionModalClosed}
-            overlaydim
             additionalz={12}
           >
             <SSuggestNewContainer>
@@ -605,7 +606,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ) : null}
       {/* Add a custom option Modal */}
       <McConfirmCustomOptionModal
-        isVisible={confirmCustomOptionModalOpen}
+        show={confirmCustomOptionModalOpen}
+        type='following'
         handleAddCustomOption={handleAddNewOption}
         closeModal={() => setConfirmCustomOptionModalOpen(false)}
       />
@@ -614,8 +616,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='mc'
+        show={paymentSuccessValue !== undefined}
         value={paymentSuccessValue}
-        isVisible={paymentSuccessValue !== undefined}
+        type='following'
         closeModal={() => {
           setPaymentSuccessValue(undefined);
           promptUserWithPushNotificationsPermissionModal();
@@ -666,6 +669,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {buyBundleModalOpen && post.creator && (
         <BuyBundleModal
           show
+          type='following'
           creator={post.creator}
           successPath={successPath}
           additionalZ={13}

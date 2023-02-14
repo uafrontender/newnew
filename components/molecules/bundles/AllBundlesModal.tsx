@@ -6,18 +6,19 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../redux-store/store';
 import preventParentClick from '../../../utils/preventParentClick';
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import BundleCard from './BundleCard';
 
 interface IAllBundlesModal {
   show: boolean;
+  type?: ModalType;
   creatorBundles: newnewapi.ICreatorBundle[];
   onClose: () => void;
 }
 
 const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
-  ({ show, creatorBundles, onClose }) => {
+  ({ show, type, creatorBundles, onClose }) => {
     const { t } = useTranslation('page-Bundles');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -51,7 +52,7 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
     }, [setSize, creatorBundles]);
 
     return (
-      <Modal show={show} onClose={onClose}>
+      <Modal show={show} type={type} onClose={onClose}>
         <SModalPaper
           title={!isMobile ? t('bundlesModal.title') : undefined}
           onClose={onClose}

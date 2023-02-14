@@ -127,6 +127,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
       {turnBundleModalOpen && (
         <TurnBundleModal
           show
+          type='initial'
           zIndex={1001}
           isBundlesEnabled={isSellingBundles}
           onToggleBundles={onToggleBundles}
@@ -136,8 +137,9 @@ export const DashboardBundles: React.FC = React.memo(() => {
       {successModalOpen && (
         <SuccessBundleModal
           show
-          zIndex={1002}
           isBundlesEnabled={isSellingBundles}
+          type='following'
+          zIndex={1002}
           onClose={() => setSuccessModalOpen(false)}
         />
       )}

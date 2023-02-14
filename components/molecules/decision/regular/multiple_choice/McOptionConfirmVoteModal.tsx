@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
-import Modal from '../../../../organisms/Modal';
+import Modal, { ModalType } from '../../../../organisms/Modal';
 import Headline from '../../../../atoms/Headline';
 
 // Icons
@@ -17,7 +17,7 @@ import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IMcConfirmVoteModal {
-  isOpen: boolean;
+  show: boolean;
   zIndex: number;
   postCreatorName: string;
   optionText: string;
@@ -26,13 +26,14 @@ interface IMcConfirmVoteModal {
   customPaymentWithFeeInCents: number;
   isAmountPredefined: boolean;
   minAmount: number;
+  type?: ModalType;
   onClose: () => void;
   handleOpenPaymentModal: () => void;
   handleSetSupportVotesAmount: (newAmount: string) => void;
 }
 
-const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
-  isOpen,
+const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
+  show,
   zIndex,
   postCreatorName,
   optionText,
@@ -41,6 +42,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   customSupportVotesAmount,
   customPaymentWithFeeInCents,
   minAmount,
+  type,
   onClose,
   handleOpenPaymentModal,
   handleSetSupportVotesAmount,
@@ -54,7 +56,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
 
   if (!isAmountPredefined) {
     return (
-      <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
+      <Modal show={show} type={type} additionalz={zIndex} onClose={onClose}>
         <SWrapper>
           <SContentContainer
             onClick={(e) => {
@@ -123,7 +125,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   }
 
   return (
-    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
+    <Modal show={show} type={type} additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
@@ -191,9 +193,9 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   );
 };
 
-McConfirmVoteModal.defaultProps = {};
+McOptionConfirmVoteModal.defaultProps = {};
 
-export default McConfirmVoteModal;
+export default McOptionConfirmVoteModal;
 
 const SWrapper = styled.div`
   width: 100%;

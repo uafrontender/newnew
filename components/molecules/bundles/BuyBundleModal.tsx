@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import preventParentClick from '../../../utils/preventParentClick';
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import BundleOfferCard from './BunldeOfferCard';
@@ -20,13 +20,14 @@ interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
   successPath: string;
+  type?: ModalType;
   additionalZ?: number;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, successPath, additionalZ, onClose, onSuccess }) => {
+  ({ show, type, creator, successPath, additionalZ, onClose, onSuccess }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const { appConstants } = useGetAppConstants();
@@ -42,6 +43,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
       <>
         <Modal
           show={show}
+          type={bundleToBuy !== undefined ? 'covered' : type}
           {...(additionalZ
             ? {
                 additionalz: additionalZ,
@@ -96,6 +98,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
                 }
               : {})}
             successPath={successPath}
+            type='following'
             onClose={() => setBundleToBuy(undefined)}
             onCloseSuccessModal={() => {
               if (onSuccess) {

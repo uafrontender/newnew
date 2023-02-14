@@ -4,7 +4,7 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 // Components
-import Modal from '../Modal';
+import Modal, { ModalType } from '../Modal';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import ModalPaper, { SContent } from '../ModalPaper';
@@ -37,6 +37,7 @@ const getCardStatusMessage = (cardStatus: newnewapi.CardStatus) => {
 };
 interface ICardSetupCompleteModal {
   show: boolean;
+  type?: ModalType;
   closeModal: () => void;
   clientSecret: string | null;
   setupIntentId: string | null;
@@ -44,6 +45,7 @@ interface ICardSetupCompleteModal {
 
 const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   show,
+  type,
   closeModal,
   clientSecret,
   setupIntentId,
@@ -171,7 +173,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   };
 
   return (
-    <Modal show={show} onClose={handleCloseModal} overlaydim>
+    <Modal show={show} type={type} onClose={handleCloseModal}>
       <SModalPaper onClose={handleCloseModal} isCloseButton isMobileFullScreen>
         <SModalContent>
           {/* Loading view */}

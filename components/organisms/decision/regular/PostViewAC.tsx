@@ -592,7 +592,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         {paymentSuccessModalOpen && (
           <PaymentSuccessModal
             postType='ac'
-            isVisible={paymentSuccessModalOpen}
+            show={paymentSuccessModalOpen}
             closeModal={() => {
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();

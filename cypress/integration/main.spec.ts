@@ -23,7 +23,7 @@ context('Main flow', () => {
   let payedForBundles = 0;
   let winningBid: { text: string; amount: number } | undefined = undefined;
 
-  const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25];
+  const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25] as const;
   type SuperpollOption = typeof SUPERPOLL_OPTIONS[number];
 
   function voteOnSuperpoll(

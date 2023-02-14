@@ -78,6 +78,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
         <CreatorsBundleModal
           show={creatorsBundleModalOpen}
           creatorBundle={creatorBundle}
+          type={buyBundleModalOpen ? 'covered' : 'initial'}
           onBuyMore={() => {
             Mixpanel.track('Open Buy Creators Bundle Modal', {
               _stage: 'Profile',
@@ -93,6 +94,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
       )}
       <BuyBundleModal
         show={buyBundleModalOpen}
+        type='following'
         creator={user}
         successPath={`/${user.username}`}
         onClose={() => {
