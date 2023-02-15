@@ -105,11 +105,11 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     []
   );
 
-  const handleOpenEditThumbnailMenu = useCallback(() => {
-    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
-    setShowThumbnailEdit(true);
-    setShowEllipseMenu(false);
-  }, []);
+  // const handleOpenEditThumbnailMenu = useCallback(() => {
+  //   Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
+  //   setShowThumbnailEdit(true);
+  //   setShowEllipseMenu(false);
+  // }, []);
 
   const handleCloseThumbnailEditClick = useCallback(() => {
     Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
@@ -329,7 +329,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           }}
           offsetRight='200px'
         >
-          <EllipseMenuButton
+          {/* <EllipseMenuButton
             onClick={() => {
               Mixpanel.track('Open Edit Thumbnail Menu', {
                 _stage: 'Post',
@@ -340,7 +340,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             }}
           >
             {t('thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseMenuButton>
+          </EllipseMenuButton> */}
           <EllipseMenuButton
             onClick={() => {
               Mixpanel.track('Open Edit Cover Image Menu', {
@@ -361,7 +361,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           show={showEllipseMenu}
           onClose={handleCloseEllipseMenu}
         >
-          <EllipseModalButton
+          {/* <EllipseModalButton
             onClick={() => {
               Mixpanel.track('Open Edit Thumbnail Menu', {
                 _stage: 'Post',
@@ -372,7 +372,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             }}
           >
             {t('thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseModalButton>
+          </EllipseModalButton> */}
           <EllipseModalButton
             onClick={() => {
               Mixpanel.track('Open Edit Cover Image Menu', {

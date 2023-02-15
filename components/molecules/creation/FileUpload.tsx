@@ -62,9 +62,6 @@ interface IFileUpload {
   handleCancelVideoUpload: () => void;
 }
 
-// secondStep.video.thumbnailEllipseMenu.selectSnippetButton
-// secondStep.video.thumbnailEllipseMenu.uploadImageButton
-
 const FileUpload: React.FC<IFileUpload> = ({
   id,
   value,
@@ -136,12 +133,12 @@ const FileUpload: React.FC<IFileUpload> = ({
     []
   );
 
-  const handleOpenEditThumbnailMenu = useCallback(() => {
-    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
-    setShowThumbnailEdit(true);
-    setShowEllipseMenu(false);
-    playerRef.current.pause();
-  }, []);
+  // const handleOpenEditThumbnailMenu = useCallback(() => {
+  //   Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
+  //   setShowThumbnailEdit(true);
+  //   setShowEllipseMenu(false);
+  //   playerRef.current.pause();
+  // }, []);
 
   const handleCloseThumbnailEditClick = useCallback(() => {
     Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
@@ -514,9 +511,9 @@ const FileUpload: React.FC<IFileUpload> = ({
           }}
           offsetRight='180px'
         >
-          <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
+          {/* <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseMenuButton>
+          </EllipseMenuButton> */}
           <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseMenuButton>
@@ -528,9 +525,9 @@ const FileUpload: React.FC<IFileUpload> = ({
           show={showEllipseMenu}
           onClose={handleCloseEllipseMenu}
         >
-          <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
+          {/* <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseModalButton>
+          </EllipseModalButton> */}
           <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseModalButton>
