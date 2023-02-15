@@ -68,7 +68,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
-  const { directMessagesAvailable } = useBundles();
+  const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -229,12 +229,13 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
 
   useEffect(() => {
     if (
+      isBundleDataLoaded &&
       !directMessagesAvailable &&
       (tab === 'chat' || tab === 'direct-messages')
     ) {
       router.replace(`${baseUrl}?tab=notifications`);
     }
-  }, [directMessagesAvailable, tab, baseUrl, router]);
+  }, [isBundleDataLoaded, directMessagesAvailable, tab, baseUrl, router]);
 
   return (
     <STopButtons>
