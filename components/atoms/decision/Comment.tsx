@@ -122,9 +122,14 @@ const Comment: React.FC<IComment> = ({
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
         {!comment.isDeleted ? (
-          <Link href={`/${comment.sender?.username}`}>
-            <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-          </Link>
+          comment.sender?.options?.isVerified ||
+          comment.sender?.uuid === user.userData?.userUuid ? (
+            <Link href={`/${comment.sender?.username}`}>
+              <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+            </Link>
+          ) : (
+            <SUserAvatar noHover avatarUrl={comment.sender?.avatarUrl ?? ''} />
+          )
         ) : (
           <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
         )}
@@ -132,13 +137,22 @@ const Comment: React.FC<IComment> = ({
           <SCommentHeader>
             {!comment.isDeleted ? (
               <>
-                <Link href={`/${comment.sender?.username}`}>
-                  <SNickname>
+                {comment.sender?.options?.isVerified ||
+                comment.sender?.uuid === user.userData?.userUuid ? (
+                  <Link href={`/${comment.sender?.username}`}>
+                    <SNickname>
+                      {comment.sender?.uuid === user.userData?.userUuid
+                        ? t('comments.me')
+                        : getDisplayname(comment.sender)}
+                    </SNickname>
+                  </Link>
+                ) : (
+                  <SNickname noHover>
                     {comment.sender?.uuid === user.userData?.userUuid
                       ? t('comments.me')
                       : getDisplayname(comment.sender)}
                   </SNickname>
-                </Link>
+                )}
                 {comment.sender?.options?.isCreator &&
                   comment.sender.options.isVerified && (
                     <SInlineSvg
