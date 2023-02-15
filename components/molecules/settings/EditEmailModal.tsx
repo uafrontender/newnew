@@ -79,7 +79,6 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
   return (
     <Modal
       show={show}
-      overlaydim
       transitionspeed={isMobileOrTablet ? 0.15 : 0}
       onClose={handleClose}
     >

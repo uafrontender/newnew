@@ -7,7 +7,7 @@ import useCards from '../../../utils/hooks/useCards';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 import CheckoutForm from './CheckoutForm';
@@ -22,6 +22,7 @@ interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
   redirectUrl: string;
+  modalType?: ModalType;
   amount?: number;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
@@ -39,6 +40,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   zIndex,
   setupIntent,
   redirectUrl,
+  modalType,
   amount,
   showTocApply,
   bottomCaption,
@@ -77,7 +79,12 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   }, [setupIntent, setupIntent.setupIntentClientSecret, t]);
 
   return (
-    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
+    <Modal
+      show={isOpen}
+      modalType={modalType}
+      additionalz={zIndex}
+      onClose={onClose}
+    >
       <SWrapper>
         <SContentContainer
           showTocApply={showTocApply ?? false}

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import preventParentClick from '../../../utils/preventParentClick';
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper, { SContent } from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
@@ -23,12 +23,13 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 interface ICreatorsBundleModal {
   show: boolean;
   creatorBundle: newnewapi.ICreatorBundle;
+  modalType?: ModalType;
   onBuyMore: () => void;
   onClose: () => void;
 }
 
 const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
-  ({ show, creatorBundle, onBuyMore, onClose }) => {
+  ({ show, creatorBundle, modalType, onBuyMore, onClose }) => {
     const { t } = useTranslation('common');
     const router = useRouter();
 
@@ -49,7 +50,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
 
     return (
       <>
-        <Modal show={show} onClose={onClose}>
+        <Modal show={show} modalType={modalType} onClose={onClose}>
           <SModalPaper
             onClose={onClose}
             onClick={preventParentClick()}
