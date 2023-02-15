@@ -224,6 +224,7 @@ export const Bundles: React.FC = React.memo(() => {
       {bundles && (
         <AllBundlesModal
           show={allBundlesModalOpen}
+          modalType='initial'
           creatorBundles={bundles}
           onClose={() => {
             setAllBundlesModalOpen(false);
@@ -233,6 +234,7 @@ export const Bundles: React.FC = React.memo(() => {
       {offeredCreator && (
         <BuyBundleModal
           show
+          modalType='following'
           creator={offeredCreator}
           successPath='/bundles'
           onClose={() => {
@@ -244,6 +246,7 @@ export const Bundles: React.FC = React.memo(() => {
       {shownCreatorBundle && (
         <CreatorsBundleModal
           show
+          modalType={offeredCreator !== undefined ? 'covered' : 'initial'}
           creatorBundle={shownCreatorBundle}
           onBuyMore={() => {
             setOfferedCreator(shownCreatorBundle.creator!);

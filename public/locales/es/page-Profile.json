@@ -46,7 +46,8 @@
   },
   "Profile": {
     "meta": {
-      "title": "{{displayName}} - NewNew"
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description_NEED_TRANSLATION": "{{bio}} Bid and Vote on what people do next"
     },
     "user": {
       "noContent": {
@@ -63,7 +64,8 @@
   },
   "Activity": {
     "meta": {
-      "title": "{{displayName}} - NewNew"
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description_NEED_TRANSLATION": "{{bio}} Bid and Vote on what people do next"
     },
     "noContent": {
       "description": "Cualquier actividad del creador se mostrará aquí"

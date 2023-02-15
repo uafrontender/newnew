@@ -40,7 +40,7 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<
   const { t } = useTranslation('page-Post');
 
   return (
-    <Modal show={isVisible} overlaydim additionalz={10} onClose={handleClose}>
+    <Modal show={isVisible} additionalz={10} onClose={handleClose}>
       <SContainer>
         <STitleContainer>
           <STitleText variant={6}>

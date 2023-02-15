@@ -27,7 +27,7 @@ const EllipseModal: React.FunctionComponent<IEllipseModal> = ({
     : [children];
 
   return (
-    <Modal show={show} overlaydim additionalz={zIndex} onClose={onClose}>
+    <Modal show={show} additionalz={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {

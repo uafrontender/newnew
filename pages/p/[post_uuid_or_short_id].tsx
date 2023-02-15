@@ -620,8 +620,8 @@ const PostPage: NextPage<IPostPage> = ({
       >
         <Head>
           <title>
-            {typeOfPost
-              ? t(`meta.${typeOfPost}.title`, {
+            {postParsed
+              ? t(`meta.title`, {
                   displayName: getDisplayname(postParsed.creator),
                   postTitle: postParsed.title,
                 })
@@ -629,15 +629,41 @@ const PostPage: NextPage<IPostPage> = ({
           </title>
           <meta
             name='description'
-            content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}
+            content={
+              typeOfPost === 'ac'
+                ? t(`meta.description.ac`, {
+                    totalInBids: (postParsed.totalAmount?.usdCents ?? 0) / 100,
+                  })
+                : typeOfPost === 'mc'
+                ? t(`meta.description.mc`, {
+                    totalVotes: (postParsed as newnewapi.MultipleChoice)
+                      .totalVotes,
+                  })
+                : ''
+            }
           />
           <meta
             property='og:title'
             content={
-              typeOfPost
-                ? t(`meta.${typeOfPost}.title`, {
+              postParsed
+                ? t(`meta.title`, {
                     displayName: getDisplayname(postParsed.creator),
                     postTitle: postParsed.title,
+                  })
+                : ''
+            }
+          />
+          <meta
+            property='og:description'
+            content={
+              typeOfPost === 'ac'
+                ? t(`meta.description.ac`, {
+                    totalInBids: (postParsed.totalAmount?.usdCents ?? 0) / 100,
+                  })
+                : typeOfPost === 'mc'
+                ? t(`meta.description.mc`, {
+                    totalVotes: (postParsed as newnewapi.MultipleChoice)
+                      .totalVotes,
                   })
                 : ''
             }

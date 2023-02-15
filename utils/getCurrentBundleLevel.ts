@@ -1,6 +1,6 @@
 import { useGetAppConstants } from '../contexts/appConstantsContext';
 
-const AVAILABLE_BUNDLE_LEVELS = [0, 1, 2, 3];
+const AVAILABLE_BUNDLE_LEVELS = [0, 1, 2, 3] as const;
 type BundleLevel = typeof AVAILABLE_BUNDLE_LEVELS[number];
 
 function getBundleOfferLevel(numberOfVotes: number): BundleLevel {
@@ -14,7 +14,12 @@ function getBundleOfferLevel(numberOfVotes: number): BundleLevel {
     return 0;
   }
 
-  return bundleLevel;
+  if (bundleLevel > 3) {
+    console.error('Unknown bundle offer');
+    return 3;
+  }
+
+  return bundleLevel as BundleLevel;
 }
 
 export default getBundleOfferLevel;

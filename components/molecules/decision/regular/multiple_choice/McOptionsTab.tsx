@@ -247,6 +247,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       }
 
       setIsAPIValidateLoading(false);
+
+      return res.data?.status === newnewapi.ValidateTextResponse.Status.OK;
     } catch (err) {
       console.error(err);
       setIsAPIValidateLoading(false);
@@ -325,13 +327,30 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     showErrorToastCustom,
   ]);
 
+  const customOptionExists = useMemo(
+    () => options.findIndex((option) => option.text === newOptionText) > -1,
+    [newOptionText, options]
+  );
+
   const handleAddOptionButtonClicked = useCallback(() => {
     if (canAddCustomOption) {
       setConfirmCustomOptionModalOpen(true);
     } else {
-      setBuyBundleModalOpen(true);
+      if (customOptionExists) {
+        return;
+      }
+
+      // Make sure user can add the option before selling a bundle
+      validateTextViaAPI(newOptionText).then(() => {
+        setBuyBundleModalOpen(true);
+      });
     }
-  }, [canAddCustomOption]);
+  }, [
+    customOptionExists,
+    canAddCustomOption,
+    newOptionText,
+    validateTextViaAPI,
+  ]);
 
   const handleAddOptionButtonClickCaptured = useCallback(() => {
     Mixpanel.track('Click Add Custom Option', {
@@ -533,7 +552,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       (post.creator?.options?.isOfferingBundles || bundle) ? (
         isMobile ? (
           <OptionActionMobileModal
-            isOpen={suggestNewOptionModalOpen}
+            show={suggestNewOptionModalOpen}
+            modalType={confirmCustomOptionModalOpen ? 'covered' : 'initial'}
             onClose={handleSuggestNewOptionModalClosed}
             zIndex={12}
           >
@@ -548,7 +568,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
               <SAddOptionButton
                 size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
+                disabled={
+                  !newOptionText || !newOptionTextValid || customOptionExists
+                }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
@@ -562,8 +584,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ) : (
           <Modal
             show={suggestNewOptionModalOpen}
+            modalType={confirmCustomOptionModalOpen ? 'covered' : 'initial'}
             onClose={handleSuggestNewOptionModalClosed}
-            overlaydim
             additionalz={12}
           >
             <SSuggestNewContainer>
@@ -590,7 +612,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               <SAddOptionButton
                 id='add-option-submit'
                 size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
+                disabled={
+                  !newOptionText || !newOptionTextValid || customOptionExists
+                }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
@@ -605,7 +629,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ) : null}
       {/* Add a custom option Modal */}
       <McConfirmCustomOptionModal
-        isVisible={confirmCustomOptionModalOpen}
+        show={confirmCustomOptionModalOpen}
+        modalType='following'
         handleAddCustomOption={handleAddNewOption}
         closeModal={() => setConfirmCustomOptionModalOpen(false)}
       />
@@ -614,8 +639,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='mc'
+        show={paymentSuccessValue !== undefined}
         value={paymentSuccessValue}
-        isVisible={paymentSuccessValue !== undefined}
+        modalType='following'
         closeModal={() => {
           setPaymentSuccessValue(undefined);
           promptUserWithPushNotificationsPermissionModal();
@@ -666,6 +692,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {buyBundleModalOpen && post.creator && (
         <BuyBundleModal
           show
+          modalType='following'
           creator={post.creator}
           successPath={successPath}
           additionalZ={13}
