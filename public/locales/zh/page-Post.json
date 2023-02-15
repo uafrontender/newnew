@@ -289,7 +289,7 @@
       "title": "即將開始",
       "subtitle_1": "你的{{postType}}還沒有被啟動",
       "subtitle_2": "距離啓動時間：",
-      "toggleButton_NEED_TRANSLATION": "See options",
+      "toggleButton_NEED_TRANSLATION": "查看選項",
       "timer": {
         "days": "天",
         "hours": "小時",
@@ -813,7 +813,7 @@
     "alreadyVoted": "你已獲投票",
     "mcVoteCountTooSmall": "票數太少",
     "notAllowedToCreateNewOption": "不允許有新的選項",
-    "optionNotUnique_NEED_TRANSLATION": "Option already exists",
+    "optionNotUnique": "選項已經存在",
     "cfCancelled": "Goal被取消",
     "cfFinished": "Goal已經完成",
     "cfNotStarted": "Goal尚未開始",
