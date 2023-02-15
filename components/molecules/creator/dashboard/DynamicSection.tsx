@@ -260,26 +260,28 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          <SButton view='secondary' onClick={handleChatClick}>
-            <SIconHolder>
-              <SInlineSVG
-                svg={chatIcon}
-                fill={
-                  theme.name === 'light'
-                    ? theme.colors.black
-                    : theme.colors.white
-                }
-                width='24px'
-                height='24px'
-              />
-              {unreadCountForCreator > 0 && (
-                <SIndicatorContainer>
-                  <SIndicator minified />
-                </SIndicatorContainer>
-              )}
-            </SIconHolder>
-            {t('dashboard.button.directMessages')}
-          </SButton>
+          {directMessagesAvailable && (
+            <SButton view='secondary' onClick={handleChatClick}>
+              <SIconHolder>
+                <SInlineSVG
+                  svg={chatIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.black
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+                {unreadCountForCreator > 0 && (
+                  <SIndicatorContainer>
+                    <SIndicator minified />
+                  </SIndicatorContainer>
+                )}
+              </SIconHolder>
+              {t('dashboard.button.directMessages')}
+            </SButton>
+          )}
         </>
       )}
       <AnimatedPresence
