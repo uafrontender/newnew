@@ -632,7 +632,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         {paymentSuccessModalOpen && (
           <PaymentSuccessModal
             postType='mc'
-            isVisible={paymentSuccessModalOpen}
+            show={paymentSuccessModalOpen}
             closeModal={() => {
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
@@ -699,6 +699,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       {buyBundleModalOpen && post.creator && (
         <BuyBundleModal
           show
+          modalType='initial'
           creator={post.creator}
           successPath={`/p/${post.postShortId}`}
           onClose={() => {

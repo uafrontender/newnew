@@ -13,6 +13,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { ModalType } from '../../organisms/Modal';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
@@ -37,6 +38,7 @@ interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
   successPath: string;
+  modalType?: ModalType;
   additionalZ?: number;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
@@ -46,6 +48,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
   successPath,
+  modalType,
   additionalZ,
   onClose,
   onCloseSuccessModal,
@@ -177,8 +180,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
-        // TODO: fix redirect url (pass as prop?)
         redirectUrl='bundles'
+        modalType={paymentSuccessModalOpen ? 'covered' : modalType}
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
       >
@@ -215,6 +218,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {paymentSuccessModalOpen && (
         <BundlePaymentSuccessModal
           show
+          modalType={modalType === 'covered' ? 'covered' : 'following'}
           zIndex={additionalZ ? additionalZ + 1 : 13}
           creator={creator}
           bundleOffer={bundleOffer}

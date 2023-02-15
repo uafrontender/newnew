@@ -1,16 +1,10 @@
 {
   "meta": {
-    "ac": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Bid",
-      "description": "Make money, bid in auctions with friends and support creators on NewNew"
-    },
-    "mc": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Superpoll",
-      "description": "Make money, vote with friends and support creators on NewNew"
-    },
-    "cf": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Goal",
-      "description": "Make money, pledge in crowdfunding campaigns with friends and support creators on NewNew"
+    "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "description": {
+      "ac": "${{totalInBids}} in bids on NewNew",
+      "mc": "{{totalVotes}} votes on NewNew",
+      "cf": ""
     }
   },
   "my": "my",

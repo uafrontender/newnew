@@ -69,20 +69,46 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
     }
   }, [inView, fetchNextPage]);
 
+  const bioWithTrailingDot = useMemo(() => {
+    if (!user.bio || user.bio?.length === 0) {
+      return '';
+    }
+
+    if (user.bio[user.bio.length - 1] === '.') {
+      return user.bio;
+    }
+
+    return user.bio.concat('.');
+  }, [user.bio]);
+
   return (
     <>
       <Head>
         <title>
-          {t('Profile.meta.title', { displayName: getDisplayname(user) })}
+          {t('Activity.meta.title', {
+            displayname: getDisplayname(user),
+            username: user.username,
+          })}
         </title>
-        <meta name='description' content={user.bio || ''} />
         <meta
-          property='og:title'
-          content={t('Profile.meta.title', {
-            displayName: getDisplayname(user),
+          name='description'
+          content={t('Activity.meta.description', {
+            bio: bioWithTrailingDot,
           })}
         />
-        <meta property='og:description' content={user.bio || ''} />
+        <meta
+          property='og:title'
+          content={t('Activity.meta.title', {
+            displayname: getDisplayname(user),
+            username: user.username,
+          })}
+        />
+        <meta
+          property='og:description'
+          content={t('Activity.meta.description', {
+            bio: bioWithTrailingDot,
+          })}
+        />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <div>
