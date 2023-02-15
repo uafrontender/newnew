@@ -78,7 +78,7 @@ const PostResponseSuccessModal: React.FunctionComponent<
   };
 
   return (
-    <Modal show={isOpen} additionalz={zIndex} overlaydim>
+    <Modal show={isOpen} additionalz={zIndex}>
       {!isMobile && (
         <AnimatedBackground src={assets.decision.gold} alt='coin' noBlur />
       )}

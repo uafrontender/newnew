@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
 import Button from '../../../atoms/Button';
-import Modal from '../../../organisms/Modal';
+import Modal, { ModalType } from '../../../organisms/Modal';
 
 import { TPostType } from '../../../../utils/switchPostType';
 
@@ -15,17 +15,19 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IPaymentSuccessModal {
   postType: TPostType;
+  show: boolean;
   // TODO: add information about value for guest buying stuff related cases (no data now). Make field mandatory.
   value?: number;
-  isVisible: boolean;
+  modalType?: ModalType;
   children: React.ReactNode;
   closeModal: () => void;
 }
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   postType,
+  show,
   value,
-  isVisible,
+  modalType,
   children,
   closeModal,
 }) => {
@@ -40,8 +42,8 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
     closeModal();
   }, [closeModal]);
 
-  function getModalImage(type: TPostType) {
-    switch (type) {
+  function getModalImage(typeOfPost: TPostType) {
+    switch (typeOfPost) {
       case 'ac':
         return (
           <SImageWrapper>
@@ -73,12 +75,12 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
           </SImageWrapper>
         );
       default:
-        throw new Error(`unknown post type ${type}`);
+        throw new Error(`unknown post type ${typeOfPost}`);
     }
   }
 
-  function getFormattedValue(valueToFormat: number, type: TPostType) {
-    switch (type) {
+  function getFormattedValue(valueToFormat: number, typeOfPost: TPostType) {
+    switch (typeOfPost) {
       case 'ac':
         return `$${formatNumber(valueToFormat / 100, true)}`;
       case 'mc':
@@ -86,12 +88,17 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
       case 'cf':
         return `$${formatNumber(valueToFormat / 100, true)}`;
       default:
-        throw new Error(`unknown post type ${type}`);
+        throw new Error(`unknown post type ${typeOfPost}`);
     }
   }
 
   return (
-    <Modal show={isVisible} additionalz={14} onClose={handleCloseModalMixpanel}>
+    <Modal
+      show={show}
+      modalType={modalType}
+      additionalz={14}
+      onClose={handleCloseModalMixpanel}
+    >
       {postType === 'mc' ? (
         <AnimatedBackground src={assets.decision.votes} alt='vote' />
       ) : (

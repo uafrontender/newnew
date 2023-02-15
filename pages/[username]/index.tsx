@@ -80,20 +80,46 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
     }
   }, [inView, fetchNextPage]);
 
+  const bioWithTrailingDot = useMemo(() => {
+    if (!user.bio || user.bio?.length === 0) {
+      return '';
+    }
+
+    if (user.bio[user.bio.length - 1] === '.') {
+      return user.bio;
+    }
+
+    return user.bio.concat('.');
+  }, [user.bio]);
+
   return (
     <>
       <Head>
         <title>
-          {t('Profile.meta.title', { displayName: getDisplayname(user) })}
+          {t('Profile.meta.title', {
+            displayname: getDisplayname(user),
+            username: user.username,
+          })}
         </title>
-        <meta name='description' content={user.bio || ''} />
+        <meta
+          name='description'
+          content={t('Profile.meta.description', {
+            bio: bioWithTrailingDot,
+          })}
+        />
         <meta
           property='og:title'
           content={t('Profile.meta.title', {
-            displayName: getDisplayname(user),
+            displayname: getDisplayname(user),
+            username: user.username,
           })}
         />
-        <meta property='og:description' content={user.bio || ''} />
+        <meta
+          name='og:description'
+          content={t('Profile.meta.description', {
+            bio: bioWithTrailingDot,
+          })}
+        />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <div>
