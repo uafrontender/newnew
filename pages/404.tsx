@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { ReactElement } from 'react';
 import Head from 'next/head';
-import type { GetStaticProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled, { useTheme } from 'styled-components';
@@ -66,7 +66,7 @@ const Custom404 = () => {
 
 export default Custom404;
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-404'],
