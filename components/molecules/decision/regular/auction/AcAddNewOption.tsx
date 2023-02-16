@@ -438,7 +438,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       {/* Suggest new Modal */}
       {isMobile && postStatus === 'voting' ? (
         <OptionActionMobileModal
-          isOpen={suggestNewMobileOpen}
+          show={suggestNewMobileOpen}
+          modalType={paymentModalOpen !== undefined ? 'covered' : 'initial'}
           onClose={() => setSuggestNewMobileOpen(false)}
           zIndex={12}
         >
@@ -490,6 +491,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       {paymentModalOpen ? (
         <PaymentModal
           isOpen={paymentModalOpen}
+          modalType='following'
           zIndex={12}
           amount={paymentWithFeeInCents || 0}
           redirectUrl={`p/${postShortId || postUuid}`}
@@ -546,8 +548,9 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
+        show={paymentSuccessValue !== undefined}
         value={paymentSuccessValue}
-        isVisible={paymentSuccessValue !== undefined}
+        modalType='following'
         closeModal={() => {
           setPaymentSuccessValue(undefined);
           promptUserWithPushNotificationsPermissionModal();

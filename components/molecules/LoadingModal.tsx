@@ -15,7 +15,7 @@ const LoadingModal: React.FunctionComponent<ILoadingModal> = ({
   isOpen,
   zIndex,
 }) => (
-  <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={() => {}}>
+  <Modal show={isOpen} additionalz={zIndex} onClose={() => {}}>
     <SAnimationContainer
       onClick={(e) => {
         e.stopPropagation();

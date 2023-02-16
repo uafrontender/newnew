@@ -111,22 +111,28 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
-  const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
-    useGetBlockedUsers();
+  const {
+    usersIBlocked,
+    usersBlockedMe,
+    usersBlockedLoaded,
+    changeUserBlockedStatus,
+  } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
     [usersIBlocked, user.uuid]
   );
 
+  // Consider user here blocked until we know they are not
   const isBlocked = useMemo(
     () =>
-      usersIBlocked.includes(user.uuid) || usersBlockedMe.includes(user.uuid),
-    [usersIBlocked, user.uuid, usersBlockedMe]
+      !usersBlockedLoaded ||
+      usersIBlocked.includes(user.uuid) ||
+      usersBlockedMe.includes(user.uuid),
+    [usersBlockedLoaded, usersIBlocked, user.uuid, usersBlockedMe]
   );
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
-      // if (true) {
       return [
         {
           nameToken: 'userInitial',

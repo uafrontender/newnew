@@ -13,6 +13,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { ModalType } from '../../organisms/Modal';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
@@ -36,6 +37,8 @@ const getPayWithCardErrorMessage = (
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  successPath: string;
+  modalType?: ModalType;
   additionalZ?: number;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
@@ -44,6 +47,8 @@ interface IBundlePaymentModal {
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
+  successPath,
+  modalType,
   additionalZ,
   onClose,
   onCloseSuccessModal,
@@ -87,10 +92,17 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [creator, bundleOffer, paymentFeeInCents]
   );
 
+  const successUrl = useMemo(() => {
+    if (successPath.includes('?')) {
+      return `${process.env.NEXT_PUBLIC_APP_URL}${successPath}&bundle=true`;
+    }
+    return `${process.env.NEXT_PUBLIC_APP_URL}${successPath}?bundle=true`;
+  }, [successPath]);
+
   const setupIntent = useStripeSetupIntent({
     purpose: buyCreatorsBundleRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/bundles`,
+    successUrl,
   });
 
   const handlePayWithCard = useCallback(
@@ -168,8 +180,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
-        // TODO: fix redirect url (pass as prop?)
         redirectUrl='bundles'
+        modalType={paymentSuccessModalOpen ? 'covered' : modalType}
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
       >
@@ -206,6 +218,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {paymentSuccessModalOpen && (
         <BundlePaymentSuccessModal
           show
+          modalType={modalType === 'covered' ? 'covered' : 'following'}
           zIndex={additionalZ ? additionalZ + 1 : 13}
           creator={creator}
           bundleOffer={bundleOffer}

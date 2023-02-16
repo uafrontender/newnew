@@ -62,7 +62,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
   }, [isOpen]);
 
   return (
-    <Modal show={isOpen} overlaydim additionalz={zIndex}>
+    <Modal show={isOpen} additionalz={zIndex}>
       <Container>
         <Content>
           <SHeading variant={5}>{t('tosSection.heading')}</SHeading>

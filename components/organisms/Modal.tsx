@@ -6,11 +6,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import isBrowser from '../../utils/isBrowser';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
 
+const MODAL_TYPES = ['initial', 'covered', 'following'] as const;
+export type ModalType = typeof MODAL_TYPES[number];
+
 interface IModal {
   className?: string;
   show: boolean;
+  // Modal type is used to remove dimming for Modals that were 'covered' by another modal
+  // and remove animation for modals which are 'following' the previous modal (case where dimming already faded in)
+  // TODO: how to add smooth transition on close when all modals are closed?
+  modalType?: ModalType;
   transitionspeed?: number;
-  overlaydim?: boolean;
   additionalz?: number;
   custombackdropfiltervalue?: number;
   children: ReactNode;
@@ -21,8 +27,8 @@ const Modal: React.FC<IModal> = React.memo((props) => {
   const {
     className,
     show,
+    modalType = 'initial',
     transitionspeed,
-    overlaydim,
     additionalz,
     custombackdropfiltervalue,
     children,
@@ -62,15 +68,13 @@ const Modal: React.FC<IModal> = React.memo((props) => {
         exit={{ opacity: 0 }}
         transition={{
           type: 'tween',
-          duration: transitionspeed ?? 0.15,
+          duration: modalType === 'initial' ? transitionspeed ?? 0.15 : 0,
           delay: 0,
         }}
-        // show={show}
-        // onClick={onClose}
-        overlaydim={!overlaydim ? 'false' : overlaydim.toString()}
+        nodimming={modalType === 'covered' ? 'true' : 'false'}
         additionalz={additionalz ?? undefined}
         custombackdropfiltervalue={custombackdropfiltervalue ?? undefined}
-        transitionspeed={transitionspeed ?? 0.15}
+        transitionspeed={modalType === 'initial' ? transitionspeed ?? 0.15 : 0}
       >
         <SClickableDiv
           onClick={(e) => {
@@ -87,7 +91,8 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 
 interface IStyledModalOverlay {
   transitionspeed?: number;
-  overlaydim?: string;
+  // Fix for a 'received `false` for a non-boolean attribute' issue
+  nodimming?: string;
   additionalz?: number;
   custombackdropfiltervalue?: number;
 }
@@ -100,23 +105,23 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
   z-index: ${({ additionalz }) => additionalz ?? 10};
   overflow: hidden;
   position: fixed;
-  backdrop-filter: ${({ custombackdropfiltervalue }) =>
-    custombackdropfiltervalue
-      ? `blur(${custombackdropfiltervalue}px)`
-      : 'blur(16px)'};
-  -webkit-backdrop-filter: ${({ custombackdropfiltervalue }) =>
-    custombackdropfiltervalue
+  backdrop-filter: ${({ custombackdropfiltervalue, nodimming }) =>
+    // eslint-disable-next-line no-nested-ternary
+    nodimming === 'true'
+      ? 'none'
+      : custombackdropfiltervalue
       ? `blur(${custombackdropfiltervalue}px)`
       : 'blur(16px)'};
 
-  // To avoid overlapping dim color with this bg color
-  background-color: ${({ theme, overlaydim }) =>
-    overlaydim === 'true'
-      ? 'transparent'
-      : theme.colorsThemed.background.backgroundT};
+  -webkit-backdrop-filter: ${({ custombackdropfiltervalue, nodimming }) =>
+    // eslint-disable-next-line no-nested-ternary
+    nodimming === 'true'
+      ? 'none'
+      : custombackdropfiltervalue
+      ? `blur(${custombackdropfiltervalue}px)`
+      : 'blur(16px)'};
 
   overscroll-behavior: 'none';
-
   ::before {
     top: 0;
     left: 0;
@@ -127,12 +132,14 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
     content: '';
     z-index: -1;
     position: absolute;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: ${({ nodimming }) =>
+      nodimming === 'false' ? 'blur(16px)' : null};
+    -webkit-backdrop-filter: ${({ nodimming }) =>
+      nodimming === 'false' ? 'blur(16px)' : null};
 
     /* Some screens have dimmed overlay */
-    background-color: ${({ overlaydim, theme }) =>
-      overlaydim ? theme.colorsThemed.background.overlaydim : null};
+    background-color: ${({ nodimming, theme }) =>
+      nodimming === 'false' ? theme.colorsThemed.background.overlaydim : null};
   }
 `;
 

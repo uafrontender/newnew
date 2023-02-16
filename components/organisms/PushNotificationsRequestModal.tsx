@@ -24,7 +24,7 @@ const PushNotificationsRequestModal: React.FC<
   const { t } = useTranslation('common');
 
   return (
-    <Modal show={isOpen} overlaydim onClose={onClose}>
+    <Modal show={isOpen} onClose={onClose}>
       <SWrapper>
         <motion.div initial={MInitial} animate={MAnimation}>
           <SModalPaper onClose={onClose} isCloseButton>

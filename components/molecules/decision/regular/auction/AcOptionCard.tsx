@@ -675,7 +675,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         )}
         {isMobile ? (
           <OptionActionMobileModal
-            isOpen={isSupportFormOpen}
+            show={isSupportFormOpen}
             onClose={() => handleCloseSupportForm()}
             zIndex={12}
           >
@@ -773,8 +773,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='ac'
+        show={paymentSuccessValue !== undefined}
         value={paymentSuccessValue}
-        isVisible={paymentSuccessValue !== undefined}
+        modalType='following'
         closeModal={() => {
           setPaymentSuccessValue(undefined);
           promptUserWithPushNotificationsPermissionModal();

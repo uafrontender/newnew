@@ -49,6 +49,8 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import AddOptionIcon from '../../../../../public/images/svg/icons/filled/AddOption.svg';
 import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBundleAfterStripeRedirect';
+import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
@@ -111,6 +113,65 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
+  );
+
+  const {
+    saveCard,
+    bundleStripeSetupIntentClientSecret,
+    customOptionTextFromRedirect,
+    resetBundleSetupIntentClientSecret,
+  } = usePostInnerState();
+
+  const onBundlePurchasedAfterRedirect = useCallback(async () => {
+    // Showing bundle purchased modal here would be nice, but we have no idea what offer user purchased.
+    // So, just adding an option and showing a success modal here.
+    // Also confirm custom vote modal is unnecessary as the user literally just payed for it.
+
+    if (!customOptionTextFromRedirect) {
+      return;
+    }
+
+    try {
+      const payload = new newnewapi.CreateCustomMcOptionRequest({
+        postUuid: post.postUuid,
+        optionText: customOptionTextFromRedirect,
+      });
+
+      const res = await createCustomOption(payload);
+
+      if (
+        !res.data ||
+        res.data.status !==
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
+        res.error
+      ) {
+        throw new Error(t(addOptionErrorMessage(res.data?.status)));
+      }
+
+      const optionFromResponse = (res.data
+        .option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByMe = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      setPaymentSuccessValue(1);
+    } catch (err: any) {
+      console.error(err);
+      showErrorToastCustom(err.message);
+    }
+
+    resetBundleSetupIntentClientSecret();
+  }, [
+    customOptionTextFromRedirect,
+    post.postUuid,
+    handleAddOrUpdateOptionFromResponse,
+    resetBundleSetupIntentClientSecret,
+    showErrorToastCustom,
+    t,
+  ]);
+
+  useBuyBundleAfterStripeRedirect(
+    bundleStripeSetupIntentClientSecret,
+    saveCard,
+    onBundlePurchasedAfterRedirect
   );
 
   // Scroll block
@@ -186,6 +247,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       }
 
       setIsAPIValidateLoading(false);
+
+      return res.data?.status === newnewapi.ValidateTextResponse.Status.OK;
     } catch (err) {
       console.error(err);
       setIsAPIValidateLoading(false);
@@ -264,13 +327,30 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     showErrorToastCustom,
   ]);
 
+  const customOptionExists = useMemo(
+    () => options.findIndex((option) => option.text === newOptionText) > -1,
+    [newOptionText, options]
+  );
+
   const handleAddOptionButtonClicked = useCallback(() => {
     if (canAddCustomOption) {
       setConfirmCustomOptionModalOpen(true);
     } else {
-      setBuyBundleModalOpen(true);
+      if (customOptionExists) {
+        return;
+      }
+
+      // Make sure user can add the option before selling a bundle
+      validateTextViaAPI(newOptionText).then(() => {
+        setBuyBundleModalOpen(true);
+      });
     }
-  }, [canAddCustomOption]);
+  }, [
+    customOptionExists,
+    canAddCustomOption,
+    newOptionText,
+    validateTextViaAPI,
+  ]);
 
   const handleAddOptionButtonClickCaptured = useCallback(() => {
     Mixpanel.track('Click Add Custom Option', {
@@ -306,6 +386,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       );
     }
   };
+
+  const successPath = useMemo(
+    () =>
+      newOptionText && newOptionTextValid
+        ? `/p/${post.postShortId}?custom_option_text=${encodeURIComponent(
+            newOptionText
+          )}`
+        : `/p/${post.postShortId}`,
+    [newOptionText, newOptionTextValid, post.postShortId]
+  );
 
   return (
     <>
@@ -462,7 +552,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       (post.creator?.options?.isOfferingBundles || bundle) ? (
         isMobile ? (
           <OptionActionMobileModal
-            isOpen={suggestNewOptionModalOpen}
+            show={suggestNewOptionModalOpen}
+            modalType={confirmCustomOptionModalOpen ? 'covered' : 'initial'}
             onClose={handleSuggestNewOptionModalClosed}
             zIndex={12}
           >
@@ -477,7 +568,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
               <SAddOptionButton
                 size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
+                disabled={
+                  !newOptionText || !newOptionTextValid || customOptionExists
+                }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
@@ -491,8 +584,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ) : (
           <Modal
             show={suggestNewOptionModalOpen}
+            modalType={confirmCustomOptionModalOpen ? 'covered' : 'initial'}
             onClose={handleSuggestNewOptionModalClosed}
-            overlaydim
             additionalz={12}
           >
             <SSuggestNewContainer>
@@ -519,7 +612,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               <SAddOptionButton
                 id='add-option-submit'
                 size='sm'
-                disabled={!newOptionText || !newOptionTextValid}
+                disabled={
+                  !newOptionText || !newOptionTextValid || customOptionExists
+                }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
@@ -534,7 +629,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ) : null}
       {/* Add a custom option Modal */}
       <McConfirmCustomOptionModal
-        isVisible={confirmCustomOptionModalOpen}
+        show={confirmCustomOptionModalOpen}
+        modalType='following'
         handleAddCustomOption={handleAddNewOption}
         closeModal={() => setConfirmCustomOptionModalOpen(false)}
       />
@@ -543,8 +639,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {/* Payment success Modal */}
       <PaymentSuccessModal
         postType='mc'
+        show={paymentSuccessValue !== undefined}
         value={paymentSuccessValue}
-        isVisible={paymentSuccessValue !== undefined}
+        modalType='following'
         closeModal={() => {
           setPaymentSuccessValue(undefined);
           promptUserWithPushNotificationsPermissionModal();
@@ -595,7 +692,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {buyBundleModalOpen && post.creator && (
         <BuyBundleModal
           show
+          modalType='following'
           creator={post.creator}
+          successPath={successPath}
           additionalZ={13}
           onSuccess={() => {
             if (newOptionText && newOptionTextValid) {

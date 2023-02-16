@@ -116,15 +116,20 @@ const Comment: React.FC<IComment> = ({
 
   const moreButtonRef: any = useRef<HTMLButtonElement>();
 
-  if (comment.isDeleted) return null;
+  if (comment.isDeleted || comment?.sender?.options?.isTombstone) return null;
 
   return (
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
-        {!comment.isDeleted ? (
-          <Link href={`/${comment.sender?.username}`}>
-            <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-          </Link>
+        {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
+          comment.sender?.options?.isVerified ||
+          comment.sender?.uuid === user.userData?.userUuid ? (
+            <Link href={`/${comment.sender?.username}`}>
+              <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+            </Link>
+          ) : (
+            <SUserAvatar noHover avatarUrl={comment.sender?.avatarUrl ?? ''} />
+          )
         ) : (
           <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
         )}
@@ -132,15 +137,24 @@ const Comment: React.FC<IComment> = ({
           <SCommentHeader>
             {!comment.isDeleted ? (
               <>
-                <Link href={`/${comment.sender?.username}`}>
-                  <SNickname>
+                {comment.sender?.options?.isVerified ||
+                comment.sender?.uuid === user.userData?.userUuid ? (
+                  <Link href={`/${comment.sender?.username}`}>
+                    <SNickname>
+                      {comment.sender?.uuid === user.userData?.userUuid
+                        ? t('comments.me')
+                        : getDisplayname(comment.sender)}
+                    </SNickname>
+                  </Link>
+                ) : (
+                  <SNickname noHover>
                     {comment.sender?.uuid === user.userData?.userUuid
                       ? t('comments.me')
                       : getDisplayname(comment.sender)}
                   </SNickname>
-                </Link>
-                {comment.sender?.options?.isCreator &&
-                  comment.sender.options.isVerified && (
+                )}
+                {comment.sender?.options?.isVerified &&
+                  !comment.sender?.options?.isTombstone && (
                     <SInlineSvg
                       svg={VerificationCheckmark}
                       width='20px'
