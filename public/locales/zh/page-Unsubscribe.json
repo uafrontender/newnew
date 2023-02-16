@@ -1,16 +1,16 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "Unsubscribe from NewNew"
+    "title": "退訂NewNew"
   },
-  "success_NEED_TRANSLATION": {
-    "heading": "You have successfully unsubscribed",
-    "subheading": "Manage email notifications from your settings page."
+  "success": {
+    "heading": "你已成功退訂",
+    "subheading": "在設置頁面管理電子郵件通知。"
   },
-  "fail_NEED_TRANSLATION": {
-    "heading": "We were unable to unsubscribe you",
-    "subheading": "You can still manage email notifications from your settings page."
+  "fail": {
+    "heading": "我們無法取消你的訂閱",
+    "subheading": "你仍可在設置頁面管理電子郵件通知。"
   },
-  "confirm_NEED_TRANSLATION": "Ok",
+  "confirm": "好",
   "error": {
     "requestFailed": "請求失敗"
   }

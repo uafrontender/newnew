@@ -23,12 +23,14 @@ export const BundlesContext = createContext<{
   directMessagesAvailable: boolean;
   isSellingBundles: boolean;
   hasSoldBundles: boolean;
+  isBundleDataLoaded: boolean;
   toggleIsSellingBundles: () => Promise<void>;
 }>({
   bundles: undefined,
   directMessagesAvailable: false,
   isSellingBundles: false,
   hasSoldBundles: false,
+  isBundleDataLoaded: false,
   toggleIsSellingBundles: async () => {},
 });
 
@@ -52,6 +54,8 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   const [busyTogglingSellingBundles, setBusyTogglingSellingBundles] =
     useState(false);
   const [hasSoldBundles, setHasSoldBundles] = useState(false);
+  const [isHasSoldBundlesStatusLoaded, setIsHasSoldBundlesStatusLoaded] =
+    useState(false);
 
   const fetchBundles = useCallback(async () => {
     const payload = new newnewapi.EmptyRequest({});
@@ -141,6 +145,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         fetchHasSoldBundles()
           .then((creatorHasSoldBundles) => {
             setHasSoldBundles(creatorHasSoldBundles);
+            setIsHasSoldBundlesStatusLoaded(true);
             saveStateLS('creatorHasSoldBundles', creatorHasSoldBundles);
           })
           .catch((err) => {
@@ -255,9 +260,18 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   ]);
 
   // A single place to set up the rules for all elements navigating to DM views
-  const directMessagesAvailable = useMemo(
-    () => (bundles && bundles.length > 0) || isSellingBundles || hasSoldBundles,
-    [bundles, isSellingBundles, hasSoldBundles]
+  const directMessagesAvailable = useMemo(() => {
+    return (
+      (bundles && bundles.length > 0) || isSellingBundles || hasSoldBundles
+    );
+  }, [bundles, isSellingBundles, hasSoldBundles]);
+
+  const isBundleDataLoaded = useMemo(
+    () =>
+      bundles !== undefined &&
+      isSellingBundlesStatusLoaded &&
+      isHasSoldBundlesStatusLoaded,
+    [bundles, isSellingBundlesStatusLoaded, isHasSoldBundlesStatusLoaded]
   );
 
   const contextValue = useMemo(
@@ -268,6 +282,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       // This has no WS update, could cause troubles with other tabs
       isSellingBundles,
       hasSoldBundles,
+      isBundleDataLoaded,
       // Could cause troubles if used on different tabs
       toggleIsSellingBundles,
     }),
