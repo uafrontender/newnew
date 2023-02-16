@@ -65,14 +65,14 @@
     "title": "收件箱為空",
     "text": "你與某位Bundle所有者的對話開始後，對話將在此處列出"
   },
-  "selectChat_NEED_TRANSLATION": "Select a chat to start messaging",
+  "selectChat": "選擇一個聊天室發送消息",
   "newAnnouncement": {
     "title": "新公告",
     "text": "只有你能向該組群發訊息。",
     "created": "你創建了公告",
     "member": "成員",
     "members": "成員",
-    "noAnnouncement_NEED_TRANSLATION": "No announcements here yet..."
+    "noAnnouncement": "這裡還沒有公告......"
   },
   "default": {
     "searchPlaceholder": "搜索"
