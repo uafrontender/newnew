@@ -17,7 +17,7 @@ import useErrorToasts from '../utils/hooks/useErrorToasts';
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
   usersIBlocked: [] as string[],
-  usersBlockedLoading: false,
+  usersBlockedLoaded: false,
   changeUserBlockedStatus: (
     uuid: string | null | undefined,
     block: boolean
@@ -35,6 +35,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
+  const [usersBlockedLoaded, setUsersBlockedLoaded] = useState(false);
   const socketConnection = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -64,7 +65,10 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
 
   useEffect(() => {
     async function fetchBlockedUsers() {
-      if (!user.loggedIn) return;
+      if (!user.loggedIn || usersBlockedLoading) {
+        return;
+      }
+
       try {
         setUsersBlockedLoading(true);
         const payload = new newnewapi.EmptyRequest();
@@ -73,6 +77,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
           throw new Error(res.error?.message ?? 'Request failed');
         setUsersIBlocked(res.data.userUuidsIBlocked);
         setUsersBlockedMe(res.data.userUuidsBlockedMe);
+        setUsersBlockedLoaded(true);
       } catch (err) {
         console.error(err);
         setUsersBlockedLoading(false);
@@ -107,15 +112,10 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     () => ({
       usersBlockedMe,
       usersIBlocked,
-      usersBlockedLoading,
+      usersBlockedLoaded,
       changeUserBlockedStatus,
     }),
-    [
-      usersBlockedMe,
-      usersIBlocked,
-      changeUserBlockedStatus,
-      usersBlockedLoading,
-    ]
+    [usersBlockedMe, usersIBlocked, changeUserBlockedStatus, usersBlockedLoaded]
   );
 
   return (

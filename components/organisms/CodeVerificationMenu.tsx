@@ -34,6 +34,7 @@ import { Mixpanel } from '../../utils/mixpanel';
 import useRecaptcha from '../../utils/hooks/useRecaptcha';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
+import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
@@ -80,6 +81,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
   // Timer
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+
+  useLeavePageConfirm(!isSuccess, t('leaveAlert'), []);
 
   const handleSignIn = useCallback(
     async (completeCode: string) => {
