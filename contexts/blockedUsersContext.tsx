@@ -66,6 +66,11 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   useEffect(() => {
     async function fetchBlockedUsers() {
       if (!user.loggedIn || usersBlockedLoading) {
+        if (!user.loggedIn) {
+          setUsersBlockedMe([]);
+          setUsersIBlocked([]);
+        }
+
         return;
       }
 
