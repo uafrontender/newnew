@@ -77,7 +77,7 @@ const defaultUIState: ICreationStateInterface = {
     announcementVideoUrl: '',
     thumbnailParameters: {
       startTime: 1,
-      endTime: 4,
+      endTime: 30,
     },
   },
   auction: {

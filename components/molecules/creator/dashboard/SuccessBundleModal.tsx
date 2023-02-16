@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import Modal from '../../../organisms/Modal';
+import Modal, { ModalType } from '../../../organisms/Modal';
 import ModalPaper, { SContent } from '../../../organisms/ModalPaper';
 import Button from '../../../atoms/Button';
 import logo from '../../../../public/images/dashboard/logo-modal.png';
@@ -14,16 +14,22 @@ import AnimatedBackground from '../../../atoms/AnimationBackground';
 interface IFunction {
   show: boolean;
   isBundlesEnabled: boolean | undefined;
+  modalType?: ModalType;
   zIndex?: number;
   onClose: () => void;
 }
 
 const SuccessBundleModal: React.FC<IFunction> = React.memo(
-  ({ show, isBundlesEnabled, zIndex, onClose }) => {
+  ({ show, isBundlesEnabled, modalType, zIndex, onClose }) => {
     const { t } = useTranslation('page-Creator');
     return (
       <>
-        <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+        <Modal
+          show={show}
+          modalType={modalType}
+          additionalz={zIndex}
+          onClose={onClose}
+        >
           {isBundlesEnabled ? (
             <AnimatedBackground src={assets.decision.votes} alt='vote' />
           ) : null}

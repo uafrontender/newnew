@@ -33,7 +33,6 @@ const ModalNotifications: React.FC = React.memo(() => {
   return (
     <Modal
       show={!delayed && !!currentNotification}
-      overlaydim
       additionalz={1000}
       onClose={handleClose}
     >

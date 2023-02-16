@@ -84,7 +84,9 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, isMyOption, optionType, optionId, optionCreatorUuid]);
 
-  if (!isVisible || (isMyOption && isCanDeleteOptionLoading)) return null;
+  if (!isVisible || (isMyOption && isCanDeleteOptionLoading)) {
+    return null;
+  }
 
   return (
     <>
@@ -99,6 +101,7 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
       >
         {isMyOption && (
           <SEllipseMenuButton
+            id='option-ellipse-menu-delete'
             variant={3}
             tone='error'
             onClick={() => {

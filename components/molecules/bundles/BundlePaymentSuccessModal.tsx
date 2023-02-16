@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper, { SContent } from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import assets from '../../../constants/assets';
@@ -21,12 +21,13 @@ interface IBuyBundleModal {
   show: boolean;
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  modalType?: ModalType;
   zIndex?: number;
   onClose: () => void;
 }
 
 const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
-  ({ show, creator, bundleOffer, zIndex, onClose }) => {
+  ({ show, creator, bundleOffer, modalType, zIndex, onClose }) => {
     const { t } = useTranslation('common');
     const theme = useTheme();
 
@@ -39,7 +40,12 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
 
     return (
       <>
-        <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+        <Modal
+          show={show}
+          modalType={modalType}
+          additionalz={zIndex}
+          onClose={onClose}
+        >
           <AnimatedBackground src={assets.decision.votes} alt='vote' />
           <SModalPaper onClose={onClose}>
             <Content>

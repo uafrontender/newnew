@@ -16,7 +16,7 @@
     "title": "你當前的bundle"
   },
   "bundle": {
-    "accessExpired_NEED_TRANSLATION": "Your benefits have now expired. Buy another bundle for custom options and chat",
+    "accessExpired": "您的福利現在已經過期。再購買一個bundle即可獲得自訂選項並聊天",
     "votesLeft": "剩餘<0>{{amount}}</0> 票",
     "access": "另有<0/>：",
     "unitPair": "{{amount}}{{unit}}",
