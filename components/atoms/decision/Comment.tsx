@@ -116,12 +116,12 @@ const Comment: React.FC<IComment> = ({
 
   const moreButtonRef: any = useRef<HTMLButtonElement>();
 
-  if (comment.isDeleted) return null;
+  if (comment.isDeleted || comment?.sender?.options?.isTombstone) return null;
 
   return (
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
-        {!comment.isDeleted ? (
+        {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
           comment.sender?.options?.isVerified ||
           comment.sender?.uuid === user.userData?.userUuid ? (
             <Link href={`/${comment.sender?.username}`}>
@@ -153,8 +153,8 @@ const Comment: React.FC<IComment> = ({
                       : getDisplayname(comment.sender)}
                   </SNickname>
                 )}
-                {comment.sender?.options?.isCreator &&
-                  comment.sender.options.isVerified && (
+                {comment.sender?.options?.isVerified &&
+                  !comment.sender?.options?.isTombstone && (
                     <SInlineSvg
                       svg={VerificationCheckmark}
                       width='20px'
