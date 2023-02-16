@@ -121,7 +121,7 @@
       "payPeriod": "este periodo de pago",
       "unitName": "bundle",
       "earned": "ha generado",
-      "noSoldYet": "Todavía no se ha vendido ningún BUNDLE",
+      "noSoldYet": "Todavía no se ha vendido ningún Bundle",
       "sold": "vendidos"
     },
     "bundlesSet": {

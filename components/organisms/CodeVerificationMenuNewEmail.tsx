@@ -26,6 +26,7 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
+import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 
 const AnimatedPresence = dynamic(() => import('../atoms/AnimatedPresence'));
 
@@ -72,6 +73,8 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const [timerActive, setTimerActive] = useState(false);
   const [timerHidden, setTimerHidden] = useState(false);
   const interval = useRef<number>();
+
+  useLeavePageConfirm(!isSuccess, t('leaveAlert'), []);
 
   const onCodeComplete = useCallback(
     async (completeCode: string) => {
