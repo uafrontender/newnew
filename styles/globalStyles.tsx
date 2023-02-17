@@ -15,7 +15,8 @@ const GlobalStyle = createGlobalStyle`
   /* Smooth theme transitions */
   html.theming,
   html.theming * {
-    transition: all 0.3s linear !important;
+    // Do not assign all, breaks Lotti, use only color (theme) related props here
+    transition: color 0.3s linear, background 0.3s linear, background-color 0.3s linear !important;
   }
 
   *, *:before, *:after {
