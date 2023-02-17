@@ -34,11 +34,12 @@ export interface ICodeVerificationMenuNewEmail {
   expirationTime: number;
   newEmail: string;
   redirect: 'settings' | 'dashboard';
+  allowLeave: boolean;
 }
 
 const CodeVerificationMenuNewEmail: React.FunctionComponent<
   ICodeVerificationMenuNewEmail
-> = ({ expirationTime, newEmail, redirect }) => {
+> = ({ expirationTime, newEmail, redirect, allowLeave }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
 
@@ -74,7 +75,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const [timerHidden, setTimerHidden] = useState(false);
   const interval = useRef<number>();
 
-  useLeavePageConfirm(!isSuccess, t('leaveAlert'), []);
+  useLeavePageConfirm(!isSuccess && !allowLeave, t('leaveAlert'), []);
 
   const onCodeComplete = useCallback(
     async (completeCode: string) => {

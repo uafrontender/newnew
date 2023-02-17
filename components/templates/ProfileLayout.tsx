@@ -123,12 +123,20 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   // Consider user here blocked until we know they are not
+  // Only if user logged in
   const isBlocked = useMemo(
     () =>
-      !usersBlockedLoaded ||
-      usersIBlocked.includes(user.uuid) ||
-      usersBlockedMe.includes(user.uuid),
-    [usersBlockedLoaded, usersIBlocked, user.uuid, usersBlockedMe]
+      currentUser.loggedIn &&
+      (!usersBlockedLoaded ||
+        usersIBlocked.includes(user.uuid) ||
+        usersBlockedMe.includes(user.uuid)),
+    [
+      currentUser.loggedIn,
+      usersBlockedLoaded,
+      usersIBlocked,
+      user.uuid,
+      usersBlockedMe,
+    ]
   );
 
   const tabs: Tab[] = useMemo(() => {
