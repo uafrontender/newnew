@@ -29,16 +29,28 @@ import getDisplayname from '../../utils/getDisplayname';
 import Button from '../../components/atoms/Button';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import assets from '../../constants/assets';
+import useBuyBundleAfterStripeRedirect from '../../utils/hooks/useBuyBundleAfterStripeRedirect';
 
 interface IUserPageIndex {
   user: newnewapi.IUser;
   postsFilter: newnewapi.Post.Filter;
+  stripeSetupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
 }
 
-const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
+const UserPageIndex: NextPage<IUserPageIndex> = ({
+  user,
+  postsFilter,
+  stripeSetupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { loggedIn } = useAppSelector((state) => state.user);
+  useBuyBundleAfterStripeRedirect(
+    stripeSetupIntentClientSecretFromRedirect,
+    saveCardFromRedirect
+  );
 
   const isCreator = useMemo(
     () => !!user?.options?.isCreator,
@@ -224,7 +236,9 @@ export const getServerSideProps: GetServerSideProps<
     'public, s-maxage=15, stale-while-revalidate=20, stale-if-error=5'
   );
   try {
-    const { username } = context.query;
+    // eslint-disable-next-line camelcase
+    const { username, setup_intent_client_secret, save_card } = context.query;
+
     const translationContext = await serverSideTranslations(
       context.locale!!,
       [
@@ -266,6 +280,23 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         user: res.data.toJSON(),
+        // setup intent on this page is always for bundles
+        // eslint-disable-next-line camelcase, object-shorthand
+        ...(setup_intent_client_secret &&
+        !Array.isArray(setup_intent_client_secret)
+          ? {
+              stripeSetupIntentClientSecretFromRedirect:
+                // eslint-disable-next-line camelcase
+                setup_intent_client_secret,
+            }
+          : {}),
+        // eslint-disable-next-line camelcase, object-shorthand
+        ...(save_card && !Array.isArray(save_card)
+          ? {
+              // eslint-disable-next-line camelcase
+              saveCardFromRedirect: save_card === 'true',
+            }
+          : {}),
         ...translationContext,
       },
     };
