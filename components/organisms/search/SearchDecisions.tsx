@@ -9,7 +9,6 @@ import { useTranslation } from 'next-i18next';
 import { useUpdateEffect } from 'react-use';
 
 import Button from '../../atoms/Button';
-import Sorting from '../Sorting';
 
 import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
@@ -63,23 +62,6 @@ const getSortingValue = (sorting: string) => {
       return newnewapi.PostSorting.MOST_FUNDED_FIRST;
   }
 };
-
-const sortOptions: any = [
-  {
-    key: 'sortingtype',
-    options: [
-      {
-        key: 'all',
-      },
-      {
-        key: 'num_bids',
-      },
-      {
-        key: 'newest',
-      },
-    ],
-  },
-];
 
 export const SearchDecisions: React.FC<ISearchDecisions> = ({
   query,
@@ -260,15 +242,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     ]
   );
 
-  const handleTypeChange = useCallback(
-    (newSort: { sortingtype: string }) => {
-      if (!isLoading) {
-        setPostSorting(newSort.sortingtype);
-      }
-    },
-    [isLoading]
-  );
-
   return (
     <div>
       {!(
@@ -278,12 +251,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
       ) && (
         <SToolBar disabled={false}>
           <Tabs />
-          <Sorting
-            category=''
-            options={sortOptions}
-            selected={selectedSorting}
-            onChange={handleTypeChange}
-          />
         </SToolBar>
       )}
       <SCardsSection>
