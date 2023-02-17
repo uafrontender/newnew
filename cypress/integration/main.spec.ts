@@ -178,6 +178,7 @@ context('Main flow', () => {
 
     it('can onboard', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator-onboarding`);
+      cy.url().should('include', '/creator-onboarding');
 
       cy.fixture('avatar.png', 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
@@ -223,6 +224,7 @@ context('Main flow', () => {
 
     it('can create an event', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
+      cy.url().should('include', '/creation');
 
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
@@ -275,6 +277,7 @@ context('Main flow', () => {
 
     it('can create a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
+      cy.url().should('include', '/creation');
 
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
@@ -326,6 +329,7 @@ context('Main flow', () => {
 
     it('can enable bundles', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/dashboard`);
+      cy.url().should('include', '/creator/dashboard');
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
       cy.dGet('#bundles-navigation').click();
@@ -791,7 +795,183 @@ context('Main flow', () => {
     });
   });
 
-  // TODO: Add Guest willing to buy a bundle from profile!
+  describe('Guest willing to buy a bundle from profile', () => {
+    let USER_EMAIL;
+    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
+
+    // Ignore tutorials
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can buy a bundle from creator`s profile', () => {
+      // Clear auth, use new email
+      cy.setCookie('accessToken', '');
+      cy.setCookie('refreshToken', '');
+      storage.restart();
+
+      cy.reload();
+      cy.wait(2000);
+
+      USER_EMAIL = getNextUserEmail();
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
+      cy.url().should('include', creatorUsername);
+      cy.dGet('#buy-bundle-button').click();
+      cy.dGet('#buy-bundle-1-button').click();
+
+      cy.dGet('#email-input').type(USER_EMAIL);
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+      enterVerificationCode(VERIFICATION_CODE);
+
+      cy.url().should('include', creatorUsername);
+
+      // Could be great to show bundle purchased modal, but we don't know which offer was acquired
+
+      cy.dGet('#bundles');
+
+      cy.dGet('#see-bundle-button').should('be.visible');
+    });
+
+    it('can contribute to a superpoll with bundle votes', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      cy.dGet('#support-button-0').click();
+      cy.dGet('#vote-option-bundle').click();
+      cy.dGet('#bundle-votes-number').clear().type('10');
+      cy.dGet('#use-bundle-votes').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.dGet('#support-button-supported').should('be.visible');
+    });
+
+    it('can add a custom option to a superpoll', () => {
+      const CUSTOM_OPTION = getNextCustomOptionText();
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#bundles');
+
+      cy.dGet('#add-option-button').click();
+      cy.dGet('#add-option-input').type(CUSTOM_OPTION);
+      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-confirm').click();
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.dGet('#support-button-suggested').should('be.visible');
+    });
+
+    it('can`t add another custom option to the same superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#add-option-button').should('not.exist');
+    });
+
+    it('can delete own custom option', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      cy.dGet('#suggested-option-container').click();
+      cy.dGet('#option-ellipse-menu-delete').click();
+      cy.dGet('#confirm-delete-option').click();
+
+      cy.dGet('#support-button-suggested').should('not.exist');
+      cy.dGet('#add-option-button').should('be.visible');
+    });
+
+    it('can add a new custom option after deleting old one', () => {
+      const CUSTOM_OPTION = `5new option ${testSeed}7`;
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#bundles');
+
+      cy.dGet('#add-option-button').click();
+      cy.dGet('#add-option-input').type(CUSTOM_OPTION);
+      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-confirm').click();
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.dGet('#support-button-suggested').should('be.visible');
+    });
+
+    it('can contribute to a superpoll with a card payment', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 1);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
+
+    it('can make a custom contribution to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 'custom', 13678);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
+  });
 
   describe('User willing to contribute', () => {
     const USER_EMAIL = getNextUserEmail();
@@ -1134,6 +1314,7 @@ context('Main flow', () => {
 
     it('can buy a bundle from creator`s profile', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
+      cy.url().should('include', creatorUsername);
       cy.dGet('#buy-bundle-button').click();
       cy.dGet('#buy-bundle-1-button').click();
 
@@ -1319,6 +1500,7 @@ context('Main flow', () => {
 
     it('can add a card', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/profile/settings`);
+      cy.url().should('include', '/profile/settings');
       cy.dGet('#cards').click();
       cy.dGet('#add-new-card').click();
 
