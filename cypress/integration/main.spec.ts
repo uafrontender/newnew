@@ -233,7 +233,7 @@ context('Main flow', () => {
 
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
-      cy.dGet('#title').type(`CI post ${Date.now()}`);
+      cy.dGet('#title').type(`CI post event ${testSeed}`);
       cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
@@ -286,7 +286,7 @@ context('Main flow', () => {
 
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
-      cy.dGet('#title').type(`CI post ${Date.now()}`);
+      cy.dGet('#title').type(`CI post superpoll ${testSeed}`);
 
       cy.dGet('#option-0').type(`first option`);
       cy.dGet('#option-1').type(`second option`);
@@ -547,7 +547,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -582,7 +582,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -677,7 +677,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
 
       cy.dGet('#buy-bundle-1-button').click();
 
@@ -748,7 +748,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -890,7 +890,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -918,14 +918,14 @@ context('Main flow', () => {
     });
 
     it('can add a new custom option after deleting old one', () => {
-      const CUSTOM_OPTION = `5new option ${testSeed}7`;
+      const CUSTOM_OPTION = getNextCustomOptionText();
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
       cy.dGet('#bundles');
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -1185,7 +1185,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -1220,7 +1220,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -1363,7 +1363,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -1398,7 +1398,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -1577,7 +1577,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
@@ -1612,7 +1612,7 @@ context('Main flow', () => {
 
       cy.dGet('#add-option-button').click();
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
-      cy.dGet('#add-option-submit').click();
+      cy.dGet('#add-option-submit').should('be.enabled').click();
       cy.dGet('#add-option-confirm').click();
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
