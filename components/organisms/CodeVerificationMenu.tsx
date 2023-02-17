@@ -38,12 +38,14 @@ import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
+  allowLeave: boolean;
   redirectUserTo?: string;
   onBack: () => void;
 }
 
 const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   expirationTime,
+  allowLeave,
   redirectUserTo,
   onBack,
 }) => {
@@ -82,7 +84,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   // Timer
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
 
-  useLeavePageConfirm(!isSuccess, t('leaveAlert'), []);
+  useLeavePageConfirm(!isSuccess && !allowLeave, t('leaveAlert'), []);
 
   const handleSignIn = useCallback(
     async (completeCode: string) => {
