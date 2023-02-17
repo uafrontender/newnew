@@ -106,6 +106,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         newEmail={email as string}
         redirect={redirect as 'settings' | 'dashboard'}
         expirationTime={60}
+        allowLeave={!user.loggedIn && user._persist?.rehydrated}
       />
     </>
   );
