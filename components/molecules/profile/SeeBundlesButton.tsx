@@ -36,6 +36,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
     <>
       {creatorBundle ? (
         <SButton
+          id='see-bundle-button'
           className={className}
           onClick={() => {
             setCreatorsBundleModalOpen(true);
@@ -57,6 +58,7 @@ const SeeBundlesButton: React.FC<ISeeBundlesButton> = ({
         </SButton>
       ) : (
         <SButton
+          id='buy-bundle-button'
           highlighted
           className={className}
           onClick={() => {
