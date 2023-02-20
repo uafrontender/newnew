@@ -60,6 +60,19 @@ export const markPost = (payload: newnewapi.MarkPostRequest, signal?: RequestIni
     signal ?? undefined,
   );
 
+export const renamePostTitle = (payload: newnewapi.RenamePostTitleRequest, signal?: RequestInit['signal']) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.RenamePostTitleRequest,
+    newnewapi.Post
+  >(
+    newnewapi.RenamePostTitleRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_POST}/rename_post_title`,
+    'post',
+    payload,
+    signal ?? undefined,
+  );
+
 export const deleteMyPost = (payload: newnewapi.DeleteMyPostRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.DeleteMyPostRequest,
