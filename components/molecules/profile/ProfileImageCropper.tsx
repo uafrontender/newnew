@@ -107,11 +107,14 @@ const SCropperWrapper = styled.div<{
 }>`
   position: relative;
   height: 500px;
+  width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
     height: 420px;
     width: 420px;
     z-index: 0;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .cropper-cropArea {
