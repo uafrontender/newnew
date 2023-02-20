@@ -44,7 +44,7 @@
     "lodash": "4.17.21",
     "lottie-web": "5.10.2",
     "mixpanel-browser": "2.45.0",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#5d06360cc9a1c22bc144bc6b689461323e27ab00",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#8cdd6063e78f4ee2f98ca00d6e3d1548684b2b57",
     "moment": "2.29.1",
     "moment-duration-format": "2.3.2",
     "moment-timezone": "0.5.39",
