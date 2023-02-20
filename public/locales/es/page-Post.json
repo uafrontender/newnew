@@ -734,6 +734,10 @@
       "shareBtn": "Compartir",
       "linkCopied": "¡Enlace copiado!"
     },
+    "tutorialEditTitle_NEED_TRANSLATION": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
+    },
     "winner": {
       "inResponseToYourPost": "En respuesta a tu publicación",
       "ac": {

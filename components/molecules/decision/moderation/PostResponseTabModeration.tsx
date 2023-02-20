@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -23,6 +23,12 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import EditPostTitleModal from './EditPostTitleModal';
 import InlineSvg from '../../../atoms/InlineSVG';
 import EditIconFilled from '../../../../public/images/svg/icons/filled/EditTransparent.svg';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 interface IPostResponseTabModeration {
   postUuid: string;
@@ -51,6 +57,60 @@ const PostResponseTabModeration: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
+  const [isTutorialVisible, setIsTutorialVisible] = useState(true);
+
+  const goToNextStep = useCallback(async () => {
+    if (postType === 'ac') {
+      if (
+        user.userTutorialsProgress.remainingAcResponseCurrentStep &&
+        user.userTutorialsProgress.remainingAcResponseCurrentStep[0]
+      ) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            acResponseCurrentStep:
+              user.userTutorialsProgress.remainingAcResponseCurrentStep[0],
+          });
+          await markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingAcResponseCurrentStep: [
+              ...user.userTutorialsProgress.remainingAcResponseCurrentStep,
+            ].slice(1),
+          })
+        );
+      }
+    } else if (postType === 'mc') {
+      if (
+        user.userTutorialsProgress.remainingMcResponseCurrentStep &&
+        user.userTutorialsProgress.remainingMcResponseCurrentStep[0]
+      ) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            mcResponseCurrentStep:
+              user.userTutorialsProgress.remainingMcResponseCurrentStep[0],
+          });
+          await markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingMcResponseCurrentStep: [
+              ...user.userTutorialsProgress.remainingMcResponseCurrentStep,
+            ].slice(1),
+          })
+        );
+      }
+    }
+  }, [
+    dispatch,
+    postType,
+    user.loggedIn,
+    user.userTutorialsProgress.remainingAcResponseCurrentStep,
+    user.userTutorialsProgress.remainingMcResponseCurrentStep,
+  ]);
 
   const {
     coreResponseUploading,
@@ -208,6 +268,43 @@ const PostResponseTabModeration: React.FunctionComponent<
     }
   }, [postUuid, postStatus]);
 
+  useEffect(() => {
+    if (user.userTutorialsProgressSynced) {
+      switch (postType) {
+        case 'mc': {
+          if (
+            user.userTutorialsProgress.remainingMcResponseCurrentStep &&
+            user.userTutorialsProgress.remainingMcResponseCurrentStep[0] ===
+              newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE
+          ) {
+            setIsTutorialVisible(true);
+          }
+
+          break;
+        }
+        default: {
+          if (
+            user.userTutorialsProgress.remainingAcResponseCurrentStep &&
+            user.userTutorialsProgress.remainingAcResponseCurrentStep[0] ===
+              newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE
+          ) {
+            setIsTutorialVisible(true);
+          }
+
+          break;
+        }
+      }
+    } else {
+      setIsTutorialVisible(false);
+    }
+  }, [
+    postType,
+    user.userTutorialsProgress.remainingAcResponseCurrentStep,
+    user.userTutorialsProgress.remainingMcCrCurrentStep,
+    user.userTutorialsProgress.remainingMcResponseCurrentStep,
+    user.userTutorialsProgressSynced,
+  ]);
+
   if (postStatus === 'succeeded') {
     return (
       <>
@@ -309,7 +406,7 @@ const PostResponseTabModeration: React.FunctionComponent<
   }
 
   return (
-    <SContainer>
+    <SContainer dimmed={isTutorialVisible}>
       <PostResponseTabModerationHeader
         title={t('postResponseTabModeration.awaiting.topHeader')}
       />
@@ -325,7 +422,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           winningOptionAc={winningOptionAc}
           winningOptionMc={winningOptionMc}
         />
-        <STextTitle variant={2} weight={600}>
+        <STextTitle variant={2} weight={600} undimmed={isTutorialVisible}>
           <SSpan>
             {t('postResponseTabModeration.winner.inResponseToYourPost')}
           </SSpan>
@@ -341,13 +438,28 @@ const PostResponseTabModeration: React.FunctionComponent<
           >
             <InlineSvg
               svg={EditIconFilled}
-              fill={theme.colorsThemed.text.secondary}
+              fill={
+                !isTutorialVisible
+                  ? theme.colorsThemed.text.secondary
+                  : theme.colorsThemed.text.primary
+              }
               width='20px'
               height='20px'
             />
           </SEditTitleButton>
+          {isTutorialVisible ? (
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={isTutorialVisible}
+                closeTooltip={goToNextStep}
+                title={t('postResponseTabModeration.tutorialEditTitle.title')}
+                text={t('postResponseTabModeration.tutorialEditTitle.body')}
+                dotPosition={DotPositionEnum.TopRight}
+              />
+            </STutorialTooltipHolder>
+          ) : null}
         </STextTitle>
-        <SHeadline variant={5}>
+        <SHeadline variant={5} undimmed={isTutorialVisible}>
           <PostTitleContent>{postTitle}</PostTitleContent>
         </SHeadline>
       </STextContentWrapper>
@@ -380,9 +492,22 @@ const PostResponseTabModeration: React.FunctionComponent<
 
 export default PostResponseTabModeration;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  dimmed: boolean;
+}>`
   height: 100%;
   width: 100%;
+
+  &::before {
+    content: '';
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    z-index: 10;
+
+    box-shadow: ${({ theme, dimmed }) =>
+      dimmed ? `inset 0px 200px 263px 50px rgba(0, 0, 0, 0.75);` : 'unset'};
+  }
 
   ${({ theme }) => theme.media.tablet} {
     display: grid;
@@ -412,12 +537,22 @@ const STextContentWrapper = styled.div`
   margin-top: 32px;
 `;
 
-const STextTitle = styled(Text)`
+const STextTitle = styled(Text)<{
+  undimmed?: boolean;
+}>`
+  position: relative;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   margin-top: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  ${({ undimmed }) =>
+    undimmed
+      ? css`
+          z-index: 11;
+        `
+      : null}
 
   ${({ theme }) => theme.media.tablet} {
     justify-content: space-between;
@@ -429,9 +564,20 @@ const SSpan = styled.span`
   white-space: pre;
 `;
 
-const SHeadline = styled(Headline)`
+const SHeadline = styled(Headline)<{
+  undimmed?: boolean;
+}>`
   white-space: pre-wrap;
   word-break: break-word;
+
+  ${({ theme }) => theme.media.laptop} {
+    ${({ undimmed }) =>
+      undimmed
+        ? css`
+            z-index: 11;
+          `
+        : null}
+  }
 `;
 
 const SUploadButton = styled(Button)`
@@ -501,5 +647,18 @@ const SEditTitleButton = styled(Button)`
   &:focus:enabled {
     background: ${({ theme, view }) =>
       view ? theme.colorsThemed.button.background[view] : ''};
+  }
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: 0;
+  top: 42px;
+  text-align: left;
+
+  ${({ theme }) => theme.media.laptop} {
+    left: initial;
+    right: 36px;
+    top: 36px;
   }
 `;

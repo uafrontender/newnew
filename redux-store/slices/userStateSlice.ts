@@ -56,6 +56,8 @@ const defaultUIState: IUserStateInterface = {
     remainingAcCrCurrentStep: [newnewapi.AcCreationTutorialStep.AC_CR_HERO],
     remainingCfCrCurrentStep: [newnewapi.CfCreationTutorialStep.CF_CR_HERO],
     remainingMcCrCurrentStep: [newnewapi.McCreationTutorialStep.MC_CR_HERO],
+    remainingAcResponseCurrentStep: [newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE],
+    remainingMcResponseCurrentStep: [newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE],
   },
   userTutorialsProgressSynced: false,
 };

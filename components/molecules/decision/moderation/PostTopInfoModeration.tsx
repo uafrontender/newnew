@@ -270,23 +270,25 @@ const PostTopInfoModeration: React.FunctionComponent<
           </>
         ) : null}
         <SActionsDiv>
-          <SEditTitleButton
-            view='transparent'
-            iconOnly
-            withDim
-            withShrink
-            style={{
-              padding: '8px',
-            }}
-            onClick={() => handleOpenEditTitleMenuMixpanel()}
-          >
-            <InlineSvg
-              svg={EditIconFilled}
-              fill={theme.colorsThemed.text.secondary}
-              width='20px'
-              height='20px'
-            />
-          </SEditTitleButton>
+          {!hidden ? (
+            <SEditTitleButton
+              view='transparent'
+              iconOnly
+              withDim
+              withShrink
+              style={{
+                padding: '8px',
+              }}
+              onClick={() => handleOpenEditTitleMenuMixpanel()}
+            >
+              <InlineSvg
+                svg={EditIconFilled}
+                fill={theme.colorsThemed.text.secondary}
+                width='20px'
+                height='20px'
+              />
+            </SEditTitleButton>
+          ) : null}
           <SShareButton
             view='transparent'
             iconOnly
