@@ -22,6 +22,7 @@ interface IOnboardingEditProfileImageModal {
   isOpen: boolean;
   avatarUrlInEdit: string;
   originalProfileImageWidth: number;
+  minZoom: number;
   setAvatarUrlInEdit: (value: string) => void;
   handleSetImageToSave: (value: File) => void;
   onClose: () => void;
@@ -33,6 +34,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
   isOpen,
   avatarUrlInEdit,
   originalProfileImageWidth,
+  minZoom,
   setAvatarUrlInEdit,
   handleSetImageToSave,
   onClose,
@@ -51,31 +53,21 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
   });
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
     useState<Area>();
-  const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [zoomProfileImage, setZoomProfileImage] = useState(minZoom);
   const [loading, setLoading] = useState(false);
 
   const handleSetStageToEditingGeneralUnsetPicture = () => {
     onClose();
     setAvatarUrlInEdit('');
-    setZoomProfileImage(1);
+    setZoomProfileImage(minZoom);
   };
 
   const handleZoomOutProfileImage = () => {
-    if (zoomProfileImage <= 1) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage - 0.2 <= 1) return 1;
-      return z - 0.2;
-    });
+    setZoomProfileImage((z) => Math.max(z - 0.2, minZoom));
   };
 
   const handleZoomInProfileImage = () => {
-    if (zoomProfileImage >= 3) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= 3) return 3;
-      return z + 0.2;
-    });
+    setZoomProfileImage((z) => Math.min(zoomProfileImage + 0.2, minZoom + 2));
   };
 
   const onCropCompleteProfileImage = useCallback(
@@ -145,6 +137,8 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
         <ProfileImageCropper
           crop={cropProfileImage}
           zoom={zoomProfileImage}
+          minZoom={minZoom}
+          maxZoom={minZoom + 2}
           avatarUrlInEdit={avatarUrlInEdit}
           originalImageWidth={originalProfileImageWidth}
           disabled={loading}
@@ -157,7 +151,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
             iconOnly
             size='sm'
             view='transparent'
-            disabled={zoomProfileImage <= 1 || loading}
+            disabled={zoomProfileImage <= minZoom || loading}
             onClick={handleZoomOutProfileImage}
           >
             <InlineSvg
@@ -169,8 +163,8 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
           </Button>
           <ProfileImageZoomSlider
             value={zoomProfileImage}
-            min={1}
-            max={3}
+            min={minZoom}
+            max={minZoom + 2}
             step={0.1}
             ariaLabel='Zoom'
             disabled={loading}
@@ -180,7 +174,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
             iconOnly
             size='sm'
             view='transparent'
-            disabled={zoomProfileImage >= 3 || loading}
+            disabled={zoomProfileImage >= minZoom + 2 || loading}
             onClick={handleZoomInProfileImage}
           >
             <InlineSvg
