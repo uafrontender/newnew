@@ -214,6 +214,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
     validateNicknameViaAPIDebounced(e.target.value);
   };
 
+  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
+
   // API validations
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const validateUsernameAbortControllerRef = useRef<
@@ -442,6 +444,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
           // eslint-disable-next-line react/no-this-in-sfc
           setOriginalProfileImageWidth(properlySizedImage.width);
+          const minZoom =
+            Math.max(properlySizedImage.height, properlySizedImage.width) /
+            Math.min(properlySizedImage.height, properlySizedImage.width);
+
+          setMinZoomProfileImage(minZoom);
 
           setAvatarUrlInEdit(properlySizedImage.url as string);
           setCropMenuOpen(true);
@@ -965,6 +972,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
           isOpen={cropMenuOpen}
           avatarUrlInEdit={avatarUrlInEdit}
           originalProfileImageWidth={originalProfileImageWidth}
+          minZoom={minZoomProfileImage}
           handleSetImageToSave={(val) => setImageToSave(val)}
           setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
           onClose={() => {
