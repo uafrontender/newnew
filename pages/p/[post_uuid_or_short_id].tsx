@@ -27,7 +27,7 @@ import {
   fetchMoreLikePosts,
   fetchPostByUUID,
   markPost,
-  renamePostTitle,
+  setPostTitle,
 } from '../../api/endpoints/post';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { ChannelsContext } from '../../contexts/channelsContext';
@@ -168,12 +168,12 @@ const PostPage: NextPage<IPostPage> = ({
       }
       setIsUpdateTitleLoading(true);
       try {
-        const payload = new newnewapi.RenamePostTitleRequest({
+        const payload = new newnewapi.SetPostTitleRequest({
           postUuid: postParsed?.postUuid,
           updatedTitle: newTitle,
         });
 
-        const res = await renamePostTitle(payload);
+        const res = await setPostTitle(payload);
 
         if (!res.data || res.error) {
           throw new Error(res?.error?.message || 'An error occured');
