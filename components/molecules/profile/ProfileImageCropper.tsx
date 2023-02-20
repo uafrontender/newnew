@@ -11,6 +11,8 @@ import DragToRepositionLabel from './DragToRepositionLabel';
 type TProfileImageCropper = {
   crop: Point;
   zoom: number;
+  minZoom: number;
+  maxZoom: number;
   avatarUrlInEdit: string;
   originalImageWidth: number;
   disabled: boolean;
@@ -22,8 +24,10 @@ type TProfileImageCropper = {
 };
 
 const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
-  zoom,
   crop,
+  zoom,
+  minZoom,
+  maxZoom,
   avatarUrlInEdit,
   originalImageWidth,
   disabled,
@@ -63,15 +67,21 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
       {avatarUrlInEdit && (
         <Cropper
           image={avatarUrlInEdit}
-          objectFit={isMobile ? 'horizontal-cover' : 'vertical-cover'}
+          objectFit='auto-cover'
           crop={crop}
-          cropSize={{
-            height: isMobile ? 375 : 280,
-            width: isMobile ? 375 : 280,
-          }}
+          cropSize={
+            isMobile
+              ? undefined
+              : {
+                  height: 420,
+                  width: 420,
+                }
+          }
           cropShape='round'
           showGrid={false}
           zoom={zoom}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
           aspect={1}
           classes={{
             containerClassName: 'cropper-container',
@@ -100,28 +110,8 @@ const SCropperWrapper = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height: 420px;
-    min-height: 280px;
-    max-height: calc(100% - 72px);
+    width: 420px;
     z-index: 0;
-  }
-
-  .cropper-container {
-    &:before {
-      content: '';
-      position: absolute;
-
-      width: ${({ pseudoElementWidth }) => `${pseudoElementWidth}px`};
-      height: 100%;
-
-      z-index: 12;
-
-      ${({ theme }) => theme.media.tablet} {
-        transform: ${({ x, y, zoom }) =>
-          `translate(${x}px, ${y}px) scale(${zoom})`};
-        box-shadow: 0 0 0 9999em;
-        color: ${({ theme }) => theme.colorsThemed.background.primary};
-      }
-    }
   }
 
   .cropper-cropArea {
