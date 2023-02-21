@@ -119,7 +119,7 @@ const SearchInput: React.FC = React.memo(() => {
     }
 
     const clearedSearchValue = getClearedSearchQuery(searchValue);
-    if (e.keyCode === 13 && clearedSearchValue) {
+    if (e.keyCode === 13 && clearedSearchValue.length > 1) {
       handleSeeResults(clearedSearchValue);
       closeSearch();
     }
@@ -199,9 +199,15 @@ const SearchInput: React.FC = React.memo(() => {
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
-      if (res.data.creators) setResultsCreators(res.data.creators);
-      if (res.data.posts) setResultsPosts(res.data.posts);
-      if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
+      if (res.data.creators) {
+        setResultsCreators(res.data.creators);
+      }
+      if (res.data.posts) {
+        setResultsPosts(res.data.posts);
+      }
+      if (res.data.hashtags) {
+        setResultsHashtags(res.data.hashtags);
+      }
       setIsLoading(false);
     } catch (err) {
       console.error(err);
