@@ -450,6 +450,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           {isTutorialVisible ? (
             <STutorialTooltipHolder>
               <TutorialTooltip
+                buttonId='edit-title-tutorial-btn'
                 isTooltipVisible={isTutorialVisible}
                 closeTooltip={goToNextStep}
                 title={t('postResponseTabModeration.tutorialEditTitle.title')}
