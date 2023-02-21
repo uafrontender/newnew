@@ -245,6 +245,15 @@ const SOptionsContainer = styled(motion.div)<{
   }
 
   z-index: 4;
+
+  ${({ theme }) => theme.media.laptop} {
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 `;
 
 const SOption = styled.button<{
