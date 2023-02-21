@@ -60,7 +60,7 @@ const PostResponseTabModeration: React.FunctionComponent<
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
-  const [isTutorialVisible, setIsTutorialVisible] = useState(true);
+  const [isTutorialVisible, setIsTutorialVisible] = useState(false);
 
   const goToNextStep = useCallback(async () => {
     if (postType === 'ac') {
@@ -499,14 +499,23 @@ const SContainer = styled.div<{
   width: 100%;
 
   &::before {
-    content: '';
-    width: 100%;
-    height: 100vh;
-    position: absolute;
-    z-index: 10;
+    ${({ dimmed }) =>
+      dimmed
+        ? css`
+            content: '';
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            z-index: 10;
+          `
+        : null}
 
     box-shadow: ${({ theme, dimmed }) =>
-      dimmed ? `inset 0px 200px 263px 50px rgba(0, 0, 0, 0.75);` : 'unset'};
+      dimmed
+        ? theme.name === 'dark'
+          ? `inset 0px 200px 263px 50px rgba(0, 0, 0, 0.75);`
+          : `inset 0px 200px 263px 50px rgba(255, 255, 255, 0.75);`
+        : 'unset'};
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -533,8 +542,13 @@ const STextContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: center;
 
   margin-top: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    align-items: initial;
+  }
 `;
 
 const STextTitle = styled(Text)<{
@@ -570,7 +584,7 @@ const SHeadline = styled(Headline)<{
   white-space: pre-wrap;
   word-break: break-word;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     ${({ undimmed }) =>
       undimmed
         ? css`
@@ -652,11 +666,11 @@ const SEditTitleButton = styled(Button)`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  left: 0;
+  left: -36px;
   top: 42px;
   text-align: left;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     left: initial;
     right: 36px;
     top: 36px;
