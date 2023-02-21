@@ -291,5 +291,8 @@
       "description": "Thank you, we will keep you updated about new posts on NewNew.",
       "button": "Cool!"
     }
-  }
+  },
+  "oops": "Oops!",
+  "somethingWentWrong": "Something went wrong...",
+  "goHome": "Go home"
 }
