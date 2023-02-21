@@ -82,6 +82,7 @@ const PostResponseTabModeration: React.FunctionComponent<
             ].slice(1),
           })
         );
+        setIsTutorialVisible(false);
       }
     } else if (postType === 'mc') {
       if (
@@ -102,6 +103,7 @@ const PostResponseTabModeration: React.FunctionComponent<
             ].slice(1),
           })
         );
+        setIsTutorialVisible(false);
       }
     }
   }, [
