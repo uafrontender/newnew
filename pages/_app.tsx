@@ -71,6 +71,7 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
+import AppStateContextProvider from '../contexts/appStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -250,64 +251,69 @@ const MyApp = (props: IMyApp): ReactElement => {
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary>
             <LanguageWrapper>
-              <AppConstantsContextProvider>
-                <SocketContextProvider>
-                  <ChannelsContextProvider>
-                    <PersistanceProvider store={store}>
-                      <SyncUserWrapper>
-                        <NotificationsProvider>
-                          <ModalNotificationsContextProvider>
-                            <PushNotificationContextProvider>
-                              <BlockedUsersProvider>
-                                <FollowingsContextProvider>
-                                  <BundlesContextProvider>
-                                    <ChatsProvider>
-                                      <OverlayModeProvider>
-                                        <MultipleBeforePopStateContextProvider>
-                                          <ResizeMode>
-                                            <GlobalTheme
-                                              initialTheme={colorMode}
-                                              themeFromCookie={themeFromCookie}
-                                            >
-                                              <>
-                                                <ToastContainer containerId='toast-container' />
-                                                <VideoProcessingWrapper>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
+              <AppStateContextProvider uaString={uaString}>
+                <AppConstantsContextProvider>
+                  <SocketContextProvider>
+                    <ChannelsContextProvider>
+                      <PersistanceProvider store={store}>
+                        <SyncUserWrapper>
+                          <NotificationsProvider>
+                            <ModalNotificationsContextProvider>
+                              <PushNotificationContextProvider>
+                                <BlockedUsersProvider>
+                                  <FollowingsContextProvider>
+                                    <BundlesContextProvider>
+                                      <ChatsProvider>
+                                        <OverlayModeProvider>
+                                          <MultipleBeforePopStateContextProvider>
+                                            <ResizeMode>
+                                              <GlobalTheme
+                                                initialTheme={colorMode}
+                                                themeFromCookie={
+                                                  themeFromCookie
+                                                }
+                                              >
+                                                <>
+                                                  <ToastContainer containerId='toast-container' />
+                                                  <VideoProcessingWrapper>
+                                                    {!pageProps.error ? (
+                                                      getLayout(
+                                                        <Component
+                                                          {...pageProps}
+                                                        />
+                                                      )
+                                                    ) : (
+                                                      <Error
+                                                        title={
+                                                          pageProps.error
+                                                            ?.message
+                                                        }
+                                                        statusCode={
+                                                          pageProps.error
+                                                            ?.statusCode ?? 500
+                                                        }
                                                       />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                  <PushNotificationModalContainer />
-                                                </VideoProcessingWrapper>
-                                              </>
-                                            </GlobalTheme>
-                                          </ResizeMode>
-                                        </MultipleBeforePopStateContextProvider>
-                                      </OverlayModeProvider>
-                                    </ChatsProvider>
-                                  </BundlesContextProvider>
-                                </FollowingsContextProvider>
-                              </BlockedUsersProvider>
-                            </PushNotificationContextProvider>
-                          </ModalNotificationsContextProvider>
-                        </NotificationsProvider>
-                      </SyncUserWrapper>
-                    </PersistanceProvider>
-                  </ChannelsContextProvider>
-                </SocketContextProvider>
-              </AppConstantsContextProvider>
+                                                    )}
+                                                    <PushNotificationModalContainer />
+                                                  </VideoProcessingWrapper>
+                                                </>
+                                              </GlobalTheme>
+                                            </ResizeMode>
+                                          </MultipleBeforePopStateContextProvider>
+                                        </OverlayModeProvider>
+                                      </ChatsProvider>
+                                    </BundlesContextProvider>
+                                  </FollowingsContextProvider>
+                                </BlockedUsersProvider>
+                              </PushNotificationContextProvider>
+                            </ModalNotificationsContextProvider>
+                          </NotificationsProvider>
+                        </SyncUserWrapper>
+                      </PersistanceProvider>
+                    </ChannelsContextProvider>
+                  </SocketContextProvider>
+                </AppConstantsContextProvider>
+              </AppStateContextProvider>
             </LanguageWrapper>
           </ErrorBoundary>
           <ReactQueryDevtools initialIsOpen={false} />
