@@ -117,6 +117,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
       duration: 500,
       horizontal: true,
       containerId: 'monthsContainer',
+      ignoreCancelEvents: true,
     });
   }, [visibleMonth]);
 

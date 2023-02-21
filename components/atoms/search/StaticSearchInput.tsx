@@ -124,7 +124,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
 
       const clearedSearchValue = getClearedSearchQuery(searchValue);
-      if (e.keyCode === 13 && clearedSearchValue) {
+      if (e.keyCode === 13 && clearedSearchValue.length > 1) {
         handleSeeResults(clearedSearchValue);
         closeSearch();
       }
