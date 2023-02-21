@@ -81,7 +81,8 @@
     "socket.io-client": "4.4.0",
     "styled-components": "5.3.3",
     "uuidv4": "6.2.13",
-    "validator": "13.7.0"
+    "validator": "13.7.0",
+    "video.js": "^8.0.4"
   },
   "devDependencies": {
     "@babel/core": "7.18.2",

@@ -1,3 +1,6 @@
+/* eslint-disable no-multi-assign */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useRef,
   useMemo,
@@ -7,18 +10,9 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import {
-  Player,
-  PlayerAPI,
-  PlayerConfig,
-  PlayerEvent,
-  PlayerType,
-  SourceConfig,
-  StreamType,
-  PlaybackEvent,
-  PlayerEventCallback,
-  PlayerEventBase,
-} from 'bitmovin-player';
+import videojs from 'video.js';
+import Player from 'video.js/dist/types/player';
+import addsfadsf from 'video.js/dist/types/';
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -26,10 +20,6 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import logoAnimation from '../../../../public/animations/mobile_logo.json';
 import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
 import PlayerScrubber from '../../../atoms/PlayerScrubber';
-
-type TPlayerAPIEnhanced = PlayerAPI & {
-  handleSetPlaybackTime: PlayerEventCallback;
-};
 
 interface IPostBitmovinPlayer {
   id: string;
@@ -46,185 +36,122 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   videoDurationWithTime,
   showPlayButton,
 }) => {
-  // const [init, setInit] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const videoRef = React.useRef(null);
+  const playerRef = React.useRef<Player>(null);
 
   const [isPaused, setIsPaused] = useState(false);
-
-  const [playbackTime, setPlaybackTime] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-
   const handleSetIsPaused = useCallback((stateValue: boolean) => {
     setIsPaused(stateValue);
   }, []);
 
-  const playerConfig = useMemo<PlayerConfig>(
-    () => ({
-      ui: false,
-      key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
-      playback: {
-        autoplay: true,
-        // NB! Need to be initially muted in order to comply with autoplay policies
-        // when opening the link from URL
-        muted: true,
-        preferredTech: [
-          { player: PlayerType.Html5, streaming: StreamType.Hls },
-        ],
-      },
-    }),
-    []
-  );
+  const [isHovered, setIsHovered] = useState(false);
 
-  const playerSource: SourceConfig = useMemo(
-    () => ({
-      hls: resources?.hlsStreamUrl ?? '',
-      poster: resources?.thumbnailImageUrl ?? '',
-      ...(resources?.originalVideoUrl
-        ? {
-            progressive: [
-              {
-                url: resources?.originalVideoUrl,
-                type: 'video/mp4',
-                bitrate: 500000,
-                label: 'Low',
-              },
-            ],
-          }
-        : {}),
-      options: {
-        startTime: 0,
-      },
-    }),
-    [
-      resources?.hlsStreamUrl,
-      resources?.thumbnailImageUrl,
-      resources?.originalVideoUrl,
-    ]
-  );
-
-  const playerRef: any = useRef();
-  const player = useRef<TPlayerAPIEnhanced | null>(null);
-
-  const handlePlaybackFinished = useCallback(() => {
-    // If not available set to some super high number
-    setPlaybackTime(player?.current?.getDuration() ?? 10000);
-    player?.current?.play().catch(() => {
-      handleSetIsPaused(true);
-    });
-  }, [handleSetIsPaused]);
-
-  const destroyPlayer = useCallback(async () => {
-    if (player.current != null) {
-      // setInit(false);
-      await player.current.destroy();
-    }
-  }, [player]);
-
-  const handleSetPlaybackTime: PlayerEventCallback = useCallback(
-    (e: PlayerEventBase) => {
-      setPlaybackTime((e as PlaybackEvent).time);
-    },
-    []
-  );
-
+  const [playbackTime, setPlaybackTime] = useState(0);
   const handlePlayerScrubberChangeTime = useCallback((v: number) => {
     setPlaybackTime(v);
-    player.current?.seek(v);
+
+    playerRef.current?.pause();
+    playerRef.current?.currentTime(v);
+    setTimeout(() => {
+      playerRef.current?.play();
+    }, 100);
   }, []);
 
-  const setupPlayer = useCallback(() => {
-    player.current = new Player(
-      playerRef.current,
-      playerConfig
-    ) as TPlayerAPIEnhanced;
+  const options = useMemo(
+    () => ({
+      autoplay: true,
+      loop: true,
+      controls: false,
+      responsive: false,
+      fluid: true,
+      sources: [
+        {
+          src: resources?.hlsStreamUrl,
+          type: 'application/x-mpegURL',
+        },
+      ],
+    }),
+    [resources?.hlsStreamUrl]
+  );
 
-    // setInit(true);
-  }, [playerConfig]);
+  const handlePlayerReady = useCallback(
+    (p: Player) => {
+      // @ts-ignore
+      playerRef.current = p;
 
-  const subscribe = useCallback(() => {
-    // @ts-ignore
-    if (player.current.handlePlaybackFinished) {
-      player?.current?.off(
-        PlayerEvent.PlaybackFinished,
-        // @ts-ignore
-        player.current.handlePlaybackFinished
-      );
+      // You can handle player events here, for example:
+      // @ts-ignore
+      p.on('waiting', () => {
+        videojs.log('player is waiting');
+      });
+      // @ts-ignore
+      p.on('dispose', () => {
+        videojs.log('player will dispose');
+      });
+
+      // @ts-ignore
+      p.on('play', () => {
+        videojs.log('player is playing');
+        handleSetIsPaused(false);
+      });
+      // @ts-ignore
+      p.on('pause', () => {
+        videojs.log('player is paused');
+        handleSetIsPaused(true);
+      });
+      // @ts-ignore
+      p.on('timeupdate', (e) => {
+        console.log(p.currentTime());
+        setPlaybackTime(p.currentTime());
+      });
+    },
+    [handleSetIsPaused]
+  );
+
+  React.useEffect(() => {
+    // Make sure Video.js player is only initialized once
+    if (!playerRef.current) {
+      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
+      const videoElement = document.createElement('video-js');
+
+      videoElement.classList.add('vjs-big-play-centered');
+      // @ts-ignore
+      videoRef.current?.appendChild(videoElement);
+      // @ts-ignore
+      const player = (playerRef.current = videojs(videoElement, options, () => {
+        videojs.log('player is ready');
+        handlePlayerReady && handlePlayerReady(player);
+      }));
+
+      // You could update an existing player in the `else` block here
+      // on prop change, for example:
+    } else {
+      const player = playerRef.current;
+
+      player.autoplay(options.autoplay);
+      player.src(options.sources);
     }
-    player?.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
-    // @ts-ignore
-    player.current.handlePlaybackFinished = handlePlaybackFinished;
-
-    if (player.current?.handleSetPlaybackTime) {
-      player.current?.off(
-        PlayerEvent.TimeChanged,
-        player.current?.handleSetPlaybackTime
-      );
-    }
-    player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
-    player.current!!.handleSetPlaybackTime = handleSetPlaybackTime;
-  }, [handlePlaybackFinished, handleSetPlaybackTime]);
-
-  useEffect(() => {
-    if (process.browser && typeof window !== 'undefined') {
-      setupPlayer();
-      subscribe();
-    }
-
-    return () => {
-      destroyPlayer();
-    };
-  }, [destroyPlayer, setupPlayer, subscribe]);
-
-  useEffect(() => {
-    if (player.current && loaded) {
-      if (muted) {
-        player.current.mute();
-      } else {
-        player.current.unmute();
-      }
-    }
-  }, [player, muted, loaded]);
-
-  useEffect(() => {
-    let cancel = false;
-    async function load() {
-      setIsLoading(true);
-      // console.log(player.current);
-      try {
-        await player?.current
-          ?.load(playerSource)
-          .then(() => {
-            if (cancel) return;
-            player.current?.play().catch(() => {
-              handleSetIsPaused(true);
-            });
-            setLoaded(true);
-            setIsLoading(false);
-          })
-          .catch(() => {
-            if (cancel) return;
-            console.error('Player load failed');
-          });
-      } catch (err) {
-        setLoaded(true);
-        setIsLoading(false);
-        console.error(`Error while creating Bitmovin Player instance, ${err}`);
-      }
-    }
-    load();
-    return () => {
-      cancel = true;
-    };
-  }, [playerSource, handleSetIsPaused]);
-
-  useEffect(() => {
-    player.current?.on(PlayerEvent.Paused, () => handleSetIsPaused(true));
-    player.current?.on(PlayerEvent.Play, () => handleSetIsPaused(false));
-    // player.current?.on(PlayerEvent.TimeChanged, handleSetPlaybackTime);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerSource]);
+  }, [options, videoRef]);
+
+  // Dispose the Video.js player when the functional component unmounts
+  React.useEffect(() => {
+    const player = playerRef.current;
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+        // @ts-ignore
+        playerRef.current = null;
+      }
+    };
+  }, [playerRef]);
+
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current?.muted(muted);
+    }
+  }, [muted]);
 
   return (
     <SContent
@@ -232,33 +159,29 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
-      <SVideoWrapper>
+      <SVideoWrapper data-vjs-player>
         <SWrapper
           id={id}
           onClick={() => {
-            if (loaded) {
-              if (player.current?.isPlaying()) {
-                player.current?.pause();
-              } else {
-                player.current?.play().catch(() => {
-                  handleSetIsPaused(true);
-                });
-              }
+            if (!playerRef.current?.paused()) {
+              playerRef.current?.pause();
+            } else {
+              playerRef.current?.play()?.catch(() => {
+                handleSetIsPaused(true);
+              });
             }
           }}
-          ref={playerRef}
+          ref={videoRef}
         />
         {showPlayButton && isPaused && (
           <SPlayPseudoButton
             onClick={() => {
-              if (loaded) {
-                if (player.current?.isPlaying()) {
-                  player.current?.pause();
-                } else {
-                  player.current?.play().catch(() => {
-                    handleSetIsPaused(true);
-                  });
-                }
+              if (!playerRef.current?.paused()) {
+                playerRef.current?.pause();
+              } else {
+                playerRef.current?.play()?.catch(() => {
+                  handleSetIsPaused(true);
+                });
               }
             }}
           >
@@ -271,7 +194,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
           </SPlayPseudoButton>
         )}
       </SVideoWrapper>
-      {isLoading && (
+      {/* {isLoading && (
         <SLoader>
           <Lottie
             width={65}
@@ -284,11 +207,11 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
             isStopped={!isLoading}
           />
         </SLoader>
-      )}
+      )} */}
       <PlayerScrubber
         isHovered={isHovered}
         currentTime={playbackTime}
-        videoDuration={player?.current?.getDuration() || 10}
+        videoDuration={playerRef?.current?.duration() || 10}
         withTime={videoDurationWithTime}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
@@ -348,9 +271,8 @@ const SWrapper = styled.div`
   }
 
   video {
-    top: 50% !important;
-    height: auto !important;
-    transform: translateY(-50%) !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 `;
 
