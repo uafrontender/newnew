@@ -129,8 +129,5 @@
     "prettier": "2.7.1",
     "raw-loader": "4.0.2",
     "typescript": "4.7.3"
-  },
-  "overrides": {
-    "@types/react": "18.0.27"
   }
 }
