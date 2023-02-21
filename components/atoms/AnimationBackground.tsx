@@ -178,8 +178,7 @@ const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
 const RainingAnimation = (transform: string) => keyframes`
   0% {
     opacity:0;
-    top: -300px;
-    transform: ${transform};// translateY(-100px);
+    transform: translateY(-300px) ${transform};// translateY(-100px);
   }
   10% {
     opacity:1;
@@ -189,8 +188,7 @@ const RainingAnimation = (transform: string) => keyframes`
   }
   100% {
     opacity:0;
-    top: 100%;
-    transform: ${transform};// translateY(140vh);
+    transform:  translateY(100vh)  ${transform};// translateY(140vh);
   }
 `;
 
