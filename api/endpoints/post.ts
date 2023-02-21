@@ -66,7 +66,7 @@ export const setPostTitle = (payload: newnewapi.SetPostTitleRequest, signal?: Re
     newnewapi.Post
   >(
     newnewapi.SetPostTitleRequest,
-    newnewapi.EmptyResponse,
+    newnewapi.Post,
     `${BASE_URL_POST}/set_post_title`,
     'post',
     payload,
