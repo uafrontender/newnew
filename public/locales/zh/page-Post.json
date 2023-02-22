@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "title_NEED_TRANSLATION": "{{postTitle}} | {{displayName}} on NewNew",
     "description": {
       "ac_NEED_TRANSLATION": "${{totalInBids}} in bids on NewNew",
       "mc_NEED_TRANSLATION": "{{totalVotes}} votes on NewNew",
