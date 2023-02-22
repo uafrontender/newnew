@@ -3,6 +3,7 @@ import type common from '../public/locales/en-US/common.json';
 import type componentPostCard from '../public/locales/en-US/component-PostCard.json';
 import type modalPaymentModal from '../public/locales/en-US/modal-PaymentModal.json';
 import type modalResponseSuccessModal from '../public/locales/en-US/modal-ResponseSuccessModal.json';
+import type modalEditPostTitle from '../public/locales/en-US/modal-EditPostTitle.json';
 import type page404 from '../public/locales/en-US/page-404.json';
 import type pageAbout from '../public/locales/en-US/page-About.json';
 import type pageBundles from '../public/locales/en-US/page-Bundles.json';
@@ -26,6 +27,7 @@ export interface I18nNamespaces {
   'component-PostCard': typeof componentPostCard,
   'modal-PaymentModal': typeof modalPaymentModal,
   'modal-ResponseSuccessModal': typeof modalResponseSuccessModal,
+  'modal-EditPostTitle': typeof modalEditPostTitle,
   'page-404': typeof page404,
   'page-About': typeof pageAbout,
   'page-Bundles': typeof pageBundles,

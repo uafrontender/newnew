@@ -734,6 +734,10 @@
       "shareBtn": "分享",
       "linkCopied": "鏈接已複製！"
     },
+    "tutorialEditTitle_NEED_TRANSLATION": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
+    },
     "winner": {
       "inResponseToYourPost": "回應了你的帖子",
       "ac": {
