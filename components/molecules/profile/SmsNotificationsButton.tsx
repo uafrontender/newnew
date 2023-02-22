@@ -412,12 +412,7 @@ const SIconButton = styled.div<{
   // TODO: add hover/active effects
 `;
 
-const SMobileIconButton = styled(SIconButton)`
-  // Fix for blinking due to resize initial value
-  ${({ theme }) => theme.media.tablet} {
-    display: none;
-  }
-`;
+const SMobileIconButton = styled(SIconButton)``;
 
 const SIconButtonWithText = styled(SIconButton)`
   gap: 12px;
@@ -426,9 +421,4 @@ const SIconButtonWithText = styled(SIconButton)`
   font-size: 14px;
   line-height: 24px;
   display: none;
-
-  // Fix for blinking due to resize initial value
-  ${({ theme }) => theme.media.tablet} {
-    display: flex;
-  }
 `;
