@@ -54,11 +54,17 @@ const Chat: NextPage<IChat> = ({ username }) => {
     newnewapi.IChatRoom[]
   >([]);
 
-  const { data } = useMyChatRooms({
-    myRole,
-    roomKind,
-    searchQuery: usernameQueryDebounced,
-  });
+  const { data, isFetched, isFetching } = useMyChatRooms(
+    {
+      myRole,
+      roomKind,
+      searchQuery: usernameQueryDebounced,
+    },
+    {
+      enabled: !!usernameQueryDebounced,
+    },
+    'getRoom'
+  );
 
   const chatrooms = useMemo(
     () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
@@ -124,17 +130,32 @@ const Chat: NextPage<IChat> = ({ username }) => {
             room.visavis?.user?.username === usernameArr[0].toLowerCase()
         );
         setFilteredChatroom(localChatrooms);
+
+        if (localChatrooms.length === 0) {
+          router.push('/direct-messages');
+        }
       }
+    } else if (chatrooms.length === 0 && isFetched) {
+      router.push('/direct-messages');
     }
   }, [
+    username,
     chatrooms,
     isMobileOrTablet,
     myRole,
     roomKind,
+    router,
+    isFetched,
     setActiveChatRoom,
     setHiddenMessagesArea,
-    username,
   ]);
+
+  useEffect(
+    () => () => {
+      setActiveChatRoom(null);
+    },
+    [setActiveChatRoom]
+  );
 
   useEffect(() => {
     if (filteredChatrooms.length > 0) {
@@ -157,6 +178,8 @@ const Chat: NextPage<IChat> = ({ username }) => {
   }, [
     filteredChatrooms,
     isMobileOrTablet,
+    isFetched,
+    router,
     setActiveChatRoom,
     setHiddenMessagesArea,
     setActiveTab,
@@ -167,7 +190,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <ChatContainer />
+      <ChatContainer isLoading={isFetching} />
     </>
   );
 };
