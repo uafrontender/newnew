@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import Button from '../../atoms/Button';
@@ -17,6 +16,7 @@ import CardEllipseModal from './CardEllipseModal';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import useCards from '../../../utils/hooks/useCards';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const getCardBrandName = (cardBrand: newnewapi.Card.CardBrand) => {
   switch (cardBrand) {
@@ -76,7 +76,7 @@ const Card: React.FunctionComponent<ICard> = ({
   const { t } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 

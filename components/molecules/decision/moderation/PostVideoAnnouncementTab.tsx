@@ -5,13 +5,13 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { useAppSelector } from '../../../../redux-store/store';
 
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 
 import ThumbnailIcon from '../../../../public/images/svg/icons/filled/AddImage.svg';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -46,7 +46,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
   handleToggleMuted,
 }) => {
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

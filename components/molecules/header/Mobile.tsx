@@ -11,12 +11,13 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import Button from '../../atoms/Button';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 import SearchInput from '../../atoms/search/SearchInput';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobileS = ['mobile', 'mobileS'].includes(resizeMode);
   const isMobileM = ['mobileM'].includes(resizeMode);

@@ -4,7 +4,6 @@ import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { Area, Point } from 'react-easy-crop/types';
 
-import { useAppSelector } from '../../../redux-store/store';
 import getCroppedImg from '../../../utils/cropImage';
 
 import Modal from '../../organisms/Modal';
@@ -17,6 +16,7 @@ import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import Button from '../../atoms/Button';
 import ProfileImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 import isBrowser from '../../../utils/isBrowser';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingEditProfileImageModal {
   isOpen: boolean;
@@ -41,7 +41,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

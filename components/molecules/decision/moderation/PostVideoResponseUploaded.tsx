@@ -2,12 +2,12 @@ import React, { useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import PostVideoResponsesSlider from './PostVideoResponsesSlider';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -33,7 +33,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
   handleToggleMuted,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

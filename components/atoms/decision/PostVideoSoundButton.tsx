@@ -2,13 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppSelector } from '../../../redux-store/store';
 
 import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IPostVideoSoundButton {
   postUuid: string;
@@ -23,7 +23,7 @@ const PostVideoSoundButton: React.FunctionComponent<IPostVideoSoundButton> = ({
   soundBtnBottomOverriden,
   handleToggleMuted,
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

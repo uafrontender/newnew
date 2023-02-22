@@ -33,11 +33,11 @@ import PostShareEllipseModal from '../common/PostShareEllipseModal';
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import PostShareEllipseMenu from '../common/PostShareEllipseMenu';
-import { useAppSelector } from '../../../../redux-store/store';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { TPostType } from '../../../../utils/switchPostType';
+import { useAppState } from '../../../../contexts/appStateContext';
 import EditPostTitleModal from './EditPostTitleModal';
 
 const DARK_IMAGES: Record<string, () => string> = {
@@ -74,7 +74,7 @@ const PostTopInfoModeration: React.FunctionComponent<
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

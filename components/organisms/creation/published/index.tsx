@@ -26,6 +26,7 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -46,7 +47,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
     (state) => state.creation
   );

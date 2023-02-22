@@ -20,6 +20,7 @@ import GradientMask from '../../../../atoms/GradientMask';
 
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
 import getDisplayname from '../../../../../utils/getDisplayname';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcWaitingOptionsSection {
   post: newnewapi.Auction;
@@ -30,7 +31,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

@@ -25,6 +25,16 @@ export const sizes: ISIZES = {
   mobile: 0,
 };
 
+export type TResizeMode =
+  | 'mobile'
+  | 'mobileS'
+  | 'mobileM'
+  | 'mobileL'
+  | 'tablet'
+  | 'laptop'
+  | 'laptopL'
+  | 'desktop';
+
 const mobile = customMediaQuery(sizes.mobile);
 
 const mobileS = customMediaQuery(sizes.mobileS);

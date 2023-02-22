@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
+import { useAppState } from '../../contexts/appStateContext';
 
-import { useAppSelector } from '../../redux-store/store';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 
@@ -23,7 +23,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   imageStyle,
   ...rest
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

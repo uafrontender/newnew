@@ -75,6 +75,7 @@ import useErrorToasts, {
 } from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 import RichTextInput from '../../../atoms/creation/RichTextInput';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -121,7 +122,7 @@ export const CreationSecondStepContent: React.FC<
     customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { overlayModeEnabled } = useOverlayMode();
   const { appConstants } = useGetAppConstants();
 
