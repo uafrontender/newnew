@@ -3,9 +3,8 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import Tabs, { Tab } from '../Tabs';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IProfileTabs {
   tabs: Tab[];
@@ -49,7 +48,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = (props) => {
   const { t } = useTranslation('page-Profile');
   const router = useRouter();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

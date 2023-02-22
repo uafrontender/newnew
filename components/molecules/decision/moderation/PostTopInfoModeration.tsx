@@ -24,6 +24,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import assets from '../../../../constants/assets';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
+import EditIconFilled from '../../../../public/images/svg/icons/filled/EditTransparent.svg';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 import PostEllipseModalModeration from './PostEllipseModalModeration';
@@ -32,11 +33,12 @@ import PostShareEllipseModal from '../common/PostShareEllipseModal';
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import PostShareEllipseMenu from '../common/PostShareEllipseMenu';
-import { useAppSelector } from '../../../../redux-store/store';
 import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import isBrowser from '../../../../utils/isBrowser';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { TPostType } from '../../../../utils/switchPostType';
+import { useAppState } from '../../../../contexts/appStateContext';
+import EditPostTitleModal from './EditPostTitleModal';
 
 const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.common.ac.darkAcAnimated,
@@ -72,7 +74,7 @@ const PostTopInfoModeration: React.FunctionComponent<
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -161,6 +163,17 @@ const PostTopInfoModeration: React.FunctionComponent<
     });
     handleOpenShareMenu();
   }, [handleOpenShareMenu, postUuid]);
+
+  const [isEditTitleMenuOpen, setIsEditTitleMenuOpen] = useState(false);
+
+  const handleOpenEditTitleMenuMixpanel = useCallback(() => {
+    Mixpanel.track('Open Edit Title Menu', {
+      _stage: 'Post',
+      _postUuid: postUuid,
+      _component: 'PostTopInfoModeration',
+    });
+    setIsEditTitleMenuOpen(true);
+  }, [setIsEditTitleMenuOpen, postUuid]);
 
   const moreButtonRef: any = useRef();
   const shareButtonRef: any = useRef();
@@ -257,6 +270,25 @@ const PostTopInfoModeration: React.FunctionComponent<
           </>
         ) : null}
         <SActionsDiv>
+          {!hidden ? (
+            <SEditTitleButton
+              view='transparent'
+              iconOnly
+              withDim
+              withShrink
+              style={{
+                padding: '8px',
+              }}
+              onClick={() => handleOpenEditTitleMenuMixpanel()}
+            >
+              <InlineSvg
+                svg={EditIconFilled}
+                fill={theme.colorsThemed.text.secondary}
+                width='20px'
+                height='20px'
+              />
+            </SEditTitleButton>
+          ) : null}
           <SShareButton
             view='transparent'
             iconOnly
@@ -398,6 +430,14 @@ const PostTopInfoModeration: React.FunctionComponent<
         closeModal={handleCloseDeletePostModal}
         handleConfirmDelete={handleDeletePost}
       />
+      {/* Edit Post title */}
+      {isEditTitleMenuOpen ? (
+        <EditPostTitleModal
+          modalType='initial'
+          show={isEditTitleMenuOpen}
+          closeModal={() => setIsEditTitleMenuOpen(false)}
+        />
+      ) : null}
     </SContainer>
   );
 };
@@ -652,6 +692,15 @@ const SActionsDiv = styled.div`
 
   display: flex;
   justify-content: flex-end;
+`;
+
+const SEditTitleButton = styled(Button)`
+  background: none;
+  padding: 0px;
+  &:focus:enabled {
+    background: ${({ theme, view }) =>
+      view ? theme.colorsThemed.button.background[view] : ''};
+  }
 `;
 
 const SShareButton = styled(Button)`

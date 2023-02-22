@@ -50,6 +50,7 @@ import resizeImage from '../../../utils/resizeImage';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -146,7 +147,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -213,6 +214,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
     validateNicknameViaAPIDebounced(e.target.value);
   };
+
+  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
 
   // API validations
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
@@ -442,6 +445,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
           // eslint-disable-next-line react/no-this-in-sfc
           setOriginalProfileImageWidth(properlySizedImage.width);
+          const minZoom =
+            Math.max(properlySizedImage.height, properlySizedImage.width) /
+            Math.min(properlySizedImage.height, properlySizedImage.width);
+
+          setMinZoomProfileImage(minZoom);
 
           setAvatarUrlInEdit(properlySizedImage.url as string);
           setCropMenuOpen(true);
@@ -965,6 +973,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
           isOpen={cropMenuOpen}
           avatarUrlInEdit={avatarUrlInEdit}
           originalProfileImageWidth={originalProfileImageWidth}
+          minZoom={minZoomProfileImage}
           handleSetImageToSave={(val) => setImageToSave(val)}
           setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
           onClose={() => {

@@ -23,6 +23,7 @@ import { validateText } from '../../../api/endpoints/infrastructure';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -71,7 +72,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const router = useRouter();
     const { t } = useTranslation('page-Post');
     const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

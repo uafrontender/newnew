@@ -16,11 +16,12 @@ import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { useAppState } from '../contexts/appStateContext';
 
 export const HowItWorks = () => {
   const { t } = useTranslation('page-HowItWorks');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

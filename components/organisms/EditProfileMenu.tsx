@@ -60,6 +60,7 @@ import useErrorToasts, {
 } from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -163,9 +164,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   // Common
@@ -610,6 +612,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
     useState<Area>();
   const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
   const [updateProfileImageLoading, setUpdateProfileImageLoading] =
     useState(false);
 
@@ -643,6 +646,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
           // eslint-disable-next-line react/no-this-in-sfc
           setOriginalProfileImageWidth(properlySizedImage.width);
+          const minZoom =
+            Math.max(properlySizedImage.height, properlySizedImage.width) /
+            Math.min(properlySizedImage.height, properlySizedImage.width);
+
+          setMinZoomProfileImage(minZoom);
+          setZoomProfileImage(minZoom);
           setAvatarUrlInEdit(properlySizedImage.url);
           handleSetStageToEditingProfilePicture();
         }
@@ -654,22 +663,22 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral();
     setAvatarUrlInEdit('');
     setZoomProfileImage(1);
+    setMinZoomProfileImage(1);
   };
 
   const handleZoomOutProfileImage = () => {
-    if (zoomProfileImage <= 1) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage - 0.2 <= 1) return 1;
-      return z - 0.2;
-    });
+    setZoomProfileImage((z) => Math.max(z - 0.2, minZoomProfileImage));
   };
 
   const handleZoomInProfileImage = () => {
-    if (zoomProfileImage >= 3) return;
+    if (zoomProfileImage >= minZoomProfileImage + 2) {
+      return;
+    }
 
     setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= 3) return 3;
+      if (zoomProfileImage + 0.2 >= minZoomProfileImage + 2) {
+        return minZoomProfileImage + 2;
+      }
       return z + 0.2;
     });
   };
@@ -1040,6 +1049,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <ProfileImageCropper
                 crop={cropProfileImage}
                 zoom={zoomProfileImage}
+                minZoom={minZoomProfileImage}
+                maxZoom={minZoomProfileImage + 2}
                 avatarUrlInEdit={avatarUrlInEdit}
                 originalImageWidth={originalProfileImageWidth}
                 disabled={updateProfileImageLoading}
@@ -1052,7 +1063,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
+                  disabled={
+                    zoomProfileImage <= minZoomProfileImage ||
+                    updateProfileImageLoading
+                  }
                   onClick={handleZoomOutProfileImage}
                 >
                   <InlineSvg
@@ -1064,18 +1078,25 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 </Button>
                 <ProfileImageZoomSlider
                   value={zoomProfileImage}
-                  min={1}
-                  max={3}
+                  min={minZoomProfileImage}
+                  max={minZoomProfileImage + 2}
                   step={0.1}
                   ariaLabel='Zoom'
                   disabled={updateProfileImageLoading}
-                  onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+                  onChange={(e) =>
+                    setZoomProfileImage(
+                      Math.max(Number(e.target.value), minZoomProfileImage)
+                    )
+                  }
                 />
                 <Button
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
+                  disabled={
+                    zoomProfileImage >= minZoomProfileImage + 2 ||
+                    updateProfileImageLoading
+                  }
                   onClick={handleZoomInProfileImage}
                 >
                   <InlineSvg
@@ -1245,7 +1266,7 @@ const STextInputsWrapper = styled.div`
 
 const ProfilePictureContent = styled.div`
   overflow-y: auto;
-  padding: 0 20px;
+  padding: 0 22px;
   height: 100%;
 `;
 

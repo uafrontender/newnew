@@ -2,13 +2,13 @@ import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppSelector } from '../../../redux-store/store';
 import { usePostInnerState } from '../../../contexts/postInnerContext';
 
 import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 
 import SelectIcon from '../../../public/images/svg/icons/outlined/Select.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IPostVideoEditStoryButton {
   active: boolean;
@@ -19,7 +19,7 @@ interface IPostVideoEditStoryButton {
 const PostVideoEditStoryButton: React.FunctionComponent<
   IPostVideoEditStoryButton
 > = ({ active, bottomOverriden, handleClick }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

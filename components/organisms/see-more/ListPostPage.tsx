@@ -8,9 +8,9 @@ import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 import CardSkeleton from '../../molecules/CardSkeleton';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IListPostPage {
   collection: any;
@@ -28,7 +28,7 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
     skeletonsHighlightColor,
     handlePostClicked,
   }) => {
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

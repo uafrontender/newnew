@@ -12,11 +12,10 @@ import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../UserAvatar';
 
-import { useAppSelector } from '../../../../redux-store/store';
-
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const ResponseTimer = dynamic(
   () => import('../../../atoms/dashboard/ResponseTimer')
@@ -31,7 +30,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 }) => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

@@ -30,6 +30,7 @@ import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../../utils/isBrowser';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -52,7 +53,8 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
-    const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
+    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

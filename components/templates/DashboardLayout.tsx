@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { useAppState } from '../../contexts/appStateContext';
 import { useGetChats } from '../../contexts/chatContext';
-import { useAppSelector } from '../../redux-store/store';
 import General from './General';
 
 interface IDashboardLayout {
@@ -13,7 +13,7 @@ interface IDashboardLayout {
 }
 const DashboardLayout: React.FunctionComponent<IDashboardLayout> = React.memo(
   ({ id, className, containerRef, children, withChat }) => {
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

@@ -173,6 +173,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
             // eslint-disable-next-line no-nested-ternary
             isFollowingLoading ? (
               <Skeleton
+                height='17px'
                 highlightColor={theme.colorsThemed.background.primary}
                 baseColor={theme.colorsThemed.background.secondary}
               />

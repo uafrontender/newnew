@@ -27,6 +27,7 @@ import {
   fetchMoreLikePosts,
   fetchPostByUUID,
   markPost,
+  setPostTitle,
 } from '../../api/endpoints/post';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { ChannelsContext } from '../../contexts/channelsContext';
@@ -51,6 +52,8 @@ import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import usePost from '../../utils/hooks/usePost';
 import getDisplayname from '../../utils/getDisplayname';
+import { useAppState } from '../../contexts/appStateContext';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -77,16 +80,18 @@ const PostPage: NextPage<IPostPage> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   const stripeSetupIntentClientSecretFromRedirect = useMemo(
@@ -124,6 +129,7 @@ const PostPage: NextPage<IPostPage> = ({
     data: postFromAjax,
     isLoading: isPostLoading,
     refetch: refetchPost,
+    updatePostTitleMutation,
   } = usePost(
     {
       loggedInUser: user.loggedIn,
@@ -156,17 +162,39 @@ const PostPage: NextPage<IPostPage> = ({
     [post, postFromAjax]
   );
 
-  // const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
-  //   if (typeOfPost && postParsed?.status) {
-  //     if (typeof postParsed.status === 'string') {
-  //       // NB! Status can be a string
-  //       // @ts-ignore
-  //       return switchPostStatusString(typeOfPost, postParsed?.status);
-  //     }
-  //     return switchPostStatus(typeOfPost, postParsed?.status);
-  //   }
-  //   return 'processing_announcement';
-  // });
+  const [isUpdateTitleLoading, setIsUpdateTitleLoading] = useState(false);
+  const handleUpdatePostTitle = useCallback(
+    async (newTitle: string) => {
+      if (!postParsed?.postUuid) {
+        return;
+      }
+      setIsUpdateTitleLoading(true);
+      try {
+        const payload = new newnewapi.SetPostTitleRequest({
+          postUuid: postParsed?.postUuid,
+          updatedTitle: newTitle,
+        });
+
+        const res = await setPostTitle(payload);
+
+        if (!res.data || res.error) {
+          throw new Error(res?.error?.message || 'An error occured');
+        }
+
+        updatePostTitleMutation.mutate({
+          postUuid: postParsed.postUuid,
+          title: newTitle,
+        });
+      } catch (err) {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      } finally {
+        setIsUpdateTitleLoading(false);
+      }
+    },
+    [postParsed?.postUuid, showErrorToastPredefined, updatePostTitleMutation]
+  );
+
   const postStatus = useMemo<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
@@ -179,7 +207,7 @@ const PostPage: NextPage<IPostPage> = ({
     return 'processing_announcement';
   }, [postParsed, typeOfPost]);
 
-  // TODO: a way to determine if the post was deleted by the crator themselves
+  // TODO: a way to determine if the post was deleted by the creator themselves
   // pr by an admin
   const deletedByCreator = useMemo(
     () => postStatus === 'deleted_by_creator',
@@ -616,6 +644,8 @@ const PostPage: NextPage<IPostPage> = ({
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
+        handleUpdatePostTitle={handleUpdatePostTitle}
+        isUpdateTitleLoading={isUpdateTitleLoading}
         refetchPost={refetchPost}
       >
         <Head>
@@ -770,6 +800,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         'modal-ResponseSuccessModal',
         'component-PostCard',
         'modal-PaymentModal',
+        'modal-EditPostTitle',
       ],
       null,
       SUPPORTED_LANGUAGES

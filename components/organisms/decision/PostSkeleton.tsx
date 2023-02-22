@@ -5,16 +5,15 @@ import { useTranslation } from 'next-i18next';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import GoBackButton from '../../molecules/GoBackButton';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const PostSkeleton = () => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-Post');
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -100,7 +99,7 @@ export const PostSkeletonView = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

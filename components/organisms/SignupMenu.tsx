@@ -47,6 +47,7 @@ import isSafari from '../../utils/isSafari';
 import { Mixpanel } from '../../utils/mixpanel';
 import { I18nNamespaces } from '../../@types/i18next';
 import { loadStateLS, removeStateLS } from '../../utils/localStorage';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ISignupMenu {
   goal?: string;
@@ -65,7 +66,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

@@ -37,6 +37,7 @@ import {
 } from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
 import CoverImagePreviewEdit from './CoverImagePreviewEdit';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -85,7 +86,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { post, videoProcessing } = useAppSelector((state) => state.creation);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

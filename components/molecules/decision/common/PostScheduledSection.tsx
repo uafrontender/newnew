@@ -5,7 +5,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import isBrowser from '../../../../utils/isBrowser';
-import { useAppSelector } from '../../../../redux-store/store';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
@@ -17,6 +16,7 @@ import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
 import { TPostType } from '../../../../utils/switchPostType';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostScheduledSection {
   postType: TPostType;
@@ -35,7 +35,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

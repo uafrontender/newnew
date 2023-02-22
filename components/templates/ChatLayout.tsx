@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { useAppSelector } from '../../redux-store/store';
+import { useAppState } from '../../contexts/appStateContext';
 import General from './General';
 
 interface IChatLayout {
@@ -11,7 +11,7 @@ interface IChatLayout {
 }
 const ChatLayout: React.FunctionComponent<IChatLayout> = React.memo(
   ({ id, className, containerRef, children }) => {
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobileOrTablet = [
       'mobile',
       'mobileS',

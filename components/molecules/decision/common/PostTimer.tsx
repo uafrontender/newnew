@@ -9,6 +9,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useUpdateEffect } from 'react-use';
 import styled, { css } from 'styled-components';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { useAppState } from '../../../../contexts/appStateContext';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import useHasMounted from '../../../../utils/hooks/useHasMounted';
@@ -38,7 +39,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
