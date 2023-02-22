@@ -148,13 +148,21 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     });
 
     useEffect(() => {
-      setTimeout(() => {
-        if (globalSearchActive) {
+      let timeoutId: ReturnType<typeof setTimeout>;
+
+      if (globalSearchActive) {
+        timeoutId = setTimeout(() => {
           inputRef.current?.focus();
-        } else {
-          inputRef.current?.blur();
+        }, 1000);
+      } else {
+        inputRef.current?.blur();
+      }
+
+      return () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
         }
-      }, 1000);
+      };
     }, [globalSearchActive]);
 
     useEffect(() => {
