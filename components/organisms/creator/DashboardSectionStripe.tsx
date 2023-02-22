@@ -19,6 +19,7 @@ import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 import GoBackButton from '../../molecules/GoBackButton';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -52,7 +53,7 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation('page-Creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

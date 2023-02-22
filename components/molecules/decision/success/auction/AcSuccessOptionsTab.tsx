@@ -20,6 +20,7 @@ import getDisplayname from '../../../../../utils/getDisplayname';
 
 import Lottie from '../../../../atoms/Lottie';
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcSuccessOptionsTab {
   post: newnewapi.Auction;
@@ -33,7 +34,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

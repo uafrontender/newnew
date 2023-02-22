@@ -35,6 +35,7 @@ import useRecaptcha from '../../utils/hooks/useRecaptcha';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
@@ -53,7 +54,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { t } = useTranslation('page-VerifyEmail');
   const { resumePushNotification } = usePushNotifications();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

@@ -45,6 +45,7 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import getDateFormatForTimeZone from '../../../utils/getDateFormatForTimeZone';
+import { useAppState } from '../../../contexts/appStateContext';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -104,7 +105,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       handleResetSubmitError,
     }) => {
       const theme = useTheme();
-      const { resizeMode } = useAppSelector((state) => state.ui);
+      const { resizeMode } = useAppState();
       const user = useAppSelector((state) => state.user);
 
       const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

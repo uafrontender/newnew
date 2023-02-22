@@ -28,6 +28,7 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -51,7 +52,8 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const { t } = useTranslation('page-Post');
     const theme = useTheme();
     const dispatch = useAppDispatch();
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

@@ -22,12 +22,10 @@ import { sendMessage } from '../../../api/endpoints/chat';
 
 /* Utils */
 import getDisplayname from '../../../utils/getDisplayname';
-import { useAppSelector } from '../../../redux-store/store';
 import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
-import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 /* Components */
 import Button from '../../atoms/Button';
@@ -36,6 +34,7 @@ import TextArea from '../../atoms/direct-messages/TextArea';
 import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader';
 import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -66,7 +65,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const { t } = useTranslation('page-Chat');
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

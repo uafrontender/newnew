@@ -8,11 +8,11 @@ import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 
 import { useOnClickEsc } from '../../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../../redux-store/store';
 import useDropDownDirection from '../../../utils/hooks/useDropDownDirection';
 import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 type TItem = {
   id: string;
@@ -32,7 +32,7 @@ export const DropDown: React.FC<IDropDown> = (props) => {
   const theme = useTheme();
   const ref: any = useRef();
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const selectedItem = options.find((el) => el.id === value);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

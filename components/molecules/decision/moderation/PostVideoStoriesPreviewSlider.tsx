@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import isBrowser from '../../../../utils/isBrowser';
-import { useAppSelector } from '../../../../redux-store/store';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import PostVideoThumbnailItem from './PostVideoThumbnailItem';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoStoriesPreviewSlider {
   videos: newnewapi.IVideoUrls[];
@@ -31,7 +31,7 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   handleDeleteAdditionalVideo,
   handleDeleteUnuploadedAdditonalResponse,
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

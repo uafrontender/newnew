@@ -6,13 +6,13 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import Headline from '../../atoms/Headline';
-import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
 import { useBundles } from '../../../contexts/bundlesContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -33,7 +33,7 @@ const SuccessBundleModal = dynamic(
 
 export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { appConstants } = useGetAppConstants();
   const { isSellingBundles, toggleIsSellingBundles } = useBundles();
 

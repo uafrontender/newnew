@@ -53,6 +53,7 @@ import assets from '../../../../../constants/assets';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -122,7 +123,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
