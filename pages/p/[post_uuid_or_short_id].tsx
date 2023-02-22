@@ -51,6 +51,7 @@ import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import usePost from '../../utils/hooks/usePost';
 import getDisplayname from '../../utils/getDisplayname';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -77,7 +78,8 @@ const PostPage: NextPage<IPostPage> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
@@ -86,7 +88,7 @@ const PostPage: NextPage<IPostPage> = ({
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   const stripeSetupIntentClientSecretFromRedirect = useMemo(

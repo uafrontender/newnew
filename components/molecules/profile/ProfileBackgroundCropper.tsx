@@ -4,9 +4,8 @@ import { useTranslation } from 'next-i18next';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
 
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
 import DragToRepositionLabel from './DragToRepositionLabel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export type CropperObjectFit =
   | 'horizontal-cover'
@@ -41,9 +40,9 @@ const ProfileBackgroundCropper: React.FunctionComponent<
   onZoomChange,
 }) => {
   const { t } = useTranslation('common');
-  const { ui } = useAppSelector((state) => state);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
   const [isPressed, setIsPressed] = useState(false);
 
