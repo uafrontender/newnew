@@ -22,6 +22,7 @@ import {
 import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import getGuestId from '../../../utils/getGuestId';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
@@ -50,7 +51,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   const theme = useTheme();
   const socketConnection = useContext(SocketContext);
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

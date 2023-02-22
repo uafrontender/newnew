@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
 import useCards from '../../../utils/hooks/useCards';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
@@ -17,6 +16,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IPaymentModal {
   isOpen: boolean;
@@ -51,7 +51,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

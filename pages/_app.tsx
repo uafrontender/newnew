@@ -29,7 +29,6 @@ import 'nprogress/nprogress.css';
 import Error from './_error';
 
 // Global CSS configurations
-import ResizeMode from '../HOC/ResizeMode';
 import withRecaptchaProvider from '../HOC/withRecaptcha';
 import GlobalTheme from '../styles/ThemeProvider';
 
@@ -71,7 +70,9 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
-import AppStateContextProvider from '../contexts/appStateContext';
+import AppStateContextProvider, {
+  useAppState,
+} from '../contexts/appStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -114,7 +115,7 @@ Router.events.on('routeChangeError', (err, url) => {
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
   const store = useStore();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -266,39 +267,34 @@ const MyApp = (props: IMyApp): ReactElement => {
                                       <ChatsProvider>
                                         <OverlayModeProvider>
                                           <MultipleBeforePopStateContextProvider>
-                                            <ResizeMode>
-                                              <GlobalTheme
-                                                initialTheme={colorMode}
-                                                themeFromCookie={
-                                                  themeFromCookie
-                                                }
-                                              >
-                                                <>
-                                                  <ToastContainer containerId='toast-container' />
-                                                  <VideoProcessingWrapper>
-                                                    {!pageProps.error ? (
-                                                      getLayout(
-                                                        <Component
-                                                          {...pageProps}
-                                                        />
-                                                      )
-                                                    ) : (
-                                                      <Error
-                                                        title={
-                                                          pageProps.error
-                                                            ?.message
-                                                        }
-                                                        statusCode={
-                                                          pageProps.error
-                                                            ?.statusCode ?? 500
-                                                        }
+                                            <GlobalTheme
+                                              initialTheme={colorMode}
+                                              themeFromCookie={themeFromCookie}
+                                            >
+                                              <>
+                                                <ToastContainer containerId='toast-container' />
+                                                <VideoProcessingWrapper>
+                                                  {!pageProps.error ? (
+                                                    getLayout(
+                                                      <Component
+                                                        {...pageProps}
                                                       />
-                                                    )}
-                                                    <PushNotificationModalContainer />
-                                                  </VideoProcessingWrapper>
-                                                </>
-                                              </GlobalTheme>
-                                            </ResizeMode>
+                                                    )
+                                                  ) : (
+                                                    <Error
+                                                      title={
+                                                        pageProps.error?.message
+                                                      }
+                                                      statusCode={
+                                                        pageProps.error
+                                                          ?.statusCode ?? 500
+                                                      }
+                                                    />
+                                                  )}
+                                                  <PushNotificationModalContainer />
+                                                </VideoProcessingWrapper>
+                                              </>
+                                            </GlobalTheme>
                                           </MultipleBeforePopStateContextProvider>
                                         </OverlayModeProvider>
                                       </ChatsProvider>

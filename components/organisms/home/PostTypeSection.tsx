@@ -10,8 +10,8 @@ import type { TStaticPost } from '../../molecules/home/StaticPostCard';
 import Text from '../../atoms/Text';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IPostTypeSectionProps {
   posts: newnewapi.Post[] | TStaticPost[];
@@ -34,7 +34,7 @@ const PostTypeSection = ({
   isStatic,
   padding,
 }: IPostTypeSectionProps) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isDesktop = ['laptop', 'laptopM', 'laptopL'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

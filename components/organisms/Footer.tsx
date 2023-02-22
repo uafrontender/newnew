@@ -28,6 +28,7 @@ import {
 } from '../../redux-store/slices/uiStateSlice';
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IFooter {}
 
@@ -45,7 +46,8 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
+  const { colorMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const topItems: TItem[] = [
     // TODO: return about link later when we have a page for it

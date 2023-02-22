@@ -2,11 +2,10 @@ import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { useAppSelector } from '../../redux-store/store';
-
 import InlineSvg from '../atoms/InlineSVG';
 
 import CloseIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
@@ -31,7 +30,7 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
     ...otherProps
   }) => {
     const theme = useTheme();
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

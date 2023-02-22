@@ -18,6 +18,7 @@ import { markAsRead } from '../../../api/endpoints/notification';
 import getDisplayname from '../../../utils/getDisplayname';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -40,7 +41,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
 }) => {
   const { t } = useTranslation('page-Notifications');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

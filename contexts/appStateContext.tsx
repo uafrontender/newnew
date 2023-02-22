@@ -25,8 +25,6 @@ interface IAppStateContextProvider {
   children: React.ReactNode;
 }
 
-// TODO: remove ResizeModeHoc
-// TODO: apply everywhere
 // TODO: clear redux store
 function getResizeMode(uaString: string): TResizeMode {
   const ua = parse(

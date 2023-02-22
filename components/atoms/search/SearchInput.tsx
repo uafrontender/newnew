@@ -32,6 +32,7 @@ import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -53,9 +54,8 @@ const SearchInput: React.FC = React.memo(() => {
     []
   );
 
-  const { resizeMode, globalSearchActive } = useAppSelector(
-    (state) => state.ui
-  );
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
