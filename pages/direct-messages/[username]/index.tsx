@@ -14,6 +14,7 @@ import ChatContainer from '../../../components/organisms/direct-messages/ChatCon
 import { useGetChats } from '../../../contexts/chatContext';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IChat {
   username: string;
@@ -23,7 +24,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

@@ -8,13 +8,13 @@ import { useInView } from 'react-intersection-observer';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import { Mixpanel } from '../../../../../utils/mixpanel';
-import { useAppSelector } from '../../../../../redux-store/store';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import McOptionCardModeration from './McOptionCardModeration';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IMcOptionsTabModeration {
   post: newnewapi.MultipleChoice;
@@ -45,7 +45,7 @@ const McOptionsTabModeration: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

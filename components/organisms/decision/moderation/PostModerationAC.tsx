@@ -35,6 +35,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import useAcOptions from '../../../../utils/hooks/useAcOptions';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -61,7 +62,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const { t } = useTranslation('page-Post');
     const { showErrorToastCustom } = useErrorToasts();
     const { user } = useAppSelector((state) => state);
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

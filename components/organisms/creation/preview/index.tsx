@@ -51,6 +51,7 @@ import useErrorToasts, {
 } from '../../../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -94,7 +95,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     },
     [tCommon]
   );
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const {
     query: { tab },
   } = router;

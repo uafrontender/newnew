@@ -21,6 +21,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const MyAvatarMassupdate = dynamic(
   () => import('../../atoms/direct-messages/MyAvatarMassupdate')
@@ -32,7 +33,7 @@ interface IFunctionProps {
 
 const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   const { t } = useTranslation('page-Chat');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
   const isMobileOrTablet = [
     'mobile',

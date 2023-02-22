@@ -15,6 +15,7 @@ import McOptionCard from '../../regular/multiple_choice/McOptionCard';
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IMcWaitingOptionsSection {
   post: newnewapi.MultipleChoice;
@@ -25,7 +26,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

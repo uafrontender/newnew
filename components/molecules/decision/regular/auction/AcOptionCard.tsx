@@ -57,6 +57,7 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -120,7 +121,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

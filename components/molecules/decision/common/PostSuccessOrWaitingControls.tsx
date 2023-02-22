@@ -20,6 +20,7 @@ import PostShareEllipseModal from './PostShareEllipseModal';
 // Icons
 import ShareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostSuccessOrWaitingControls {}
 
@@ -29,7 +30,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
   const theme = useTheme();
   const router = useRouter();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

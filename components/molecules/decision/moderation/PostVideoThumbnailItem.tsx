@@ -5,8 +5,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../../redux-store/store';
-
 import InlineSvg from '../../../atoms/InlineSVG';
 import DeleteVideoModal from './DeleteVideoModal';
 
@@ -14,6 +12,7 @@ import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import Tooltip from '../../../atoms/Tooltip';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoThumbnailItem {
   index: number;
@@ -38,7 +37,7 @@ const PostVideoThumbnailItem: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('page-Post');
   const { postParsed } = usePostInnerState();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

@@ -9,9 +9,9 @@ import Container from '../atoms/Grid/Container';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import { useAppSelector } from '../../redux-store/store';
 import HeroVisual from './components/HeroVisual';
 import BaseLayout from './BaseLayout';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
@@ -23,7 +23,7 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
   children,
 }) => {
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

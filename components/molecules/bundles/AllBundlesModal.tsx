@@ -4,11 +4,11 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import BundleCard from './BundleCard';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IAllBundlesModal {
   show: boolean;
@@ -20,7 +20,7 @@ interface IAllBundlesModal {
 const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
   ({ show, modalType, creatorBundles, onClose }) => {
     const { t } = useTranslation('page-Bundles');
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

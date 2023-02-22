@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 import NewMessageIcon from '../../../public/images/svg/icons/filled/NewMessage.svg';
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface INewMessageButton {
   handleClick: () => void;
@@ -11,7 +11,7 @@ interface INewMessageButton {
 
 const NewMessageButton: React.FC<INewMessageButton> = ({ handleClick }) => {
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
