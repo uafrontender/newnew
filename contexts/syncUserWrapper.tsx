@@ -438,6 +438,65 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 await markTutorialStepAsCompleted(payloadSetData);
               }
             }
+
+            if (
+              localUserTutorialsProgress.remainingAcResponseCurrentStep &&
+              syncedObj.remainingAcResponseCurrentStep &&
+              syncedObj.remainingAcResponseCurrentStep.length >
+                localUserTutorialsProgress.remainingAcResponseCurrentStep.length
+            ) {
+              const wrongLocalData =
+                localUserTutorialsProgress.remainingAcResponseCurrentStep
+                  .length > 0 &&
+                localUserTutorialsProgress.remainingAcResponseCurrentStep[
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep
+                    .length - 1
+                ] !== newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE;
+
+              if (!wrongLocalData) {
+                syncedObj.remainingAcResponseCurrentStep =
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    acResponseCurrentStep: localUserTutorialsProgress
+                      .remainingAcResponseCurrentStep[0]
+                      ? localUserTutorialsProgress
+                          .remainingAcResponseCurrentStep[0]
+                      : newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
+            }
+
+            if (
+              localUserTutorialsProgress.remainingMcResponseCurrentStep &&
+              syncedObj.remainingMcResponseCurrentStep &&
+              syncedObj.remainingMcResponseCurrentStep.length >
+                localUserTutorialsProgress.remainingMcResponseCurrentStep.length
+            ) {
+              const wrongLocalData =
+                localUserTutorialsProgress.remainingMcResponseCurrentStep
+                  .length > 0 &&
+                localUserTutorialsProgress.remainingMcResponseCurrentStep[
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep
+                    .length - 1
+                ] !== newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE;
+
+              if (!wrongLocalData) {
+                syncedObj.remainingMcResponseCurrentStep =
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    mcResponseCurrentStep: localUserTutorialsProgress
+                      .remainingMcResponseCurrentStep[0]
+                      ? localUserTutorialsProgress
+                          .remainingMcResponseCurrentStep[0]
+                      : newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
+            }
+
             dispatch(setUserTutorialsProgress(syncedObj));
             saveStateLS('userTutorialsProgress', syncedObj);
           } else {

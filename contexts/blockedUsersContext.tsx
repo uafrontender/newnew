@@ -22,6 +22,7 @@ const BlockedUsersContext = createContext({
     uuid: string | null | undefined,
     block: boolean
   ) => {},
+  isChangingUserBlockedStatus: false,
 });
 
 interface IBlockedUsersProvider {
@@ -36,11 +37,14 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
   const [usersBlockedLoaded, setUsersBlockedLoaded] = useState(false);
+  const [isChangingUserBlockedStatus, setIsChangingUserBlockedStatus] =
+    useState(false);
   const socketConnection = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const changeUserBlockedStatus = useCallback(
     async (uuid: string | null | undefined, block: boolean) => {
+      setIsChangingUserBlockedStatus(true);
       try {
         if (!uuid) throw new Error('No uuid provided');
         const payload = new newnewapi.MarkUserRequest({
@@ -58,6 +62,8 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       } catch (err) {
         console.error(err);
         showErrorToastPredefined(undefined);
+      } finally {
+        setIsChangingUserBlockedStatus(false);
       }
     },
     []
@@ -119,8 +125,15 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       usersIBlocked,
       usersBlockedLoaded,
       changeUserBlockedStatus,
+      isChangingUserBlockedStatus,
     }),
-    [usersBlockedMe, usersIBlocked, changeUserBlockedStatus, usersBlockedLoaded]
+    [
+      usersBlockedMe,
+      usersIBlocked,
+      changeUserBlockedStatus,
+      usersBlockedLoaded,
+      isChangingUserBlockedStatus,
+    ]
   );
 
   return (

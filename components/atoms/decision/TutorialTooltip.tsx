@@ -17,6 +17,7 @@ interface ITutorialTooltip {
   text?: string;
   closeTooltip: () => void;
   dotPosition: DotPositionEnum;
+  buttonId?: string;
 }
 
 export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
@@ -25,6 +26,7 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
   text,
   closeTooltip,
   dotPosition,
+  buttonId,
 }) => {
   const { t } = useTranslation('page-Post');
   const { overlayModeEnabled } = useOverlayMode();
@@ -33,6 +35,12 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
       <STitle>{title}</STitle>
       {text && <SText>{text}</SText>}
       <SButton
+        // Optional id for tests
+        {...(buttonId
+          ? {
+              id: buttonId,
+            }
+          : {})}
         onClick={(e) => {
           e.stopPropagation();
           closeTooltip();
