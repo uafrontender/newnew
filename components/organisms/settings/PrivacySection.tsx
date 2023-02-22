@@ -20,6 +20,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getUserByUsername } from '../../../api/endpoints/user';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
+import Loader from '../../atoms/Loader';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -43,14 +44,20 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] =
     useState(false);
   // Blocked users
-  const { usersIBlocked: usersIBlockedIds, changeUserBlockedStatus } =
-    useGetBlockedUsers();
+  const {
+    usersIBlocked: usersIBlockedIds,
+    changeUserBlockedStatus,
+    isChangingUserBlockedStatus,
+  } = useGetBlockedUsers();
   const [blockedUsers, setBlockedUsers] = useState<
     Omit<newnewapi.User, 'toJSON'>[]
   >([]);
+  const [isBlockedUsersLoading, setBlockedUsersLoading] = useState(false);
 
+  // TODO: we need to make a normal non-hacky request here
   useEffect(() => {
     async function fetchUsersIBlocked() {
+      setBlockedUsersLoading(true);
       try {
         const users: newnewapi.User[] = [];
         for (let i = 0; i < usersIBlockedIds.length; i++) {
@@ -68,6 +75,8 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
       } catch (err) {
         console.error(err);
         showErrorToastPredefined(undefined);
+      } finally {
+        setBlockedUsersLoading(false);
       }
     }
 
@@ -117,11 +126,14 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         <SBlockedUsersContainerTitle variant={2}>
           {t('Settings.sections.privacy.blockedUsers.title')}
         </SBlockedUsersContainerTitle>
-        {blockedUsers.length === 0 && (
+        {blockedUsers.length === 0 && !isBlockedUsersLoading ? (
           <Text variant={3}>
             {t('Settings.sections.privacy.blockedUsers.noBlockedUsers')}
           </Text>
-        )}
+        ) : null}
+        {isBlockedUsersLoading && blockedUsers?.length === 0 ? (
+          <SLoader />
+        ) : null}
         {blockedUsers &&
           blockedUsers.map((user) => (
             <SBlockedUserCard key={user.uuid}>
@@ -139,13 +151,13 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                   />
                 )}
               </SNickname>
-
               <Link href={`/${user.username}`}>
                 <SLink>
                   <SUsername variant={2}>{`@${user.username}`}</SUsername>
                 </SLink>
               </Link>
               <SUnblockButton
+                disabled={isChangingUserBlockedStatus || isBlockedUsersLoading}
                 onClick={() => {
                   Mixpanel.track('Unblock user', {
                     _stage: 'Settings',
@@ -325,4 +337,10 @@ const SCloseAccountSubsection = styled.div`
 const SCloseAccountButton = styled(Button)`
   grid-area: delete;
   justify-self: right;
+`;
+
+const SLoader = styled(Loader)`
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 24px;
 `;

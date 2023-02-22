@@ -64,6 +64,8 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  handleUpdatePostTitle: (newTitle: string) => Promise<void>;
+  isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
@@ -109,6 +111,8 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => {},
   handleCloseDeletePostModal: () => {},
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
+  handleUpdatePostTitle: (() => {}) as () => Promise<void>,
+  isUpdateTitleLoading: false,
   refetchPost: (() => {}) as any,
 });
 
@@ -144,6 +148,8 @@ interface IPostContextProvider {
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  handleUpdatePostTitle: (newTitle: string) => Promise<void>;
+  isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
@@ -178,6 +184,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleOpenDeletePostModal,
   handleCloseDeletePostModal,
   handleSetIsConfirmToClosePost,
+  handleUpdatePostTitle,
+  isUpdateTitleLoading,
   refetchPost,
   children,
 }) => {
@@ -270,6 +278,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      handleUpdatePostTitle,
+      isUpdateTitleLoading,
       refetchPost,
     }),
     [
@@ -310,6 +320,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      handleUpdatePostTitle,
+      isUpdateTitleLoading,
       refetchPost,
     ]
   );

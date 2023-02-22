@@ -259,7 +259,12 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 
         return (
           <>
-            <SAstrologyImg src={imageSrc} />
+            <SAstrologyImg
+              src={imageSrc}
+              onClick={() => {
+                explicitInputRef.current?.focus();
+              }}
+            />
             <SCustomInput>
               <input
                 ref={(node) => {
