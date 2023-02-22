@@ -1,12 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -23,7 +17,7 @@ import BottomNavigation from '../organisms/BottomNavigation';
 import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
@@ -36,7 +30,6 @@ import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
 import ChatContainer from '../organisms/direct-messages/ChatContainer';
 import { useAppState } from '../../contexts/appStateContext';
-import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 
 interface IGeneral {
   className?: string;
@@ -57,7 +50,6 @@ export const General: React.FC<IGeneral> = (props) => {
     children,
   } = props;
   const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
   const { banner, globalSearchActive } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppState();
   const theme = useTheme();
@@ -193,12 +185,6 @@ export const General: React.FC<IGeneral> = (props) => {
     () => isMobile && scrollDirection !== 'down' && !noMobileNavigation,
     [isMobile, scrollDirection, noMobileNavigation]
   );
-
-  useEffect(() => {
-    if (!mobileNavigationVisible && globalSearchActive) {
-      dispatch(setGlobalSearchActive(false));
-    }
-  }, [mobileNavigationVisible, dispatch, globalSearchActive]);
 
   return (
     <SBaseLayout
