@@ -13,7 +13,6 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { ToastContainer } from 'react-toastify';
 import { CookiesProvider } from 'react-cookie';
-import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
@@ -33,10 +32,7 @@ import withRecaptchaProvider from '../HOC/withRecaptcha';
 import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
-import { setResizeMode } from '../redux-store/slices/uiStateSlice';
 import { useAppSelector, wrapper } from '../redux-store/store';
-
-import isBrowser from '../utils/isBrowser';
 
 // Socket context
 import SocketContextProvider from '../contexts/socketContext';
@@ -70,9 +66,7 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
-import AppStateContextProvider, {
-  useAppState,
-} from '../contexts/appStateContext';
+import AppStateContextProvider from '../contexts/appStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -115,7 +109,6 @@ Router.events.on('routeChangeError', (err, url) => {
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
   const store = useStore();
-  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -203,30 +196,6 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
-
-  useEffect(() => {
-    let newResizeMode = 'mobile';
-    const ua = parse(
-      uaString || (isBrowser() ? window?.navigator?.userAgent : '')
-    );
-
-    if (ua.isTablet) {
-      newResizeMode = 'tablet';
-    } else if (ua.isDesktop) {
-      newResizeMode = 'laptop';
-
-      if (['laptopL', 'desktop'].includes(resizeMode)) {
-        // keep old mode in case laptop
-        newResizeMode = resizeMode;
-      }
-    } else if (['mobileL', 'mobileM', 'mobileS'].includes(resizeMode)) {
-      // keep old mode in case mobile
-      newResizeMode = resizeMode;
-    }
-    if (newResizeMode !== resizeMode) {
-      store.dispatch(setResizeMode(resizeMode));
-    }
-  }, [resizeMode, uaString, store]);
 
   // TODO: move to the store logic
   useEffect(() => {
