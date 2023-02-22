@@ -4,9 +4,8 @@ import styled, { css, useTheme } from 'styled-components';
 import Button from '../atoms/Button';
 import InlineSVG from '../atoms/InlineSVG';
 
-import { useAppSelector } from '../../redux-store/store';
-
 import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IUserAvatar {
   avatarUrl?: string;
@@ -18,7 +17,7 @@ interface IUserAvatar {
 
 export const UserAvatar: React.FC<IUserAvatar> = React.memo((props) => {
   const { avatarUrl, onClick, withClick, ...rest } = props;
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const theme = useTheme();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

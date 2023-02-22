@@ -7,13 +7,12 @@ import Link from 'next/link';
 import Lottie from '../atoms/Lottie';
 import InlineSVG from '../atoms/InlineSVG';
 
-import { useAppSelector } from '../../redux-store/store';
-
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
 import logoText from '../../public/images/svg/logo_text.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 export const Logo: React.FunctionComponent<{
   style?: React.CSSProperties;
@@ -22,7 +21,7 @@ export const Logo: React.FunctionComponent<{
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

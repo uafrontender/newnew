@@ -203,9 +203,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               ) : (
                 <Skeleton
                   count={1}
-                  height='100%'
-                  width='120px'
-                  wrapper={SSkeletonWrapper}
+                  height='34px'
+                  width='164px'
                   highlightColor={theme.colorsThemed.background.primary}
                 />
               )}
@@ -238,10 +237,4 @@ const SEllipseMenu = styled(EllipseMenu)`
 
 const SEllipseMenuButton = styled(EllipseMenuButton)`
   text-align: right;
-`;
-
-const SSkeletonWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  padding: 8px;
 `;

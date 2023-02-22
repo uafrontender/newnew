@@ -35,6 +35,7 @@ import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
 import ChatContainer from '../organisms/direct-messages/ChatContainer';
+import { useAppState } from '../../contexts/appStateContext';
 import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 
 interface IGeneral {
@@ -57,9 +58,8 @@ export const General: React.FC<IGeneral> = (props) => {
   } = props;
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { banner, resizeMode, globalSearchActive } = useAppSelector(
-    (state) => state.ui
-  );
+  const { banner, globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();

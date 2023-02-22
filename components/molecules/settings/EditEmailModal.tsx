@@ -9,8 +9,8 @@ import EditEmailStepTwo from './EditEmailStepTwo';
 import EditEmailStepThree from './EditEmailStepThree';
 import EditEmailSuccess from './EditEmailSuccess';
 
-import { useAppSelector } from '../../../redux-store/store';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IEditEmailModal {
   show: boolean;
@@ -26,7 +26,7 @@ enum Steps {
 }
 
 const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const [newEmail, setNewEmail] = useState('');
 

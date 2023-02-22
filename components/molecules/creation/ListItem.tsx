@@ -8,7 +8,7 @@ import { useTranslation } from 'next-i18next';
 
 import Caption from '../../atoms/Caption';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
 import {
   clearCreation,
@@ -16,6 +16,7 @@ import {
 } from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const DARK_IMAGES_ANIMATED: Record<string, () => string> = {
   auction: assets.common.ac.darkAcAnimated,
@@ -50,7 +51,7 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

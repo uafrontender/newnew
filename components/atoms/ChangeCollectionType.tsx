@@ -9,10 +9,10 @@ import Headline from './Headline';
 import InlineSVG from './InlineSVG';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import arrowDown from '../../public/images/svg/icons/filled/ArrowDown.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IChangeCollectionType {
   options: any;
@@ -29,7 +29,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
   const { t } = useTranslation('page-SeeMore');
   const ref: any = useRef();
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

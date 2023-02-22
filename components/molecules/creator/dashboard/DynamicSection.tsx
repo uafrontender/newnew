@@ -20,7 +20,6 @@ import AnimatedPresence, {
 
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
-import { useAppSelector } from '../../../../redux-store/store';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
@@ -31,6 +30,7 @@ import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { getRoom } from '../../../../api/endpoints/chat';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useBundles } from '../../../../contexts/bundlesContext';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -58,7 +58,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const {
     unreadCountForCreator,
     setActiveTab,

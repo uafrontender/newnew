@@ -13,8 +13,8 @@ import { formatNumber } from '../../../utils/format';
 import cashOutIcon from '../../../public/images/svg/icons/filled/CashOut.svg';
 import stripeTitleIcon from '../../../public/images/svg/icons/filled/StripeTitle.svg';
 import { getExpressDashboardLoginLink } from '../../../api/endpoints/stripe';
-import { useAppSelector } from '../../../redux-store/store';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ICashOut {
   nextCashOutAmount: newnewapi.IMoneyAmount;
@@ -33,7 +33,7 @@ const CashOut: React.FC<ICashOut> = ({
 
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

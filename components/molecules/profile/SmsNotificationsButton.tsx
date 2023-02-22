@@ -22,6 +22,7 @@ import {
 import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import getGuestId from '../../../utils/getGuestId';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SAVED_PHONE_COUNTRY_CODE_KEY = 'savedPhoneCountryCode';
 const SAVED_PHONE_NUMBER_KEY = 'savedPhoneNumber';
@@ -50,7 +51,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   const theme = useTheme();
   const socketConnection = useContext(SocketContext);
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -411,12 +412,7 @@ const SIconButton = styled.div<{
   // TODO: add hover/active effects
 `;
 
-const SMobileIconButton = styled(SIconButton)`
-  // Fix for blinking due to resize initial value
-  ${({ theme }) => theme.media.tablet} {
-    display: none;
-  }
-`;
+const SMobileIconButton = styled(SIconButton)``;
 
 const SIconButtonWithText = styled(SIconButton)`
   gap: 12px;
@@ -425,9 +421,4 @@ const SIconButtonWithText = styled(SIconButton)`
   font-size: 14px;
   line-height: 24px;
   display: none;
-
-  // Fix for blinking due to resize initial value
-  ${({ theme }) => theme.media.tablet} {
-    display: flex;
-  }
 `;

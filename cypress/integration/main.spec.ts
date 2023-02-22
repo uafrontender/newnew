@@ -1669,7 +1669,7 @@ context('Main flow', () => {
   describe('Creator willing to respond', () => {
     const defaultStorage = {
       userTutorialsProgress:
-        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[], "remainingAcResponseCurrentStep":[], "remainingMcResponseCurrentStep":[]}',
     };
     const storage = createStorage(defaultStorage);
 

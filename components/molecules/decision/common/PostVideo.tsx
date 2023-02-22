@@ -10,6 +10,7 @@ import { markPost } from '../../../../api/endpoints/post';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -36,7 +37,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

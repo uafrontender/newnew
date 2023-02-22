@@ -51,6 +51,7 @@ import CloseIcon from '../../../../../public/images/svg/icons/outlined/Close.svg
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBundleAfterStripeRedirect';
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
@@ -110,7 +111,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

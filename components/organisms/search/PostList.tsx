@@ -9,10 +9,10 @@ import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IList {
   collection: any;
@@ -27,7 +27,7 @@ export const PostList: React.FC<IList> = ({
   skeletonsBgColor,
   skeletonsHighlightColor,
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

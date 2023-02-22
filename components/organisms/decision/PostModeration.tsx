@@ -12,10 +12,10 @@ import ModerationView from './moderation';
 
 // Icons
 import GoBackButton from '../../molecules/GoBackButton';
-import { useAppSelector } from '../../../redux-store/store';
 
 // Icons
 import assets from '../../../constants/assets';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
@@ -39,7 +39,7 @@ const PostModeration: React.FunctionComponent<IPostModeration> = () => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

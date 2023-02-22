@@ -1,15 +1,15 @@
 import dynamic from 'next/dynamic';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import { useAppState } from '../../../contexts/appStateContext';
 import { useGetChats } from '../../../contexts/chatContext';
-import { useAppSelector } from '../../../redux-store/store';
 import SelectChat from '../../atoms/direct-messages/SelectChat';
 import ChatContent from './ChatContent';
 
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 
 export const ChatContainer = () => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
