@@ -734,6 +734,10 @@
       "shareBtn": "Share",
       "linkCopied": "Link copied!"
     },
+    "tutorialEditTitle": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
+    },
     "winner": {
       "inResponseToYourPost": "In response to your post",
       "ac": {
