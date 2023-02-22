@@ -6,8 +6,6 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 // Components
 import InlineSvg from '../../atoms/InlineSVG';
 import DropdownSelect, {
@@ -22,6 +20,8 @@ import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import Modal from '../../organisms/Modal';
 import BirthDateMobileInput from '../BirthDateMobileInput';
+import getLocalizedDay from '../../../utils/getDay';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const minDate = new Date(new Date().setFullYear(1900));
 
@@ -50,7 +50,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -87,7 +87,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
       return Array(31)
         .fill('')
         .map((_, i) => ({
-          name: (i + 1).toString(),
+          name: getLocalizedDay(i + 1, locale),
           value: i + 1,
         }));
     }
@@ -95,7 +95,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
     return Array(new Date(value?.year, value?.month, 0).getDate())
       .fill('')
       .map((_, i) => ({
-        name: (i + 1).toString(),
+        name: getLocalizedDay(i + 1, locale),
         value: i + 1,
       }));
   });
@@ -127,18 +127,18 @@ const OnboardingBirthDateInput: React.FunctionComponent<
         return Array(31)
           .fill('')
           .map((_, i) => ({
-            name: (i + 1).toString(),
+            name: getLocalizedDay(i + 1, locale),
             value: i + 1,
           }));
       }
       return Array(new Date(value?.year, value?.month, 0).getDate())
         .fill('')
         .map((_, i) => ({
-          name: (i + 1).toString(),
+          name: getLocalizedDay(i + 1, locale),
           value: i + 1,
         }));
     });
-  }, [value?.month, value?.year, setAvailableDays]);
+  }, [value?.month, value?.year, locale, setAvailableDays]);
 
   useEffect(() => {
     if (
@@ -164,7 +164,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
               width='120px'
               label={
                 value?.day
-                  ? value?.day.toString()
+                  ? availableDays.find((o) => o.value === value.day)?.name!!
                   : t('detailsSection.form.dateOfBirth.units.day')
               }
               options={availableDays}

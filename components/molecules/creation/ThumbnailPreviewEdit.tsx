@@ -12,10 +12,10 @@ import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 
-import { useAppSelector } from '../../../redux-store/store';
 import { TThumbnailParameters } from '../../../redux-store/slices/creationStateSlice';
 
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -43,7 +43,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
   const endTimeRef: any = useRef(null);
   const startTimeRef: any = useRef(null);
   const progressIndicatorRef: any = useRef(null);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const preventCLick = useCallback((e: any) => {

@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppDispatch } from '../../redux-store/store';
 import { setUserData } from '../../redux-store/slices/userStateSlice';
 
 // API
@@ -27,6 +27,7 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
+import { useAppState } from '../../contexts/appStateContext';
 
 const AnimatedPresence = dynamic(() => import('../atoms/AnimatedPresence'));
 
@@ -43,7 +44,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

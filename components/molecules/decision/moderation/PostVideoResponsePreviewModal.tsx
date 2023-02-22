@@ -11,7 +11,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 
 import chevronLeft from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -29,7 +29,7 @@ export const PostVideoResponsePreviewModal: React.FC<
 > = ({ open, value, handleClose, handleConfirm }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const preventCLick = (e: any) => {

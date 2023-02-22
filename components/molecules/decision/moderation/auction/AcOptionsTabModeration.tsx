@@ -8,8 +8,6 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
-import { useAppSelector } from '../../../../../redux-store/store';
-
 import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
@@ -25,6 +23,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 import { usePostModerationResponsesContext } from '../../../../../contexts/postModerationResponsesContext';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcOptionsTabModeration {
   postUuid: string;
@@ -58,7 +57,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
   handleUpdateWinningOption,
 }) => {
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

@@ -17,6 +17,7 @@ import ChatUserData from '../../atoms/direct-messages/ChatUserData';
 import InlineSVG from '../../atoms/InlineSVG';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { useGetChats } from '../../../contexts/chatContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const GoBackButton = dynamic(
   () => import('../../atoms/direct-messages/GoBackButton')
@@ -43,7 +44,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
 }) => {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

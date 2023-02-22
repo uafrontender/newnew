@@ -9,7 +9,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
 import preventParentClick from '../../../utils/preventParentClick';
 
 import Modal from '../../organisms/Modal';
@@ -17,6 +16,7 @@ import ModalPaper from '../../organisms/ModalPaper';
 import Button from '../../atoms/Button';
 import CheckMark from '../CheckMark';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -33,7 +33,7 @@ interface IReportModal {
 const ReportModal: React.FC<IReportModal> = React.memo(
   ({ show, reportedDisplayname, onClose, onSubmit }) => {
     const { t } = useTranslation('common');
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

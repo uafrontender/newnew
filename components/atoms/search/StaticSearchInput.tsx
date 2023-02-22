@@ -31,6 +31,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../Loader';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IStaticSearchInput {
   width?: string;
@@ -59,9 +60,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       newnewapi.IHashtag[]
     >([]);
 
-    const { resizeMode, globalSearchActive } = useAppSelector(
-      (state) => state.ui
-    );
+    const { globalSearchActive } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const router = useRouter();
 
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -124,7 +124,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
 
       const clearedSearchValue = getClearedSearchQuery(searchValue);
-      if (e.keyCode === 13 && clearedSearchValue) {
+      if (e.keyCode === 13 && clearedSearchValue.length > 1) {
         handleSeeResults(clearedSearchValue);
         closeSearch();
       }

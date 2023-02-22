@@ -9,11 +9,11 @@ import Modal from '../organisms/Modal';
 import Button from './Button';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IChangeLanguage {}
 
@@ -22,7 +22,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
   const ref: any = useRef();
   const { locale } = useRouter();
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const [, setCookie] = useCookies();
 

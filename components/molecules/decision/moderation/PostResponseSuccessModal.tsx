@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { Mixpanel } from '../../../../utils/mixpanel';
 
 import Text from '../../../atoms/Text';
@@ -18,6 +17,7 @@ import assets from '../../../../constants/assets';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import CopyLinkIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostResponseSuccessModal {
   isOpen: boolean;
@@ -32,7 +32,7 @@ const PostResponseSuccessModal: React.FunctionComponent<
   const router = useRouter();
   const { t: tCommon } = useTranslation('common');
   const { t } = useTranslation('modal-ResponseSuccessModal');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

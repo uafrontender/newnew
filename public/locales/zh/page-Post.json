@@ -289,7 +289,7 @@
       "title": "即將開始",
       "subtitle_1": "你的{{postType}}還沒有被啟動",
       "subtitle_2": "距離啓動時間：",
-      "toggleButton_NEED_TRANSLATION": "查看選項",
+      "toggleButton": "查看選項",
       "timer": {
         "days": "天",
         "hours": "小時",
@@ -733,6 +733,10 @@
       "youMade": "你做了",
       "shareBtn": "分享",
       "linkCopied": "鏈接已複製！"
+    },
+    "tutorialEditTitle_NEED_TRANSLATION": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
     },
     "winner": {
       "inResponseToYourPost": "回應了你的帖子",

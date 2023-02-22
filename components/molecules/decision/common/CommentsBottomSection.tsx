@@ -34,6 +34,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import usePostComments from '../../../../utils/hooks/usePostComments';
 import useComponentScrollRestoration from '../../../../utils/hooks/useComponentScrollRestoration';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -57,7 +58,7 @@ const CommentsBottomSection: React.FunctionComponent<
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

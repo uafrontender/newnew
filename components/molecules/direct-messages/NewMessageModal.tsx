@@ -39,6 +39,7 @@ import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -66,7 +67,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
   const scrollRef: any = useRef();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
