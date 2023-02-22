@@ -4,10 +4,10 @@ This is a NewNew web
 
 First, run the development server:
 
-Use node v14
+Use node v16
 
 ```bash
-nvm install 16.14.2
+nvm install 16.16.0
 # optionally make it a default version
 nvm alias default 16
 ```

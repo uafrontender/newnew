@@ -15,7 +15,6 @@ import dynamic from 'next/dynamic';
 
 import isBrowser from '../../../../utils/isBrowser';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { useAppSelector } from '../../../../redux-store/store';
 import { setPostThumbnail } from '../../../../api/endpoints/post';
 import { TThumbnailParameters } from '../../../../redux-store/slices/creationStateSlice';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
@@ -30,6 +29,7 @@ import PostVideoAnnouncementTab from './PostVideoAnnouncementTab';
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
@@ -62,7 +62,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

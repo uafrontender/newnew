@@ -12,11 +12,11 @@ import Container from '../atoms/Grid/Container';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import OnboardingMobileHeader from '../molecules/creator-onboarding/OnboardingMobileHeader';
-import { useAppSelector } from '../../redux-store/store';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 import HeroVisual from './components/HeroVisual';
 import BaseLayout from './BaseLayout';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ICreatorOnboardingLayout {
   hideOnboardingHeader?: boolean;
@@ -29,7 +29,7 @@ const CreatorOnboardingLayout: React.FunctionComponent<
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

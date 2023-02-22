@@ -60,6 +60,7 @@ import PostCardEllipseModal from './PostCardEllipseModal';
 import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 import getChunks from '../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -114,7 +115,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

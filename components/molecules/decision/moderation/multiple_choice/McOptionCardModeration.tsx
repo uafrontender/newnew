@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../../../redux-store/store';
 import { TMcOptionWithHighestField } from '../../../../../utils/hooks/useMcOptions';
 
 import Text from '../../../../atoms/Text';
@@ -34,6 +33,7 @@ import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 import { Mixpanel } from '../../../../../utils/mixpanel';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -62,7 +62,7 @@ const McOptionCardModeration: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

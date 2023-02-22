@@ -18,15 +18,6 @@ import { AppThunk } from '../store';
 
 export type TColorMode = 'light' | 'dark' | 'auto';
 export type TGlobalSearchActive = true | false;
-export type TResizeMode =
-  | 'mobile'
-  | 'mobileS'
-  | 'mobileM'
-  | 'mobileL'
-  | 'tablet'
-  | 'laptop'
-  | 'laptopL'
-  | 'desktop';
 export type TBanner = {
   show: boolean;
   title: string;
@@ -35,7 +26,6 @@ export type TBanner = {
 export interface UIStateInterface {
   banner: TBanner;
   colorMode: TColorMode;
-  resizeMode: TResizeMode;
   mutedMode: boolean;
   globalSearchActive: TGlobalSearchActive;
 }
@@ -49,7 +39,6 @@ export const defaultUIState: UIStateInterface = {
   },
   colorMode: 'auto',
   // colorMode: 'dark',
-  resizeMode: 'laptop',
   mutedMode: true,
   globalSearchActive: false,
 };
@@ -60,9 +49,6 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
   reducers: {
     _setColorMode(state, { payload }: PayloadAction<TColorMode>) {
       state.colorMode = payload;
-    },
-    setResizeMode(state, { payload }: PayloadAction<TResizeMode>) {
-      state.resizeMode = payload;
     },
     setGlobalSearchActive(
       state,
@@ -82,7 +68,6 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
 export const {
   setBanner,
   _setColorMode,
-  setResizeMode,
   toggleMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
@@ -101,11 +86,15 @@ export const setColorMode =
     // Smooth theming
     if (isBrowser()) {
       document?.documentElement?.classList?.add('theming');
-      document?.documentElement?.addEventListener('transitionend', () => {
-        if (document?.documentElement) {
-          document?.documentElement?.classList?.remove('theming');
-        }
-      }, {once: true});
+      document?.documentElement?.addEventListener(
+        'transitionend',
+        () => {
+          if (document?.documentElement) {
+            document?.documentElement?.classList?.remove('theming');
+          }
+        },
+        { once: true }
+      );
       // document?.documentElement?.classList?.toggle('theme-change');
     }
   };

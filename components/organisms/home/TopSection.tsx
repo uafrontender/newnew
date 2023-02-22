@@ -13,11 +13,11 @@ import ScrollArrow from '../../atoms/ScrollArrow';
 
 import useScrollGradientsHorizontal from '../../../utils/hooks/useScrollGradientsHorizontal';
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
-import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TOP_10 } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import GradientMaskHorizontal from '../../atoms/GradientMaskHorizontal';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -44,7 +44,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
 
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

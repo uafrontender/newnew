@@ -19,6 +19,7 @@ import { Mixpanel } from '../../../../../utils/mixpanel';
 
 import Lottie from '../../../../atoms/Lottie';
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IMcSuccessOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -32,7 +33,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

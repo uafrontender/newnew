@@ -9,12 +9,12 @@ import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import UserAvatar from '../UserAvatar';
 import BundleOfferCard from './BunldeOfferCard';
-import { useAppSelector } from '../../../redux-store/store';
 import BundlePaymentModal from './BundlePaymentModal';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import InlineSvg from '../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -37,7 +37,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
     onSuccess,
   }) => {
     const { t } = useTranslation('common');
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const { appConstants } = useGetAppConstants();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode

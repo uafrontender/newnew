@@ -4,16 +4,16 @@ import { useTranslation } from 'react-i18next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
-import { useAppSelector } from '../../../redux-store/store';
 import NewMessage from './NewMessage';
 import { useGetChats } from '../../../contexts/chatContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const GoBackButton = dynamic(
   () => import('../../atoms/direct-messages/GoBackButton')
 );
 
 const ChatToolbar: React.FC = () => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { t } = useTranslation('page-Chat');
   const {
     setSearchChatroom,

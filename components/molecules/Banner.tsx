@@ -10,11 +10,13 @@ import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IBanner {}
 
 const Banner: React.FC<IBanner> = React.memo(() => {
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const theme = useTheme();
   const dispatch = useAppDispatch();

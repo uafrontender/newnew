@@ -11,7 +11,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -28,7 +28,7 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
 
   const theme = useTheme();
   const { t } = useTranslation('page-Creation');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const preventCLick = (e: any) => {

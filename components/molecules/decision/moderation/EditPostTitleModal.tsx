@@ -12,9 +12,9 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import InlineSvg from '../../../atoms/InlineSVG';
 import CloseIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import EditPostTitleTextArea from '../../../atoms/moderation/EditPostTitleTextArea';
-import { useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { CREATION_TITLE_MAX } from '../../../../constants/general';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IEditPostTitleModal {
   show: boolean;
@@ -30,7 +30,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
   const theme = useTheme();
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('modal-EditPostTitle');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

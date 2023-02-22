@@ -14,6 +14,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
 import useSearchPosts from '../../../utils/hooks/useSearchPosts';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const PostList = dynamic(() => import('./PostList'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
@@ -73,7 +74,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   const { loggedIn } = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

@@ -21,9 +21,9 @@ import AuthLayout, {
 } from '../components/templates/AuthLayout';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { unsubscribeFromEmailNotifications } from '../api/endpoints/notification';
-import { useAppSelector } from '../redux-store/store';
 import Lottie from '../components/atoms/Lottie';
 import logoAnimation from '../public/animations/mobile_logo.json';
+import { useAppState } from '../contexts/appStateContext';
 
 const UnsubscribeMenu = dynamic(
   () => import('../components/organisms/UnsubscribeMenu')
@@ -38,7 +38,7 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
   const authLayoutContext = useContext(AuthLayoutContext);
   const [requestDone, setRequestDone] = useState(false);
   const [unsubscribed, setUnsubscribed] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
