@@ -223,12 +223,12 @@ const SEditPictureMenu = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: min(15vh, 136px);
+    top: max(min((100vh - 690px) / 2, 136px), 0px);
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 75vh;
-    max-height: 684px;
+    height: 100%;
+    max-height: 690px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
