@@ -8,7 +8,8 @@ const AnimatedBackground: React.FunctionComponent<{
   src: string;
   alt: string;
   noBlur?: boolean;
-}> = React.memo(({ className, src, alt, noBlur }) => {
+  isCalculatedHeight?: boolean;
+}> = React.memo(({ className, src, alt, noBlur, isCalculatedHeight }) => {
   const [delayed, setDelayed] = useState(true);
   const elements = useMemo(() => [1, 2, 3], []);
 
@@ -23,10 +24,10 @@ const AnimatedBackground: React.FunctionComponent<{
   const [containerHeight, setContainerHeight] = useState<number>(0);
 
   useEffect(() => {
-    if (isBrowser()) {
+    if (isBrowser() && isCalculatedHeight) {
       setContainerHeight(containerRef.current?.clientHeight || 0);
     }
-  }, [delayed]);
+  }, [delayed, isCalculatedHeight]);
 
   if (delayed || !isBrowser()) {
     return null;
@@ -34,7 +35,7 @@ const AnimatedBackground: React.FunctionComponent<{
 
   return (
     <SContainer className={className} ref={containerRef}>
-      {containerHeight && (
+      {(isCalculatedHeight ? containerHeight : true) && (
         <>
           {elements.map((el, i) => (
             <FloatingAsset
@@ -154,7 +155,7 @@ interface IFloatingAsset {
   right?: number;
   delay: number;
   noBlur?: boolean;
-  transformHeight: number;
+  transformHeight?: number;
 }
 
 const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
@@ -199,11 +200,11 @@ const FloatingAsset: React.FunctionComponent<IFloatingAsset> = ({
 
 const RainingAnimation = (
   transform: string,
-  transformHeight: number
+  transformHeight?: number
 ) => keyframes`
   0% {
     opacity:0;
-    transform: ${transform} translateY(-300px);// translateY(-100px);
+    transform: ${transform} translateY(-300px);
   }
   10% {
     opacity:1;
@@ -213,7 +214,9 @@ const RainingAnimation = (
   }
   100% {
     opacity:0;
-    transform: ${transform} ${`translateY(${transformHeight}px)`};// translateY(140vh);
+    transform: ${transform} ${`translateY(${
+  transformHeight ? `${transformHeight}px` : '100vh'
+})`};
   }
 `;
 
@@ -224,7 +227,7 @@ const SIcon = styled.div<{
   speed: number;
   noBlur?: boolean;
   transformOffset: number;
-  transformHeight: number;
+  transformHeight?: number;
 }>`
   display: flex;
 
