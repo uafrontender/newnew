@@ -13,7 +13,10 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import CloseIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import EditPostTitleTextArea from '../../../atoms/moderation/EditPostTitleTextArea';
 import { validateText } from '../../../../api/endpoints/infrastructure';
-import { CREATION_TITLE_MAX } from '../../../../constants/general';
+import {
+  CREATION_TITLE_MAX,
+  CREATION_TITLE_MIN,
+} from '../../../../constants/general';
 import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IEditPostTitleModal {
@@ -74,12 +77,16 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
         switch (res.data.status) {
           case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
             setIsTitleValid(false);
-            setTitleValidationError(tCommon('error.text.min'));
+            setTitleValidationError(
+              tCommon('error.text.min', { value: CREATION_TITLE_MIN })
+            );
             break;
           }
           case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
             setIsTitleValid(false);
-            setTitleValidationError(tCommon('error.text.max'));
+            setTitleValidationError(
+              tCommon('error.text.max', { value: CREATION_TITLE_MAX })
+            );
             break;
           }
           case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
@@ -297,6 +304,7 @@ const SContainer = styled.div`
     top: calc(50% - 160px);
     left: calc(50% - 240px);
     width: 480px;
+    box-shadow: ${({ theme }) => theme.shadows.lightBlue};
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
