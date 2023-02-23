@@ -304,6 +304,7 @@ const SContainer = styled.div`
     top: calc(50% - 160px);
     left: calc(50% - 240px);
     width: 480px;
+    box-shadow: ${({ theme }) => theme.shadows.lightBlue};
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
