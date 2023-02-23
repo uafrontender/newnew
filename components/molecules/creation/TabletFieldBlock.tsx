@@ -6,7 +6,7 @@ import Text from '../../atoms/Text';
 import Caption from '../../atoms/Caption';
 import DropdownSelect from '../../atoms/DropdownSelect';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ITabletFieldBlock {
   id: string;
@@ -40,7 +40,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
   } = props;
   const { t } = useTranslation('page-Creation');
   const inputRef: any = useRef();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isTablet = ['tablet'].includes(resizeMode);
 
   const handleBlur = useCallback(() => {

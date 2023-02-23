@@ -60,6 +60,7 @@ import useErrorToasts, {
 } from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -163,9 +164,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   // Common

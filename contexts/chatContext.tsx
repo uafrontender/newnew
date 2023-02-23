@@ -12,6 +12,7 @@ import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { getTotalUnreadMessageCounts } from '../api/endpoints/chat';
 import { useBundles } from './bundlesContext';
+import { useAppState } from './appStateContext';
 
 interface IChatsContext {
   unreadCountForUser: number;
@@ -72,7 +73,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   >();
   const [justSentMessage, setJustSentMessage] = useState<boolean>(false);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

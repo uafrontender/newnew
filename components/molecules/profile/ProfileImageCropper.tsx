@@ -3,10 +3,8 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
-
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
 import DragToRepositionLabel from './DragToRepositionLabel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 type TProfileImageCropper = {
   crop: Point;
@@ -36,9 +34,9 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
   onZoomChange,
 }) => {
   const { t } = useTranslation('common');
-  const { ui } = useAppSelector((state) => state);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
   const [isPressed, setIsPressed] = useState(false);
 

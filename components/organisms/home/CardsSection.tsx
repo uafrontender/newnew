@@ -22,13 +22,13 @@ import ScrollArrowPermanent from '../../atoms/ScrollArrowPermanent';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import { formatString } from '../../../utils/format';
-import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import { Mixpanel } from '../../../utils/mixpanel';
 import useComponentScrollRestoration from '../../../utils/hooks/useComponentScrollRestoration';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -78,7 +78,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
 
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

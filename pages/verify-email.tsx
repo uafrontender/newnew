@@ -18,6 +18,7 @@ import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { SignupReason, signupReasons } from '../utils/signUpReasons';
+import { useAppState } from '../contexts/appStateContext';
 
 interface IVerifyEmail {
   reason?: SignupReason;
@@ -29,7 +30,7 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
   const { t } = useTranslation('page-VerifyEmail');
   const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

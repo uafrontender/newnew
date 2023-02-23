@@ -6,8 +6,6 @@ import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 // Components
 import InlineSvg from '../../atoms/InlineSVG';
 import DropdownSelect, {
@@ -23,6 +21,7 @@ import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import Modal from '../../organisms/Modal';
 import BirthDateMobileInput from '../BirthDateMobileInput';
 import getLocalizedDay from '../../../utils/getDay';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const minDate = new Date(new Date().setFullYear(1900));
 
@@ -51,7 +50,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

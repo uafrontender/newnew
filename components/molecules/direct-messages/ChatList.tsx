@@ -10,10 +10,10 @@ import { useRouter } from 'next/router';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
 import { useGetChats } from '../../../contexts/chatContext';
-import { useAppSelector } from '../../../redux-store/store';
 import Loader from '../../atoms/Loader';
 import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const NoResults = dynamic(
   () => import('../../atoms/direct-messages/NoResults')
@@ -27,7 +27,7 @@ interface IChatList {
 
 const ChatList: React.FC<IChatList> = ({ hidden }) => {
   const { ref: scrollRef, inView } = useInView();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

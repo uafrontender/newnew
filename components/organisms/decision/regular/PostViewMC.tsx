@@ -46,6 +46,7 @@ import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
+import { useAppState } from '../../../../contexts/appStateContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -95,7 +96,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

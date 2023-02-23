@@ -44,6 +44,7 @@ import { getMyTransactions } from '../../../api/endpoints/payments';
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
@@ -64,7 +65,8 @@ const MyProfileSettingsIndex = () => {
     (state: any) => state.user
   );
 
-  const { resizeMode, colorMode } = useAppSelector((state: any) => state.ui);
+  const { colorMode } = useAppSelector((state: any) => state.ui);
+  const { resizeMode } = useAppState();
   // Measurements
   const isMobileOrTablet = [
     'mobile',

@@ -3,8 +3,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import countries from 'i18n-iso-countries';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 // Utils
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
@@ -12,6 +10,7 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 // Icons
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import InlineSvg from '../../atoms/InlineSVG';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingCountrySelect {
   selected: string;
@@ -40,7 +39,7 @@ const OnboardingCountrySelect = ({
   const optionsContainerRef = useRef<HTMLDivElement>();
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

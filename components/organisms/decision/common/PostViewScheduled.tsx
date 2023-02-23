@@ -19,6 +19,7 @@ import PostScheduledSection from '../../../molecules/decision/common/PostSchedul
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import McOptionsTabModeration from '../../../molecules/decision/moderation/multiple_choice/McOptionsTabModeration';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
@@ -37,7 +38,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     const { t } = useTranslation('page-Post');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );

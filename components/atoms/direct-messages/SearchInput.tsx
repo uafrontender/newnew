@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import InlineSVG from '../InlineSVG';
-import { useAppSelector } from '../../../redux-store/store';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ISearchInput {
   placeholderText: string;
@@ -28,7 +28,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   const inputRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
   const [focusedInput, setFocusedInput] = useState<boolean>(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

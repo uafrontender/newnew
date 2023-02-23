@@ -23,6 +23,7 @@ import {
   setCustomCoverImageUrl,
   unsetCustomCoverImageUrl,
 } from '../../../redux-store/slices/creationStateSlice';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ICoverImagePreviewEdit {
   open: boolean;
@@ -37,7 +38,7 @@ const CoverImagePreviewEdit: React.FunctionComponent<
   const { t } = useTranslation('page-Creation');
   const dispatch = useAppDispatch();
   const { customCoverImageUrl } = useAppSelector((state) => state.creation);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const preventCLick = useCallback((e: any) => {

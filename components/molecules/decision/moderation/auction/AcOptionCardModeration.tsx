@@ -6,7 +6,6 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
-import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
@@ -33,6 +32,7 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -60,7 +60,7 @@ const AcOptionCardModeration: React.FunctionComponent<
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

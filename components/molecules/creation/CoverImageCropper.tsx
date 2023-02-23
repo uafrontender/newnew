@@ -2,9 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
-
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
 type TCoverImageCropper = {
   crop: Point;
@@ -29,9 +27,9 @@ const CoverImageCropper: React.FunctionComponent<TCoverImageCropper> = ({
   onCropComplete,
   onZoomChange,
 }) => {
-  const { ui } = useAppSelector((state) => state);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   return (
