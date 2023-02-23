@@ -47,7 +47,7 @@
   "Profile": {
     "meta": {
       "title": "{{displayname}} (@{{username}}) | NewNew",
-      "description_NEED_TRANSLATION": "{{bio}} Bid and Vote on what people do next"
+      "description": "{{bio}} 對人們下一步做什麼進行出價和投票"
     },
     "user": {
       "noContent": {
@@ -65,7 +65,7 @@
   "Activity": {
     "meta": {
       "title": "{{displayname}} (@{{username}}) | NewNew",
-      "description_NEED_TRANSLATION": "{{bio}} Bid and Vote on what people do next"
+      "description": "{{bio}} 對人們下一步做什麼進行出價和投票"
     },
     "noContent": {
       "description": "創作者的所有活動都將在這裡顯示"
