@@ -189,9 +189,18 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.startsAt?.seconds]);
 
-    const [thumbnailUrl, setThumbnailUrl] = useState(
-      postParsed.announcement?.thumbnailUrl ?? ''
-    );
+    const [videoThumbnailUrl, setVideoThumbnailUrl] = useState(() => {
+      if (
+        postParsed?.response &&
+        postParsed?.response !== null &&
+        postParsed?.response?.thumbnailUrl &&
+        typeof postParsed?.response?.thumbnailUrl === 'string'
+      ) {
+        console.log(postParsed?.response?.thumbnailUrl);
+        return postParsed?.response?.thumbnailUrl;
+      }
+      return postParsed.announcement?.thumbnailUrl as string;
+    });
 
     const [coverImageUrl, setCoverImageUrl] = useState<
       string | undefined | null
@@ -312,32 +321,6 @@ export const PostCard: React.FC<ICard> = React.memo(
         }
       };
 
-      const handlerSocketThumbnailUpdated = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
-
-        if (
-          !decoded ||
-          !decoded.thumbnailUrl ||
-          decoded.postUuid !== postParsed.postUuid
-        )
-          return;
-
-        // Wait to make sure that cloudfare cache has been invalidated
-        setTimeout(() => {
-          fetch(decoded.thumbnailUrl)
-            .then((res) => res.blob())
-            .then((blobFromFetch) => {
-              const url = URL.createObjectURL(blobFromFetch);
-
-              setThumbnailUrl(url);
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        }, 10000);
-      };
-
       const handlerSocketPostCoverImageUpdated = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
@@ -367,10 +350,6 @@ export const PostCard: React.FC<ICard> = React.memo(
 
       if (socketConnection) {
         socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
-        socketConnection?.on(
-          'PostThumbnailUpdated',
-          handlerSocketThumbnailUpdated
-        );
         socketConnection.on(
           'PostCoverImageUpdated',
           handlerSocketPostCoverImageUpdated
@@ -380,10 +359,6 @@ export const PostCard: React.FC<ICard> = React.memo(
       return () => {
         if (socketConnection && socketConnection?.connected) {
           socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
-          socketConnection?.off(
-            'PostThumbnailUpdated',
-            handlerSocketThumbnailUpdated
-          );
           socketConnection.off(
             'PostCoverImageUpdated',
             handlerSocketPostCoverImageUpdated
@@ -430,6 +405,30 @@ export const PostCard: React.FC<ICard> = React.memo(
         videoRef.current?.removeEventListener('ended', handleVideoEnded);
       };
     }, [handleVideoEnded]);
+
+    useEffect(() => {
+      async function checkResponseThumbnailAvailable() {
+        try {
+          if (postParsed?.response?.thumbnailUrl) {
+            const res = await fetch(postParsed?.response?.thumbnailUrl);
+            console.log(res.status);
+            if (res.status !== 200) {
+              setVideoThumbnailUrl(
+                postParsed?.announcement?.thumbnailUrl as string
+              );
+            }
+          }
+          return;
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      checkResponseThumbnailAvailable();
+    }, [
+      postParsed?.announcement?.thumbnailUrl,
+      postParsed?.response?.thumbnailUrl,
+    ]);
 
     useEffect(() => {
       router.prefetch(
@@ -503,13 +502,13 @@ export const PostCard: React.FC<ICard> = React.memo(
                 ref={(el) => {
                   videoRef.current = el!!;
                 }}
-                key={thumbnailUrl}
+                key={videoThumbnailUrl}
                 muted
                 playsInline
               >
                 <source
-                  key={thumbnailUrl}
-                  src={thumbnailUrl}
+                  key={videoThumbnailUrl}
+                  src={videoThumbnailUrl}
                   type='video/mp4'
                 />
               </video>
@@ -618,12 +617,16 @@ export const PostCard: React.FC<ICard> = React.memo(
               ref={(el) => {
                 videoRef.current = el!!;
               }}
-              key={thumbnailUrl}
+              key={videoThumbnailUrl}
               muted
               playsInline
               preload='none'
             >
-              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
+              <source
+                key={videoThumbnailUrl}
+                src={videoThumbnailUrl}
+                type='video/mp4'
+              />
             </video>
             <STopContent>
               <SButtonIcon
