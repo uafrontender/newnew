@@ -46,8 +46,8 @@
       },
       "list": {
         "ac": "Bids",
-        "cf": "Superpolls",
-        "mc": "Goals",
+        "mc": "Superpolls",
+        "cf": "Goals",
         "bundles": "Bundles"
       },
       "filter": {
@@ -126,7 +126,7 @@
     },
     "bundlesSet": {
       "title": "Bundles de Superpoll",
-      "subTitle": "Ofrece bundles de Superpoll para aumentar tus ganancias y acercarte a tu audiencia. ",
+      "subTitle": "Ofrece Bundles de Superpoll para aumentar tus ganancias y acercarte a tu audiencia. ",
       "votes": "votos",
       "description": "Además, la gente obtiene {{duration}} meses de:",
       "descriptionSingular": "Además, la gente obtiene 1 mes de:",
