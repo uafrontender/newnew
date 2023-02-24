@@ -54,11 +54,18 @@ const OnboardingCountrySelect = ({
 
   useEffect(() => {
     if (isOpen && selected) {
-      const itemTopPos =
-        optionsRefs.current[options.findIndex((o) => o === selected)].offsetTop;
+      const selectedItemIndex = options.findIndex((o) => o === selected);
+
+      // Do not scroll to the first item in the list
+      if (selectedItemIndex < 1) {
+        return;
+      }
+      const itemTopPos = optionsRefs.current[selectedItemIndex].offsetTop;
 
       if (optionsContainerRef.current) {
-        optionsContainerRef.current.scrollTop = itemTopPos;
+        // Leave a small gap above the selected item
+        const TOP_PADDING = 8;
+        optionsContainerRef.current.scrollTop = itemTopPos - TOP_PADDING;
       }
     }
   }, [selected, options, isOpen]);
