@@ -55,7 +55,7 @@
     },
     "doneButton": "Sounds good!",
     "ac": "{{postCreator}} will pick their favorite one once the Bid is over.",
-    "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
+    "mc": "{{postCreator}} will do the option with the most amount of votes when the Superpoll is over.",
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
   "postFailedBoxModeration": {

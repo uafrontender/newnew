@@ -81,6 +81,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     []
   );
 
+  // TODO: Add translations
   const postTypeText = useCallback(() => {
     if (postData) {
       if (postData.auction) return 'Bid';
