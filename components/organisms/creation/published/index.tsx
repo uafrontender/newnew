@@ -65,6 +65,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
   }
 
+  // TODO: Add translations
   const postTypeText = useCallback(() => {
     if (postData) {
       if (postData.auction) return 'Bid';
