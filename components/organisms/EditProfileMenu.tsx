@@ -1056,56 +1056,56 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 onCropComplete={onCropCompleteProfileImage}
                 onZoomChange={setZoomProfileImage}
               />
-              <SSliderWrapper>
-                <Button
-                  iconOnly
-                  size='sm'
-                  view='transparent'
-                  disabled={
-                    zoomProfileImage <= minZoomProfileImage ||
-                    updateProfileImageLoading
-                  }
-                  onClick={handleZoomOutProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomOutIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='24px'
-                    height='24px'
-                  />
-                </Button>
-                <ProfileImageZoomSlider
-                  value={zoomProfileImage}
-                  min={minZoomProfileImage}
-                  max={minZoomProfileImage + 2}
-                  step={0.1}
-                  ariaLabel='Zoom'
-                  disabled={updateProfileImageLoading}
-                  onChange={(e) =>
-                    setZoomProfileImage(
-                      Math.max(Number(e.target.value), minZoomProfileImage)
-                    )
-                  }
-                />
-                <Button
-                  iconOnly
-                  size='sm'
-                  view='transparent'
-                  disabled={
-                    zoomProfileImage >= minZoomProfileImage + 2 ||
-                    updateProfileImageLoading
-                  }
-                  onClick={handleZoomInProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomInIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='24px'
-                    height='24px'
-                  />
-                </Button>
-              </SSliderWrapper>
             </ProfilePictureContent>
+            <SSliderWrapper>
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomProfileImage <= minZoomProfileImage ||
+                  updateProfileImageLoading
+                }
+                onClick={handleZoomOutProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomOutIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+              <ProfileImageZoomSlider
+                value={zoomProfileImage}
+                min={minZoomProfileImage}
+                max={minZoomProfileImage + 2}
+                step={0.1}
+                ariaLabel='Zoom'
+                disabled={updateProfileImageLoading}
+                onChange={(e) =>
+                  setZoomProfileImage(
+                    Math.max(Number(e.target.value), minZoomProfileImage)
+                  )
+                }
+              />
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomProfileImage >= minZoomProfileImage + 2 ||
+                  updateProfileImageLoading
+                }
+                onClick={handleZoomInProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomInIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+            </SSliderWrapper>
             <SControlsWrapperPicture>
               <Button
                 view='secondary'
@@ -1271,10 +1271,6 @@ const ProfilePictureContent = styled.div`
 const SSliderWrapper = styled.div`
   display: none;
   ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    bottom: 107px;
     z-index: 1;
     background-color: ${({ theme }) =>
       theme.name === 'light'
