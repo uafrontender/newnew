@@ -866,8 +866,12 @@ context('Main flow', () => {
       cy.dGet('#see-bundle-button').should('be.visible');
     });
 
-    it('can contribute to a superpoll with bundle votes', () => {
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+    it('can visit post from profile and contribute to a superpoll with bundle votes', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
+      cy.url().should('include', creatorUsername);
+      const postCardSelector = `#post-card-${superpollShortId}`;
+      cy.dGet(postCardSelector).click();
+
       cy.url().should('include', '/p/');
 
       cy.dGet('#support-button-0').click();
@@ -1339,8 +1343,12 @@ context('Main flow', () => {
       cy.dGet('#see-bundle-button').should('be.visible');
     });
 
-    it('can contribute to a superpoll with bundle votes', () => {
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+    it('can visit post from profile and contribute to a superpoll with bundle votes', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
+      cy.url().should('include', creatorUsername);
+      const postCardSelector = `#post-card-${superpollShortId}`;
+      cy.dGet(postCardSelector).click();
+
       cy.url().should('include', '/p/');
 
       cy.dGet('#support-button-0').click();
