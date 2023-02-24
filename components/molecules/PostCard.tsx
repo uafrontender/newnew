@@ -196,7 +196,6 @@ export const PostCard: React.FC<ICard> = React.memo(
         postParsed?.response?.thumbnailUrl &&
         typeof postParsed?.response?.thumbnailUrl === 'string'
       ) {
-        console.log(postParsed?.response?.thumbnailUrl);
         return postParsed?.response?.thumbnailUrl;
       }
       return postParsed.announcement?.thumbnailUrl as string;
@@ -204,7 +203,11 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     const [coverImageUrl, setCoverImageUrl] = useState<
       string | undefined | null
-    >(postParsed.announcement?.coverImageUrl ?? undefined);
+    >(
+      (postParsed.response?.coverImageUrl ||
+        postParsed.announcement?.coverImageUrl) ??
+        undefined
+    );
 
     const handleUserClick = (username: string) => {
       Mixpanel.track('Go To Creator Profile', {
@@ -335,7 +338,14 @@ export const PostCard: React.FC<ICard> = React.memo(
               .then((blobFromFetch) => {
                 const url = URL.createObjectURL(blobFromFetch);
 
-                setCoverImageUrl(url);
+                if (
+                  (postParsed?.response?.coverImageUrl &&
+                    decoded.videoTargetType ===
+                      newnewapi.VideoTargetType.RESPONSE) ||
+                  !postParsed?.response?.coverImageUrl
+                ) {
+                  setCoverImageUrl(url);
+                }
               })
               .catch((err) => {
                 console.error(err);
@@ -366,7 +376,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection]);
+    }, [socketConnection, postParsed]);
 
     useEffect(() => {
       if (hovered) {
@@ -410,8 +420,9 @@ export const PostCard: React.FC<ICard> = React.memo(
       async function checkResponseThumbnailAvailable() {
         try {
           if (postParsed?.response?.thumbnailUrl) {
-            const res = await fetch(postParsed?.response?.thumbnailUrl);
-            console.log(res.status);
+            const res = await fetch(postParsed?.response?.thumbnailUrl, {
+              method: 'HEAD',
+            });
             if (res.status !== 200) {
               setVideoThumbnailUrl(
                 postParsed?.announcement?.thumbnailUrl as string
@@ -491,6 +502,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 className='thumnailHolder'
                 src={
                   (coverImageUrl ||
+                    postParsed?.response?.thumbnailImageUrl ||
                     postParsed.announcement?.thumbnailImageUrl) ??
                   ''
                 }
@@ -606,7 +618,9 @@ export const PostCard: React.FC<ICard> = React.memo(
             <SThumbnailHolder
               className='thumnailHolder'
               src={
-                (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
+                (coverImageUrl ||
+                  postParsed?.response?.thumbnailImageUrl ||
+                  postParsed.announcement?.thumbnailImageUrl) ??
                 ''
               }
               alt='Post'
