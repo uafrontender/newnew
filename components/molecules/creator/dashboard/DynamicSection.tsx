@@ -61,10 +61,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const { resizeMode } = useAppState();
   const {
     unreadCountForCreator,
-    setActiveTab,
     activeTab,
     activeChatRoom,
+    hiddenMessagesArea,
     setActiveChatRoom,
+    setActiveTab,
   } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
@@ -198,7 +199,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   useEffect(() => {
     if (
       router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
-      !activeChatRoom
+      !activeChatRoom &&
+      hiddenMessagesArea === false
     ) {
       if (router.query.roomID) {
         (async () => {
@@ -219,8 +221,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         })();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseUrl, router, activeChatRoom]);
+  }, [baseUrl, router, activeChatRoom, setActiveChatRoom, hiddenMessagesArea]);
 
   useEffect(() => {
     if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {

@@ -18,11 +18,14 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
+
   const {
     activeChatRoom,
     hiddenMessagesArea,
     mobileChatOpened,
     setMobileChatOpened,
+    setHiddenMessagesArea,
   } = useGetChats();
 
   useEffect(() => {
@@ -30,6 +33,14 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
       setMobileChatOpened(false);
     }
   }, [mobileChatOpened, isMobile, setMobileChatOpened]);
+
+  useEffect(() => {
+    // Reset hiddenMessagesArea to null for desktop, to prevent issue with white chat area after setting hiddenMessagesArea in DynamicSection
+    // TODO: consider removing hiddenMessagesArea from context
+    if (hiddenMessagesArea && !isMobile && !isTablet) {
+      setHiddenMessagesArea(null);
+    }
+  }, [setHiddenMessagesArea, isTablet, isMobile, hiddenMessagesArea]);
 
   return (
     <SContainer mobileChatOpened={mobileChatOpened}>
