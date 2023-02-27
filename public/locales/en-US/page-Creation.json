@@ -165,7 +165,6 @@
       },
       "setThumbnail": "Set a thumbnail",
       "thumbnailEllipseMenu": {
-        "selectSnippetButton": "Select a snippet",
         "uploadImageButton": "Upload an image"
       },
       "deleteFile": "Delete file",
