@@ -240,6 +240,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
         const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
           videoFileSubdirectory,
+          videoTargetType: newnewapi.VideoTargetType.ANNOUNCEMENT,
         });
 
         const res = await getCoverImageUploadUrl(imageUrlPayload);
