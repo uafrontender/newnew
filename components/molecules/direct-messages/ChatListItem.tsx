@@ -176,7 +176,9 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
         <SChatItemContentWrapper>
           <ChatName chat={chatRoom} />
           <SChatItemTime variant={3} weight={600}>
-            {moment((chatRoom.updatedAt?.seconds as number) * 1000).fromNow()}
+            {moment((chatRoom.updatedAt?.seconds as number) * 1000)
+              .locale(router.locale || 'en-US')
+              .fromNow()}
           </SChatItemTime>
         </SChatItemContentWrapper>
         <SChatItemContentWrapper>
