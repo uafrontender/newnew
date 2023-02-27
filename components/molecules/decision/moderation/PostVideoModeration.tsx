@@ -105,12 +105,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     []
   );
 
-  const handleOpenEditThumbnailMenu = useCallback(() => {
-    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
-    setShowThumbnailEdit(true);
-    setShowEllipseMenu(false);
-  }, []);
-
   const handleCloseThumbnailEditClick = useCallback(() => {
     Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
     setShowThumbnailEdit(false);
@@ -331,18 +325,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         >
           <EllipseMenuButton
             onClick={() => {
-              Mixpanel.track('Open Edit Thumbnail Menu', {
-                _stage: 'Post',
-                _postUuid: postUuid,
-                _component: 'PostVideoModaration',
-              });
-              handleOpenEditThumbnailMenu();
-            }}
-          >
-            {t('thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseMenuButton>
-          <EllipseMenuButton
-            onClick={() => {
               Mixpanel.track('Open Edit Cover Image Menu', {
                 _stage: 'Post',
                 _postUuid: postUuid,
@@ -361,18 +343,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           show={showEllipseMenu}
           onClose={handleCloseEllipseMenu}
         >
-          <EllipseModalButton
-            onClick={() => {
-              Mixpanel.track('Open Edit Thumbnail Menu', {
-                _stage: 'Post',
-                _postUuid: postUuid,
-                _component: 'PostVideoModaration',
-              });
-              handleOpenEditThumbnailMenu();
-            }}
-          >
-            {t('thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseModalButton>
           <EllipseModalButton
             onClick={() => {
               Mixpanel.track('Open Edit Cover Image Menu', {
