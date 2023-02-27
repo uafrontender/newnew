@@ -32,12 +32,17 @@ const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   return MessageCircle;
 };
 
-const Notification: React.FC<newnewapi.INotification> = ({
+interface INotification extends newnewapi.INotification {
+  currentTime: number;
+}
+
+const Notification: React.FC<INotification> = ({
   id,
   content,
   createdAt,
   target,
   isRead,
+  currentTime,
 }) => {
   const { t } = useTranslation('page-Notifications');
   const theme = useTheme();
@@ -209,7 +214,7 @@ const Notification: React.FC<newnewapi.INotification> = ({
             <STitle>{getNotificationTitle()}</STitle>
             <SContent>{content?.message}</SContent>
             <SDate>
-              {moment((createdAt?.seconds as number) * 1000).fromNow()}
+              {moment((createdAt?.seconds as number) * 1000).from(currentTime)}
             </SDate>
           </SInfo>
           {content?.relatedPost &&

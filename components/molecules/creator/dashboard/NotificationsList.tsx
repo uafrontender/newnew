@@ -44,6 +44,9 @@ export const NotificationsList: React.FC<IFunction> = ({
     number[] | null
   >(null);
 
+  // Used to update notification timers
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
   // TODO: return a list of new notifications once WS message can be used
   // const [newNotifications, setNewNotifications] = useState<
   //   newnewapi.INotification[]
@@ -138,6 +141,15 @@ export const NotificationsList: React.FC<IFunction> = ({
     }
   }, [inView, loading, hasMore, loadMore]);
 
+  useEffect(() => {
+    const updateTimeInterval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000);
+    return () => {
+      clearInterval(updateTimeInterval);
+    };
+  }, []);
+
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
@@ -213,7 +225,7 @@ export const NotificationsList: React.FC<IFunction> = ({
   );
 
   const renderNotificationItem = useCallback(
-    (item: newnewapi.INotification) => {
+    (item: newnewapi.INotification, itemCurrentTime: number) => {
       const message = getEnrichedNotificationMessage(item);
 
       return (
@@ -250,7 +262,9 @@ export const NotificationsList: React.FC<IFunction> = ({
                   </SNotificationItemText>
                 )}
                 <SNotificationItemTime variant={2} weight={600}>
-                  {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
+                  {moment((item.createdAt?.seconds as number) * 1000).from(
+                    itemCurrentTime
+                  )}
                 </SNotificationItemTime>
               </SNotificationItemCenter>
               {unreadNotifications &&
@@ -291,7 +305,10 @@ export const NotificationsList: React.FC<IFunction> = ({
       ) : notifications && notifications.length < 1 ? (
         <NoResults />
       ) : (
-        notifications && notifications.map(renderNotificationItem)
+        notifications &&
+        notifications.map((notification) =>
+          renderNotificationItem(notification, currentTime)
+        )
       )}
       {hasMore && !loading && initialLoadDone && (
         <SRef ref={scrollRefNotifications}>
