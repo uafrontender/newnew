@@ -43,6 +43,9 @@ export const Notifications = () => {
   const user = useAppSelector((state) => state.user);
   const [readAllToTime, setReadAllToTime] = useState<number | undefined>();
 
+  // Used to update notification timers
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
   // TODO: return a list of new notifications once WS message can be used
   // const [newNotifications, setNewNotifications] = useState<
   //   newnewapi.INotification[]
@@ -114,22 +117,47 @@ export const Notifications = () => {
     }
   }, [user.loggedIn, user._persist?.rehydrated, router]);
 
+  useEffect(() => {
+    const updateTimeInterval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000);
+    return () => {
+      clearInterval(updateTimeInterval);
+    };
+  }, []);
+
   // TODO: return a list of new notifications once WS message can be used
   // const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
   //   return  [...newNotifications, ...notifications];
   // }, [notifications, newNotifications]);
 
   const renderNotification = useCallback(
-    (item: newnewapi.INotification) => {
+    (item: newnewapi.INotification, itemCurrentTime: number) => {
       const { id, isRead, ...rest } = item;
       if (readAllToTime && item.createdAt?.seconds) {
         const createdAtTime = (item.createdAt.seconds as number) * 1000;
         if (readAllToTime >= createdAtTime) {
-          return <Notification key={id as any} id={id} isRead {...rest} />;
+          return (
+            <Notification
+              key={id as any}
+              id={id}
+              isRead
+              currentTime={itemCurrentTime}
+              {...rest}
+            />
+          );
         }
       }
 
-      return <Notification key={id as any} id={id} isRead={isRead} {...rest} />;
+      return (
+        <Notification
+          key={id as any}
+          id={id}
+          isRead={isRead}
+          currentTime={itemCurrentTime}
+          {...rest}
+        />
+      );
     },
     [readAllToTime]
   );
@@ -154,7 +182,9 @@ export const Notifications = () => {
         </SHeadingWrapper>
 
         {notifications.length > 0 ? (
-          notifications?.map(renderNotification)
+          notifications?.map((notification) =>
+            renderNotification(notification, currentTime)
+          )
         ) : !hasMore ? (
           <NoResults />
         ) : !initialLoadDone ? (
