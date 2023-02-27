@@ -31,12 +31,14 @@ function getResizeMode(uaString: string): TResizeMode {
   const ua = parse(
     uaString || (isBrowser() ? window?.navigator?.userAgent : '')
   );
+
   if (ua.isTablet) {
     return 'tablet';
   }
 
   if (ua.isDesktop) {
-    return 'laptop';
+    // Use laptop L as a default size
+    return 'laptopL';
   }
 
   return 'mobile';

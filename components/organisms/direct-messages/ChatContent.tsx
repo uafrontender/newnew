@@ -84,8 +84,6 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
-  const [isSubscriptionExpired, setIsSubscriptionExpired] =
-    useState<boolean>(false);
 
   useEffect(() => {
     if (chatRoom.id) {
@@ -210,13 +208,12 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
-      isSubscriptionExpired ||
+      !chatRoom.visavis?.isSubscriptionActive ||
       chatRoom.visavis?.user?.options?.isTombstone ||
       !chatRoom ||
       (isAnnouncement && !isMyAnnouncement),
     [
       isVisavisBlocked,
-      isSubscriptionExpired,
       isMessagingDisabled,
       isAnnouncement,
       isMyAnnouncement,
@@ -233,7 +230,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       return <MessagingDisabled user={chatRoom.visavis.user} />;
 
     if (
-      isSubscriptionExpired &&
+      !chatRoom.visavis?.isSubscriptionActive &&
       chatRoom.visavis?.user?.uuid &&
       chatRoom.myRole
     )
@@ -247,7 +244,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, [
     isMessagingDisabled,
     chatRoom.visavis?.user,
-    isSubscriptionExpired,
+    chatRoom.visavis?.isSubscriptionActive,
     chatRoom.myRole,
   ]);
 
