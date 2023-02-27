@@ -5,6 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
@@ -39,7 +40,7 @@ export const PostList: React.FC<IList> = ({
     resizeMode
   );
 
-  const renderItem = (item: any, index: number) => (
+  const renderItem = (item: newnewapi.Post, index: number) => (
     <Link
       href={`/p/${
         switchPostType(item)[0].postShortId
@@ -48,7 +49,7 @@ export const PostList: React.FC<IList> = ({
       }`}
       key={switchPostType(item)[0].postUuid}
     >
-      <SItemWrapper>
+      <SItemWrapper id={`post-card-${switchPostType(item)[0].postShortId}`}>
         <PostCard
           item={item}
           index={index + 1}

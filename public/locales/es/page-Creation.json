@@ -162,7 +162,6 @@
       },
       "setThumbnail": "Establecer miniatura",
       "thumbnailEllipseMenu": {
-        "selectSnippetButton": "Selecciona un fragmento",
         "uploadImageButton": "Subir una imagen"
       },
       "deleteFile": "Borrar archivo",

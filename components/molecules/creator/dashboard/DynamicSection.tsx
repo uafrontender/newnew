@@ -75,7 +75,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isSmallDesktop = ['laptop', 'laptopM'].includes(resizeMode);
 
   const [showNewMessageModal, setShowNewMessageModal] =
     useState<boolean>(false);
@@ -84,7 +85,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     setShowNewMessageModal(false);
   };
 
-  const isDesktop = !isMobile && !isTablet;
+  const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
   } = router;

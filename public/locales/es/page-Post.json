@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "title_NEED_TRANSLATION": "{{postTitle}} | {{displayName}} on NewNew",
     "description": {
       "ac_NEED_TRANSLATION": "${{totalInBids}} in bids on NewNew",
       "mc_NEED_TRANSLATION": "{{totalVotes}} votes on NewNew",
@@ -338,7 +338,7 @@
         "others": "otros",
         "bid": "ofertar",
         "supportButton": "potenciar",
-        "supportAgainButton": "aumentar",
+        "supportAgainButton": "potenciar \nde nuevo",
         "raiseBidButton": "potenciar oferta",
         "placeABidButton": "Realizar oferta",
         "cancelButton": "Cancelar",
@@ -500,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "Selecciona un fragmento",
     "uploadImageButton": "Subir una imagen"
   },
   "postVideoThumbnailEdit": {

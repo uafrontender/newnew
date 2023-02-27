@@ -1,9 +1,9 @@
 {
   "meta": {
-    "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "title": "NewNew上的{{postTitle}} | {{displayName}}",
     "description": {
-      "ac_NEED_TRANSLATION": "${{totalInBids}} in bids on NewNew",
-      "mc_NEED_TRANSLATION": "{{totalVotes}} votes on NewNew",
+      "ac": "NewNew上出價共有${{totalInBids}}",
+      "mc": "NewNew上投票共有{{totalVotes}}",
       "cf": ""
     }
   },
@@ -500,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "選擇一個片段",
     "uploadImageButton": "上傳圖片"
   },
   "postVideoThumbnailEdit": {
@@ -734,9 +733,9 @@
       "shareBtn": "分享",
       "linkCopied": "鏈接已複製！"
     },
-    "tutorialEditTitle_NEED_TRANSLATION": {
-      "title": "Edit title",
-      "body": "Click the title of the post and make your changes."
+    "tutorialEditTitle": {
+      "title": "編輯標題",
+      "body": "點擊帖子標題可進行修改"
     },
     "winner": {
       "inResponseToYourPost": "回應了你的帖子",

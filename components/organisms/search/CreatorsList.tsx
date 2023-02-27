@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import CreatorCard from '../../molecules/search/CreatorCard';
+import { useAppSelector } from '../../../redux-store/store';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -29,6 +30,8 @@ export const CreatorsList: React.FC<IList> = ({
   withEllipseMenu = false,
   onBuyBundleClicked,
 }) => {
+  const user = useAppSelector((state) => state.user);
+
   const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
       if (creator) {
@@ -36,11 +39,14 @@ export const CreatorsList: React.FC<IList> = ({
       }
     };
 
+    const isCardWithEllipseMenu =
+      creator.uuid !== user.userData?.userUuid ? withEllipseMenu : false;
+
     return (
       <SItemWrapper key={creator.uuid} onClick={handleItemClick}>
         <CreatorCard
           creator={creator}
-          withEllipseMenu={withEllipseMenu ?? false}
+          withEllipseMenu={isCardWithEllipseMenu}
           onBundleClicked={onBuyBundleClicked}
         />
       </SItemWrapper>
