@@ -500,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "Select a snippet",
     "uploadImageButton": "Upload an image"
   },
   "postVideoThumbnailEdit": {
