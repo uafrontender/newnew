@@ -42,9 +42,6 @@ import { useAppState } from '../../../contexts/appStateContext';
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
-const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
-  ssr: false,
-});
 
 interface IFileUpload {
   id: string;
@@ -98,7 +95,6 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
   const [showEllipseMenu, setShowEllipseMenu] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -133,14 +129,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     () => setShowEllipseMenu(false),
     []
   );
-
-  const handleCloseThumbnailEditClick = useCallback(() => {
-    Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
-    setShowThumbnailEdit(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
-  }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
@@ -177,15 +165,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     setLocalFile(null);
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
-
-  const handlePreviewEditSubmit = useCallback(
-    (params: TThumbnailParameters) => {
-      Mixpanel.track('Preview Edit Submit', { _stage: 'Creation' });
-      handleCloseThumbnailEditClick();
-      onChange('thumbnailParameters', params);
-    },
-    [handleCloseThumbnailEditClick, onChange]
-  );
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -477,13 +456,6 @@ const FileUpload: React.FC<IFileUpload> = ({
         open={showFullPreview}
         value={value}
         handleClose={handleCloseFullPreviewClick}
-      />
-      <ThumbnailPreviewEdit
-        open={showThumbnailEdit}
-        value={value}
-        thumbnails={thumbnails}
-        handleClose={handleCloseThumbnailEditClick}
-        handleSubmit={handlePreviewEditSubmit}
       />
       {coverImageModalOpen && (
         <CoverImagePreviewEdit
