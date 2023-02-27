@@ -8,15 +8,12 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import isBrowser from '../../../../utils/isBrowser';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { setPostThumbnail } from '../../../../api/endpoints/post';
-import { TThumbnailParameters } from '../../../../redux-store/slices/creationStateSlice';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
@@ -28,18 +25,10 @@ import PostVideoResponseUploadedTab from './PostVideoResponseUploadedTab';
 import PostVideoAnnouncementTab from './PostVideoAnnouncementTab';
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
-import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../../contexts/appStateContext';
 
 const PostBitmovinPlayer = dynamic(
   () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
-
-const PostVideoThumbnailEdit = dynamic(
-  () => import('./PostVideoThumbnailEdit'),
   {
     ssr: false,
   }
@@ -61,7 +50,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleToggleMuted,
 }) => {
   const { t } = useTranslation('page-Post');
-  const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
@@ -92,11 +80,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     announcement.coverImageUrl ?? undefined
   );
   const [showEllipseMenu, setShowEllipseMenu] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
-
-  const [isSubmitNewThumbnailLoading, setIsSubmitNewThumbnailLoading] =
-    useState(false);
 
   const handleOpenEllipseMenu = useCallback(() => setShowEllipseMenu(true), []);
 
@@ -104,11 +88,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     () => setShowEllipseMenu(false),
     []
   );
-
-  const handleCloseThumbnailEditClick = useCallback(() => {
-    Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
-    setShowThumbnailEdit(false);
-  }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
@@ -144,40 +123,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       postStatus === 'processing_response',
     [coreResponse, postStatus]
   );
-
-  const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
-    setIsSubmitNewThumbnailLoading(true);
-    try {
-      Mixpanel.track('Submit New Thumbnail', {
-        _stage: 'Post',
-        _postUuid: postUuid,
-        _component: 'PostVideoModeration',
-      });
-      const payload = new newnewapi.SetPostThumbnailRequest({
-        postUuid,
-        thumbnailParameters: {
-          startTime: {
-            seconds: params.startTime,
-          },
-          endTime: {
-            seconds: params.endTime,
-          },
-        },
-      });
-
-      const res = await setPostThumbnail(payload);
-
-      if (res.error) throw new Error('Request failed');
-
-      handleCloseThumbnailEditClick();
-      toast.success(t('postVideoThumbnailEdit.toast.success'));
-    } catch (err) {
-      console.error(err);
-      showErrorToastCustom(t('postVideoThumbnailEdit.toast.error'));
-    } finally {
-      setIsSubmitNewThumbnailLoading(false);
-    }
-  };
 
   // Editing stories
   const [isEditingStories, setIsEditingStories] = useState(false);
@@ -357,15 +302,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           </EllipseModalButton>
         </EllipseModal>
       ) : null}
-      {/* Edit thumbnail */}
-      <PostVideoThumbnailEdit
-        open={showThumbnailEdit}
-        value={announcement}
-        thumbnails={thumbnails}
-        isLoading={isSubmitNewThumbnailLoading}
-        handleClose={handleCloseThumbnailEditClick}
-        handleSubmit={handleSubmitNewThumbnail}
-      />
       {/* Edit Cover Image */}
       {coverImageModalOpen && (
         <PostVideoCoverImageEdit
