@@ -87,6 +87,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
   } = router;
+
   const tabs: Tab[] = useMemo(() => {
     if (directMessagesAvailable) {
       return [
