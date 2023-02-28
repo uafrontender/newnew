@@ -98,7 +98,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const goBackHandler = useCallback(() => {
     setHiddenMessagesArea(true);
     if (isDashboard) {
-      router.query = {};
       if (router.asPath.includes('/creator/bundles')) {
         router.push(`/creator/bundles?tab=chat`);
       } else {
