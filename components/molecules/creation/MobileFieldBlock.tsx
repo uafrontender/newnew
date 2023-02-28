@@ -200,16 +200,18 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const handleDateChange = (date: any) => {
         onChange(id, { date });
 
-        const isNewDateSame = moment(date)
-          .startOf('D')
-          .isSame(moment().startOf('day'));
+        const resultingDate = moment(
+          `${date.format('YYYY-MM-DD')}  ${value.time}`
+        );
 
-        if (
-          isNewDateSame &&
-          localTimeOfTheDay === 'pm' &&
-          value?.['hours-format'] === 'am'
-        ) {
-          onChange(id, { 'hours-format': 'pm' });
+        if (resultingDate.isBefore(moment())) {
+          onChange(id, {
+            time: moment().format('hh:mm'),
+          });
+
+          onChange(id, {
+            'hours-format': moment().format('a'),
+          });
         }
       };
 
