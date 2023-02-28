@@ -42,8 +42,15 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const { activeChatRoom, setActiveChatRoom, activeTab, setSearchChatroom } =
-    useGetChats();
+
+  const {
+    activeChatRoom,
+    setActiveChatRoom,
+    activeTab,
+    setSearchChatroom,
+    setHiddenMessagesArea,
+  } = useGetChats();
+
   const user = useAppSelector((state) => state.user);
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) => {
@@ -138,15 +145,20 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
         `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
       );
       setActiveChatRoom(chatRoom);
+      if (isMobileOrTablet) {
+        setHiddenMessagesArea(false);
+      }
       setSearchChatroom('');
     }
   }, [
-    setActiveChatRoom,
     chatRoom,
-    setSearchChatroom,
     chatRoute,
     isDashboard,
     router,
+    isMobileOrTablet,
+    setActiveChatRoom,
+    setSearchChatroom,
+    setHiddenMessagesArea,
   ]);
 
   let avatar = (
