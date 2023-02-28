@@ -18,6 +18,7 @@ import {
 import { reportPost } from '../api/endpoints/report';
 import { ReportData } from '../components/molecules/direct-messages/ReportModal';
 import { useAppSelector } from '../redux-store/store';
+import { TUpdatePostCoverImageMutation } from '../utils/hooks/usePost';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
 
@@ -65,6 +66,9 @@ const PostInnerContext = createContext<{
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
   handleUpdatePostTitle: (newTitle: string) => Promise<void>;
+  handleUpdatePostCoverImage: (
+    newImage: TUpdatePostCoverImageMutation
+  ) => Promise<void>;
   isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -112,6 +116,7 @@ const PostInnerContext = createContext<{
   handleCloseDeletePostModal: () => {},
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
   handleUpdatePostTitle: (() => {}) as () => Promise<void>,
+  handleUpdatePostCoverImage: (() => {}) as () => Promise<void>,
   isUpdateTitleLoading: false,
   refetchPost: (() => {}) as any,
 });
@@ -149,6 +154,9 @@ interface IPostContextProvider {
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
   handleUpdatePostTitle: (newTitle: string) => Promise<void>;
+  handleUpdatePostCoverImage: (
+    newImage: TUpdatePostCoverImageMutation
+  ) => Promise<void>;
   isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -185,6 +193,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleCloseDeletePostModal,
   handleSetIsConfirmToClosePost,
   handleUpdatePostTitle,
+  handleUpdatePostCoverImage,
   isUpdateTitleLoading,
   refetchPost,
   children,
@@ -279,6 +288,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
       handleUpdatePostTitle,
+      handleUpdatePostCoverImage,
       isUpdateTitleLoading,
       refetchPost,
     }),
@@ -321,6 +331,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
       handleUpdatePostTitle,
+      handleUpdatePostCoverImage,
       isUpdateTitleLoading,
       refetchPost,
     ]

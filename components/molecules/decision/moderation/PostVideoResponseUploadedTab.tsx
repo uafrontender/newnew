@@ -27,6 +27,8 @@ import PostVideoEditStoryButton from '../../../atoms/decision/PostVideoEditStory
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import SetThumbnailButtonIconOnly from '../../../atoms/decision/SetThumbnailButtonIconOnly';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoResponseUploadedTab {
   id: string;
@@ -36,6 +38,7 @@ interface IPostVideoResponseUploadedTab {
   handleToggleMuted: () => void;
   handleToggleEditingStories: () => void;
   handleUnsetEditingStories: () => void;
+  handleOpenEditCoverImageMenu: () => void;
 }
 
 const PostVideoResponseUploadedTab: React.FunctionComponent<
@@ -48,8 +51,15 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   handleToggleMuted,
   handleToggleEditingStories,
   handleUnsetEditingStories,
+  handleOpenEditCoverImageMenu,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet'].includes(resizeMode);
+
   const { showErrorToastCustom } = useErrorToasts();
   const {
     coreResponse,
@@ -321,6 +331,14 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     localFile,
   ]);
 
+  const thumbnailButtonBottomOverriden = useMemo(
+    () =>
+      responses && responses?.length > 1
+        ? (soundBtnBottomOverriden || 0) + (isMobile ? 64 : 84)
+        : soundBtnBottomOverriden,
+    [isMobile, responses, soundBtnBottomOverriden]
+  );
+
   useEffect(() => {
     if (responseFileProcessingProgress === 100) {
       handleSetReadyToUploadAdditionalResponse(true);
@@ -382,6 +400,19 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           active={isEditingStories}
           bottomOverriden={soundBtnBottomOverriden}
           handleClick={handleToggleEditingStories}
+        />
+      ) : null}
+      {!isEditingStories &&
+      !responseFileUploadLoading &&
+      !responseFileProcessingLoading ? (
+        <SetThumbnailButtonIconOnly
+          handleClick={handleOpenEditCoverImageMenu}
+          soundBtnBottomOverriden={
+            !isTablet ? thumbnailButtonBottomOverriden : soundBtnBottomOverriden
+          }
+          positionLeftOverriden={
+            responses && responses?.length > 1 && isTablet ? 64 : 0
+          }
         />
       ) : null}
       {currentAdditionalResponseStep === 'editing' &&
