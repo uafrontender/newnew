@@ -20,6 +20,12 @@ type TUpdatePostTitleMutation = {
   title: string;
 };
 
+export type TUpdatePostCoverImageMutation = {
+  postUuid: string;
+  coverImageUrl: string | undefined;
+  target: 'announcement' | 'response';
+};
+
 const usePost = (
   params: IUsePost,
   options?: Omit<UseQueryOptions<newnewapi.IPost, any>, 'queryKey' | 'queryFn'>
@@ -91,7 +97,69 @@ const usePost = (
     },
   });
 
-  return { ...query, updatePostTitleMutation };
+  const updatePostCoverImageMutation = useMutation({
+    mutationFn: (newTitlenewCoverImageParams: TUpdatePostCoverImageMutation) =>
+      new Promise((res) => {
+        res(newTitlenewCoverImageParams);
+      }),
+    onSuccess: (_, newCoverImage) => {
+      queryClient.setQueryData(
+        [
+          params.loggedInUser ? 'private' : 'public',
+          'fetchPostByUUID',
+          params.postUuid,
+        ],
+        // @ts-ignore
+        (data: newnewapi.IPost | undefined) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            if (workingData.auction) {
+              if (
+                newCoverImage.target === 'announcement' &&
+                workingData.auction?.announcement
+              ) {
+                workingData.auction.announcement.coverImageUrl =
+                  newCoverImage.coverImageUrl;
+              } else if (
+                newCoverImage.target === 'response' &&
+                workingData.auction?.response
+              ) {
+                workingData.auction.response.coverImageUrl =
+                  newCoverImage.coverImageUrl;
+              }
+            } else if (workingData.multipleChoice) {
+              if (
+                newCoverImage.target === 'announcement' &&
+                workingData.multipleChoice?.announcement
+              ) {
+                workingData.multipleChoice.announcement.coverImageUrl =
+                  newCoverImage.coverImageUrl;
+              } else if (
+                newCoverImage.target === 'response' &&
+                workingData.multipleChoice?.response
+              ) {
+                workingData.multipleChoice.response.coverImageUrl =
+                  newCoverImage.coverImageUrl;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+    },
+  });
+
+  return { ...query, updatePostTitleMutation, updatePostCoverImageMutation };
 };
 
 export default usePost;
