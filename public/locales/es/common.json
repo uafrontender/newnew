@@ -291,5 +291,8 @@
       "description": "Gracias, te mantendremos informado de las novedades en NewNew.",
       "button": "¡Genial!"
     }
-  }
+  },
+  "oops": "¡Ups!",
+  "somethingWentWrong": "Algo salió mal...",
+  "goHome": "Ir al inicio"
 }
