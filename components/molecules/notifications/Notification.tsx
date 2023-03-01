@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/dist/client/router';
 
 import UserAvatar from '../UserAvatar';
 import { InlineSvg } from '../../atoms/InlineSVG';
@@ -32,14 +33,20 @@ const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   return MessageCircle;
 };
 
-const Notification: React.FC<newnewapi.INotification> = ({
+interface INotification extends newnewapi.INotification {
+  currentTime: number;
+}
+
+const Notification: React.FC<INotification> = ({
   id,
   content,
   createdAt,
   target,
   isRead,
+  currentTime,
 }) => {
   const { t } = useTranslation('page-Notifications');
+  const { locale } = useRouter();
   const theme = useTheme();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -209,7 +216,9 @@ const Notification: React.FC<newnewapi.INotification> = ({
             <STitle>{getNotificationTitle()}</STitle>
             <SContent>{content?.message}</SContent>
             <SDate>
-              {moment((createdAt?.seconds as number) * 1000).fromNow()}
+              {moment((createdAt?.seconds as number) * 1000)
+                .locale(locale || 'en-US')
+                .from(currentTime)}
             </SDate>
           </SInfo>
           {content?.relatedPost &&

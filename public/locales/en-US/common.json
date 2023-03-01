@@ -155,7 +155,7 @@
       "votes": "<0>{{amount}}</0> votes unlocked",
       "for": "for <0>{{creator}}</0>",
       "access": "plus {{amount}} {{unit}} of:",
-      "customOptions": "adding custom superpoll options",
+      "customOptions": "adding custom Superpoll options",
       "chat": "1-on-1 private chat",
       "button": "Sounds good!",
       "unit": {
@@ -291,5 +291,8 @@
       "description": "Thank you, we will keep you updated about new posts on NewNew.",
       "button": "Cool!"
     }
-  }
+  },
+  "oops": "Oops!",
+  "somethingWentWrong": "Something went wrong...",
+  "goHome": "Go home"
 }

@@ -285,11 +285,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on bids and superpolls"
+            "caption": "People will not be able to see how much you spent on Bids and Superpolls"
           },
           "private": {
             "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on bids and superpolls"
+            "caption": "People will not be able to see any of your activity on Bids and Superpolls"
           }
         },
         "blockedUsers": {

@@ -61,10 +61,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const { resizeMode } = useAppState();
   const {
     unreadCountForCreator,
-    setActiveTab,
     activeTab,
     activeChatRoom,
+    hiddenMessagesArea,
     setActiveChatRoom,
+    setActiveTab,
   } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
@@ -74,7 +75,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isSmallDesktop = ['laptop', 'laptopM'].includes(resizeMode);
 
   const [showNewMessageModal, setShowNewMessageModal] =
     useState<boolean>(false);
@@ -83,10 +85,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     setShowNewMessageModal(false);
   };
 
-  const isDesktop = !isMobile && !isTablet;
+  const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
   } = router;
+
   const tabs: Tab[] = useMemo(() => {
     if (directMessagesAvailable) {
       return [
@@ -197,7 +200,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   useEffect(() => {
     if (
       router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
-      !activeChatRoom
+      !activeChatRoom &&
+      hiddenMessagesArea === false
     ) {
       if (router.query.roomID) {
         (async () => {
@@ -218,8 +222,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         })();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseUrl, router, activeChatRoom]);
+  }, [baseUrl, router, activeChatRoom, setActiveChatRoom, hiddenMessagesArea]);
 
   useEffect(() => {
     if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
