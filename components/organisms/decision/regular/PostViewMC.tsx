@@ -493,9 +493,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -529,9 +529,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -581,9 +581,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                       />
                       <SEndDate>
                         {t('expires.end_date')}{' '}
-                        {moment(
-                          (post.expiresAt?.seconds as number) * 1000
-                        ).format('DD MMM YYYY [at] hh:mm A')}
+                        {moment((post.expiresAt?.seconds as number) * 1000)
+                          .locale(router.locale || 'en-US')
+                          .format('DD MMM YYYY [at] hh:mm A')}
                       </SEndDate>
                     </>
                   ) : (

@@ -257,7 +257,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
             </SLoader>
           )}
           <StripeElements stipeSecret={stripeSecret}>
-            <AddCardForm onCancel={closeModal} onSuccess={onCardSuccess} />
+            <AddCardForm onCancel={handleClose} onSuccess={onCardSuccess} />
           </StripeElements>
         </SModalPaper>
       </Modal>

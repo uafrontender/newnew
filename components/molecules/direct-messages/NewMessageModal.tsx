@@ -205,7 +205,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         );
       }
 
-      if (mobileChatOpened) setHiddenMessagesArea(false);
+      if (mobileChatOpened) {
+        setHiddenMessagesArea(false);
+      }
       closeModal();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

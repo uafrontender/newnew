@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Cropper from 'react-easy-crop';
@@ -39,12 +39,41 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
     resizeMode
   );
   const [isPressed, setIsPressed] = useState(false);
+  const [cropSize, setCropSize] = useState<number | undefined>();
+  const containerRef = useRef<HTMLDivElement | undefined>();
 
   const handleSetPressed = () => setIsPressed(true);
   const handleSetUnpressed = () => setIsPressed(false);
 
+  useEffect(() => {
+    if (!containerRef.current) {
+      return () => {};
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (!containerRef.current) {
+        return;
+      }
+      const boundingClientRect = containerRef.current.getBoundingClientRect();
+      const newCropSize =
+        Math.min(boundingClientRect.height, boundingClientRect.width) - 6;
+      setCropSize(newCropSize);
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isMobile]);
+
   return (
     <SCropperWrapper
+      ref={(elem) => {
+        if (elem) {
+          containerRef.current = elem;
+        }
+      }}
       x={crop.x}
       y={crop.y}
       zoom={zoom}
@@ -68,12 +97,12 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
           objectFit='auto-cover'
           crop={crop}
           cropSize={
-            isMobile
-              ? undefined
-              : {
-                  height: 420,
-                  width: 420,
+            cropSize
+              ? {
+                  height: cropSize,
+                  width: cropSize,
                 }
+              : undefined
           }
           cropShape='round'
           showGrid={false}
@@ -108,8 +137,7 @@ const SCropperWrapper = styled.div<{
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 420px;
-    width: 420px;
+    height: 100%;
     z-index: 0;
     margin-right: auto;
     margin-left: auto;

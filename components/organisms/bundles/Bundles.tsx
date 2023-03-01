@@ -126,7 +126,11 @@ export const Bundles: React.FC = React.memo(() => {
       </Head>
       <Container>
         <SAnimationContainer>
-          <SAnimationBackground src={assets.common.vote} alt='vote' />
+          <SAnimationBackground
+            src={assets.common.vote}
+            alt='vote'
+            isCalculatedHeight
+          />
           <SubNavigation>
             {isMobile ? (
               <SBackButton onClick={() => router.back()} />

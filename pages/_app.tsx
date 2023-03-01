@@ -220,26 +220,26 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider cookies={cookiesInstance}>
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary>
-            <LanguageWrapper>
-              <AppStateContextProvider uaString={uaString}>
-                <AppConstantsContextProvider>
-                  <SocketContextProvider>
-                    <ChannelsContextProvider>
-                      <PersistanceProvider store={store}>
-                        <SyncUserWrapper>
-                          <NotificationsProvider>
-                            <ModalNotificationsContextProvider>
-                              <PushNotificationContextProvider>
-                                <BlockedUsersProvider>
-                                  <FollowingsContextProvider>
-                                    <BundlesContextProvider>
-                                      <ChatsProvider>
-                                        <OverlayModeProvider>
-                                          <MultipleBeforePopStateContextProvider>
-                                            <GlobalTheme
-                                              initialTheme={colorMode}
-                                              themeFromCookie={themeFromCookie}
-                                            >
+            <AppStateContextProvider uaString={uaString}>
+              <GlobalTheme
+                initialTheme={colorMode}
+                themeFromCookie={themeFromCookie}
+              >
+                <LanguageWrapper>
+                  <AppConstantsContextProvider>
+                    <SocketContextProvider>
+                      <ChannelsContextProvider>
+                        <PersistanceProvider store={store}>
+                          <SyncUserWrapper>
+                            <NotificationsProvider>
+                              <ModalNotificationsContextProvider>
+                                <PushNotificationContextProvider>
+                                  <BlockedUsersProvider>
+                                    <FollowingsContextProvider>
+                                      <BundlesContextProvider>
+                                        <ChatsProvider>
+                                          <OverlayModeProvider>
+                                            <MultipleBeforePopStateContextProvider>
                                               <>
                                                 <ToastContainer containerId='toast-container' />
                                                 <VideoProcessingWrapper>
@@ -263,23 +263,23 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                   <PushNotificationModalContainer />
                                                 </VideoProcessingWrapper>
                                               </>
-                                            </GlobalTheme>
-                                          </MultipleBeforePopStateContextProvider>
-                                        </OverlayModeProvider>
-                                      </ChatsProvider>
-                                    </BundlesContextProvider>
-                                  </FollowingsContextProvider>
-                                </BlockedUsersProvider>
-                              </PushNotificationContextProvider>
-                            </ModalNotificationsContextProvider>
-                          </NotificationsProvider>
-                        </SyncUserWrapper>
-                      </PersistanceProvider>
-                    </ChannelsContextProvider>
-                  </SocketContextProvider>
-                </AppConstantsContextProvider>
-              </AppStateContextProvider>
-            </LanguageWrapper>
+                                            </MultipleBeforePopStateContextProvider>
+                                          </OverlayModeProvider>
+                                        </ChatsProvider>
+                                      </BundlesContextProvider>
+                                    </FollowingsContextProvider>
+                                  </BlockedUsersProvider>
+                                </PushNotificationContextProvider>
+                              </ModalNotificationsContextProvider>
+                            </NotificationsProvider>
+                          </SyncUserWrapper>
+                        </PersistanceProvider>
+                      </ChannelsContextProvider>
+                    </SocketContextProvider>
+                  </AppConstantsContextProvider>
+                </LanguageWrapper>
+              </GlobalTheme>
+            </AppStateContextProvider>
           </ErrorBoundary>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>

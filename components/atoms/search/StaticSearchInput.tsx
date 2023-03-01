@@ -148,16 +148,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     });
 
     useEffect(() => {
-      setTimeout(() => {
-        if (globalSearchActive) {
-          inputRef.current?.focus();
-        } else {
-          inputRef.current?.blur();
-        }
-      }, 1000);
-    }, [globalSearchActive]);
-
-    useEffect(() => {
       const resizeObserver = new ResizeObserver(() => {
         // eslint-disable-next-line max-len
         setInputRightPosition(
@@ -221,6 +211,10 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       if (clearedSearchValue?.length > 1) {
         getQuickSearchResult(clearedSearchValue);
         setIsResultsDropVisible(true);
+        document.documentElement.style.setProperty(
+          '--window-inner-height',
+          `${window.innerHeight}px`
+        );
       } else if (
         (!clearedSearchValue || clearedSearchValue.length === 1) &&
         !isMobileOrTablet
@@ -502,7 +496,7 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: fill-available;
+  height: calc(var(--window-inner-height) - 1px);
   top: 56px;
   left: 0;
   padding: 16px;

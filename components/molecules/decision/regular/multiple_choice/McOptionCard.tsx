@@ -1368,20 +1368,22 @@ const SSupportButtonDesktop = styled(Button)<{
   isBlue: boolean;
   active: boolean;
 }>`
+  flex-shrink: 0;
   height: 100%;
-  width: 60px;
+  width: auto;
+  min-width: 60px;
 
   color: #ffffff;
   background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  padding: initial;
+  padding: 8px;
 
   border-radius: initial;
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   border-bottom-right-radius: ${({ theme }) => theme.borderRadius.medium};
 
   span {
-    width: 100%;
+    width: auto;
 
     text-align: center;
     white-space: pre;

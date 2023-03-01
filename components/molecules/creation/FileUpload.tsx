@@ -42,9 +42,6 @@ import { useAppState } from '../../../contexts/appStateContext';
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
-const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
-  ssr: false,
-});
 
 interface IFileUpload {
   id: string;
@@ -62,9 +59,6 @@ interface IFileUpload {
   onChange: (id: string, value: any) => void;
   handleCancelVideoUpload: () => void;
 }
-
-// secondStep.video.thumbnailEllipseMenu.selectSnippetButton
-// secondStep.video.thumbnailEllipseMenu.uploadImageButton
 
 const FileUpload: React.FC<IFileUpload> = ({
   id,
@@ -101,7 +95,6 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
   const [showEllipseMenu, setShowEllipseMenu] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -136,21 +129,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     () => setShowEllipseMenu(false),
     []
   );
-
-  const handleOpenEditThumbnailMenu = useCallback(() => {
-    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
-    setShowThumbnailEdit(true);
-    setShowEllipseMenu(false);
-    playerRef.current.pause();
-  }, []);
-
-  const handleCloseThumbnailEditClick = useCallback(() => {
-    Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
-    setShowThumbnailEdit(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
-  }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
@@ -187,15 +165,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     setLocalFile(null);
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
-
-  const handlePreviewEditSubmit = useCallback(
-    (params: TThumbnailParameters) => {
-      Mixpanel.track('Preview Edit Submit', { _stage: 'Creation' });
-      handleCloseThumbnailEditClick();
-      onChange('thumbnailParameters', params);
-    },
-    [handleCloseThumbnailEditClick, onChange]
-  );
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -488,13 +457,6 @@ const FileUpload: React.FC<IFileUpload> = ({
         value={value}
         handleClose={handleCloseFullPreviewClick}
       />
-      <ThumbnailPreviewEdit
-        open={showThumbnailEdit}
-        value={value}
-        thumbnails={thumbnails}
-        handleClose={handleCloseThumbnailEditClick}
-        handleSubmit={handlePreviewEditSubmit}
-      />
       {coverImageModalOpen && (
         <CoverImagePreviewEdit
           open={coverImageModalOpen}
@@ -515,9 +477,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           }}
           offsetRight='180px'
         >
-          <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
-            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseMenuButton>
           <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseMenuButton>
@@ -529,9 +488,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           show={showEllipseMenu}
           onClose={handleCloseEllipseMenu}
         >
-          <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
-            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseModalButton>
           <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseModalButton>
@@ -601,7 +557,7 @@ const SPlayerWrapper = styled.div`
   width: 64px;
   height: 108px;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
@@ -615,6 +571,8 @@ const SThumbnailHolder = styled.img`
   height: 100%;
   transition: linear 0.3s;
   z-index: 1;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 `;
 
 const SButtonsContainer = styled.div`

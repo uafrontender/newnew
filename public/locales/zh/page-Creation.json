@@ -162,7 +162,6 @@
       },
       "setThumbnail": "設置縮略圖",
       "thumbnailEllipseMenu": {
-        "selectSnippetButton": "選擇一個片段",
         "uploadImageButton": "上傳圖片"
       },
       "deleteFile": "刪除檔案",

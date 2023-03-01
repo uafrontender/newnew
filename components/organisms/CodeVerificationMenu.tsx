@@ -108,9 +108,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           !data ||
           data.status !== newnewapi.SignInResponse.Status.SUCCESS ||
           error
-        )
+        ) {
           throw new Error(error?.message ?? 'Request failed');
-
+        }
         dispatch(
           setUserData({
             username: data.me?.username,

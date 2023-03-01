@@ -18,7 +18,7 @@
     "noToken": "No hay ningún token",
     "invalidToken": "El token no es válido"
   },
-  "leaveAlert_NEED_TRANSLATION": "Are you sure you want to leave the page?",
+  "leaveAlert": "¿Estás seguro que quieres salir de esta página?",
   "verifying": "Verificando tu correo electrónico...",
   "backButton": "Regresar",
   "updated": "¡Hemos actualizado tu correo electrónico!",

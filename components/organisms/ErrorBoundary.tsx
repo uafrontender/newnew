@@ -1,6 +1,8 @@
 import React from 'react';
 import * as Sentry from '@sentry/react';
 
+import ErrorPage from './ErrorPage';
+
 interface IErrorBoundary {
   children: React.ReactNode;
 }
@@ -10,10 +12,14 @@ export class ErrorBoundary extends React.Component<IErrorBoundary> {
     console.error(error, errorInfo);
   }
 
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
   render() {
     const { children } = this.props;
     return (
-      <Sentry.ErrorBoundary fallback={<h1>Something went wrong.</h1>}>
+      <Sentry.ErrorBoundary fallback={<ErrorPage />}>
         {children}
       </Sentry.ErrorBoundary>
     );

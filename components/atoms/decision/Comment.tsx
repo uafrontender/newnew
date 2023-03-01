@@ -172,9 +172,9 @@ const Comment: React.FC<IComment> = ({
               <SDate>
                 {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
                 &bull;{' '}
-                {moment(
-                  (comment.createdAt?.seconds as number) * 1000
-                ).fromNow()}
+                {moment((comment.createdAt?.seconds as number) * 1000)
+                  .locale(router.locale || 'en-US')
+                  .fromNow()}
               </SDate>
             )}
             <SActionsDiv>
