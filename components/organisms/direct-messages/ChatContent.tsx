@@ -280,7 +280,8 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
-      !chatRoom.visavis?.isSubscriptionActive ||
+      (chatRoom.myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER &&
+        !chatRoom.visavis?.isSubscriptionActive) ||
       chatRoom.visavis?.user?.options?.isTombstone ||
       !chatRoom ||
       (isAnnouncement && !isMyAnnouncement),
