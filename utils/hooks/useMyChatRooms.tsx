@@ -17,10 +17,16 @@ const useMyChatRooms = (
       paging: newnewapi.IPagingResponse | null | undefined;
     }>,
     'queryKey' | 'queryFn'
-  >
+  >,
+  additionalKey?: string
 ) => {
   const query = useInfiniteQuery(
-    ['private', 'getMyRooms', params],
+    [
+      'private',
+      'getMyRooms',
+      ...(additionalKey ? [additionalKey] : []),
+      params,
+    ],
     async ({ pageParam }) => {
       const payload = new newnewapi.GetMyRoomsRequest({
         ...(params.roomKind ? { roomKind: params.roomKind } : {}),

@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -13,7 +13,6 @@ import ChatLayout from '../../../components/templates/ChatLayout';
 import ChatContainer from '../../../components/organisms/direct-messages/ChatContainer';
 import { useGetChats } from '../../../contexts/chatContext';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
-import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface IChat {
@@ -40,32 +39,15 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [router, user.loggedIn, user._persist?.rehydrated]);
 
-  const { setActiveChatRoom, setActiveTab, setHiddenMessagesArea } =
-    useGetChats();
-
-  const [usernameQuery, setUsernameQuery] = useState('');
-  const usernameQueryDebounced = useDebouncedValue(usernameQuery, 500);
-  const [myRole, setMyRole] = useState<newnewapi.ChatRoom.MyRole | undefined>();
-  const [roomKind, setRoomKind] = useState<
-    newnewapi.ChatRoom.Kind | undefined
-  >();
-
-  const [filteredChatrooms, setFilteredChatroom] = useState<
-    newnewapi.IChatRoom[]
-  >([]);
-
-  const { data } = useMyChatRooms({
-    myRole,
-    roomKind,
-    searchQuery: usernameQueryDebounced,
-  });
-
-  const chatrooms = useMemo(
-    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
-    [data]
-  );
+  const {
+    setActiveChatRoom,
+    setActiveTab,
+    setHiddenMessagesArea,
+    activeChatRoom: activeChatRoomFromContext,
+  } = useGetChats();
 
   useEffect(() => {
+    // prevent user from opening chat with himself
     if (
       username &&
       !username.includes('-') &&
@@ -75,99 +57,160 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [router, username, user.userData?.username]);
 
-  useEffect(() => {
-    const parseUsername = () => {
-      if (!username.includes('-')) {
-        if (username !== user.userData?.username) {
-          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-          setUsernameQuery(username);
-          setMyRole(undefined);
-        }
-      } else {
-        const usernameArr = username.split('-');
-        setUsernameQuery(usernameArr[0]);
-        if (usernameArr[1] === 'bundle') {
-          setMyRole(newnewapi.ChatRoom.MyRole.CREATOR);
-          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-        }
-        if (usernameArr[1] === 'announcement') {
-          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE);
-          if (usernameArr[0] === user.userData?.username) {
-            setMyRole(newnewapi.ChatRoom.MyRole.CREATOR);
-          } else {
-            setMyRole(newnewapi.ChatRoom.MyRole.SUBSCRIBER);
-          }
-        }
-      }
-    };
-
-    if (username) {
-      parseUsername();
+  // Parse roomKind, username, myRole from ulr parameter [username]
+  // [username] possible forms: username, username-bundle, username-announcement
+  const chatRoomParams = useMemo(() => {
+    if (!username) {
+      return null;
     }
-  }, [username, user.userData?.username]);
 
-  useEffect(() => {
-    if (chatrooms.length > 0) {
+    if (!username.includes('-')) {
+      if (username !== user.userData?.username) {
+        return {
+          roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+          username,
+        };
+      }
+    } else {
       const usernameArr = username.split('-');
-      if (
-        chatrooms.length === 1 &&
-        myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
-        roomKind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
-      ) {
-        setActiveChatRoom(chatrooms[0]);
-        if (isMobileOrTablet) {
-          setHiddenMessagesArea(false);
+
+      if (usernameArr[1] === 'bundle') {
+        return {
+          myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+          roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+          username: usernameArr[0],
+        };
+      }
+      if (usernameArr[1] === 'announcement') {
+        if (usernameArr[0] === user.userData?.username) {
+          return {
+            myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+            roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+            username: usernameArr[0],
+          };
         }
-      } else {
-        const localChatrooms = chatrooms.filter(
-          (room) =>
-            room.visavis?.user?.username === usernameArr[0].toLowerCase()
-        );
-        setFilteredChatroom(localChatrooms);
+
+        return {
+          myRole: newnewapi.ChatRoom.MyRole.SUBSCRIBER,
+          roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+          username: usernameArr[0],
+        };
       }
     }
-  }, [
-    chatrooms,
-    isMobileOrTablet,
-    myRole,
-    roomKind,
-    setActiveChatRoom,
-    setHiddenMessagesArea,
-    username,
-  ]);
+
+    return null;
+  }, [user.userData?.username, username]);
+
+  const { data, isFetched, isFetching } = useMyChatRooms(
+    {
+      ...chatRoomParams,
+      searchQuery: chatRoomParams?.username,
+    },
+    {
+      enabled: !!chatRoomParams,
+    },
+    'getRoom'
+  );
+
+  const chatRooms = useMemo(
+    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
+    [data]
+  );
+
+  // Calculate activeChatRoom from requested chatRooms
+  const activeChatRoom = useMemo(() => {
+    if (!chatRoomParams) {
+      return null;
+    }
+
+    if (chatRooms.length === 0) {
+      return null;
+    }
+
+    // Announcements, creator role
+    if (
+      chatRoomParams.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
+      chatRoomParams.roomKind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
+    ) {
+      return chatRooms.filter(
+        (chatRoom) =>
+          chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
+          chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
+      )[0];
+    }
+
+    // other cases
+    if (chatRoomParams.myRole) {
+      return chatRooms.filter(
+        (chatRoom) =>
+          chatRoom.kind === chatRoomParams.roomKind &&
+          chatRoom.myRole === chatRoomParams.myRole &&
+          chatRoom.visavis?.user?.username ===
+            chatRoomParams.username.toLowerCase()
+      )[0];
+    }
+
+    const filteredChatRooms = chatRooms.filter(
+      (chatRoom) =>
+        chatRoom.kind === chatRoomParams.roomKind &&
+        chatRoom.visavis?.user?.username ===
+          chatRoomParams.username?.toLowerCase()
+    );
+
+    if (filteredChatRooms.length === 2) {
+      return filteredChatRooms.filter(
+        (chatRoom) => chatRoom.myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER
+      )[0];
+    }
+
+    return filteredChatRooms[0];
+  }, [chatRoomParams, chatRooms]);
 
   useEffect(() => {
-    if (filteredChatrooms.length > 0) {
-      if (filteredChatrooms.length === 1) {
+    if (isFetched && !isFetching) {
+      setActiveChatRoom(activeChatRoom);
+
+      // Set activeTab
+      if (
+        activeChatRoom &&
+        activeChatRoom.id !== activeChatRoomFromContext?.id
+      ) {
         setActiveTab(
-          filteredChatrooms[0].myRole === newnewapi.ChatRoom.MyRole.CREATOR
+          activeChatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
             ? newnewapi.ChatRoom.MyRole.CREATOR
             : newnewapi.ChatRoom.MyRole.SUBSCRIBER
         );
-        setActiveChatRoom(filteredChatrooms[0]);
+
         if (isMobileOrTablet) {
           setHiddenMessagesArea(false);
         }
       }
-      // if we have 1 chatroom as creator and 1 as bundle ownder
-      if (filteredChatrooms.length === 2) {
-        setMyRole(newnewapi.ChatRoom.MyRole.SUBSCRIBER);
-      }
     }
   }, [
-    filteredChatrooms,
+    activeChatRoom,
+    isFetched,
+    isFetching,
     isMobileOrTablet,
     setActiveChatRoom,
-    setHiddenMessagesArea,
     setActiveTab,
+    setHiddenMessagesArea,
+    activeChatRoomFromContext?.id,
   ]);
+
+  // Reset activeChatRoom on unmount
+  useEffect(
+    () => () => {
+      setActiveChatRoom(null);
+    },
+    [setActiveChatRoom]
+  );
 
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <ChatContainer />
+      <ChatContainer isLoading={isFetching} />
     </>
   );
 };

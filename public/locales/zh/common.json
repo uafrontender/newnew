@@ -291,5 +291,8 @@
       "description": "謝謝，我們將隨時向你通報NewNew上的新帖子。",
       "button": "酷！"
     }
-  }
+  },
+  "oops": "哎呀！",
+  "somethingWentWrong_NEED_TRANSLATION": "Something went wrong...",
+  "goHome": "返回首頁"
 }
