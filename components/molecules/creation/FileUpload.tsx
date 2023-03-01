@@ -557,7 +557,7 @@ const SPlayerWrapper = styled.div`
   width: 64px;
   height: 108px;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
@@ -571,6 +571,8 @@ const SThumbnailHolder = styled.img`
   height: 100%;
   transition: linear 0.3s;
   z-index: 1;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 `;
 
 const SButtonsContainer = styled.div`
