@@ -411,15 +411,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         },
         {
           key: 'startsAt',
-          value: `${formatStartsAt().format(
-            'MMM DD YYYY [at] hh:mm A'
-          )} ${userTimezone}`,
+          value: `${formatStartsAt()
+            .locale(router.locale || 'en-US')
+            .format('MMM DD YYYY [at] hh:mm A')} ${userTimezone}`,
         },
         {
           key: 'expiresAt',
-          value: `${formatExpiresAt(false).format(
-            'MMM DD YYYY [at] hh:mm A'
-          )} ${userTimezone}`,
+          value: `${formatExpiresAt(false)
+            .locale(router.locale || 'en-US')
+            .format('MMM DD YYYY [at] hh:mm A')} ${userTimezone}`,
         },
         {
           key: 'comments',
@@ -445,6 +445,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       auction.minimalBid,
       crowdfunding.targetBackerCount,
       userData?.options?.isOfferingBundles,
+      router.locale,
       formatExpiresAt,
       userTimezone,
     ]

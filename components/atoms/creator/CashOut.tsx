@@ -5,6 +5,8 @@ import { useTranslation } from 'next-i18next';
 import { google, newnewapi } from 'newnew-api';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
+import { useRouter } from 'next/dist/client/router';
+
 import InlineSVG from '../InlineSVG';
 import Button from '../Button';
 import Text from '../Text';
@@ -26,6 +28,7 @@ const CashOut: React.FC<ICashOut> = ({
   nextCashOutDate,
 }) => {
   const { t } = useTranslation('page-Creator');
+  const { locale } = useRouter();
 
   const [stripeLink, setStripeLink] = useState<
     newnewapi.GetExpressDashboardLoginLinkResponse | undefined
@@ -123,9 +126,9 @@ const CashOut: React.FC<ICashOut> = ({
           {nextCashOutDate && (
             <SDescriptionAutoPayout variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
-                date: moment((nextCashOutDate.seconds as number) * 1000).format(
-                  'MMM DD YYYY'
-                ),
+                date: moment((nextCashOutDate.seconds as number) * 1000)
+                  .locale(locale || 'en-US')
+                  .format('MMM DD YYYY'),
               })}
             </SDescriptionAutoPayout>
           )}

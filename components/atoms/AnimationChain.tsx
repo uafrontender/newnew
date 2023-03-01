@@ -72,6 +72,18 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
       }
     }, [videoSrcList, currentVideoIndex, getPreviousIndex]);
 
+    useEffect(() => {
+      // Show it anyway after 2s
+      const RESERVE_SHOW_TIMEOUT = 2000;
+      const reserveShowTimer = setTimeout(() => {
+        setPlaceholderLoaded(true);
+      }, RESERVE_SHOW_TIMEOUT);
+
+      return () => {
+        clearTimeout(reserveShowTimer);
+      };
+    }, []);
+
     return (
       <Container
         className={className}

@@ -172,7 +172,6 @@ const SContent = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 320px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
