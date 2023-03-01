@@ -206,7 +206,7 @@ export const General: React.FC<IGeneral> = (props) => {
             {...(restrictMaxWidth
               ? {}
               : {
-                  noMaxContent: true,
+                  wideContainer: true,
                 })}
           >
             <Row noPaddingMobile={noPaddingMobile}>
