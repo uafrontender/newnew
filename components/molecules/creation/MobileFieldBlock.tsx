@@ -200,6 +200,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const handleDateChange = (date: any) => {
         onChange(id, { date });
 
+        // Date here is a moment
         const resultingDate = moment(
           `${date.format('YYYY-MM-DD')}  ${value.time}`
         );

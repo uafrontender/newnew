@@ -39,8 +39,23 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const handleDateChange = useCallback(
     (date: any) => {
       onChange(id, { date });
+
+      // Date here is a string
+      const resultingDate = moment(
+        `${moment(date).format('YYYY-MM-DD')}  ${value.time}`
+      );
+
+      if (resultingDate.isBefore(moment())) {
+        onChange(id, {
+          time: moment().format('hh:mm'),
+        });
+
+        onChange(id, {
+          'hours-format': moment().format('a'),
+        });
+      }
     },
-    [id, onChange]
+    [id, value, onChange]
   );
   const handleTypeChange = useCallback(
     (e: any, type: any) => {
