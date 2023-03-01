@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 interface ISContainer {
-  noMaxContent?: boolean;
+  wideContainer?: boolean;
 }
 
 export const SContainer = styled.div<ISContainer>`
@@ -21,9 +21,10 @@ export const SContainer = styled.div<ISContainer>`
 
   ${(props) => props.theme.media.laptopL} {
     ${(props) =>
-      props.noMaxContent &&
+      props.wideContainer &&
       css`
-        max-width: unset;
+        // 1920px is a maximum container width according to our designs
+        max-width: 1920px;
       `}
   }
 `;

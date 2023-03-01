@@ -40,6 +40,9 @@ interface IMobileFieldBlock {
   formattedDescription?: any;
 }
 
+// This component is overloaded and produces unnecessary hook instances
+// TODO: rework, separate 'input' | 'select' | 'date' into own components.
+// Provide type safety for all properties
 const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const {
     id,
@@ -82,12 +85,15 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     },
     [id, onChange]
   );
+
   const handleFocus = useCallback(() => {
     setFocused(true);
   }, []);
+
   const handleClick = useCallback(() => {
     handleFocus();
   }, [handleFocus]);
+
   const handleBlur = useCallback(() => {
     setFocused(false);
 
@@ -98,10 +104,12 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       onChange(id, inputProps?.max as number);
     }
   }, [inputProps, id, onChange, value]);
+
   const preventCLick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
   const renderItem = useCallback(
     (item: any) => {
       const handleItemClick = () => {
@@ -125,6 +133,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     },
     [id, onChange, handleBlur, value]
   );
+
   const getModal = useCallback(() => {
     if (type === 'select') {
       return (
@@ -160,11 +169,13 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           title: t('secondStep.field.startsAt.modal.hoursFormat.pm'),
         },
       ];
+
       const renderDay = (el: any) => (
         <SDay key={el.value} variant={1} weight={500}>
           {t(`secondStep.field.startsAt.modal.days.${el.value}` as any)}
         </SDay>
       );
+
       const handleScheduleChange = (selectedId: string) => {
         if (selectedId === 'right-away') {
           onChange(id, { date: new Date() });
@@ -177,14 +188,31 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         }
         onChange(id, { type: selectedId });
       };
-      const handleFormatChange = (selectedId: string) => {
+
+      const handleHoursFormatChange = (selectedId: string) => {
         onChange(id, { 'hours-format': selectedId });
       };
+
       const handleTimeChange = (e: any) => {
         onChange(id, { time: e.target.value });
       };
+
       const handleDateChange = (date: any) => {
         onChange(id, { date });
+
+        const resultingDate = moment(
+          `${date.format('YYYY-MM-DD')}  ${value.time}`
+        );
+
+        if (resultingDate.isBefore(moment())) {
+          onChange(id, {
+            time: moment().format('hh:mm'),
+          });
+
+          onChange(id, {
+            'hours-format': moment().format('a'),
+          });
+        }
       };
 
       return (
@@ -251,7 +279,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   }
                   options={formatOptions}
                   selected={value?.['hours-format']}
-                  onChange={handleFormatChange}
+                  onChange={handleHoursFormatChange}
                 />
               </SModalToggleWrapper>
               <SScheduleButton view='primaryGrad' onClick={handleBlur}>

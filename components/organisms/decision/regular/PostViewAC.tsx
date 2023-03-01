@@ -425,9 +425,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -461,9 +461,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -513,9 +513,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                       />
                       <SEndDate>
                         {t('expires.end_date')}{' '}
-                        {moment(
-                          (post.expiresAt?.seconds as number) * 1000
-                        ).format('DD MMM YYYY [at] hh:mm A')}
+                        {moment((post.expiresAt?.seconds as number) * 1000)
+                          .locale(router.locale || 'en-US')
+                          .format('DD MMM YYYY [at] hh:mm A')}
                       </SEndDate>
                     </>
                   ) : (
@@ -605,6 +605,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
+                .locale(router.locale || 'en-US')
                 .subtract(3, 'days')
                 .calendar(),
             })}

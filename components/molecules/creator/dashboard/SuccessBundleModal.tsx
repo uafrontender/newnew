@@ -103,4 +103,6 @@ const STitle = styled(Headline)`
 `;
 const SText = styled(Text)`
   margin-bottom: 30px;
+
+  text-align: center;
 `;

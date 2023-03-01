@@ -1,9 +1,9 @@
 {
   "meta": {
-    "title_NEED_TRANSLATION": "{{postTitle}} | {{displayName}} on NewNew",
+    "title": "{{postTitle}} | {{displayName}} en NewNew",
     "description": {
-      "ac_NEED_TRANSLATION": "${{totalInBids}} in bids on NewNew",
-      "mc_NEED_TRANSLATION": "{{totalVotes}} votes on NewNew",
+      "ac": "${{totalInBids}} en ofertas en NewNew",
+      "mc": "{{totalVotes}} votos en NewNew",
       "cf": ""
     }
   },
@@ -733,9 +733,9 @@
       "shareBtn": "Compartir",
       "linkCopied": "¡Enlace copiado!"
     },
-    "tutorialEditTitle_NEED_TRANSLATION": {
-      "title": "Edit title",
-      "body": "Click the title of the post and make your changes."
+    "tutorialEditTitle": {
+      "title": "Editar título",
+      "body": "Haz clic en el título de la entrada y realiza los cambios que desees."
     },
     "winner": {
       "inResponseToYourPost": "En respuesta a tu publicación",

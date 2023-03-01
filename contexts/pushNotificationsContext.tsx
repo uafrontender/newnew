@@ -264,6 +264,12 @@ const PushNotificationsContextProvider: React.FC<
         return false;
       }
 
+      const sub = subscription?.toJSON();
+
+      if (!sub || !sub?.keys?.p256dh || !sub?.keys?.auth || !sub.endpoint) {
+        return false;
+      }
+
       const checkSubscriptionValue = await fetchCheckSubscription(
         subscription.endpoint
       );

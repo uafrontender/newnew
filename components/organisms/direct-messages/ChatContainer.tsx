@@ -4,20 +4,28 @@ import styled, { css } from 'styled-components';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import SelectChat from '../../atoms/direct-messages/SelectChat';
+import Loader from '../../atoms/Loader';
 import ChatContent from './ChatContent';
 
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 
-export const ChatContainer = () => {
+interface IChatContainer {
+  isLoading?: boolean;
+}
+
+export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
+
   const {
     activeChatRoom,
     hiddenMessagesArea,
     mobileChatOpened,
     setMobileChatOpened,
+    setHiddenMessagesArea,
   } = useGetChats();
 
   useEffect(() => {
@@ -26,13 +34,22 @@ export const ChatContainer = () => {
     }
   }, [mobileChatOpened, isMobile, setMobileChatOpened]);
 
+  useEffect(() => {
+    // Reset hiddenMessagesArea to null for desktop, to prevent issue with white chat area after setting hiddenMessagesArea in DynamicSection
+    // TODO: consider removing hiddenMessagesArea from context
+    if (hiddenMessagesArea && !isMobile && !isTablet) {
+      setHiddenMessagesArea(null);
+    }
+  }, [setHiddenMessagesArea, isTablet, isMobile, hiddenMessagesArea]);
+
   return (
     <SContainer mobileChatOpened={mobileChatOpened}>
       {hiddenMessagesArea !== false && <ChatSidebar />}
       {hiddenMessagesArea !== true && (
         <SContent>
           {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
-          {!activeChatRoom && <SelectChat />}
+          {!activeChatRoom && !isLoading && <SelectChat />}
+          {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
         </SContent>
       )}
     </SContainer>

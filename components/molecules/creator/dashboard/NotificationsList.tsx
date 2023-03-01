@@ -7,6 +7,7 @@ import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
+import { useRouter } from 'next/dist/client/router';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
@@ -40,6 +41,7 @@ export const NotificationsList: React.FC<IFunction> = ({
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
+  const { locale } = useRouter();
   const [unreadNotifications, setUnreadNotifications] = useState<
     number[] | null
   >(null);
@@ -262,9 +264,9 @@ export const NotificationsList: React.FC<IFunction> = ({
                   </SNotificationItemText>
                 )}
                 <SNotificationItemTime variant={2} weight={600}>
-                  {moment((item.createdAt?.seconds as number) * 1000).from(
-                    itemCurrentTime
-                  )}
+                  {moment((item.createdAt?.seconds as number) * 1000)
+                    .locale(locale || 'en-US')
+                    .from(itemCurrentTime)}
                 </SNotificationItemTime>
               </SNotificationItemCenter>
               {unreadNotifications &&
@@ -278,8 +280,9 @@ export const NotificationsList: React.FC<IFunction> = ({
       );
     },
     [
-      unreadNotifications,
       user.userData?.userUuid,
+      locale,
+      unreadNotifications,
       getEnrichedNotificationMessage,
       markNotificationAsRead,
     ]

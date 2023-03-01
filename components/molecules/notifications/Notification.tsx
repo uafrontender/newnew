@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/dist/client/router';
 
 import UserAvatar from '../UserAvatar';
 import { InlineSvg } from '../../atoms/InlineSVG';
@@ -45,6 +46,7 @@ const Notification: React.FC<INotification> = ({
   currentTime,
 }) => {
   const { t } = useTranslation('page-Notifications');
+  const { locale } = useRouter();
   const theme = useTheme();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -214,7 +216,9 @@ const Notification: React.FC<INotification> = ({
             <STitle>{getNotificationTitle()}</STitle>
             <SContent>{content?.message}</SContent>
             <SDate>
-              {moment((createdAt?.seconds as number) * 1000).from(currentTime)}
+              {moment((createdAt?.seconds as number) * 1000)
+                .locale(locale || 'en-US')
+                .from(currentTime)}
             </SDate>
           </SInfo>
           {content?.relatedPost &&
