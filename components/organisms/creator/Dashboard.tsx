@@ -279,7 +279,7 @@ const SContent = styled.div`
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
-    border-radius: 24px;
+    border-top-left-radius: 24px;
   }
 `;
 
