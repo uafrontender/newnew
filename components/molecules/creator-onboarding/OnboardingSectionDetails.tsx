@@ -891,6 +891,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   : t('detailsSection.form.email.errors.invalidEmail')
               }
               onChange={handleEmailInput}
+              readOnly={!!user.userData?.email}
             />
             <OnboardingCountrySelect
               width='100%'
@@ -1079,7 +1080,7 @@ const SFieldPairContainer = styled.div<{ marginBottom?: number }>`
 const SSeparator = styled.div`
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-top: 20px;
+  margin-top: 32px;
   margin-bottom: 32px;
 `;
 
