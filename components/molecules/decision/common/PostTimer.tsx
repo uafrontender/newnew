@@ -4,6 +4,7 @@
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/dist/client/router';
 import dynamic from 'next/dist/shared/lib/dynamic';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useUpdateEffect } from 'react-use';
@@ -37,6 +38,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   onTimeExpired,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { locale } = useRouter();
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppState();
@@ -260,7 +262,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       ) : (
         <STimerItemEnded>
           {t(`postType.${postType}`)} {t('expires.ended_on')}{' '}
-          {moment(timestampSeconds).format('DD MMM YYYY [at] hh:mm A')}
+          {moment(timestampSeconds)
+            .locale(locale || 'en-US')
+            .format('DD MMM YYYY [at] hh:mm A')}
           <STutorialTooltipHolder>
             <TutorialTooltip
               isTooltipVisible={isTooltipVisible}
