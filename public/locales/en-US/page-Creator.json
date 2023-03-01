@@ -46,8 +46,8 @@
       },
       "list": {
         "ac": "Bids",
-        "cf": "Goals",
         "mc": "Superpolls",
+        "cf": "Goals",
         "bundles": "Bundles"
       },
       "filter": {

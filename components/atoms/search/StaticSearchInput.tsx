@@ -31,6 +31,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../Loader';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IStaticSearchInput {
   width?: string;
@@ -59,9 +60,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       newnewapi.IHashtag[]
     >([]);
 
-    const { resizeMode, globalSearchActive } = useAppSelector(
-      (state) => state.ui
-    );
+    const { globalSearchActive } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const router = useRouter();
 
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -124,7 +124,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
 
       const clearedSearchValue = getClearedSearchQuery(searchValue);
-      if (e.keyCode === 13 && clearedSearchValue) {
+      if (e.keyCode === 13 && clearedSearchValue.length > 1) {
         handleSeeResults(clearedSearchValue);
         closeSearch();
       }
@@ -146,16 +146,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
         handleSearchClose();
       }
     });
-
-    useEffect(() => {
-      setTimeout(() => {
-        if (globalSearchActive) {
-          inputRef.current?.focus();
-        } else {
-          inputRef.current?.blur();
-        }
-      }, 1000);
-    }, [globalSearchActive]);
 
     useEffect(() => {
       const resizeObserver = new ResizeObserver(() => {
@@ -221,6 +211,10 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       if (clearedSearchValue?.length > 1) {
         getQuickSearchResult(clearedSearchValue);
         setIsResultsDropVisible(true);
+        document.documentElement.style.setProperty(
+          '--window-inner-height',
+          `${window.innerHeight}px`
+        );
       } else if (
         (!clearedSearchValue || clearedSearchValue.length === 1) &&
         !isMobileOrTablet
@@ -502,7 +496,7 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: fill-available;
+  height: calc(var(--window-inner-height) - 1px);
   top: 56px;
   left: 0;
   padding: 16px;

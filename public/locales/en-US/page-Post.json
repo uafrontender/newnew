@@ -55,7 +55,7 @@
     },
     "doneButton": "Sounds good!",
     "ac": "{{postCreator}} will pick their favorite one once the Bid is over.",
-    "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
+    "mc": "{{postCreator}} will do the option with the most amount of votes when the Superpoll is over.",
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
   "postFailedBoxModeration": {
@@ -500,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "Select a snippet",
     "uploadImageButton": "Upload an image"
   },
   "postVideoThumbnailEdit": {
@@ -733,6 +732,10 @@
       "youMade": "You made",
       "shareBtn": "Share",
       "linkCopied": "Link copied!"
+    },
+    "tutorialEditTitle": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
     },
     "winner": {
       "inResponseToYourPost": "In response to your post",

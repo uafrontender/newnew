@@ -825,6 +825,15 @@ context('Main flow', () => {
       storage.save();
     });
 
+    it('can enter post page from creators profile', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
+      cy.url().should('include', creatorUsername);
+      const postCardSelector = `#post-card-${superpollShortId}`;
+      cy.dGet(postCardSelector).click();
+
+      cy.url().should('include', '/p/');
+    });
+
     it('can buy a bundle from creator`s profile', () => {
       // Clear auth, use new email
       cy.setCookie('accessToken', '');
@@ -1312,6 +1321,15 @@ context('Main flow', () => {
       });
     });
 
+    it('can enter post page from creators profile', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
+      cy.url().should('include', creatorUsername);
+      const postCardSelector = `#post-card-${superpollShortId}`;
+      cy.dGet(postCardSelector).click();
+
+      cy.url().should('include', '/p/');
+    });
+
     it('can buy a bundle from creator`s profile', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
       cy.url().should('include', creatorUsername);
@@ -1669,7 +1687,7 @@ context('Main flow', () => {
   describe('Creator willing to respond', () => {
     const defaultStorage = {
       userTutorialsProgress:
-        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[], "remainingAcResponseCurrentStep":[], "remainingMcResponseCurrentStep":[]}',
     };
     const storage = createStorage(defaultStorage);
 

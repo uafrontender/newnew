@@ -43,6 +43,7 @@ import PostTitleContent from '../../../../atoms/PostTitleContent';
 import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupIntent';
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -97,7 +98,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   const { showErrorToastCustom } = useErrorToasts();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

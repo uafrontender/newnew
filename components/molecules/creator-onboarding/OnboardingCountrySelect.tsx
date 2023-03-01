@@ -3,8 +3,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import countries from 'i18n-iso-countries';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 // Utils
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
@@ -12,6 +10,7 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 // Icons
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import InlineSvg from '../../atoms/InlineSVG';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingCountrySelect {
   selected: string;
@@ -40,7 +39,7 @@ const OnboardingCountrySelect = ({
   const optionsContainerRef = useRef<HTMLDivElement>();
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -55,11 +54,18 @@ const OnboardingCountrySelect = ({
 
   useEffect(() => {
     if (isOpen && selected) {
-      const itemTopPos =
-        optionsRefs.current[options.findIndex((o) => o === selected)].offsetTop;
+      const selectedItemIndex = options.findIndex((o) => o === selected);
+
+      // Do not scroll to the first item in the list
+      if (selectedItemIndex < 1) {
+        return;
+      }
+      const itemTopPos = optionsRefs.current[selectedItemIndex].offsetTop;
 
       if (optionsContainerRef.current) {
-        optionsContainerRef.current.scrollTop = itemTopPos;
+        // Leave a small gap above the selected item
+        const TOP_PADDING = 8;
+        optionsContainerRef.current.scrollTop = itemTopPos - TOP_PADDING;
       }
     }
   }, [selected, options, isOpen]);

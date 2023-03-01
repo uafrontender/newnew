@@ -26,16 +26,18 @@ import CreatorsBundleModal from '../../molecules/bundles/CreatorsBundleModal';
 import AnimatedBackground from '../../atoms/AnimationBackground';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import BundleCreatorsList from '../../molecules/bundles/BundleCreatorsList';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Bundles: React.FC = React.memo(() => {
   const router = useRouter();
   const { t } = useTranslation('page-Bundles');
   const theme = useTheme();
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
-  const isTablet = ['tablet'].includes(ui.resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -124,7 +126,11 @@ export const Bundles: React.FC = React.memo(() => {
       </Head>
       <Container>
         <SAnimationContainer>
-          <SAnimationBackground src={assets.common.vote} alt='vote' />
+          <SAnimationBackground
+            src={assets.common.vote}
+            alt='vote'
+            isCalculatedHeight
+          />
           <SubNavigation>
             {isMobile ? (
               <SBackButton onClick={() => router.back()} />

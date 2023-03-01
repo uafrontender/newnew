@@ -24,6 +24,7 @@ import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -63,7 +64,7 @@ const Comment: React.FC<IComment> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -171,9 +172,9 @@ const Comment: React.FC<IComment> = ({
               <SDate>
                 {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
                 &bull;{' '}
-                {moment(
-                  (comment.createdAt?.seconds as number) * 1000
-                ).fromNow()}
+                {moment((comment.createdAt?.seconds as number) * 1000)
+                  .locale(router.locale || 'en-US')
+                  .fromNow()}
               </SDate>
             )}
             <SActionsDiv>

@@ -5,8 +5,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useUpdateEffect } from 'react-use';
 
-import { useAppSelector } from '../../../../redux-store/store';
-
 import InlineSvg from '../../../atoms/InlineSVG';
 
 import isBrowser from '../../../../utils/isBrowser';
@@ -16,6 +14,7 @@ import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
 import AlertIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
 import AlertIconInverted from '../../../../public/images/svg/icons/filled/AlertInverted.svg';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IResponseTimer {
   timestampSeconds: number;
@@ -27,7 +26,7 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
   onTimeExpired,
 }) => {
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

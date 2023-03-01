@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -28,6 +28,7 @@ import {
 } from '../../redux-store/slices/uiStateSlice';
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IFooter {}
 
@@ -45,7 +46,8 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
+  const { colorMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const topItems: TItem[] = [
     // TODO: return about link later when we have a page for it
@@ -89,6 +91,16 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  useEffect(() => {
+    Mixpanel.track_links(
+      'footer a',
+      'Navigation Item Clicked',
+      (e: HTMLLinkElement) => ({
+        _target: e?.getAttribute('href'),
+      })
+    );
+  }, []);
 
   const handleLogoClick = () => {
     if (router.pathname === '/') {

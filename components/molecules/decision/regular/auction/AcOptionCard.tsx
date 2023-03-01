@@ -57,6 +57,7 @@ import BidIconLight from '../../../../../public/images/decision/bid-icon-light.p
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -120,7 +121,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -1049,20 +1050,22 @@ const SSupportButton = styled(Button)<{
 const SSupportButtonDesktop = styled(Button)<{
   isBlue: boolean;
 }>`
+  flex-shrink: 0;
   height: 100%;
-  width: 60px;
+  width: auto;
+  min-width: 60px;
 
   color: #ffffff;
   background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  padding: initial;
+  padding: 8px;
 
   border-radius: initial;
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   border-bottom-right-radius: ${({ theme }) => theme.borderRadius.medium};
 
   span {
-    width: 100%;
+    width: auto;
 
     text-align: center;
     white-space: pre;

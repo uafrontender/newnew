@@ -31,6 +31,7 @@ import AcOptionCard from './AcOptionCard';
 
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcOptionsTab {
   postUuid: string;
@@ -74,7 +75,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

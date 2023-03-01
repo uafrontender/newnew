@@ -47,7 +47,7 @@
   "Profile": {
     "meta": {
       "title": "{{displayname}} (@{{username}}) | NewNew",
-      "description_NEED_TRANSLATION": "{{bio}} Bid and Vote on what people do next"
+      "description": "{{bio}} 對人們下一步做什麼進行出價和投票"
     },
     "user": {
       "noContent": {
@@ -65,7 +65,7 @@
   "Activity": {
     "meta": {
       "title": "{{displayname}} (@{{username}}) | NewNew",
-      "description_NEED_TRANSLATION": "{{bio}} Bid and Vote on what people do next"
+      "description": "{{bio}} 對人們下一步做什麼進行出價和投票"
     },
     "noContent": {
       "description": "創作者的所有活動都將在這裡顯示"
@@ -266,9 +266,9 @@
         "title": "交易",
         "you": "你",
         "type": {
-          "1": "Bid",
-          "2": "Superpoll",
-          "3": "Goal"
+          "1": "bid",
+          "2": "superpoll",
+          "3": "goal"
         },
         "actions": {
           "topup": "為你的錢包充值,",
@@ -285,11 +285,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "不讓別人查看我的消費",
-            "caption": "其他人看不到你為出價或Superpoll上花了多少錢"
+            "caption": "其他人看不到你為Bids或Superpolls上花了多少錢"
           },
           "private": {
             "title": "將我的活動設為隱秘",
-            "caption": "其他人看不到你在出價或Superpoll上的活動"
+            "caption": "其他人看不到你在Bids或Superpolls上的活動"
           }
         },
         "blockedUsers": {

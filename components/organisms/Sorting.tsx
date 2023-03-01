@@ -13,10 +13,10 @@ import SortIconAnimated from '../atoms/SortIconAnimated';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface ISorting {
   category: string;
@@ -32,7 +32,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

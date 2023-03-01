@@ -1,4 +1,3 @@
-/* eslint-disable default-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
@@ -14,6 +13,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import SortOption from '../../atoms/SortOption';
 import useSearchPosts from '../../../utils/hooks/useSearchPosts';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const PostList = dynamic(() => import('./PostList'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
@@ -51,13 +51,10 @@ const getSortingValue = (sorting: string) => {
   switch (sorting) {
     case 'num_bids':
       return newnewapi.PostSorting.MOST_VOTED_FIRST;
-      break;
     case 'all':
       return newnewapi.PostSorting.MOST_FUNDED_FIRST;
-      break;
     case 'newest':
       return newnewapi.PostSorting.NEWEST_FIRST;
-      break;
     default:
       return newnewapi.PostSorting.MOST_FUNDED_FIRST;
   }
@@ -73,7 +70,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   const { loggedIn } = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -151,20 +148,27 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         case newnewapi.Post.Filter.MULTIPLE_CHOICES:
           routerArr.push('mc');
           break;
+        default:
+          // Do nothing
+          break;
       }
     });
 
-    router.push({
-      pathname: '/search',
-      query: {
-        query,
-        type,
-        tab: 'posts',
-        filter: routerArr.length > 0 ? routerArr.join('-') : '',
-        sorting: postSorting,
+    router.push(
+      {
+        pathname: '/search',
+        query: {
+          query,
+          type,
+          tab: 'posts',
+          filter: routerArr.length > 0 ? routerArr.join('-') : '',
+          sorting: postSorting,
+        },
       },
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      undefined,
+      // Avoid page reload as we stay on the same page
+      { shallow: true }
+    );
   }, [postSorting, activeTabs, query, type]);
 
   const tabTypes = useMemo(
@@ -183,25 +187,18 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     [tCommon]
   );
 
-  const updateActiveTabs = useCallback(
-    (tabType: newnewapi.Post.Filter) => {
-      if (!isLoading) {
-        setActiveTabs((curr) => {
-          const arr = [...curr];
-          const index = arr.findIndex((item) => item === tabType);
+  const updateActiveTabs = useCallback((tabType: newnewapi.Post.Filter) => {
+    setActiveTabs((curr) => {
+      const index = curr.findIndex((item) => item === tabType);
 
-          if (index < 0) {
-            arr.push(tabType);
-          } else {
-            arr.splice(index, 1);
-          }
-
-          return arr;
-        });
+      // While we have only 2 tabs, there is no way to enable 2 at a time
+      if (index < 0) {
+        return [tabType];
       }
-    },
-    [isLoading]
-  );
+
+      return [];
+    });
+  }, []);
 
   const clearSorting = useCallback(() => {
     setPostSorting('all');

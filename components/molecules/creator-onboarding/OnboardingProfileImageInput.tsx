@@ -2,12 +2,11 @@ import React, { useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 
 import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingProfileImageInput {
   id?: string;
@@ -20,7 +19,7 @@ const OnboardingProfileImageInput: React.FunctionComponent<
 > = ({ id, imageInEditUrl, handleChangeImageInEdit }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',

@@ -32,6 +32,7 @@ import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -53,9 +54,8 @@ const SearchInput: React.FC = React.memo(() => {
     []
   );
 
-  const { resizeMode, globalSearchActive } = useAppSelector(
-    (state) => state.ui
-  );
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -119,7 +119,7 @@ const SearchInput: React.FC = React.memo(() => {
     }
 
     const clearedSearchValue = getClearedSearchQuery(searchValue);
-    if (e.keyCode === 13 && clearedSearchValue) {
+    if (e.keyCode === 13 && clearedSearchValue.length > 1) {
       handleSeeResults(clearedSearchValue);
       closeSearch();
     }
@@ -144,13 +144,21 @@ const SearchInput: React.FC = React.memo(() => {
   });
 
   useEffect(() => {
-    setTimeout(() => {
-      if (globalSearchActive) {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    if (globalSearchActive) {
+      timeoutId = setTimeout(() => {
         inputRef.current?.focus();
-      } else {
-        inputRef.current?.blur();
+      }, 1000);
+    } else {
+      inputRef.current?.blur();
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
-    }, 1000);
+    };
   }, [globalSearchActive]);
 
   useEffect(() => {
@@ -199,9 +207,15 @@ const SearchInput: React.FC = React.memo(() => {
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
-      if (res.data.creators) setResultsCreators(res.data.creators);
-      if (res.data.posts) setResultsPosts(res.data.posts);
-      if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
+      if (res.data.creators) {
+        setResultsCreators(res.data.creators);
+      }
+      if (res.data.posts) {
+        setResultsPosts(res.data.posts);
+      }
+      if (res.data.hashtags) {
+        setResultsHashtags(res.data.hashtags);
+      }
       setIsLoading(false);
     } catch (err) {
       console.error(err);

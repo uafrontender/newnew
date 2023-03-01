@@ -5,7 +5,7 @@ import React from 'react';
 import { animateScroll } from 'react-scroll';
 import styled from 'styled-components';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import Button from '../Button';
 
 interface IFunctionProps {
@@ -15,7 +15,7 @@ interface IFunctionProps {
 const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

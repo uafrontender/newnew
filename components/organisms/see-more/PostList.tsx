@@ -5,13 +5,14 @@ import React from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -34,12 +35,12 @@ export const PostList: React.FC<IList> = ({
   skeletonsHighlightColor,
   handleRemovePostFromState,
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const renderItem = (item: any, index: number) => (
+  const renderItem = (item: newnewapi.Post, index: number) => (
     <Link
       href={`/p/${
         switchPostType(item)[0].postShortId
@@ -48,7 +49,7 @@ export const PostList: React.FC<IList> = ({
       }`}
       key={switchPostType(item)[0].postUuid}
     >
-      <SItemWrapper>
+      <SItemWrapper id={`post-card-${switchPostType(item)[0].postShortId}`}>
         <PostCard
           item={item}
           index={index + 1}

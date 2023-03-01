@@ -40,6 +40,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import getDisplayname from '../../../../utils/getDisplayname';
 import useAcOptions from '../../../../utils/hooks/useAcOptions';
+import { useAppState } from '../../../../contexts/appStateContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -82,7 +83,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -423,9 +425,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -459,9 +461,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -511,9 +513,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                       />
                       <SEndDate>
                         {t('expires.end_date')}{' '}
-                        {moment(
-                          (post.expiresAt?.seconds as number) * 1000
-                        ).format('DD MMM YYYY [at] hh:mm A')}
+                        {moment((post.expiresAt?.seconds as number) * 1000)
+                          .locale(router.locale || 'en-US')
+                          .format('DD MMM YYYY [at] hh:mm A')}
                       </SEndDate>
                     </>
                   ) : (
@@ -603,6 +605,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               postDeadline: moment(
                 (post.responseUploadDeadline?.seconds as number) * 1000
               )
+                .locale(router.locale || 'en-US')
                 .subtract(3, 'days')
                 .calendar(),
             })}

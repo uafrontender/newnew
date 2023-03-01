@@ -17,11 +17,12 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const theme = useTheme();
 
   const isDesktopL = ['laptopL', 'desktop'].includes(resizeMode);

@@ -50,6 +50,7 @@ import resizeImage from '../../../utils/resizeImage';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -146,7 +147,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -516,7 +517,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               nickname: nicknameInEdit.trim(),
             }
           : {}),
-        ...(fieldsToBeUpdated.dateOfBirth
+        ...(fieldsToBeUpdated.dateOfBirth &&
+        !isEqual(user.userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
           ? {
               dateOfBirth: dateInEdit,
             }

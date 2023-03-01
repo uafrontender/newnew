@@ -75,6 +75,7 @@ import useErrorToasts, {
 } from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 import RichTextInput from '../../../atoms/creation/RichTextInput';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -121,7 +122,7 @@ export const CreationSecondStepContent: React.FC<
     customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { overlayModeEnabled } = useOverlayMode();
   const { appConstants } = useGetAppConstants();
 
@@ -842,9 +843,9 @@ export const CreationSecondStepContent: React.FC<
                   formattedValue={t(
                     `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
-                  formattedDescription={formatExpiresAt().format(
-                    'DD MMM [at] hh:mm A'
-                  )}
+                  formattedDescription={formatExpiresAt()
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM [at] hh:mm A')}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
@@ -856,9 +857,9 @@ export const CreationSecondStepContent: React.FC<
                   formattedValue={t(
                     `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
-                  formattedDescription={formatStartsAt().format(
-                    'DD MMM [at] hh:mm A'
-                  )}
+                  formattedDescription={formatStartsAt()
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM [at] hh:mm A')}
                 />
               </SFieldWrapper>
             </SListWrapper>
@@ -877,9 +878,9 @@ export const CreationSecondStepContent: React.FC<
                 formattedValue={t(
                   `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
-                formattedDescription={formatExpiresAt().format(
-                  'DD MMM [at] hh:mm A'
-                )}
+                formattedDescription={formatExpiresAt()
+                  .locale(router.locale || 'en-US')
+                  .format('DD MMM [at] hh:mm A')}
               />
             </SItemWrapper>
             <TabletStartDate
@@ -910,6 +911,7 @@ export const CreationSecondStepContent: React.FC<
       post.startsAt,
       post.options.commentsEnabled,
       expireOptions,
+      router.locale,
       t,
       formatExpiresAt,
       formatStartsAt,

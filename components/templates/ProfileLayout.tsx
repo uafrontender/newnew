@@ -45,6 +45,8 @@ import getGenderPronouns, {
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
+import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -64,7 +66,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const { t } = useTranslation('page-Profile');
 
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -111,6 +113,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState(false);
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
   const {
     usersIBlocked,
     usersBlockedMe,
@@ -219,6 +222,15 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   ]);
 
   const moreButtonRef = useRef() as any;
+
+  const bundleExpired = useMemo(() => {
+    if (!creatorsBundle || !creatorsBundle.bundle?.accessExpiresAt?.seconds) {
+      return false;
+    }
+    const expiresAtTime =
+      (creatorsBundle.bundle!.accessExpiresAt!.seconds as number) * 1000;
+    return expiresAtTime < Date.now();
+  }, [creatorsBundle]);
 
   return (
     <>
@@ -354,22 +366,43 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SShareButton>
             </SShareDiv>
 
-            {creatorsBundle && (
-              <CustomLink href={`/direct-messages/${user.username}`}>
-                <SSendButton
-                  view='brandYellow'
-                  onClickCapture={() => {
-                    Mixpanel.track('Send Message Button Clicked', {
-                      _stage: 'Profile',
-                      _creatorUuid: user.uuid,
-                      _component: 'ProfileLayout',
-                    });
-                  }}
-                >
-                  {t('profileLayout.buttons.sendMessage')}
-                </SSendButton>
-              </CustomLink>
-            )}
+            {
+              // eslint-disable-next-line no-nested-ternary
+              creatorsBundle && user.options?.isOfferingBundles ? (
+                !bundleExpired ? (
+                  <CustomLink href={`/direct-messages/${user.username}`}>
+                    <SSendButton
+                      view='brandYellow'
+                      onClickCapture={() => {
+                        Mixpanel.track('Send Message Button Clicked', {
+                          _stage: 'Profile',
+                          _creatorUuid: user.uuid,
+                          _component: 'ProfileLayout',
+                        });
+                      }}
+                    >
+                      {t('profileLayout.buttons.sendMessage')}
+                    </SSendButton>
+                  </CustomLink>
+                ) : (
+                  <SSendButton
+                    view='brandYellow'
+                    onClick={() => {
+                      setBuyBundleModalOpen(true);
+                    }}
+                    onClickCapture={() => {
+                      Mixpanel.track('Send Message Button Clicked', {
+                        _stage: 'Profile',
+                        _creatorUuid: user.uuid,
+                        _component: 'ProfileLayout',
+                      });
+                    }}
+                  >
+                    {t('profileLayout.buttons.sendMessage')}
+                  </SSendButton>
+                )
+              ) : null
+            }
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
             {isMobile && !isUserBlocked && (
               <SMobileSeeBundleButton
@@ -417,6 +450,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
+      {creatorsBundle && user.options?.isOfferingBundles && bundleExpired ? (
+        <BuyBundleModal
+          show={buyBundleModalOpen}
+          modalType='initial'
+          creator={user}
+          // Irrelevant since guests wont see it
+          successPath={`/${user.username}`}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
+      ) : null}
     </>
   );
 };

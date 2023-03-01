@@ -29,6 +29,7 @@ import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
 import ChatContainer from '../organisms/direct-messages/ChatContainer';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IGeneral {
   className?: string;
@@ -49,9 +50,8 @@ export const General: React.FC<IGeneral> = (props) => {
     children,
   } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, resizeMode, globalSearchActive } = useAppSelector(
-    (state) => state.ui
-  );
+  const { banner, globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
@@ -206,7 +206,7 @@ export const General: React.FC<IGeneral> = (props) => {
             {...(restrictMaxWidth
               ? {}
               : {
-                  noMaxContent: true,
+                  wideContainer: true,
                 })}
           >
             <Row noPaddingMobile={noPaddingMobile}>

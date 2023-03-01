@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/dist/client/router';
 
 import { TPostType } from '../../../../utils/switchPostType';
 
@@ -15,12 +16,15 @@ const PostTimerEnded: React.FunctionComponent<IPostTimerEnded> = ({
   postType,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { locale } = useRouter();
 
   return (
     <SWrapper>
       <STimerItemEnded>
         {t(`postType.${postType}`)} {t('expires.ended_on')}{' '}
-        {moment(timestampSeconds).format('DD MMM YYYY [at] hh:mm A')}
+        {moment(timestampSeconds)
+          .locale(locale || 'en-US')
+          .format('DD MMM YYYY [at] hh:mm A')}
       </STimerItemEnded>
     </SWrapper>
   );

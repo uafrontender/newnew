@@ -15,11 +15,12 @@ import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
 import AnimationChain from '../../atoms/AnimationChain';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const HeroSection = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation('common');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
 

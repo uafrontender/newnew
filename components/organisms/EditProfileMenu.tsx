@@ -60,6 +60,7 @@ import useErrorToasts, {
 } from '../../utils/hooks/useErrorToasts';
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -163,9 +164,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   // Common
@@ -1056,56 +1058,56 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 onCropComplete={onCropCompleteProfileImage}
                 onZoomChange={setZoomProfileImage}
               />
-              <SSliderWrapper>
-                <Button
-                  iconOnly
-                  size='sm'
-                  view='transparent'
-                  disabled={
-                    zoomProfileImage <= minZoomProfileImage ||
-                    updateProfileImageLoading
-                  }
-                  onClick={handleZoomOutProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomOutIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='24px'
-                    height='24px'
-                  />
-                </Button>
-                <ProfileImageZoomSlider
-                  value={zoomProfileImage}
-                  min={minZoomProfileImage}
-                  max={minZoomProfileImage + 2}
-                  step={0.1}
-                  ariaLabel='Zoom'
-                  disabled={updateProfileImageLoading}
-                  onChange={(e) =>
-                    setZoomProfileImage(
-                      Math.max(Number(e.target.value), minZoomProfileImage)
-                    )
-                  }
-                />
-                <Button
-                  iconOnly
-                  size='sm'
-                  view='transparent'
-                  disabled={
-                    zoomProfileImage >= minZoomProfileImage + 2 ||
-                    updateProfileImageLoading
-                  }
-                  onClick={handleZoomInProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomInIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='24px'
-                    height='24px'
-                  />
-                </Button>
-              </SSliderWrapper>
             </ProfilePictureContent>
+            <SSliderWrapper>
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomProfileImage <= minZoomProfileImage ||
+                  updateProfileImageLoading
+                }
+                onClick={handleZoomOutProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomOutIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+              <ProfileImageZoomSlider
+                value={zoomProfileImage}
+                min={minZoomProfileImage}
+                max={minZoomProfileImage + 2}
+                step={0.1}
+                ariaLabel='Zoom'
+                disabled={updateProfileImageLoading}
+                onChange={(e) =>
+                  setZoomProfileImage(
+                    Math.max(Number(e.target.value), minZoomProfileImage)
+                  )
+                }
+              />
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomProfileImage >= minZoomProfileImage + 2 ||
+                  updateProfileImageLoading
+                }
+                onClick={handleZoomInProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomInIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+            </SSliderWrapper>
             <SControlsWrapperPicture>
               <Button
                 view='secondary'
@@ -1186,12 +1188,12 @@ const SEditProfileMenu = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: min(15vh, 136px);
+    top: max(min((100vh - 690px) / 2, 136px), 0px);
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 75vh;
-    max-height: 684px;
+    height: 100%;
+    max-height: 690px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
@@ -1264,17 +1266,13 @@ const STextInputsWrapper = styled.div`
 
 const ProfilePictureContent = styled.div`
   overflow-y: auto;
-  padding: 0 22px;
+  padding: 0 20px;
   height: 100%;
 `;
 
 const SSliderWrapper = styled.div`
   display: none;
   ${({ theme }) => theme.media.tablet} {
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    bottom: 107px;
     z-index: 1;
     background-color: ${({ theme }) =>
       theme.name === 'light'

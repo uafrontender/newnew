@@ -17,6 +17,7 @@ import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -39,7 +40,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -275,11 +276,11 @@ const SContent = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 320px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
     border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
   }
 `;
 
