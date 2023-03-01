@@ -317,6 +317,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     isDaySame,
     isTimeOfTheDaySame,
     localTimeOfTheDay,
+    maxDate,
     onChange,
     id,
   ]);
