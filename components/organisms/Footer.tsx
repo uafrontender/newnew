@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -91,6 +91,16 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  useEffect(() => {
+    Mixpanel.track_links(
+      'footer a',
+      'Navigation Item Clicked',
+      (e: HTMLLinkElement) => ({
+        _target: e?.getAttribute('href'),
+      })
+    );
+  }, []);
 
   const handleLogoClick = () => {
     if (router.pathname === '/') {

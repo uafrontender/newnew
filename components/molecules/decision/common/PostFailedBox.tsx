@@ -94,8 +94,6 @@ const SCtaButtonContainer = styled.div`
 const SCTAButton = styled.button`
   background: #ffffff;
 
-  box-shadow: 0px 15px 35px -10px rgba(29, 134, 255, 0.35);
-
   border: transparent;
   border-radius: 16px;
 
@@ -105,6 +103,13 @@ const SCTAButton = styled.button`
   font-size: 14px;
   line-height: 24px;
   color: ${({ theme }) => theme.colors.dark};
+  transition: 0.2s linear;
 
   cursor: pointer;
+
+  &:hover:enabled {
+    background-color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colorsThemed.button.color.common};
+    box-shadow: ${({ theme }) => theme.shadows.lightBlue};
+  }
 `;
