@@ -42,7 +42,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>
-        <Container noMaxContent>
+        <Container wideContainer>
           <Row>
             <Col>
               {isMobile && <Mobile />}

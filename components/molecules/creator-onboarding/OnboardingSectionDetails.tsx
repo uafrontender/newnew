@@ -517,7 +517,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               nickname: nicknameInEdit.trim(),
             }
           : {}),
-        ...(fieldsToBeUpdated.dateOfBirth
+        ...(fieldsToBeUpdated.dateOfBirth &&
+        !isEqual(user.userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
           ? {
               dateOfBirth: dateInEdit,
             }
