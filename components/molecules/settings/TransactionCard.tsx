@@ -5,6 +5,8 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
+import { useRouter } from 'next/dist/client/router';
+
 import Text from '../../atoms/Text';
 // Icons
 // import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
@@ -20,6 +22,7 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   transaction,
 }) => {
   const { t } = useTranslation('page-Profile');
+  const { locale } = useRouter();
   const user = useAppSelector((state) => state.user);
 
   return (
@@ -62,9 +65,9 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
         </SAmount>
       )}
       <SDate variant={2}>
-        {moment((transaction.createdAt?.seconds as number) * 1000).format(
-          'MMM DD YYYY'
-        )}
+        {moment((transaction.createdAt?.seconds as number) * 1000)
+          .locale(locale || 'en-US')
+          .format('MMM DD YYYY')}
       </SDate>
     </STransactionCard>
   );

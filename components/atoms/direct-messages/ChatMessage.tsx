@@ -126,11 +126,13 @@ const ChatMessage: React.FC<IChatMessage> = ({
       </>
     );
   }
+
   if (!nextElement) {
     let date = moment(itemElDate).format('MMM DD');
     if (date === moment().format('MMM DD')) {
       date = t('chat.today');
     }
+
     return (
       <>
         {content}
