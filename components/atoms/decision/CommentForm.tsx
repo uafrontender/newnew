@@ -84,6 +84,8 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       'tablet',
     ].includes(resizeMode);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     // Comment content from URL
     const { newCommentContentFromUrl, handleResetNewCommentContentFromUrl } =
       useContext(CommentFromUrlContext);
@@ -216,9 +218,15 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         return;
       }
 
-      onSubmit(commentToSend);
-      setCommentText('');
-      setCommentToSend('');
+      const handleOnSubmit = async () => {
+        setIsSubmitting(true);
+        await onSubmit(commentToSend);
+        setIsSubmitting(false);
+        setCommentText('');
+        setCommentToSend('');
+      };
+
+      handleOnSubmit();
     }, [commentToSend, commentTextError, isAPIValidateLoading, onSubmit]);
 
     const handleBlur = useCallback(() => {
@@ -278,13 +286,15 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
             withShadow
             view={commentText ? 'primaryGrad' : 'quaternary'}
             onClick={handleSubmit}
-            disabled={!commentText || !!commentTextError}
+            disabled={!commentText || !!commentTextError || isSubmitting}
             style={{
               ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
             }}
+            loading={isSubmitting}
+            loadingAnimationColor='blue'
           >
             <SInlineSVG
-              svg={sendIcon}
+              svg={!isSubmitting ? sendIcon : ''}
               fill={
                 commentText
                   ? theme.colors.white
