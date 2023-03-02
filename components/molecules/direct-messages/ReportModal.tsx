@@ -30,6 +30,7 @@ interface IReportModal {
   onClose: () => void;
 }
 
+// Accept user object, use JSX.element in ModalPaperTitle, use DisplayName component to add verification icon
 const ReportModal: React.FC<IReportModal> = React.memo(
   ({ show, reportedDisplayname, onClose, onSubmit }) => {
     const { t } = useTranslation('common');
@@ -165,7 +166,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       []
     );
 
-    // Use JSX.element in ModalPaperTitle, use DisplayName component to add verification icon
     return (
       <>
         <Modal show={show} onClose={handleClose} additionalz={1000}>

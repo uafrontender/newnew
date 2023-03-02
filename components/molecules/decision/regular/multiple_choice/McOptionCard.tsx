@@ -754,7 +754,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
             ).toString()}
-            postCreatorName={getDisplayname(creator)}
             optionText={option.text}
             onClose={() => handleCloseConfirmVoteModal()}
             handleOpenPaymentModal={() => handleOpenPaymentModal()}
