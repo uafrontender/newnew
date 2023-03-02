@@ -157,7 +157,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   }, [handlePlayerReady, options]);
 
   // Dispose the Video.js player when the functional component unmounts
-  // NB! From official example
+  // NB! From official example video.js
   useEffect(() => {
     const player = playerRef.current;
 
