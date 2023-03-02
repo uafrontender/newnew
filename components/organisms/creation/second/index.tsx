@@ -845,7 +845,7 @@ export const CreationSecondStepContent: React.FC<
                   )}
                   formattedDescription={formatExpiresAt()
                     .locale(router.locale || 'en-US')
-                    .format('DD MMM [at] hh:mm A')}
+                    .format(`DD MMM[${t('at')}]hh:mm A`)}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
@@ -859,7 +859,7 @@ export const CreationSecondStepContent: React.FC<
                   )}
                   formattedDescription={formatStartsAt()
                     .locale(router.locale || 'en-US')
-                    .format('DD MMM [at] hh:mm A')}
+                    .format(`DD MMM[${t('at')}]hh:mm A`)}
                 />
               </SFieldWrapper>
             </SListWrapper>
@@ -880,7 +880,7 @@ export const CreationSecondStepContent: React.FC<
                 )}
                 formattedDescription={formatExpiresAt()
                   .locale(router.locale || 'en-US')
-                  .format('DD MMM [at] hh:mm A')}
+                  .format(`DD MMM[${t('at')}]hh:mm A`)}
               />
             </SItemWrapper>
             <TabletStartDate
