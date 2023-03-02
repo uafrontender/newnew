@@ -413,13 +413,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           key: 'startsAt',
           value: `${formatStartsAt()
             .locale(router.locale || 'en-US')
-            .format('MMM DD YYYY [at] hh:mm A')} ${userTimezone}`,
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
         },
         {
           key: 'expiresAt',
           value: `${formatExpiresAt(false)
             .locale(router.locale || 'en-US')
-            .format('MMM DD YYYY [at] hh:mm A')} ${userTimezone}`,
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
         },
         {
           key: 'comments',
