@@ -142,7 +142,7 @@ export const SChatItemLine = styled.div`
 `;
 
 export const SChatItemText = styled(Text)`
-  display: inline;
+  display: inline-flex;
   flex-shrink: 1;
   overflow: hidden;
   text-overflow: ellipsis;

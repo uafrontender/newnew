@@ -19,7 +19,6 @@ import {
   SUserAlias,
   SChatItemM,
   SUserAvatar,
-  SVerificationSVG,
   SChatItemLine,
 } from '../../atoms/direct-messages/styles';
 import UserAvatar from '../UserAvatar';
@@ -33,13 +32,12 @@ import Modal from '../../organisms/Modal';
 import { getVisavisList } from '../../../api/endpoints/chat';
 
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../DisplayName';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -277,15 +275,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             <SChatItemCenter>
               <SChatItemLine>
                 <SChatItemText variant={3} weight={600}>
-                  {getDisplayname(chat.user)}
+                  <DisplayName user={chat.user} />
                 </SChatItemText>
-                {chat.user?.isVerified && (
-                  <SVerificationSVG
-                    svg={VerificationCheckmark}
-                    width='20px'
-                    height='20px'
-                  />
-                )}
               </SChatItemLine>
               <SUserAlias>@{chat.user?.username}</SUserAlias>
             </SChatItemCenter>

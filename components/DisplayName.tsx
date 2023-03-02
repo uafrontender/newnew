@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -6,23 +6,46 @@ import Link from 'next/link';
 import getDisplayname from '../utils/getDisplayname';
 import InlineSvg from './atoms/InlineSVG';
 import VerificationCheckmark from '../public/images/svg/icons/filled/Verification.svg';
+import { TUserData } from '../redux-store/slices/userStateSlice';
 
 interface IDisplayName {
   className?: string;
-  user?: newnewapi.IUser | null;
+  user: newnewapi.IUser | newnewapi.ITinyUser | TUserData | null | undefined;
+  altName?: string;
+  suffix?: string;
   href?: string;
   onClick?: () => void;
 }
 
-// TODO: Probably needs to cover "me", "I", "my" cases as well
 const DisplayName: React.FC<IDisplayName> = ({
   className,
   user,
+  altName,
+  suffix,
   href,
   onClick,
 }) => {
   const spanRef = useRef<HTMLSpanElement>(null);
   const [size, setSize] = useState<number>(0);
+
+  const isVerified: boolean = useMemo(() => {
+    if (!user) {
+      return false;
+    }
+
+    // Tiny user
+    if ('isVerified' in user) {
+      return user.isVerified ?? false;
+    }
+
+    // newnewapi.IUser | TUserData
+    if ('options' in user) {
+      return user.options?.isVerified ?? false;
+    }
+
+    return false;
+  }, [user]);
+  const gap = useMemo(() => Math.round(size / 10), [size]);
 
   useLayoutEffect(() => {
     if (spanRef.current) {
@@ -39,12 +62,14 @@ const DisplayName: React.FC<IDisplayName> = ({
       <>
         <Link href={href}>
           <SName ref={spanRef} className={className} onClick={onClick}>
-            {getDisplayname(user)}
+            {altName ?? getDisplayname(user)}
+            {suffix}
           </SName>
         </Link>
-        {user.options?.isVerified && (
+        {isVerified && (
           // Need to make icon to be the same size as span. No better way found.
           <SInlineSvg
+            gap={gap}
             height={`${size}px`}
             width='auto'
             svg={VerificationCheckmark}
@@ -59,11 +84,13 @@ const DisplayName: React.FC<IDisplayName> = ({
   return (
     <>
       <SName ref={spanRef} className={className} onClick={onClick}>
-        {getDisplayname(user)}
+        {altName ?? getDisplayname(user)}
+        {suffix}
       </SName>
-      {user.options?.isVerified && (
+      {isVerified && (
         // Need to make icon to be the same size as span. No better way found.
         <SInlineSvg
+          gap={gap}
           height={`${size}px`}
           width='auto'
           svg={VerificationCheckmark}
@@ -83,10 +110,9 @@ const SName = styled.span`
   text-overflow: ellipsis;
 `;
 
-const SInlineSvg = styled(InlineSvg)`
+const SInlineSvg = styled(InlineSvg)<{ gap: number }>`
   flex-shrink: 0;
-  // Should it depend on the size and be 1/10 of it?
-  margin-left: 4px;
+  margin-left: ${({ gap }) => `${gap}px`};
 
   svg {
     height: 100%;
