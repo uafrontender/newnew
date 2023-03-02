@@ -742,13 +742,15 @@
       "ac": {
         "numBiddersChoseSingular": "{{amount}} patrocinador escogió",
         "numBiddersChose": "{{amount}} patrocinadores escogieron",
-        "optionCreator": "la oferta de <0>{{nickname}}</0><1/>"
+        "optionCreator": "la oferta de <0/>",
+        "suffix": ""
       },
       "mc": {
         "numBiddersChoseSingular": "{{amount}} votante escogió",
         "numBiddersChose": "{{amount}} votantes escogieron",
         "optionOwn": "la opción",
-        "optionCreator": "la opción de <0>{{nickname}}</0><1/>"
+        "optionCreator": "la opción de <0/>",
+        "suffix": ""
       }
     }
   },
