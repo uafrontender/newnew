@@ -31,6 +31,7 @@ import { getRoom } from '../../../../api/endpoints/chat';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import { useAppState } from '../../../../contexts/appStateContext';
+import Loader from '../../../atoms/Loader';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -72,11 +73,18 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
 
+  const [chatRoomLoading, setChatRoomLoading] = useState(false);
+
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isSmallDesktop = ['laptop', 'laptopM'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
+
+  const {
+    query: { tab = isDesktop ? 'notifications' : '' },
+  } = router;
 
   const [showNewMessageModal, setShowNewMessageModal] =
     useState<boolean>(false);
@@ -84,11 +92,6 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const closeNewMsgModal = () => {
     setShowNewMessageModal(false);
   };
-
-  const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
-  const {
-    query: { tab = isDesktop ? 'notifications' : '' },
-  } = router;
 
   const tabs: Tab[] = useMemo(() => {
     if (directMessagesAvailable) {
@@ -201,11 +204,12 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     if (
       router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
       !activeChatRoom &&
-      hiddenMessagesArea === false
+      hiddenMessagesArea !== true
     ) {
       if (router.query.roomID) {
         (async () => {
           try {
+            setChatRoomLoading(true);
             const payload = new newnewapi.GetRoomRequest({
               roomId: _.toNumber(router.query.roomID),
             });
@@ -218,6 +222,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
           } catch (err) {
             router.push(`${baseUrl}?tab=chat`);
             console.error(err);
+          } finally {
+            setChatRoomLoading(false);
           }
         })();
       }
@@ -301,12 +307,17 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
           isDashboardMessages={tab === 'direct-messages'}
         >
           {tab === 'direct-messages' ? (
-            activeChatRoom && (
-              <>
-                <ChatContent chatRoom={activeChatRoom!!} />
-                <ChatList hidden />
-              </>
-            )
+            <>
+              {activeChatRoom && !chatRoomLoading && (
+                <>
+                  <ChatContent chatRoom={activeChatRoom!!} />
+                  <ChatList hidden />
+                </>
+              )}
+              {!activeChatRoom && chatRoomLoading && (
+                <Loader size='md' isStatic />
+              )}
+            </>
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>
