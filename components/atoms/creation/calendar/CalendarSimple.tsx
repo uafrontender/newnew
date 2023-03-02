@@ -22,11 +22,12 @@ import { DAYS } from '../../../../constants/general';
 
 interface ICalendarSimple {
   date: any;
+  maxDate?: Date;
   onChange: (date: any) => void;
 }
 
 export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
-  const { date, onChange } = props;
+  const { date, maxDate, onChange } = props;
   const monthsToRender = [
     moment().startOf('month'),
     moment().startOf('month').add(1, 'month'),
@@ -89,6 +90,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     (el: moment.Moment, index: number) => {
       const opts: any = {
         date: el,
+        maxDate,
       };
 
       if (index === 0) {
@@ -106,7 +108,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
         </SDaysListItem>
       );
     },
-    [date, handleChange]
+    [date, maxDate, handleChange]
   );
 
   useOnClickEsc(wrapperRef, handleClose);
