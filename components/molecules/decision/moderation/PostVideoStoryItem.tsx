@@ -4,12 +4,9 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoStoryItem {
   video: newnewapi.IVideoUrls;
@@ -32,7 +29,7 @@ const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
       key={`key_${video?.uuid}_${index}`}
     >
       {isVisible ? (
-        <PostBitmovinPlayer
+        <PostVideojsPlayer
           id={`id_${video?.uuid ?? index}`}
           resources={video}
           muted={isMuted}

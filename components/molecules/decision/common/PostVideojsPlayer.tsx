@@ -1,6 +1,5 @@
 /* eslint-disable no-multi-assign */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useRef,
   useMemo,
@@ -11,6 +10,7 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import videojs from 'video.js';
+import 'videojs-contrib-quality-levels';
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -19,7 +19,7 @@ import logoAnimation from '../../../../public/animations/mobile_logo.json';
 import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
 import PlayerScrubber from '../../../atoms/PlayerScrubber';
 
-interface IPostBitmovinPlayer {
+interface IPostVideojsPlayer {
   id: string;
   muted?: boolean;
   resources?: newnewapi.IVideoUrls;
@@ -27,10 +27,10 @@ interface IPostBitmovinPlayer {
   showPlayButton?: boolean;
 }
 
-export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
+export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
   ({ id, muted, resources, videoDurationWithTime, showPlayButton }) => {
-    const videoRef = React.useRef(null);
-    const playerRef = React.useRef<videojs.Player>();
+    const videoRef = useRef(null);
+    const playerRef = useRef<videojs.Player>();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -43,10 +43,12 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
 
     const [playbackTime, setPlaybackTime] = useState(0);
     const handlePlayerScrubberChangeTime = useCallback(
-      (v: number) => {
+      (newValue: number) => {
+        // Pause the player when scrubbing
+        // to avoid double playback start
         playerRef.current?.pause();
-        setPlaybackTime(v);
-        playerRef.current?.currentTime(v);
+        setPlaybackTime(newValue);
+        playerRef.current?.currentTime(newValue);
 
         setTimeout(() => {
           playerRef.current?.play()?.catch(() => {
@@ -59,7 +61,6 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
 
     const options: videojs.PlayerOptions = useMemo(
       () => ({
-        autoplay: true as videojs.Autoplay,
         loop: true,
         controls: false,
         responsive: false,
@@ -74,58 +75,46 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
       [resources]
     );
 
-    useEffect(() => {
-      console.log(resources);
-    }, [resources]);
-
+    // playerRef is set here, as well as all the listeners
+    // List of video.js events
+    // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
     const handlePlayerReady = useCallback(
       (p: videojs.Player) => {
         playerRef.current = p;
 
-        p.on('waiting', () => {
-          videojs.log('player is waiting');
-        });
+        // Autoplay
         p.on('ready', () => {
-          videojs.log('player is ready');
-          // playerRef.current?.play()?.catch(() => {
-          //   handleSetIsPaused(true);
-          // });
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
         });
-        p.on('dispose', () => {
-          videojs.log('player will dispose');
-        });
+
+        // Paused state
         p.on('play', () => {
-          videojs.log('player is playing');
           handleSetIsPaused(false);
         });
         p.on('pause', () => {
-          videojs.log('player is paused');
           handleSetIsPaused(true);
         });
+
         p.on('timeupdate', (e) => {
           setPlaybackTime(p.currentTime());
         });
+
+        // Loading state
         p.on('loadstart', (e) => {
-          videojs.log('player is loading');
           setIsLoading(true);
         });
         p.on('canplay', (e) => {
-          videojs.log('player is canplay');
           setIsLoading(false);
-          // p?.play()?.catch(() => {
-          //   handleSetIsPaused(true);
-          // });
         });
       },
       [handleSetIsPaused]
     );
 
     useEffect(() => {
-      console.log('init!');
       // Make sure Video.js player is only initialized once
       if (!playerRef.current) {
-        console.log('ha!');
-
         // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
         const videoElement = document.createElement('video-js');
 
@@ -137,31 +126,15 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
           videoElement,
           options,
           () => {
-            videojs.log('player is ready');
             handlePlayerReady && handlePlayerReady(player);
           }
         ));
-
-        // You could update an existing player in the `else` block here
-        // on prop change, for example:
-      } else {
-        console.log('ho!');
-
-        try {
-          const player = playerRef.current;
-
-          player.autoplay(options.autoplay!!);
-          player.src(options.sources!!);
-        } catch (err) {
-          handleSetIsPaused(true);
-        }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [handlePlayerReady, options]);
 
     // Dispose the Video.js player when the functional component unmounts
+    // NB! From official example
     useEffect(() => {
-      console.log('mounted');
       const player = playerRef.current;
 
       return () => {
@@ -246,9 +219,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
   }
 );
 
-export default PostBitmovinPlayer;
+export default PostVideojsPlayer;
 
-PostBitmovinPlayer.defaultProps = {
+PostVideojsPlayer.defaultProps = {
   muted: true,
   resources: {},
   showPlayButton: false,

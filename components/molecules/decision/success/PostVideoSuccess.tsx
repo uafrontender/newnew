@@ -14,12 +14,9 @@ import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoSuccess {
   postUuid: string;
@@ -144,7 +141,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       {openedTab === 'response' && response ? (
         <>
           {!additionalResponses || additionalResponses.length === 0 ? (
-            <PostBitmovinPlayer
+            <PostVideojsPlayer
               key={postUuid}
               id={`video-${postUuid}`}
               resources={response}
@@ -169,7 +166,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         </>
       ) : (
         <>
-          <PostBitmovinPlayer
+          <PostVideojsPlayer
             id={postUuid}
             resources={announcement}
             muted={isMuted}
