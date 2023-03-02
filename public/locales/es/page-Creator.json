@@ -37,8 +37,8 @@
         "textBio": "Añade una biografía para retirar tus ganancias",
         "textBank": "Añade tus datos bancarios para retirar tus ganancias",
         "button": "Añadir",
-        "stripeIssue_NEED_TRANSLATION": "There's an issue with your Stripe account",
-        "stripeIssueButton_NEED_TRANSLATION": "See Stripe account"
+        "stripeIssue": "Hay un problema con tu cuenta de Stripe",
+        "stripeIssueButton": "Ver cuenta de Stripe"
       },
       "makeDecision": {
         "text": "Haz una publicación. Empieza a ganar dinero.",
@@ -46,8 +46,8 @@
       },
       "list": {
         "ac": "Bids",
-        "cf": "Superpolls",
-        "mc": "Goals",
+        "mc": "Superpolls",
+        "cf": "Goals",
         "bundles": "Bundles"
       },
       "filter": {
@@ -121,12 +121,12 @@
       "payPeriod": "este periodo de pago",
       "unitName": "bundle",
       "earned": "ha generado",
-      "noSoldYet": "Todavía no se ha vendido ningún BUNDLE",
+      "noSoldYet": "Todavía no se ha vendido ningún Bundle",
       "sold": "vendidos"
     },
     "bundlesSet": {
       "title": "Bundles de Superpoll",
-      "subTitle": "Ofrece bundles de Superpoll para aumentar tus ganancias y acercarte a tu audiencia. ",
+      "subTitle": "Ofrece Bundles de Superpoll para aumentar tus ganancias y acercarte a tu audiencia. ",
       "votes": "votos",
       "description": "Además, la gente obtiene {{duration}} meses de:",
       "descriptionSingular": "Además, la gente obtiene 1 mes de:",

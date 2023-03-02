@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useAppSelector } from '../../redux-store/store';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface ICardSkeleton {
   count: number;
@@ -114,7 +114,7 @@ interface ICardSkeletonSection {
 export const CardSkeletonSection: React.FunctionComponent<
   ICardSkeletonSection
 > = ({ count, width, height, ...restProps }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -175,7 +175,7 @@ export const CardSkeletonList: React.FunctionComponent<ICardSkeletonList> = ({
   count,
   wrapperStyle,
 }) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

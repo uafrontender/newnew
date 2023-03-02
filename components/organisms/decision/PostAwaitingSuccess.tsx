@@ -5,13 +5,13 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import { usePostInnerState } from '../../../contexts/postInnerContext';
-import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
 import GoBackButton from '../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -23,7 +23,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
   IPostAwaitingSuccess
 > = () => {
   const { t } = useTranslation('page-Post');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

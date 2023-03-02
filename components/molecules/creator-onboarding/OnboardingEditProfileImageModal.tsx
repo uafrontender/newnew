@@ -4,7 +4,6 @@ import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { Area, Point } from 'react-easy-crop/types';
 
-import { useAppSelector } from '../../../redux-store/store';
 import getCroppedImg from '../../../utils/cropImage';
 
 import Modal from '../../organisms/Modal';
@@ -17,11 +16,13 @@ import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import Button from '../../atoms/Button';
 import ProfileImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 import isBrowser from '../../../utils/isBrowser';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingEditProfileImageModal {
   isOpen: boolean;
   avatarUrlInEdit: string;
   originalProfileImageWidth: number;
+  minZoom: number;
   setAvatarUrlInEdit: (value: string) => void;
   handleSetImageToSave: (value: File) => void;
   onClose: () => void;
@@ -33,13 +34,14 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
   isOpen,
   avatarUrlInEdit,
   originalProfileImageWidth,
+  minZoom,
   setAvatarUrlInEdit,
   handleSetImageToSave,
   onClose,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -51,31 +53,21 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
   });
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
     useState<Area>();
-  const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [zoomProfileImage, setZoomProfileImage] = useState(minZoom);
   const [loading, setLoading] = useState(false);
 
   const handleSetStageToEditingGeneralUnsetPicture = () => {
     onClose();
     setAvatarUrlInEdit('');
-    setZoomProfileImage(1);
+    setZoomProfileImage(minZoom);
   };
 
   const handleZoomOutProfileImage = () => {
-    if (zoomProfileImage <= 1) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage - 0.2 <= 1) return 1;
-      return z - 0.2;
-    });
+    setZoomProfileImage((z) => Math.max(z - 0.2, minZoom));
   };
 
   const handleZoomInProfileImage = () => {
-    if (zoomProfileImage >= 3) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= 3) return 3;
-      return z + 0.2;
-    });
+    setZoomProfileImage((z) => Math.min(zoomProfileImage + 0.2, minZoom + 2));
   };
 
   const onCropCompleteProfileImage = useCallback(
@@ -145,6 +137,8 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
         <ProfileImageCropper
           crop={cropProfileImage}
           zoom={zoomProfileImage}
+          minZoom={minZoom}
+          maxZoom={minZoom + 2}
           avatarUrlInEdit={avatarUrlInEdit}
           originalImageWidth={originalProfileImageWidth}
           disabled={loading}
@@ -157,7 +151,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
             iconOnly
             size='sm'
             view='transparent'
-            disabled={zoomProfileImage <= 1 || loading}
+            disabled={zoomProfileImage <= minZoom || loading}
             onClick={handleZoomOutProfileImage}
           >
             <InlineSvg
@@ -169,8 +163,8 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
           </Button>
           <ProfileImageZoomSlider
             value={zoomProfileImage}
-            min={1}
-            max={3}
+            min={minZoom}
+            max={minZoom + 2}
             step={0.1}
             ariaLabel='Zoom'
             disabled={loading}
@@ -180,7 +174,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
             iconOnly
             size='sm'
             view='transparent'
-            disabled={zoomProfileImage >= 3 || loading}
+            disabled={zoomProfileImage >= minZoom + 2 || loading}
             onClick={handleZoomInProfileImage}
           >
             <InlineSvg
@@ -229,12 +223,12 @@ const SEditPictureMenu = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: min(15vh, 136px);
+    top: max(min((100vh - 690px) / 2, 136px), 0px);
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 75vh;
-    max-height: 684px;
+    height: 100%;
+    max-height: 690px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }

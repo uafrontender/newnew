@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
@@ -20,7 +20,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
   onClose,
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -62,7 +62,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
   }, [isOpen]);
 
   return (
-    <Modal show={isOpen} overlaydim additionalz={zIndex}>
+    <Modal show={isOpen} additionalz={zIndex}>
       <Container>
         <Content>
           <SHeading variant={5}>{t('tosSection.heading')}</SHeading>
@@ -219,10 +219,13 @@ const STosText = styled.div`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  ${({ theme }) => theme.media.laptop} {
-    // Remove scrollbar on laptop
-    margin-right: -58px;
-    padding-right: 58px;
+  ${({ theme }) => theme.media.tablet} {
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 `;
 

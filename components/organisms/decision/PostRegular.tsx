@@ -6,7 +6,6 @@ import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 
 import { usePostInnerState } from '../../../contexts/postInnerContext';
-import { useAppSelector } from '../../../redux-store/store';
 import getDisplayname from '../../../utils/getDisplayname';
 
 import RegularView from './regular';
@@ -16,6 +15,7 @@ import Headline from '../../atoms/Headline';
 import assets from '../../../constants/assets';
 import GoBackButton from '../../molecules/GoBackButton';
 import isBrowser from '../../../utils/isBrowser';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ListPostPage = dynamic(() => import('../see-more/ListPostPage'));
 const PostFailedBox = dynamic(
@@ -43,7 +43,7 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

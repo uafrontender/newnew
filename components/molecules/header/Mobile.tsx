@@ -6,22 +6,41 @@ import { useTranslation } from 'next-i18next';
 
 import Logo from '../Logo';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/search/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Button from '../../atoms/Button';
+import StaticSearchInput from '../../atoms/search/StaticSearchInput';
+import SearchInput from '../../atoms/search/SearchInput';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation();
 
+  const { resizeMode } = useAppState();
+
+  const isMobileS = ['mobile', 'mobileS'].includes(resizeMode);
+  const isMobileM = ['mobileM'].includes(resizeMode);
+  const isMobileL = ['mobileL'].includes(resizeMode);
+
   return (
     <SContainer>
-      <Logo />
+      <Logo isShort />
       <SRightBlock>
-        <SItemWithMargin>
+        {isMobileS && user.loggedIn ? (
           <SearchInput />
-        </SItemWithMargin>
+        ) : (
+          <StaticSearchInput
+            // TODO: remove nested ternary
+            width={
+              isMobileL && user.loggedIn
+                ? '40vw'
+                : isMobileM && user.loggedIn
+                ? '150px'
+                : undefined
+            }
+          />
+        )}
         <SItemWithMargin>
           <Link
             href={
@@ -120,16 +139,12 @@ const SRightBlock = styled.nav`
 const SItemWithMargin = styled.div`
   margin-left: 6px;
 
-  ${(props) => props.theme.media.mobileM} {
+  ${(props) => props.theme.media.mobileL} {
     margin-left: 16px;
   }
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 24px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-left: 16px;
   }
 `;
 

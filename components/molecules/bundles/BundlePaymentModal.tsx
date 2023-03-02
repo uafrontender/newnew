@@ -13,14 +13,32 @@ import getDisplayname from '../../../utils/getDisplayname';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { ModalType } from '../../organisms/Modal';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
 import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
 
+const getPayWithCardErrorMessage = (
+  status?: newnewapi.BuyCreatorsBundleResponse.Status
+) => {
+  switch (status) {
+    case newnewapi.BuyCreatorsBundleResponse.Status.NOT_ENOUGH_FUNDS:
+      return 'errors.notEnoughMoney';
+    case newnewapi.BuyCreatorsBundleResponse.Status.CARD_NOT_FOUND:
+      return 'errors.cardNotFound';
+    case newnewapi.BuyCreatorsBundleResponse.Status.CARD_CANNOT_BE_USED:
+      return 'errors.cardCannotBeUsed';
+    default:
+      return 'errors.requestFailed';
+  }
+};
+
 interface IBundlePaymentModal {
   creator: newnewapi.IUser;
   bundleOffer: newnewapi.IBundleOffer;
+  successPath: string;
+  modalType?: ModalType;
   additionalZ?: number;
   onClose: () => void;
   onCloseSuccessModal?: () => void;
@@ -29,11 +47,14 @@ interface IBundlePaymentModal {
 const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   creator,
   bundleOffer,
+  successPath,
+  modalType,
   additionalZ,
   onClose,
   onCloseSuccessModal,
 }) => {
   const { t } = useTranslation('common');
+  const { t: tPost } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
   const router = useRouter();
   const { appConstants } = useGetAppConstants();
@@ -71,10 +92,17 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
     [creator, bundleOffer, paymentFeeInCents]
   );
 
+  const successUrl = useMemo(() => {
+    if (successPath.includes('?')) {
+      return `${process.env.NEXT_PUBLIC_APP_URL}${successPath}&bundle=true`;
+    }
+    return `${process.env.NEXT_PUBLIC_APP_URL}${successPath}?bundle=true`;
+  }, [successPath]);
+
   const setupIntent = useStripeSetupIntent({
     purpose: buyCreatorsBundleRequest,
     isGuest: !user.loggedIn,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/bundles`,
+    successUrl,
   });
 
   const handlePayWithCard = useCallback(
@@ -119,7 +147,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ?? t('modal.buyBundle.error.requestFailed')
+            res.error?.message ??
+              tPost(getPayWithCardErrorMessage(res.data?.status))
           );
         }
 
@@ -132,7 +161,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         setupIntent.destroy();
       }
     },
-    [setupIntent, router, t, showErrorToastCustom]
+    [setupIntent, router, tPost, showErrorToastCustom]
   );
 
   const paymentWithFeeInCents = useMemo(
@@ -151,8 +180,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         isOpen
         amount={paymentWithFeeInCents}
         setupIntent={setupIntent}
-        // TODO: fix redirect url (pass as prop?)
         redirectUrl='bundles'
+        modalType={paymentSuccessModalOpen ? 'covered' : modalType}
         onClose={onClose}
         handlePayWithCard={handlePayWithCard}
       >
@@ -189,6 +218,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
       {paymentSuccessModalOpen && (
         <BundlePaymentSuccessModal
           show
+          modalType={modalType === 'covered' ? 'covered' : 'following'}
           zIndex={additionalZ ? additionalZ + 1 : 13}
           creator={creator}
           bundleOffer={bundleOffer}

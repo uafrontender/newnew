@@ -1,19 +1,15 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'next-i18next';
+import React, { useEffect } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
 import { useAppSelector } from '../redux-store/store';
 import { useBundles } from '../contexts/bundlesContext';
-import { Mixpanel } from '../utils/mixpanel';
-import { buyCreatorsBundle } from '../api/endpoints/bundles';
-import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import useBuyBundleAfterStripeRedirect from '../utils/hooks/useBuyBundleAfterStripeRedirect';
 
 const Bundles = dynamic(
   () => import('../components/organisms/bundles/Bundles')
@@ -29,79 +25,12 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
   saveCardFromRedirect,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('page-Bundles');
-  const { user } = useAppSelector((state) => state);
-  const { showErrorToastCustom } = useErrorToasts();
-  const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
-    useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
-  const [saveCard, setSaveCard] = useState(
-    () => saveCardFromRedirect ?? undefined
-  );
-
   const { bundles } = useBundles();
-
-  const buyBundleAfterStripeRedirect = useCallback(async () => {
-    if (!stripeSetupIntentClientSecret) {
-      return;
-    }
-
-    if (!user._persist?.rehydrated) {
-      return;
-    }
-
-    if (!user.loggedIn) {
-      router.push(
-        `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-      );
-      return;
-    }
-
-    Mixpanel.track('Buy Bundle After Stripe Redirect');
-
-    try {
-      const stripeContributionRequest = new newnewapi.StripeContributionRequest(
-        {
-          stripeSetupIntentClientSecret,
-          saveCard,
-        }
-      );
-
-      // Reset
-      setStripeSetupIntentClientSecret(undefined);
-      setSaveCard(undefined);
-
-      const res = await buyCreatorsBundle(stripeContributionRequest);
-
-      if (
-        !res.data ||
-        res.error ||
-        res.data.status !== newnewapi.BuyCreatorsBundleResponse.Status.SUCCESS
-      ) {
-        throw new Error(res.error?.message ?? t('error.requestFailed'));
-      }
-    } catch (err: any) {
-      console.error(err);
-      showErrorToastCustom(err.message);
-    } finally {
-      router.replace('/bundles');
-    }
-  }, [
-    stripeSetupIntentClientSecret,
-    user._persist?.rehydrated,
-    user.loggedIn,
-    router,
-    saveCard,
-    t,
-    showErrorToastCustom,
-  ]);
-
-  // A Delay allows to cancel first request when the second full re-render happens
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      buyBundleAfterStripeRedirect();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [buyBundleAfterStripeRedirect]);
+  const { user } = useAppSelector((state) => state);
+  useBuyBundleAfterStripeRedirect(
+    stripeSetupIntentClientSecretFromRedirect,
+    saveCardFromRedirect
+  );
 
   useEffect(() => {
     if (
@@ -116,7 +45,6 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
     user._persist?.rehydrated,
     bundles,
     router,
-    buyBundleAfterStripeRedirect,
   ]);
 
   return <Bundles />;
@@ -137,7 +65,7 @@ export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
   );
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'page-Bundles', 'modal-PaymentModal'],
+    ['common', 'page-Bundles', 'modal-PaymentModal', 'page-Post'],
     null,
     SUPPORTED_LANGUAGES
   );
@@ -148,6 +76,7 @@ export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
   return {
     props: {
       ...translationContext,
+      // setup intent on this page is always for bundles
       // eslint-disable-next-line camelcase, object-shorthand
       ...(setup_intent_client_secret &&
       !Array.isArray(setup_intent_client_secret)

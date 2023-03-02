@@ -41,14 +41,19 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue =
-      (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
+      e.target.value[0] === '@' ? e.target.value.slice(1) : e.target.value;
 
     onChange(newValue);
   };
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      return;
+    }
+
+    if (isValid) {
+      setErrorBordersShown(false);
+    }
   }, [focused, isValid]);
 
   const inputContainerRef = useRef(null);
@@ -211,8 +216,7 @@ const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsername
   line-height: 24px;
   font-weight: 500;
 
-  padding: 12px 40px 12px 20px;
-  padding-right: 32px;
+  padding: 12px 48px 12px 20px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
@@ -307,13 +311,16 @@ const SErrorDiv = styled.div`
 `;
 
 const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  display: block;
+  width: 100%;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 
   margin-top: 16px;
 
-  text-align: center;
+  text-align: start;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;

@@ -75,6 +75,7 @@ import useErrorToasts, {
 } from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 import RichTextInput from '../../../atoms/creation/RichTextInput';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -118,11 +119,11 @@ export const CreationSecondStepContent: React.FC<
     crowdfunding,
     multiplechoice,
     videoProcessing,
+    customCoverImageUrl,
   } = useAppSelector((state) => state.creation);
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { overlayModeEnabled } = useOverlayMode();
-
   const { appConstants } = useGetAppConstants();
 
   const cfFormattedDescription = useMemo(() => {
@@ -598,7 +599,7 @@ export const CreationSecondStepContent: React.FC<
         // });
         dispatch(setCreationTitle(value.trim() ? value : ''));
       } else if (key === 'minimalBid') {
-        Mixpanel.track('Minimal Big Change', {
+        Mixpanel.track('Minimal Bid Change', {
           _stage: 'Creation',
           _value: value,
         });
@@ -842,9 +843,9 @@ export const CreationSecondStepContent: React.FC<
                   formattedValue={t(
                     `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
-                  formattedDescription={formatExpiresAt().format(
-                    'DD MMM [at] hh:mm A'
-                  )}
+                  formattedDescription={formatExpiresAt()
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM [at] hh:mm A')}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
@@ -856,9 +857,9 @@ export const CreationSecondStepContent: React.FC<
                   formattedValue={t(
                     `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
-                  formattedDescription={formatStartsAt().format(
-                    'DD MMM [at] hh:mm A'
-                  )}
+                  formattedDescription={formatStartsAt()
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM [at] hh:mm A')}
                 />
               </SFieldWrapper>
             </SListWrapper>
@@ -877,9 +878,9 @@ export const CreationSecondStepContent: React.FC<
                 formattedValue={t(
                   `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
-                formattedDescription={formatExpiresAt().format(
-                  'DD MMM [at] hh:mm A'
-                )}
+                formattedDescription={formatExpiresAt()
+                  .locale(router.locale || 'en-US')
+                  .format('DD MMM [at] hh:mm A')}
               />
             </SItemWrapper>
             <TabletStartDate
@@ -910,6 +911,7 @@ export const CreationSecondStepContent: React.FC<
       post.startsAt,
       post.options.commentsEnabled,
       expireOptions,
+      router.locale,
       t,
       formatExpiresAt,
       formatStartsAt,
@@ -1021,9 +1023,9 @@ export const CreationSecondStepContent: React.FC<
   useEffect(() => {
     if (playerRef.current && isDesktop) {
       if (overlayModeEnabled) {
-        playerRef.current.pause();
+        playerRef.current?.pause()?.catch(() => {});
       } else {
-        playerRef.current.play().catch(() => {});
+        playerRef.current?.play()?.catch(() => {});
       }
     }
   }, [overlayModeEnabled, isDesktop]);
@@ -1187,6 +1189,7 @@ export const CreationSecondStepContent: React.FC<
                 id='video'
                 value={videoProcessing?.targetUrls}
                 thumbnails={post.thumbnailParameters}
+                customCoverImageUrl={customCoverImageUrl}
                 etaUpload={fileUpload.eta}
                 errorUpload={fileUpload.error}
                 loadingUpload={fileUpload.loading}
@@ -1288,6 +1291,7 @@ export const CreationSecondStepContent: React.FC<
                           borderRadius='16px'
                           mutePosition='left'
                           showPlayButton
+                          withScrubber
                         />
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>

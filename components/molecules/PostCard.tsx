@@ -18,6 +18,7 @@ import Text from '../atoms/Text';
 import Button from '../atoms/Button';
 import InlineSVG from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
+import Loader from '../atoms/Loader';
 
 import { formatNumber } from '../../utils/format';
 import { useAppSelector } from '../../redux-store/store';
@@ -59,6 +60,7 @@ import PostCardEllipseModal from './PostCardEllipseModal';
 import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 import getChunks from '../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -113,7 +115,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -126,6 +128,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     // Hovered state
     const [hovered, setHovered] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
+    const [isVideoLoading, setIsVideoLoading] = useState(false);
 
     const handleSetHovered = () => setHovered(true);
     const handleSetUnhovered = () => {
@@ -139,6 +142,14 @@ export const PostCard: React.FC<ICard> = React.memo(
     };
 
     useOnTouchStartOutside(wrapperRef, handleClickOutsideMobile);
+
+    const handleVideoEnded = useCallback(() => {
+      if (hovered) {
+        videoRef?.current?.play().catch(() => {
+          console.error('Autoplay is not allowed');
+        });
+      }
+    }, [hovered]);
 
     // Socket
     const socketConnection = useContext(SocketContext);
@@ -385,7 +396,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     useEffect(() => {
       if (hovered) {
         videoRef.current?.play().catch(() => {
-          console.error("Autoplay doesn't allowed");
+          console.error('Autoplay is not allowed');
         });
       } else {
         videoRef.current?.pause();
@@ -397,14 +408,28 @@ export const PostCard: React.FC<ICard> = React.memo(
     useEffect(() => {
       const handleCanPlay = () => {
         setVideoReady(true);
+        setIsVideoLoading(false);
+      };
+
+      const handleLoadStart = () => {
+        setIsVideoLoading(true);
+      };
+
+      const handleLoadedData = () => {
+        setIsVideoLoading(false);
       };
 
       videoRef.current?.addEventListener('canplay', handleCanPlay);
+      videoRef.current?.addEventListener('loadstart', handleLoadStart);
+      videoRef.current?.addEventListener('loadeddata', handleLoadedData);
+      videoRef.current?.addEventListener('ended', handleVideoEnded);
 
       return () => {
         videoRef.current?.removeEventListener('canplay', handleCanPlay);
+        videoRef.current?.removeEventListener('loadstart', handleLoadStart);
+        videoRef.current?.removeEventListener('ended', handleVideoEnded);
       };
-    }, []);
+    }, [handleVideoEnded]);
 
     useEffect(() => {
       router.prefetch(
@@ -458,7 +483,12 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
-              <SThumnailHolder
+              {isVideoLoading && hovered && !videoReady ? (
+                <SLoaderContainer>
+                  <Loader size='sm' />
+                </SLoaderContainer>
+              ) : null}
+              <SThumbnailHolder
                 className='thumnailHolder'
                 src={
                   (coverImageUrl ||
@@ -467,14 +497,13 @@ export const PostCard: React.FC<ICard> = React.memo(
                 }
                 alt='Post'
                 draggable={false}
-                hovered={hovered && videoReady}
+                hovered={hovered && videoReady && !isVideoLoading}
               />
               <video
                 ref={(el) => {
                   videoRef.current = el!!;
                 }}
                 key={thumbnailUrl}
-                loop
                 muted
                 playsInline
               >
@@ -570,7 +599,12 @@ export const PostCard: React.FC<ICard> = React.memo(
       >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
-            <SThumnailHolder
+            {isVideoLoading && hovered && !videoReady ? (
+              <SLoaderContainer>
+                <Loader size='sm' />
+              </SLoaderContainer>
+            ) : null}
+            <SThumbnailHolder
               className='thumnailHolder'
               src={
                 (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
@@ -578,16 +612,16 @@ export const PostCard: React.FC<ICard> = React.memo(
               }
               alt='Post'
               draggable={false}
-              hovered={hovered && videoReady}
+              hovered={hovered && videoReady && !isVideoLoading}
             />
             <video
               ref={(el) => {
                 videoRef.current = el!!;
               }}
               key={thumbnailUrl}
-              loop
               muted
               playsInline
+              preload='none'
             >
               <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
             </video>
@@ -960,7 +994,7 @@ const SImageHolder = styled.div<ISWrapper>`
   }
 `;
 
-const SThumnailHolder = styled.img<{
+const SThumbnailHolder = styled.img<{
   hovered: boolean;
 }>`
   opacity: ${({ hovered }) => (hovered ? 0 : 1)};
@@ -1120,6 +1154,20 @@ const SImageHolderOutside = styled.div`
     height: 100%;
     /* z-index: -1; */
   }
+`;
+
+const SLoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 10;
 `;
 
 const SBottomContentOutside = styled.div`

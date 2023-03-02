@@ -18,6 +18,7 @@
     "noToken": "沒有令牌",
     "invalidToken": "无效的令牌"
   },
+  "leaveAlert": "確定要離開本頁嗎？",
   "verifying": "正在驗證新電子郵件......",
   "backButton": "返回",
   "updated": "電子郵件已更新！",

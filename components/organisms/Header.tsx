@@ -12,6 +12,7 @@ import Container from '../atoms/Grid/Container';
 
 import { useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IHeader {
   visible: boolean;
@@ -19,7 +20,8 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -40,7 +42,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>
-        <Container noMaxContent>
+        <Container wideContainer>
           <Row>
             <Col>
               {isMobile && <Mobile />}

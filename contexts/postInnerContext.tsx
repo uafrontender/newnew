@@ -37,6 +37,8 @@ const PostInnerContext = createContext<{
   recommendedPosts: newnewapi.Post[];
   saveCard: boolean | undefined;
   stripeSetupIntentClientSecret: string | undefined;
+  bundleStripeSetupIntentClientSecret: string | undefined;
+  customOptionTextFromRedirect: string | undefined;
   loadingRef: any;
   recommendedPostsLoading: boolean;
   reportPostOpen: boolean;
@@ -48,6 +50,7 @@ const PostInnerContext = createContext<{
   handleGoBackInsidePost: () => void;
   handleReportOpen: () => void;
   resetSetupIntentClientSecret: () => void;
+  resetBundleSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
   shareMenuOpen: boolean;
   deletePostOpen: boolean;
@@ -61,6 +64,8 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  handleUpdatePostTitle: (newTitle: string) => Promise<void>;
+  isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
@@ -76,6 +81,8 @@ const PostInnerContext = createContext<{
   recommendedPosts: [],
   saveCard: undefined,
   stripeSetupIntentClientSecret: undefined,
+  bundleStripeSetupIntentClientSecret: undefined,
+  customOptionTextFromRedirect: undefined,
   loadingRef: undefined,
   recommendedPostsLoading: false,
   reportPostOpen: false,
@@ -90,6 +97,7 @@ const PostInnerContext = createContext<{
   handleGoBackInsidePost: () => {},
   handleReportOpen: () => {},
   resetSetupIntentClientSecret: () => {},
+  resetBundleSetupIntentClientSecret: () => {},
   handleCloseAndGoBack: () => {},
   shareMenuOpen: false,
   deletePostOpen: false,
@@ -103,6 +111,8 @@ const PostInnerContext = createContext<{
   handleOpenEllipseMenu: () => {},
   handleCloseDeletePostModal: () => {},
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
+  handleUpdatePostTitle: (() => {}) as () => Promise<void>,
+  isUpdateTitleLoading: false,
   refetchPost: (() => {}) as any,
 });
 
@@ -121,6 +131,8 @@ interface IPostContextProvider {
   recommendedPosts: newnewapi.Post[];
   saveCard: boolean | undefined;
   stripeSetupIntentClientSecret: string | undefined;
+  bundleStripeSetupIntentClientSecret: string | undefined;
+  customOptionText: string | undefined;
   loadingRef: any;
   recommendedPostsLoading: boolean;
   handleSeeNewDeletedBox: () => void;
@@ -128,6 +140,7 @@ interface IPostContextProvider {
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
   resetSetupIntentClientSecret: () => void;
+  resetBundleSetupIntentClientSecret: () => void;
   handleCloseAndGoBack: () => void;
   handleFollowDecision: () => Promise<void>;
   deletePostOpen: boolean;
@@ -135,6 +148,8 @@ interface IPostContextProvider {
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
   handleSetIsConfirmToClosePost: (newState: boolean) => void;
+  handleUpdatePostTitle: (newTitle: string) => Promise<void>;
+  isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<newnewapi.IPost, any>>;
@@ -155,17 +170,22 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleSeeNewDeletedBox,
   saveCard,
   stripeSetupIntentClientSecret,
+  bundleStripeSetupIntentClientSecret,
+  customOptionText: customOptionTextFromRedirect,
   loadingRef,
   handleCloseAndGoBack,
   handleSetIsFollowingDecision,
   handleGoBackInsidePost,
   resetSetupIntentClientSecret,
+  resetBundleSetupIntentClientSecret,
   handleFollowDecision,
   deletePostOpen,
   handleDeletePost,
   handleOpenDeletePostModal,
   handleCloseDeletePostModal,
   handleSetIsConfirmToClosePost,
+  handleUpdatePostTitle,
+  isUpdateTitleLoading,
   refetchPost,
   children,
 }) => {
@@ -231,6 +251,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       recommendedPosts,
       saveCard,
       stripeSetupIntentClientSecret,
+      bundleStripeSetupIntentClientSecret,
+      customOptionTextFromRedirect,
       handleSeeNewDeletedBox,
       handleOpenRecommendedPost,
       loadingRef,
@@ -242,6 +264,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleGoBackInsidePost,
       handleReportOpen,
       resetSetupIntentClientSecret,
+      resetBundleSetupIntentClientSecret,
       handleCloseAndGoBack,
       shareMenuOpen,
       deletePostOpen,
@@ -255,6 +278,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      handleUpdatePostTitle,
+      isUpdateTitleLoading,
       refetchPost,
     }),
     [
@@ -268,6 +293,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       recommendedPosts,
       saveCard,
       stripeSetupIntentClientSecret,
+      bundleStripeSetupIntentClientSecret,
+      customOptionTextFromRedirect,
       handleSeeNewDeletedBox,
       handleOpenRecommendedPost,
       loadingRef,
@@ -279,6 +306,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleGoBackInsidePost,
       handleReportOpen,
       resetSetupIntentClientSecret,
+      resetBundleSetupIntentClientSecret,
       handleCloseAndGoBack,
       shareMenuOpen,
       deletePostOpen,
@@ -292,6 +320,8 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleOpenEllipseMenu,
       handleCloseDeletePostModal,
       handleSetIsConfirmToClosePost,
+      handleUpdatePostTitle,
+      isUpdateTitleLoading,
       refetchPost,
     ]
   );

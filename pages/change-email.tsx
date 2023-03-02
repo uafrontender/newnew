@@ -33,7 +33,9 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
       try {
         setIsLoading(true);
 
-        if (!email_address || !token) throw new Error('No token');
+        if (!email_address || !token) {
+          throw new Error('No token on change email');
+        }
 
         const requestPayload = new newnewapi.SetMyEmailRequest({
           emailAddress: email_address,

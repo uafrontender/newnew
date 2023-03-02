@@ -1,16 +1,10 @@
 {
   "meta": {
-    "ac": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Bid",
-      "description": "Gana dinero, haz ofertas en subastas con amigos y apoya creadores en NewNew"
-    },
-    "mc": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Superpoll",
-      "description": "Gana dinero, vota con tus amigos y apoya creadores en NewNew"
-    },
-    "cf": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Goal",
-      "description": "Gana dinero, participa en campañas de crowdfunding con amigos y apoya creadores en NewNew"
+    "title": "{{postTitle}} | {{displayName}} en NewNew",
+    "description": {
+      "ac": "${{totalInBids}} en ofertas en NewNew",
+      "mc": "{{totalVotes}} votos en NewNew",
+      "cf": ""
     }
   },
   "my": "mi",
@@ -295,7 +289,7 @@
       "title": "Próximamente",
       "subtitle_1": "Tu {{postType}} no está activo todavía.",
       "subtitle_2": "Comenzará en",
-      "toggleButton_NEED_TRANSLATION": "See options",
+      "toggleButton": "Ver opciones",
       "timer": {
         "days": "Días",
         "hours": "Horas",
@@ -506,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "Selecciona un fragmento",
     "uploadImageButton": "Subir una imagen"
   },
   "postVideoThumbnailEdit": {
@@ -740,6 +733,10 @@
       "shareBtn": "Compartir",
       "linkCopied": "¡Enlace copiado!"
     },
+    "tutorialEditTitle": {
+      "title": "Editar título",
+      "body": "Haz clic en el título de la entrada y realiza los cambios que desees."
+    },
     "winner": {
       "inResponseToYourPost": "En respuesta a tu publicación",
       "ac": {
@@ -819,7 +816,7 @@
     "alreadyVoted": "Ya has votado",
     "mcVoteCountTooSmall": "El número de votos es demasiado pequeño",
     "notAllowedToCreateNewOption": "No se permite crear una nueva opción",
-    "optionNotUnique_NEED_TRANSLATION": "Option already exists",
+    "optionNotUnique": "Esta opción ya existe",
     "cfCancelled": "El Goal ha sido cancelado",
     "cfFinished": "El Goal ya ha concluido",
     "cfNotStarted": "El Goal no ha comenzado todavía",

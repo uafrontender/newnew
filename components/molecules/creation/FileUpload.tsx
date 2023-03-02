@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -14,14 +13,13 @@ import DeleteVideo from './DeleteVideo';
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
-import { loadVideo } from '../../../utils/loadVideo';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-// import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+
 import {
   removeUploadedFile,
   stopVideoProcessing,
@@ -39,11 +37,9 @@ import {
 } from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
 import CoverImagePreviewEdit from './CoverImagePreviewEdit';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
-  ssr: false,
-});
-const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
   ssr: false,
 });
 
@@ -59,12 +55,10 @@ interface IFileUpload {
   loadingProcessing: boolean;
   progressProcessing: number;
   thumbnails: TThumbnailParameters;
+  customCoverImageUrl?: string;
   onChange: (id: string, value: any) => void;
   handleCancelVideoUpload: () => void;
 }
-
-// secondStep.video.thumbnailEllipseMenu.selectSnippetButton
-// secondStep.video.thumbnailEllipseMenu.uploadImageButton
 
 const FileUpload: React.FC<IFileUpload> = ({
   id,
@@ -78,6 +72,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   loadingProcessing,
   progressProcessing,
   thumbnails,
+  customCoverImageUrl,
   onChange,
   handleCancelVideoUpload,
 }) => {
@@ -85,7 +80,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { post, videoProcessing } = useAppSelector((state) => state.creation);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -100,7 +95,6 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
   const [showEllipseMenu, setShowEllipseMenu] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -135,21 +129,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     () => setShowEllipseMenu(false),
     []
   );
-
-  const handleOpenEditThumbnailMenu = useCallback(() => {
-    Mixpanel.track('Edit Thumbnail', { _stage: 'Creation' });
-    setShowThumbnailEdit(true);
-    setShowEllipseMenu(false);
-    playerRef.current.pause();
-  }, []);
-
-  const handleCloseThumbnailEditClick = useCallback(() => {
-    Mixpanel.track('Close Thumbnail Edit Dialog', { _stage: 'Creation' });
-    setShowThumbnailEdit(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
-  }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
@@ -186,15 +165,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     setLocalFile(null);
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
-
-  const handlePreviewEditSubmit = useCallback(
-    (params: TThumbnailParameters) => {
-      Mixpanel.track('Preview Edit Submit', { _stage: 'Creation' });
-      handleCloseThumbnailEditClick();
-      onChange('thumbnailParameters', params);
-    },
-    [handleCloseThumbnailEditClick, onChange]
-  );
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -403,6 +373,14 @@ const FileUpload: React.FC<IFileUpload> = ({
             }}
           />
           <SPlayerWrapper>
+            {customCoverImageUrl && (
+              <SThumbnailHolder
+                className='thumnailHolder'
+                src={customCoverImageUrl ?? ''}
+                alt='Post preview'
+                draggable={false}
+              />
+            )}
             <BitmovinPlayer
               id='small-thumbnail'
               innerRef={playerRef}
@@ -458,6 +436,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     handleRetryVideoUpload,
     value,
     thumbnails,
+    customCoverImageUrl,
     showEllipseMenu,
     handleOpenEllipseMenu,
     handleDeleteVideoShow,
@@ -477,13 +456,6 @@ const FileUpload: React.FC<IFileUpload> = ({
         open={showFullPreview}
         value={value}
         handleClose={handleCloseFullPreviewClick}
-      />
-      <ThumbnailPreviewEdit
-        open={showThumbnailEdit}
-        value={value}
-        thumbnails={thumbnails}
-        handleClose={handleCloseThumbnailEditClick}
-        handleSubmit={handlePreviewEditSubmit}
       />
       {coverImageModalOpen && (
         <CoverImagePreviewEdit
@@ -505,9 +477,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           }}
           offsetRight='180px'
         >
-          <EllipseMenuButton onClick={() => handleOpenEditThumbnailMenu()}>
-            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseMenuButton>
           <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseMenuButton>
@@ -519,9 +488,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           show={showEllipseMenu}
           onClose={handleCloseEllipseMenu}
         >
-          <EllipseModalButton onClick={() => handleOpenEditThumbnailMenu()}>
-            {t('secondStep.video.thumbnailEllipseMenu.selectSnippetButton')}
-          </EllipseModalButton>
           <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
             {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
           </EllipseModalButton>
@@ -587,13 +553,26 @@ const SFileBox = styled.div`
 `;
 
 const SPlayerWrapper = styled.div`
+  position: relative;
   width: 64px;
   height: 108px;
+  overflow: hidden;
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
     height: 124px;
   }
+`;
+
+const SThumbnailHolder = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: linear 0.3s;
+  z-index: 1;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 `;
 
 const SButtonsContainer = styled.div`

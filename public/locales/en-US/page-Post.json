@@ -1,16 +1,10 @@
 {
   "meta": {
-    "ac": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Bid",
-      "description": "Make money, bid in auctions with friends and support creators on NewNew"
-    },
-    "mc": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Superpoll",
-      "description": "Make money, vote with friends and support creators on NewNew"
-    },
-    "cf": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Goal",
-      "description": "Make money, pledge in crowdfunding campaigns with friends and support creators on NewNew"
+    "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "description": {
+      "ac": "${{totalInBids}} in bids on NewNew",
+      "mc": "{{totalVotes}} votes on NewNew",
+      "cf": ""
     }
   },
   "my": "my",
@@ -61,7 +55,7 @@
     },
     "doneButton": "Sounds good!",
     "ac": "{{postCreator}} will pick their favorite one once the Bid is over.",
-    "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
+    "mc": "{{postCreator}} will do the option with the most amount of votes when the Superpoll is over.",
     "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
   "postFailedBoxModeration": {
@@ -506,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "Select a snippet",
     "uploadImageButton": "Upload an image"
   },
   "postVideoThumbnailEdit": {
@@ -739,6 +732,10 @@
       "youMade": "You made",
       "shareBtn": "Share",
       "linkCopied": "Link copied!"
+    },
+    "tutorialEditTitle": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
     },
     "winner": {
       "inResponseToYourPost": "In response to your post",

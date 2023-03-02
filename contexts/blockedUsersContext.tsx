@@ -17,11 +17,12 @@ import useErrorToasts from '../utils/hooks/useErrorToasts';
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
   usersIBlocked: [] as string[],
-  usersBlockedLoading: false,
+  usersBlockedLoaded: false,
   changeUserBlockedStatus: (
     uuid: string | null | undefined,
     block: boolean
   ) => {},
+  isChangingUserBlockedStatus: false,
 });
 
 interface IBlockedUsersProvider {
@@ -35,11 +36,15 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
+  const [usersBlockedLoaded, setUsersBlockedLoaded] = useState(false);
+  const [isChangingUserBlockedStatus, setIsChangingUserBlockedStatus] =
+    useState(false);
   const socketConnection = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const changeUserBlockedStatus = useCallback(
     async (uuid: string | null | undefined, block: boolean) => {
+      setIsChangingUserBlockedStatus(true);
       try {
         if (!uuid) throw new Error('No uuid provided');
         const payload = new newnewapi.MarkUserRequest({
@@ -57,6 +62,8 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       } catch (err) {
         console.error(err);
         showErrorToastPredefined(undefined);
+      } finally {
+        setIsChangingUserBlockedStatus(false);
       }
     },
     []
@@ -64,7 +71,15 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
 
   useEffect(() => {
     async function fetchBlockedUsers() {
-      if (!user.loggedIn) return;
+      if (!user.loggedIn || usersBlockedLoading) {
+        if (!user.loggedIn) {
+          setUsersBlockedMe([]);
+          setUsersIBlocked([]);
+        }
+
+        return;
+      }
+
       try {
         setUsersBlockedLoading(true);
         const payload = new newnewapi.EmptyRequest();
@@ -73,6 +88,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
           throw new Error(res.error?.message ?? 'Request failed');
         setUsersIBlocked(res.data.userUuidsIBlocked);
         setUsersBlockedMe(res.data.userUuidsBlockedMe);
+        setUsersBlockedLoaded(true);
       } catch (err) {
         console.error(err);
         setUsersBlockedLoading(false);
@@ -107,14 +123,16 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     () => ({
       usersBlockedMe,
       usersIBlocked,
-      usersBlockedLoading,
+      usersBlockedLoaded,
       changeUserBlockedStatus,
+      isChangingUserBlockedStatus,
     }),
     [
       usersBlockedMe,
       usersIBlocked,
       changeUserBlockedStatus,
-      usersBlockedLoading,
+      usersBlockedLoaded,
+      isChangingUserBlockedStatus,
     ]
   );
 

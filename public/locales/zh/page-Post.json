@@ -1,16 +1,10 @@
 {
   "meta": {
-    "ac": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Bid",
-      "description": "賺錢，與朋友一起出價競拍，支持NewNew上的創作者"
-    },
-    "mc": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Superpoll",
-      "description": "賺錢，與朋友一起投票，支持NewNew上的創作者"
-    },
-    "cf": {
-      "title": "{{postTitle}} - {{displayName}} - NewNew Goal",
-      "description": "賺錢，與朋友一起在眾籌活動中認捐，支持NewNew上的創作者"
+    "title": "NewNew上的{{postTitle}} | {{displayName}}",
+    "description": {
+      "ac": "NewNew上出價共有${{totalInBids}}",
+      "mc": "NewNew上投票共有{{totalVotes}}",
+      "cf": ""
     }
   },
   "my": "我的",
@@ -295,7 +289,7 @@
       "title": "即將開始",
       "subtitle_1": "你的{{postType}}還沒有被啟動",
       "subtitle_2": "距離啓動時間：",
-      "toggleButton_NEED_TRANSLATION": "See options",
+      "toggleButton": "查看選項",
       "timer": {
         "days": "天",
         "hours": "小時",
@@ -506,7 +500,6 @@
     }
   },
   "thumbnailEllipseMenu": {
-    "selectSnippetButton": "選擇一個片段",
     "uploadImageButton": "上傳圖片"
   },
   "postVideoThumbnailEdit": {
@@ -740,6 +733,10 @@
       "shareBtn": "分享",
       "linkCopied": "鏈接已複製！"
     },
+    "tutorialEditTitle": {
+      "title": "編輯標題",
+      "body": "點擊帖子標題可進行修改"
+    },
     "winner": {
       "inResponseToYourPost": "回應了你的帖子",
       "ac": {
@@ -819,7 +816,7 @@
     "alreadyVoted": "你已獲投票",
     "mcVoteCountTooSmall": "票數太少",
     "notAllowedToCreateNewOption": "不允許有新的選項",
-    "optionNotUnique_NEED_TRANSLATION": "Option already exists",
+    "optionNotUnique": "選項已經存在",
     "cfCancelled": "Goal被取消",
     "cfFinished": "Goal已經完成",
     "cfNotStarted": "Goal尚未開始",

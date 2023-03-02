@@ -17,6 +17,7 @@ import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -39,7 +40,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -84,8 +85,14 @@ export const Dashboard: React.FC = React.memo(() => {
     try {
       const payload = new newnewapi.PagedRequest();
       const res = await getMyUrgentPosts(payload);
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.posts) setExpirationPosts(res.data?.posts);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      if (res.data?.posts) {
+        setExpirationPosts(res.data?.posts);
+      }
       setIsLoadingExpirationPosts(false);
     } catch (err) {
       setIsLoadingExpirationPosts(false);
@@ -164,6 +171,27 @@ export const Dashboard: React.FC = React.memo(() => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection baseUrl='/creator/dashboard' />}
         </STitleBlock>
+
+        {isLoadingExpirationPosts ? (
+          <SBlock>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SBlock>
+        ) : (
+          expirationPosts.length > 0 && (
+            <SBlock>
+              <ExpirationPosts expirationPosts={expirationPosts} />
+            </SBlock>
+          )
+        )}
+
         {user.creatorData?.options.stripeConnectStatus &&
           user.creatorData.options.stripeConnectStatus ===
             newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
@@ -172,6 +200,7 @@ export const Dashboard: React.FC = React.memo(() => {
               <StripeIssueBanner />
             </SBlock>
           )}
+
         {!user.creatorData?.isLoaded ? (
           <SBlock>
             <Lottie
@@ -189,25 +218,6 @@ export const Dashboard: React.FC = React.memo(() => {
           !user.userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
               <YourToDos />
-            </SBlock>
-          )
-        )}
-        {isLoadingExpirationPosts ? (
-          <SBlock>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SBlock>
-        ) : (
-          expirationPosts.length > 0 && (
-            <SBlock>
-              <ExpirationPosts expirationPosts={expirationPosts} />
             </SBlock>
           )
         )}
@@ -266,11 +276,11 @@ const SContent = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 320px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
     border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
   }
 `;
 

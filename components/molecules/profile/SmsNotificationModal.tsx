@@ -80,7 +80,7 @@ const SmsNotificationModal: React.FC<ISmsNotificationModal> = React.memo(
     }
 
     return (
-      <Modal show overlaydim additionalz={zIndex} onClose={onClose}>
+      <Modal show additionalz={zIndex} onClose={onClose}>
         <Container>
           <Content
             onClick={(e) => {

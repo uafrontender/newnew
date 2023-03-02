@@ -7,7 +7,6 @@ import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -17,12 +16,16 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
+import StaticSearchInput from '../../atoms/search/StaticSearchInput';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const theme = useTheme();
+
+  const isDesktopL = ['laptopL', 'desktop'].includes(resizeMode);
 
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
@@ -57,23 +60,35 @@ export const Desktop: React.FC = React.memo(() => {
           console.log(err);
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user.userData?.username]);
 
   return (
     <SContainer>
-      <Logo />
+      <Logo isShort={!isDesktopL} />
       <SRightBlock>
         {process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' && 'TEST'}
-        {user.loggedIn && !globalSearchActive && (
+        {user.loggedIn && user.userData?.options?.isCreator && (
+          <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 12 }}>
+            <SNavText variant={3} weight={600} onClick={handlerCopy}>
+              {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
+            </SNavText>
+          </SItemWithMargin>
+        )}
+        <SItemWithMargin>
+          {/* <SearchInput /> */}
+          <StaticSearchInput
+            width={
+              user.userData?.options?.isCreator &&
+              bundles &&
+              bundles.length > 0 &&
+              !isDesktopL
+                ? '250px'
+                : undefined
+            }
+          />
+        </SItemWithMargin>
+        {user.loggedIn && (
           <>
-            {user.userData?.options?.isCreator && (
-              <SItemWithMargin style={{ paddingRight: 16 }}>
-                <SNavText variant={3} weight={600} onClick={handlerCopy}>
-                  {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
-                </SNavText>
-              </SItemWithMargin>
-            )}
             {directMessagesAvailable && (
               <SItemWithMargin>
                 <NavigationItem
@@ -96,9 +111,7 @@ export const Desktop: React.FC = React.memo(() => {
             </SItemWithMargin>
           </>
         )}
-        <SItemWithMargin>
-          <SearchInput />
-        </SItemWithMargin>
+
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator && (
@@ -296,10 +309,10 @@ const SItemWithMargin = styled.div`
 `;
 
 const SNavText = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  opacity: 0.5;
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
   transition: opacity ease 0.5s;
   cursor: pointer;
+  white-space: nowrap;
 `;
 
 const SButton = styled(Button)`

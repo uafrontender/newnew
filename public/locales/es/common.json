@@ -155,7 +155,7 @@
       "votes": "<0>{{amount}}</0> votos desbloqueados",
       "for": "para <0>{{creator}}</0>",
       "access": "Quedan {{amount}} {{unit}} de:",
-      "customOptions": "añadir opciones personalizadas a la superpoll",
+      "customOptions": "añadir opciones personalizadas a la Superpoll",
       "chat": "chat privado 1-a-1",
       "button": "¡Suena bien!",
       "unit": {
@@ -164,7 +164,7 @@
       }
     },
     "creatorsBundle": {
-      "accessExpired_NEED_TRANSLATION": "Your benefits have now expired. Buy another bundle for custom options and chat",
+      "accessExpired": "Tus beneficios han caducado. Compra otro bundle para tener opciones personalizadas y acceder al chat",
       "votesLeft": "Quedan <0>{{amount}}</0> votos",
       "for": "para ",
       "access": "Quedan <0/> de:",
@@ -291,5 +291,8 @@
       "description": "Gracias, te mantendremos informado de las novedades en NewNew.",
       "button": "¡Genial!"
     }
-  }
+  },
+  "oops": "¡Ups!",
+  "somethingWentWrong": "Algo salió mal...",
+  "goHome": "Ir al inicio"
 }

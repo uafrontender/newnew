@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
 import useCards from '../../../utils/hooks/useCards';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 import CheckoutForm from './CheckoutForm';
@@ -17,11 +16,13 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IPaymentModal {
   isOpen: boolean;
   zIndex: number;
   redirectUrl: string;
+  modalType?: ModalType;
   amount?: number;
   showTocApply?: boolean;
   bottomCaption?: React.ReactNode;
@@ -39,6 +40,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   zIndex,
   setupIntent,
   redirectUrl,
+  modalType,
   amount,
   showTocApply,
   bottomCaption,
@@ -49,7 +51,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('modal-PaymentModal');
   const { showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -77,7 +79,12 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   }, [setupIntent, setupIntent.setupIntentClientSecret, t]);
 
   return (
-    <Modal show={isOpen} overlaydim additionalz={zIndex} onClose={onClose}>
+    <Modal
+      show={isOpen}
+      modalType={modalType}
+      additionalz={zIndex}
+      onClose={onClose}
+    >
       <SWrapper>
         <SContentContainer
           showTocApply={showTocApply ?? false}

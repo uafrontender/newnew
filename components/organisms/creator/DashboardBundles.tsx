@@ -6,13 +6,13 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 
 import Headline from '../../atoms/Headline';
-import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
 import { useBundles } from '../../../contexts/bundlesContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -33,7 +33,7 @@ const SuccessBundleModal = dynamic(
 
 export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { appConstants } = useGetAppConstants();
   const { isSellingBundles, toggleIsSellingBundles } = useBundles();
 
@@ -127,6 +127,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
       {turnBundleModalOpen && (
         <TurnBundleModal
           show
+          modalType='initial'
           zIndex={1001}
           isBundlesEnabled={isSellingBundles}
           onToggleBundles={onToggleBundles}
@@ -136,8 +137,9 @@ export const DashboardBundles: React.FC = React.memo(() => {
       {successModalOpen && (
         <SuccessBundleModal
           show
-          zIndex={1002}
           isBundlesEnabled={isSellingBundles}
+          modalType='following'
+          zIndex={1002}
           onClose={() => setSuccessModalOpen(false)}
         />
       )}
@@ -170,11 +172,11 @@ const SContent = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 320px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
     border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
   }
 `;
 

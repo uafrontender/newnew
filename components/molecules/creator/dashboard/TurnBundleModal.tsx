@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Modal from '../../../organisms/Modal';
+import Modal, { ModalType } from '../../../organisms/Modal';
 import ModalPaper, { SContent } from '../../../organisms/ModalPaper';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
@@ -13,6 +13,7 @@ import assets from '../../../../constants/assets';
 
 interface ITurnBundleModal {
   show: boolean;
+  modalType?: ModalType;
   isBundlesEnabled: boolean | undefined;
   zIndex?: number;
   onToggleBundles: () => void;
@@ -20,13 +21,18 @@ interface ITurnBundleModal {
 }
 
 const TurnBundleModal: React.FC<ITurnBundleModal> = React.memo(
-  ({ show, isBundlesEnabled, zIndex, onClose, onToggleBundles }) => {
+  ({ show, modalType, isBundlesEnabled, zIndex, onClose, onToggleBundles }) => {
     const { t } = useTranslation('page-Creator');
     const theme = useTheme();
 
     return (
       <>
-        <Modal show={show} additionalz={zIndex} onClose={onClose} overlaydim>
+        <Modal
+          show={show}
+          modalType={modalType}
+          additionalz={zIndex}
+          onClose={onClose}
+        >
           <SModalPaper onClose={onClose} isCloseButton>
             <Content>
               <SBundlesImage
@@ -130,4 +136,6 @@ const STitle = styled(Headline)`
 `;
 const SText = styled(Text)`
   margin-bottom: 30px;
+
+  text-align: center;
 `;

@@ -22,12 +22,10 @@ import { sendMessage } from '../../../api/endpoints/chat';
 
 /* Utils */
 import getDisplayname from '../../../utils/getDisplayname';
-import { useAppSelector } from '../../../redux-store/store';
 import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
-import logoAnimation from '../../../public/animations/mobile_logo.json';
 
 /* Components */
 import Button from '../../atoms/Button';
@@ -36,6 +34,7 @@ import TextArea from '../../atoms/direct-messages/TextArea';
 import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader';
 import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -66,7 +65,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const { t } = useTranslation('page-Chat');
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -85,8 +84,6 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
-  const [isSubscriptionExpired, setIsSubscriptionExpired] =
-    useState<boolean>(false);
 
   useEffect(() => {
     if (chatRoom.id) {
@@ -211,13 +208,12 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
-      isSubscriptionExpired ||
+      !chatRoom.visavis?.isSubscriptionActive ||
       chatRoom.visavis?.user?.options?.isTombstone ||
       !chatRoom ||
       (isAnnouncement && !isMyAnnouncement),
     [
       isVisavisBlocked,
-      isSubscriptionExpired,
       isMessagingDisabled,
       isAnnouncement,
       isMyAnnouncement,
@@ -226,13 +222,15 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   );
 
   const whatComponentToDisplay = useCallback(() => {
-    if (chatRoom.visavis?.user?.options?.isTombstone) return <AccountDeleted />;
+    if (chatRoom.visavis?.user?.options?.isTombstone) {
+      return <AccountDeleted />;
+    }
 
     if (isMessagingDisabled && chatRoom.visavis?.user)
       return <MessagingDisabled user={chatRoom.visavis.user} />;
 
     if (
-      isSubscriptionExpired &&
+      !chatRoom.visavis?.isSubscriptionActive &&
       chatRoom.visavis?.user?.uuid &&
       chatRoom.myRole
     )
@@ -246,7 +244,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, [
     isMessagingDisabled,
     chatRoom.visavis?.user,
-    isSubscriptionExpired,
+    chatRoom.visavis?.isSubscriptionActive,
     chatRoom.myRole,
   ]);
 

@@ -26,6 +26,7 @@ import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.s
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -46,7 +47,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
     (state) => state.creation
   );
@@ -64,6 +65,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
   }
 
+  // TODO: Add translations
   const postTypeText = useCallback(() => {
     if (postData) {
       if (postData.auction) return 'Bid';
@@ -248,13 +250,14 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     <>
       <SContent>
         <SPlayerWrapper>
+          {/* It seems like the video here is intentionally a 3-seconds one */}
           {fileProcessing.progress === 100 ? (
             <BitmovinPlayer
               id='published'
-              muted={false}
+              muted
               resources={videoProcessing?.targetUrls}
-              thumbnails={post.thumbnailParameters}
               showPlayButton
+              withMuteControl
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>

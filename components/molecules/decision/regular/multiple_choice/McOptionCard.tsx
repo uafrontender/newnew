@@ -53,6 +53,7 @@ import assets from '../../../../../constants/assets';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -122,7 +123,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -535,9 +536,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
         setIsSupportMenuOpen(false);
+        setPaymentModalOpen(false);
         setLoadingModalOpen(false);
         handleSetPaymentSuccessValue(votesCount);
-        setIsSupportMenuOpen(false);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
@@ -592,6 +593,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }}
       >
         <SContainer
+          id={
+            isBlue && isSuggestedByMe ? 'suggested-option-container' : undefined
+          }
           layout='position'
           transition={{
             type: 'spring',
@@ -600,7 +604,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={false}
           $isBlue={isBlue}
-          onClick={(e) => handleClickOptionBodyOpenEllipseMenu(e)}
+          onClick={(e: any) => handleClickOptionBodyOpenEllipseMenu(e)}
         >
           {isMobile && (
             <SEllipseButtonMobile
@@ -744,7 +748,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {isConfirmVoteModalOpen ? (
           <McOptionConfirmVoteModal
             zIndex={11}
-            isOpen={isConfirmVoteModalOpen}
+            show={isConfirmVoteModalOpen}
+            modalType={paymentModalOpen ? 'covered' : 'initial'}
             isAmountPredefined={isAmountPredefined || !!supportVoteOffer}
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
@@ -767,6 +772,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {bundle?.votesLeft ? (
           <UseBundleVotesModal
             show={bundleVotesModalOpen}
+            modalType='initial' // following on Mobile?
             bundleVotesLeft={bundle.votesLeft}
             optionText={option.text}
             handleVoteWithBundleVotes={handleVoteWithBundleVotes}
@@ -778,6 +784,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <PaymentModal
             zIndex={12}
             isOpen={paymentModalOpen}
+            modalType='following'
             amount={
               !isAmountPredefined
                 ? customPaymentWithFeeInCents
@@ -1361,20 +1368,22 @@ const SSupportButtonDesktop = styled(Button)<{
   isBlue: boolean;
   active: boolean;
 }>`
+  flex-shrink: 0;
   height: 100%;
-  width: 60px;
+  width: auto;
+  min-width: 60px;
 
   color: #ffffff;
   background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  padding: initial;
+  padding: 8px;
 
   border-radius: initial;
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   border-bottom-right-radius: ${({ theme }) => theme.borderRadius.medium};
 
   span {
-    width: 100%;
+    width: auto;
 
     text-align: center;
     white-space: pre;

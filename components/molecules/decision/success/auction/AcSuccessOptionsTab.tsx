@@ -18,6 +18,10 @@ import GradientMask from '../../../../atoms/GradientMask';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import getDisplayname from '../../../../../utils/getDisplayname';
 
+import Lottie from '../../../../atoms/Lottie';
+import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../../../../contexts/appStateContext';
+
 interface IAcSuccessOptionsTab {
   post: newnewapi.Auction;
   handleGoBack: () => void;
@@ -30,7 +34,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -38,6 +42,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   // Options
   const {
     processedOptions: options,
+    isLoading: optionsLoading,
     hasNextPage: hasNextOptionsPage,
     fetchNextPage: fetchNextOptionsPage,
   } = useAcOptions(
@@ -83,6 +88,19 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             active={showBottomGradient}
           />
         </>
+      ) : null}
+      {options.length === 0 && optionsLoading ? (
+        <SNoOptionsYet>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SNoOptionsYet>
       ) : null}
       <SBidsContainer
         ref={(el) => {
@@ -204,4 +222,23 @@ const SLoaderDiv = styled.div`
 const SLoadMoreBtn = styled(Button)`
   width: 100%;
   height: 56px;
+`;
+
+// No options yet
+const SNoOptionsYet = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 300px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 400px;
+  }
 `;

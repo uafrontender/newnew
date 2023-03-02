@@ -21,6 +21,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const MyAvatarMassupdate = dynamic(
   () => import('../../atoms/direct-messages/MyAvatarMassupdate')
@@ -32,7 +33,7 @@ interface IFunctionProps {
 
 const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   const { t } = useTranslation('page-Chat');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
   const isMobileOrTablet = [
     'mobile',
@@ -41,8 +42,15 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const { activeChatRoom, setActiveChatRoom, activeTab, setSearchChatroom } =
-    useGetChats();
+
+  const {
+    activeChatRoom,
+    setActiveChatRoom,
+    activeTab,
+    setSearchChatroom,
+    setHiddenMessagesArea,
+  } = useGetChats();
+
   const user = useAppSelector((state) => state.user);
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) => {
@@ -137,15 +145,20 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
         `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
       );
       setActiveChatRoom(chatRoom);
+      if (isMobileOrTablet) {
+        setHiddenMessagesArea(false);
+      }
       setSearchChatroom('');
     }
   }, [
-    setActiveChatRoom,
     chatRoom,
-    setSearchChatroom,
     chatRoute,
     isDashboard,
     router,
+    isMobileOrTablet,
+    setActiveChatRoom,
+    setSearchChatroom,
+    setHiddenMessagesArea,
   ]);
 
   let avatar = (
@@ -175,7 +188,9 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
         <SChatItemContentWrapper>
           <ChatName chat={chatRoom} />
           <SChatItemTime variant={3} weight={600}>
-            {moment((chatRoom.updatedAt?.seconds as number) * 1000).fromNow()}
+            {moment((chatRoom.updatedAt?.seconds as number) * 1000)
+              .locale(router.locale || 'en-US')
+              .fromNow()}
           </SChatItemTime>
         </SChatItemContentWrapper>
         <SChatItemContentWrapper>

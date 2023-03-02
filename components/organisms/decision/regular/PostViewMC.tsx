@@ -46,6 +46,7 @@ import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
+import { useAppState } from '../../../../contexts/appStateContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -95,7 +96,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -332,7 +334,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   useEffect(() => {
     const controller = new AbortController();
     const makeVoteAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
+      if (!stripeSetupIntentClientSecret || loadingModalOpen) {
+        return;
+      }
 
       if (!user._persist?.rehydrated) {
         return;
@@ -489,9 +493,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -525,9 +529,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                 />
                 <SEndDate>
                   {t('expires.end_date')}{' '}
-                  {moment((post.expiresAt?.seconds as number) * 1000).format(
-                    'DD MMM YYYY [at] hh:mm A'
-                  )}
+                  {moment((post.expiresAt?.seconds as number) * 1000)
+                    .locale(router.locale || 'en-US')
+                    .format('DD MMM YYYY [at] hh:mm A')}
                 </SEndDate>
               </>
             ) : (
@@ -577,9 +581,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                       />
                       <SEndDate>
                         {t('expires.end_date')}{' '}
-                        {moment(
-                          (post.expiresAt?.seconds as number) * 1000
-                        ).format('DD MMM YYYY [at] hh:mm A')}
+                        {moment((post.expiresAt?.seconds as number) * 1000)
+                          .locale(router.locale || 'en-US')
+                          .format('DD MMM YYYY [at] hh:mm A')}
                       </SEndDate>
                     </>
                   ) : (
@@ -630,7 +634,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         {paymentSuccessModalOpen && (
           <PaymentSuccessModal
             postType='mc'
-            isVisible={paymentSuccessModalOpen}
+            show={paymentSuccessModalOpen}
             closeModal={() => {
               setPaymentSuccessModalOpen(false);
               promptUserWithPushNotificationsPermissionModal();
@@ -697,7 +701,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       {buyBundleModalOpen && post.creator && (
         <BuyBundleModal
           show
+          modalType='initial'
           creator={post.creator}
+          successPath={`/p/${post.postShortId}`}
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}

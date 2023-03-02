@@ -4,22 +4,23 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
 import preventParentClick from '../../../utils/preventParentClick';
-import Modal from '../../organisms/Modal';
+import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper from '../../organisms/ModalPaper';
 import BundleCard from './BundleCard';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IAllBundlesModal {
   show: boolean;
+  modalType?: ModalType;
   creatorBundles: newnewapi.ICreatorBundle[];
   onClose: () => void;
 }
 
 const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
-  ({ show, creatorBundles, onClose }) => {
+  ({ show, modalType, creatorBundles, onClose }) => {
     const { t } = useTranslation('page-Bundles');
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -51,7 +52,7 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
     }, [setSize, creatorBundles]);
 
     return (
-      <Modal show={show} onClose={onClose}>
+      <Modal show={show} modalType={modalType} onClose={onClose}>
         <SModalPaper
           title={!isMobile ? t('bundlesModal.title') : undefined}
           onClose={onClose}

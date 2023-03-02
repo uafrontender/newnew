@@ -81,6 +81,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     []
   );
 
+  // TODO: Add translations
   const postTypeText = useCallback(() => {
     if (postData) {
       if (postData.auction) return 'Bid';
@@ -246,11 +247,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
               fileProcessing.progress === 100 ? (
                 <BitmovinPlayer
                   id='published-modal'
-                  muted={false}
+                  muted
                   resources={videoProcessing?.targetUrls}
-                  thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
                   showPlayButton
+                  withMuteControl
                 />
               ) : (
                 <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>

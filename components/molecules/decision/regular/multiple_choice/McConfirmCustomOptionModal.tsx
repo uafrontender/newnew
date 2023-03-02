@@ -4,24 +4,31 @@ import styled from 'styled-components';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
-import Modal from '../../../../organisms/Modal';
+import Modal, { ModalType } from '../../../../organisms/Modal';
 import Headline from '../../../../atoms/Headline';
 
 interface IMcConfirmCustomOptionModal {
-  isVisible: boolean;
+  show: boolean;
+  modalType?: ModalType;
   handleAddCustomOption: () => void;
   closeModal: () => void;
 }
 
 const McConfirmCustomOptionModal: React.FC<IMcConfirmCustomOptionModal> = ({
-  isVisible,
+  show,
+  modalType,
   handleAddCustomOption,
   closeModal,
 }) => {
   const { t } = useTranslation('page-Post');
 
   return (
-    <Modal show={isVisible} additionalz={12} onClose={closeModal}>
+    <Modal
+      show={show}
+      modalType={modalType}
+      additionalz={12}
+      onClose={closeModal}
+    >
       <SContainer>
         <SModal>
           <SHeadline variant={5}>

@@ -16,6 +16,7 @@ import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IWinningOption {
   postType: TPostType;
@@ -31,7 +32,7 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -55,29 +56,35 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                   ),
                 })}
           </SSpan>
-          <SUserAvatar
-            draggable={false}
-            src={winningOptionAc?.creator?.avatarUrl!!}
-          />
-          <SSpan>
-            <Trans
-              i18nKey='postResponseTabModeration.winner.ac.optionCreator'
-              t={t}
-              // @ts-ignore
-              components={[
-                <CreatorLink href={`/${winningOptionAc.creator?.username}`} />,
-                winningOptionAc.creator?.options?.isVerified ? (
-                  <SInlineSvg
-                    svg={VerificationCheckmark}
-                    width={isMobile ? '18px' : '22px'}
-                    height={isMobile ? '18px' : '22px'}
-                    fill='none'
-                  />
-                ) : null,
-                { nickname: getDisplayname(winningOptionAc.creator!!) },
-              ]}
-            />
-          </SSpan>
+          {winningOptionAc?.creator ? (
+            <>
+              <SUserAvatar
+                draggable={false}
+                src={winningOptionAc?.creator?.avatarUrl!!}
+              />
+              <SSpan>
+                <Trans
+                  i18nKey='postResponseTabModeration.winner.ac.optionCreator'
+                  t={t}
+                  // @ts-ignore
+                  components={[
+                    <CreatorLink
+                      href={`/${winningOptionAc.creator?.username}`}
+                    />,
+                    winningOptionAc.creator?.options?.isVerified ? (
+                      <SInlineSvg
+                        svg={VerificationCheckmark}
+                        width={isMobile ? '18px' : '22px'}
+                        height={isMobile ? '18px' : '22px'}
+                        fill='none'
+                      />
+                    ) : null,
+                    { nickname: getDisplayname(winningOptionAc.creator!!) },
+                  ]}
+                />
+              </SSpan>
+            </>
+          ) : null}
         </SText>
         <SHeadline variant={5}>{winningOptionAc.title}</SHeadline>
       </>

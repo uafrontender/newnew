@@ -12,7 +12,6 @@ import Headline from '../../../atoms/Headline';
 import CoverImageEdit from './CoverImageEdit';
 import CoverImageZoomSlider from '../../../atoms/profile/ProfileImageZoomSlider';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import CoverImageCropper from '../../creation/CoverImageCropper';
 import getCroppedImg from '../../../../utils/cropImage';
 
@@ -24,6 +23,7 @@ import chevronLeft from '../../../../public/images/svg/icons/outlined/ChevronLef
 import { setPostCoverImage } from '../../../../api/endpoints/post';
 import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoCoverImageEdit {
   open: boolean;
@@ -39,7 +39,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined } = useErrorToasts();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const preventCLick = useCallback((e: any) => {

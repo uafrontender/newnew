@@ -13,7 +13,6 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { ToastContainer } from 'react-toastify';
 import { CookiesProvider } from 'react-cookie';
-import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
@@ -29,15 +28,11 @@ import 'nprogress/nprogress.css';
 import Error from './_error';
 
 // Global CSS configurations
-import ResizeMode from '../HOC/ResizeMode';
 import withRecaptchaProvider from '../HOC/withRecaptcha';
 import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
-import { setResizeMode } from '../redux-store/slices/uiStateSlice';
 import { useAppSelector, wrapper } from '../redux-store/store';
-
-import isBrowser from '../utils/isBrowser';
 
 // Socket context
 import SocketContextProvider from '../contexts/socketContext';
@@ -71,6 +66,7 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
+import AppStateContextProvider from '../contexts/appStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -113,7 +109,6 @@ Router.events.on('routeChangeError', (err, url) => {
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
   const store = useStore();
-  const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -184,40 +179,23 @@ const MyApp = (props: IMyApp): ReactElement => {
 
   useEffect(() => {
     if (user.loggedIn && user.userData?.username) {
-      Mixpanel.identify(user.userData.username);
+      Mixpanel.identify(user.userData.userUuid);
       Mixpanel.people.set({
         $name: user.userData.username,
         $email: user.userData.email,
         newnewId: user.userData.userUuid,
+        isCreator: user.userData.options?.isCreator,
+      });
+      Mixpanel.register({
+        isCreator: user.userData.options?.isCreator,
+        username: user.userData.username,
       });
       Mixpanel.track('Session started!');
+    } else {
+      Mixpanel.track('Guest Session started!');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
-
-  useEffect(() => {
-    let newResizeMode = 'mobile';
-    const ua = parse(
-      uaString || (isBrowser() ? window?.navigator?.userAgent : '')
-    );
-
-    if (ua.isTablet) {
-      newResizeMode = 'tablet';
-    } else if (ua.isDesktop) {
-      newResizeMode = 'laptop';
-
-      if (['laptopL', 'desktop'].includes(resizeMode)) {
-        // keep old mode in case laptop
-        newResizeMode = resizeMode;
-      }
-    } else if (['mobileL', 'mobileM', 'mobileS'].includes(resizeMode)) {
-      // keep old mode in case mobile
-      newResizeMode = resizeMode;
-    }
-    if (newResizeMode !== resizeMode) {
-      store.dispatch(setResizeMode(resizeMode));
-    }
-  }, [resizeMode, uaString, store]);
 
   // TODO: move to the store logic
   useEffect(() => {
@@ -242,26 +220,26 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider cookies={cookiesInstance}>
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary>
-            <LanguageWrapper>
-              <AppConstantsContextProvider>
-                <SocketContextProvider>
-                  <ChannelsContextProvider>
-                    <PersistanceProvider store={store}>
-                      <SyncUserWrapper>
-                        <NotificationsProvider>
-                          <ModalNotificationsContextProvider>
-                            <PushNotificationContextProvider>
-                              <BlockedUsersProvider>
-                                <FollowingsContextProvider>
-                                  <BundlesContextProvider>
-                                    <ChatsProvider>
-                                      <OverlayModeProvider>
-                                        <MultipleBeforePopStateContextProvider>
-                                          <ResizeMode>
-                                            <GlobalTheme
-                                              initialTheme={colorMode}
-                                              themeFromCookie={themeFromCookie}
-                                            >
+            <AppStateContextProvider uaString={uaString}>
+              <GlobalTheme
+                initialTheme={colorMode}
+                themeFromCookie={themeFromCookie}
+              >
+                <LanguageWrapper>
+                  <AppConstantsContextProvider>
+                    <SocketContextProvider>
+                      <ChannelsContextProvider>
+                        <PersistanceProvider store={store}>
+                          <SyncUserWrapper>
+                            <NotificationsProvider>
+                              <ModalNotificationsContextProvider>
+                                <PushNotificationContextProvider>
+                                  <BlockedUsersProvider>
+                                    <FollowingsContextProvider>
+                                      <BundlesContextProvider>
+                                        <ChatsProvider>
+                                          <OverlayModeProvider>
+                                            <MultipleBeforePopStateContextProvider>
                                               <>
                                                 <ToastContainer containerId='toast-container' />
                                                 <VideoProcessingWrapper>
@@ -285,23 +263,23 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                   <PushNotificationModalContainer />
                                                 </VideoProcessingWrapper>
                                               </>
-                                            </GlobalTheme>
-                                          </ResizeMode>
-                                        </MultipleBeforePopStateContextProvider>
-                                      </OverlayModeProvider>
-                                    </ChatsProvider>
-                                  </BundlesContextProvider>
-                                </FollowingsContextProvider>
-                              </BlockedUsersProvider>
-                            </PushNotificationContextProvider>
-                          </ModalNotificationsContextProvider>
-                        </NotificationsProvider>
-                      </SyncUserWrapper>
-                    </PersistanceProvider>
-                  </ChannelsContextProvider>
-                </SocketContextProvider>
-              </AppConstantsContextProvider>
-            </LanguageWrapper>
+                                            </MultipleBeforePopStateContextProvider>
+                                          </OverlayModeProvider>
+                                        </ChatsProvider>
+                                      </BundlesContextProvider>
+                                    </FollowingsContextProvider>
+                                  </BlockedUsersProvider>
+                                </PushNotificationContextProvider>
+                              </ModalNotificationsContextProvider>
+                            </NotificationsProvider>
+                          </SyncUserWrapper>
+                        </PersistanceProvider>
+                      </ChannelsContextProvider>
+                    </SocketContextProvider>
+                  </AppConstantsContextProvider>
+                </LanguageWrapper>
+              </GlobalTheme>
+            </AppStateContextProvider>
           </ErrorBoundary>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
@@ -478,7 +456,12 @@ const PRE_FETCH_LINKS_DARK = (
     {/* Bundle assets (static is not used yet, preload when used) */}
     <link rel='prefetch' href={assets.bundles.darkBundles} as='image' />
     {assets.bundles.darkVotes.map((asset) => (
-      <link rel='prefetch' href={asset.animated()} as='image' />
+      <link
+        key={asset.static}
+        rel='prefetch'
+        href={asset.animated()}
+        as='image'
+      />
     ))}
   </>
 );
@@ -545,8 +528,13 @@ const PRE_FETCH_LINKS_LIGHT = (
     {/* <link rel='prefetch' href={assets.creation.lightCfStatic} as='image' /> */}
     {/* Bundle assets (static is not used yet, preload when used) */}
     <link rel='prefetch' href={assets.bundles.lightBundles} as='image' />
-    {assets.bundles.lightVotes.map((asset) => (
-      <link rel='prefetch' href={asset.animated()} as='image' />
+    {assets.bundles.lightVotes.map((asset, i) => (
+      <link
+        key={asset.static}
+        rel='prefetch'
+        href={asset.animated()}
+        as='image'
+      />
     ))}
   </>
 );

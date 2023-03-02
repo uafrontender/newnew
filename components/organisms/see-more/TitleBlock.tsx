@@ -3,12 +3,10 @@ import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
-import Sorting from '../Sorting';
 import ChangeCollectionType from '../../atoms/ChangeCollectionType';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import SortOption from '../../atoms/SortOption';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ITitleBlock {
   category: string;
@@ -22,7 +20,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   authenticated,
 }) => {
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

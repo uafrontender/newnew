@@ -27,6 +27,7 @@ import {
   fetchMoreLikePosts,
   fetchPostByUUID,
   markPost,
+  setPostTitle,
 } from '../../api/endpoints/post';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { ChannelsContext } from '../../contexts/channelsContext';
@@ -51,13 +52,17 @@ import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import usePost from '../../utils/hooks/usePost';
 import getDisplayname from '../../utils/getDisplayname';
+import { useAppState } from '../../contexts/appStateContext';
+import useErrorToasts from '../../utils/hooks/useErrorToasts';
 
 interface IPostPage {
   postUuidOrShortId: string;
   post?: newnewapi.IPost;
   setup_intent_client_secret?: string;
+  bundle_setup_intent_client_secret?: string;
   comment_id?: string;
   comment_content?: string;
+  custom_option_text?: string;
   save_card?: boolean;
   isServerSide?: boolean;
 }
@@ -66,6 +71,8 @@ const PostPage: NextPage<IPostPage> = ({
   postUuidOrShortId,
   post,
   setup_intent_client_secret,
+  bundle_setup_intent_client_secret,
+  custom_option_text,
   comment_id,
   comment_content,
   save_card,
@@ -73,21 +80,31 @@ const PostPage: NextPage<IPostPage> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
+  const { showErrorToastPredefined } = useErrorToasts();
 
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   const stripeSetupIntentClientSecretFromRedirect = useMemo(
     () => setup_intent_client_secret,
     [setup_intent_client_secret]
+  );
+  const bundleStripeSetupIntentClientSecretFromRedirect = useMemo(
+    () => bundle_setup_intent_client_secret,
+    [bundle_setup_intent_client_secret]
+  );
+  const customOptionFromRedirect = useMemo(
+    () => custom_option_text,
+    [custom_option_text]
   );
   const saveCardFromRedirect = useMemo(() => save_card, [save_card]);
   const commentIdFromUrl = useMemo(() => comment_id, [comment_id]);
@@ -112,6 +129,7 @@ const PostPage: NextPage<IPostPage> = ({
     data: postFromAjax,
     isLoading: isPostLoading,
     refetch: refetchPost,
+    updatePostTitleMutation,
   } = usePost(
     {
       loggedInUser: user.loggedIn,
@@ -124,6 +142,7 @@ const PostPage: NextPage<IPostPage> = ({
         router.replace('/404');
       },
       enabled: !post,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -143,17 +162,39 @@ const PostPage: NextPage<IPostPage> = ({
     [post, postFromAjax]
   );
 
-  // const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
-  //   if (typeOfPost && postParsed?.status) {
-  //     if (typeof postParsed.status === 'string') {
-  //       // NB! Status can be a string
-  //       // @ts-ignore
-  //       return switchPostStatusString(typeOfPost, postParsed?.status);
-  //     }
-  //     return switchPostStatus(typeOfPost, postParsed?.status);
-  //   }
-  //   return 'processing_announcement';
-  // });
+  const [isUpdateTitleLoading, setIsUpdateTitleLoading] = useState(false);
+  const handleUpdatePostTitle = useCallback(
+    async (newTitle: string) => {
+      if (!postParsed?.postUuid) {
+        return;
+      }
+      setIsUpdateTitleLoading(true);
+      try {
+        const payload = new newnewapi.SetPostTitleRequest({
+          postUuid: postParsed?.postUuid,
+          updatedTitle: newTitle,
+        });
+
+        const res = await setPostTitle(payload);
+
+        if (!res.data || res.error) {
+          throw new Error(res?.error?.message || 'An error occured');
+        }
+
+        updatePostTitleMutation.mutate({
+          postUuid: postParsed.postUuid,
+          title: newTitle,
+        });
+      } catch (err) {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+      } finally {
+        setIsUpdateTitleLoading(false);
+      }
+    },
+    [postParsed?.postUuid, showErrorToastPredefined, updatePostTitleMutation]
+  );
+
   const postStatus = useMemo<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
@@ -166,7 +207,7 @@ const PostPage: NextPage<IPostPage> = ({
     return 'processing_announcement';
   }, [postParsed, typeOfPost]);
 
-  // TODO: a way to determine if the post was deleted by the crator themselves
+  // TODO: a way to determine if the post was deleted by the creator themselves
   // pr by an admin
   const deletedByCreator = useMemo(
     () => postStatus === 'deleted_by_creator',
@@ -238,6 +279,17 @@ const PostPage: NextPage<IPostPage> = ({
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
     useState(() => stripeSetupIntentClientSecretFromRedirect ?? undefined);
 
+  const [
+    bundleStripeSetupIntentClientSecret,
+    setBundleStripeSetupIntentClientSecret,
+  ] = useState(
+    () => bundleStripeSetupIntentClientSecretFromRedirect ?? undefined
+  );
+
+  const [customOptionText, setCustomOptionText] = useState(
+    customOptionFromRedirect ?? undefined
+  );
+
   const [saveCard, setSaveCard] = useState(
     () => saveCardFromRedirect ?? undefined
   );
@@ -282,6 +334,12 @@ const PostPage: NextPage<IPostPage> = ({
 
   const resetSetupIntentClientSecret = useCallback(() => {
     setStripeSetupIntentClientSecret(undefined);
+    setSaveCard(false);
+  }, []);
+
+  const resetBundleSetupIntentClientSecret = useCallback(() => {
+    setBundleStripeSetupIntentClientSecret(undefined);
+    setCustomOptionText(undefined);
     setSaveCard(false);
   }, []);
 
@@ -571,6 +629,11 @@ const PostPage: NextPage<IPostPage> = ({
         saveCard={saveCard}
         stripeSetupIntentClientSecret={stripeSetupIntentClientSecret}
         resetSetupIntentClientSecret={resetSetupIntentClientSecret}
+        bundleStripeSetupIntentClientSecret={
+          bundleStripeSetupIntentClientSecret
+        }
+        customOptionText={customOptionText}
+        resetBundleSetupIntentClientSecret={resetBundleSetupIntentClientSecret}
         handleCloseAndGoBack={handleCloseAndGoBack}
         handleGoBackInsidePost={handleGoBackInsidePost}
         isFollowingDecision={isFollowingDecision}
@@ -581,12 +644,14 @@ const PostPage: NextPage<IPostPage> = ({
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
+        handleUpdatePostTitle={handleUpdatePostTitle}
+        isUpdateTitleLoading={isUpdateTitleLoading}
         refetchPost={refetchPost}
       >
         <Head>
           <title>
-            {typeOfPost
-              ? t(`meta.${typeOfPost}.title`, {
+            {postParsed
+              ? t(`meta.title`, {
                   displayName: getDisplayname(postParsed.creator),
                   postTitle: postParsed.title,
                 })
@@ -594,15 +659,41 @@ const PostPage: NextPage<IPostPage> = ({
           </title>
           <meta
             name='description'
-            content={typeOfPost ? t(`meta.${typeOfPost}.description`) : ''}
+            content={
+              typeOfPost === 'ac'
+                ? t(`meta.description.ac`, {
+                    totalInBids: (postParsed.totalAmount?.usdCents ?? 0) / 100,
+                  })
+                : typeOfPost === 'mc'
+                ? t(`meta.description.mc`, {
+                    totalVotes: (postParsed as newnewapi.MultipleChoice)
+                      .totalVotes,
+                  })
+                : ''
+            }
           />
           <meta
             property='og:title'
             content={
-              typeOfPost
-                ? t(`meta.${typeOfPost}.title`, {
+              postParsed
+                ? t(`meta.title`, {
                     displayName: getDisplayname(postParsed.creator),
                     postTitle: postParsed.title,
+                  })
+                : ''
+            }
+          />
+          <meta
+            property='og:description'
+            content={
+              typeOfPost === 'ac'
+                ? t(`meta.description.ac`, {
+                    totalInBids: (postParsed.totalAmount?.usdCents ?? 0) / 100,
+                  })
+                : typeOfPost === 'mc'
+                ? t(`meta.description.mc`, {
+                    totalVotes: (postParsed as newnewapi.MultipleChoice)
+                      .totalVotes,
                   })
                 : ''
             }
@@ -613,7 +704,11 @@ const PostPage: NextPage<IPostPage> = ({
           />
           <meta
             property='og:image'
-            content={postParsed?.announcement?.thumbnailImageUrl ?? ''}
+            content={
+              (postParsed?.announcement?.coverImageUrl ||
+                postParsed?.announcement?.thumbnailImageUrl) ??
+              ''
+            }
           />
         </Head>
         <AnimatePresence exitBeforeEnter>
@@ -694,6 +789,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       comment_id,
       comment_content,
       save_card,
+      bundle,
+      custom_option_text,
     } = context.query;
     const translationContext = await serverSideTranslations(
       context.locale!!,
@@ -703,6 +800,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         'modal-ResponseSuccessModal',
         'component-PostCard',
         'modal-PaymentModal',
+        'modal-EditPostTitle',
       ],
       null,
       SUPPORTED_LANGUAGES
@@ -747,9 +845,13 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         const queryObject = {
           ...(setup_intent_client_secret &&
           !Array.isArray(setup_intent_client_secret)
-            ? {
-                setup_intent_client_secret,
-              }
+            ? bundle
+              ? {
+                  bundle_setup_intent_client_secret: setup_intent_client_secret,
+                }
+              : {
+                  setup_intent_client_secret,
+                }
             : {}),
           ...(comment_id && !Array.isArray(comment_id)
             ? {
@@ -765,6 +867,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
             ? {
                 save_card,
               }
+            : {}),
+          ...(custom_option_text && !Array.isArray(custom_option_text)
+            ? { custom_option_text }
             : {}),
         };
 
@@ -798,9 +903,13 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           post: res.data.toJSON() as newnewapi.IPost,
           ...(setup_intent_client_secret &&
           !Array.isArray(setup_intent_client_secret)
-            ? {
-                setup_intent_client_secret,
-              }
+            ? bundle
+              ? {
+                  bundle_setup_intent_client_secret: setup_intent_client_secret,
+                }
+              : {
+                  setup_intent_client_secret,
+                }
             : {}),
           ...(save_card && !Array.isArray(save_card)
             ? {
@@ -817,6 +926,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
                 comment_content,
               }
             : {}),
+          ...(custom_option_text && !Array.isArray(custom_option_text)
+            ? { custom_option_text }
+            : {}),
           ...translationContext,
         },
       };
@@ -830,9 +942,13 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         isServerSide: false,
         ...(setup_intent_client_secret &&
         !Array.isArray(setup_intent_client_secret)
-          ? {
-              setup_intent_client_secret,
-            }
+          ? bundle
+            ? {
+                bundle_setup_intent_client_secret: setup_intent_client_secret,
+              }
+            : {
+                setup_intent_client_secret,
+              }
           : {}),
         ...(save_card && !Array.isArray(save_card)
           ? {
@@ -848,6 +964,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ? {
               comment_content,
             }
+          : {}),
+        ...(custom_option_text && !Array.isArray(custom_option_text)
+          ? { custom_option_text }
           : {}),
         ...translationContext,
       },

@@ -3,6 +3,7 @@ import moment from 'moment';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Text from '../../Text';
 import InlineSVG from '../../InlineSVG';
@@ -32,6 +33,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   ];
 
   const theme = useTheme();
+  const { locale } = useRouter();
   const { t } = useTranslation('page-Creation');
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
@@ -117,6 +119,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
       duration: 500,
       horizontal: true,
       containerId: 'monthsContainer',
+      ignoreCancelEvents: true,
     });
   }, [visibleMonth]);
 
@@ -124,7 +127,9 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     <SWrapper ref={wrapperRef}>
       <SContainer onClick={open ? handleClose : handleClick}>
         <SCalendarLabel variant={2} weight={500}>
-          {moment(date).format('MMMM DD')}
+          {moment(date)
+            .locale(locale || 'en-US')
+            .format('MMMM DD')}
         </SCalendarLabel>
         <InlineSVG
           svg={calendarIcon}
@@ -155,7 +160,10 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
               )}
             </SInlineSVGWrapper>
             <SMonth variant={2} weight={600}>
-              {moment().add(visibleMonth, 'month').format('MMMM YYYY')}
+              {moment()
+                .locale(locale || 'en-US')
+                .add(visibleMonth, 'month')
+                .format('MMMM YYYY')}
             </SMonth>
             <SInlineSVGWrapper
               onClick={handleNextMonth}

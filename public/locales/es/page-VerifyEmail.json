@@ -18,6 +18,7 @@
     "noToken": "No hay ningún token",
     "invalidToken": "El token no es válido"
   },
+  "leaveAlert": "¿Estás seguro que quieres salir de esta página?",
   "verifying": "Verificando tu correo electrónico...",
   "backButton": "Regresar",
   "updated": "¡Hemos actualizado tu correo electrónico!",

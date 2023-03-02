@@ -21,6 +21,7 @@ import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verif
 import { useBundles } from '../../../contexts/bundlesContext';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -36,7 +37,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const { t } = useTranslation('common');
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );

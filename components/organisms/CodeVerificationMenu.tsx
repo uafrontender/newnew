@@ -34,15 +34,19 @@ import { Mixpanel } from '../../utils/mixpanel';
 import useRecaptcha from '../../utils/hooks/useRecaptcha';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
+import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
+  allowLeave: boolean;
   redirectUserTo?: string;
   onBack: () => void;
 }
 
 const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   expirationTime,
+  allowLeave,
   redirectUserTo,
   onBack,
 }) => {
@@ -50,7 +54,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { t } = useTranslation('page-VerifyEmail');
   const { resumePushNotification } = usePushNotifications();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -81,6 +85,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   // Timer
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
 
+  useLeavePageConfirm(!isSuccess && !allowLeave, t('leaveAlert'), []);
+
   const handleSignIn = useCallback(
     async (completeCode: string) => {
       try {
@@ -102,9 +108,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           !data ||
           data.status !== newnewapi.SignInResponse.Status.SUCCESS ||
           error
-        )
+        ) {
           throw new Error(error?.message ?? 'Request failed');
-
+        }
         dispatch(
           setUserData({
             username: data.me?.username,

@@ -29,16 +29,28 @@ import getDisplayname from '../../utils/getDisplayname';
 import Button from '../../components/atoms/Button';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import assets from '../../constants/assets';
+import useBuyBundleAfterStripeRedirect from '../../utils/hooks/useBuyBundleAfterStripeRedirect';
 
 interface IUserPageIndex {
   user: newnewapi.IUser;
   postsFilter: newnewapi.Post.Filter;
+  stripeSetupIntentClientSecretFromRedirect?: string;
+  saveCardFromRedirect?: boolean;
 }
 
-const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
+const UserPageIndex: NextPage<IUserPageIndex> = ({
+  user,
+  postsFilter,
+  stripeSetupIntentClientSecretFromRedirect,
+  saveCardFromRedirect,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { loggedIn } = useAppSelector((state) => state.user);
+  useBuyBundleAfterStripeRedirect(
+    stripeSetupIntentClientSecretFromRedirect,
+    saveCardFromRedirect
+  );
 
   const isCreator = useMemo(
     () => !!user?.options?.isCreator,
@@ -80,20 +92,46 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({ user, postsFilter }) => {
     }
   }, [inView, fetchNextPage]);
 
+  const bioWithTrailingDot = useMemo(() => {
+    if (!user.bio || user.bio?.length === 0) {
+      return '';
+    }
+
+    if (user.bio[user.bio.length - 1] === '.') {
+      return user.bio;
+    }
+
+    return user.bio.concat('.');
+  }, [user.bio]);
+
   return (
     <>
       <Head>
         <title>
-          {t('Profile.meta.title', { displayName: getDisplayname(user) })}
+          {t('Profile.meta.title', {
+            displayname: getDisplayname(user),
+            username: user.username,
+          })}
         </title>
-        <meta name='description' content={user.bio || ''} />
+        <meta
+          name='description'
+          content={t('Profile.meta.description', {
+            bio: bioWithTrailingDot,
+          })}
+        />
         <meta
           property='og:title'
           content={t('Profile.meta.title', {
-            displayName: getDisplayname(user),
+            displayname: getDisplayname(user),
+            username: user.username,
           })}
         />
-        <meta property='og:description' content={user.bio || ''} />
+        <meta
+          name='og:description'
+          content={t('Profile.meta.description', {
+            bio: bioWithTrailingDot,
+          })}
+        />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <div>
@@ -198,7 +236,9 @@ export const getServerSideProps: GetServerSideProps<
     'public, s-maxage=15, stale-while-revalidate=20, stale-if-error=5'
   );
   try {
-    const { username } = context.query;
+    // eslint-disable-next-line camelcase
+    const { username, setup_intent_client_secret, save_card } = context.query;
+
     const translationContext = await serverSideTranslations(
       context.locale!!,
       [
@@ -240,6 +280,23 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         user: res.data.toJSON(),
+        // setup intent on this page is always for bundles
+        // eslint-disable-next-line camelcase, object-shorthand
+        ...(setup_intent_client_secret &&
+        !Array.isArray(setup_intent_client_secret)
+          ? {
+              stripeSetupIntentClientSecretFromRedirect:
+                // eslint-disable-next-line camelcase
+                setup_intent_client_secret,
+            }
+          : {}),
+        // eslint-disable-next-line camelcase, object-shorthand
+        ...(save_card && !Array.isArray(save_card)
+          ? {
+              // eslint-disable-next-line camelcase
+              saveCardFromRedirect: save_card === 'true',
+            }
+          : {}),
         ...translationContext,
       },
     };

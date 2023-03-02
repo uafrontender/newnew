@@ -40,6 +40,7 @@ import getGenderPronouns, {
 import getDisplayname from '../../utils/getDisplayname';
 import copyToClipboard from '../../utils/copyToClipboard';
 import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 type TPageType =
   | 'activelyBidding'
@@ -70,7 +71,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
@@ -455,7 +456,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         {/* Edit Profile modal menu */}
         <Modal
           show={isEditProfileMenuOpen}
-          overlaydim
           transitionspeed={isMobileOrTablet ? 0.15 : 0}
           onClose={handleClosePreventDiscarding}
         >

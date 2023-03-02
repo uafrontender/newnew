@@ -45,6 +45,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { I18nNamespaces } from '../../../../@types/i18next';
+import { useAppState } from '../../../../contexts/appStateContext';
 /* import getGuestId from '../../../../utils/getGuestId';
  import {
   getGuestSmsNotificationsSubscriptionStatus,
@@ -109,7 +110,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   // const socketConnection = useContext(SocketContext);
   // const { showErrorToastCustom } = useErrorToasts();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

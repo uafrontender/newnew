@@ -13,6 +13,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
+import { useRouter } from 'next/dist/client/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
@@ -35,6 +36,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import useAcOptions from '../../../../utils/hooks/useAcOptions';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -59,9 +61,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
   () => {
     const dispatch = useAppDispatch();
     const { t } = useTranslation('page-Post');
+    const { locale } = useRouter();
     const { showErrorToastCustom } = useErrorToasts();
     const { user } = useAppSelector((state) => state);
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -367,9 +371,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                   />
                   <SEndDate>
                     {t('expires.end_date')}{' '}
-                    {moment((post.expiresAt?.seconds as number) * 1000).format(
-                      'DD MMM YYYY [at] hh:mm A'
-                    )}
+                    {moment((post.expiresAt?.seconds as number) * 1000)
+                      .locale(locale || 'en-US')
+                      .format('DD MMM YYYY [at] hh:mm A')}
                   </SEndDate>
                 </>
               )}
@@ -418,9 +422,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                     />
                     <SEndDate>
                       {t('expires.end_date')}{' '}
-                      {moment(
-                        (post.expiresAt?.seconds as number) * 1000
-                      ).format('DD MMM YYYY [at] hh:mm A')}
+                      {moment((post.expiresAt?.seconds as number) * 1000)
+                        .locale(locale || 'en-US')
+                        .format('DD MMM YYYY [at] hh:mm A')}
                     </SEndDate>
                   </>
                 )}
@@ -487,7 +491,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                                 {t('expires.end_date')}{' '}
                                 {moment(
                                   (post.expiresAt?.seconds as number) * 1000
-                                ).format('DD MMM YYYY [at] hh:mm A')}
+                                )
+                                  .locale(locale || 'en-US')
+                                  .format('DD MMM YYYY [at] hh:mm A')}
                               </SEndDate>
                             </>
                           )}
