@@ -165,6 +165,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       []
     );
 
+    // Use JSX.element in ModalPaperTitle, use DisplayName component to add verification icon
     return (
       <>
         <Modal show={show} onClose={handleClose} additionalz={1000}>
