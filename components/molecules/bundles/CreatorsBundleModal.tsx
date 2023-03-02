@@ -3,7 +3,6 @@ import React, { useMemo, Fragment } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import preventParentClick from '../../../utils/preventParentClick';
@@ -15,10 +14,8 @@ import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
-import InlineSvg from '../../atoms/InlineSVG';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import DisplayName from '../../DisplayName';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -80,28 +77,17 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 />
                 <SForLine>
                   <span>{t('modal.creatorsBundle.for')}</span>
-                  <Link href={`/${creatorBundle?.creator?.username}`}>
-                    <SUserName
-                      onClick={() => {
-                        if (
-                          router.asPath ===
-                          `/${creatorBundle?.creator?.username}`
-                        ) {
-                          onClose();
-                        }
-                      }}
-                    >
-                      {getDisplayname(creatorBundle?.creator)}
-                    </SUserName>
-                  </Link>
-                  {creatorBundle?.creator?.options?.isVerified && (
-                    <SInlineSvg
-                      svg={VerificationCheckmark}
-                      width='24px'
-                      height='24px'
-                      fill='none'
-                    />
-                  )}
+                  <SDisplayName
+                    user={creatorBundle?.creator}
+                    href={`/${creatorBundle?.creator?.username}`}
+                    onClick={() => {
+                      if (
+                        router.asPath === `/${creatorBundle?.creator?.username}`
+                      ) {
+                        onClose();
+                      }
+                    }}
+                  />
                 </SForLine>
               </SUserInfo>
               <SBundleInfo>
@@ -228,20 +214,13 @@ const SForLine = styled.div`
   line-height: 24px;
 `;
 
-const SUserName = styled.span`
-  overflow: hidden;
-  text-overflow: ellipsis;
+const SDisplayName = styled(DisplayName)`
   cursor: pointer;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 
   &:hover {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
-`;
-
-const SInlineSvg = styled(InlineSvg)`
-  margin-left: 2px;
-  flex-shrink: 0;
 `;
 
 const SBundleInfo = styled.div`
