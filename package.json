@@ -82,7 +82,7 @@
     "styled-components": "5.3.3",
     "uuidv4": "6.2.13",
     "validator": "13.7.0",
-    "video.js": "^8.0.4"
+    "video.js": "7.21.3"
   },
   "devDependencies": {
     "@babel/core": "7.18.2",
@@ -106,6 +106,7 @@
     "@types/react-scroll": "1.8.3",
     "@types/styled-components": "5.1.25",
     "@types/validator": "13.7.3",
+    "@types/video.js": "^7.3.51",
     "@typescript-eslint/eslint-plugin": "5.27.1",
     "@typescript-eslint/parser": "5.27.1",
     "babel-loader": "8.2.3",

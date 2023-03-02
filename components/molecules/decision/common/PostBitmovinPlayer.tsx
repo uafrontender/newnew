@@ -11,8 +11,6 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import videojs from 'video.js';
-import Player from 'video.js/dist/types/player';
-import addsfadsf from 'video.js/dist/types/';
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -29,152 +27,167 @@ interface IPostBitmovinPlayer {
   showPlayButton?: boolean;
 }
 
-export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
-  id,
-  muted,
-  resources,
-  videoDurationWithTime,
-  showPlayButton,
-}) => {
-  const videoRef = React.useRef(null);
-  const playerRef = React.useRef<Player>(null);
+export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = React.memo(
+  ({ id, muted, resources, videoDurationWithTime, showPlayButton }) => {
+    const videoRef = React.useRef(null);
+    const playerRef = React.useRef<videojs.Player>();
 
-  const [isPaused, setIsPaused] = useState(false);
-  const handleSetIsPaused = useCallback((stateValue: boolean) => {
-    setIsPaused(stateValue);
-  }, []);
+    const [isLoading, setIsLoading] = useState(false);
 
-  const [isHovered, setIsHovered] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const handleSetIsPaused = useCallback((stateValue: boolean) => {
+      setIsPaused(stateValue);
+    }, []);
 
-  const [playbackTime, setPlaybackTime] = useState(0);
-  const handlePlayerScrubberChangeTime = useCallback((v: number) => {
-    setPlaybackTime(v);
+    const [isHovered, setIsHovered] = useState(false);
 
-    playerRef.current?.pause();
-    playerRef.current?.currentTime(v);
-    setTimeout(() => {
-      playerRef.current?.play();
-    }, 100);
-  }, []);
+    const [playbackTime, setPlaybackTime] = useState(0);
+    const handlePlayerScrubberChangeTime = useCallback(
+      (v: number) => {
+        playerRef.current?.pause();
+        setPlaybackTime(v);
+        playerRef.current?.currentTime(v);
 
-  const options = useMemo(
-    () => ({
-      autoplay: true,
-      loop: true,
-      controls: false,
-      responsive: false,
-      fluid: true,
-      sources: [
-        {
-          src: resources?.hlsStreamUrl,
-          type: 'application/x-mpegURL',
-        },
-      ],
-    }),
-    [resources?.hlsStreamUrl]
-  );
+        setTimeout(() => {
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
+        }, 100);
+      },
+      [handleSetIsPaused]
+    );
 
-  const handlePlayerReady = useCallback(
-    (p: Player) => {
-      // @ts-ignore
-      playerRef.current = p;
+    const options: videojs.PlayerOptions = useMemo(
+      () => ({
+        autoplay: true as videojs.Autoplay,
+        loop: true,
+        controls: false,
+        responsive: false,
+        fluid: true,
+        sources: [
+          {
+            src: resources!!.hlsStreamUrl as string,
+            type: 'application/x-mpegURL',
+          },
+        ],
+      }),
+      [resources]
+    );
 
-      // You can handle player events here, for example:
-      // @ts-ignore
-      p.on('waiting', () => {
-        videojs.log('player is waiting');
-      });
-      // @ts-ignore
-      p.on('dispose', () => {
-        videojs.log('player will dispose');
-      });
+    useEffect(() => {
+      console.log(resources);
+    }, [resources]);
 
-      // @ts-ignore
-      p.on('play', () => {
-        videojs.log('player is playing');
-        handleSetIsPaused(false);
-      });
-      // @ts-ignore
-      p.on('pause', () => {
-        videojs.log('player is paused');
-        handleSetIsPaused(true);
-      });
-      // @ts-ignore
-      p.on('timeupdate', (e) => {
-        console.log(p.currentTime());
-        setPlaybackTime(p.currentTime());
-      });
-    },
-    [handleSetIsPaused]
-  );
+    const handlePlayerReady = useCallback(
+      (p: videojs.Player) => {
+        playerRef.current = p;
 
-  React.useEffect(() => {
-    // Make sure Video.js player is only initialized once
-    if (!playerRef.current) {
-      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
-      const videoElement = document.createElement('video-js');
+        p.on('waiting', () => {
+          videojs.log('player is waiting');
+        });
+        p.on('ready', () => {
+          videojs.log('player is ready');
+          // playerRef.current?.play()?.catch(() => {
+          //   handleSetIsPaused(true);
+          // });
+        });
+        p.on('dispose', () => {
+          videojs.log('player will dispose');
+        });
+        p.on('play', () => {
+          videojs.log('player is playing');
+          handleSetIsPaused(false);
+        });
+        p.on('pause', () => {
+          videojs.log('player is paused');
+          handleSetIsPaused(true);
+        });
+        p.on('timeupdate', (e) => {
+          setPlaybackTime(p.currentTime());
+        });
+        p.on('loadstart', (e) => {
+          videojs.log('player is loading');
+          setIsLoading(true);
+        });
+        p.on('canplay', (e) => {
+          videojs.log('player is canplay');
+          setIsLoading(false);
+          // p?.play()?.catch(() => {
+          //   handleSetIsPaused(true);
+          // });
+        });
+      },
+      [handleSetIsPaused]
+    );
 
-      videoElement.classList.add('vjs-big-play-centered');
-      // @ts-ignore
-      videoRef.current?.appendChild(videoElement);
-      // @ts-ignore
-      const player = (playerRef.current = videojs(videoElement, options, () => {
-        videojs.log('player is ready');
-        handlePlayerReady && handlePlayerReady(player);
-      }));
+    useEffect(() => {
+      console.log('init!');
+      // Make sure Video.js player is only initialized once
+      if (!playerRef.current) {
+        console.log('ha!');
 
-      // You could update an existing player in the `else` block here
-      // on prop change, for example:
-    } else {
+        // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
+        const videoElement = document.createElement('video-js');
+
+        videoElement.classList.add('vjs-big-play-centered');
+        // @ts-ignore
+        videoRef.current?.appendChild(videoElement);
+        // @ts-ignore
+        const player = (playerRef.current = videojs(
+          videoElement,
+          options,
+          () => {
+            videojs.log('player is ready');
+            handlePlayerReady && handlePlayerReady(player);
+          }
+        ));
+
+        // You could update an existing player in the `else` block here
+        // on prop change, for example:
+      } else {
+        console.log('ho!');
+
+        try {
+          const player = playerRef.current;
+
+          player.autoplay(options.autoplay!!);
+          player.src(options.sources!!);
+        } catch (err) {
+          handleSetIsPaused(true);
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Dispose the Video.js player when the functional component unmounts
+    useEffect(() => {
+      console.log('mounted');
       const player = playerRef.current;
 
-      player.autoplay(options.autoplay);
-      player.src(options.sources);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options, videoRef]);
+      return () => {
+        if (player && !player.isDisposed()) {
+          player.dispose();
+          // @ts-ignore
+          playerRef.current = null;
+        }
+      };
+    }, []);
 
-  // Dispose the Video.js player when the functional component unmounts
-  React.useEffect(() => {
-    const player = playerRef.current;
-
-    return () => {
-      if (player && !player.isDisposed()) {
-        player.dispose();
-        // @ts-ignore
-        playerRef.current = null;
+    useEffect(() => {
+      if (playerRef.current) {
+        playerRef.current?.muted(!!muted);
       }
-    };
-  }, [playerRef]);
+    }, [muted]);
 
-  useEffect(() => {
-    if (playerRef.current) {
-      playerRef.current?.muted(muted);
-    }
-  }, [muted]);
-
-  return (
-    <SContent
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
-      <SVideoWrapper data-vjs-player>
-        <SWrapper
-          id={id}
-          onClick={() => {
-            if (!playerRef.current?.paused()) {
-              playerRef.current?.pause();
-            } else {
-              playerRef.current?.play()?.catch(() => {
-                handleSetIsPaused(true);
-              });
-            }
-          }}
-          ref={videoRef}
-        />
-        {showPlayButton && isPaused && (
-          <SPlayPseudoButton
+    return (
+      <SContent
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
+        <SVideoWrapper data-vjs-player>
+          <SWrapper
+            id={id}
             onClick={() => {
               if (!playerRef.current?.paused()) {
                 playerRef.current?.pause();
@@ -184,40 +197,54 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
                 });
               }
             }}
-          >
-            <InlineSvg
-              svg={PlayIcon}
-              width='32px'
-              height='32px'
-              fill='#FFFFFF'
-            />
-          </SPlayPseudoButton>
-        )}
-      </SVideoWrapper>
-      {/* {isLoading && (
-        <SLoader>
-          <Lottie
-            width={65}
-            height={60}
-            options={{
-              loop: false,
-              autoplay: true,
-              animationData: logoAnimation,
-            }}
-            isStopped={!isLoading}
+            ref={videoRef}
           />
-        </SLoader>
-      )} */}
-      <PlayerScrubber
-        isHovered={isHovered}
-        currentTime={playbackTime}
-        videoDuration={playerRef?.current?.duration() || 10}
-        withTime={videoDurationWithTime}
-        handleChangeTime={handlePlayerScrubberChangeTime}
-      />
-    </SContent>
-  );
-};
+          {showPlayButton && isPaused && (
+            <SPlayPseudoButton
+              onClick={() => {
+                if (!playerRef.current?.paused()) {
+                  playerRef.current?.pause();
+                } else {
+                  playerRef.current?.play()?.catch(() => {
+                    handleSetIsPaused(true);
+                  });
+                }
+              }}
+            >
+              <InlineSvg
+                svg={PlayIcon}
+                width='32px'
+                height='32px'
+                fill='#FFFFFF'
+              />
+            </SPlayPseudoButton>
+          )}
+        </SVideoWrapper>
+        {isLoading && (
+          <SLoader>
+            <Lottie
+              width={65}
+              height={60}
+              options={{
+                loop: false,
+                autoplay: true,
+                animationData: logoAnimation,
+              }}
+              isStopped={!isLoading}
+            />
+          </SLoader>
+        )}
+        <PlayerScrubber
+          isHovered={isHovered}
+          currentTime={playbackTime}
+          videoDuration={playerRef?.current?.duration() || 10}
+          withTime={videoDurationWithTime}
+          handleChangeTime={handlePlayerScrubberChangeTime}
+        />
+      </SContent>
+    );
+  }
+);
 
 export default PostBitmovinPlayer;
 
