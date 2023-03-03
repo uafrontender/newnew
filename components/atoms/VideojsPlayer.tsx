@@ -112,6 +112,13 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
         innerRef.current = p;
       }
 
+      // Autoplay
+      p.on('ready', (e) => {
+        playerRef.current?.play()?.catch(() => {
+          handleSetIsPaused(true);
+        });
+      });
+
       // Paused state
       p.on('play', () => {
         handleSetIsPaused(false);

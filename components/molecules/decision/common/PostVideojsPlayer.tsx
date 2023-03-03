@@ -89,6 +89,13 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     (p: videojs.Player) => {
       playerRef.current = p;
 
+      // Autoplay
+      p.on('ready', (e) => {
+        playerRef.current?.play()?.catch(() => {
+          handleSetIsPaused(true);
+        });
+      });
+
       // Paused state
       p.on('play', () => {
         handleSetIsPaused(false);
