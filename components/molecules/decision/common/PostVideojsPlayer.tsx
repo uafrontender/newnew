@@ -27,138 +27,152 @@ interface IPostVideojsPlayer {
   showPlayButton?: boolean;
 }
 
-export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
-  ({ id, muted, resources, videoDurationWithTime, showPlayButton }) => {
-    const videoRef = useRef(null);
-    const playerRef = useRef<videojs.Player>();
+export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
+  id,
+  muted,
+  resources,
+  videoDurationWithTime,
+  showPlayButton,
+}) => {
+  const videoRef = useRef(null);
+  const playerRef = useRef<videojs.Player>();
 
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [isPaused, setIsPaused] = useState(false);
-    const handleSetIsPaused = useCallback((stateValue: boolean) => {
-      setIsPaused(stateValue);
-    }, []);
+  const [isPaused, setIsPaused] = useState(false);
+  const handleSetIsPaused = useCallback((stateValue: boolean) => {
+    setIsPaused(stateValue);
+  }, []);
 
-    const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-    const [playbackTime, setPlaybackTime] = useState(0);
-    const handlePlayerScrubberChangeTime = useCallback(
-      (newValue: number) => {
-        // Pause the player when scrubbing
-        // to avoid double playback start
-        playerRef.current?.pause();
-        setPlaybackTime(newValue);
-        playerRef.current?.currentTime(newValue);
+  const [playbackTime, setPlaybackTime] = useState(0);
+  const handlePlayerScrubberChangeTime = useCallback(
+    (newValue: number) => {
+      // Pause the player when scrubbing
+      // to avoid double playback start
+      playerRef.current?.pause();
+      setPlaybackTime(newValue);
+      playerRef.current?.currentTime(newValue);
 
-        setTimeout(() => {
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
-        }, 100);
-      },
-      [handleSetIsPaused]
-    );
-
-    const options: videojs.PlayerOptions = useMemo(
-      () => ({
-        loop: true,
-        controls: false,
-        responsive: false,
-        fluid: true,
-        playsinline: true,
-        disablePictureInPicture: true,
-        sources: [
-          {
-            src: resources!!.hlsStreamUrl as string,
-            type: 'application/x-mpegURL',
-          },
-        ],
-      }),
-      [resources]
-    );
-
-    // playerRef is set here, as well as all the listeners
-    // List of video.js events
-    // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
-    const handlePlayerReady = useCallback(
-      (p: videojs.Player) => {
-        playerRef.current = p;
-
-        // Paused state
-        p.on('play', () => {
-          handleSetIsPaused(false);
-        });
-        p.on('pause', () => {
+      setTimeout(() => {
+        playerRef.current?.play()?.catch(() => {
           handleSetIsPaused(true);
         });
+      }, 100);
+    },
+    [handleSetIsPaused]
+  );
 
-        p.on('timeupdate', (e) => {
-          setPlaybackTime(p.currentTime());
+  const options: videojs.PlayerOptions = useMemo(
+    () => ({
+      loop: true,
+      controls: false,
+      responsive: false,
+      fluid: true,
+      playsinline: true,
+      disablePictureInPicture: true,
+      sources: [
+        {
+          src: resources!!.hlsStreamUrl as string,
+          type: 'application/x-mpegURL',
+        },
+      ],
+    }),
+    [resources]
+  );
+
+  // playerRef is set here, as well as all the listeners
+  // List of video.js events
+  // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
+  const handlePlayerReady = useCallback(
+    (p: videojs.Player) => {
+      playerRef.current = p;
+
+      // Paused state
+      p.on('play', () => {
+        handleSetIsPaused(false);
+      });
+      p.on('pause', () => {
+        handleSetIsPaused(true);
+      });
+
+      p.on('timeupdate', (e) => {
+        setPlaybackTime(p.currentTime());
+      });
+
+      // Loading state & Autoplay
+      p.on('loadstart', (e) => {
+        setIsLoading(true);
+        playerRef.current?.play()?.catch(() => {
+          handleSetIsPaused(true);
         });
+      });
+      p.on('canplay', (e) => {
+        setIsLoading(false);
+      });
+    },
+    [handleSetIsPaused]
+  );
 
-        // Loading state & Autoplay
-        p.on('loadstart', (e) => {
-          setIsLoading(true);
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
-        });
-        p.on('canplay', (e) => {
-          setIsLoading(false);
-        });
-      },
-      [handleSetIsPaused]
-    );
+  useEffect(() => {
+    // Make sure Video.js player is only initialized once
+    if (!playerRef.current) {
+      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
+      const videoElement = document.createElement('video-js');
 
-    useEffect(() => {
-      // Make sure Video.js player is only initialized once
-      if (!playerRef.current) {
-        // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
-        const videoElement = document.createElement('video-js');
+      videoElement.classList.add('vjs-big-play-centered');
+      // @ts-ignore
+      videoRef.current?.appendChild(videoElement);
+      // @ts-ignore
+      const player = (playerRef.current = videojs(videoElement, options, () => {
+        handlePlayerReady && handlePlayerReady(player);
+      }));
+    }
+  }, [handlePlayerReady, options]);
 
-        videoElement.classList.add('vjs-big-play-centered');
+  // Dispose the Video.js player when the functional component unmounts
+  // NB! From official example
+  useEffect(() => {
+    const player = playerRef.current;
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
         // @ts-ignore
-        videoRef.current?.appendChild(videoElement);
-        // @ts-ignore
-        const player = (playerRef.current = videojs(
-          videoElement,
-          options,
-          () => {
-            handlePlayerReady && handlePlayerReady(player);
-          }
-        ));
+        playerRef.current = null;
       }
-    }, [handlePlayerReady, options]);
+    };
+  }, []);
 
-    // Dispose the Video.js player when the functional component unmounts
-    // NB! From official example
-    useEffect(() => {
-      const player = playerRef.current;
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current?.muted(!!muted);
+    }
+  }, [muted]);
 
-      return () => {
-        if (player && !player.isDisposed()) {
-          player.dispose();
-          // @ts-ignore
-          playerRef.current = null;
-        }
-      };
-    }, []);
-
-    useEffect(() => {
-      if (playerRef.current) {
-        playerRef.current?.muted(!!muted);
-      }
-    }, [muted]);
-
-    return (
-      <SContent
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
-        <SVideoWrapper data-vjs-player>
-          <SWrapper
-            id={id}
+  return (
+    <SContent
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
+      <SVideoWrapper data-vjs-player>
+        <SWrapper
+          id={id}
+          onClick={() => {
+            if (!playerRef.current?.paused()) {
+              playerRef.current?.pause();
+            } else {
+              playerRef.current?.play()?.catch(() => {
+                handleSetIsPaused(true);
+              });
+            }
+          }}
+          ref={videoRef}
+        />
+        {showPlayButton && isPaused && (
+          <SPlayPseudoButton
             onClick={() => {
               if (!playerRef.current?.paused()) {
                 playerRef.current?.pause();
@@ -168,54 +182,40 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                 });
               }
             }}
-            ref={videoRef}
-          />
-          {showPlayButton && isPaused && (
-            <SPlayPseudoButton
-              onClick={() => {
-                if (!playerRef.current?.paused()) {
-                  playerRef.current?.pause();
-                } else {
-                  playerRef.current?.play()?.catch(() => {
-                    handleSetIsPaused(true);
-                  });
-                }
-              }}
-            >
-              <InlineSvg
-                svg={PlayIcon}
-                width='32px'
-                height='32px'
-                fill='#FFFFFF'
-              />
-            </SPlayPseudoButton>
-          )}
-        </SVideoWrapper>
-        {isLoading && (
-          <SLoader>
-            <Lottie
-              width={65}
-              height={60}
-              options={{
-                loop: false,
-                autoplay: true,
-                animationData: logoAnimation,
-              }}
-              isStopped={!isLoading}
+          >
+            <InlineSvg
+              svg={PlayIcon}
+              width='32px'
+              height='32px'
+              fill='#FFFFFF'
             />
-          </SLoader>
+          </SPlayPseudoButton>
         )}
-        <PlayerScrubber
-          isHovered={isHovered}
-          currentTime={playbackTime}
-          videoDuration={playerRef?.current?.duration() || 10}
-          withTime={videoDurationWithTime}
-          handleChangeTime={handlePlayerScrubberChangeTime}
-        />
-      </SContent>
-    );
-  }
-);
+      </SVideoWrapper>
+      {isLoading && (
+        <SLoader>
+          <Lottie
+            width={65}
+            height={60}
+            options={{
+              loop: false,
+              autoplay: true,
+              animationData: logoAnimation,
+            }}
+            isStopped={!isLoading}
+          />
+        </SLoader>
+      )}
+      <PlayerScrubber
+        isHovered={isHovered}
+        currentTime={playbackTime}
+        videoDuration={playerRef?.current?.duration() || 10}
+        withTime={videoDurationWithTime}
+        handleChangeTime={handlePlayerScrubberChangeTime}
+      />
+    </SContent>
+  );
+};
 
 export default PostVideojsPlayer;
 
