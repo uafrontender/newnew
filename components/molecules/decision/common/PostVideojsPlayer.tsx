@@ -65,6 +65,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         controls: false,
         responsive: false,
         fluid: true,
+        playsinline: true,
+        disablePictureInPicture: true,
         sources: [
           {
             src: resources!!.hlsStreamUrl as string,
@@ -82,13 +84,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       (p: videojs.Player) => {
         playerRef.current = p;
 
-        // Autoplay
-        p.on('ready', () => {
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
-        });
-
         // Paused state
         p.on('play', () => {
           handleSetIsPaused(false);
@@ -101,9 +96,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           setPlaybackTime(p.currentTime());
         });
 
-        // Loading state
+        // Loading state & Autoplay
         p.on('loadstart', (e) => {
           setIsLoading(true);
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
         });
         p.on('canplay', (e) => {
           setIsLoading(false);

@@ -89,6 +89,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       controls: false,
       responsive: false,
       fluid: true,
+      playsinline: true,
+      disablePictureInPicture: true,
       sources: [
         {
           src: resources!!.hlsStreamUrl as string,
@@ -110,13 +112,6 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
         innerRef.current = p;
       }
 
-      // Autoplay
-      p.on('ready', () => {
-        playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
-        });
-      });
-
       // Paused state
       p.on('play', () => {
         handleSetIsPaused(false);
@@ -129,9 +124,12 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
         setPlaybackTime(p.currentTime());
       });
 
-      // Loading state
+      // Loading state & Autoplay
       p.on('loadstart', (e) => {
         setIsLoading(true);
+        playerRef.current?.play()?.catch(() => {
+          handleSetIsPaused(true);
+        });
       });
       p.on('canplay', (e) => {
         setIsLoading(false);
