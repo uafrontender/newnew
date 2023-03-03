@@ -97,6 +97,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         handleSetIsPaused(true);
       });
 
+      p.on('error', (e: any) => {
+        console.error(e);
+      });
+
       p.on('timeupdate', (e) => {
         setPlaybackTime(p.currentTime());
       });
