@@ -481,7 +481,7 @@ export const darkTheme: DefaultTheme = {
       'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
     listTop: {
       primary:
-        'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+        'linear-gradient(180deg, rgba(12, 11, 20, 0.9),  rgba(20, 21, 31, 0) 100%)',
       secondary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
       tertiary:
@@ -491,7 +491,7 @@ export const darkTheme: DefaultTheme = {
     },
     listBottom: {
       primary:
-        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(12, 11, 20, 0.9) 100%)',
       secondary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
       tertiary:

@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
 import React, {
   useCallback,
   useEffect,
@@ -7,7 +6,7 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import styled, { keyframes, useTheme } from 'styled-components';
+import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -15,16 +14,18 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Button from '../Button';
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG, { InlineSvg } from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
+
+import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
+
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import { useAppState } from '../../../contexts/appStateContext';
+import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -121,12 +122,18 @@ const Comment: React.FC<IComment> = ({
 
   return (
     <>
-      <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
+      <SComment
+        key={comment.id.toString()}
+        id={`comment_id_${comment.id}`}
+        isMoreMenuOpened={ellipseMenuOpen}
+      >
         {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
           comment.sender?.options?.isVerified ||
           comment.sender?.uuid === user.userData?.userUuid ? (
             <Link href={`/${comment.sender?.username}`}>
-              <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+              <a>
+                <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+              </a>
             </Link>
           ) : (
             <SUserAvatar noHover avatarUrl={comment.sender?.avatarUrl ?? ''} />
@@ -326,11 +333,39 @@ const OpenedFlash = keyframes`
   }
 `;
 
-const SComment = styled.div`
+const SMoreButton = styled(Button)`
+  padding: 2px;
+
+  background: none;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    opacity: 0;
+
+    padding: 8px;
+  }
+
+  @media (hover: none) {
+    &:active:enabled {
+      background: none;
+    }
+  }
+`;
+
+const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
   position: relative;
   display: flex;
 
   width: 100%;
+
+  padding-top: 12px;
 
   // For scrollIntoView when comment_id is provided in URL
   scroll-margin-top: -320px;
@@ -352,6 +387,23 @@ const SComment = styled.div`
       animation: ${OpenedFlash} 1.5s forwards linear;
     }
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    &:hover {
+      ${SMoreButton} {
+        opacity: 1;
+      }
+    }
+
+    ${({ isMoreMenuOpened }) =>
+      isMoreMenuOpened
+        ? css`
+            ${SMoreButton} {
+              opacity: 1;
+            }
+          `
+        : null}
+  }
 `;
 
 const SCommentContent = styled.div`
@@ -372,18 +424,6 @@ const SCommentHeader = styled.div`
 const SActionsDiv = styled.div`
   position: relative;
   margin-left: auto;
-`;
-
-const SMoreButton = styled(Button)`
-  background: none;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  padding: 8px;
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
 `;
 
 const SNickname = styled.span<{
@@ -441,7 +481,6 @@ const SReply = styled.div`
 `;
 
 const SSeparator = styled.div`
-  margin: 0 0 12px;
   height: 1px;
   overflow: hidden;
   background: ${(props) =>

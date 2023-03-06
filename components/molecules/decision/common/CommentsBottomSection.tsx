@@ -241,6 +241,7 @@ const CommentsBottomSection: React.FunctionComponent<
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
+
       if (size) {
         setHeightDelta(size);
       }
@@ -340,12 +341,7 @@ const CommentsBottomSection: React.FunctionComponent<
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <SActionSection
-          id='comments-scrolling-container'
-          ref={(el) => {
-            scrollRef.current = el!!;
-          }}
-        >
+        <SActionSection>
           <CommentForm
             isRoot
             postUuidOrShortId={postShortId || postUuid}
@@ -358,66 +354,73 @@ const CommentsBottomSection: React.FunctionComponent<
             onBlur={onFormBlur ?? undefined}
             onFocus={onFormFocus ?? undefined}
           />
-          <SCommentsWrapper>
-            {comments.length === 0 && !commentsLoading ? (
-              <SNoCommentsYet>
-                <SNoCommentsImgContainer>
-                  <img src={NoContentYetImg.src} alt='No content yet' />
-                </SNoCommentsImgContainer>
-                <SNoCommentsCaption variant={3}>
-                  {t('comments.noCommentsCaption')}
-                </SNoCommentsCaption>
-                {!isMobile && (
-                  <SMakeBidArrowSvg
-                    svg={MakeFirstBidArrow}
-                    fill={theme.colorsThemed.background.quinary}
-                    width='36px'
-                  />
-                )}
-              </SNoCommentsYet>
-            ) : null}
-            {comments &&
-              comments.map((item, index) => (
-                <Comment
-                  key={item.id.toString()}
-                  canDeleteComment={canDeleteComments}
-                  lastChild={index === comments.length - 1}
-                  comment={item}
-                  isDeletingComment={isDeletingComment}
-                  handleAddComment={(newMsg: string) =>
-                    handleAddComment(newMsg, item.id as number)
-                  }
-                  handleDeleteComment={handleDeleteComment}
-                  onFormBlur={onFormBlur ?? undefined}
-                  onFormFocus={onFormFocus ?? undefined}
-                />
-              ))}
-            <SLoaderDiv
-              ref={loadingRef}
-              style={{
-                ...(commentsLoading || isMobile
-                  ? {
-                      display: 'none',
+          <SScrollContainer
+            ref={(el) => {
+              scrollRef.current = el!!;
+            }}
+            id='comments-scrolling-container'
+          >
+            <SCommentsWrapper>
+              {comments.length === 0 && !commentsLoading ? (
+                <SNoCommentsYet>
+                  <SNoCommentsImgContainer>
+                    <img src={NoContentYetImg.src} alt='No content yet' />
+                  </SNoCommentsImgContainer>
+                  <SNoCommentsCaption variant={3}>
+                    {t('comments.noCommentsCaption')}
+                  </SNoCommentsCaption>
+                  {!isMobile && (
+                    <SMakeBidArrowSvg
+                      svg={MakeFirstBidArrow}
+                      fill={theme.colorsThemed.background.quinary}
+                      width='36px'
+                    />
+                  )}
+                </SNoCommentsYet>
+              ) : null}
+              {comments &&
+                comments.map((item, index) => (
+                  <Comment
+                    key={item.id.toString()}
+                    canDeleteComment={canDeleteComments}
+                    lastChild={index === comments.length - 1}
+                    comment={item}
+                    isDeletingComment={isDeletingComment}
+                    handleAddComment={(newMsg: string) =>
+                      handleAddComment(newMsg, item.id as number)
                     }
-                  : {}),
-              }}
-            />
-            {isMobile && hasNextPage && (
-              <SLoadMoreButton
-                view='secondary'
-                disabled={commentsLoading}
-                onClick={() => {
-                  Mixpanel.track('Click Load More Comments', {
-                    _stage: 'Post',
-                    _postUuid: postUuid,
-                  });
-                  fetchNextPage();
+                    handleDeleteComment={handleDeleteComment}
+                    onFormBlur={onFormBlur ?? undefined}
+                    onFormFocus={onFormFocus ?? undefined}
+                  />
+                ))}
+              <SLoaderDiv
+                ref={loadingRef}
+                style={{
+                  ...(commentsLoading || isMobile
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
                 }}
-              >
-                {t('comments.seeMore')}
-              </SLoadMoreButton>
-            )}
-          </SCommentsWrapper>
+              />
+              {isMobile && hasNextPage && (
+                <SLoadMoreButton
+                  view='secondary'
+                  disabled={commentsLoading}
+                  onClick={() => {
+                    Mixpanel.track('Click Load More Comments', {
+                      _stage: 'Post',
+                      _postUuid: postUuid,
+                    });
+                    fetchNextPage();
+                  }}
+                >
+                  {t('comments.seeMore')}
+                </SLoadMoreButton>
+              )}
+            </SCommentsWrapper>
+          </SScrollContainer>
         </SActionSection>
         <GradientMask
           gradientType='primary'
@@ -455,11 +458,10 @@ const STabContainer = styled(motion.div)`
   }
 `;
 
-const SActionSection = styled.div`
+const SScrollContainer = styled.div`
   padding-right: 0;
-  height: 100%;
-
   max-height: 500px;
+  height: 100%;
 
   overflow-y: auto;
 
@@ -478,15 +480,19 @@ const SActionSection = styled.div`
     border-radius: 4px;
     transition: 0.2s linear;
   }
+`;
 
+const SActionSection = styled.div`
   &:hover {
-    scrollbar-width: thin;
-    &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
-    }
+    ${SScrollContainer} {
+      scrollbar-width: thin;
+      &::-webkit-scrollbar-track {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
 
-    &::-webkit-scrollbar-thumb {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
     }
   }
 `;
@@ -495,6 +501,10 @@ const SCommentsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 0 16px 0 32px;
+  }
 `;
 
 const SLoaderDiv = styled.div`
