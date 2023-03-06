@@ -140,6 +140,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       // Add message to draft for mobile and dashboard
       if (isUmount.current && chatRoom.id) {
         addInputValueIntoChatsDraft(chatRoom.id, messageText);
+        isUmount.current = false;
       }
     },
     [addInputValueIntoChatsDraft, chatRoom.id, messageText]

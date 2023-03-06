@@ -203,8 +203,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   useEffect(() => {
     if (
       router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
-      !activeChatRoom &&
-      hiddenMessagesArea !== true
+      !activeChatRoom
     ) {
       if (router.query.roomID) {
         (async () => {
