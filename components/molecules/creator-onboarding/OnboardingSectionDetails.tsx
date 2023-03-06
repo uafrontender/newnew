@@ -453,14 +453,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
           setAvatarUrlInEdit(properlySizedImage.url as string);
           setCropMenuOpen(true);
-          if (isBrowser()) {
-            window.history.pushState(
-              {
-                stage: 'edit-profile-picture',
-              },
-              ''
-            );
-          }
         }
       });
     }
