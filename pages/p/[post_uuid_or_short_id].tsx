@@ -130,6 +130,7 @@ const PostPage: NextPage<IPostPage> = ({
     isLoading: isPostLoading,
     refetch: refetchPost,
     updatePostTitleMutation,
+    updatePostStatusMutation,
   } = usePost(
     {
       loggedInUser: user.loggedIn,
@@ -308,7 +309,9 @@ const PostPage: NextPage<IPostPage> = ({
     []
   );
 
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
   const handleDeletePost = useCallback(async () => {
+    setIsDeletingPost(true);
     try {
       const payload = new newnewapi.DeleteMyPostRequest({
         postUuid: postParsed?.postUuid,
@@ -316,8 +319,16 @@ const PostPage: NextPage<IPostPage> = ({
 
       const res = await deleteMyPost(payload);
 
-      if (!res.error) {
-        await refetchPost();
+      if (!res.error && postParsed?.postUuid && typeOfPost) {
+        updatePostStatusMutation.mutate({
+          postUuid: postParsed?.postUuid,
+          postType: typeOfPost,
+          status:
+            typeOfPost === 'ac'
+              ? newnewapi.Auction.Status.DELETED_BY_CREATOR
+              : newnewapi.MultipleChoice.Status.DELETED_BY_CREATOR,
+        });
+        setIsDeletingPost(false);
         handleCloseDeletePostModal();
         if (document?.documentElement) {
           setTimeout(() => {
@@ -329,8 +340,15 @@ const PostPage: NextPage<IPostPage> = ({
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsDeletingPost(false);
     }
-  }, [handleCloseDeletePostModal, refetchPost, postParsed?.postUuid]);
+  }, [
+    postParsed?.postUuid,
+    typeOfPost,
+    updatePostStatusMutation,
+    handleCloseDeletePostModal,
+  ]);
 
   const resetSetupIntentClientSecret = useCallback(() => {
     setStripeSetupIntentClientSecret(undefined);
@@ -566,7 +584,45 @@ const PostPage: NextPage<IPostPage> = ({
 
       if (!decoded) return;
       if (decoded.postUuid === postParsed?.postUuid) {
-        await refetchPost();
+        if (decoded.auction) {
+          const parsedStatus = switchPostStatus(
+            'ac',
+            decoded.auction as newnewapi.Auction.Status
+          );
+
+          if (
+            parsedStatus === 'deleted_by_admin' ||
+            parsedStatus === 'deleted_by_creator'
+          ) {
+            updatePostStatusMutation.mutate({
+              postUuid: postParsed?.postUuid,
+              postType: 'ac',
+              status: decoded.auction as newnewapi.Auction.Status,
+            });
+          } else {
+            await refetchPost();
+          }
+        } else if (decoded.multipleChoice) {
+          const parsedStatus = switchPostStatus(
+            'ac',
+            decoded.multipleChoice as newnewapi.MultipleChoice.Status
+          );
+
+          if (
+            parsedStatus === 'deleted_by_admin' ||
+            parsedStatus === 'deleted_by_creator'
+          ) {
+            updatePostStatusMutation.mutate({
+              postUuid: postParsed?.postUuid,
+              postType: 'mc',
+              status: decoded.multipleChoice as newnewapi.MultipleChoice.Status,
+            });
+          } else {
+            await refetchPost();
+          }
+        } else {
+          await refetchPost();
+        }
       }
     };
 
@@ -640,6 +696,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleFollowDecision={handleFollowDecision}
         handleSetIsFollowingDecision={handleSetIsFollowingDecision}
         deletePostOpen={deletePostOpen}
+        isDeletingPost={isDeletingPost}
         handleDeletePost={handleDeletePost}
         handleOpenDeletePostModal={handleOpenDeletePostModal}
         handleCloseDeletePostModal={handleCloseDeletePostModal}
