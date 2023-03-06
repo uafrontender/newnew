@@ -260,7 +260,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         <SInputWrapper>
           <CommentTextArea
             id='title'
-            maxlength={150}
+            maxlength={500}
             value={commentText}
             focus={focusedInput}
             error={
