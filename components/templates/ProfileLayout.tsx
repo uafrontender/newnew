@@ -16,10 +16,10 @@ import Text from '../atoms/Text';
 import Button from '../atoms/Button';
 import CustomLink from '../atoms/CustomLink';
 import General from './General';
-import { Tab } from '../molecules/Tabs';
+// import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
-import ProfileTabs from '../molecules/profile/ProfileTabs';
+// import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
@@ -48,17 +48,13 @@ import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
 
-type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
-
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
-  renderedPage: TPageType;
   children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
-  renderedPage,
   children,
 }) => {
   const router = useRouter();
@@ -141,22 +137,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       usersBlockedMe,
     ]
   );
-
-  const tabs: Tab[] = useMemo(() => {
+  // NOTE: activity page is temporarily disabled
+  /* const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
       return [
         {
           nameToken: 'userInitial',
           url: `/${user.username}`,
         },
-        {
+        
+         {
           nameToken: 'activity',
           url: `/${user.username}/activity`,
         },
       ];
     }
     return [];
-  }, [user]);
+  }, [user]); */
 
   // TODO: Re-enable once new SMS service is integrated
   /* const subscription: SubscriptionToCreator = useMemo(
@@ -413,9 +410,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SUserData>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0 && !isBlocked ? (
+          {/* NOTE: activity page is temporarily disabled */}
+          {/* tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
-          ) : null}
+          ) : null */}
         </SProfileLayout>
         {!isBlocked && children}
       </SGeneral>

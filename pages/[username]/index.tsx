@@ -209,18 +209,8 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 (UserPageIndex as NextPageWithLayout).getLayout = function getLayout(
   page: ReactElement
 ) {
-  const renderedPage = (page.props as IUserPageIndex).user?.options?.isCreator
-    ? 'creatorsDecisions'
-    : (page.props as IUserPageIndex).user?.options?.isActivityPrivate
-    ? 'activityHidden'
-    : 'activity';
-
   return (
-    <ProfileLayout
-      key={page.props.user.uuid}
-      user={page.props.user}
-      renderedPage={renderedPage}
-    >
+    <ProfileLayout key={page.props.user.uuid} user={page.props.user}>
       {page}
     </ProfileLayout>
   );
