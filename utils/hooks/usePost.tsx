@@ -10,6 +10,8 @@ import { cloneDeep } from 'lodash';
 import { fetchPostByUUID } from '../../api/endpoints/post';
 import useErrorToasts from './useErrorToasts';
 
+import { TPostType } from '../switchPostType';
+
 interface IUsePost {
   loggedInUser: boolean;
   postUuid: string;
@@ -18,6 +20,12 @@ interface IUsePost {
 type TUpdatePostTitleMutation = {
   postUuid: string;
   title: string;
+};
+
+type TUpdatePostStatusMutation = {
+  postUuid: string;
+  postType: TPostType;
+  status: newnewapi.Auction.Status | newnewapi.MultipleChoice.Status;
 };
 
 const usePost = (
@@ -91,7 +99,50 @@ const usePost = (
     },
   });
 
-  return { ...query, updatePostTitleMutation };
+  const updatePostStatusMutation = useMutation({
+    mutationFn: (newStatusParams: TUpdatePostStatusMutation) =>
+      new Promise((res) => {
+        res(newStatusParams);
+      }),
+    onSuccess: (_, newStatusParams) => {
+      queryClient.setQueryData(
+        [
+          params.loggedInUser ? 'private' : 'public',
+          'fetchPostByUUID',
+          params.postUuid,
+        ],
+        // @ts-ignore
+        (data: newnewapi.IPost | undefined) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            if (workingData.auction && newStatusParams.postType === 'ac') {
+              workingData.auction.status =
+                newStatusParams.status as newnewapi.Auction.Status;
+            } else if (
+              workingData.multipleChoice &&
+              newStatusParams.postType === 'mc'
+            ) {
+              workingData.multipleChoice.status =
+                newStatusParams.status as newnewapi.MultipleChoice.Status;
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+    },
+  });
+
+  return { ...query, updatePostTitleMutation, updatePostStatusMutation };
 };
 
 export default usePost;
