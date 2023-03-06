@@ -88,7 +88,6 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       loop: true,
       controls: false,
       responsive: false,
-      fluid: true,
       playsinline: true,
       disablePictureInPicture: true,
       autoplay: true,
@@ -328,6 +327,7 @@ const SWrapper = styled.div`
   video {
     width: 100% !important;
     height: 100% !important;
+    object-fit: cover;
   }
 `;
 
