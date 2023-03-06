@@ -90,6 +90,7 @@ const PostTopInfoModeration: React.FunctionComponent<
     deletePostOpen,
     handleEllipseMenuClose,
     handleShareClose,
+    isDeletingPost,
     handleDeletePost,
     handleOpenShareMenu,
     handleOpenEllipseMenu,
@@ -428,6 +429,7 @@ const PostTopInfoModeration: React.FunctionComponent<
         postType={typeOfPost as TPostType}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
+        isDeletingPost={isDeletingPost}
         handleConfirmDelete={handleDeletePost}
       />
       {/* Edit Post title */}
