@@ -91,6 +91,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       fluid: true,
       playsinline: true,
       disablePictureInPicture: true,
+      autoplay: true,
       sources: [
         {
           src: resources!!.hlsStreamUrl as string,

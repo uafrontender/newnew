@@ -72,6 +72,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       fluid: true,
       playsinline: true,
       disablePictureInPicture: true,
+      autoplay: true,
       sources: [
         {
           src: resources!!.hlsStreamUrl as string,
