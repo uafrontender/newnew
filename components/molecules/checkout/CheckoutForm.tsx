@@ -98,7 +98,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       }
 
       if (!loggedIn && !email) {
-        setEmailError('Email is required');
+        setEmailError(t('errorCaptions.emailRequired'));
         return;
       }
 
