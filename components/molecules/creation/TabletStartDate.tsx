@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -27,6 +27,15 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const [animate, setAnimate] = useState(value.type === 'schedule');
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
 
+  const maxDate: Date = useMemo(() => {
+    // If today is the last day of the month, max date is the last day of next month
+    if (moment().endOf('day').isSame(moment().endOf('month'))) {
+      return moment().add(1, 'M').endOf('month').toDate();
+    }
+
+    return moment().add(1, 'M').toDate();
+  }, []);
+
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
@@ -39,8 +48,25 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const handleDateChange = useCallback(
     (date: any) => {
       onChange(id, { date });
+
+      // Date here is a string
+      const resultingDate = moment(
+        `${moment(date).format('YYYY-MM-DD')}  ${value.time}:00 ${
+          value['hours-format']
+        }`
+      );
+
+      if (resultingDate.isBefore(moment())) {
+        onChange(id, {
+          time: moment().add(1, 'minute').format('hh:mm'),
+        });
+
+        onChange(id, {
+          'hours-format': moment().format('a'),
+        });
+      }
     },
-    [id, onChange]
+    [id, value, onChange]
   );
   const handleTypeChange = useCallback(
     (e: any, type: any) => {
@@ -81,7 +107,11 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       >
         <SCalendarWrapper>
           <SCalendarInput>
-            <CalendarSimple date={value?.date} onChange={handleDateChange} />
+            <CalendarSimple
+              date={value?.date}
+              maxDate={maxDate}
+              onChange={handleDateChange}
+            />
           </SCalendarInput>
           <STimeInput>
             <TimePicker

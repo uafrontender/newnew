@@ -154,6 +154,7 @@ const MyProfileSettingsIndex = () => {
       dispatch(
         setUserData({
           options: {
+            ...userData?.options,
             isActivityPrivate: data.me?.options?.isActivityPrivate,
             isCreator: data.me?.options?.isCreator,
             isVerified: data.me?.options?.isVerified,

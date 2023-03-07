@@ -24,12 +24,16 @@ interface IChatsContext {
   activeTab: newnewapi.ChatRoom.MyRole | undefined;
   searchChatroom: string;
   justSentMessage: boolean;
+  chatsDraft: { roomId: number | Long; text: string }[];
   setJustSentMessage: (value: boolean) => void;
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => void;
   setActiveTab: (activeTab: newnewapi.ChatRoom.MyRole | undefined) => void;
   setHiddenMessagesArea: (hiddenMessagesArea: boolean | null) => void;
   setSearchChatroom: (str: string) => void;
   setMobileChatOpened: (mobileChatOpened: boolean) => void;
+  addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => void;
+  removeInputValueFromChatsDraft: (roomId: number | Long) => void;
+  restDraft: () => void;
 }
 
 const ChatsContext = createContext<IChatsContext>({
@@ -42,12 +46,16 @@ const ChatsContext = createContext<IChatsContext>({
   activeTab: undefined,
   searchChatroom: '',
   justSentMessage: false,
+  chatsDraft: [],
   setJustSentMessage: (value: boolean) => {},
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => {},
   setActiveTab: (activeTab: newnewapi.ChatRoom.MyRole | undefined) => {},
   setHiddenMessagesArea: (hiddenMessagesArea: boolean | null) => {},
   setSearchChatroom: (str: string) => {},
   setMobileChatOpened: (mobileChatOpened: boolean) => {},
+  addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => {},
+  removeInputValueFromChatsDraft: (roomId: number | Long) => {},
+  restDraft: () => {},
 });
 
 interface IChatsProvider {
@@ -72,6 +80,9 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     newnewapi.ChatRoom.MyRole | undefined
   >();
   const [justSentMessage, setJustSentMessage] = useState<boolean>(false);
+  const [chatsDraft, setChatsDraft] = useState<
+    { roomId: number | Long; text: string }[]
+  >([]);
 
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -160,6 +171,39 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     };
   }, [justSentMessage]);
 
+  const removeInputValueFromChatsDraft = useCallback(
+    (roomId: number | Long) => {
+      setChatsDraft((prevState) => [
+        ...prevState.filter((chatDraft) => chatDraft.roomId !== roomId),
+      ]);
+    },
+    []
+  );
+
+  const addInputValueIntoChatsDraft = useCallback(
+    (roomId: number | Long, text: string) => {
+      setChatsDraft((prevState) => {
+        const draft = prevState.filter(
+          (chatDraft) => chatDraft.roomId === roomId
+        )[0];
+
+        if (draft) {
+          return [
+            ...prevState.filter((chatDraft) => chatDraft.roomId !== roomId),
+            { roomId, text },
+          ];
+        }
+
+        return [...prevState, { roomId, text }];
+      });
+    },
+    []
+  );
+
+  const restDraft = useCallback(() => {
+    setChatsDraft([]);
+  }, []);
+
   const resetState = useCallback(() => {
     setUnreadCountForUser(0);
     setUnreadCountForCreator(0);
@@ -170,6 +214,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     setSearchChatroom('');
     setActiveTab(undefined);
     setJustSentMessage(false);
+    setChatsDraft([]);
   }, []);
 
   const userWasLoggedIn = useRef(false);
@@ -195,12 +240,16 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       searchChatroom,
       activeTab,
       justSentMessage,
+      chatsDraft,
       setJustSentMessage,
       setActiveTab,
       setActiveChatRoom,
       setMobileChatOpened,
       setHiddenMessagesArea,
       setSearchChatroom,
+      addInputValueIntoChatsDraft,
+      removeInputValueFromChatsDraft,
+      restDraft,
     }),
     [
       unreadCount,
@@ -212,12 +261,16 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       searchChatroom,
       activeTab,
       justSentMessage,
+      chatsDraft,
       setJustSentMessage,
       setActiveTab,
       setActiveChatRoom,
       setMobileChatOpened,
       setHiddenMessagesArea,
       setSearchChatroom,
+      addInputValueIntoChatsDraft,
+      removeInputValueFromChatsDraft,
+      restDraft,
     ]
   );
 
