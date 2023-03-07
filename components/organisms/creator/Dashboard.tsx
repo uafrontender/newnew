@@ -280,6 +280,7 @@ const SContent = styled.div`
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
     border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
   }
 `;
 

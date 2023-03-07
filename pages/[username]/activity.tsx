@@ -4,7 +4,7 @@ import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -20,7 +20,7 @@ import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import { NoContentDescription } from '../../components/atoms/profile/NoContentCommon';
-import { SUPPORTED_LANGUAGES } from '../../constants/general';
+// import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import getDisplayname from '../../utils/getDisplayname';
 import assets from '../../constants/assets';
 
@@ -162,17 +162,8 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 (UserPageActivity as NextPageWithLayout).getLayout = function getLayout(
   page: ReactElement
 ) {
-  const renderedPage = (page.props as IUserPageActivity).user?.options
-    ?.isActivityPrivate
-    ? 'activityHidden'
-    : 'activity';
-
   return (
-    <ProfileLayout
-      key={page.props.user.uuid}
-      user={page.props.user}
-      renderedPage={renderedPage}
-    >
+    <ProfileLayout key={page.props.user.uuid} user={page.props.user}>
       {page}
     </ProfileLayout>
   );
@@ -189,7 +180,7 @@ export const getServerSideProps: GetServerSideProps<
   );
   try {
     const { username } = context.query;
-    const translationContext = await serverSideTranslations(
+    /* const translationContext = await serverSideTranslations(
       context.locale!!,
       [
         'common',
@@ -201,7 +192,7 @@ export const getServerSideProps: GetServerSideProps<
       ],
       null,
       SUPPORTED_LANGUAGES
-    );
+    ); */
 
     if (!username || Array.isArray(username)) {
       return {
@@ -227,12 +218,20 @@ export const getServerSideProps: GetServerSideProps<
       };
     }
 
+    // NOTE: activity page is temporarily disabled
     return {
+      redirect: {
+        destination: `/${username}`,
+        permanent: false,
+      },
+    };
+
+    /* return {
       props: {
         user: res.data.toJSON(),
         ...translationContext,
       },
-    };
+    }; */
   } catch (err) {
     return {
       redirect: {

@@ -56,6 +56,7 @@ const PostInnerContext = createContext<{
   shareMenuOpen: boolean;
   deletePostOpen: boolean;
   ellipseMenuOpen: boolean;
+  isDeletingPost: boolean;
   handleDeletePost: () => Promise<void>;
   handleFollowDecision: () => Promise<void>;
   handleEllipseMenuClose: () => void;
@@ -106,6 +107,7 @@ const PostInnerContext = createContext<{
   shareMenuOpen: false,
   deletePostOpen: false,
   ellipseMenuOpen: false,
+  isDeletingPost: false,
   handleDeletePost: (() => {}) as () => Promise<void>,
   handleFollowDecision: (() => {}) as () => Promise<void>,
   handleEllipseMenuClose: () => {},
@@ -149,6 +151,7 @@ interface IPostContextProvider {
   handleCloseAndGoBack: () => void;
   handleFollowDecision: () => Promise<void>;
   deletePostOpen: boolean;
+  isDeletingPost: boolean;
   handleDeletePost: () => Promise<void>;
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
@@ -188,6 +191,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   resetBundleSetupIntentClientSecret,
   handleFollowDecision,
   deletePostOpen,
+  isDeletingPost,
   handleDeletePost,
   handleOpenDeletePostModal,
   handleCloseDeletePostModal,
@@ -278,6 +282,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       shareMenuOpen,
       deletePostOpen,
       ellipseMenuOpen,
+      isDeletingPost,
       handleDeletePost,
       handleFollowDecision,
       handleEllipseMenuClose,
@@ -321,6 +326,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       shareMenuOpen,
       deletePostOpen,
       ellipseMenuOpen,
+      isDeletingPost,
       handleDeletePost,
       handleFollowDecision,
       handleEllipseMenuClose,

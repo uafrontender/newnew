@@ -43,6 +43,8 @@ interface IMobileFieldBlock {
 // This component is overloaded and produces unnecessary hook instances
 // TODO: rework, separate 'input' | 'select' | 'date' into own components.
 // Provide type safety for all properties
+// TODO: this component sets Moment object to value.date, causing an error in the console
+// 'A non-serializable value was detected in the state'
 const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const {
     id,
@@ -54,6 +56,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     formattedDescription,
     onChange,
   } = props;
+
   const inputRef: any = useRef();
   const theme = useTheme();
   const { t } = useTranslation('page-Creation');
@@ -67,6 +70,19 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
     return false;
   }, [value?.date]);
+
+  const maxDate = useMemo(() => {
+    if (value?.type === 'right-away') {
+      return moment();
+    }
+
+    // If today is the last day of the month, max date is the last day of next month
+    if (moment().endOf('day').isSame(moment().endOf('month'))) {
+      return moment().add(1, 'M').endOf('month');
+    }
+
+    return moment().add(1, 'M');
+  }, [value?.type]);
 
   const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
     const currentTime = moment();
@@ -185,7 +201,12 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           onChange(id, {
             'hours-format': moment().format('a'),
           });
+        } else {
+          onChange(id, {
+            time: moment().add(1, 'minute').format('hh:mm'),
+          });
         }
+
         onChange(id, { type: selectedId });
       };
 
@@ -200,13 +221,16 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const handleDateChange = (date: any) => {
         onChange(id, { date });
 
+        // Date here is a moment
         const resultingDate = moment(
-          `${date.format('YYYY-MM-DD')}  ${value.time}`
+          `${date.format('YYYY-MM-DD')}  ${value.time}:00 ${
+            value['hours-format']
+          }`
         );
 
         if (resultingDate.isBefore(moment())) {
           onChange(id, {
-            time: moment().format('hh:mm'),
+            time: moment().add(1, 'minute').format('hh:mm'),
           });
 
           onChange(id, {
@@ -246,11 +270,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 <SCalendarContent>
                   <CalendarScrollableVertically
                     minDate={moment()}
-                    maxDate={
-                      value?.type === 'right-away'
-                        ? moment()
-                        : moment().add(1, 'M')
-                    }
+                    maxDate={maxDate}
                     onSelect={handleDateChange}
                     selectedDate={moment(value?.date).startOf('D')}
                   />
@@ -304,6 +324,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     isDaySame,
     isTimeOfTheDaySame,
     localTimeOfTheDay,
+    maxDate,
     onChange,
     id,
   ]);
@@ -593,6 +614,8 @@ const SSeparator = styled.div`
   height: 1px;
   border-radius: 2px;
   background-color: ${(props) => props.theme.colorsThemed.background.outlines1};
+  // Otherwise blue color of selected number goes through
+  z-index: 2;
 `;
 
 const SCustomDays = styled.div`
@@ -628,6 +651,7 @@ const SCalendarTopGrad = styled.div`
   z-index: 1;
   position: absolute;
   background: ${(props) => props.theme.gradients.calendarTop};
+  pointer-events: none;
 `;
 
 const SCalendarBottomGrad = styled.div`
@@ -638,6 +662,7 @@ const SCalendarBottomGrad = styled.div`
   z-index: 1;
   position: absolute;
   background: ${(props) => props.theme.gradients.calendarBottom};
+  pointer-events: none;
 `;
 
 const STimePickerWrapper = styled.div`

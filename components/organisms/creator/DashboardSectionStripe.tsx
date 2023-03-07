@@ -97,7 +97,9 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
 
   const handleRedirectToStripeSetup = async () => {
     try {
-      const locationUrl = window.location.href;
+      // On close stripe in new tab return to dashboard
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+      const locationUrl = `${baseUrl}/creator/dashboard`;
       const payload = new newnewapi.SetupStripeCreatorAccountRequest({
         refreshUrl: locationUrl,
         returnUrl: locationUrl,
@@ -109,7 +111,8 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
         throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.setupUrl;
-      window.location.href = url;
+      // Open in a separate tab to keep navigation history intact
+      window.open(url);
     } catch (err) {
       console.error(err);
     }
