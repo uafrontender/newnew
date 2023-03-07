@@ -10,7 +10,12 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import videojs from 'video.js';
+// NB! We have to import these twice
+// eslint-disable-next-line import/no-duplicates
 import 'videojs-contrib-quality-levels';
+// eslint-disable-next-line import/no-duplicates
+import { QualityLevel, QualityLevelList } from 'videojs-contrib-quality-levels';
+// NB! We have to import these twice
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -65,6 +70,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   // NB! Commented out for now
   // const [isFulscreen, setIsFullscreen] = useState(false);
 
+  const qualityLevels = useRef<QualityLevelList>();
+  const [videoOrientation, setVideoOrientation] = useState<
+    'vertical' | 'horizontal'
+  >('vertical');
+
   const [isHovered, setIsHovered] = useState(false);
 
   const [playbackTime, setPlaybackTime] = useState(0);
@@ -113,6 +123,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   const handlePlayerReady = useCallback(
     (p: videojs.Player) => {
       playerRef.current = p;
+
+      qualityLevels.current = p?.qualityLevels?.();
+
+      qualityLevels?.current?.on('addqualitylevel', (event) => {
+        const ql = event.qualityLevel as QualityLevel;
+        if (ql?.height && ql?.width) {
+          setVideoOrientation(
+            ql.height >= ql.width ? 'vertical' : 'horizontal'
+          );
+        }
+      });
 
       // Autoplay
       p.on('ready', (e) => {
@@ -170,6 +191,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     [handleSetIsPaused]
   );
 
+  // useEffect(() => {
+  //   qualityLevels?.current?.on('addqualitylevel', (event) => {
+  //     console.log(event.qualityLevel);
+  //   });
+  // }, []);
+
   useEffect(() => {
     // Make sure Video.js player is only initialized once
     if (!playerRef.current) {
@@ -225,6 +252,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             }
           }}
           ref={videoRef}
+          videoOrientation={videoOrientation}
         />
         {showPlayButton && isPaused && !isScrubberTimeChanging && (
           <SPlayPseudoButton
@@ -344,7 +372,9 @@ const SVideoWrapper = styled.div`
   }
 `;
 
-const SWrapper = styled.div`
+const SWrapper = styled.div<{
+  videoOrientation: 'vertical' | 'horizontal';
+}>`
   width: 100% !important;
   height: 100% !important;
   overflow: hidden !important;
@@ -360,7 +390,13 @@ const SWrapper = styled.div`
   video {
     width: 100% !important;
     height: 100% !important;
-    object-fit: contain;
+
+    object-fit: ${({ videoOrientation }) =>
+      videoOrientation === 'vertical' ? 'cover' : 'contain'};
+
+    ${({ theme }) => theme.media.tablet} {
+      object-fit: contain;
+    }
   }
 
   video::-webkit-media-controls-enclosure {
