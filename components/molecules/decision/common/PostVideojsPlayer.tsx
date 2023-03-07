@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 // NB! We have to import these twice
 // eslint-disable-next-line import/no-duplicates
@@ -70,7 +71,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   // NB! Commented out for now
   // const [isFulscreen, setIsFullscreen] = useState(false);
 
-  const qualityLevels = useRef<QualityLevelList>();
+  const qualityLevelsRef = useRef<QualityLevelList>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([]);
+
   const [videoOrientation, setVideoOrientation] = useState<
     'vertical' | 'horizontal'
   >('vertical');
@@ -121,81 +125,99 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   // List of video.js events
   // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
   const handlePlayerReady = useCallback(
-    (p: videojs.Player) => {
-      playerRef.current = p;
+    async (p: videojs.Player) => {
+      try {
+        playerRef.current = p;
 
-      qualityLevels.current = p?.qualityLevels?.();
+        qualityLevelsRef.current = p?.qualityLevels?.();
 
-      qualityLevels?.current?.on('addqualitylevel', (event) => {
-        const ql = event.qualityLevel as QualityLevel;
-        if (ql?.height && ql?.width) {
-          setVideoOrientation(
-            ql.height >= ql.width ? 'vertical' : 'horizontal'
+        if (resources!!.hlsStreamUrl) {
+          const loadedManifestRaw = await fetch(resources!!.hlsStreamUrl).then(
+            (r) => r.text()
           );
+          const parsedManifest = hlsParser.parse(loadedManifestRaw);
+
+          if (parsedManifest && parsedManifest.isMasterPlaylist) {
+            const v1 = parsedManifest?.variants?.[0];
+
+            if (
+              v1 &&
+              v1.resolution &&
+              v1.resolution?.height &&
+              v1.resolution?.width
+            ) {
+              setVideoOrientation(
+                v1.resolution?.height >= v1.resolution?.width
+                  ? 'vertical'
+                  : 'horizontal'
+              );
+            }
+          }
         }
-      });
 
-      // Autoplay
-      p.on('ready', (e) => {
-        playerRef.current?.play()?.catch(() => {
+        qualityLevelsRef?.current?.on('addqualitylevel', (event) => {
+          const ql = event.qualityLevel as QualityLevel;
+          setQualityLevels((curr) => [...curr, ql]);
+        });
+
+        // Autoplay
+        p.on('ready', (e) => {
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
+        });
+
+        // Paused state
+        p.on('play', () => {
+          handleSetIsPaused(false);
+        });
+        p.on('pause', () => {
           handleSetIsPaused(true);
         });
-      });
 
-      // Paused state
-      p.on('play', () => {
-        handleSetIsPaused(false);
-      });
-      p.on('pause', () => {
-        handleSetIsPaused(true);
-      });
-
-      p.on('error', (e: any) => {
-        console.error(e);
-      });
-
-      p.on('timeupdate', (e) => {
-        setPlaybackTime(p.currentTime());
-      });
-
-      // Loading state & Autoplay
-      p.on('loadstart', (e) => {
-        setIsLoading(true);
-        playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+        p.on('error', (e: any) => {
+          console.error(e);
         });
-      });
-      p.on('canplay', (e) => {
-        setIsLoading(false);
-      });
 
-      // NB! Commented out for now
-      // Fulscreen
-      // p.on('fullscreenchange', (e) => {
-      //   console.log(p?.isFullscreen());
-      //   setIsFullscreen(p?.isFullscreen());
-      // });
+        p.on('timeupdate', (e) => {
+          setPlaybackTime(p.currentTime());
+        });
 
-      // NB! Commented out for now
-      // p.on('volumechange', (e) => {
-      //   console.log(p?.volume());
-      //   console.log(p?.muted());
-      //   if (p?.volume() === 0 || p?.muted()) {
-      //     dispatch(setMutedMode(true));
-      //   } else {
-      //     dispatch(setMutedMode(false));
-      //   }
-      // });
+        // Loading state & Autoplay
+        p.on('loadstart', (e) => {
+          setIsLoading(true);
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
+        });
+        p.on('canplay', (e) => {
+          setIsLoading(false);
+        });
+
+        // NB! Commented out for now
+        // Fulscreen
+        // p.on('fullscreenchange', (e) => {
+        //   console.log(p?.isFullscreen());
+        //   setIsFullscreen(p?.isFullscreen());
+        // });
+
+        // NB! Commented out for now
+        // p.on('volumechange', (e) => {
+        //   console.log(p?.volume());
+        //   console.log(p?.muted());
+        //   if (p?.volume() === 0 || p?.muted()) {
+        //     dispatch(setMutedMode(true));
+        //   } else {
+        //     dispatch(setMutedMode(false));
+        //   }
+        // });
+      } catch (err) {
+        console.error(err);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleSetIsPaused]
   );
-
-  // useEffect(() => {
-  //   qualityLevels?.current?.on('addqualitylevel', (event) => {
-  //     console.log(event.qualityLevel);
-  //   });
-  // }, []);
 
   useEffect(() => {
     // Make sure Video.js player is only initialized once
@@ -393,10 +415,6 @@ const SWrapper = styled.div<{
 
     object-fit: ${({ videoOrientation }) =>
       videoOrientation === 'vertical' ? 'cover' : 'contain'};
-
-    ${({ theme }) => theme.media.tablet} {
-      object-fit: contain;
-    }
   }
 
   video::-webkit-media-controls-enclosure {
