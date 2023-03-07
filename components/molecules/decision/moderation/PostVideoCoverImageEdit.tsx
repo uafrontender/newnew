@@ -148,7 +148,11 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
           updateCoverImagePayload
         );
 
-        if (updateCoverImageRes.error) {
+        if (
+          updateCoverImageRes.error ||
+          updateCoverImageRes?.data?.status ===
+            newnewapi.SetPostCoverImageResponse.SetPostCoverImageStatus.OK
+        ) {
           throw new Error('Could not update cover image');
         }
 
