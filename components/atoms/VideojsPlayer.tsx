@@ -21,7 +21,7 @@ import volumeOn from '../../public/images/svg/icons/filled/VolumeON.svg';
 import volumeOff from '../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 
-interface IBitmovinPlayer {
+interface IVideojsPlayer {
   id: string;
   muted?: boolean;
   innerRef?: any;
@@ -34,7 +34,7 @@ interface IBitmovinPlayer {
   withScrubber?: boolean;
 }
 
-export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
+export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
   const {
     id,
     muted,
@@ -59,6 +59,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isPaused, setIsPaused] = useState(false);
+
   const handleSetIsPaused = useCallback((stateValue: boolean) => {
     setIsPaused(stateValue);
   }, []);
@@ -66,15 +67,19 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const [playbackTime, setPlaybackTime] = useState(0);
+  const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
+
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
       // Pause the player when scrubbing
       // to avoid double playback start
+      setIsScrubberTimeChanging(true);
       playerRef.current?.pause();
       setPlaybackTime(newValue);
       playerRef.current?.currentTime(newValue);
 
       setTimeout(() => {
+        setIsScrubberTimeChanging(false);
         playerRef.current?.play()?.catch(() => {
           handleSetIsPaused(true);
         });
@@ -202,7 +207,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
             }
           }}
         />
-        {showPlayButton && isPaused && (
+        {showPlayButton && isPaused && !isScrubberTimeChanging && (
           <SPlayPseudoButton
             onClick={() => {
               if (!playerRef.current?.paused()) {
@@ -267,9 +272,9 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   );
 };
 
-export default BitmovinPlayer;
+export default VideojsPlayer;
 
-BitmovinPlayer.defaultProps = {
+VideojsPlayer.defaultProps = {
   muted: true,
   innerRef: undefined,
   resources: {},

@@ -68,15 +68,19 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const [playbackTime, setPlaybackTime] = useState(0);
+  const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
+
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
       // Pause the player when scrubbing
       // to avoid double playback start
+      setIsScrubberTimeChanging(true);
       playerRef.current?.pause();
       setPlaybackTime(newValue);
       playerRef.current?.currentTime(newValue);
 
       setTimeout(() => {
+        setIsScrubberTimeChanging(false);
         playerRef.current?.play()?.catch(() => {
           handleSetIsPaused(true);
         });
@@ -222,7 +226,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           }}
           ref={videoRef}
         />
-        {showPlayButton && isPaused && (
+        {showPlayButton && isPaused && !isScrubberTimeChanging && (
           <SPlayPseudoButton
             onClick={() => {
               if (!playerRef.current?.paused()) {
