@@ -51,12 +51,14 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
 
       // Date here is a string
       const resultingDate = moment(
-        `${moment(date).format('YYYY-MM-DD')}  ${value.time}`
+        `${moment(date).format('YYYY-MM-DD')}  ${value.time}:00 ${
+          value['hours-format']
+        }`
       );
 
       if (resultingDate.isBefore(moment())) {
         onChange(id, {
-          time: moment().format('hh:mm'),
+          time: moment().add(1, 'minute').format('hh:mm'),
         });
 
         onChange(id, {
