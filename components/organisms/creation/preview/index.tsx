@@ -317,8 +317,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (
         !data ||
         error ||
-        data?.createPostStatus !==
-          newnewapi.CreatePostResponse.CreatePostStatus.OK
+        data?.createPostStatus ===
+          newnewapi.CreatePostResponse.CreatePostStatus.INVALID_VALUE
       ) {
         throw new Error(error?.message ?? 'Request failed');
       }
