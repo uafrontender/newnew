@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -76,7 +77,13 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
   const { usersIBlocked, usersBlockedMe, changeUserBlockedStatus } =
     useGetBlockedUsers();
-  const { setJustSentMessage } = useGetChats();
+  const {
+    chatsDraft,
+    setJustSentMessage,
+    addInputValueIntoChatsDraft,
+    removeInputValueFromChatsDraft,
+  } = useGetChats();
+
   const [messageText, setMessageText] = useState<string>('');
   const [messageTextValid, setMessageTextValid] = useState(false);
 
@@ -98,6 +105,62 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
+
+  const prevChatRoomId = useRef(chatRoom.id);
+
+  useEffect(() => {
+    // Add message to draft
+    if (prevChatRoomId.current && prevChatRoomId.current !== chatRoom.id) {
+      addInputValueIntoChatsDraft(prevChatRoomId.current, messageText);
+
+      setMessageText('');
+      setMessageTextValid(false);
+      setSendingMessage(false);
+
+      prevChatRoomId.current = chatRoom.id;
+    }
+  }, [
+    chatRoom.id,
+    messageText,
+    addInputValueIntoChatsDraft,
+    removeInputValueFromChatsDraft,
+  ]);
+
+  const isUmount = useRef(false);
+
+  useEffect(
+    () => () => {
+      isUmount.current = true;
+    },
+    []
+  );
+
+  useEffect(
+    () => () => {
+      // Add message to draft for mobile and dashboard
+      if (isUmount.current && chatRoom.id) {
+        addInputValueIntoChatsDraft(chatRoom.id, messageText);
+        isUmount.current = false;
+      }
+    },
+    [addInputValueIntoChatsDraft, chatRoom.id, messageText]
+  );
+
+  // Ready message from draft
+  useEffect(() => {
+    if (
+      chatRoom.id &&
+      chatsDraft.filter((chatDraft) => chatDraft.roomId === chatRoom.id)[0]
+    ) {
+      const draft = chatsDraft.filter(
+        (chatDraft) => chatDraft.roomId === chatRoom.id
+      )[0];
+
+      const isValid = validateInputText(draft.text);
+      setMessageTextValid(isValid);
+      setMessageText(draft.text);
+    }
+  }, [chatRoom.id, chatsDraft]);
 
   const isAnnouncement = useMemo(
     () => chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
@@ -164,6 +227,10 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
 
           setJustSentMessage(true);
           setSendingMessage(false);
+
+          if (chatRoom.id) {
+            removeInputValueFromChatsDraft(chatRoom.id);
+          }
         } catch (err) {
           console.error(err);
           setMessageText(tmpMsgText);
@@ -171,7 +238,13 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
         }
       }
     }
-  }, [chatRoom, messageTextValid, messageText, setJustSentMessage]);
+  }, [
+    chatRoom,
+    messageTextValid,
+    messageText,
+    setJustSentMessage,
+    removeInputValueFromChatsDraft,
+  ]);
 
   const handleSubmit = useCallback(() => {
     Mixpanel.track('Send Message Button Clicked', {
@@ -208,7 +281,8 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     () =>
       isMessagingDisabled ||
       isVisavisBlocked ||
-      !chatRoom.visavis?.isSubscriptionActive ||
+      (chatRoom.myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER &&
+        !chatRoom.visavis?.isSubscriptionActive) ||
       chatRoom.visavis?.user?.options?.isTombstone ||
       !chatRoom ||
       (isAnnouncement && !isMyAnnouncement),

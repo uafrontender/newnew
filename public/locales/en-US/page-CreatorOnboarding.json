@@ -69,7 +69,7 @@
       },
       "email": {
         "placeholder": "Email address",
-        "cantChangeInfoCaption": "You can't change this info.",
+        "cantChangeInfoCaption": "You can edit your email in settings later",
         "errors": {
           "invalidEmail": "Please enter a valid email address",
           "emailTaken": "This email is already taken. Try another one"
