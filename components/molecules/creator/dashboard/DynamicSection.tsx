@@ -64,7 +64,6 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     unreadCountForCreator,
     activeTab,
     activeChatRoom,
-    hiddenMessagesArea,
     setActiveChatRoom,
     setActiveTab,
   } = useGetChats();
@@ -227,7 +226,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         })();
       }
     }
-  }, [baseUrl, router, activeChatRoom, setActiveChatRoom, hiddenMessagesArea]);
+  }, [baseUrl, router, activeChatRoom, setActiveChatRoom]);
 
   useEffect(() => {
     if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
