@@ -259,6 +259,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           throw new Error('Upload failed');
         }
 
+        // Set hasCoverImage to true
         hasCoverImage = true;
       }
 
