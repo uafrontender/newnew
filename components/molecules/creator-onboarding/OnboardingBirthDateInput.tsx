@@ -284,7 +284,10 @@ const SErrorDiv = styled.div`
   justify-content: flex-start;
   align-items: center;
 
-  margin-top: 16px;
+  position: absolute;
+  bottom: -22px;
+
+  margin-top: 6px;
 
   text-align: center;
   font-weight: 600;

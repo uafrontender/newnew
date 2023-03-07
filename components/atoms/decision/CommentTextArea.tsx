@@ -38,9 +38,11 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
     },
     [id, onChange]
   );
+
   const handleFocus = useCallback(() => {
     onFocus(id);
   }, [id, onFocus]);
+
   const handleBlur = useCallback(
     (e: FocusEvent<HTMLTextAreaElement>) => {
       onBlur(id, e.target.value);
@@ -93,7 +95,6 @@ interface ISContent {
 }
 
 const SContent = styled.div<ISContent>`
-  padding: 9px 20px;
   position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
@@ -111,14 +112,16 @@ const SContent = styled.div<ISContent>`
 `;
 
 const SCommentTextArea = styled(CommentTextAreaAutoSize)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
+  padding: 9px 20px;
   width: 100%;
-  border: none;
+
   resize: none;
+
+  border: none;
   outline: none;
   background: transparent;
   font-weight: 500;
-
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-size: 14px;
   line-height: 20px;
   vertical-align: middle;

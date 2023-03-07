@@ -260,6 +260,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           throw new Error('Upload failed');
         }
 
+        // Set hasCoverImage to true
         hasCoverImage = true;
       }
 
@@ -315,11 +316,16 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       const { data, error } = await createPost(payload);
 
-      if (!data || error) {
+      if (
+        !data ||
+        error ||
+        data?.createPostStatus ===
+          newnewapi.CreatePostResponse.CreatePostStatus.INVALID_VALUE
+      ) {
         throw new Error(error?.message ?? 'Request failed');
       }
 
-      dispatch(setPostData(data));
+      dispatch(setPostData(data?.post));
 
       if (isMobile) {
         setIsDisabledAdditionally(true);
@@ -414,13 +420,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           key: 'startsAt',
           value: `${formatStartsAt()
             .locale(router.locale || 'en-US')
-            .format('MMM DD YYYY [at] hh:mm A')} ${userTimezone}`,
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
         },
         {
           key: 'expiresAt',
           value: `${formatExpiresAt(false)
             .locale(router.locale || 'en-US')
-            .format('MMM DD YYYY [at] hh:mm A')} ${userTimezone}`,
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
         },
         {
           key: 'comments',

@@ -33,6 +33,7 @@ interface IPostModerationControls {
   handleOpenEllipseMenu: () => void;
   handleOpenDeletePostModal: () => void;
   handleCloseDeletePostModal: () => void;
+  isDeletingPost: boolean;
   handleDeletePost: () => Promise<void>;
 }
 
@@ -50,6 +51,7 @@ const PostModerationControls: React.FunctionComponent<
   handleCloseAndGoBack,
   handleEllipseMenuClose,
   handleShareClose,
+  isDeletingPost,
   handleDeletePost,
   handleOpenShareMenu,
   handleOpenEllipseMenu,
@@ -174,6 +176,7 @@ const PostModerationControls: React.FunctionComponent<
         postType={typeOfPost as TPostType}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
+        isDeletingPost={isDeletingPost}
         handleConfirmDelete={handleDeletePost}
       />
     </SPostSuccessWaitingControlsDiv>
