@@ -142,11 +142,11 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
           )}
 
           {/* Empty inbox */}
-          {chatrooms.length === 0 && !searchChatroom && <EmptyInbox />}
+          {chatrooms.length === 0 && !searchChatroomDebounced && <EmptyInbox />}
 
           {/* No Search Results */}
-          {chatrooms.length === 0 && searchChatroom && (
-            <NoResults text={searchChatroom} />
+          {chatrooms.length === 0 && searchChatroomDebounced && (
+            <NoResults text={searchChatroomDebounced} />
           )}
         </>
       )}
