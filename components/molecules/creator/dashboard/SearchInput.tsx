@@ -107,7 +107,7 @@ interface ISInputWrapper {
 
 const SInputWrapper = styled.div<ISInputWrapper>`
   top: 50%;
-  width: ${(props) => (props.active ? '280px' : '44px')};
+  width: ${(props) => (props.active ? '235px' : '44px')};
   right: ${(props) => (props.active ? '-56px' : 0)};
 
   display: flex;

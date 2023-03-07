@@ -39,24 +39,28 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
+
   const handleTimeChange = useCallback(
     (key: string, time: any) => {
       onChange(id, { [key]: time });
     },
     [id, onChange]
   );
+
   const handleDateChange = useCallback(
     (date: any) => {
       onChange(id, { date });
 
       // Date here is a string
       const resultingDate = moment(
-        `${moment(date).format('YYYY-MM-DD')}  ${value.time}`
+        `${moment(date).format('YYYY-MM-DD')}  ${value.time}:00 ${
+          value['hours-format']
+        }`
       );
 
       if (resultingDate.isBefore(moment())) {
         onChange(id, {
-          time: moment().format('hh:mm'),
+          time: moment().add(1, 'minute').format('hh:mm'),
         });
 
         onChange(id, {
@@ -66,6 +70,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     },
     [id, value, onChange]
   );
+
   const handleTypeChange = useCallback(
     (e: any, type: any) => {
       const changeBody: any = { type };
@@ -73,6 +78,8 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
         changeBody.date = moment().format();
         changeBody.time = moment().format('hh:mm');
         changeBody['hours-format'] = moment().format('a');
+      } else {
+        changeBody.time = moment().add(1, 'minute').format('hh:mm');
       }
 
       onChange(id, changeBody);

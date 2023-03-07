@@ -95,13 +95,13 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     return false;
   }, [router.asPath]);
 
-  const goBackHandler = useCallback(() => {
+  const goBackHandler = useCallback(async () => {
     setHiddenMessagesArea(true);
     if (isDashboard) {
       if (router.asPath.includes('/creator/bundles')) {
-        router.push(`/creator/bundles?tab=chat`);
+        await router.push(`/creator/bundles?tab=chat`);
       } else {
-        router.push(`/creator/dashboard?tab=chat`);
+        await router.push(`/creator/dashboard?tab=chat`);
       }
 
       setActiveChatRoom(null);

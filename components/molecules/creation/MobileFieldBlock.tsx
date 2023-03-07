@@ -201,7 +201,12 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           onChange(id, {
             'hours-format': moment().format('a'),
           });
+        } else {
+          onChange(id, {
+            time: moment().add(1, 'minute').format('hh:mm'),
+          });
         }
+
         onChange(id, { type: selectedId });
       };
 
@@ -218,12 +223,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
         // Date here is a moment
         const resultingDate = moment(
-          `${date.format('YYYY-MM-DD')}  ${value.time}`
+          `${date.format('YYYY-MM-DD')}  ${value.time}:00 ${
+            value['hours-format']
+          }`
         );
 
         if (resultingDate.isBefore(moment())) {
           onChange(id, {
-            time: moment().format('hh:mm'),
+            time: moment().add(1, 'minute').format('hh:mm'),
           });
 
           onChange(id, {
