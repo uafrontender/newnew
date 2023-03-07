@@ -8,6 +8,7 @@ import React, {
   useCallback,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
 
@@ -64,6 +65,10 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
     setIsPaused(stateValue);
   }, []);
 
+  const [videoOrientation, setVideoOrientation] = useState<
+    'vertical' | 'horizontal'
+  >('vertical');
+
   const [isHovered, setIsHovered] = useState(false);
 
   const [playbackTime, setPlaybackTime] = useState(0);
@@ -110,11 +115,36 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
   // List of video.js events
   // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
   const handlePlayerReady = useCallback(
-    (p: videojs.Player) => {
+    async (p: videojs.Player) => {
       playerRef.current = p;
 
       if (innerRef) {
         innerRef.current = p;
+      }
+
+      // Load manifest and determine vertical/horizontal orientation
+      if (resources!!.hlsStreamUrl) {
+        const loadedManifestRaw = await fetch(resources!!.hlsStreamUrl).then(
+          (r) => r.text()
+        );
+        const parsedManifest = hlsParser.parse(loadedManifestRaw);
+
+        if (parsedManifest && parsedManifest.isMasterPlaylist) {
+          const v1 = parsedManifest?.variants?.[0];
+
+          if (
+            v1 &&
+            v1.resolution &&
+            v1.resolution?.height &&
+            v1.resolution?.width
+          ) {
+            setVideoOrientation(
+              v1.resolution?.height >= v1.resolution?.width
+                ? 'vertical'
+                : 'horizontal'
+            );
+          }
+        }
       }
 
       // Autoplay
@@ -147,6 +177,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
         setIsLoading(false);
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleSetIsPaused, innerRef]
   );
 
@@ -197,6 +228,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
         <SWrapper
           id={id}
           ref={videoRef}
+          videoOrientation={videoOrientation}
           onClick={() => {
             if (!playerRef.current?.paused()) {
               playerRef.current?.pause();
@@ -316,7 +348,9 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
   -webkit-backdrop-filter: blur(32px);
 `;
 
-const SWrapper = styled.div`
+const SWrapper = styled.div<{
+  videoOrientation: 'vertical' | 'horizontal';
+}>`
   width: 100% !important;
   height: 100% !important;
   overflow: hidden !important;
@@ -332,7 +366,8 @@ const SWrapper = styled.div`
   video {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover;
+    object-fit: ${({ videoOrientation }) =>
+      videoOrientation === 'vertical' ? 'cover' : 'contain'};
   }
 `;
 

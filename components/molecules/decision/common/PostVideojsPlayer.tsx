@@ -129,8 +129,15 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       try {
         playerRef.current = p;
 
+        // Set qualityLevels
         qualityLevelsRef.current = p?.qualityLevels?.();
 
+        qualityLevelsRef?.current?.on('addqualitylevel', (event) => {
+          const ql = event.qualityLevel as QualityLevel;
+          setQualityLevels((curr) => [...curr, ql]);
+        });
+
+        // Load manifest and determine vertical/horizontal orientation
         if (resources!!.hlsStreamUrl) {
           const loadedManifestRaw = await fetch(resources!!.hlsStreamUrl).then(
             (r) => r.text()
@@ -154,11 +161,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             }
           }
         }
-
-        qualityLevelsRef?.current?.on('addqualitylevel', (event) => {
-          const ql = event.qualityLevel as QualityLevel;
-          setQualityLevels((curr) => [...curr, ql]);
-        });
 
         // Autoplay
         p.on('ready', (e) => {
