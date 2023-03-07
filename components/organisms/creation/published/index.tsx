@@ -65,11 +65,17 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
   }
 
-  // TODO: Add translations
+  // No need in translation as these are reserved words
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Bid';
-      if (postData.crowdfunding) return 'Goal';
+      if (postData.auction) {
+        return 'Bid';
+      }
+
+      if (postData.crowdfunding) {
+        return 'Goal';
+      }
+
       return 'Superpoll';
     }
     return 'Bid';

@@ -11,6 +11,7 @@ interface IPostConfirmDeleteModal {
   postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
+  isDeletingPost: boolean;
   handleConfirmDelete: () => void;
 }
 
@@ -19,6 +20,7 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
   postType,
   isVisible,
   closeModal,
+  isDeletingPost,
   handleConfirmDelete,
 }) => {
   const { t } = useTranslation('page-Post');
@@ -54,10 +56,18 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
             {t('deletePostModal.body', { postType: t(`postType.${postType}`) })}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton view='secondary' onClick={closeModalMixpanel}>
+            <SCancelButton
+              view='secondary'
+              disabled={isDeletingPost}
+              onClick={closeModalMixpanel}
+            >
               {t('deletePostModal.button.cancel')}
             </SCancelButton>
-            <SConfirmButton view='danger' onClick={handleConfirmDeleteMixpanel}>
+            <SConfirmButton
+              view='danger'
+              disabled={isDeletingPost}
+              onClick={handleConfirmDeleteMixpanel}
+            >
               {t('deletePostModal.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
