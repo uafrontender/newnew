@@ -148,7 +148,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       usersBlockedMe,
     ]
   );
-  // NOTE: activity page is temporarily disabled
+  // NOTE: activity is temporarily disabled
   /* const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
       return [
@@ -428,7 +428,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SUserData>
           {/* Temp, all creators for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {/* NOTE: activity page is temporarily disabled */}
+          {/* NOTE: activity is temporarily disabled */}
           {/* tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
           ) : null */}

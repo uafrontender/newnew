@@ -51,7 +51,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
   );
-  // NOTE: activity for users is temporarily disabled
+  // NOTE: activity is temporarily disabled
   /* const isCreator = useMemo(
     () => !!user?.options?.isCreator,
     [user?.options?.isCreator]
@@ -61,7 +61,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     [user?.options?.isActivityPrivate]
   ); */
 
-  // NOTE: activity for users is temporarily disabled
+  // NOTE: activity is temporarily disabled
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useUserPosts(
       {
@@ -137,7 +137,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       </Head>
       <div>
         {
-          // NOTE: activity for users is temporarily disabled
+          // NOTE: activity is temporarily disabled
           /* !isCreator && isActivityPrivate ? (
           <SMain>
             <SAccountPrivate>
@@ -179,7 +179,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                   </NoContentCard>
                 )}
               {
-                // NOTE: activity for users is temporarily disabled
+                // NOTE: activity is temporarily disabled
                 /* user.options &&
                 !user.options.isCreator &&
                 posts &&
@@ -318,7 +318,7 @@ const SCardsSection = styled.div`
   }
 `;
 
-// NOTE: activity for users is temporarily disabled
+// NOTE: activity is temporarily disabled
 // Account private
 /* const SAccountPrivate = styled.div``;
 

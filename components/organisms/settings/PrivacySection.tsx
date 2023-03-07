@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import Caption from '../../atoms/Caption';
 import Text from '../../atoms/Text';
-import Toggle from '../../atoms/Toggle';
+// import Toggle from '../../atoms/Toggle';
 import Button from '../../atoms/Button';
 import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
 import InlineSvg from '../../atoms/InlineSVG';
@@ -24,18 +24,19 @@ import Loader from '../../atoms/Loader';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
-  isAccountPrivate: boolean;
+  // isAccountPrivate: boolean;
   handleToggleSpendingHidden: () => void;
-  handleToggleAccountPrivate: () => void;
+  // handleToggleAccountPrivate: () => void;
   // Allows handling visuals for active/inactive state
   handleSetActive: () => void;
 };
 
+// NOTE: activity is temporarily disabled
 const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   isSpendingHidden,
-  isAccountPrivate,
+  // isAccountPrivate,
   handleToggleSpendingHidden,
-  handleToggleAccountPrivate,
+  // handleToggleAccountPrivate,
   handleSetActive,
 }) => {
   const { t } = useTranslation('page-Profile');
@@ -86,8 +87,8 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 
   return (
     <SWrapper onMouseEnter={() => handleSetActive()}>
-      <SHidingSubsectionsContainer>
-        {/* <SHidingSubsection>
+      {/* <SHidingSubsectionsContainer> */}
+      {/* <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
             {t('Settings.sections.privacy.privacySubsections.spendings.title')}
           </SHidingSubsectionTitle>
@@ -105,7 +106,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
             }}
           />
         </SHidingSubsection> */}
-        <SHidingSubsection>
+      {/* <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
             {t('Settings.sections.privacy.privacySubsections.private.title')}
           </SHidingSubsectionTitle>
@@ -120,8 +121,8 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
               justifySelf: 'right',
             }}
           />
-        </SHidingSubsection>
-      </SHidingSubsectionsContainer>
+          </SHidingSubsection> */}
+      {/* </SHidingSubsectionsContainer> */}
       <SBlockedUsersContainer>
         <SBlockedUsersContainerTitle variant={2}>
           {t('Settings.sections.privacy.blockedUsers.title')}
@@ -206,7 +207,7 @@ export default PrivacySection;
 
 const SWrapper = styled.div``;
 
-const SHidingSubsectionsContainer = styled.div`
+/* const SHidingSubsectionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -222,8 +223,8 @@ const SHidingSubsection = styled.div`
   grid-template-areas:
     'titleAr toggle'
     'captionAr toggle';
-  grid-template-columns: 5fr 1fr;
-`;
+  grid-template-columns: 5fr 1fr; 
+`; */
 
 const SHidingSubsectionTitle = styled(Text)`
   grid-area: titleAr;
@@ -231,11 +232,11 @@ const SHidingSubsectionTitle = styled(Text)`
   margin-bottom: 8px;
 `;
 
-const SHidingSubsectionCaption = styled(Caption)`
+/* const SHidingSubsectionCaption = styled(Caption)`
   grid-area: captionAr;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
+`; */
 
 const SBlockedUsersContainer = styled.div`
   display: flex;
