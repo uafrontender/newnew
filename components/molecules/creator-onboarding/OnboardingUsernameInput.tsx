@@ -296,7 +296,10 @@ const SErrorDiv = styled.div`
   justify-content: flex-start;
   align-items: center;
 
-  margin-top: 16px;
+  position: absolute;
+  bottom: -22px;
+
+  margin-top: 6px;
 
   text-align: center;
   font-weight: 600;
@@ -325,7 +328,7 @@ const SPreviewDiv = styled.div`
   font-size: 12px;
   line-height: 16px;
   position: absolute;
-  bottom: -30px;
+  bottom: -22px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 

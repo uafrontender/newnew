@@ -36,44 +36,46 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
 
   return (
     <SContainer>
-      {readOnly && (
-        <SReadonlyLock>
-          <InlineSvg
-            svg={LockIcon}
-            width='24px'
-            height='24px'
-            fill={theme.colorsThemed.text.tertiary}
-          />
-        </SReadonlyLock>
-      )}
-      <SOnboardingInput
-        id={id}
-        type={type}
-        value={value}
-        readOnly={readOnly}
-        errorBordersShown={errorBordersShown}
-        onChange={onChange}
-        style={{
-          ...(readOnly
-            ? {
-                cursor: 'default',
-                userSelect: 'none',
-              }
-            : {}),
-        }}
-        onBlur={() => {
-          if (value && (value as string).length > 0 && !isValid) {
-            setErrorBordersShown(true);
-          } else {
+      <SInputWrapper>
+        {readOnly && (
+          <SReadonlyLock>
+            <InlineSvg
+              svg={LockIcon}
+              width='24px'
+              height='24px'
+              fill={theme.colorsThemed.text.tertiary}
+            />
+          </SReadonlyLock>
+        )}
+        <SOnboardingInput
+          id={id}
+          type={type}
+          value={value}
+          readOnly={readOnly}
+          errorBordersShown={errorBordersShown}
+          onChange={onChange}
+          style={{
+            ...(readOnly
+              ? {
+                  cursor: 'default',
+                  userSelect: 'none',
+                }
+              : {}),
+          }}
+          onBlur={() => {
+            if (value && (value as string).length > 0 && !isValid) {
+              setErrorBordersShown(true);
+            } else {
+              setErrorBordersShown(false);
+            }
+          }}
+          onFocus={(e) => {
+            if (onFocus) onFocus(e);
             setErrorBordersShown(false);
-          }
-        }}
-        onFocus={(e) => {
-          if (onFocus) onFocus(e);
-          setErrorBordersShown(false);
-        }}
-        {...rest}
-      />
+          }}
+          {...rest}
+        />
+      </SInputWrapper>
       {readOnly && <SReadonlyCaption>{cantChangeInfoCaption}</SReadonlyCaption>}
       {errorBordersShown ? (
         <AnimatedPresence animateWhenInView={false} animation='t-09'>
@@ -108,6 +110,10 @@ const SContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     /* width: 296px; */
   }
+`;
+
+const SInputWrapper = styled.div`
+  position: relative;
 `;
 
 const SReadonlyCaption = styled.div`
@@ -197,6 +203,9 @@ const SErrorDiv = styled.div`
   justify-content: flex-start;
   align-items: center;
 
+  position: absolute;
+  bottom: -22px;
+
   margin-top: 6px;
 
   text-align: center;
@@ -215,5 +224,6 @@ const SReadonlyLock = styled.div`
   position: absolute;
 
   right: 20px;
-  top: 34px;
+  top: 50%;
+  transform: translateY(-50%);
 `;

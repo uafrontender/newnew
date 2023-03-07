@@ -76,6 +76,7 @@ export const YourToDos = () => {
               <SBottomActionButton
                 withDim
                 withShrink
+                withShadow
                 view='primaryGrad'
                 onClick={() => {
                   Mixpanel.track('Navigation Item Clicked', {
@@ -97,6 +98,7 @@ export const YourToDos = () => {
               <SBottomActionButton
                 withDim
                 withShrink
+                withShadow
                 view='primaryGrad'
                 onClick={() => {
                   Mixpanel.track('Navigation Item Clicked', {

@@ -47,6 +47,7 @@ import getDisplayname from '../../utils/getDisplayname';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
+import { useGetChats } from '../../contexts/chatContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -74,6 +75,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
   );
+
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
+  const { setHiddenMessagesArea } = useGetChats();
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
   const { bundles } = useBundles();
@@ -220,6 +231,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     router,
     user.uuid,
   ]);
+
+  const handleSendMessageClick = useCallback(() => {
+    if (isMobileOrTablet) {
+      setHiddenMessagesArea(false);
+    }
+  }, [isMobileOrTablet, setHiddenMessagesArea]);
 
   const moreButtonRef = useRef() as any;
 
@@ -380,6 +397,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                           _component: 'ProfileLayout',
                         });
                       }}
+                      onClick={handleSendMessageClick}
                     >
                       {t('profileLayout.buttons.sendMessage')}
                     </SSendButton>
