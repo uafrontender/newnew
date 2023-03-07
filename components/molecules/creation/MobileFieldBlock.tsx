@@ -201,7 +201,12 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           onChange(id, {
             'hours-format': moment().format('a'),
           });
+        } else {
+          onChange(id, {
+            time: moment().add(1, 'minute').format('hh:mm'),
+          });
         }
+
         onChange(id, { type: selectedId });
       };
 
