@@ -263,6 +263,8 @@ export const CreationSecondStepContent: React.FC<
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
+  const [currentMoment, setCurrentMoment] = useState(moment());
+
   const [invalidMcOptionsIndicies, setInvalidMcOptionsIndicies] = useState<
     Set<number>
   >(new Set());
@@ -335,9 +337,9 @@ export const CreationSecondStepContent: React.FC<
       !post.announcementVideoUrl ||
       !optionsAreValid ||
       !targetBackersValid ||
-      formatExpiresAt().unix() < moment().unix() ||
+      formatExpiresAt().unix() < currentMoment.unix() ||
       (post.startsAt.type !== 'right-away' &&
-        formatStartsAt().unix() < moment().unix()),
+        formatStartsAt().unix() <= currentMoment.endOf('minute').unix()),
     [
       formatExpiresAt,
       formatStartsAt,
@@ -347,6 +349,7 @@ export const CreationSecondStepContent: React.FC<
       post.title,
       targetBackersValid,
       titleError,
+      currentMoment,
     ]
   );
 
@@ -1134,10 +1137,10 @@ export const CreationSecondStepContent: React.FC<
   // However, it re renders after every letter typed anyway
   // TODO: optimize this view
   useEffect(() => {
-    let updateStartDate: any;
+    const updateTime = setInterval(() => {
+      setCurrentMoment(moment());
 
-    if (post.startsAt.type === 'right-away') {
-      updateStartDate = setInterval(() => {
+      if (post.startsAt.type === 'right-away') {
         const newStartAt = {
           type: post.startsAt.type,
           date: moment().format(),
@@ -1145,11 +1148,11 @@ export const CreationSecondStepContent: React.FC<
           'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
         };
         dispatch(setCreationStartDate(newStartAt));
-      }, 1000);
-    }
+      }
+    }, 1000);
 
     return () => {
-      clearInterval(updateStartDate);
+      clearInterval(updateTime);
     };
   }, [post.startsAt, dispatch]);
 
