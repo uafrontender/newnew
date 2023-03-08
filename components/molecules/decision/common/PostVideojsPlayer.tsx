@@ -11,7 +11,7 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import hlsParser from 'hls-parser';
 import videojs from 'video.js';
-// NB! We have to import these twice
+// NB! We have to import these twice due to package issues
 // eslint-disable-next-line import/no-duplicates
 import 'videojs-contrib-quality-levels';
 // eslint-disable-next-line import/no-duplicates
