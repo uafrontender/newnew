@@ -28,10 +28,8 @@ import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
 import PlayerScrubber from '../../../atoms/PlayerScrubber';
 // import { useAppState } from '../../../../contexts/appStateContext';
 // import Button from '../../../atoms/Button';
-// import {
-//   setMutedMode,
-// } from '../../../../redux-store/slices/uiStateSlice';
-// import { useAppDispatch } from '../../../../redux-store/store';
+import { setMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { useAppDispatch } from '../../../../redux-store/store';
 
 interface IPostVideojsPlayer {
   id: string;
@@ -50,7 +48,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   showPlayButton,
   onPlaybackFinished,
 }) => {
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   // const { resizeMode } = useAppState();
   // const isMobileOrTablet = [
   //   'mobile',
@@ -112,7 +110,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       responsive: false,
       playsinline: true,
       disablePictureInPicture: true,
-      autoplay: true,
       sources: [
         {
           src: resources!!.hlsStreamUrl as string,
@@ -164,11 +161,30 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           }
         }
 
-        // Autoplay
-        p.on('ready', (e) => {
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
+        // Autoplay implementation by official video.js guide
+        // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
+        p.ready(() => {
+          const promise = p.play();
+
+          if (promise !== undefined) {
+            promise
+              .then(() => {
+                // Autoplay started!
+                // console.log('Autoplay started!');
+              })
+              .catch((error) => {
+                console.log(error);
+                // Autoplay was prevented.
+                // console.log('Autoplay was prevented.');
+                // Try to mute and start over, catch with displaying pause button
+                dispatch(setMutedMode(true));
+                setTimeout(() => {
+                  playerRef.current?.play()?.catch((e) => {
+                    handleSetIsPaused(true);
+                  });
+                }, 100);
+              });
+          }
         });
 
         // Paused state
@@ -190,9 +206,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         // Loading state & Autoplay
         p.on('loadstart', (e) => {
           setIsLoading(true);
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
         });
         p.on('canplay', (e) => {
           setIsLoading(false);
@@ -213,21 +226,19 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         // });
 
         // NB! Commented out for now
-        // p.on('volumechange', (e) => {
-        //   console.log(p?.volume());
-        //   console.log(p?.muted());
-        //   if (p?.volume() === 0 || p?.muted()) {
-        //     dispatch(setMutedMode(true));
-        //   } else {
-        //     dispatch(setMutedMode(false));
-        //   }
-        // });
+        p.on('volumechange', (e) => {
+          if (p?.volume() === 0 || p?.muted()) {
+            dispatch(setMutedMode(true));
+          } else {
+            dispatch(setMutedMode(false));
+          }
+        });
       } catch (err) {
         console.error(err);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused, onPlaybackFinished]
+    [handleSetIsPaused, onPlaybackFinished, resources]
   );
 
   useEffect(() => {
@@ -239,6 +250,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       videoElement.classList.add('vjs-big-play-centered');
       // @ts-ignore
       videoRef.current?.appendChild(videoElement);
+
       // @ts-ignore
       const player = (playerRef.current = videojs(videoElement, options, () => {
         handlePlayerReady && handlePlayerReady(player);

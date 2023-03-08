@@ -304,7 +304,7 @@ const SScrollLeft = styled(Button)`
   top: calc(50% - 100px);
   left: 0px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     &:disabled:after {
       background: transparent;
     }
@@ -330,7 +330,7 @@ const SScrollRight = styled(Button)`
   top: calc(50% - 100px);
   right: 0px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     &:disabled:after {
       background: transparent;
     }
