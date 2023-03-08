@@ -9,12 +9,9 @@ import Button from '../../../atoms/Button';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import SetThumbnailButtonIconOnly from '../../../atoms/decision/SetThumbnailButtonIconOnly';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoAnnouncementTab {
   postUuid: string;
@@ -43,7 +40,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
 
   return (
     <>
-      <PostBitmovinPlayer
+      <PostVideojsPlayer
         id={postUuid}
         resources={announcement}
         muted={isMuted}
