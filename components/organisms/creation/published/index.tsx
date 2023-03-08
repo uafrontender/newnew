@@ -36,7 +36,7 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -258,7 +258,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
         <SPlayerWrapper>
           {/* It seems like the video here is intentionally a 3-seconds one */}
           {fileProcessing.progress === 100 ? (
-            <BitmovinPlayer
+            <VideojsPlayer
               id='published'
               muted
               resources={videoProcessing?.targetUrls}
