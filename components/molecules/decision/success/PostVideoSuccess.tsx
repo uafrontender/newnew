@@ -92,9 +92,22 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         .getElementById('sound-button')
         ?.getBoundingClientRect();
 
-      const videoRect = document
+      let videoRect: DOMRect | undefined;
+      videoRect = document
         .getElementById(`${postUuid}`)
         ?.getBoundingClientRect();
+
+      if (!videoRect) {
+        videoRect = document
+          .getElementById(`video-${postUuid}`)
+          ?.getBoundingClientRect();
+      }
+
+      if (!videoRect) {
+        videoRect = document
+          .getElementById('responsesSlider')
+          ?.getBoundingClientRect();
+      }
 
       if (rect && videoRect) {
         const delta = window.innerHeight - videoRect.bottom;
@@ -134,7 +147,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobileOrTablet, postUuid]);
+  }, [isMobileOrTablet, postUuid, openedTab]);
 
   return (
     <SVideoWrapper>
