@@ -14,6 +14,7 @@ interface IPlayerScrubber {
   currentTime: number;
   videoDuration: number;
   withTime?: boolean;
+  bufferedPercent?: number;
   handleChangeTime: (newTime: number) => void;
 }
 
@@ -22,6 +23,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
   currentTime,
   videoDuration,
   withTime,
+  bufferedPercent,
   handleChangeTime,
 }) => {
   const sliderRef = useRef<HTMLInputElement>();
@@ -81,6 +83,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
         max={100}
         step={0.1}
         aria-labelledby='Video seek'
+        bufferedPercent={bufferedPercent}
         onTouchStart={() => setIsChanging(true)}
         onTouchEnd={() => setIsChanging(false)}
         onTouchCancel={() => setIsChanging(false)}
@@ -120,7 +123,9 @@ const SContainer = styled.div<{
   }
 `;
 
-const SSlider = styled.input.attrs({ type: 'range' })`
+const SSlider = styled.input.attrs({ type: 'range' })<{
+  bufferedPercent?: number;
+}>`
   -webkit-appearance: none;
   display: block;
 
