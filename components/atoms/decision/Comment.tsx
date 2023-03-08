@@ -106,9 +106,32 @@ const Comment: React.FC<IComment> = ({
     setConfirmDeleteComment(true);
   };
 
+  const commentFormRef = useRef<HTMLFormElement | null>(null);
+
   const replyHandler = () => {
-    setIsReplyFormOpen(!isReplyFormOpen);
+    setIsReplyFormOpen((prevState) => !prevState);
   };
+
+  const isReplyFormOpenRef = useRef(isReplyFormOpen);
+
+  useEffect(() => {
+    if (
+      isReplyFormOpen &&
+      !isReplyFormOpenRef.current &&
+      commentFormRef.current
+    ) {
+      commentFormRef.current.scrollIntoView({
+        block: 'center',
+        inline: 'end',
+        behavior: 'smooth',
+      });
+      isReplyFormOpenRef.current = true;
+    }
+
+    if (!isReplyFormOpen) {
+      isReplyFormOpenRef.current = false;
+    }
+  }, [isReplyFormOpen]);
 
   useEffect(() => {
     if (comment.isOpen) {
@@ -235,6 +258,7 @@ const Comment: React.FC<IComment> = ({
                   onSubmit={(newMsg: string) => handleAddComment(newMsg)}
                   onBlur={onFormBlur ?? undefined}
                   onFocus={onFormFocus ?? undefined}
+                  ref={commentFormRef}
                 />
               </>
             ))}
