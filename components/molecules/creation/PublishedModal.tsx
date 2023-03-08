@@ -34,7 +34,7 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -250,7 +250,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
           <SPlayerWrapper>
             {open ? (
               fileProcessing.progress === 100 ? (
-                <BitmovinPlayer
+                <VideojsPlayer
                   id='published-modal'
                   muted
                   resources={videoProcessing?.targetUrls}

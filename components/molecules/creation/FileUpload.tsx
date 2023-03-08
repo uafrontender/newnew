@@ -39,7 +39,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import CoverImagePreviewEdit from './CoverImagePreviewEdit';
 import { useAppState } from '../../../contexts/appStateContext';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -381,11 +381,10 @@ const FileUpload: React.FC<IFileUpload> = ({
                 draggable={false}
               />
             )}
-            <BitmovinPlayer
+            <VideojsPlayer
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
-              thumbnails={thumbnails}
               borderRadius='8px'
               showPlayButton={showPlayButton}
               playButtonSize='small'
@@ -435,7 +434,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     value,
-    thumbnails,
     customCoverImageUrl,
     showEllipseMenu,
     handleOpenEllipseMenu,

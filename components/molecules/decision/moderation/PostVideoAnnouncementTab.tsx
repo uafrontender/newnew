@@ -13,12 +13,9 @@ import ThumbnailIcon from '../../../../public/images/svg/icons/filled/AddImage.s
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoAnnouncementTab {
   postUuid: string;
@@ -57,7 +54,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
 
   return (
     <>
-      <PostBitmovinPlayer
+      <PostVideojsPlayer
         id={postUuid}
         resources={announcement}
         muted={isMuted}

@@ -19,7 +19,7 @@ aws ecr get-login-password | docker login --username AWS --password-stdin "$ECR_
 
 # build docker image
 docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
-docker build --build-arg "NEXT_JS_ASSET_URL=$NEXT_JS_ASSET_URL" --build-arg "NEXT_PUBLIC_BITMOVIN_PLAYER_KEY=$NEXT_PUBLIC_BITMOVIN_PLAYER_KEY" --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -t "$CI_APPLICATION_REPOSITORY:latest" .
+docker build --build-arg "NEXT_JS_ASSET_URL=$NEXT_JS_ASSET_URL" --build-arg --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -t "$CI_APPLICATION_REPOSITORY:latest" .
 
 # push image to amazon ecr
 docker push "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
