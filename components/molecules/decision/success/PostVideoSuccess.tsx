@@ -155,6 +155,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               videos={[response, ...additionalResponses]}
               isMuted={isMuted}
               videoDurationWithTime
+              autoscroll
             />
           )}
           <PostVideoSoundButton

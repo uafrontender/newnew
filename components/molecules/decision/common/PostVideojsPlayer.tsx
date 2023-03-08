@@ -39,6 +39,7 @@ interface IPostVideojsPlayer {
   resources?: newnewapi.IVideoUrls;
   videoDurationWithTime?: boolean;
   showPlayButton?: boolean;
+  onPlaybackFinished?: () => void;
 }
 
 export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
@@ -47,6 +48,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   resources,
   videoDurationWithTime,
   showPlayButton,
+  onPlaybackFinished,
 }) => {
   // const dispatch = useAppDispatch();
   // const { resizeMode } = useAppState();
@@ -105,7 +107,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   const options: videojs.PlayerOptions = useMemo(
     () => ({
-      loop: true,
+      loop: !onPlaybackFinished,
       controls: false,
       responsive: false,
       playsinline: true,
@@ -118,7 +120,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         },
       ],
     }),
-    [resources]
+    [resources, onPlaybackFinished]
   );
 
   // playerRef is set here, as well as all the listeners
@@ -196,6 +198,13 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           setIsLoading(false);
         });
 
+        // Playback finished handler
+        if (onPlaybackFinished) {
+          p.on('ended', () => {
+            onPlaybackFinished();
+          });
+        }
+
         // NB! Commented out for now
         // Fulscreen
         // p.on('fullscreenchange', (e) => {
@@ -218,7 +227,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused]
+    [handleSetIsPaused, onPlaybackFinished]
   );
 
   useEffect(() => {

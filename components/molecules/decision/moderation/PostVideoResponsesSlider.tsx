@@ -20,6 +20,7 @@ import PostVideoStoriesPreviewSlider from './PostVideoStoriesPreviewSlider';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
@@ -30,6 +31,7 @@ interface IPostVideoResponsesSlider {
   videoDurationWithTime?: boolean;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
   handleDeleteUnuploadedAdditonalResponse?: () => void;
+  autoscroll?: boolean;
 }
 
 const PostVideoResponsesSlider: React.FunctionComponent<
@@ -43,7 +45,17 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   videoDurationWithTime,
   handleDeleteAdditionalVideo,
   handleDeleteUnuploadedAdditonalResponse,
+  autoscroll,
 }) => {
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const { postParsed } = usePostInnerState();
   const { videoProcessing } = usePostModerationResponsesContext();
   const uploadedFile = useMemo(
@@ -72,7 +84,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       if (containerWidth) {
         containerRef.current?.scrollTo({
           left: containerWidth * scrollTo,
-          behavior: 'smooth',
+          behavior: 'auto',
         });
       }
     },
@@ -164,6 +176,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
             isVisible={currentVideo === i}
             isMuted={isMuted}
             videoDurationWithTime={videoDurationWithTime}
+            onPlaybackFinished={autoscroll ? handleScrollRight : undefined}
           />
         ))}
       </SContainer>
@@ -195,15 +208,22 @@ const PostVideoResponsesSlider: React.FunctionComponent<
                 opacity: 1,
               }
             : {}),
+          ...(isMobileOrTablet
+            ? {
+                background: 'transparent',
+              }
+            : {}),
         }}
         onClick={handleScrollLeft}
       >
-        <InlineSvg
-          svg={arrowIconLeft}
-          fill='#FFFFFF'
-          width='24px'
-          height='24px'
-        />
+        {!isMobileOrTablet ? (
+          <InlineSvg
+            svg={arrowIconLeft}
+            fill='#FFFFFF'
+            width='24px'
+            height='24px'
+          />
+        ) : null}
       </SScrollLeft>
       <SScrollRight
         view='transparent'
@@ -215,15 +235,22 @@ const PostVideoResponsesSlider: React.FunctionComponent<
                 opacity: 1,
               }
             : {}),
+          ...(isMobileOrTablet
+            ? {
+                background: 'transparent',
+              }
+            : {}),
         }}
         onClick={handleScrollRight}
       >
-        <InlineSvg
-          svg={arrowIconRight}
-          fill='#FFFFFF'
-          width='24px'
-          height='24px'
-        />
+        {!isMobileOrTablet ? (
+          <InlineSvg
+            svg={arrowIconRight}
+            fill='#FFFFFF'
+            width='24px'
+            height='24px'
+          />
+        ) : null}
       </SScrollRight>
       {isEditingStories ? (
         <PostVideoStoriesPreviewSlider
@@ -271,12 +298,23 @@ const SContainer = styled.div`
 const SScrollLeft = styled(Button)`
   position: absolute;
 
-  top: calc(50% - 24px);
-  left: 24px;
+  width: 75px;
+  height: 200px;
 
-  display: none;
+  top: calc(50% - 100px);
+  left: 0px;
+
+  @media (max-width: 768px) {
+    &:disabled:after {
+      background: transparent;
+    }
+  }
 
   ${({ theme }) => theme.media.laptop} {
+    width: initial;
+    height: initial;
+    top: calc(50% - 24px);
+    left: 24px;
     display: block;
     opacity: 0;
     transition: 0.3s linear;
@@ -286,12 +324,23 @@ const SScrollLeft = styled(Button)`
 const SScrollRight = styled(Button)`
   position: absolute;
 
-  top: calc(50% - 24px);
-  right: 24px;
+  width: 75px;
+  height: 200px;
 
-  display: none;
+  top: calc(50% - 100px);
+  right: 0px;
+
+  @media (max-width: 768px) {
+    &:disabled:after {
+      background: transparent;
+    }
+  }
 
   ${({ theme }) => theme.media.laptop} {
+    width: initial;
+    height: initial;
+    top: calc(50% - 24px);
+    right: 24px;
     display: block;
     opacity: 0;
     transition: 0.3s linear;

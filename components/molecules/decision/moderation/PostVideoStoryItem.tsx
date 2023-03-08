@@ -14,6 +14,7 @@ interface IPostVideoStoryItem {
   isVisible: boolean;
   isMuted?: boolean;
   videoDurationWithTime?: boolean;
+  onPlaybackFinished?: () => void;
 }
 
 const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
@@ -22,6 +23,7 @@ const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
   isVisible,
   isMuted,
   videoDurationWithTime,
+  onPlaybackFinished,
 }) => {
   return (
     <SVideoStoryItem
@@ -35,6 +37,7 @@ const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
           muted={isMuted}
           showPlayButton
           videoDurationWithTime={videoDurationWithTime}
+          onPlaybackFinished={onPlaybackFinished}
         />
       ) : (
         <SPlaceHolder>
