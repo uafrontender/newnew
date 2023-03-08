@@ -84,6 +84,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   const [playbackTime, setPlaybackTime] = useState(0);
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
+  // NB! Commented out for now
+  // const [bufferedPercent, setBufferedPercent] = useState(0);
+
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
       // Pause the player when scrubbing
@@ -217,6 +220,13 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             onPlaybackFinished();
           });
         }
+
+        // Buffered percent
+        // p.on('progress', () => {
+        //   if (p?.bufferedPercent()) {
+        //     setBufferedPercent(p.bufferedPercent() * 100);
+        //   }
+        // });
 
         // NB! Commented out for now
         // Fulscreen
@@ -355,6 +365,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         currentTime={playbackTime}
         videoDuration={playerRef?.current?.duration() || 10}
         withTime={videoDurationWithTime}
+        // bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
       {/* {isFulscreen ? (
