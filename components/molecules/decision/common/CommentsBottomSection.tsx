@@ -423,15 +423,19 @@ const CommentsBottomSection: React.FunctionComponent<
           </SScrollContainer>
         </SActionSection>
         <GradientMask
-          gradientType='primary'
+          gradientType='blended'
           positionTop={heightDelta}
           active={showTopGradient}
           width='calc(100% - 4px)'
+          height='100px'
+          animateOpacity
         />
         <GradientMask
-          gradientType='primary'
+          gradientType='blended'
           active={showBottomGradient}
           width='calc(100% - 4px)'
+          height='100px'
+          animateOpacity
         />
       </STabContainer>
     </>
@@ -453,6 +457,11 @@ const STabContainer = styled(motion.div)`
   align-self: flex-end;
 
   margin-bottom: 40px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 56px;
   }

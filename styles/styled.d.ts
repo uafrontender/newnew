@@ -208,12 +208,14 @@ declare module 'styled-components' {
         secondary: string;
         tertiary: string;
         quaternary: string;
+        blended: string;
       };
       listBottom: {
         primary: string;
         secondary: string;
         tertiary: string;
         quaternary: string;
+        blended: string;
       };
       listLeft: {
         primary: string;
