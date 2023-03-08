@@ -127,7 +127,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   // List of video.js events
   // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
   const handlePlayerReady = useCallback(
-    async (p: videojs.Player) => {
+    (p: videojs.Player) => {
       try {
         playerRef.current = p;
 
@@ -138,31 +138,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           const ql = event.qualityLevel as QualityLevel;
           setQualityLevels((curr) => [...curr, ql]);
         });
-
-        // Load manifest and determine vertical/horizontal orientation
-        if (resources!!.hlsStreamUrl) {
-          const loadedManifestRaw = await fetch(resources!!.hlsStreamUrl).then(
-            (r) => r.text()
-          );
-          const parsedManifest = hlsParser.parse(loadedManifestRaw);
-
-          if (parsedManifest && parsedManifest.isMasterPlaylist) {
-            const v1 = parsedManifest?.variants?.[0];
-
-            if (
-              v1 &&
-              v1.resolution &&
-              v1.resolution?.height &&
-              v1.resolution?.width
-            ) {
-              setVideoOrientation(
-                v1.resolution?.height >= v1.resolution?.width
-                  ? 'vertical'
-                  : 'horizontal'
-              );
-            }
-          }
-        }
 
         // Autoplay implementation by official video.js guide
         // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
@@ -206,7 +181,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           setPlaybackTime(p.currentTime());
         });
 
-        // Loading state & Autoplay
+        // Loading state
         p.on('loadstart', (e) => {
           setIsLoading(true);
         });
@@ -250,6 +225,42 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleSetIsPaused, onPlaybackFinished, resources]
   );
+
+  const fetchManifestDetermineOrientation = useCallback(async () => {
+    try {
+      // Load manifest and determine vertical/horizontal orientation
+      if (resources!!.hlsStreamUrl) {
+        const loadedManifestRaw = await fetch(resources!!.hlsStreamUrl).then(
+          (r) => r.text()
+        );
+        const parsedManifest = hlsParser.parse(loadedManifestRaw);
+
+        if (parsedManifest && parsedManifest.isMasterPlaylist) {
+          const v1 = parsedManifest?.variants?.[0];
+
+          if (
+            v1 &&
+            v1.resolution &&
+            v1.resolution?.height &&
+            v1.resolution?.width
+          ) {
+            setVideoOrientation(
+              v1.resolution?.height >= v1.resolution?.width
+                ? 'vertical'
+                : 'horizontal'
+            );
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [resources]);
+
+  // Separate use effect for fetching manifest and determening horizontal/vertical orientation
+  useEffect(() => {
+    fetchManifestDetermineOrientation();
+  }, [fetchManifestDetermineOrientation]);
 
   useEffect(() => {
     // Make sure Video.js player is only initialized once
