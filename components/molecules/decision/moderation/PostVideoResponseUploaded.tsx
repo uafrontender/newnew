@@ -9,12 +9,9 @@ import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import PostVideoResponsesSlider from './PostVideoResponsesSlider';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoResponseUploaded {
   isMuted: boolean;
@@ -89,7 +86,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
           }
         />
       ) : (
-        <PostBitmovinPlayer
+        <PostVideojsPlayer
           id={postParsed?.postUuid ?? ''}
           resources={coreResponse}
           muted={isMuted}
