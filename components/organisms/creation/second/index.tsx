@@ -77,7 +77,7 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import RichTextInput from '../../../atoms/creation/RichTextInput';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 const HeroPopup = dynamic(
@@ -1286,7 +1286,7 @@ export const CreationSecondStepContent: React.FC<
                   !fileProcessing.loading ? (
                     <SFloatingSubSectionWithPlayer>
                       <SFloatingSubSectionPlayer>
-                        <BitmovinPlayer
+                        <VideojsPlayer
                           withMuteControl
                           id='floating-preview'
                           innerRef={playerRef}

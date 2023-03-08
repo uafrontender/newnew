@@ -27,12 +27,9 @@ import PostVideoResponseUpload from './PostVideoResponseUpload';
 import PostVideoCoverImageEdit from './PostVideoCoverImageEdit';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoModeration {
   postUuid: string;
@@ -217,7 +214,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           !responseFileUploadLoading &&
           !responseFileProcessingLoading ? (
           <>
-            <PostBitmovinPlayer
+            <PostVideojsPlayer
               id={postUuid}
               resources={videoProcessing.targetUrls!!}
               muted={isMuted}
