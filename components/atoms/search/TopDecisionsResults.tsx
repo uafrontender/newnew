@@ -3,15 +3,13 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import getDisplayname from '../../../utils/getDisplayname';
 import usePageVisibility from '../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../utils/isBrowser';
 import { Mixpanel } from '../../../utils/mixpanel';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
 import UserAvatar from '../../molecules/UserAvatar';
-import InlineSvg from '../InlineSVG';
 import PostTitleContent from '../PostTitleContent';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import DisplayName from '../../DisplayName';
 
 interface IFunction {
   posts: newnewapi.IPost[];
@@ -72,17 +70,9 @@ const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
                       <PostTitleContent>{data.title}</PostTitleContent>
                     </SPostTitle>
                   )}
-                  <SCreatorUsername>
-                    {getDisplayname(data.creator)}
-                    {data.creator?.options?.isVerified && (
-                      <InlineSvg
-                        svg={VerificationCheckmark}
-                        width='20px'
-                        height='20px'
-                        fill='none'
-                      />
-                    )}
-                  </SCreatorUsername>
+                  <SCreatorInfo>
+                    <DisplayName user={data.creator} />
+                  </SCreatorInfo>
                 </SPostData>
               </SLeftSide>
               <SPostDetails>
@@ -194,7 +184,7 @@ const SPostTitle = styled.span`
   pointer-events: none;
 `;
 
-const SCreatorUsername = styled.div`
+const SCreatorInfo = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;

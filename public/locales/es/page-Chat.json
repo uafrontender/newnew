@@ -40,7 +40,7 @@
   "modal": {
     "blockUser": {
       "title": "Bloquear",
-      "messageFirstPart": "¿Estás seguro de que quieres bloquear a",
+      "messageFirstPart": "¿Estás seguro de que quieres bloquear a ",
       "messageSecondPart": "de mandarte mensajes?",
       "button": {
         "cancel": "Cancelar",

@@ -241,6 +241,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     </SItem>
   );
 
+  // TODO: Integrate DisplayName component instead
   const displayName = getDisplayname(user.userData);
 
   return (

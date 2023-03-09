@@ -145,7 +145,8 @@
         "months": "meses"
       },
       "payment": {
-        "header": "Bundle de Superpoll de {{creator}}"
+        "header": "Bundle de Superpoll de <0/>",
+        "suffix": ""
       },
       "error": {
         "requestFailed": "La solicitud ha fallado"
@@ -153,7 +154,7 @@
     },
     "buyBundleSuccess": {
       "votes": "<0>{{amount}}</0> votos desbloqueados",
-      "for": "para <0>{{creator}}</0>",
+      "for": "para <0/>",
       "access": "Quedan {{amount}} {{unit}} de:",
       "customOptions": "añadir opciones personalizadas a la Superpoll",
       "chat": "chat privado 1-a-1",

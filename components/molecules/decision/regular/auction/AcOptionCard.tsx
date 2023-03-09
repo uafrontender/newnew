@@ -489,20 +489,17 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
               isMyBid ? (
                 <OptionCardUsernameSpan
-                  type='me'
-                  usernameText={option.supporterCount > 1 ? t('me') : t('my')}
+                  user={option.supporterCount > 1 ? t('me') : t('my')}
                   isBlue={isBlue}
                 />
               ) : (
                 <OptionCardUsernameSpan
-                  type='otherUser'
                   user={option.creator!!}
                   isBlue={isBlue}
                 />
               )
             ) : (
               <OptionCardUsernameSpan
-                type='otherUser'
                 user={{
                   ...option.whitelistSupporter,
                   options: { ...option.whitelistSupporter, isVerified: true },
@@ -514,11 +511,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             (isSupportedByMe &&
               !!option.whitelistSupporter &&
               option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
-              <OptionCardUsernameSpan
-                type='me'
-                usernameText={`, ${t('me')}`}
-                isBlue={isBlue}
-              />
+              <OptionCardUsernameSpan user={`, ${t('me')}`} isBlue={isBlue} />
             ) : null}
             {option.supporterCount >
             ((isSupportedByMe && !isMyBid) ||
