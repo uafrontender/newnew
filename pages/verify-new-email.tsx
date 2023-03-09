@@ -60,6 +60,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         dispatch(
           setUserData({
             options: {
+              ...user.userData?.options,
               isActivityPrivate:
                 becomeCreatorRes.data.me?.options?.isActivityPrivate,
               isCreator: becomeCreatorRes.data.me?.options?.isCreator,
