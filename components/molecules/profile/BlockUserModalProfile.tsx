@@ -6,8 +6,8 @@ import styled from 'styled-components';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import getDisplayname from '../../../utils/getDisplayname';
 import preventParentClick from '../../../utils/preventParentClick';
+import DisplayName from '../../DisplayName';
 
 interface IBlockUserModalProfile {
   user: newnewapi.IUser;
@@ -33,7 +33,8 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
         <SModal>
           <SModalTitle>{t('modal.blockUser.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.blockUser.messageFirstPart')} {getDisplayname(user)}{' '}
+            {t('modal.blockUser.messageFirstPart')}
+            <DisplayName user={user} />
             {t('modal.blockUser.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
@@ -88,6 +89,8 @@ const SModalTitle = styled.strong`
 `;
 
 const SModalMessage = styled.p`
+  display: inline-flex;
+  white-space: pre;
   font-size: 16px;
   margin-bottom: 24px;
 `;

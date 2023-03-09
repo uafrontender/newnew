@@ -7,8 +7,8 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
-import getDisplayname from '../../../utils/getDisplayname';
 import { Mixpanel } from '../../../utils/mixpanel';
+import DisplayName from '../../DisplayName';
 
 interface IBlockUserModal {
   user: newnewapi.IVisavisUser;
@@ -44,14 +44,18 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
       <SContainer>
         <SModal>
           <SModalTitle>
-            {isAnnouncement
-              ? t('modal.blockGroup.title')
-              : `${t('modal.blockUser.title')} ${getDisplayname(user.user)}`}
+            {isAnnouncement ? (
+              t('modal.blockGroup.title')
+            ) : (
+              <>
+                {t('modal.blockUser.title')} <DisplayName user={user.user} />
+              </>
+            )}
           </SModalTitle>
           <SModalMessage>
-            {`${t('modal.blockUser.messageFirstPart')} ${getDisplayname(
-              user.user
-            )} ${t('modal.blockUser.messageSecondPart')}`}
+            {t('modal.blockUser.messageFirstPart')}
+            <DisplayName user={user.user} />{' '}
+            {t('modal.blockUser.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton view='secondary' onClick={closeModal}>
@@ -103,11 +107,16 @@ const SModal = styled.div`
 `;
 
 const SModalTitle = styled.strong`
+  display: inline-flex;
+  white-space: pre;
   font-size: 20px;
   margin-bottom: 16px;
 `;
 
 const SModalMessage = styled.p`
+  display: inline-flex;
+  white-space: pre;
+  flex-flow: wrap;
   font-size: 16px;
   margin-bottom: 24px;
 `;

@@ -30,17 +30,16 @@ import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 import isBrowser from '../../utils/isBrowser';
 import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
 import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
-import getDisplayname from '../../utils/getDisplayname';
 import copyToClipboard from '../../utils/copyToClipboard';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
+import DisplayName from '../DisplayName';
 
 type TPageType =
   | 'activelyBidding'
@@ -376,15 +375,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         <SUserData>
           <SUsernameWrapper>
             <SUsername variant={4}>
-              {getDisplayname(user.userData)}
-              {user.userData?.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='32px'
-                  height='32px'
-                  fill='none'
-                />
-              )}
+              <DisplayName user={user.userData} />
             </SUsername>
             {isGenderPronounsDefined(user.userData?.genderPronouns) && (
               <SGenderPronouns variant={2}>
@@ -640,8 +631,4 @@ const SMyProfileLayout = styled.div`
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
   }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-left: 4px;
 `;
