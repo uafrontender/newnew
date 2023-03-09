@@ -218,7 +218,7 @@ export const getServerSideProps: GetServerSideProps<
       };
     }
 
-    // NOTE: activity page is temporarily disabled
+    // NOTE: activity is temporarily disabled
     return {
       redirect: {
         destination: `/${username}`,
