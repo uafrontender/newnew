@@ -22,7 +22,6 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
-import BackButton from '../molecules/profile/BackButton';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 
@@ -30,6 +29,8 @@ import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
+import BackButtonIcon from '../../public/images/svg/icons/filled/Back.svg';
+import mockProfileBg from '../../public/images/mock/profile-bg.png';
 
 import isBrowser from '../../utils/isBrowser';
 import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
@@ -315,9 +316,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       <SMyProfileLayout>
         <ProfileBackground
           // Temp
-          pictureURL={
-            user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'
-          }
+          pictureURL={user?.userData?.coverUrl ?? mockProfileBg.src}
         >
           <SButton
             view='transparent'
@@ -363,11 +362,23 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               : t('profileLayout.headerButtons.settings')}
           </SButton>
         </ProfileBackground>
-        <SBackButton
+        <SButtonBack
+          view='transparent'
+          withDim
+          withShrink
+          iconOnly
           onClick={() => {
             router.back();
           }}
-        />
+          onClickCapture={() => {
+            Mixpanel.track('Click Back Button', {
+              _stage: 'MyProfile',
+              _component: 'MyProfileLayout',
+            });
+          }}
+        >
+          <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
+        </SButtonBack>
         {/* NB! Temp */}
         {user.userData?.avatarUrl && (
           <ProfileImage src={user.userData?.avatarUrl} />
@@ -516,15 +527,11 @@ const SGeneral = styled(General)`
   }
 `;
 
-// TODO: standardize.
 const SButton = styled(Button)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? 'rgba(255, 255, 255, 0.06)'
-      : 'rgba(11, 10, 19, 0.2)'};
+  background: rgba(11, 10, 19, 0.1);
 `;
 
-const SBackButton = styled(BackButton)`
+const SButtonBack = styled(SButton)`
   position: absolute;
   top: 16px;
   left: 16px;

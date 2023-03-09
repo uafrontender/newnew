@@ -29,12 +29,13 @@ import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import ReportModal, {
   ReportData,
 } from '../molecules/direct-messages/ReportModal';
-import BackButton from '../molecules/profile/BackButton';
 // import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import BackButtonIcon from '../../public/images/svg/icons/filled/Back.svg';
+import mockProfileBg from '../../public/images/mock/profile-bg.png';
 
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import { reportUser } from '../../api/endpoints/report';
@@ -148,7 +149,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       usersBlockedMe,
     ]
   );
-  // NOTE: activity page is temporarily disabled
+  // NOTE: activity is temporarily disabled
   /* const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
       return [
@@ -250,15 +251,25 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     <>
       <SGeneral restrictMaxWidth>
         <SProfileLayout>
-          <ProfileBackground
-            pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
-          />
+          <ProfileBackground pictureURL={user.coverUrl ?? mockProfileBg.src} />
           {/* Favorites and more options buttons */}
-          <SBackButton
+          <SButtonBack
+            view='transparent'
+            withDim
+            withShrink
+            iconOnly
             onClick={() => {
               router.back();
             }}
-          />
+            onClickCapture={() => {
+              Mixpanel.track('Click Back Button', {
+                _stage: 'Profile',
+                _component: 'ProfileLayout',
+              });
+            }}
+          >
+            <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
+          </SButtonBack>
           <SSideButtons>
             {
               // TODO: Re-enable once new SMS service is integrated
@@ -420,7 +431,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </SUserData>
           {/* Temp, all creators for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {/* NOTE: activity page is temporarily disabled */}
+          {/* NOTE: activity is temporarily disabled */}
           {/* tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
           ) : null */}
@@ -502,6 +513,59 @@ const SGeneral = styled(General)`
         }
       }
     }
+  }
+`;
+
+const SProfileLayout = styled.div`
+  position: relative;
+  /* overflow: hidden; */
+
+  margin-top: -28px;
+  margin-bottom: 24px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: -8px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: -16px;
+  }
+`;
+
+const SButtonBack = styled(Button)`
+  background: rgba(11, 10, 19, 0.1);
+
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    top: 24px;
+    left: 24px;
+  }
+`;
+
+const SSideButtons = styled.div`
+  display: flex;
+  position: absolute;
+  width: 100%;
+  gap: 16px;
+  padding: 16px;
+
+  top: 164px;
+  justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    top: 204px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    top: 244px;
+    justify-content: flex-end;
   }
 `;
 
@@ -627,17 +691,6 @@ const SIconButton = styled.div<{
   // TODO: add hover/active effects
 `;
 
-const SBackButton = styled(BackButton)`
-  position: absolute;
-  top: 16px;
-  left: 16px;
-
-  ${(props) => props.theme.media.laptop} {
-    top: 24px;
-    left: 24px;
-  }
-`;
-
 // const SFavoritesButton = styled(Button)`
 //   position: absolute;
 //   top: 164px;
@@ -672,43 +725,3 @@ const SBackButton = styled(BackButton)`
 //     right: calc(4px + 68px);
 //   }
 // `;
-
-const SSideButtons = styled.div`
-  display: flex;
-  position: absolute;
-  width: 100%;
-  gap: 16px;
-  padding: 16px;
-
-  top: 164px;
-  justify-content: space-between;
-
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-    justify-content: flex-end;
-  }
-`;
-
-const SProfileLayout = styled.div`
-  position: relative;
-  /* overflow: hidden; */
-
-  margin-top: -28px;
-  margin-bottom: 24px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  ${(props) => props.theme.media.tablet} {
-    margin-top: -8px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-top: -16px;
-  }
-`;
