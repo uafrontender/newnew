@@ -236,7 +236,7 @@
   },
   "blockUserModal": {
     "title": "屏蔽用戶",
-    "messageFirstPart": "你真的想屏蔽",
+    "messageFirstPart": "你真的想屏蔽 ",
     "messageSecondPart": "?",
     "button": {
       "cancel": "取消",
@@ -743,13 +743,15 @@
       "ac": {
         "numBiddersChoseSingular": "{{amount}} 位出價者選擇了",
         "numBiddersChose": "{{amount}} 位出價者選擇了",
-        "optionCreator": "<0>{{nickname}}</0><1/> 的出價"
+        "optionCreator": "<0/> 的出價",
+        "suffix": ""
       },
       "mc": {
         "numBiddersChoseSingular": "{{amount}} 位投票者選擇了",
         "numBiddersChose": "{{amount}} 位投票者選擇了",
         "optionOwn": "選項",
-        "optionCreator": "<0>{{nickname}}</0><1/> 的選擇"
+        "optionCreator": "<0/> 的選擇",
+        "suffix": ""
       }
     }
   },

@@ -11,10 +11,8 @@ import UserAvatar from '../UserAvatar';
 import BundleOfferCard from './BunldeOfferCard';
 import BundlePaymentModal from './BundlePaymentModal';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import InlineSvg from '../../atoms/InlineSVG';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
 import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../DisplayName';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -72,15 +70,9 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
               )}
               <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
               <SUserData>
-                <SUsername>{getDisplayname(creator)}</SUsername>
-                {creator.options?.isVerified && (
-                  <SInlineSvg
-                    svg={VerificationCheckmark}
-                    width='24px'
-                    height='24px'
-                    fill='none'
-                  />
-                )}
+                <SUsername>
+                  <DisplayName user={creator} />
+                </SUsername>
               </SUserData>
               <SOfferedBundleList>
                 {appConstants.bundleOffers?.map((bundleOffer, index) => (
@@ -177,6 +169,7 @@ const SUserData = styled.div`
 `;
 
 const SUsername = styled.h4`
+  display: inline-flex;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 700;
   font-size: 20px;
@@ -189,10 +182,6 @@ const SUsername = styled.h4`
     font-size: 24px;
     line-height: 32px;
   }
-`;
-
-const SInlineSvg = styled(InlineSvg)`
-  flex-shrink: 0;
 `;
 
 const SOfferedBundleList = styled.div`

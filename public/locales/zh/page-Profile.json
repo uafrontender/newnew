@@ -84,7 +84,7 @@
   "modal": {
     "blockUser": {
       "title": "屏蔽用戶",
-      "messageFirstPart": "你真的想屏蔽",
+      "messageFirstPart": "你真的想屏蔽 ",
       "messageSecondPart": "?",
       "button": {
         "cancel": "取消",

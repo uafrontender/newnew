@@ -19,7 +19,6 @@ import getDisplayname from '../../../../../utils/getDisplayname';
 interface IMcConfirmVoteModal {
   show: boolean;
   zIndex: number;
-  postCreatorName: string;
   optionText: string;
   supportVotesAmount: string;
   customSupportVotesAmount: string;
@@ -35,7 +34,6 @@ interface IMcConfirmVoteModal {
 const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   show,
   zIndex,
-  postCreatorName,
   optionText,
   supportVotesAmount,
   isAmountPredefined,
@@ -170,14 +168,18 @@ const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               : t('mcPost.optionsTab.optionCard.confirmVoteModal.votes')}
           </SHeadline>
           <SCreatorsText variant={2}>
+            {/** TODO: use DisplayName component, add it using Trans, change translations to use component */}
             {parseInt(supportVotesAmount) === 1
               ? t(
                   'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
-                  { creator: postCreatorName }
+                  { creator: getDisplayname(postCreator) }
                 )
               : t(
                   'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
-                  { creator: postCreatorName, amount: supportVotesAmount }
+                  {
+                    creator: getDisplayname(postCreator),
+                    amount: supportVotesAmount,
+                  }
                 )}
           </SCreatorsText>
           <SCaption variant={3}>
