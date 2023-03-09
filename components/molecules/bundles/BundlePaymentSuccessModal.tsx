@@ -12,10 +12,8 @@ import { formatNumber } from '../../../utils/format';
 import BulletLine from './BulletLine';
 import Button from '../../atoms/Button';
 import AnimatedBackground from '../../atoms/AnimationBackground';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import InlineSvg from '../../atoms/InlineSVG';
-import getDisplayname from '../../../utils/getDisplayname';
 import getBundleOfferLevel from '../../../utils/getCurrentBundleLevel';
+import DisplayName from '../../DisplayName';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -81,18 +79,12 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                     i18nKey='modal.buyBundleSuccess.for'
                     // @ts-ignore
                     components={[
-                      <SLink href={`/${creator?.username}`} />,
-                      { creator: getDisplayname(creator) },
+                      <SDisplayName
+                        user={creator}
+                        href={`/${creator?.username}`}
+                      />,
                     ]}
                   />
-                  {creator.options?.isVerified && (
-                    <InlineSvg
-                      svg={VerificationCheckmark}
-                      width='24px'
-                      height='24px'
-                      fill='none'
-                    />
-                  )}
                 </SUsername>
               </SUserInfo>
               <SBundleInfo>
@@ -198,8 +190,9 @@ const SUsername = styled.div`
   white-space: pre;
 `;
 
-const SLink = styled.a`
+const SDisplayName = styled(DisplayName)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  cursor: pointer;
 
   &:hover {
     color: ${({ theme }) => theme.colorsThemed.text.primary};

@@ -6,9 +6,9 @@ import styled from 'styled-components';
 import Modal from '../../../organisms/Modal';
 import Button from '../../../atoms/Button';
 import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
-import getDisplayname from '../../../../utils/getDisplayname';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
+import DisplayName from '../../../DisplayName';
 
 interface IBlockUserModalPost {
   user: newnewapi.IUser;
@@ -43,7 +43,8 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
         <SModal>
           <SModalTitle>{t('blockUserModal.title')}</SModalTitle>
           <SModalMessage>
-            {t('blockUserModal.messageFirstPart')} {getDisplayname(user)}{' '}
+            {t('blockUserModal.messageFirstPart')}
+            <DisplayName user={user} />
             {t('blockUserModal.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
@@ -96,6 +97,8 @@ const SModalTitle = styled.strong`
 `;
 
 const SModalMessage = styled.p`
+  display: inline-flex;
+  white-space: pre;
   font-size: 16px;
   margin-bottom: 24px;
 `;

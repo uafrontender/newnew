@@ -754,7 +754,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             supportVotesAmount={(
               supportVoteOffer?.amountOfVotes || 0
             ).toString()}
-            postCreatorName={getDisplayname(creator)}
             optionText={option.text}
             onClose={() => handleCloseConfirmVoteModal()}
             handleOpenPaymentModal={() => handleOpenPaymentModal()}
@@ -1007,7 +1006,6 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             {whiteListedSupporter ? (
               <OptionCardUsernameSpan
-                type='otherUser'
                 user={{
                   ...whiteListedSupporter,
                   options: { ...whiteListedSupporter, isVerified: true },
@@ -1015,11 +1013,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 isBlue={isBlue}
               />
             ) : firstVoter ? (
-              <OptionCardUsernameSpan
-                type='otherUser'
-                user={firstVoter}
-                isBlue={isBlue}
-              />
+              <OptionCardUsernameSpan user={firstVoter} isBlue={isBlue} />
             ) : null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -1045,8 +1039,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
         {supporterCount > 0 ? (
           <>
             <OptionCardUsernameSpan
-              type='me'
-              usernameText={supporterCountSubtracted > 0 ? t('me') : t('I')}
+              user={supporterCountSubtracted > 0 ? t('me') : t('I')}
               isBlue={isBlue}
             />
             <SSpanBiddersRegular className='spanRegular'>
@@ -1071,14 +1064,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         {!whiteListedSupporter ? (
-          <OptionCardUsernameSpan
-            type='otherUser'
-            user={optionCreator}
-            isBlue={isBlue}
-          />
+          <OptionCardUsernameSpan user={optionCreator} isBlue={isBlue} />
         ) : (
           <OptionCardUsernameSpan
-            type='otherUser'
             user={{
               ...whiteListedSupporter,
               options: { ...whiteListedSupporter, isVerified: true },
@@ -1108,14 +1096,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         {!whiteListedSupporter ? (
-          <OptionCardUsernameSpan
-            type='otherUser'
-            user={optionCreator}
-            isBlue={isBlue}
-          />
+          <OptionCardUsernameSpan user={optionCreator} isBlue={isBlue} />
         ) : (
           <OptionCardUsernameSpan
-            type='otherUser'
             user={{
               ...whiteListedSupporter,
               options: { ...whiteListedSupporter, isVerified: true },
@@ -1124,11 +1107,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           />
         )}
         {', '}
-        <OptionCardUsernameSpan
-          type='me'
-          usernameText={`${t('me')}`}
-          isBlue={isBlue}
-        />
+        <OptionCardUsernameSpan user={`${t('me')}`} isBlue={isBlue} />
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted - 1 > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1151,8 +1130,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         <OptionCardUsernameSpan
-          type='me'
-          usernameText={supporterCount > 1 ? t('me') : t('I')}
+          user={supporterCount > 1 ? t('me') : t('I')}
           isBlue={isBlue}
         />
         <SSpanBiddersRegular className='spanRegular'>
