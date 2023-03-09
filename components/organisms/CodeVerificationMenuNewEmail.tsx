@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 
 // Redux
-import { useAppDispatch } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setUserData } from '../../redux-store/slices/userStateSlice';
 
 // API
@@ -43,6 +43,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 > = ({ expirationTime, newEmail, redirect, allowLeave }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
+  const user = useAppSelector((state) => state.user);
 
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -121,6 +122,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
             setUserData({
               email: newEmail,
               options: {
+                ...user.userData?.options,
                 isActivityPrivate:
                   becomeCreatorRes.data.me?.options?.isActivityPrivate,
                 isCreator: becomeCreatorRes.data.me?.options?.isCreator,
@@ -150,6 +152,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
       setIsSignInWithEmailLoading,
       setSubmitError,
       setTimerActive,
+      user.userData?.options,
       newEmail,
       redirect,
       dispatch,

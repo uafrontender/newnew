@@ -9,10 +9,11 @@ import { useAppState } from '../../../contexts/appStateContext';
 import Button from '../Button';
 
 interface IFunctionProps {
+  className?: string;
   closeDrop?: () => void;
 }
 
-const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
+const NoResults: React.FC<IFunctionProps> = ({ className, closeDrop }) => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { resizeMode } = useAppState();
@@ -35,7 +36,7 @@ const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
     }
   };
   return (
-    <SNoResults>
+    <SNoResults className={className}>
       <SEmptyInboxTitle>{t('search.noResults.title')}</SEmptyInboxTitle>
       <SEmptyInboxText>{t('search.noResults.description')}</SEmptyInboxText>
       <Button onClick={exploreHandler}>{t('search.noResults.action')}</Button>
