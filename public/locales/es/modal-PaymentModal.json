@@ -31,5 +31,8 @@
     "requestFailed": "La solicitud ha fallado",
     "invalidFee": "Algo ha salido mal. Vuelve a cargar la página e inténtalo de nuevo"
   },
+  "errorCaptions": {
+    "emailRequired_NEED_TRANSLATION": "Email is required"
+  },
   "processingFee": "Cuota de procesamiento"
 }

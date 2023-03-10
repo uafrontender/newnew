@@ -40,7 +40,7 @@
   "modal": {
     "blockUser": {
       "title": "Block",
-      "messageFirstPart": "Are you sure you want to block",
+      "messageFirstPart": "Are you sure you want to block ",
       "messageSecondPart": "from messaging you?",
       "button": {
         "cancel": "Cancel",

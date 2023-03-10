@@ -142,13 +142,11 @@ const AcOptionCardModeration: React.FunctionComponent<
             <SBiddersInfo variant={3}>
               {!option.whitelistSupporter ? (
                 <OptionCardUsernameSpan
-                  type='otherUser'
                   user={option.creator!!}
                   isBlue={!!isWinner}
                 />
               ) : (
                 <OptionCardUsernameSpan
-                  type='otherUser'
                   user={{
                     ...option.whitelistSupporter,
                     options: { ...option.whitelistSupporter, isVerified: true },
@@ -294,13 +292,11 @@ const AcOptionCardModeration: React.FunctionComponent<
           <SBiddersInfo variant={3}>
             {!option.whitelistSupporter ? (
               <OptionCardUsernameSpan
-                type='otherUser'
                 user={option.creator!!}
                 isBlue={!!isWinner}
               />
             ) : (
               <OptionCardUsernameSpan
-                type='otherUser'
                 user={{
                   ...option.whitelistSupporter,
                   options: { ...option.whitelistSupporter, isVerified: true },

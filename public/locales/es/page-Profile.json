@@ -84,7 +84,7 @@
   "modal": {
     "blockUser": {
       "title": "Bloquear usuario",
-      "messageFirstPart": "¿De verdad quieres bloquear a",
+      "messageFirstPart": "¿De verdad quieres bloquear a ",
       "messageSecondPart": "?",
       "button": {
         "cancel": "Cancelar",

@@ -145,7 +145,8 @@
         "months": "月"
       },
       "payment": {
-        "header": "{{creator}}的Superpoll Bundle"
+        "header": "<0/>的Superpoll Bundle",
+        "suffix": ""
       },
       "error": {
         "requestFailed": "請求失敗"
@@ -153,7 +154,7 @@
     },
     "buyBundleSuccess": {
       "votes": "已解鎖<0>{{amount}}</0>投票",
-      "for": "為",
+      "for": "為  <0/>",
       "access": "剩餘{{amount}} {{unit}}:",
       "customOptions": "添加定制Superpoll選項",
       "chat": "一對一私聊",

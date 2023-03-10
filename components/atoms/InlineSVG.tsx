@@ -7,7 +7,7 @@ interface IInlineSvg {
   fill?: string;
   width?: string;
   height?: string;
-  onClick?: () => any;
+  onClick?: (e: React.MouseEvent) => any;
   hoverFill?: string | undefined;
   clickable?: boolean;
   scaleOnClick?: boolean;
