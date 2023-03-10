@@ -37,6 +37,8 @@
       "placeholder": "例如，我應該在哪裡做我的第一個紋身 \uD83D\uDE4A"
     },
     "fileUpload": {
+      "titleMobile_NEED_TRANSLATION": "Select a file ",
+      "titleDesktop_NEED_TRANSLATION": "Select a file or drag and drop here",
       "description": "視頻檔案大小最高10GB",
       "button": "選擇檔案"
     },
