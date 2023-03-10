@@ -25,10 +25,10 @@ import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSucce
 import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
+import WinningMcOptionCreator from '../../../molecules/decision/common/WinningMcOptionCreator';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -135,9 +135,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
           const payload = new newnewapi.GetMcOptionRequest({
             optionId: id,
           });
-
           const res = await getMcOption(payload);
-
           if (res.data?.option) {
             setWinningOption(
               res.data.option as newnewapi.MultipleChoice.Option
@@ -235,10 +233,9 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                   <SSeparator />
                   {winningOption && (
                     <>
-                      <WinningOptionCreator
-                        type='mc'
+                      <WinningMcOptionCreator
                         postCreator={post.creator!!}
-                        winningOptionMc={winningOption}
+                        winningOption={winningOption}
                       />
                       <SWinningOptionAmount variant={4}>
                         {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}

@@ -21,6 +21,7 @@ interface IWinningOptionCreator {
   winningOptionMc?: newnewapi.MultipleChoice.IOption;
 }
 
+// Now works for AC only. Refactor. Might have bugs. Check who to show logic
 const WinningOptionCreator: React.FC<IWinningOptionCreator> = ({
   type,
   postCreator,
