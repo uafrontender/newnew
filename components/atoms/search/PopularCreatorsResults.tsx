@@ -7,9 +7,8 @@ import React from 'react';
 import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 import InlineSvg from '../InlineSVG';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
 import { Mixpanel } from '../../../utils/mixpanel';
+import DisplayName from '../../DisplayName';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -36,17 +35,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
                 </SUserAvatar>
                 <SPostData>
                   <CreatorData>
-                    <SCreatorUsername>
-                      {getDisplayname(creator)}
-                    </SCreatorUsername>
-                    {creator.options?.isVerified && (
-                      <SInlineSVG
-                        svg={VerificationCheckmark}
-                        width='16px'
-                        height='16px'
-                        fill='none'
-                      />
-                    )}
+                    <SDisplayName user={creator} />
                   </CreatorData>
                   <SLink>{t('search.creatorSubtitle')}</SLink>
                 </SPostData>
@@ -119,7 +108,7 @@ const SUserAvatar = styled.div`
   }
 `;
 
-const SCreatorUsername = styled.span`
+const SDisplayName = styled(DisplayName)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 

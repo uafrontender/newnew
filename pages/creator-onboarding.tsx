@@ -142,12 +142,22 @@ export const getServerSideProps: GetServerSideProps<
     'Cache-Control',
     'public, s-maxage=30, stale-while-revalidate=35'
   );
+
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-CreatorOnboarding'],
     null,
     SUPPORTED_LANGUAGES
   );
+
+  if (!context?.req?.cookies?.accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/sign-up?to=create',
+      },
+    };
+  }
 
   try {
     const countriesPayload = new newnewapi.EmptyRequest({});

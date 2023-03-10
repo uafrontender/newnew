@@ -44,7 +44,6 @@ import iconDark8 from '../../public/images/svg/numbers/8_dark.svg';
 import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 
 // Utils
 import switchPostType, { TPostType } from '../../utils/switchPostType';
@@ -61,6 +60,7 @@ import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 import getChunks from '../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
+import DisplayName from '../DisplayName';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -691,23 +691,15 @@ export const PostCard: React.FC<ICard> = React.memo(
               }}
             />
             <SUsernameContainer>
-              <SUsername
-                variant={2}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleUserClick(postParsed.creator?.username!!);
-                }}
-              >
-                {getDisplayname(postParsed.creator)}
-              </SUsername>
-              {postParsed.creator?.options?.isVerified && (
-                <SInlineSVG
-                  svg={VerificationCheckmark}
-                  width='16px'
-                  height='16px'
-                  fill='none'
+              <SUsername variant={2}>
+                <DisplayName
+                  user={postParsed.creator}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUserClick(postParsed.creator?.username!!);
+                  }}
                 />
-              )}
+              </SUsername>
             </SUsernameContainer>
             <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
@@ -1251,7 +1243,7 @@ const SUsernameContainer = styled.div`
 `;
 
 const SUsername = styled(Text)`
-  display: inline-block;
+  display: inline-flex;
   flex-shrink: 1;
   font-weight: 700;
   font-size: 12px;
@@ -1401,8 +1393,4 @@ const SButtonIcon = styled(Button)`
     opacity: 0;
     transition: all ease 0.5s;
   }
-`;
-
-const SInlineSVG = styled(InlineSVG)`
-  flex-shrink: 0;
 `;
