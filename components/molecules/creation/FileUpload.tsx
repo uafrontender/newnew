@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import dropboxIcon from '../../../public/images/svg/icons/outlined/upload-cloud.svg';
 
 import {
   removeUploadedFile,
@@ -259,9 +260,65 @@ const FileUpload: React.FC<IFileUpload> = ({
     videoProcessing?.taskUuid,
   ]);
 
+  // Drag & Drop support
+  const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
+
+  const handleOnDragOver = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setDropZoneHighlighted(true);
+    },
+    []
+  );
+
+  const handleOnDragLeave = useCallback(() => {
+    setDropZoneHighlighted(false);
+  }, []);
+
+  const handleOnDrop = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+
+      const { files } = e.dataTransfer;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
+
+      Mixpanel.track('Video Selected with drag and drop', {
+        _stage: 'Creation',
+        _file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+      });
+
+      if (file.size > MAX_VIDEO_SIZE) {
+        showErrorToastCustom(t('secondStep.video.error.maxSize'));
+      } else {
+        Mixpanel.track('Video Loading', { _stage: 'Creation' });
+
+        setLocalFile(file);
+        onChange(id, file);
+      }
+
+      setDropZoneHighlighted(false);
+    },
+    [id, onChange, showErrorToastCustom, t]
+  );
+
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox htmlFor='file'>
+      <SDropBox
+        htmlFor='file'
+        isHighlighted={dropZoneHighlighted}
+        onDragOver={(e) => handleOnDragOver(e)}
+        onDragLeave={() => handleOnDragLeave()}
+        onDrop={(e) => handleOnDrop(e)}
+      >
         <input
           id='file'
           ref={inputRef}
@@ -276,9 +333,24 @@ const FileUpload: React.FC<IFileUpload> = ({
             }
           }}
         />
-        <SPlaceholder weight={600} variant={2}>
-          {t('secondStep.fileUpload.description')}
-        </SPlaceholder>
+        {!isMobile && !isTablet ? (
+          <SInlineSVGDropBox
+            svg={dropboxIcon}
+            fill='none'
+            width='48px'
+            height='48px'
+          />
+        ) : null}
+        <SDropBoxWrapper>
+          <SPseudoHeadline variant={3} weight={600}>
+            {isMobile || isTablet
+              ? t('secondStep.fileUpload.titleMobile')
+              : t('secondStep.fileUpload.titleDesktop')}
+          </SPseudoHeadline>
+          <SPlaceholder weight={600} variant={2}>
+            {t('secondStep.fileUpload.description')}
+          </SPlaceholder>
+        </SDropBoxWrapper>
         <SButton view='primaryGrad' onClick={handleUploadButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
@@ -419,6 +491,9 @@ const FileUpload: React.FC<IFileUpload> = ({
 
     return content;
   }, [
+    dropZoneHighlighted,
+    isMobile,
+    isTablet,
     t,
     handleUploadButtonClick,
     loadingUpload,
@@ -427,20 +502,23 @@ const FileUpload: React.FC<IFileUpload> = ({
     loadingProcessing,
     progressProcessing,
     localFile,
+    handleOnDragOver,
+    handleOnDragLeave,
+    handleOnDrop,
     handleFileChange,
     etaUpload,
     progressUpload,
     handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    value,
     customCoverImageUrl,
+    value,
+    showPlayButton,
     showEllipseMenu,
     handleOpenEllipseMenu,
     handleDeleteVideoShow,
     isDesktop,
     handleFullPreview,
-    showPlayButton,
   ]);
 
   return (
@@ -503,25 +581,39 @@ const SWrapper = styled.div`
   width: 100%;
 `;
 
-const SDropBox = styled.label`
+const SDropBox = styled.label<{
+  isHighlighted: boolean;
+}>`
   width: 100%;
   cursor: copy;
   display: flex;
   padding: 16px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  background: ${({ theme, isHighlighted }) =>
+    isHighlighted
+      ? 'rgba(29, 106, 255, 0.2)'
+      : theme.colorsThemed.background.tertiary};
   align-items: center;
   border-radius: 16px;
-  flex-direction: column;
-  justify-content: center;
+  border: 1.5px dashed ${({ theme }) => theme.colors.blue};
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
   }
 `;
 
+const SInlineSVGDropBox = styled(InlineSVG)``;
+
+const SDropBoxWrapper = styled.div`
+  flex-grow: 3;
+`;
+
+const SPseudoHeadline = styled(Text)``;
+
 const SPlaceholder = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-bottom: 12px;
 `;
 
 const SButton = styled(Button)`

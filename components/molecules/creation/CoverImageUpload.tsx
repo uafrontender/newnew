@@ -60,7 +60,7 @@ const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
       {coverImageToBeSaved ? (
         <SSetCoverImageLabel>
           <SCoverPreview alt='cover' src={coverImageToBeSaved} />
-          <SDeleteButton view='transparent' onClick={() => handleDeleteFile()}>
+          <SDeleteButton view='secondary' onClick={() => handleDeleteFile()}>
             {t('secondStep.video.coverImage.uploadCoverImage.deleteBtn')}
           </SDeleteButton>
         </SSetCoverImageLabel>
