@@ -505,6 +505,8 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {
+    const controller = new AbortController();
+
     async function markAsViewed() {
       if (
         !postParsed?.postUuid ||
@@ -520,7 +522,7 @@ const PostPage: NextPage<IPostPage> = ({
           postUuid: postParsed?.postUuid,
         });
 
-        const res = await markPost(markAsViewedPayload);
+        const res = await markPost(markAsViewedPayload, controller.signal);
 
         if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
@@ -528,12 +530,9 @@ const PostPage: NextPage<IPostPage> = ({
       }
     }
 
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
+    markAsViewed();
     return () => {
-      clearTimeout(timer);
+      controller.abort();
     };
   }, [
     post,
