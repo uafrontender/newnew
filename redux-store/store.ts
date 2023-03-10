@@ -28,7 +28,7 @@ import { createWrapper } from 'next-redux-wrapper';
 // Import reducers
 import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
-import creationReducer from './slices/creationStateSlice';
+// import creationReducer from './slices/creationStateSlice';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -53,22 +53,14 @@ const userPersistConfig = {
   whitelist: ['loggedIn', 'userData'],
 };
 
-const creationPersistConfig = {
-  key: 'creation',
-  storage,
-  whitelist: [],
-};
-
 const reducers = {
   ui: persistReducer(uiPersistConfig, uiReducer),
   user: persistReducer(userPersistConfig, userReducer),
-  creation: persistReducer(creationPersistConfig, creationReducer),
 };
 
 const combinedReducer = combineReducers({
   ui: uiReducer,
   user: userReducer,
-  creation: creationReducer,
 });
 
 export type EnhancedStoreWithPersistor = EnhancedStore & {

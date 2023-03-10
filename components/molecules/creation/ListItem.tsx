@@ -8,15 +8,10 @@ import { useTranslation } from 'next-i18next';
 
 import Caption from '../../atoms/Caption';
 
-import { useAppDispatch } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
-import {
-  clearCreation,
-  clearPostData,
-} from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppState } from '../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
 
 const DARK_IMAGES_ANIMATED: Record<string, () => string> = {
   auction: assets.common.ac.darkAcAnimated,
@@ -50,14 +45,12 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   const { t } = useTranslation('page-Creation');
   const theme = useTheme();
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const { clearCreation, clearPostData } = usePostCreationState();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
-
-  const { appConstants } = useGetAppConstants();
 
   const [mouseEntered, setMouseEntered] = useState(false);
 
@@ -83,21 +76,16 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
             _stage: 'Creation',
             _postType: itemKey,
           });
-          dispatch(
-            clearCreation(
-              appConstants.minAcBid ? appConstants.minAcBid / 100 : 5
-            )
-          );
-          dispatch(clearPostData({}));
+
+          clearCreation();
+
+          clearPostData();
         }}
         onKeyUp={(e) => {
           if (e.key === 'Enter') {
-            dispatch(
-              clearCreation(
-                appConstants.minAcBid ? appConstants.minAcBid / 100 : 5
-              )
-            );
-            dispatch(clearPostData({}));
+            clearCreation();
+
+            clearPostData();
           }
         }}
       >
