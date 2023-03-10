@@ -28,7 +28,7 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
-import WinningMcOptionCreator from '../../../molecules/decision/common/WinningMcOptionCreator';
+import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -233,7 +233,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                   <SSeparator />
                   {winningOption && (
                     <>
-                      <WinningMcOptionCreator
+                      <WinningMcOptionSupporters
                         postCreator={post.creator!!}
                         winningOption={winningOption}
                       />

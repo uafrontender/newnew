@@ -13,19 +13,22 @@ interface IWinningMcOptionCreator {
   winningOption: newnewapi.MultipleChoice.IOption;
 }
 
-const WinningMcOptionCreator: React.FC<IWinningMcOptionCreator> = React.memo(
+const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
   ({ postCreator, winningOption }) => {
     const { t } = useTranslation('page-Post');
     const userData = useAppSelector((state) => state.user?.userData);
 
     const userToRender = useMemo(() => {
-      // If user is the whitelisted supporter, show me
-      if (winningOption.whitelistSupporter?.uuid === userData?.userUuid) {
-        return 'me';
+      if (!userData?.userUuid) {
+        return null;
       }
 
       // If whitelisted user supported it, show them
       if (winningOption.whitelistSupporter) {
+        // If user is the whitelisted supporter, show me / I
+        if (winningOption.whitelistSupporter.uuid === userData.userUuid) {
+          return 'me';
+        }
         return winningOption.whitelistSupporter;
       }
 
@@ -116,7 +119,7 @@ const WinningMcOptionCreator: React.FC<IWinningMcOptionCreator> = React.memo(
   }
 );
 
-export default WinningMcOptionCreator;
+export default WinningMcOptionSupporters;
 
 const SCreator = styled.div`
   display: flex;

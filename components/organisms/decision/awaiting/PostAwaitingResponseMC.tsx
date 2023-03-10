@@ -35,7 +35,7 @@ import PostSuccessOrWaitingControls from '../../../molecules/decision/common/Pos
 import isBrowser from '../../../../utils/isBrowser';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useAppState } from '../../../../contexts/appStateContext';
-import WinningMcOptionCreator from '../../../molecules/decision/common/WinningMcOptionCreator';
+import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -289,7 +289,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                   <SSeparator />
                   {winningOption ? (
                     <>
-                      <WinningMcOptionCreator
+                      <WinningMcOptionSupporters
                         postCreator={post.creator!!}
                         winningOption={winningOption}
                       />
