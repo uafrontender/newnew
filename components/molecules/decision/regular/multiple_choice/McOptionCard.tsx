@@ -976,6 +976,8 @@ McOptionCard.defaultProps = {
 
 export default McOptionCard;
 
+// TODO: just use option and useMemo instead of individual option fields
+// TODO: add logic that accepts option and returns users (me) to show  (not a component)
 export const RenderSupportersInfo: React.FunctionComponent<{
   isBlue: boolean;
   isCreatorsBid: boolean;
@@ -1004,16 +1006,11 @@ export const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            {whiteListedSupporter ? (
+            {whiteListedSupporter || firstVoter ? (
               <OptionCardUsernameSpan
-                user={{
-                  ...whiteListedSupporter,
-                  options: { ...whiteListedSupporter, isVerified: true },
-                }}
+                user={whiteListedSupporter ?? firstVoter}
                 isBlue={isBlue}
               />
-            ) : firstVoter ? (
-              <OptionCardUsernameSpan user={firstVoter} isBlue={isBlue} />
             ) : null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
@@ -1063,17 +1060,10 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
     return (
       <>
-        {!whiteListedSupporter ? (
-          <OptionCardUsernameSpan user={optionCreator} isBlue={isBlue} />
-        ) : (
-          <OptionCardUsernameSpan
-            user={{
-              ...whiteListedSupporter,
-              options: { ...whiteListedSupporter, isVerified: true },
-            }}
-            isBlue={isBlue}
-          />
-        )}
+        <OptionCardUsernameSpan
+          user={whiteListedSupporter ?? optionCreator}
+          isBlue={isBlue}
+        />
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubtracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -1095,17 +1085,10 @@ export const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
     return (
       <>
-        {!whiteListedSupporter ? (
-          <OptionCardUsernameSpan user={optionCreator} isBlue={isBlue} />
-        ) : (
-          <OptionCardUsernameSpan
-            user={{
-              ...whiteListedSupporter,
-              options: { ...whiteListedSupporter, isVerified: true },
-            }}
-            isBlue={isBlue}
-          />
-        )}
+        <OptionCardUsernameSpan
+          user={whiteListedSupporter ?? optionCreator}
+          isBlue={isBlue}
+        />
         {', '}
         <OptionCardUsernameSpan user={`${t('me')}`} isBlue={isBlue} />
         <SSpanBiddersRegular className='spanRegular'>
