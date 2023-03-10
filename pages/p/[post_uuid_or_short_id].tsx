@@ -507,11 +507,13 @@ const PostPage: NextPage<IPostPage> = ({
   useEffect(() => {
     async function markAsViewed() {
       if (
-        !postParsed ||
+        !postParsed?.postUuid ||
         !user.loggedIn ||
         user.userData?.userUuid === postParsed?.creator?.uuid
-      )
+      ) {
         return;
+      }
+
       try {
         const markAsViewedPayload = new newnewapi.MarkPostRequest({
           markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
@@ -533,7 +535,13 @@ const PostPage: NextPage<IPostPage> = ({
     return () => {
       clearTimeout(timer);
     };
-  }, [post, postParsed, user.loggedIn, user.userData?.userUuid]);
+  }, [
+    post,
+    postParsed?.postUuid,
+    postParsed?.creator?.uuid,
+    user.loggedIn,
+    user.userData?.userUuid,
+  ]);
 
   // Infinite scroll
   useEffect(() => {
