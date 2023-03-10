@@ -37,6 +37,8 @@
       "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
+      "titleMobile": "Select a file ",
+      "titleDesktop": "Select a file or drag and drop here",
       "description": "Video can be up to 10 GB",
       "button": "Select file"
     },
