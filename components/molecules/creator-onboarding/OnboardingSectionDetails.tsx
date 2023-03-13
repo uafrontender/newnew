@@ -453,14 +453,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
           setAvatarUrlInEdit(properlySizedImage.url as string);
           setCropMenuOpen(true);
-          if (isBrowser()) {
-            window.history.pushState(
-              {
-                stage: 'edit-profile-picture',
-              },
-              ''
-            );
-          }
         }
       });
     }
@@ -580,6 +572,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         dispatch(
           setUserData({
             options: {
+              ...user.userData?.options,
               isActivityPrivate:
                 becomeCreatorRes.data.me?.options?.isActivityPrivate,
               isCreator: becomeCreatorRes.data.me?.options?.isCreator,
@@ -892,6 +885,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   : t('detailsSection.form.email.errors.invalidEmail')
               }
               onChange={handleEmailInput}
+              readOnly={!!user.userData?.email}
             />
             <OnboardingCountrySelect
               width='100%'
@@ -1080,7 +1074,7 @@ const SFieldPairContainer = styled.div<{ marginBottom?: number }>`
 const SSeparator = styled.div`
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-top: 20px;
+  margin-top: 32px;
   margin-bottom: 32px;
 `;
 

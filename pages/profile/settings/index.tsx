@@ -18,13 +18,13 @@ import {
 import {
   logoutUser,
   logoutUserClearCookiesAndRedirect,
-  setUserData,
+  // setUserData,
 } from '../../../redux-store/slices/userStateSlice';
 
 // API
-import { logout, updateMe } from '../../../api/endpoints/user';
+import { logout /* , updateMe */ } from '../../../api/endpoints/user';
 
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+// import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import { NextPageWithLayout } from '../../_app';
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
@@ -50,7 +50,7 @@ const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { showErrorToastPredefined } = useErrorToasts();
+  // const { showErrorToastPredefined } = useErrorToasts();
 
   // Translations
   const { t } = useTranslation('page-Profile');
@@ -134,7 +134,8 @@ const MyProfileSettingsIndex = () => {
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 
-  const handleToggleAccountPrivate = async () => {
+  // NOTE: activity is temporarily disabled
+  /* const handleToggleAccountPrivate = async () => {
     try {
       Mixpanel.track('Set profile privacy', {
         _stage: 'Privacy Profile Settings',
@@ -154,6 +155,7 @@ const MyProfileSettingsIndex = () => {
       dispatch(
         setUserData({
           options: {
+            ...userData?.options,
             isActivityPrivate: data.me?.options?.isActivityPrivate,
             isCreator: data.me?.options?.isCreator,
             isVerified: data.me?.options?.isVerified,
@@ -165,7 +167,7 @@ const MyProfileSettingsIndex = () => {
       console.error(err);
       showErrorToastPredefined(undefined);
     }
-  };
+  }; */
 
   const [myTransactions, setMyTransactions] = useState<
     newnewapi.ITransaction[]
@@ -248,9 +250,9 @@ const MyProfileSettingsIndex = () => {
       content: (
         <PrivacySection
           isSpendingHidden={spendingHidden}
-          isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
+          // isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
           handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
-          handleToggleAccountPrivate={handleToggleAccountPrivate}
+          // handleToggleAccountPrivate={handleToggleAccountPrivate}
           handleSetActive={() => {}}
         />
       ),

@@ -8,9 +8,7 @@ import UserAvatar from '../UserAvatar';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
-import InlineSvg from '../../atoms/InlineSVG';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
+import DisplayName from '../../DisplayName';
 
 interface IBundleCard {
   className?: string;
@@ -43,15 +41,7 @@ const BundleCard: React.FC<IBundleCard> = ({
         />
         <SUserData>
           <SDisplayNameContainer>
-            <SDisplayName>{getDisplayname(creatorBundle.creator)}</SDisplayName>
-            {creatorBundle.creator.options?.isVerified && (
-              <SInlineSvg
-                svg={VerificationCheckmark}
-                width='24px'
-                height='24px'
-                fill='none'
-              />
-            )}
+            <SDisplayName user={creatorBundle.creator} />
           </SDisplayNameContainer>
           <Link href={`/${creatorBundle.creator?.username}`}>
             <SUserName>{`@${creatorBundle.creator?.username}`}</SUserName>
@@ -145,6 +135,7 @@ const SUserAvatar = styled(UserAvatar)<{ small: boolean }>`
 const SUserData = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
   margin-left: 12px;
   overflow: hidden;
 `;
@@ -160,7 +151,7 @@ const SDisplayNameContainer = styled.div`
   white-space: nowrap;
 `;
 
-const SDisplayName = styled.p`
+const SDisplayName = styled(DisplayName)`
   flex-shrink: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -169,10 +160,6 @@ const SDisplayName = styled.p`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
-const SInlineSvg = styled(InlineSvg)`
-  flex-shrink: 0;
 `;
 
 const SUserName = styled.p`

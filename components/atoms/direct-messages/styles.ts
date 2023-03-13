@@ -85,9 +85,12 @@ export const SChatItem = styled.div<ISChatItem>`
     }
     return css``;
   }}
-  &:hover {
-    background: ${(props) => props.theme.colorsThemed.background.secondary};
-    border-radius: ${(props) => props.theme.borderRadius.medium};
+
+  @media (hover: hover) {
+    &:hover {
+      background: ${(props) => props.theme.colorsThemed.background.secondary};
+      border-radius: ${(props) => props.theme.borderRadius.medium};
+    }
   }
 `;
 
@@ -95,10 +98,17 @@ export const SChatItemM = styled.div`
   cursor: pointer;
   display: flex;
   padding: 12px;
-  &.active,
-  &:hover {
+
+  &.active {
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: ${(props) => props.theme.colorsThemed.background.tertiary};
+      border-radius: ${(props) => props.theme.borderRadius.medium};
+    }
   }
 `;
 
@@ -142,7 +152,7 @@ export const SChatItemLine = styled.div`
 `;
 
 export const SChatItemText = styled(Text)`
-  display: inline;
+  display: inline-flex;
   flex-shrink: 1;
   overflow: hidden;
   text-overflow: ellipsis;

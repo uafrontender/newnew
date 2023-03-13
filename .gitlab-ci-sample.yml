@@ -40,7 +40,6 @@ variables:
   NEXT_JS_ASSET_URL: 'https://$CI_AWS_S3_BUCKET.s3.amazonaws.com'
   npm_config_cache: '$CI_PROJECT_DIR/.npm'
   CYPRESS_CACHE_FOLDER: '$CI_PROJECT_DIR/cache/Cypress'
-  NEXT_PUBLIC_BITMOVIN_PLAYER_KEY: '$BITMOVIN_PLAYER_KEY'
 
 stages:
   - test

@@ -53,7 +53,7 @@ import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 const PublishedModal = dynamic(
@@ -259,6 +259,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           throw new Error('Upload failed');
         }
 
+        // Set hasCoverImage to true
         hasCoverImage = true;
       }
 
@@ -314,11 +315,16 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       const { data, error } = await createPost(payload);
 
-      if (!data || error) {
+      if (
+        !data ||
+        error ||
+        data?.createPostStatus ===
+          newnewapi.CreatePostResponse.CreatePostStatus.INVALID_VALUE
+      ) {
         throw new Error(error?.message ?? 'Request failed');
       }
 
-      dispatch(setPostData(data));
+      dispatch(setPostData(data?.post));
 
       if (isMobile) {
         setIsDisabledAdditionally(true);
@@ -542,7 +548,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SPlayerWrapper>
             {fileProcessing.progress === 100 ? (
-              <BitmovinPlayer
+              <VideojsPlayer
                 id='preview-mobile'
                 withMuteControl
                 resources={videoProcessing?.targetUrls}
@@ -581,7 +587,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         <SLeftPart>
           <STabletPlayer>
             {fileProcessing.progress === 100 ? (
-              <BitmovinPlayer
+              <VideojsPlayer
                 withMuteControl
                 id='preview'
                 innerRef={playerRef}

@@ -16,10 +16,10 @@ import Text from '../atoms/Text';
 import Button from '../atoms/Button';
 import CustomLink from '../atoms/CustomLink';
 import General from './General';
-import { Tab } from '../molecules/Tabs';
+// import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
-import ProfileTabs from '../molecules/profile/ProfileTabs';
+// import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
@@ -29,13 +29,13 @@ import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
 import ReportModal, {
   ReportData,
 } from '../molecules/direct-messages/ReportModal';
-import BackButton from '../molecules/profile/BackButton';
 // import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
+import BackButtonIcon from '../../public/images/svg/icons/filled/Back.svg';
+import mockProfileBg from '../../public/images/mock/profile-bg.png';
 
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import { reportUser } from '../../api/endpoints/report';
@@ -45,20 +45,18 @@ import getGenderPronouns, {
 import { useBundles } from '../../contexts/bundlesContext';
 import getDisplayname from '../../utils/getDisplayname';
 import { Mixpanel } from '../../utils/mixpanel';
+import DisplayName from '../DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
-
-type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
+import { useGetChats } from '../../contexts/chatContext';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
-  renderedPage: TPageType;
   children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
-  renderedPage,
   children,
 }) => {
   const router = useRouter();
@@ -74,6 +72,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
   );
+
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
+  const { setHiddenMessagesArea } = useGetChats();
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
   const { bundles } = useBundles();
@@ -141,22 +149,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       usersBlockedMe,
     ]
   );
-
-  const tabs: Tab[] = useMemo(() => {
+  // NOTE: activity is temporarily disabled
+  /* const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
       return [
         {
           nameToken: 'userInitial',
           url: `/${user.username}`,
         },
-        {
+        
+         {
           nameToken: 'activity',
           url: `/${user.username}/activity`,
         },
       ];
     }
     return [];
-  }, [user]);
+  }, [user]); */
 
   // TODO: Re-enable once new SMS service is integrated
   /* const subscription: SubscriptionToCreator = useMemo(
@@ -221,6 +230,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     user.uuid,
   ]);
 
+  const handleSendMessageClick = useCallback(() => {
+    if (isMobileOrTablet) {
+      setHiddenMessagesArea(false);
+    }
+  }, [isMobileOrTablet, setHiddenMessagesArea]);
+
   const moreButtonRef = useRef() as any;
 
   const bundleExpired = useMemo(() => {
@@ -236,15 +251,25 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     <>
       <SGeneral restrictMaxWidth>
         <SProfileLayout>
-          <ProfileBackground
-            pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
-          />
+          <ProfileBackground pictureURL={user.coverUrl ?? mockProfileBg.src} />
           {/* Favorites and more options buttons */}
-          <SBackButton
+          <SButtonBack
+            view='transparent'
+            withDim
+            withShrink
+            iconOnly
             onClick={() => {
               router.back();
             }}
-          />
+            onClickCapture={() => {
+              Mixpanel.track('Click Back Button', {
+                _stage: 'Profile',
+                _component: 'ProfileLayout',
+              });
+            }}
+          >
+            <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
+          </SButtonBack>
           <SSideButtons>
             {
               // TODO: Re-enable once new SMS service is integrated
@@ -294,15 +319,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUserData>
             <SUsernameWrapper>
               <SUsername variant={4}>
-                {getDisplayname(user)}
-                {user.options?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='32px'
-                    height='32px'
-                    fill='none'
-                  />
-                )}
+                <DisplayName user={user} />
               </SUsername>
               {isGenderPronounsDefined(user.genderPronouns) && (
                 <SGenderPronouns variant={2}>
@@ -380,6 +397,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                           _component: 'ProfileLayout',
                         });
                       }}
+                      onClick={handleSendMessageClick}
                     >
                       {t('profileLayout.buttons.sendMessage')}
                     </SSendButton>
@@ -411,11 +429,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               />
             )}
           </SUserData>
-          {/* Temp, all creactors for now */}
+          {/* Temp, all creators for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0 && !isBlocked ? (
+          {/* NOTE: activity is temporarily disabled */}
+          {/* tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
-          ) : null}
+          ) : null */}
         </SProfileLayout>
         {!isBlocked && children}
       </SGeneral>
@@ -494,6 +513,59 @@ const SGeneral = styled(General)`
         }
       }
     }
+  }
+`;
+
+const SProfileLayout = styled.div`
+  position: relative;
+  /* overflow: hidden; */
+
+  margin-top: -28px;
+  margin-bottom: 24px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: -8px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: -16px;
+  }
+`;
+
+const SButtonBack = styled(Button)`
+  background: rgba(11, 10, 19, 0.1);
+
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    top: 24px;
+    left: 24px;
+  }
+`;
+
+const SSideButtons = styled.div`
+  display: flex;
+  position: absolute;
+  width: 100%;
+  gap: 16px;
+  padding: 16px;
+
+  top: 164px;
+  justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    top: 204px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    top: 244px;
+    justify-content: flex-end;
   }
 `;
 
@@ -619,17 +691,6 @@ const SIconButton = styled.div<{
   // TODO: add hover/active effects
 `;
 
-const SBackButton = styled(BackButton)`
-  position: absolute;
-  top: 16px;
-  left: 16px;
-
-  ${(props) => props.theme.media.laptop} {
-    top: 24px;
-    left: 24px;
-  }
-`;
-
 // const SFavoritesButton = styled(Button)`
 //   position: absolute;
 //   top: 164px;
@@ -664,47 +725,3 @@ const SBackButton = styled(BackButton)`
 //     right: calc(4px + 68px);
 //   }
 // `;
-
-const SSideButtons = styled.div`
-  display: flex;
-  position: absolute;
-  width: 100%;
-  gap: 16px;
-  padding: 16px;
-
-  top: 164px;
-  justify-content: space-between;
-
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-    justify-content: flex-end;
-  }
-`;
-
-const SProfileLayout = styled.div`
-  position: relative;
-  /* overflow: hidden; */
-
-  margin-top: -28px;
-  margin-bottom: 24px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  ${(props) => props.theme.media.tablet} {
-    margin-top: -8px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-top: -16px;
-  }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-left: 4px;
-`;

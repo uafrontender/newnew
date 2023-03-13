@@ -1,13 +1,13 @@
 /* eslint-disable no-nested-ternary */
 import React, { ReactElement, useEffect, useMemo } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled /* , { useTheme } */ from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
+// import Link from 'next/link';
 
 import ProfileLayout from '../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../_app';
@@ -16,17 +16,17 @@ import useUserPosts from '../../utils/hooks/useUserPosts';
 import { useAppSelector } from '../../redux-store/store';
 
 import PostList from '../../components/organisms/see-more/PostList';
-import InlineSvg from '../../components/atoms/InlineSVG';
+// import InlineSvg from '../../components/atoms/InlineSVG';
 
-import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
-import Text from '../../components/atoms/Text';
+// import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
+// import Text from '../../components/atoms/Text';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import {
   NoContentDescription,
-  NoContentSuggestion,
+  // NoContentSuggestion,
 } from '../../components/atoms/profile/NoContentCommon';
 import getDisplayname from '../../utils/getDisplayname';
-import Button from '../../components/atoms/Button';
+// import Button from '../../components/atoms/Button';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import assets from '../../constants/assets';
 import useBuyBundleAfterStripeRedirect from '../../utils/hooks/useBuyBundleAfterStripeRedirect';
@@ -44,38 +44,39 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   stripeSetupIntentClientSecretFromRedirect,
   saveCardFromRedirect,
 }) => {
-  const theme = useTheme();
+  // const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { loggedIn } = useAppSelector((state) => state.user);
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
   );
-
-  const isCreator = useMemo(
+  // NOTE: activity is temporarily disabled
+  /* const isCreator = useMemo(
     () => !!user?.options?.isCreator,
     [user?.options?.isCreator]
   );
   const isActivityPrivate = useMemo(
     () => !!user?.options?.isActivityPrivate,
     [user?.options?.isActivityPrivate]
-  );
+  ); */
 
+  // NOTE: activity is temporarily disabled
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useUserPosts(
       {
         userUuid: user.uuid as string,
         loggedInUser: loggedIn,
-        relation: isCreator
-          ? newnewapi.GetUserPostsRequest.Relation.THEY_CREATED
-          : newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-        postsFilter,
-      },
-      !isCreator
+        relation:
+          /* isCreator
+          ? */ newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
+        /*: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED */ postsFilter,
+      }
+      /* !isCreator
         ? {
             enabled: !isActivityPrivate,
           }
-        : {}
+        : {} */
     );
 
   const posts = useMemo(
@@ -135,7 +136,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <div>
-        {!isCreator && isActivityPrivate ? (
+        {
+          // NOTE: activity is temporarily disabled
+          /* !isCreator && isActivityPrivate ? (
           <SMain>
             <SAccountPrivate>
               <SPrivateLock>
@@ -153,10 +156,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
               </SAccountPrivateText>
             </SAccountPrivate>
           </SMain>
-        ) : (
-          <SMain>
+        ) : */ <SMain>
             <SCardsSection>
-              {posts && (
+              {user.options?.isCreator && posts && (
                 <PostList
                   category=''
                   loading={isLoading || isFetchingNextPage}
@@ -176,7 +178,9 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                     </NoContentDescription>
                   </NoContentCard>
                 )}
-              {user.options &&
+              {
+                // NOTE: activity is temporarily disabled
+                /* user.options &&
                 !user.options.isCreator &&
                 posts &&
                 posts.length === 0 &&
@@ -196,11 +200,12 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                       </SButton>
                     </Link>
                   </NoContentCard>
-                )}
+                    ) */
+              }
             </SCardsSection>
             {hasNextPage && <div ref={loadingRef} />}
           </SMain>
-        )}
+        }
       </div>
     </>
   );
@@ -209,18 +214,8 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 (UserPageIndex as NextPageWithLayout).getLayout = function getLayout(
   page: ReactElement
 ) {
-  const renderedPage = (page.props as IUserPageIndex).user?.options?.isCreator
-    ? 'creatorsDecisions'
-    : (page.props as IUserPageIndex).user?.options?.isActivityPrivate
-    ? 'activityHidden'
-    : 'activity';
-
   return (
-    <ProfileLayout
-      key={page.props.user.uuid}
-      user={page.props.user}
-      renderedPage={renderedPage}
-    >
+    <ProfileLayout key={page.props.user.uuid} user={page.props.user}>
       {page}
     </ProfileLayout>
   );
@@ -323,8 +318,9 @@ const SCardsSection = styled.div`
   }
 `;
 
+// NOTE: activity is temporarily disabled
 // Account private
-const SAccountPrivate = styled.div``;
+/* const SAccountPrivate = styled.div``;
 
 const SPrivateLock = styled.div`
   display: flex;
@@ -362,4 +358,4 @@ const SButton = styled(Button)`
   ${({ theme }) => theme.media.laptop} {
     width: 224px;
   }
-`;
+`; */

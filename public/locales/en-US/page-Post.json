@@ -236,7 +236,7 @@
   },
   "blockUserModal": {
     "title": "Block user",
-    "messageFirstPart": "Do you really want to block",
+    "messageFirstPart": "Do you really want to block ",
     "messageSecondPart": "?",
     "button": {
       "cancel": "Cancel",
@@ -743,13 +743,15 @@
       "ac": {
         "numBiddersChoseSingular": "{{amount}} bidder chose",
         "numBiddersChose": "{{amount}} bidders chose",
-        "optionCreator": "<0>{{nickname}}</0>'s<1/> bid"
+        "optionCreator": "<0/> bid",
+        "suffix": "'s"
       },
       "mc": {
         "numBiddersChoseSingular": "{{amount}} voter chose",
         "numBiddersChose": "{{amount}} voters chose",
         "optionOwn": "the option",
-        "optionCreator": "<0>{{nickname}}</0>'s<1/> option"
+        "optionCreator": "<0/> option",
+        "suffix": "'s"
       }
     }
   },

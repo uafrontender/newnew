@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
 
-// TODO: use PaginatedData (but it requires a server side sorting)
+// TODO: use react query (but it requires a server side sorting)
 interface IBundleCreatorsList {
   className?: string;
   creators: newnewapi.IUser[];
@@ -15,7 +15,9 @@ interface IBundleCreatorsList {
   onBundleClicked: (creator: newnewapi.IUser) => void;
 }
 
-// TODO: separate out a component for scroll and load more (with optional shade)
+// With the logic to sort users (the ones user bought bundles from first) on FE
+// The user who scrolls down will not see new creators they have bundles for
+// As such creators will be added to the top of the list, while user looks at the bottom
 const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
   className,
   creators,

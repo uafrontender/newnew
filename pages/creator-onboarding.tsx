@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
@@ -15,10 +13,7 @@ import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import useLeavePageConfirm from '../utils/hooks/useLeavePageConfirm';
 import { getSupportedCreatorCountries } from '../api/endpoints/payments';
-import {
-  acceptCreatorTerms,
-  getMyOnboardingState,
-} from '../api/endpoints/user';
+import { getMyOnboardingState } from '../api/endpoints/user';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
 import assets from '../constants/assets';
@@ -49,7 +44,6 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
 
-  const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -148,12 +142,22 @@ export const getServerSideProps: GetServerSideProps<
     'Cache-Control',
     'public, s-maxage=30, stale-while-revalidate=35'
   );
+
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-CreatorOnboarding'],
     null,
     SUPPORTED_LANGUAGES
   );
+
+  if (!context?.req?.cookies?.accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/sign-up?to=create',
+      },
+    };
+  }
 
   try {
     const countriesPayload = new newnewapi.EmptyRequest({});

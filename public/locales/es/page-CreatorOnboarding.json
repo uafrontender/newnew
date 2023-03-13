@@ -69,7 +69,7 @@
       },
       "email": {
         "placeholder": "Correo electrónico",
-        "cantChangeInfoCaption": "No puedes cambiar esta información.",
+        "cantChangeInfoCaption_NEED_TRANSLATION": "You can edit your email in settings later",
         "errors": {
           "invalidEmail": "Por favor, introduce una dirección de correo electrónico válida",
           "emailTaken": "Este correo electrónico ya está ocupado. Prueba con otro"

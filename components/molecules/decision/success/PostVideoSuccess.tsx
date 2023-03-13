@@ -14,12 +14,9 @@ import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const PostBitmovinPlayer = dynamic(
-  () => import('../common/PostBitmovinPlayer'),
-  {
-    ssr: false,
-  }
-);
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideoSuccess {
   postUuid: string;
@@ -95,9 +92,22 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         .getElementById('sound-button')
         ?.getBoundingClientRect();
 
-      const videoRect = document
+      let videoRect: DOMRect | undefined;
+      videoRect = document
         .getElementById(`${postUuid}`)
         ?.getBoundingClientRect();
+
+      if (!videoRect) {
+        videoRect = document
+          .getElementById(`video-${postUuid}`)
+          ?.getBoundingClientRect();
+      }
+
+      if (!videoRect) {
+        videoRect = document
+          .getElementById('responsesSlider')
+          ?.getBoundingClientRect();
+      }
 
       if (rect && videoRect) {
         const delta = window.innerHeight - videoRect.bottom;
@@ -137,14 +147,14 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobileOrTablet, postUuid]);
+  }, [isMobileOrTablet, postUuid, openedTab]);
 
   return (
     <SVideoWrapper>
       {openedTab === 'response' && response ? (
         <>
           {!additionalResponses || additionalResponses.length === 0 ? (
-            <PostBitmovinPlayer
+            <PostVideojsPlayer
               key={postUuid}
               id={`video-${postUuid}`}
               resources={response}
@@ -158,6 +168,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               videos={[response, ...additionalResponses]}
               isMuted={isMuted}
               videoDurationWithTime
+              autoscroll
             />
           )}
           <PostVideoSoundButton
@@ -169,7 +180,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         </>
       ) : (
         <>
-          <PostBitmovinPlayer
+          <PostVideojsPlayer
             id={postUuid}
             resources={announcement}
             muted={isMuted}

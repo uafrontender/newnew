@@ -14,7 +14,7 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Button from '../Button';
-import InlineSVG, { InlineSvg } from '../InlineSVG';
+import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 
@@ -24,8 +24,8 @@ import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import DisplayName from '../../DisplayName';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -170,32 +170,29 @@ const Comment: React.FC<IComment> = ({
               <>
                 {comment.sender?.options?.isVerified ||
                 comment.sender?.uuid === user.userData?.userUuid ? (
-                  <Link href={`/${comment.sender?.username}`}>
-                    <SNickname>
-                      {comment.sender?.uuid === user.userData?.userUuid
+                  <SDisplayName
+                    user={comment.sender}
+                    altName={
+                      comment.sender?.uuid === user.userData?.userUuid
                         ? t('comments.me')
-                        : getDisplayname(comment.sender)}
-                    </SNickname>
-                  </Link>
+                        : undefined
+                    }
+                    href={`/${comment.sender?.username}`}
+                  />
                 ) : (
-                  <SNickname noHover>
-                    {comment.sender?.uuid === user.userData?.userUuid
-                      ? t('comments.me')
-                      : getDisplayname(comment.sender)}
-                  </SNickname>
+                  <SDisplayName
+                    user={comment.sender}
+                    altName={
+                      comment.sender?.uuid === user.userData?.userUuid
+                        ? t('comments.me')
+                        : undefined
+                    }
+                    noHover
+                  />
                 )}
-                {comment.sender?.options?.isVerified &&
-                  !comment.sender?.options?.isTombstone && (
-                    <SInlineSvg
-                      svg={VerificationCheckmark}
-                      width='20px'
-                      height='20px'
-                      fill='none'
-                    />
-                  )}
               </>
             ) : (
-              <SNickname noHover>{t('comments.commentDeleted')}</SNickname>
+              <SCommentDeleted>{t('comments.commentDeleted')}</SCommentDeleted>
             )}
             <SBid> </SBid>
             {!comment.isDeleted && (
@@ -450,7 +447,7 @@ const SActionsDiv = styled.div`
   margin-left: auto;
 `;
 
-const SNickname = styled.span<{
+const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
@@ -466,8 +463,8 @@ const SNickname = styled.span<{
   }
 `;
 
-const SInlineSvg = styled(InlineSvg)`
-  margin-left: 2px;
+const SCommentDeleted = styled.span`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
 `;
 
 const SBid = styled.span`
