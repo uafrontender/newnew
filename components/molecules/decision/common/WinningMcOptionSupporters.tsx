@@ -23,26 +23,22 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
         return null;
       }
 
-      // If whitelisted user supported it, show them
-      if (winningOption.whitelistSupporter) {
-        // If user is the whitelisted supporter, show me / I
-        if (winningOption.whitelistSupporter.uuid === userData.userUuid) {
-          return 'me';
-        }
-        return winningOption.whitelistSupporter;
-      }
-
-      // If I supported it show me
+      // If I supported the option show me
       if (winningOption.isSupportedByMe) {
         return 'me';
       }
 
-      // If created by post creator => return first voter
+      // If whitelisted user supported the option, show them
+      if (winningOption.whitelistSupporter) {
+        return winningOption.whitelistSupporter;
+      }
+
+      // If the option created by post creator then return first voter
       if (winningOption.creator?.uuid === postCreator?.uuid) {
         return winningOption.firstVoter;
       }
 
-      // For custom options show its creator
+      // For custom options show it's creator
       return winningOption.creator;
     }, [
       winningOption.whitelistSupporter,
