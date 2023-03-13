@@ -147,11 +147,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   isPrimary={!!card.isPrimary}
                   brand={card.brand as newnewapi.Card.CardBrand}
                   funding={card.funding as newnewapi.Card.CardFunding}
-                  lastFourDigits={
-                    !user.userData?.options?.isWhiteListed
-                      ? (card.last4 as string)
-                      : ''
-                  }
+                  lastFourDigits={card.last4 as string}
                   backgroundImg={
                     backgroundsByCardUuid
                       ? backgroundsByCardUuid[card.cardUuid! as string]
