@@ -18,7 +18,7 @@ import ScrollArrowPermanent from '../components/atoms/ScrollArrowPermanent';
 
 // utils
 import { NextPageWithLayout } from './_app';
-import { useAppSelector } from '../redux-store/store';
+import { useAppState } from '../contexts/appStateContext';
 import { TColorMode } from '../redux-store/slices/uiStateSlice';
 
 // assets
@@ -247,7 +247,7 @@ PrevArrow.defaultProps = {
 export const About = () => {
   const { t } = useTranslation('page-About');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
