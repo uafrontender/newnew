@@ -717,7 +717,9 @@ const PostPage: NextPage<IPostPage> = ({
             {postParsed
               ? t(`meta.title`, {
                   displayName: getDisplayname(postParsed.creator),
-                  postTitle: deletedByCreator ? '' : postParsed.title,
+                  postTitle: deletedByCreator
+                    ? t('meta.deletedPost')
+                    : postParsed.title,
                 })
               : ''}
           </title>
@@ -742,7 +744,9 @@ const PostPage: NextPage<IPostPage> = ({
               postParsed
                 ? t(`meta.title`, {
                     displayName: getDisplayname(postParsed.creator),
-                    postTitle: deletedByCreator ? '' : postParsed.title,
+                    postTitle: deletedByCreator
+                      ? t('meta.deletedPost')
+                      : postParsed.title,
                   })
                 : ''
             }
