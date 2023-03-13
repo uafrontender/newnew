@@ -1002,13 +1002,22 @@ export const CreationSecondStepContent: React.FC<
     [videoProcessing, fileProcessing]
   );
 
+  const videoProcessingFallbackAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
   // Video processing fallback
   useEffect(() => {
     async function videoProcessingFallback(hlsUrl: string) {
-      const available = await waitResourceIsAvailable(hlsUrl, {
-        maxAttempts: 720,
-        retryTimeMs: 5000,
-      });
+      videoProcessingFallbackAbortControllerRef.current = new AbortController();
+
+      const available = await waitResourceIsAvailable(
+        hlsUrl,
+        {
+          maxAttempts: 720,
+          retryTimeMs: 5000,
+        },
+        videoProcessingFallbackAbortControllerRef?.current.signal
+      );
 
       if (available) {
         setCreationFileProcessingLoading(false);
@@ -1022,6 +1031,10 @@ export const CreationSecondStepContent: React.FC<
     if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
       videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
     }
+
+    return () => {
+      videoProcessingFallbackAbortControllerRef?.current?.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileProcessing.loading, videoProcessing?.targetUrls?.hlsStreamUrl]);
 
@@ -1182,6 +1195,13 @@ export const CreationSecondStepContent: React.FC<
       clearInterval(updateTime);
     };
   }, [post.startsAt, setCreationStartDate]);
+
+  useEffect(
+    () => () => {
+      xhrRef?.current?.abort();
+    },
+    []
+  );
 
   return (
     <>

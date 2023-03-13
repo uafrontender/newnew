@@ -6,12 +6,13 @@ import React, {
   useContext,
   useMemo,
   useCallback,
+  useEffect,
 } from 'react';
 import { useGetAppConstants } from './appConstantsContext';
 
 export type TPostData = Omit<newnewapi.Post, 'toJSON' | '_nickname' | '_email'>;
 export type TVideoProcessingData = Omit<
-  newnewapi.StartVideoProcessingResponse,
+  newnewapi.IStartVideoProcessingResponse,
   'toJSON' | '_nickname' | '_email'
 >;
 export type TThumbnailParameters = {
@@ -190,6 +191,10 @@ const PostCreationContextProvider: React.FunctionComponent<
   IPostCreationContextProvider
 > = ({ children }) => {
   const { appConstants } = useGetAppConstants();
+  const defaultMinAcBid = useMemo(
+    () => appConstants.minAcBid,
+    [appConstants.minAcBid]
+  );
 
   const [postInCreation, setPostInCreation] =
     useState<ICreationState>(defaultPostState);
@@ -389,21 +394,35 @@ const PostCreationContextProvider: React.FunctionComponent<
   }, []);
 
   const clearCreation = useCallback(() => {
+    console.log('Clearing creation');
     setPostInCreation((curr) => {
       const workingObj = { ...curr };
       workingObj.post = { ...defaultPostState.post };
       workingObj.auction = { ...defaultPostState.auction };
       workingObj.auction.minimalBid = appConstants.minAcBid
         ? appConstants.minAcBid / 100
-        : 5;
+        : 2;
       workingObj.crowdfunding = { ...defaultPostState.crowdfunding };
       workingObj.multiplechoice = { ...defaultPostState.multiplechoice };
       workingObj.fileUpload = { ...defaultPostState.fileUpload };
       workingObj.fileProcessing = { ...defaultPostState.fileProcessing };
 
-      // @ts-ignore
-      workingObj.videoProcessing = { ...defaultPostState.videoProcessing };
+      workingObj.videoProcessing = { taskUuid: '', targetUrls: {} };
+      workingObj.fileUpload = {
+        error: false,
+        loading: false,
+        progress: 0,
+        eta: 0,
+      };
+      workingObj.fileProcessing = {
+        error: false,
+        loading: false,
+        progress: 0,
+        eta: 0,
+      };
       workingObj.customCoverImageUrl = undefined;
+
+      console.log(workingObj);
       return workingObj;
     });
   }, [appConstants.minAcBid]);
@@ -415,6 +434,14 @@ const PostCreationContextProvider: React.FunctionComponent<
       return workingObj;
     });
   }, []);
+
+  // If appConstants have changed, update the value of min Ac bid
+  useEffect(() => {
+    if (defaultMinAcBid) {
+      setCreationMinBid(defaultMinAcBid / 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultMinAcBid]);
 
   const contextValueMemo = useMemo(
     () => ({
