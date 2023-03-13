@@ -314,11 +314,16 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       const { data, error } = await createPost(payload);
 
-      if (!data || error) {
+      if (
+        !data ||
+        error ||
+        data?.createPostStatus ===
+          newnewapi.CreatePostResponse.CreatePostStatus.INVALID_VALUE
+      ) {
         throw new Error(error?.message ?? 'Request failed');
       }
 
-      dispatch(setPostData(data));
+      dispatch(setPostData(data?.post));
 
       if (isMobile) {
         setIsDisabledAdditionally(true);

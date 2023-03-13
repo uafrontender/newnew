@@ -11,10 +11,10 @@ const BASE_URL_POST = `${BASE_URL}/post`;
 export const createPost = (payload: newnewapi.CreatePostRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.CreatePostRequest,
-    newnewapi.Post
+    newnewapi.CreatePostResponse
   >(
     newnewapi.CreatePostRequest,
-    newnewapi.Post,
+    newnewapi.CreatePostResponse,
     `${BASE_URL_POST}/create_post`,
     'post',
     payload,
@@ -37,10 +37,10 @@ export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest, sig
 export const setPostCoverImage = (payload: newnewapi.SetPostCoverImageRequest, signal?: RequestInit['signal']) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetPostCoverImageRequest,
-    newnewapi.EmptyResponse
+    newnewapi.SetPostCoverImageResponse
   >(
     newnewapi.SetPostCoverImageRequest,
-    newnewapi.EmptyResponse,
+    newnewapi.SetPostCoverImageResponse,
     `${BASE_URL_POST}/set_post_cover_image`,
     'post',
     payload,
