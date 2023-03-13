@@ -468,26 +468,28 @@ const STabContainer = styled(motion.div)`
 `;
 
 const SScrollContainer = styled.div`
-  padding-right: 0;
-  max-height: 500px;
-  height: 100%;
+  ${({ theme }) => theme.media.tablet} {
+    padding-right: 0;
+    max-height: 500px;
+    height: 100%;
 
-  overflow-y: auto;
+    overflow-y: auto;
 
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  scrollbar-width: none;
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
+    // Scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    scrollbar-width: none;
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+    }
   }
 `;
 
@@ -570,6 +572,6 @@ const SMakeBidArrowSvg = styled(InlineSvg)`
 `;
 
 const SLoadMoreButton = styled(Button)`
-  width: calc(100% - 12px);
+  width: 100%;
   margin-bottom: 12px;
 `;
