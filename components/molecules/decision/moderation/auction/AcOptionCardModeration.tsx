@@ -479,6 +479,8 @@ const SOptionInfo = styled(Text)<{
 
   margin-bottom: 8px;
 
+  word-break: break-word;
+
   ${({ isWhite }) =>
     isWhite
       ? css`
