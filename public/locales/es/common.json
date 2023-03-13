@@ -193,7 +193,8 @@
     "copied": "¡Enlace copiado!"
   },
   "search": {
-    "placeholder_NEED_TRANSLATION": "Search creators and hashtags",
+    "placeholder": "Búsqueda",
+    "placeholderLong_NEED_TRANSLATION": "Search creators and hashtags",
     "topPosts": "Publicaciones populares",
     "popularCreators": "Creadores populares",
     "creatorSubtitle": "Ver publicaciones",

@@ -291,7 +291,11 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
               value={searchValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder={t('search.placeholder')}
+              placeholder={
+                !isMobile
+                  ? t('search.placeholderLong')
+                  : t('search.placeholder')
+              }
             />
           </SInputWrapper>
 

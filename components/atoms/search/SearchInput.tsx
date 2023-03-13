@@ -303,7 +303,9 @@ const SearchInput: React.FC = React.memo(() => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder={t('search.placeholder')}
+            placeholder={
+              !isMobile ? t('search.placeholderLong') : t('search.placeholder')
+            }
           />
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
