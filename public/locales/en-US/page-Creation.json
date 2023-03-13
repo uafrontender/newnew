@@ -1,30 +1,31 @@
 {
   "back": "Back",
+  "at": " at ",
   "first-step-title": "What will you post?",
-  "first-step-auction-title": "Event",
+  "first-step-auction-title": "Bid",
   "first-step-auction-sub-title": "People send bids for things they want you to do",
   "first-step-multiple-choice-title": "Superpoll",
   "first-step-multiple-choice-sub-title": "People pay to vote and you do the option with the most votes",
   "first-step-crowdfunding-title": "Goal",
   "first-step-crowdfunding-sub-title": "People pool money together to back your goal",
-  "second-step-auction-title": "Event",
+  "second-step-auction-title": "Bid",
   "second-step-multiple-choice-title": "Superpoll",
   "second-step-crowdfunding-title": "Goal",
   "videoBeingProcessedCaption": "Your video will be available once processed",
   "tabs": {
-    "auction": "Event",
+    "auction": "Bid",
     "multiple-choice": "Superpoll",
     "crowdfunding": "Goal"
   },
   "firstStep": {
     "meta": {
       "title": "Create a post on NewNew",
-      "description": "Create an Event, a Superpoll or a Goal on NewNew in a few simple clicks and earn money"
+      "description": "Create an Bid, a Superpoll or a Goal on NewNew in a few simple clicks and earn money"
     }
   },
   "secondStep": {
     "meta": {
-      "title-auction": "Post an Event on NewNew",
+      "title-auction": "Post an Bid on NewNew",
       "title-multiple-choice": "Post a Superpoll on NewNew",
       "title-crowdfunding": "Post a Goal on NewNew",
       "description-auction": "Fans bid on your auctions and you earn cash",
@@ -32,9 +33,12 @@
       "description-crowdfunding": "Use crowdfunding campaigns to fund your life goals and earn money"
     },
     "input": {
+      "label": "Title",
       "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
+      "titleMobile": "Select a file ",
+      "titleDesktop": "Select a file or drag and drop here",
       "description": "Video can be up to 10 GB",
       "button": "Select file"
     },
@@ -46,7 +50,7 @@
         "floating": "Preview"
       },
       "subTitle": {
-        "votesInfo": "People will spend a minimum of $2 to vote",
+        "votesInfo": "People will spend a minimum of $1 to vote",
         "floating": "Upload your video to preview it here",
         "floatingProcessing": "Preview will be available after processing"
       }
@@ -61,7 +65,8 @@
       }
     },
     "card": {
-      "left": "{{time}} left"
+      "left": "{{time}} left",
+      "soon": "Coming Soon"
     },
     "button": {
       "retry": "Retry",
@@ -82,7 +87,7 @@
         "value": "${{value}}",
         "label": "$",
         "placeholder": "1",
-        "description": "the minimum bid a person can place on your event"
+        "description": "the minimum bid a person can place"
       },
       "targetBackerCount": {
         "title": "Minimum backers",
@@ -96,7 +101,11 @@
         "value": "{{value}}",
         "description": "{{value}}",
         "options": {
+          "2-minutes": "2 minutes",
+          "5-minutes": "5 minutes",
+          "10-minutes": "10 minutes",
           "1-hour": "1 hour",
+          "3-hours": "3 hours",
           "6-hours": "6 hours",
           "12-hours": "12 hours",
           "1-day": "1 day",
@@ -158,13 +167,25 @@
         "description": "There was an error and your file could not be uploaded. Would you like to try again."
       },
       "setThumbnail": "Set a thumbnail",
+      "thumbnailEllipseMenu": {
+        "uploadImageButton": "Upload an image"
+      },
       "deleteFile": "Delete file",
       "previewFull": "Preview",
       "thumbnail": {
         "info": "Learn more",
-        "title": "Set preview",
-        "submit": "Save changes",
-        "description": "Select a 3 sec snippet as preview cover. A good preview draws viewer's attention."
+        "title": "Set a thumbnail from the video",
+        "submit": "Save",
+        "description": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+      },
+      "coverImage": {
+        "title": "Upload an image",
+        "submit": "Save",
+        "uploadCoverImage": {
+          "caption": "Select custom cover image",
+          "uploadBtn": "Select",
+          "deleteBtn": "Delete"
+        }
       },
       "full": {
         "title": "Video preview"
@@ -175,7 +196,7 @@
         "process": "{{progress}}% • {{time}} left"
       },
       "processing": {
-        "title": "You can still fill out the details below and publish your post while the video is being processed!",
+        "title": "Your file is processing. It won’t take long...",
         "description": "Your video is processing",
         "process": "{{progress}}% • {{time}} left"
       }
@@ -183,11 +204,11 @@
   },
   "preview": {
     "meta": {
-      "title-auction": "Creation | Event | Preview",
+      "title-auction": "Creation | Bid | Preview",
       "title-multiple-choice": "Creation | Superpoll | Preview",
       "title-crowdfunding": "Creation | Goal | Preview"
     },
-    "title-auction": "Review my Event",
+    "title-auction": "Review my Bid",
     "title-multiple-choice": "Review my Superpoll",
     "title-crowdfunding": "Review my Goal",
     "button": {
@@ -212,10 +233,10 @@
   },
   "published": {
     "meta": {
-      "title-auction-published": "Creation | Event | Published",
+      "title-auction-published": "Creation | Bid | Published",
       "title-multiple-choice-published": "Creation | Superpoll | Published",
       "title-crowdfunding-published": "Creation | Goal | Published",
-      "title-auction-scheduled": "Creation | Event | Scheduled",
+      "title-auction-scheduled": "Creation | Bid | Scheduled",
       "title-multiple-choice-scheduled": "Creation | Superpoll | Scheduled",
       "title-crowdfunding-scheduled": "Creation | Goal | Scheduled"
     },
@@ -241,7 +262,7 @@
       "heroButtonText": "Let's go"
     },
     "heroPopupAC": {
-      "title": "Events",
+      "title": "Bids",
       "line1": "1. Open to ideas? Post a video and have the\n audience send you bids on what you should do",
       "line2": "2. People send bids with their ideas, and\n how much they’ll pay to see you do it",
       "line3": "3. Choose your favorite bid, then\n upload a video of yourself doing it!"

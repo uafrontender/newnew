@@ -1,20 +1,18 @@
 {
   "meta": {
     "title": "Regístrate a NewNew",
-    "description": "Registrarte a NewNew es rápido y sencillo. Únete ahora para ser un creador o espectador",
-    "title-log-in": "Inicia sesión en NewNew",
-    "description-log-in": "Iniciar sesión en NewNew es rápido y sencillo"
+    "description": "Registrarse en NewNew es rápido y sencillo.",
+    "title-create": "Registrarse a NewNew",
+    "description-create": "Registrarse en NewNew es rápido y sencillo. Únete ahora y conviértete en un creador"
   },
   "heading": {
     "sign-in": "Registrarse",
-    "log-in": "Iniciar sesión",
     "sign-in-to": "Registrarse para",
     "reason": {
       "comment": "comentar",
       "bid": "ofertar",
-      "subscribe": "suscribirse",
       "pledge": "hacer una contribución",
-      "follow-decision": "seguir una decisión",
+      "follow-decision": "marcar publicación como favorita",
       "follow-creator": "seguir un creador",
       "report": "hacer un reporte"
     },
@@ -34,11 +32,12 @@
   "error": {
     "emailInvalid": "Correo electrónico inválido",
     "genericError": "Se ha producido un error",
-    "Failed to fetch": "No se ha podido enviar"
+    "Failed to fetch": "No se ha podido enviar",
+    "An error occurred": "Se ha producido un error"
   },
   "legalDisclaimer": {
-    "mainText": "Al crear una cuenta, estás aceptando nuestra ",
-    "privacyPolicy": "Política de privacidad",
+    "mainText": "Al crear una cuenta, aceptas nuestra ",
+    "privacyPolicy": "Política de privacidad, ",
     "terms": "Términos",
     "and": "y",
     "communityGuidelines": "Normas comunitarias"

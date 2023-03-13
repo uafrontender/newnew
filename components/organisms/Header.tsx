@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import React from 'react';
 import styled from 'styled-components';
 
@@ -11,6 +12,7 @@ import Container from '../atoms/Grid/Container';
 
 import { useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IHeader {
   visible: boolean;
@@ -18,7 +20,14 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet', 'laptop'].includes(resizeMode);
+  const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
 
   const hasMounted = useHasMounted();
 
@@ -33,16 +42,12 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>
-        <Container noMaxContent>
+        <Container wideContainer>
           <Row>
             <Col>
-              {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-                resizeMode
-              ) && <Mobile />}
-              {['tablet', 'laptop'].includes(resizeMode) && <Tablet />}
-              {['laptopM', 'laptopL', 'desktop'].includes(resizeMode) && (
-                <Desktop />
-              )}
+              {isMobile && <Mobile />}
+              {isTablet && <Tablet />}
+              {isDesktop && <Desktop />}
             </Col>
           </Row>
         </Container>

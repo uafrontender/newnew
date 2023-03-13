@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -14,9 +15,9 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
+import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import ShareMenu from './ShareMenu';
-import { useAppSelector } from '../../redux-store/store';
-import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import { useBundles } from '../../contexts/bundlesContext';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -31,11 +32,10 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
-  const user = useAppSelector((state) => state.user);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
   const { unreadCount } = useGetChats();
 
   useOnClickEsc(containerRef, handleClose);
@@ -43,6 +43,11 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
 
   const handleClick = (url: string) => {
     router.push(`/${url}`);
+  };
+
+  const handleCloseShareMenu = () => {
+    setShareMenuOpen(false);
+    handleClose();
   };
 
   return (
@@ -58,14 +63,12 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         >
           {!shareMenuOpen ? (
             <>
-              {((user.userData?.options?.isOfferingSubscription &&
-                mySubscribersTotal > 0) ||
-                creatorsImSubscribedTo.length > 0) && (
+              {directMessagesAvailable && (
                 <SButton
                   onClick={() =>
                     router.route.includes('direct-messages')
                       ? handleClose()
-                      : handleClick('/direct-messages')
+                      : handleClick('direct-messages')
                   }
                 >
                   {unreadCount && unreadCount > 0 ? (
@@ -104,11 +107,39 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                   height='24px'
                 />
               </SButton>
+              {/* If user purchased bundles, notifications are moved to more menu */}
+              {/* TODO: Refactor the menu to make it work with the collection, auto split navigation items */}
+              {bundles && bundles.length > 0 && (
+                <SButton
+                  onClick={() =>
+                    router.route.includes('direct-messages')
+                      ? handleClose()
+                      : handleClick('notifications')
+                  }
+                >
+                  <SText
+                    variant={2}
+                    active={router.route.includes('notifications')}
+                  >
+                    {t('mobileBottomNavigation.notifications')}
+                  </SText>
+                  <InlineSvg
+                    svg={notificationsIconFilled}
+                    fill={
+                      router.route.includes('notifications')
+                        ? theme.colorsThemed.accent.blue
+                        : theme.colorsThemed.text.tertiary
+                    }
+                    width='24px'
+                    height='24px'
+                  />
+                </SButton>
+              )}
             </>
           ) : (
             <ShareMenu
               isVisible={shareMenuOpen}
-              handleClose={() => setShareMenuOpen(false)}
+              handleClose={handleCloseShareMenu}
             />
           )}
         </SContainer>

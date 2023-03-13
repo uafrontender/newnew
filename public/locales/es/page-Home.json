@@ -1,15 +1,16 @@
 {
   "meta": {
-    "title": "NewNew - Haz ofertas, vota y coopera sobre decisiones ajenas",
-    "description": "Decide qué será lo siguiente que las personas harán en sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
+    "title": "NewNew",
+    "description": "Decide qué será lo siguiente que las personas harán con sus vidas. Vota, haz ofertas y coopera con la comunidad en NewNew para ver a personas hacer cosas en la vida real"
   },
   "cardsSection": {
     "title": {
       "biggest": "Lo mejor de todos los tiempos",
       "for-you": "Para ti",
-      "ac": "Los eventos más grandes",
-      "mc": "Superencuestas populares",
-      "cf": "Objetivos populares"
+      "ac": "Los Bids más grandes",
+      "mc": "Superpolls populares",
+      "cf": "Goals populares",
+      "recent-activity": "Actividad reciente"
     },
     "button": {
       "showMore": "Ver más",
@@ -17,18 +18,80 @@
       "creatorOnTheRise": "En ascenso"
     }
   },
+  "section": {
+    "your": "Tus publicaciones",
+    "explore": "Explorar"
+  },
   "tutorial": {
     "ac": {
-      "title": "Evento",
-      "caption": "Envía al creador una oferta con lo que quieres que haga, cuánto estás dispuesto a gastar y ve si aceptan tu oferta."
+      "title": "Bids",
+      "caption": "Envía a los creadores ofertas personalizadas y mira si eligen la tuya."
     },
     "mc": {
-      "title": "Superencuestas",
-      "caption": "Un creador hace una Superencuesta en la que pagas por votar. Cuando se acaba el tiempo, mira cómo el creador realiza la opción que obtiene la mayor cantidad de votos."
+      "title": "Superpolls",
+      "caption": "Participa y vota sobre lo que crees que debería hacer un creador y observa cómo realiza la opción con la mayor cantidad de votos."
     },
     "cf": {
-      "title": "Objetivo",
-      "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el objetivo, verás cómo el creador lo realiza."
+      "title": "Goals",
+      "caption": "Reúne dinero con otros para respaldar los objetivos de tus creadores favoritos. Si un número suficiente de personas respalda el Goal, verás cómo el creador lo realiza."
+    },
+    "for-you": {
+      "title": "Para ti",
+      "caption": "Esta sección mostrará las publicaciones recomendadas para ti."
+    },
+    "biggest": {
+      "title": "Lo mejor de todos los tiempos",
+      "caption": "Esta sección mostrará las mejores publicaciones de todos los tiempos."
+    },
+    "recent-activity": {
+      "title": "Actividad reciente",
+      "caption": "Esta sección mostrará las publicaciones en las que participas"
     }
-  }
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "learMore": "¿Quieres conocer más información? Visita el <0>Soporte de NewNew</0>",
+    "items": [
+      {
+        "question": "¿Qué es NewNew?",
+        "answer": "NewNew es un mercado interactivo en el que realizas ofertas y votas sobre los acontecimientos de la vida de las personas. Los creadores ganan dinero dejando que otros opinen sobre sus decisiones de vida."
+      },
+      {
+        "question": "¿Puedo ganar dinero en NewNew?",
+        "answer": "¡Sí! <0>Regístrate para volverte un creador</0> y  permita que las personas paguen por votar y ofertas por tus decisiones de vida."
+      },
+      {
+        "question": "¿Cómo funcionan las ofertas?",
+        "answer": "El público te envía diferentes ofertas sobre lo que ellos creen que deberías hacer y cuánto pagarían por verte hacerlo.\n¡Elegirás tu oferta favorita y subirás un video de ti mismo haciéndolo! No te preocupes... ¡no tienes que elegir la oferta de mayor precio (pero puedes hacerlo si quieres)! Puedes elegir cualquier oferta con la que te sientas cómodo."
+      },
+      {
+        "question": "¿Cómo funcionan los Superpolls?",
+        "answer": "Publica una encuesta en video con diferentes opciones de las que el público podrá elegir. \nLa gente paga para votar por su opción favorita y tú subirás un video de ti mismo haciendo la opción que obtuvo más votos."
+      },
+      {
+        "question": "¿Qué son los Bundles de Superpoll?",
+        "answer": "Los creadores pueden ofrecer Bundles con descuento para sus Superpolls. La compra de un bundle es opcional, pero con la compra de un bundle obtienes <2>Un gran descuento en la compra de votos + más poder de voto para usar en las próximas Superpolls</2> <2>La posibilidad de añadir tu propia opción personalizada a las Superpolls del creador</2> <2>Mensajes 1-a-1 con el creador</2>"
+      },
+      {
+        "question": "¿Pueden las marcas utilizar NewNew?",
+        "answer": "Sí, las marcas también son creadores de contenido. NewNew es un lugar ideal para relacionarte con tus clientes a un nivel hiperinteractivo. Tus clientes pueden ayudar a tomar decisiones importantes para tu marca y sentirse incluidos y escuchados en el proceso de tu próximo gran producto, lanzamiento, etc. Además, no hay nadie mejor para recibir opiniones que aquellos que han invertido en tu marca."
+      },
+      {
+        "question": "¿Y si el creador no hace por lo que se ha votado u ofertado?",
+        "answer": "No se te cobrará si <1>El creador nunca sube un video de respuesta a una Superpoll o Bid</1> <1>El creador no elige tu Bid en específico</1>"
+      }
+    ]
+  },
+  "becomeCreator": {
+    "title": "¿Estás listo para crear algo emocionante?"
+  },
+  "createFirstPost": {
+    "title": "Publica tu primer Bid o Superpoll",
+    "filter": {
+      "active": "Activo",
+      "ended": "Concluido"
+    }
+  },
+  "ooops": "¡Ups!",
+  "noPosts": "No hemos encontrado ninguna publicación"
 }

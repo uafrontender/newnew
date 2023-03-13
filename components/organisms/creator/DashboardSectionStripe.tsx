@@ -18,38 +18,88 @@ import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 import GoBackButton from '../../molecules/GoBackButton';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
+
+const getStripeButtonTextKey = (
+  stripeConnectStatus:
+    | newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+    | undefined
+    | null
+) => {
+  switch (stripeConnectStatus) {
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .PROCESSING: {
+      return 'stripe.button.stripeConnecting';
+    }
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .CONNECTED_ALL_GOOD: {
+      return 'stripe.button.stripeConnectedLink';
+    }
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .CONNECTED_NEEDS_ATTENTION: {
+      return 'stripe.button.requireInformation';
+    }
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+      .NOT_CONNECTED:
+    default: {
+      return 'stripe.button.requestSetupLink';
+    }
+  }
+};
 
 const DashboardSectionStripe: React.FC = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation('page-Creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const { stripeConnectStatus } = user.creatorData?.options || {};
+
   const [stripeProcessing, setStripeProcessing] = useState(false);
   const [isConnectedToStripe, setIsConnectedToStripe] = useState(false);
+  const [stripeNeedAttention, setStripeNeedAttention] = useState(false);
 
   useEffect(() => {
-    if (user.creatorData?.options.stripeConnectStatus === 4) {
-      setStripeProcessing(true);
-    } else {
-      setStripeProcessing(false);
-    }
-  }, [user.creatorData?.options.stripeConnectStatus]);
+    switch (stripeConnectStatus) {
+      case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+        .PROCESSING: {
+        setStripeProcessing(true);
+        break;
+      }
+      case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+        .CONNECTED_ALL_GOOD: {
+        setStripeProcessing(false);
+        setIsConnectedToStripe(true);
+        setStripeNeedAttention(false);
 
-  useEffect(() => {
-    if (user.creatorData?.options.isCreatorConnectedToStripe) {
-      setIsConnectedToStripe(true);
-    } else {
-      setIsConnectedToStripe(false);
-    }
-  }, [user.creatorData?.options.isCreatorConnectedToStripe]);
+        break;
+      }
+      case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+        .CONNECTED_NEEDS_ATTENTION: {
+        setStripeProcessing(false);
+        setIsConnectedToStripe(false);
+        setStripeNeedAttention(true);
 
-  const handleRedirectToStripesetup = async () => {
+        break;
+      }
+      default: {
+        setStripeProcessing(false);
+        setIsConnectedToStripe(false);
+        setStripeNeedAttention(false);
+      }
+    }
+  }, [stripeConnectStatus]);
+
+  const handleRedirectToStripeSetup = async () => {
     try {
-      const locationUrl = window.location.href;
+      // On close stripe in new tab return to dashboard
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+      const locationUrl = `${baseUrl}/creator/dashboard`;
       const payload = new newnewapi.SetupStripeCreatorAccountRequest({
         refreshUrl: locationUrl,
         returnUrl: locationUrl,
@@ -61,7 +111,8 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
         throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.setupUrl;
-      window.location.href = url;
+      // Open in a separate tab to keep navigation history intact
+      window.open(url);
     } catch (err) {
       console.error(err);
     }
@@ -81,45 +132,53 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
       </SUl>
       <SButtons>
         <SButton
-          view='primaryGrad'
+          view={stripeNeedAttention ? 'danger' : 'primaryGrad'}
           isConnectedToStripe={isConnectedToStripe || stripeProcessing}
+          stripeNeedAttention={stripeNeedAttention}
           style={{
-            ...(isConnectedToStripe && !stripeProcessing
+            ...(isConnectedToStripe
               ? {
                   background: theme.colorsThemed.accent.success,
                 }
               : {}),
+            ...(stripeNeedAttention
+              ? {
+                  cursor: 'default',
+                }
+              : {}),
           }}
           onClick={() => {
-            if (!isConnectedToStripe && !stripeProcessing) {
-              handleRedirectToStripesetup();
+            if (
+              !isConnectedToStripe &&
+              !stripeProcessing &&
+              !stripeNeedAttention
+            ) {
+              Mixpanel.track('Redirect to Stripe', {
+                _button: getStripeButtonTextKey(stripeConnectStatus),
+                _stage: 'Dashboard',
+                _component: 'DashboardSectionStripe',
+              });
+              handleRedirectToStripeSetup();
             }
           }}
         >
           <InlineSvg
-            svg={
-              !isConnectedToStripe || stripeProcessing
-                ? StripeLogoS
-                : VerificationPassedInverted
-            }
+            svg={isConnectedToStripe ? VerificationPassedInverted : StripeLogoS}
             width='24px'
             height='24px'
           />
-          {stripeProcessing && (
-            <span>{t('stripe.button.stripeConnecting')}</span>
-          )}
-          {isConnectedToStripe && !stripeProcessing && (
-            <span>{t('stripe.button.stripeConnectedLink')}</span>
-          )}
-          {!isConnectedToStripe && !stripeProcessing && (
-            <span>{t('stripe.button.requestSetupLink')}</span>
-          )}
+          <span>{t(getStripeButtonTextKey(stripeConnectStatus))}</span>
         </SButton>
-        {isConnectedToStripe && (
+        {(isConnectedToStripe || stripeNeedAttention) && (
           <SButtonUpdate
             view='transparent'
             onClick={() => {
-              handleRedirectToStripesetup();
+              Mixpanel.track('Redirect to Stripe', {
+                _button: 'Update payment info',
+                _stage: 'Dashboard',
+                _component: 'DashboardSectionStripe',
+              });
+              handleRedirectToStripeSetup();
             }}
           >
             {t('stripe.button.update')}
@@ -247,6 +306,7 @@ const SButtons = styled.div`
 
 const SButton = styled(Button)<{
   isConnectedToStripe?: boolean;
+  stripeNeedAttention?: boolean;
 }>`
   margin-bottom: 24px;
   font-size: 16px;
@@ -260,6 +320,17 @@ const SButton = styled(Button)<{
       margin-left: 10px;
     }
   }
+
+  ${({ stripeNeedAttention }) =>
+    stripeNeedAttention
+      ? css`
+          &&& {
+            &:hover {
+              box-shadow: none;
+            }
+          }
+        `
+      : ''};
 
   ${({ isConnectedToStripe }) =>
     isConnectedToStripe

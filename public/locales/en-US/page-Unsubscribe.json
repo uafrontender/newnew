@@ -2,6 +2,16 @@
   "meta": {
     "title": "Unsubscribe from NewNew"
   },
-  "heading": "You have successfully unsubscribed",
-  "subheading": "Manage email notifications from your settings page."
+  "success": {
+    "heading": "You have successfully unsubscribed",
+    "subheading": "Manage email notifications from your settings page."
+  },
+  "fail": {
+    "heading": "We were unable to unsubscribe you",
+    "subheading": "You can still manage email notifications from your settings page."
+  },
+  "confirm": "Ok",
+  "error": {
+    "requestFailed": "Request failed"
+  }
 }

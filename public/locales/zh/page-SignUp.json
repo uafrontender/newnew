@@ -1,49 +1,48 @@
 {
   "meta": {
-    "title": "Sign up to NewNew",
-    "description": "Signing up to NewNew is fast and easy. Join now to be a Creator or watch people",
-    "title-log-in": "Log in to NewNew",
-    "description-log-in": "Logging in to NewNew is fast and easy"
+    "title": "登入 NewNew",
+    "description": "登入到 NewNew 快速而簡單。",
+    "title-create": "登入 NewNew",
+    "description-create": "登入到 NewNew 快速而簡單。現在加入成為創作者"
   },
   "heading": {
-    "sign-in": "Sign up",
-    "log-in": "Log in",
-    "sign-in-to": "Sign up to",
+    "sign-in": "登入",
+    "sign-in-to": "登入",
     "reason": {
-      "comment": "comment",
-      "bid": "bid",
-      "subscribe": "subscribe",
-      "pledge": "make pledge",
-      "follow-decision": "favorite post",
-      "follow-creator": "favorite creator",
-      "report": "make a report"
+      "comment": "評論",
+      "bid": "出價",
+      "pledge": "作出承諾",
+      "follow-decision": "最喜歡的帖子",
+      "follow-creator": "最喜愛的創作者",
+      "report": "提交舉報"
     },
-    "subheading": "We'll log you in or create an account.",
-    "subheadingSessionExpired": "Session expired, please sign in again"
+    "subheading": "我們會爲你登錄或創建一個帳戶。",
+    "subheadingSessionExpired": "會話過期，請重新登錄"
   },
   "signUpOptions": {
-    "google": "Continue with Google",
-    "apple": "Continue with Apple ID",
-    "facebook": "Continue with Facebook",
-    "twitter": "Continue with Twitter",
-    "orContinueWith": "or continue with",
-    "email": "Email",
-    "signInButton": "Sign up",
-    "logInButton": "Log in"
+    "google": "使用Google登入",
+    "apple": "使用Apple ID登入",
+    "facebook": "使用Facebook登入",
+    "twitter": "用Twitter登入",
+    "orContinueWith": "或使用",
+    "email": "電子郵件",
+    "signInButton": "登入",
+    "logInButton": "登錄"
   },
   "error": {
-    "emailInvalid": "Invalid address",
-    "genericError": "An error occurred",
-    "Failed to fetch": "Failed to submit"
+    "emailInvalid": "無效的地址",
+    "genericError": "發生錯誤",
+    "Failed to fetch": "提交失敗",
+    "An error occurred": "發生錯誤"
   },
   "legalDisclaimer": {
-    "mainText": "By creating an account you agree to our ",
-    "privacyPolicy": "Privacy Policy",
-    "terms": "Terms",
-    "and": "and",
-    "communityGuidelines": "Community Guidelines"
+    "mainText": "創建帳戶即表明你同意我們的",
+    "privacyPolicy": "隱私政策、",
+    "terms": "條款",
+    "and": "和",
+    "communityGuidelines": "社區指南"
   },
   "button": {
-    "back": "Go back"
+    "back": "返回"
   }
 }

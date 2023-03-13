@@ -16,9 +16,9 @@ export const CreationFirstStepContent = () => {
       {
         key: 'multiple-choice',
       },
-      {
-        key: 'crowdfunding',
-      },
+      // {
+      //   key: 'crowdfunding',
+      // },
     ],
     []
   );

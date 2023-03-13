@@ -10,13 +10,13 @@ import { AnimatePresence } from 'framer-motion';
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Logo from '../molecules/Logo';
-import HeroVisual from './HeroVisual';
+import HeroVisual from './components/HeroVisual';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import assets from '../../constants/assets';
+import BaseLayout from './BaseLayout';
 
 export const AuthLayoutContext = createContext({
   shouldHeroUnmount: false,
@@ -53,45 +53,36 @@ export interface IAuthLayout {
   children: React.ReactNode;
 }
 
-const SAuthLayout = styled.div`
-  position: relative;
-
-  height: 100vh;
-  width: 100vw;
-`;
-
 const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
   const router = useRouter();
   const theme = useTheme();
 
   return (
-    <ErrorBoundary>
+    <BaseLayout>
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
         <AuthLayoutContextProvider>
-          <SAuthLayout>
-            <Container>
-              <BackgroundVisual
-                view={
-                  router.pathname.includes('verify-email') ||
-                  router.pathname.includes('verify-new-email') ||
-                  router.pathname.includes('unsubscribe')
-                    ? 'floating-items'
-                    : 'hero-visual'
-                }
-              />
-              {!router.pathname.includes('verify-email') &&
-              !router.pathname.includes('verify-new-email') ? (
-                <HomeLogoButton />
-              ) : null}
-              <AnimatePresence>{children}</AnimatePresence>
-            </Container>
-          </SAuthLayout>
+          <Container>
+            <BackgroundVisual
+              view={
+                router.pathname.includes('verify-email') ||
+                router.pathname.includes('verify-new-email') ||
+                router.pathname.includes('unsubscribe')
+                  ? 'floating-items'
+                  : 'hero-visual'
+              }
+            />
+            {!router.pathname.includes('verify-email') &&
+            !router.pathname.includes('verify-new-email') ? (
+              <HomeLogoButton />
+            ) : null}
+            <AnimatePresence>{children}</AnimatePresence>
+          </Container>
         </AuthLayoutContextProvider>
       </SkeletonTheme>
-    </ErrorBoundary>
+    </BaseLayout>
   );
 };
 
@@ -183,60 +174,102 @@ const HeroVisualContainer = styled('div')`
 `;
 
 const VerifyEmailVisual: React.FunctionComponent = () => {
+  const theme = useTheme();
+
   return (
     <SVerifyEmailBgWrapper>
       <img
-        src={assets.floatingAssets.bottomGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkBottomGlassSphere
+            : assets.floatingAssets.lightBottomGlassSphere
+        }
         alt='background'
         className='email-bg-BottomGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.bottomSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkBottomSphere
+            : assets.floatingAssets.lightBottomSphere
+        }
         alt='background'
         className='email-bg-BottomSphereImage'
       />
-      <img
-        src={assets.floatingAssets.crowdfunding}
+      {/* <img
+        src={assets.floatingAssets.darkCrowdfunding}
         alt='background'
         className='email-bg-CrowdfundingImage'
-      />
+      /> */}
       <img
-        src={assets.floatingAssets.leftGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkLeftGlassSphere
+            : assets.floatingAssets.lightLeftGlassSphere
+        }
         alt='background'
         className='email-bg-LeftGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.subMC}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkSubMC
+            : assets.floatingAssets.lightSubMC
+        }
         alt='background'
-        className='email-bg-BulbImage'
+        className={`email-bg-BulbImage ${theme.name}`}
       />
       <img
-        src={assets.floatingAssets.multipleChoice}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkMultipleChoice
+            : assets.floatingAssets.lightMultipleChoice
+        }
         alt='background'
         className='email-bg-ChoiceImage'
       />
       <img
-        src={assets.floatingAssets.rightGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkRightGlassSphere
+            : assets.floatingAssets.lightRightGlassSphere
+        }
         alt='background'
         className='email-bg-RightGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.topGlassSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkTopGlassSphere
+            : assets.floatingAssets.lightTopGlassSphere
+        }
         alt='background'
         className='email-bg-TopGlassSphereImage'
       />
       <img
-        src={assets.floatingAssets.topMiddleSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkTopMiddleSphere
+            : assets.floatingAssets.lightTopMiddleSphere
+        }
         alt='background'
         className='email-bg-TopMiddleSphereImage'
       />
       <img
-        src={assets.floatingAssets.bottomSphere}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkBottomSphere
+            : assets.floatingAssets.lightBottomSphere
+        }
         alt='background'
         className='email-bg-BottomMiddleSphereImage'
       />
       <img
-        src={assets.floatingAssets.votes}
+        src={
+          theme.name === 'dark'
+            ? assets.floatingAssets.darkVotes
+            : assets.floatingAssets.lightVotes
+        }
         alt='background'
         className='email-bg-VotesImage'
       />
@@ -328,6 +361,15 @@ const SVerifyEmailBgWrapper = styled.div`
 
     animation: enter-BulbImage ease forwards 1.4s,
       floating infinite alternate linear 3.6s 1.4s;
+
+    &.light {
+      @media (max-width: 1440px) {
+        height: 135px;
+      }
+
+      height: 175px;
+      top: 5px;
+    }
   }
 
   .email-bg-ChoiceImage {

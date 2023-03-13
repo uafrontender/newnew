@@ -16,6 +16,7 @@ declare module 'styled-components' {
       black: string;
       blue: string;
       dark: string;
+      darkGray: string;
     };
     colorsThemed: {
       statusBar: {
@@ -119,6 +120,8 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          common: string;
+          brandYellow: string;
         };
         background: {
           primary: string;
@@ -132,6 +135,8 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          common: string;
+          brandYellow: string;
         };
         hover: {
           primary: string;
@@ -145,6 +150,13 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          common: string;
+          brandYellow: string;
+        };
+        hoverShadow: {
+          primary: string;
+          danger: string;
+          brandYellow: string;
         };
         active: {
           primary: string;
@@ -158,6 +170,7 @@ declare module 'styled-components' {
           transparent: string;
           changeLanguage: string;
           danger: string;
+          brandYellow: string;
         };
         ripple: {
           primary: string;
@@ -171,6 +184,7 @@ declare module 'styled-components' {
       };
     };
     shadows: {
+      lightBlue: string;
       mediumBlue: string;
       intenseBlue: string;
       mediumGrey: string;
@@ -181,6 +195,7 @@ declare module 'styled-components' {
       arrowLeft: string;
       arrowRight: string;
       blueDiagonal: string;
+      blueReversedDiagonal: string;
       blueHorizontal: string;
       heroNotifications: string;
       heroNotificationsTablet: string;
@@ -192,11 +207,13 @@ declare module 'styled-components' {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
       };
       listBottom: {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
       };
       listLeft: {
         primary: string;

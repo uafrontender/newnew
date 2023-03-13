@@ -69,7 +69,7 @@
       },
       "email": {
         "placeholder": "Email address",
-        "cantChangeInfoCaption": "You can't change this info.",
+        "cantChangeInfoCaption": "You can edit your email in settings later",
         "errors": {
           "invalidEmail": "Please enter a valid email address",
           "emailTaken": "This email is already taken. Try another one"
@@ -79,7 +79,13 @@
         "label": "Date of birth",
         "captions": {
           "twoTimesOnly": "Birthday can be changed 2 times only.",
-          "cannotChange": "You can’t change birthday."
+          "cannotChange": "You can’t change birthday.",
+          "instruction": "Set your date of birth"
+        },
+        "units": {
+          "day": "Day",
+          "month": "Month",
+          "year": "Year"
         },
         "errors": {
           "tooYoung": "You must be 18 or older to become a creator"
@@ -106,7 +112,8 @@
       "back": "Back",
       "submit": "Done"
     },
-    "agreedToTosCheckbox": "I have read and agree to"
+    "agreedToTosCheckbox": "I have read and agree to",
+    "linkText": "NewNew's terms"
   },
   "aboutSection": {
     "meta": {
@@ -117,8 +124,7 @@
       "submit": "Save changes",
       "back": "Close"
     },
-    "heading": "This what your fans see",
-
+    "heading": "This is what your fans see",
     "bio": {
       "title": "Bio",
       "placeholder": "Tell a few words about yourself...",
@@ -129,9 +135,6 @@
         "inappropriate": "Offensive words are forbidden",
         "linksForbidden": "Links not allowed"
       }
-    },
-    "tags": {
-      "title": "What will you post about the most? Select at least three"
     }
   },
   "stripeSection": {
@@ -154,28 +157,8 @@
       "submit": "Submit",
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
-      "stripeConnecting": "Connecting..."
-    }
-  },
-  "subRateSection": {
-    "meta": {
-      "title": "Grow your passive income.",
-      "description": "Enable subscriptions for your channel and get paid monthly."
-    },
-    "side": {
-      "heading": "Grow your passive income.",
-      "subheading": "Enable subscriptions for your channel and get paid monthly."
-    },
-    "heading": "Set your subscription rate",
-    "selectInput": {
-      "perMonth": "/month",
-      "select": "Select",
-      "featured": "Popular",
-      "noProduct": "No subscription"
-    },
-    "button": {
-      "submit": "Save changes",
-      "back": "Close"
+      "stripeConnecting": "Connecting...",
+      "requireInformation": "Stripe requires info"
     }
   }
 }

@@ -1,4 +1,6 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
@@ -11,7 +13,7 @@ import InlineSVG from '../InlineSVG';
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
-import { quickSearchPostsAndCreators } from '../../../api/endpoints/search';
+import { quickSearch } from '../../../api/endpoints/search';
 import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
@@ -23,11 +25,22 @@ import PopularCreatorsResults from './PopularCreatorsResults';
 import Button from '../Button';
 import Lottie from '../Lottie';
 import NoResults from './NoResults';
+import PopularTagsResults from './PopularTagsResults';
+import getChunks from '../../../utils/getChunks/getChunks';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { Mixpanel } from '../../../utils/mixpanel';
+import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
@@ -37,10 +50,12 @@ const SearchInput: React.FC = React.memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
-
-  const { resizeMode, globalSearchActive } = useAppSelector(
-    (state) => state.ui
+  const [resultsHashtags, setResultsHashtags] = useState<newnewapi.IHashtag[]>(
+    []
   );
+
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -54,15 +69,48 @@ const SearchInput: React.FC = React.memo(() => {
     'tablet',
   ].includes(resizeMode);
 
+  const handleSeeResults = (query: string) => {
+    Mixpanel.track('Search All Results Clicked', {
+      _query: query,
+    });
+
+    const chunks = getChunks(query);
+    const firstChunk = chunks[0];
+    const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
+
+    if (isHashtag) {
+      router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
+    } else {
+      const encodedQuery = encodeURIComponent(query);
+      if (resultsPosts.length === 0 && resultsCreators.length > 0) {
+        router.push(`/search?query=${encodedQuery}&tab=creators`);
+      } else {
+        router.push(`/search?query=${encodedQuery}&tab=posts`);
+      }
+    }
+  };
+
   const handleSearchClick = useCallback(() => {
+    Mixpanel.track('Search Clicked');
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
+
   const handleSearchClose = () => {
+    Mixpanel.track('Search Closed');
+
     setSearchValue('');
     dispatch(setGlobalSearchActive(false));
   };
+
   const handleInputChange = (e: any) => {
-    setSearchValue(e.target.value);
+    // TODO: create util for spaces handle
+    const onlySpacesRegex = /^\s+$/;
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setSearchValue('');
+    } else {
+      setSearchValue(e.target.value);
+    }
   };
 
   const handleKeyDown = (e: any) => {
@@ -70,20 +118,18 @@ const SearchInput: React.FC = React.memo(() => {
       handleSearchClose();
     }
 
-    if (e.keyCode === 13 && searchValue) {
-      setIsResultsDropVisible(false);
-      router.push(`/search?query=${searchValue}&tab=posts`);
-      setSearchValue('');
+    const clearedSearchValue = getClearedSearchQuery(searchValue);
+    if (e.keyCode === 13 && clearedSearchValue.length > 1) {
+      handleSeeResults(clearedSearchValue);
+      closeSearch();
     }
   };
 
   const handleSubmit = () => {};
   const handleCloseIconClick = () => {
-    if (searchValue) {
-      setSearchValue('');
-    } else {
-      handleSearchClose();
-    }
+    setSearchValue('');
+    handleSearchClose();
+    setIsResultsDropVisible(false);
   };
 
   useOnClickEsc(inputContainerRef, () => {
@@ -98,13 +144,21 @@ const SearchInput: React.FC = React.memo(() => {
   });
 
   useEffect(() => {
-    setTimeout(() => {
-      if (globalSearchActive) {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    if (globalSearchActive) {
+      timeoutId = setTimeout(() => {
         inputRef.current?.focus();
-      } else {
-        inputRef.current?.blur();
+      }, 1000);
+    } else {
+      inputRef.current?.blur();
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
-    }, 1000);
+    };
   }, [globalSearchActive]);
 
   useEffect(() => {
@@ -129,36 +183,85 @@ const SearchInput: React.FC = React.memo(() => {
   const resetResults = () => {
     setResultsCreators([]);
     setResultsPosts([]);
+    setResultsHashtags([]);
   };
+
+  const quickSearchAbortControllerRef = useRef<AbortController | undefined>();
 
   async function getQuickSearchResult(query: string) {
     try {
+      if (quickSearchAbortControllerRef.current) {
+        quickSearchAbortControllerRef.current?.abort();
+      }
+      quickSearchAbortControllerRef.current = new AbortController();
+
       setIsLoading(true);
-      const payload = new newnewapi.QuickSearchPostsAndCreatorsRequest({
+      const payload = new newnewapi.QuickSearchRequest({
         query,
       });
-      const res = await quickSearchPostsAndCreators(payload);
+
+      const res = await quickSearch(
+        payload,
+        quickSearchAbortControllerRef?.current?.signal
+      );
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
-      if (res.data.creators) setResultsCreators(res.data.creators);
-      if (res.data.posts) setResultsPosts(res.data.posts);
+      if (res.data.creators) {
+        setResultsCreators(res.data.creators);
+      }
+      if (res.data.posts) {
+        setResultsPosts(res.data.posts);
+      }
+      if (res.data.hashtags) {
+        setResultsHashtags(res.data.hashtags);
+      }
       setIsLoading(false);
     } catch (err) {
-      setIsLoading(false);
       console.error(err);
+      setIsLoading(false);
+      showErrorToastPredefined(undefined);
     }
   }
 
+  const debouncedSearchValue = useDebouncedValue(searchValue, 500);
+
   useEffect(() => {
-    if (searchValue) {
-      getQuickSearchResult(searchValue);
+    const clearedSearchValue = getClearedSearchQuery(debouncedSearchValue);
+    if (clearedSearchValue?.length > 1) {
+      getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
-    } else if (!searchValue && !isMobileOrTablet) {
+    } else if (
+      (!clearedSearchValue || clearedSearchValue.length === 1) &&
+      !isMobileOrTablet
+    ) {
       setIsResultsDropVisible(false);
       resetResults();
     }
-  }, [searchValue, isMobileOrTablet]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchValue, isMobileOrTablet]);
+
+  function closeSearch() {
+    handleSearchClose();
+    setSearchValue('');
+    setIsResultsDropVisible(false);
+    resetResults();
+  }
+
+  useEffect(() => {
+    if (isMobileOrTablet && isResultsDropVisible) {
+      enableOverlayMode();
+    }
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [
+    isMobileOrTablet,
+    isResultsDropVisible,
+    enableOverlayMode,
+    disableOverlayMode,
+  ]);
 
   return (
     <>
@@ -167,10 +270,7 @@ const SearchInput: React.FC = React.memo(() => {
           view='tertiary'
           iconOnly
           onClick={() => {
-            handleSearchClose();
-            setSearchValue('');
-            setIsResultsDropVisible(false);
-            resetResults();
+            closeSearch();
           }}
         >
           <InlineSVG
@@ -203,20 +303,14 @@ const SearchInput: React.FC = React.memo(() => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder='Search'
-          />
-          <SRightInlineSVG
-            clickable
-            svg={closeIcon}
-            fill={theme.colorsThemed.text.primary}
-            width={isMobile ? '20px' : '24px'}
-            height={isMobile ? '20px' : '24px'}
-            onClick={handleCloseIconClick}
+            placeholder={t('search.placeholder')}
           />
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
           <SResultsDrop>
-            {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+            {resultsPosts.length === 0 &&
+            resultsCreators.length === 0 &&
+            resultsHashtags.length === 0 ? (
               !isLoading ? (
                 <SNoResults>
                   <NoResults closeDrop={handleCloseIconClick} />
@@ -235,29 +329,42 @@ const SearchInput: React.FC = React.memo(() => {
                 </SBlock>
               )
             ) : (
-              <>
+              <div
+                onClick={() => {
+                  closeSearch();
+                }}
+              >
                 {resultsPosts.length > 0 && (
                   <TopDecisionsResults posts={resultsPosts} />
                 )}
                 {resultsCreators.length > 0 && (
                   <PopularCreatorsResults creators={resultsCreators} />
                 )}
+                {resultsHashtags.length > 0 && (
+                  <PopularTagsResults hashtags={resultsHashtags} />
+                )}
                 <SButton
                   onClick={() => {
-                    router.push(`/search?query=${searchValue}&tab=posts`);
+                    const clearedSearchValue =
+                      getClearedSearchQuery(searchValue);
+                    if (clearedSearchValue) {
+                      handleSeeResults(clearedSearchValue);
+                    }
                   }}
                   view='quaternary'
                 >
                   {t('search.allResults')}
                 </SButton>
-              </>
+              </div>
             )}
           </SResultsDrop>
         )}
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
         <SResultsDropMobile>
-          {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+          {resultsPosts.length === 0 &&
+          resultsCreators.length === 0 &&
+          resultsHashtags.length === 0 ? (
             !isLoading ? (
               <SNoResults>
                 <NoResults closeDrop={handleCloseIconClick} />
@@ -276,22 +383,28 @@ const SearchInput: React.FC = React.memo(() => {
               </SBlock>
             )
           ) : (
-            <>
+            <div onClick={() => closeSearch()}>
               {resultsPosts.length > 0 && (
                 <TopDecisionsResults posts={resultsPosts} />
               )}
               {resultsCreators.length > 0 && (
                 <PopularCreatorsResults creators={resultsCreators} />
               )}
+              {resultsHashtags.length > 0 && (
+                <PopularTagsResults hashtags={resultsHashtags} />
+              )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}&tab=posts`);
+                  const clearedSearchValue = getClearedSearchQuery(searchValue);
+                  if (clearedSearchValue) {
+                    handleSeeResults(clearedSearchValue);
+                  }
                 }}
                 view='quaternary'
               >
                 {t('search.allResults')}
               </SButton>
-            </>
+            </div>
           )}
         </SResultsDropMobile>
       )}
@@ -344,9 +457,11 @@ const SResultsDrop = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 112px);
   top: 56px;
   padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
@@ -363,7 +478,7 @@ const SResultsDrop = styled.div`
 const SCloseButtonMobile = styled(Button)`
   position: absolute;
   left: 0;
-  top: 10px;
+  top: 8px;
   z-index: 1;
 
   padding: 8px;
@@ -385,10 +500,16 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: 100vh;
+  height: fill-available;
   top: 56px;
   left: 0;
   padding: 16px;
+  overflow: auto;
+
+  @supports (-webkit-touch-callout: none) {
+    /* CSS specific to iOS devices */
+    padding-bottom: 32px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
@@ -482,16 +603,6 @@ const SInput = styled.input`
 `;
 
 const SLeftInlineSVG = styled(InlineSVG)`
-  min-width: 20px;
-  min-height: 20px;
-
-  ${({ theme }) => theme.media.tablet} {
-    min-width: 24px;
-    min-height: 24px;
-  }
-`;
-
-const SRightInlineSVG = styled(InlineSVG)`
   min-width: 20px;
   min-height: 20px;
 

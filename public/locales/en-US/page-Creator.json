@@ -13,38 +13,42 @@
       "new": "New",
       "earlier": "Earlier"
     },
-    "enableSubscription": {
-      "title": "Earn more with subscriptions",
-      "description": "Enable subscriptions to earn steady income and connect with the people who ❤️ you most",
-      "learnMore": "Learn more",
-      "submit": "Turn on Subscriptions"
-    },
     "earnings": {
       "title": "My Earnings",
       "earned": "earned in last",
       "earnedToday": "earned today",
       "earnedYesterday": "earned yesterday",
+      "units": {
+        "days": "days",
+        "months": "months"
+      },
       "insights": "Insights",
       "insightsTablet": "Go to insights",
       "cashOut": {
-        "amount": "Your next payout of",
+        "amount": "Your Stripe earnings are",
+        "amountSecondLine": "Manage your balance on Stripe.",
+        "stripeButton": "Take me to Stripe",
         "date": "will automatically be sent on {{date}}.",
         "submit": "Learn More",
         "noPayouts": "You don’t have any upcoming payouts"
       },
       "toDosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",
-        "button": "Add"
+        "textBio": "Add a bio to withdraw your earnings",
+        "textBank": "Add your bank info to withdraw your earnings",
+        "button": "Add",
+        "stripeIssue": "There's an issue with your Stripe account",
+        "stripeIssueButton": "See Stripe account"
       },
       "makeDecision": {
         "text": "Make a post. Start earning.",
         "button": "Make a post"
       },
       "list": {
-        "ac": "Events",
-        "cf": "Superpolls",
-        "mc": "Goals",
-        "subscriptions": "Subscriptions"
+        "ac": "Bids",
+        "mc": "Superpolls",
+        "cf": "Goals",
+        "bundles": "Bundles"
       },
       "filter": {
         "today": "Today",
@@ -70,7 +74,7 @@
         }
       },
       "postTypes": {
-        "auction": "Event",
+        "auction": "Bid",
         "multipleChoice": "Superpoll",
         "crowdfunding": "Goal"
       },
@@ -80,34 +84,8 @@
         "minutes": "m",
         "seconds": "s",
         "leftToRespond": "left to respond"
-      }
-    },
-    "subscriptionStats": {
-      "title": "Subscriptions",
-      "noSubs": "Bring more exposure to your business, share with your network",
-      "newTitle": "Recently subscribed",
-      "newLink": "Subscriptions",
-      "seeAll": "See all new subs",
-      "prevWeek": "vs prev week",
-      "banner": {
-        "description": "Send a welcome message to your new subscribers",
-        "submit": "Send message"
       },
-      "list": {
-        "subscribers": "Subscribers",
-        "activeSubs": "Active subs",
-        "views": "Views"
-      },
-      "filter": {
-        "today": "Today",
-        "yesterday": "Yesterday",
-        "last_7_days": "Last 7 days",
-        "last_30_days": "Last 30 days",
-        "last_90_days": "Last 90 days",
-        "last_12_months": "Last 12 months"
-      },
-      "copyLink": "Copy your link",
-      "copied": "Copied"
+      "linkCopied": "Link copied!"
     },
     "toDos": {
       "title": "Complete these steps to get paid",
@@ -117,25 +95,64 @@
       "completeProfileButton": "Add",
       "addCashOutMethod": "Add bank info",
       "addCashOutMethodButton": "Add"
+    },
+    "aboutBundles": {
+      "title": "Superpoll Bundles",
+      "text": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
+      "button": "Tell me more!"
     }
-  },
-  "subscriptions": {
-    "meta": {
-      "title": "Creator Subscriptions"
-    },
-    "title": "My Subscribers",
-    "table": {
-      "subscribers": "Subscribers",
-      "date": "Date subscribed",
-      "updateSub": "Update subscription"
-    },
-    "messageAll": "DM all"
   },
   "earnings": {
     "meta": {
       "title": "Creator Earnings"
     },
     "title": "Earnings"
+  },
+  "myBundles": {
+    "meta": {
+      "title": "My Bundles",
+      "description": "View your NewNew Bundles"
+    },
+    "title": "My Bundles",
+    "buttonTurnOn": "Turn on bundles",
+    "buttonTurnOff": "Turn off bundles",
+    "earnings": {
+      "title": "Bundles Earnings",
+      "payPeriod": "this pay period",
+      "unitName": "bundle",
+      "earned": "earned",
+      "noSoldYet": "No bundles sold yet",
+      "sold": "sold"
+    },
+    "bundlesSet": {
+      "title": "Superpoll Bundles",
+      "subTitle": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
+      "votes": "votes",
+      "description": "plus people get {{duration}} months of:",
+      "descriptionSingular": "plus people get 1 month of:",
+      "firstOption": "adding custom options to your Superpolls",
+      "secondOption": "sending you private chats",
+      "perBundle": "per bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title": "Turn On bundles",
+        "text": "Are you sure you want to activate bundles?"
+      },
+      "turnoff": {
+        "title": "Turn Off bundles",
+        "text": "Are you sure you want to deactivate bundles?"
+      },
+      "activated": {
+        "title": "Congratulations!",
+        "text": "You have successfully activated bundles"
+      },
+      "deactivated": {
+        "title": "So sad!",
+        "text": "But you can activate bundles at any time"
+      },
+      "button": "Sounds good!"
+    }
   },
   "getPaid": {
     "meta": {
@@ -151,14 +168,14 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
-    "subscriptions": "Subscribers",
     "myPosts": "My Posts",
     "insights": "Insights",
     "earnings": "Earnings",
+    "bundles": "Bundles",
     "getPaid": "Add Bank",
     "getPaidEdit": "Edit Bank",
     "transactions": "Transactions",
-    "newPost": "New post"
+    "newPost": "Make a Decision"
   },
   "tabs": {
     "chat": "DMs",
@@ -170,7 +187,7 @@
     "noMessagesFirstLine": "No messages here yet...",
     "typing": "Typing...",
     "toolbar": {
-      "searchPlaceholder": "Search for messages or users"
+      "searchPlaceholder": "Search for users"
     },
     "modal": {
       "newMessage": {
@@ -180,48 +197,11 @@
     },
     "emptyInbox": {
       "title": "Your inbox is empty",
-      "text": "Once you start a new conversation, you’ll see it listed here"
+      "text": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
     },
     "default": {
       "searchPlaceholder": "Search"
     }
-  },
-  "subRateSection": {
-    "heading": "Set your subscription price",
-    "selectInput": {
-      "perMonth": "/month",
-      "select": "Select",
-      "featured": "Popular"
-    },
-    "button": {
-      "enable": "Turn on Subscription",
-      "update": "Save",
-      "back": "Cancel"
-    },
-    "removeSubscription": "Remove subscription"
-  },
-  "subscribersFeatures": {
-    "title": "By subscribing to you, your subscribers will be able to:",
-    "firstFeature": "Direct message you",
-    "secondFeature": "Get a free vote on your Superpolls",
-    "thirdFeature": "Add custom suggestions to your Superpolls",
-    "note": "Don’t worry–turning on subscriptions won’t limit people from participating in your Events, Superpolls or Goals"
-  },
-  "enableSubModal": {
-    "title": "Turn on subscription",
-    "note": "This subscription price is locked for 30 days from the day you enable it",
-    "button": "Yes, turn on subscription",
-    "confirmationTextFirstPart": "Confirm",
-    "confirmationTextSecondPart": "monthly subscription"
-  },
-  "removeSubModal": {
-    "title": "Remove my subscription",
-    "note": "If you remove your subscription, you won’t be able to gain new subscribers and your subscription will end for your current subscribers. You will also lose the abilitiy to chat with your subscribers.\n You can turn your subscription back on at any time. ",
-    "button": "Remove my subscription"
-  },
-  "noResults": {
-    "text": "Share your profile to let others\n know about your subscription",
-    "updateSub": "Update subscription"
   },
   "modal": {
     "newMessage": {
@@ -237,7 +217,10 @@
     "members": "members"
   },
   "announcement": {
-    "title": "'s announcement"
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "'s",
+    "afterName": "announcements"
   },
   "stripe": {
     "meta": {
@@ -256,7 +239,8 @@
       "requestSetupLink": "Connect with Stripe",
       "stripeConnectedLink": "Stripe connected!",
       "back": "Close",
-      "stripeConnecting": "Connecting..."
+      "stripeConnecting": "Connecting...",
+      "requireInformation": "Stripe requires info"
     }
   },
   "noNotifications": "Any new notifications you receive\nwill appear here"

@@ -1,24 +1,24 @@
 {
   "meta": {
     "ac": {
-      "title": "Ve más Eventos en NewNew",
-      "description": "Ver más Eventos de creadores publicados en la empresa emergente de economía de creadores NewNew"
+      "title": "Ve más Bids en NewNew",
+      "description": "Ver más Bids de creadores publicados en la empresa emergente de economía de creadores NewNew"
     },
     "mc": {
-      "title": "Ver más Superencuestas en NewNew",
-      "description": "Ver más creadores de Superencuestas publicados en la empresa emergente de economía de creadores NewNew"
+      "title": "Ver más Superpolls en NewNew",
+      "description": "Ver más creadores de Superpolls publicados en la empresa emergente de economía de creadores NewNew"
     },
     "cf": {
-      "title": "Ver más Objetivos en NewNew",
-      "description": "Ver más creadores de Objetivos publicados en la empresa emergente de economía de creadores NewNew"
+      "title": "Ver más Goals en NewNew",
+      "description": "Ver más creadores de Goals publicados en la empresa emergente de economía de creadores NewNew"
     },
     "biggest": {
       "title": "Ver más de las mejores publicaciones para ti",
-      "description": "Ve los vídeos y las decisiones más importantes de los creadores que creemos que te gustarán"
+      "description": "Ve los videos y las publicaciones más importantes de los creadores que creemos que te gustarán"
     },
     "for-you": {
       "title": "Ver más publicaciones para ti",
-      "description": "Ve vídeos y decisiones de los creadores que creemos que te gustarán"
+      "description": "Ve videos y publicaciones de los creadores que creemos que te gustarán"
     }
   },
   "sortingOption": {
@@ -48,11 +48,12 @@
   },
   "collection": {
     "title": {
-      "ac": "Eventos",
-      "mc": "Superencuestas",
-      "cf": "Objetivos",
+      "ac": "Bids",
+      "mc": "Superpolls",
+      "cf": "Goals",
       "biggest": "Lo mejor de todos los tiempos",
-      "for-you": "Para ti"
+      "for-you": "Para ti",
+      "recent-activity": "Actividad reciente"
     },
     "button": {
       "cancel": "Cancelar"

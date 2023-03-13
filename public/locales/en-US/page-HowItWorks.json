@@ -1,19 +1,19 @@
 {
   "meta": {
     "title": "How NewNew Works",
-    "description": "Find out more about Events, Superpolls & Goals started by Creators on NewNew"
+    "description": "Find out more about Bids & Superpolls started by Creators on NewNew"
   },
   "intro": {
     "title": "How NewNew works",
     "text": "First time? Here’s a quick rundown of the\nthings you can do on NewNew..."
   },
   "events": {
-    "title": "Events",
-    "text": "You send bids to creators with what you want them to do and how much you’ll spend to see it happen. When the time’s up on the Event, the creator chooses their favorite bid and uploads a video of themselves doing it. You can come up with your own unique bid idea or back someone else’s bid to make sure it gets chosen."
+    "title": "Bids",
+    "text": "You send bids to creators with what you want them to do and how much you’ll spend to see it happen. When the time’s up on the Bid, the creator chooses their favorite bid and uploads a video of themselves doing it. You can come up with your own unique bid idea or back someone else’s bid to make sure it gets chosen."
   },
   "superpolls": {
     "title": "Superpolls",
-    "text": "These are paid polls. You vote on your favorite option and the creator will upload a video doing the option with the most amount of votes. You can also add your own options to the creator’s Superpoll if you subscribe to them... so basically, anything goes!"
+    "text": "These are paid polls. You vote on your favorite option and the creator will upload a video doing the option with the most amount of votes."
   },
   "goals": {
     "title": "Goals",

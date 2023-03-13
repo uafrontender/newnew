@@ -4,10 +4,12 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useCookies } from 'react-cookie';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
 import { signInWithEmail } from '../../api/endpoints/auth';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
@@ -33,18 +35,28 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { resumePushNotification } = usePushNotifications();
 
   useEffect(() => {
-    if (user.loggedIn) router?.push('/');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (user.loggedIn) router?.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading) return;
       try {
         setIsLoading(true);
 
-        if (!email_address || !token) throw new Error('No token');
+        if (!email_address || !token) {
+          throw new Error('No token on email verification');
+        }
 
         const requestPayload = new newnewapi.EmailSignInRequest({
           emailAddress: email_address,
@@ -54,7 +66,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         const res = await signInWithEmail(requestPayload);
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -101,6 +113,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         dispatch(setSignupEmailInput(''));
         dispatch(setUserLoggedIn(true));
 
+        resumePushNotification();
+
         setIsLoading(false);
         if (data.redirectUrl) {
           router?.push(data.redirectUrl);
@@ -119,7 +133,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   return (
     <div>
@@ -152,7 +166,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
                 top: 'calc(50% + 48px)',
               }}
             >
-              An error occured
+              An error occurred
             </div>
           ) : null}
         </div>
@@ -163,7 +177,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
 export default EmailAuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  IEmailAuthRedirectPage
+> = async (context) => {
   const { email_address, token } = context.query;
 
   if (

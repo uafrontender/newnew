@@ -16,6 +16,7 @@ const basicTheme: Omit<
     black: '#000000',
     blue: '#2955EC',
     dark: '#0B0A13',
+    darkGray: '#2C2C33',
   },
   borderRadius: {
     small: '8px',
@@ -132,6 +133,8 @@ export const lightTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         changeLanguage: '#2C2C33',
         danger: '#FFFFFF',
+        common: '#2C2C33',
+        brandYellow: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -144,8 +147,10 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#FFFFFF',
         quaternary: 'rgba(0, 21, 128, 0.06)',
         transparent: 'rgba(11, 10, 19, 0.2)',
-        changeLanguage: '#FFFFFF',
+        changeLanguage: 'rgba(0, 21, 128, 0.06)',
         danger: '#F12C46',
+        common: '#FFFFFF',
+        brandYellow: '#FFE604',
       },
       hover: {
         primary: '#1D6AFF',
@@ -160,6 +165,13 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#E2E7F3',
         danger: '#F12C46',
+        common: '#000000',
+        brandYellow: '#FFE604',
+      },
+      hoverShadow: {
+        primary: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
+        danger: '0px 15px 35px -10px rgba(255, 29, 106, 0.6)',
+        brandYellow: '0px 15px 35px -10px rgba(255, 230, 4, 0.6)',
       },
       active: {
         primary: '#0950DA',
@@ -173,6 +185,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#D4DBED',
         danger: '#F12C46',
+        brandYellow: '#F0DA13',
       },
       ripple: {
         primary: '#0045CC',
@@ -186,6 +199,7 @@ export const lightTheme: DefaultTheme = {
     },
   },
   shadows: {
+    lightBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.35)',
     mediumBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.25)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey:
@@ -203,6 +217,8 @@ export const lightTheme: DefaultTheme = {
       'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal:
       'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueReversedDiagonal:
+      'linear-gradient(135deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     heroNotifications:
       'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
     heroNotificationsTablet:
@@ -222,6 +238,8 @@ export const lightTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);',
     },
     listBottom: {
       primary:
@@ -230,6 +248,8 @@ export const lightTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(241, 243, 249, 0) 0%, rgba(241, 243, 249, 0.8) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);',
     },
     listLeft: {
       primary:
@@ -363,6 +383,8 @@ export const darkTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         changeLanguage: '#FFFFFF',
         danger: '#FFFFFF',
+        common: '#2C2C33',
+        brandYellow: '#2C2C33',
       },
       background: {
         primary: '#1D6AFF',
@@ -377,6 +399,8 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#14151F',
         danger: '#F12C46',
+        common: '#FFFFFF',
+        brandYellow: '#FFE604',
       },
       hover: {
         primary: '#1D6AFF',
@@ -391,6 +415,13 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#1E1F29',
         danger: '#F12C46',
+        common: '#000000',
+        brandYellow: '#FFE604',
+      },
+      hoverShadow: {
+        primary: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
+        danger: '0px 15px 35px -10px rgba(255, 29, 106, 0.6)',
+        brandYellow: '0px 15px 35px -10px rgba(255, 230, 4, 0.6)',
       },
       active: {
         primary: '#0950DA',
@@ -404,6 +435,7 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#282933',
         danger: '#F12C46',
+        brandYellow: '#F0DA13',
       },
       ripple: {
         primary: '#0045CC',
@@ -417,6 +449,7 @@ export const darkTheme: DefaultTheme = {
     },
   },
   shadows: {
+    lightBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.35)',
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey:
@@ -432,6 +465,8 @@ export const darkTheme: DefaultTheme = {
       'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal:
       'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueReversedDiagonal:
+      'linear-gradient(135deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     heroNotifications:
       'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
     heroNotificationsTablet:
@@ -451,6 +486,8 @@ export const darkTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(11, 10, 19, 0) 0%, rgba(11, 10, 19, 1) 100%)',
     },
     listBottom: {
       primary:
@@ -459,6 +496,8 @@ export const darkTheme: DefaultTheme = {
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+      quaternary:
+        'linear-gradient(180deg, rgba(11, 10, 19, 1) 0%, rgba(11, 10, 19, 0) 100%)',
     },
     listLeft: {
       primary:

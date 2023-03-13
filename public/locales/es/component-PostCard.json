@@ -1,20 +1,20 @@
 {
   "button": {
     "withActivity": {
-      "ac": "{{amount}} en pujas",
+      "ac": "{{amount}} en ofertas",
       "mc": "{{votes}} votos",
       "mcSingular": "{{votes}} voto",
       "cf": "{{backed}} de {{total}} patrocinadores"
     },
     "withoutActivity": {
       "ac": "Ofertar ahora",
-      "mc": "Votar ahora",
-      "cf": "Patrocinar este objetivo"
+      "mc": "¡Sé el primero en votar!",
+      "cf": "Patrocinar este Goal"
     },
     "seeResults": {
-      "ac": "Ver evento",
-      "mc": "Ver superencuesta",
-      "cf": "Ver objetivo"
+      "ac": "Ver Bid",
+      "mc": "Ver Superpoll",
+      "cf": "Ver Goal"
     }
   },
   "timer": {
@@ -22,6 +22,8 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
-    "endedOn": "Terminó el "
+    "secondsLeft": "s",
+    "endedOn": "Terminó el ",
+    "soon": "Próximamente"
   }
 }

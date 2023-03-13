@@ -6,7 +6,7 @@ import Text from '../../atoms/Text';
 import Caption from '../../atoms/Caption';
 import DropdownSelect from '../../atoms/DropdownSelect';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ITabletFieldBlock {
   id: string;
@@ -20,6 +20,7 @@ interface ITabletFieldBlock {
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
     max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -39,7 +40,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
   } = props;
   const { t } = useTranslation('page-Creation');
   const inputRef: any = useRef();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isTablet = ['tablet'].includes(resizeMode);
 
   const handleBlur = useCallback(() => {
@@ -56,12 +57,12 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
       value: item.id,
     })) || [];
 
-  const inputLabel = t(`secondStep.field.${id}.label`);
+  const inputLabel = t(`secondStep.field.${id}.label` as any);
 
   return (
     <SContainer>
       <STitle variant={2} weight={600}>
-        {t(`secondStep.field.${id}.title`)}
+        {t(`secondStep.field.${id}.title` as any)}
       </STitle>
       <SContentPart>
         {type === 'input' ? (
@@ -79,16 +80,20 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                   onChange(id, e?.target?.value);
                 }}
                 withLabel={!!inputLabel}
-                placeholder={t(`secondStep.field.${id}.placeholder`)}
+                placeholder={
+                  inputProps?.customPlaceholder ??
+                  t(`secondStep.field.${id}.placeholder` as any)
+                }
                 {...inputProps}
               />
             </SInputContent>
           </SInputWrapper>
         ) : (
-          <DropdownSelect<number>
+          <DropdownSelect<string>
+            id={id}
             closeOnSelect
             width={isTablet ? '200px' : '208px'}
-            label={t(`secondStep.field.${id}.value`, {
+            label={t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
             options={getSelectOptions()}
@@ -100,7 +105,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
           />
         )}
         <SDescription variant={3} weight={600}>
-          {t(`secondStep.field.${id}.description`, {
+          {t(`secondStep.field.${id}.description` as any, {
             value: formattedDescription || value,
           })}
         </SDescription>

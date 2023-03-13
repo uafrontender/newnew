@@ -9,6 +9,7 @@ import DatePicker, {
   registerLocale,
 } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment';
 
 // Components
 import InlineSvg from '../../atoms/InlineSVG';
@@ -43,6 +44,8 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { useAppSelector } from '../../../redux-store/store';
+import getDateFormatForTimeZone from '../../../utils/getDateFormatForTimeZone';
+import { useAppState } from '../../../contexts/appStateContext';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -55,7 +58,7 @@ for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
   const importedLocale = require(`date-fns/locale/${localeName}/index.js`);
   registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
 }
-const minDate = new Date(new Date().setFullYear(1900));
+const minDate = new Date(1900, 0);
 
 const signs: IAstrologySigns = {
   Cake: CakeIcon,
@@ -88,264 +91,280 @@ interface ISettingsBirthDateInput {
 }
 
 const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
-  ({
-    value,
-    maxDate,
-    locale,
-    submitError,
-    disabled,
-    labelCaption,
-    bottomCaption,
-    onChange,
-    handleSetActive,
-    handleResetSubmitError,
-  }) => {
-    const theme = useTheme();
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+  React.memo(
+    ({
+      value,
+      maxDate,
+      locale,
+      submitError,
+      disabled,
+      labelCaption,
+      bottomCaption,
+      onChange,
+      handleSetActive,
+      handleResetSubmitError,
+    }) => {
+      const theme = useTheme();
+      const { resizeMode } = useAppState();
+      const user = useAppSelector((state) => state.user);
 
-    const [calendarOpen, setCalendarOpen] = useState(false);
-    const months: TDropdownSelectItem<number>[] = Array(12)
-      .fill('')
-      .map((_, i) => {
-        return {
-          name: getLocalizedMonth(i, locale),
-          value: i,
-        };
-      });
-    const years: TDropdownSelectItem<number>[] = useMemo(() => {
-      const workingArr = [];
-      for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
-        workingArr.push({
-          name: i.toString(),
-          value: i,
-        });
-      }
-      return workingArr;
-    }, [maxDate]);
-
-    const handleToggleCalendarOpen = () => {
-      if (submitError) {
-        handleResetSubmitError();
-      }
-      setCalendarOpen((curr) => !curr);
-    };
-
-    const handleRenderCustomHeader = (
-      props: ReactDatePickerCustomHeaderProps
-    ) => {
-      return (
-        <SDatePickerHeader>
-          <DropdownSelect<number>
-            label={props.date.getFullYear().toString()}
-            options={years}
-            selected={props.date.getFullYear()}
-            width='110px'
-            maxItems={4}
-            closeOnSelect
-            onSelect={(val) => props.changeYear(val)}
-          />
-          <DropdownSelect<number>
-            label={getLocalizedMonth(props.date.getMonth(), locale)}
-            options={months}
-            selected={props.date.getMonth()}
-            width='183px'
-            maxItems={4}
-            closeOnSelect
-            onSelect={(val) => props.changeMonth(val)}
-          />
-        </SDatePickerHeader>
+      const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+        resizeMode
       );
-    };
 
-    // eslint-disable-next-line react/no-unstable-nested-components
-    const CustomInputForwardRef = forwardRef<
-      HTMLInputElement,
-      React.DetailedHTMLProps<
-        React.InputHTMLAttributes<HTMLInputElement>,
-        HTMLInputElement
-      >
-    >((props, ref) => {
-      const [inputData, setInputData] = useState(props.value);
-
-      const [placeholder, setPlaceholder] = useState(props.placeholder);
-      const explicitInputRef = useRef<HTMLInputElement>();
-
-      const imageSrc = useMemo(() => {
-        if (
-          props.value &&
-          props.value instanceof Date &&
-          props.value === inputData
-        ) {
-          return signs[findAstrologySign(props.value)].src;
+      const [calendarOpen, setCalendarOpen] = useState(false);
+      const months: TDropdownSelectItem<number>[] = Array(12)
+        .fill('')
+        .map((_, i) => {
+          return {
+            name: getLocalizedMonth(i, locale),
+            value: i,
+          };
+        });
+      const years: TDropdownSelectItem<number>[] = useMemo(() => {
+        const workingArr = [];
+        for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {
+          workingArr.push({
+            name: i.toString(),
+            value: i,
+          });
         }
+        return workingArr;
+      }, [maxDate]);
 
-        if (inputData?.toString().length === 0) {
-          return CakeIcon.src;
+      const handleToggleCalendarOpen = () => {
+        if (submitError) {
+          handleResetSubmitError();
         }
-
-        let replaced: any = inputData?.toString().split('-');
-        replaced = [replaced[1], replaced[0], replaced[2]].join('/');
-
-        const parsedDate = new Date(replaced);
-        if (
-          parsedDate instanceof Date &&
-          !Number.isNaN((parsedDate as Date).valueOf()) &&
-          (parsedDate as Date) < maxDate
-        ) {
-          return signs[findAstrologySign(value)].src;
-        }
-        return InputInvalidIcon.src;
-      }, [props.value, inputData]);
-
-      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Input contains invalid characters
-        if (e.target.value.length > 0 && !e.target.value.match(/^[0-9-]+$/)) {
-          return;
-        }
-
-        // Input too long
-        if (e.target.value.length > 8) return;
-
-        // No hyphen
-        if (
-          (e.target.value.length === 3 || e.target.value.length === 6) &&
-          e.target.value.charAt(e.target.value.length - 1) !== '-'
-        ) {
-          return;
-        }
-
-        // Insert hyphen
-        if (
-          (e.target.value.length === 2 || e.target.value.length === 5) &&
-          e.target.value.length > (inputData as string)?.length
-        ) {
-          e.target.value += '-';
-          setInputData(e.target.value);
-          props.onChange?.(e);
-          return;
-        }
-
-        setInputData(e.target.value);
-
-        // The length is valid, call the outer onChange()
-        if (e.target.value.length === 8 || e.target.value.length === 0) {
-          props.onChange?.(e);
-        }
+        setCalendarOpen((curr) => !curr);
       };
 
-      useEffect(() => {
-        const arr1 = Array((inputData as string).length).fill(' ');
-        const arr = arr1.map((val, i) => {
-          if (i === 2 || i === 5) {
-            return '<span>&nbsp;</span>';
+      const handleRenderCustomHeader = (
+        props: ReactDatePickerCustomHeaderProps
+      ) => {
+        return (
+          <SDatePickerHeader>
+            <DropdownSelect<number>
+              label={props.date.getFullYear().toString()}
+              options={years}
+              selected={props.date.getFullYear()}
+              width='110px'
+              maxItems={4}
+              closeOnSelect
+              onSelect={(val) => props.changeYear(val)}
+            />
+            <DropdownSelect<number>
+              label={getLocalizedMonth(props.date.getMonth(), locale)}
+              options={months}
+              selected={props.date.getMonth()}
+              width='183px'
+              maxItems={4}
+              closeOnSelect
+              onSelect={(val) => props.changeMonth(val)}
+            />
+          </SDatePickerHeader>
+        );
+      };
+
+      // eslint-disable-next-line react/no-unstable-nested-components
+      const CustomInputForwardRef = forwardRef<
+        HTMLInputElement,
+        React.DetailedHTMLProps<
+          React.InputHTMLAttributes<HTMLInputElement>,
+          HTMLInputElement
+        >
+      >((props, ref) => {
+        const [inputData, setInputData] = useState(props.value);
+
+        const [placeholder, setPlaceholder] = useState(props.placeholder);
+        const explicitInputRef = useRef<HTMLInputElement>();
+
+        const imageSrc = useMemo(() => {
+          if (
+            props.value &&
+            props.value instanceof Date &&
+            props.value === inputData
+          ) {
+            return signs[findAstrologySign(props.value)].src;
           }
-          return '<span>&nbsp;&nbsp;&nbsp;</span>';
-        });
-        const newVal =
-          arr.join('') +
-          (props.placeholder?.slice((inputData as string).length) || '');
-        setPlaceholder(newVal);
-      }, [inputData, props.placeholder]);
+
+          if (inputData?.toString().length === 0) {
+            return CakeIcon.src;
+          }
+
+          const parsedDate = moment(
+            inputData?.toString(),
+            getDateFormatForTimeZone(user.userData?.timeZone)
+          ).toDate();
+
+          if (
+            parsedDate instanceof Date &&
+            !Number.isNaN((parsedDate as Date).valueOf()) &&
+            (parsedDate as Date) < maxDate
+          ) {
+            return signs[findAstrologySign(value)].src;
+          }
+          return InputInvalidIcon.src;
+        }, [props.value, inputData]);
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          // Input contains invalid characters
+          if (e.target.value.length > 0 && !e.target.value.match(/^[0-9-]+$/)) {
+            return;
+          }
+
+          // Input too long
+          if (e.target.value.length > 8) return;
+
+          // No hyphen
+          if (
+            (e.target.value.length === 3 || e.target.value.length === 6) &&
+            e.target.value.charAt(e.target.value.length - 1) !== '-'
+          ) {
+            return;
+          }
+
+          // Insert hyphen
+          if (
+            (e.target.value.length === 2 || e.target.value.length === 5) &&
+            e.target.value.length > (inputData as string)?.length
+          ) {
+            e.target.value += '-';
+            setInputData(e.target.value);
+            props.onChange?.(e);
+            return;
+          }
+
+          setInputData(e.target.value);
+
+          // The length is valid, call the outer onChange()
+          if (e.target.value.length === 8 || e.target.value.length === 0) {
+            props.onChange?.(e);
+          }
+        };
+
+        useEffect(() => {
+          const arr1 = Array((inputData as string).length).fill(' ');
+          const arr = arr1.map((val, i) => {
+            if (i === 2 || i === 5) {
+              return '<span>&nbsp;</span>';
+            }
+            return '<span>&nbsp;&nbsp;&nbsp;</span>';
+          });
+          const newVal =
+            arr.join('') +
+            (props.placeholder?.slice((inputData as string).length) || '');
+          setPlaceholder(newVal);
+        }, [inputData, props.placeholder]);
+
+        return (
+          <>
+            <SAstrologyImg
+              src={imageSrc}
+              onClick={() => {
+                explicitInputRef.current?.focus();
+              }}
+            />
+            <SCustomInput>
+              <input
+                ref={(node) => {
+                  explicitInputRef.current = node!!;
+                  (ref as Function)(node);
+                }}
+                readOnly
+                disabled={props.disabled}
+                inputMode='numeric'
+                value={inputData}
+                onChange={handleChange}
+                onPaste={(e) => e.preventDefault()}
+                onFocus={props.disabled ? () => {} : (props.onClick as any)}
+              />
+              <SPseudoPlaceholder
+                dangerouslySetInnerHTML={{
+                  __html: placeholder ?? '',
+                }}
+                onClick={() => explicitInputRef.current?.focus()}
+              />
+              <CalendarButton
+                type='button'
+                disabled={props.disabled}
+                onClick={props.disabled ? () => {} : (props.onClick as any)}
+              >
+                <InlineSvg
+                  svg={CalendarIcon}
+                  width='24px'
+                  height='24px'
+                  fill={
+                    !calendarOpen
+                      ? theme.colorsThemed.text.quaternary
+                      : theme.colorsThemed.text.primary
+                  }
+                />
+              </CalendarButton>
+            </SCustomInput>
+          </>
+        );
+      });
 
       return (
-        <>
-          <SAstrologyImg src={imageSrc} />
-          <SCustomInput>
-            <input
-              ref={(node) => {
-                explicitInputRef.current = node!!;
-                (ref as Function)(node);
-              }}
-              readOnly
-              disabled={props.disabled}
-              inputMode='numeric'
-              value={inputData}
-              onChange={handleChange}
-              onPaste={(e) => e.preventDefault()}
-            />
-            <SPseudoPlaceholder
-              dangerouslySetInnerHTML={{
-                __html: placeholder ?? '',
-              }}
-              onClick={() => explicitInputRef.current?.focus()}
-            />
-            <CalendarButton
-              type='button'
-              disabled={props.disabled}
-              onClick={props.disabled ? () => {} : (props.onClick as any)}
-            >
-              <InlineSvg
-                svg={CalendarIcon}
-                width='24px'
-                height='24px'
-                fill={
-                  !calendarOpen
-                    ? theme.colorsThemed.text.quaternary
-                    : theme.colorsThemed.text.primary
-                }
-              />
-            </CalendarButton>
-          </SCustomInput>
-        </>
-      );
-    });
-
-    return (
-      <SContainer onMouseEnter={() => handleSetActive?.()}>
-        <SLabel>{labelCaption}</SLabel>
-        {/* <SAstrologyImg
+        <SContainer onMouseEnter={() => handleSetActive?.()}>
+          <SLabel>{labelCaption}</SLabel>
+          {/* <SAstrologyImg
         src={signs[findAstrologySign(value)].src}
       /> */}
-        <SDatePicker>
-          <DatePicker
-            disabled={disabled}
-            selected={value ?? undefined}
-            placeholderText='DD-MM-YY'
-            dateFormat='dd-MM-yy'
-            minDate={minDate}
-            maxDate={maxDate}
-            shouldCloseOnSelect={false}
-            fixedHeight
-            preventOpenOnFocus
-            adjustDateOnChange
-            onInputClick={() => {}}
-            // Locales
-            locale={locale ?? 'en-US'}
-            formatWeekDay={(d) => d[0].toUpperCase()}
-            // Custom render elements
-            renderCustomHeader={handleRenderCustomHeader}
-            customInput={<CustomInputForwardRef disabled={disabled} />}
-            // Calendar
-            popperPlacement={isMobile ? 'bottom' : 'bottom-end'}
-            popperModifiers={[
-              {
-                name: 'offset',
-                options: {
-                  offset: [0, 6],
+          <SDatePicker>
+            <DatePicker
+              disabled={disabled}
+              selected={value ?? undefined}
+              placeholderText={getDateFormatForTimeZone(
+                user.userData?.timeZone
+              ).toUpperCase()}
+              dateFormat={getDateFormatForTimeZone(
+                user.userData?.timeZone,
+                true
+              )}
+              minDate={minDate}
+              maxDate={maxDate}
+              shouldCloseOnSelect={false}
+              fixedHeight
+              preventOpenOnFocus
+              adjustDateOnChange
+              onInputClick={() => {}}
+              // Locales
+              locale={locale ?? 'en-US'}
+              formatWeekDay={(d) => d[0].toUpperCase()}
+              // Custom render elements
+              renderCustomHeader={handleRenderCustomHeader}
+              customInput={<CustomInputForwardRef disabled={disabled} />}
+              // Calendar
+              popperPlacement={isMobile ? 'bottom' : 'bottom-end'}
+              popperModifiers={[
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [0, 6],
+                  },
                 },
-              },
-            ]}
-            // Handlers
-            onChange={onChange}
-            onCalendarOpen={() => handleToggleCalendarOpen()}
-            onCalendarClose={() => handleToggleCalendarOpen()}
-          />
-        </SDatePicker>
-        <SBottomCaption>{bottomCaption}</SBottomCaption>
-        {submitError ? (
-          <AnimatedPresence animateWhenInView={false} animation='t-09'>
-            <SErrorDiv>
-              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-              {submitError}
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null}
-      </SContainer>
-    );
-  };
+              ]}
+              // Handlers
+              onChange={onChange}
+              onCalendarOpen={() => handleToggleCalendarOpen()}
+              onCalendarClose={() => handleToggleCalendarOpen()}
+            />
+          </SDatePicker>
+          <SBottomCaption>{bottomCaption}</SBottomCaption>
+          {submitError ? (
+            <AnimatedPresence animateWhenInView={false} animation='t-09'>
+              <SErrorDiv>
+                <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+                {submitError}
+              </SErrorDiv>
+            </AnimatedPresence>
+          ) : null}
+        </SContainer>
+      );
+    }
+  );
 
 SettingsBirthDateInput.defaultProps = {
   value: undefined,
@@ -477,6 +496,7 @@ const SDatePicker = styled.div`
     }
   }
   .react-datepicker-popper {
+    z-index: 6;
     width: 356px;
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     border: transparent;
@@ -565,25 +585,33 @@ const SDatePicker = styled.div`
               .react-datepicker__day {
                 color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-                &:hover {
-                  position: relative;
-                  color: #ffffff;
-                  background: transparent;
+                @media (hover: hover) {
+                  &:hover {
+                    position: relative;
+                    color: #ffffff;
+                    background: transparent;
 
-                  &:before {
-                    position: absolute;
-                    top: calc(50% - 22px);
-                    left: calc(50% - 22px);
-                    content: '';
+                    &:before {
+                      position: absolute;
+                      top: calc(50% - 22px);
+                      left: calc(50% - 22px);
+                      content: '';
 
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 50%;
+                      width: 44px;
+                      height: 44px;
+                      border-radius: 50%;
 
-                    background: ${({ theme }) =>
-                      theme.colorsThemed.accent.blue};
+                      background: ${({ theme }) =>
+                        theme.colorsThemed.accent.blue};
 
-                    z-index: -1;
+                      z-index: -1;
+                    }
+                  }
+                }
+
+                @media (hover: none) {
+                  &:hover {
+                    background: transparent;
                   }
                 }
               }

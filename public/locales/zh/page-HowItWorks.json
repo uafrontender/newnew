@@ -1,19 +1,19 @@
 {
   "meta": {
     "title": "NewNew如何運作",
-    "description": "瞭解更多關於由NewNew上的創作者發起的Event、Superpoll和Goal"
+    "description": "瞭解更多關於由NewNew上的創作者發起的Bid、Superpoll和Goal"
   },
   "intro": {
     "title": "NewNew如何運作",
     "text": "第一次使用嗎？這裡有關於你在NewNew上\n可以做的事情的簡述......"
   },
   "events": {
-    "title": "Event",
-    "text": "你向創作者發送出價，說明你想讓他們做什麼，以及你願意花多少錢來看到他們完成生, 到了Event的時間之後，創作者會選擇他們最喜歡的出價，並上傳他們完成此事的視頻。你出價時可以給出你自己的獨特想法，也可以支持別人的出價，讓它被選中。"
+    "title": "Bid",
+    "text": "你向創作者發送出價，說明你想讓他們做什麼，以及你願意花多少錢來看到他們完成, 到了Bid的規定時間之後，創作者會選擇他們最喜歡的出價，並上傳他們完成此事的視頻。你出價時可以給出你自己的獨特想法，也可以支持別人的出價，讓它被選中。"
   },
   "superpolls": {
-    "title": "Superpoll",
-    "text": "Superpoll是付費投票。你挑選自己喜歡的選項並投票，創作者將完成獲得最多選票的選項，並上傳視頻。如果你訂閱了創作者的Superpoll，也可以把自己的選項添加到他們的Superpoll中......所以，實際上，什麼都可以！"
+    "title": "Superpolls",
+    "text": "這些是付費調查。你投票選擇你喜歡的選項，創作者將完成得到最多票數的選項並上傳相關視頻。"
   },
   "goals": {
     "title": "Goal",

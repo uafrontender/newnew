@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
-
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
 import DragToRepositionLabel from './DragToRepositionLabel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 type TProfileImageCropper = {
   crop: Point;
   zoom: number;
+  minZoom: number;
+  maxZoom: number;
   avatarUrlInEdit: string;
   originalImageWidth: number;
   disabled: boolean;
@@ -22,8 +22,10 @@ type TProfileImageCropper = {
 };
 
 const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
-  zoom,
   crop,
+  zoom,
+  minZoom,
+  maxZoom,
   avatarUrlInEdit,
   originalImageWidth,
   disabled,
@@ -32,17 +34,46 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
   onZoomChange,
 }) => {
   const { t } = useTranslation('common');
-  const { ui } = useAppSelector((state) => state);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
   const [isPressed, setIsPressed] = useState(false);
+  const [cropSize, setCropSize] = useState<number | undefined>();
+  const containerRef = useRef<HTMLDivElement | undefined>();
 
   const handleSetPressed = () => setIsPressed(true);
   const handleSetUnpressed = () => setIsPressed(false);
 
+  useEffect(() => {
+    if (!containerRef.current) {
+      return () => {};
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (!containerRef.current) {
+        return;
+      }
+      const boundingClientRect = containerRef.current.getBoundingClientRect();
+      const newCropSize =
+        Math.min(boundingClientRect.height, boundingClientRect.width) - 6;
+      setCropSize(newCropSize);
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isMobile]);
+
   return (
     <SCropperWrapper
+      ref={(elem) => {
+        if (elem) {
+          containerRef.current = elem;
+        }
+      }}
       x={crop.x}
       y={crop.y}
       zoom={zoom}
@@ -63,15 +94,21 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
       {avatarUrlInEdit && (
         <Cropper
           image={avatarUrlInEdit}
-          objectFit={isMobile ? 'horizontal-cover' : 'vertical-cover'}
+          objectFit='auto-cover'
           crop={crop}
-          cropSize={{
-            height: isMobile ? 375 : 280,
-            width: isMobile ? 375 : 280,
-          }}
+          cropSize={
+            cropSize
+              ? {
+                  height: cropSize,
+                  width: cropSize,
+                }
+              : undefined
+          }
           cropShape='round'
           showGrid={false}
           zoom={zoom}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
           aspect={1}
           classes={{
             containerClassName: 'cropper-container',
@@ -97,29 +134,13 @@ const SCropperWrapper = styled.div<{
 }>`
   position: relative;
   height: 500px;
+  width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 420px;
-    min-height: 280px;
-  }
-
-  .cropper-container {
-    &:before {
-      content: '';
-      position: absolute;
-
-      width: ${({ pseudoElementWidth }) => `${pseudoElementWidth}px`};
-      height: 100%;
-
-      z-index: 12;
-
-      ${({ theme }) => theme.media.tablet} {
-        transform: ${({ x, y, zoom }) =>
-          `translate(${x}px, ${y}px) scale(${zoom})`};
-        box-shadow: 0 0 0 9999em;
-        color: ${({ theme }) => theme.colorsThemed.background.primary};
-      }
-    }
+    height: 100%;
+    z-index: 0;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .cropper-cropArea {

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -10,9 +10,12 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
-import InlineSVG from '../../../atoms/InlineSVG';
+import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
+import InlineSVG, { InlineSvg } from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
 
+import { I18nNamespaces } from '../../../../@types/i18next';
+import getDisplayname from '../../../../utils/getDisplayname';
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
@@ -21,6 +24,9 @@ import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -30,7 +36,7 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -41,7 +47,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
     (state) => state.creation
   );
@@ -59,38 +65,44 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
   }
 
+  // No need in translation as these are reserved words
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
-      if (postData.crowdfunding) return 'Goal';
+      if (postData.auction) {
+        return 'Bid';
+      }
+
+      if (postData.crowdfunding) {
+        return 'Goal';
+      }
+
       return 'Superpoll';
     }
-    return 'Event';
+    return 'Bid';
   }, [postData]);
 
-  interface IItemButtonAttrs extends NamedNodeMap {
-    type?: {
-      value: string;
-    };
-  }
-
   const socialBtnClickHandler = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const attr: IItemButtonAttrs = (e.target as HTMLDivElement).attributes;
-      const val = attr.type?.value;
+    (buttonType: string) => {
+      const val = buttonType;
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
-              url += postData.auction.postUuid;
+              url += postData.auction.postShortId
+                ? postData.auction.postShortId
+                : postData.auction.postUuid;
             }
             if (postData.crowdfunding) {
-              url += postData.crowdfunding.postUuid;
+              url += postData.crowdfunding.postShortId
+                ? postData.crowdfunding.postShortId
+                : postData.crowdfunding.postUuid;
             }
             if (postData.multipleChoice) {
-              url += postData.multipleChoice.postUuid;
+              url += postData.multipleChoice.postShortId
+                ? postData.multipleChoice.postShortId
+                : postData.multipleChoice.postUuid;
             }
 
             copyPostUrlToClipboard(url)
@@ -115,20 +127,26 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       if (postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
-              url += postData.auction.postUuid;
+              url += postData.auction.postShortId
+                ? postData.auction.postShortId
+                : postData.auction.postUuid;
             }
             if (postData.crowdfunding) {
-              url += postData.crowdfunding.postUuid;
+              url += postData.crowdfunding.postShortId
+                ? postData.crowdfunding.postShortId
+                : postData.crowdfunding.postUuid;
             }
             if (postData.multipleChoice) {
-              url += postData.multipleChoice.postUuid;
+              url += postData.multipleChoice.postShortId
+                ? postData.multipleChoice.postShortId
+                : postData.multipleChoice.postUuid;
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation({}));
+              dispatch(clearCreation(undefined));
             });
           }
         }
@@ -163,6 +181,8 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
+    } else if (post.expiresAt === '3-hours') {
+      dateValue.add(3, 'h');
     } else if (post.expiresAt === '6-hours') {
       dateValue.add(6, 'h');
     } else if (post.expiresAt === '12-hours') {
@@ -175,6 +195,12 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -182,11 +208,17 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
   const renderItem = (item: any) => (
     <SItem key={item.key} type={item.key}>
-      <SItemButton type={item.key} onClick={socialBtnClickHandler}>
+      <SItemButton
+        buttonType={item.key}
+        onClick={() => socialBtnClickHandler(item.key)}
+      >
         <InlineSVG
           svg={SOCIAL_ICONS[item.key] as string}
           width='25px'
           height='25px'
+          onClick={() => {
+            socialBtnClickHandler(item.key);
+          }}
         />
       </SItemButton>
       <SItemTitle
@@ -197,21 +229,41 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(
+              `published.socials.${
+                item.key as keyof I18nNamespaces['page-Creation']['published']['socials']
+              }`
+            )}
       </SItemTitle>
     </SItem>
   );
+
+  // Redirect if post state is empty
+  useEffect(() => {
+    if (!post.title) {
+      router.push('/profile/my-posts');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!post.title) {
+    return <LoadingView />;
+  }
+
+  const displayName = getDisplayname(user.userData);
 
   return (
     <>
       <SContent>
         <SPlayerWrapper>
+          {/* It seems like the video here is intentionally a 3-seconds one */}
           {fileProcessing.progress === 100 ? (
-            <BitmovinPlayer
+            <VideojsPlayer
               id='published'
-              muted={false}
+              muted
               resources={videoProcessing?.targetUrls}
-              thumbnails={post.thumbnailParameters}
+              showPlayButton
+              withMuteControl
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -219,19 +271,31 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
         </SPlayerWrapper>
         <SUserBlock>
           <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-          <SUserTitle variant={3} weight={600}>
-            {user.userData?.nickname && user.userData?.nickname?.length > 8
-              ? `${user.userData?.nickname?.substring(0, 8)}...`
-              : user.userData?.nickname}
-          </SUserTitle>
+          <SUserTitleContainer>
+            <SUserTitle variant={3} weight={600}>
+              {displayName && displayName.length > 8
+                ? `${displayName.substring(0, 8)}...`
+                : displayName}
+            </SUserTitle>
+            {user.userData?.options?.isVerified && (
+              <InlineSvg
+                svg={VerificationCheckmark}
+                width='20px'
+                height='20px'
+                fill='none'
+              />
+            )}
+          </SUserTitleContainer>
           <SCaption variant={2} weight={700}>
-            {t('secondStep.card.left', {
-              time: formatExpiresAtNoStartsAt().fromNow(true),
-            })}
+            {post.startsAt.type === 'right-away'
+              ? t('secondStep.card.left', {
+                  time: formatExpiresAtNoStartsAt().fromNow(true),
+                })
+              : t('secondStep.card.soon')}
           </SCaption>
         </SUserBlock>
         <SPostTitleText variant={3} weight={600}>
-          {post?.title}
+          <PostTitleContent>{post.title}</PostTitleContent>
         </SPostTitleText>
         <STitle variant={6}>
           {t(
@@ -327,7 +391,7 @@ const STitle = styled(Headline)`
 
 const SUserBlock = styled.div`
   width: 224px;
-  margin: 16px auto 0 auto;
+  margin: 16px auto 16px auto;
   display: grid;
   align-items: center;
   flex-direction: row;
@@ -342,14 +406,20 @@ const SUserAvatar = styled(UserAvatar)`
   min-height: 36px;
 `;
 
-const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
+const SUserTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   overflow: hidden;
-  position: relative;
+`;
+
+const SUserTitle = styled(Text)`
   padding-left: 12px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  margin-right: 2px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SSocials = styled.div`
@@ -372,7 +442,7 @@ const SItem = styled.div<{
 `;
 
 interface ISItemButton {
-  type: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
+  buttonType: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
 }
 
 const SItemButton = styled.div<ISItemButton>`
@@ -384,7 +454,16 @@ const SItemButton = styled.div<ISItemButton>`
   align-items: center;
   border-radius: 16px;
   justify-content: center;
-  background: ${(props) => props.theme.colorsThemed.social[props.type].main};
+  background: ${(props) =>
+    props.theme.colorsThemed.social[props.buttonType].main};
+
+  border: transparent;
+  cursor: pointer;
+
+  &:hover:enabled,
+  &:focus:enabled {
+    outline: none;
+  }
 `;
 
 const SItemTitle = styled(Caption)<{
@@ -406,6 +485,8 @@ const SPostTitleText = styled(Text)`
   width: 224px;
   margin-left: auto;
   margin-right: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SCaption = styled(Caption)`

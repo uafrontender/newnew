@@ -1,23 +1,23 @@
 {
   "meta": {
     "title": "¿Cómo funciona NewNew?",
-    "description": "Más información sobre Eventos, Superencuestas y Objetivos iniciados por Creadores en NewNew"
+    "description": "Más información sobre Bids, Superpolls y Goals iniciados por Creadores en NewNew"
   },
   "intro": {
     "title": "¿Cómo funciona NewNew?",
-    "text": "¿Esta es tu primera vez en NewNew? Aquí tienes un corto resumen de las\ncosas que puedes hacer aquí..."
+    "text": "¿Esta es la primera vez que nos visitas? Aquí tienes un corto resumen de las cosas que puedes hacer en NewNew..."
   },
   "events": {
-    "title": "Eventos",
-    "text": "Envía ofertas a los creadores con lo que quieres que hagan y la cantidad que gastarías para verlos haciéndolo. Cuando se acabe el tiempo del Evento, el creador eligirá su oferta favorita y subirá un vídeo de sí mismo realizándola. Puedes proponer tu propia idea de oferta o respaldar la oferta de otra persona para asegurarte de que sea elegida."
+    "title": "Bids",
+    "text": "Envía ofertas a los creadores con lo que quieres que hagan y la cantidad que gastarías para verlos haciéndolo. Cuando se acabe el tiempo del Bid, el creador eligirá su oferta favorita y subirá un video de sí mismo realizándola. Puedes proponer tu propia idea de oferta o respaldar la oferta de otra persona para asegurarte de que sea elegida."
   },
   "superpolls": {
-    "title": "Superencuestas",
-    "text": "Estas son encuestas de pago. Votas por tu opción favorita y el creador sube un vídeo haciendo la opción más votada. También puedes añadir tus propias opciones a la Superencuesta del creador si estás suscrito a él... así que, en esencia, ¡todo es válido!"
+    "title": "Superpolls",
+    "text": "Estas son encuestas de pago. Votas por tu opción favorita y el creador sube un video haciendo la opción más votada."
   },
   "goals": {
-    "title": "Objetivos",
-    "text": "Apoya el Objetivo de un creador y mira cómo se hace realidad. El creador establece una cantidad mínima de patrocinadores que necesita para alcanzar su Objetivo. Los objetivos son únicos, interesantes y divertidos. Créenos... esta no es la típica campaña de crowdfunding."
+    "title": "Goals",
+    "text": "Apoya el Goal de un creador y ve cómo se hace realidad. El creador establece una cantidad mínima de patrocinadores que necesita para alcanzar su Goal. Los objetivos son únicos, interesantes y divertidos. Créenos... esta no es la típica campaña de crowdfunding."
   },
   "exploreButton": "Explorar",
   "createButton": "Crear ahora"

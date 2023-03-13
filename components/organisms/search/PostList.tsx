@@ -3,24 +3,22 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { usePostModalState } from '../../../contexts/postModalContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IList {
   collection: any;
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -28,10 +26,8 @@ export const PostList: React.FC<IList> = ({
   loading,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
 }) => {
-  const { postOverlayOpen } = usePostModalState();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -43,26 +39,25 @@ export const PostList: React.FC<IList> = ({
   const skeletonNumber =
     (isMobile && 1) || (isTablet && 3) || (isSmallDesktops && 4) || 5; // calculations how menu skeletons to display
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      handlePostClicked(item);
-    };
-
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
-      >
+  const renderItem = (item: any, index: number) => (
+    <Link
+      href={`/p/${
+        switchPostType(item)[0].postShortId
+          ? switchPostType(item)[0].postShortId
+          : switchPostType(item)[0].postUuid
+      }`}
+      key={switchPostType(item)[0].postUuid}
+    >
+      <SItemWrapper>
         <PostCard
           item={item}
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
-          shouldStop={postOverlayOpen}
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   return (
     <>

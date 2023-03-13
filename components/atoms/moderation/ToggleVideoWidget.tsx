@@ -2,6 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IToggleVideoWidget {
   currentTab: 'announcement' | 'response';
@@ -18,7 +19,7 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
   wrapperCSS,
   handleChangeTab,
 }) => {
-  const { t } = useTranslation('modal-Post');
+  const { t } = useTranslation('page-Post');
 
   return (
     <SToggleVideoWidget
@@ -30,24 +31,56 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
           <STabBtn
             disabled={disabled}
             active={currentTab === 'announcement'}
-            onClick={() => handleChangeTab('announcement')}
+            onClick={() => {
+              Mixpanel.track('Change Tab', {
+                _stage: 'Post',
+                _tabName: 'announcement',
+                _component: 'ToggleVideoWidget',
+              });
+              handleChangeTab('announcement');
+            }}
           >
             {t('postVideo.tabs.announcement')}
           </STabBtn>
           <STabBtn
             disabled={disabled}
             active={currentTab === 'response'}
-            onClick={() => handleChangeTab('response')}
+            onClick={() => {
+              Mixpanel.track('Change Tab', {
+                _stage: 'Post',
+                _tabName: 'response',
+                _component: 'ToggleVideoWidget',
+              });
+              handleChangeTab('response');
+            }}
           >
             {t('postVideo.tabs.response')}
           </STabBtn>
         </SWrapper>
       ) : currentTab === 'response' ? (
-        <SBackToOriginalBtn onClick={() => handleChangeTab('announcement')}>
+        <SBackToOriginalBtn
+          onClick={() => {
+            Mixpanel.track('Change Tab', {
+              _stage: 'Post',
+              _tabName: 'announcement',
+              _component: 'ToggleVideoWidget',
+            });
+            handleChangeTab('announcement');
+          }}
+        >
           {t('postVideo.tabs.backToOriginalVideo')}
         </SBackToOriginalBtn>
       ) : (
-        <SBackToOriginalBtn onClick={() => handleChangeTab('response')}>
+        <SBackToOriginalBtn
+          onClick={() => {
+            Mixpanel.track('Change Tab', {
+              _stage: 'Post',
+              _tabName: 'response',
+              _component: 'ToggleVideoWidget',
+            });
+            handleChangeTab('response');
+          }}
+        >
           {t('postVideo.tabs.backToResponse')}
         </SBackToOriginalBtn>
       )}
@@ -98,6 +131,8 @@ const STabBtn = styled.button<{
   font-size: 12px;
   line-height: 16px;
   color: ${({ active }) => (active ? '#2C2C33' : '#9BA2B1')};
+
+  width: 50%;
 
   padding: 8px 16px;
 

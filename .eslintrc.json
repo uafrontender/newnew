@@ -45,6 +45,7 @@
     "radix": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-inferrable-types": "off",
+    "no-underscore-dangle": "off",
 
     "@typescript-eslint/no-unused-vars": [
       2,

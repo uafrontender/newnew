@@ -15,11 +15,13 @@ import Text from '../components/atoms/Text';
 import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { useAppState } from '../contexts/appStateContext';
 
 export const HowItWorks = () => {
   const { t } = useTranslation('page-HowItWorks');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -47,8 +49,8 @@ export const HowItWorks = () => {
             <source
               src={
                 theme.name === 'light'
-                  ? assets.info.lightQuestionMarkAnimated
-                  : assets.info.darkQuestionMarkAnimated
+                  ? assets.info.lightQuestionMarkVideo
+                  : assets.info.darkQuestionMarkVideo
               }
               type='video/mp4'
             />
@@ -59,10 +61,10 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightAcAnimated
-                  : assets.creation.darkAcAnimated
+                  ? assets.common.ac.lightAcAnimated()
+                  : assets.common.ac.darkAcAnimated()
               }
-              alt='events'
+              alt='bids'
               // Quick fix for animated image alignment
               style={
                 // eslint-disable-next-line no-nested-ternary
@@ -83,8 +85,8 @@ export const HowItWorks = () => {
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightMcAnimated
-                  : assets.creation.darkMcAnimated
+                  ? assets.common.mc.lightMcAnimated()
+                  : assets.common.mc.darkMcAnimated()
               }
               alt='superpolls'
               // Quick fix for animated image alignment
@@ -103,12 +105,12 @@ export const HowItWorks = () => {
             </SectionContent>
           </Section>
 
-          <Section>
+          {/* <Section>
             <SectionImage
               src={
                 theme.name === 'light'
-                  ? assets.creation.lightCfAnimated
-                  : assets.creation.darkCfAnimated
+                  ? assets.creation.lightCfAnimated()
+                  : assets.creation.darkCfAnimated()
               }
               alt='goals'
               // Quick fix for animated image alignment
@@ -125,7 +127,7 @@ export const HowItWorks = () => {
               <Headline variant={3}>{t('goals.title')}</Headline>
               <SectionText variant={5}>{t('goals.text')}</SectionText>
             </SectionContent>
-          </Section>
+            </Section> */}
 
           <ControlsContainer>
             <Link href='/'>
@@ -160,10 +162,16 @@ export const HowItWorks = () => {
 export default HowItWorks;
 
 export const getServerSideProps = async (context: NextPageContext) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-HowItWorks',
-  ]);
+  context.res?.setHeader(
+    'Cache-Control',
+    'public, s-maxage=30, stale-while-revalidate=35'
+  );
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-HowItWorks'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {
@@ -177,7 +185,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 20px ${({ theme }) => theme.media.tablet} {
+  padding-top: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
     padding-top: 38px;
     padding-left: 20px;
     padding-right: 20px;

@@ -6,6 +6,9 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
+import InlineSvg from '../InlineSVG';
+import { Mixpanel } from '../../../utils/mixpanel';
+import DisplayName from '../../DisplayName';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -19,13 +22,21 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
       {creators.map((creator) => (
         <Link href={`/${creator.username}`} key={creator.uuid}>
           <a>
-            <SPost>
+            <SPost
+              onClick={() => {
+                Mixpanel.track('Search Result Creator Clicked', {
+                  _creatorUsername: creator.username,
+                });
+              }}
+            >
               <SLeftSide>
                 <SUserAvatar>
                   <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
                 </SUserAvatar>
                 <SPostData>
-                  <SCreatorUsername>{creator.nickname}</SCreatorUsername>
+                  <CreatorData>
+                    <SDisplayName user={creator} />
+                  </CreatorData>
                   <SLink>{t('search.creatorSubtitle')}</SLink>
                 </SPostData>
               </SLeftSide>
@@ -75,6 +86,13 @@ const SPostData = styled.div`
   flex-direction: column;
 `;
 
+const CreatorData = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+`;
+
 const SUserAvatar = styled.div`
   width: 36px;
   height: 36px;
@@ -90,8 +108,14 @@ const SUserAvatar = styled.div`
   }
 `;
 
-const SCreatorUsername = styled.span`
+const SDisplayName = styled(DisplayName)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  min-width: 24px;
+  min-height: 24px;
+  margin-right: 14px;
 `;
 
 const SLink = styled.span`

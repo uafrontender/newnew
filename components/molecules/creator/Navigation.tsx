@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,14 +8,18 @@ import styled, { css, useTheme } from 'styled-components';
 import InlineSVG from '../../atoms/InlineSVG';
 import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboard.svg';
 import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
-import subscriptionsFilledIcon from '../../../public/images/svg/icons/filled/Subscriptions.svg';
-import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Subscriptions.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
+import bundlesFilledIcon from '../../../public/images/svg/icons/filled/Bundles.svg';
+import bundlesOutlinedIcon from '../../../public/images/svg/icons/outlined/Bundles.svg';
+import myPostsOutlinedIcon from '../../../public/images/svg/icons/outlined/MyPosts.svg';
+import myPostsFilledIcon from '../../../public/images/svg/icons/filled/MyPosts.svg';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface NavigationItem {
+  id?: string;
   url: string;
   label: string;
   iconFilled: any;
@@ -36,30 +41,55 @@ export const Navigation = () => {
         iconOutlined: dashboardOutlinedIcon,
       },
       {
-        url: '/creator/subscribers',
-        label: t('navigation.subscriptions'),
-        iconFilled: subscriptionsFilledIcon,
-        iconOutlined: subscriptionsOutlinedIcon,
+        url: '/profile/my-posts',
+        label: t('navigation.myPosts'),
+        iconFilled: myPostsFilledIcon,
+        iconOutlined: myPostsOutlinedIcon,
       },
       {
-        url: '/creator/get-paid',
-        label:
-          user.creatorData?.options?.isCreatorConnectedToStripe === true
-            ? t('navigation.getPaidEdit')
-            : t('navigation.getPaid'),
-        iconFilled: walletFilledIcon,
-        iconOutlined: walletOutlinedIcon,
+        id: 'bundles-navigation',
+        url: '/creator/bundles',
+        label: t('navigation.bundles'),
+        iconFilled: bundlesFilledIcon,
+        iconOutlined: bundlesOutlinedIcon,
       },
+      ...(!user.userData?.options?.isWhiteListed
+        ? [
+            {
+              url: '/creator/get-paid',
+              label:
+                user.creatorData?.options?.isCreatorConnectedToStripe === true
+                  ? t('navigation.getPaidEdit')
+                  : t('navigation.getPaid'),
+              iconFilled: walletFilledIcon,
+              iconOutlined: walletOutlinedIcon,
+            },
+          ]
+        : []),
     ],
-    [t, user.creatorData]
+    [
+      t,
+      user.creatorData?.options?.isCreatorConnectedToStripe,
+      user.userData?.options?.isWhiteListed,
+    ]
   );
 
   const renderItem = useCallback(
     (item: NavigationItem) => {
       const active = router.route.includes(item.url);
       return (
-        <Link href={item.url} key={item.url}>
-          <SItem active={active}>
+        <Link key={item.url} href={item.url}>
+          <SItem
+            id={item.id}
+            active={active}
+            onClickCapture={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _stage: 'Dashboard',
+                _component: 'Navigation',
+                _target: item.url,
+              });
+            }}
+          >
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
               fill={
@@ -87,7 +117,18 @@ export const Navigation = () => {
       {collection.map(renderItem)}
       <Link href='/creation'>
         <a>
-          <Button>{t('navigation.newPost')}</Button>
+          <Button
+            onClickCapture={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _button: 'Make a decision',
+                _stage: 'Dashboard',
+                _component: 'Navigation',
+                _target: '/creation',
+              });
+            }}
+          >
+            {t('navigation.newPost')}
+          </Button>
         </a>
       </Link>
     </SContainer>
@@ -128,6 +169,7 @@ const SItem = styled.a<ISItem>`
       props.active
         ? props.theme.colorsThemed.accent.blue
         : props.theme.colorsThemed.text.tertiary};
+
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 

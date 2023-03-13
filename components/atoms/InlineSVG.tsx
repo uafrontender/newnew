@@ -7,7 +7,7 @@ interface IInlineSvg {
   fill?: string;
   width?: string;
   height?: string;
-  onClick?: () => any;
+  onClick?: (e: React.MouseEvent) => any;
   hoverFill?: string | undefined;
   clickable?: boolean;
   scaleOnClick?: boolean;
@@ -17,6 +17,8 @@ export const InlineSvg: React.FC<IInlineSvg> = (props) => {
   const { svg, ...rest } = props;
 
   return (
+    // TODO: div contains svg attributes because of {...props}.
+    // TODO: no need both {...rest} and  {...props}
     <SSvgHolder
       {...rest}
       dangerouslySetInnerHTML={{ __html: svg }}

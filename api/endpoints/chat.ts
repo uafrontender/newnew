@@ -8,7 +8,10 @@ import {
 
 const BASE_URL_CHAT = `${BASE_URL}/chat`;
 
-export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
+export const markRoomAsRead = (
+  payload: newnewapi.MarkRoomAsReadRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.MarkRoomAsReadRequest,
     newnewapi.EmptyResponse
@@ -17,10 +20,14 @@ export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_CHAT}/mark_room_as_read`,
     'post',
-    payload
+    payload,
+    signal ?? undefined
   );
 
-export const getMessages = (payload: newnewapi.GetMessagesRequest) =>
+export const getMessages = (
+  payload: newnewapi.GetMessagesRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.GetMessagesRequest, newnewapi.GetMessagesResponse>(
     newnewapi.GetMessagesRequest,
     newnewapi.GetMessagesResponse,
@@ -32,10 +39,16 @@ export const getMessages = (payload: newnewapi.GetMessagesRequest) =>
       ? {
           'x-auth-token': cookiesInstance.get('accessToken'),
         }
-      : {}
+      : {},
+    'cors',
+    'same-origin',
+    signal ?? undefined
   );
 
-export const getMyRooms = (payload: newnewapi.GetMyRoomsRequest) =>
+export const getMyRooms = (
+  payload: newnewapi.GetMyRoomsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetMyRoomsRequest,
     newnewapi.GetMyRoomsResponse
@@ -44,10 +57,14 @@ export const getMyRooms = (payload: newnewapi.GetMyRoomsRequest) =>
     newnewapi.GetMyRoomsResponse,
     `${BASE_URL_CHAT}/get_my_rooms`,
     'post',
-    payload
+    payload,
+    signal ?? undefined
   );
 
-export const sendMessage = (payload: newnewapi.SendMessageRequest) =>
+export const sendMessage = (
+  payload: newnewapi.SendMessageRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SendMessageRequest,
     newnewapi.SendMessageResponse
@@ -56,10 +73,14 @@ export const sendMessage = (payload: newnewapi.SendMessageRequest) =>
     newnewapi.SendMessageResponse,
     `${BASE_URL_CHAT}/send_message`,
     'post',
-    payload
+    payload,
+    signal ?? undefined
   );
 
-export const deleteMessage = (payload: newnewapi.DeleteMessageRequest) =>
+export const deleteMessage = (
+  payload: newnewapi.DeleteMessageRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.DeleteMessageRequest,
     newnewapi.EmptyResponse
@@ -68,10 +89,14 @@ export const deleteMessage = (payload: newnewapi.DeleteMessageRequest) =>
     newnewapi.EmptyResponse,
     `${BASE_URL_CHAT}/delete_message`,
     'post',
-    payload
+    payload,
+    signal ?? undefined
   );
 
-export const getTotalUnreadMessageCounts = (payload: newnewapi.EmptyRequest) =>
+export const getTotalUnreadMessageCounts = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.TotalUnreadMessageCounts
@@ -80,10 +105,14 @@ export const getTotalUnreadMessageCounts = (payload: newnewapi.EmptyRequest) =>
     newnewapi.TotalUnreadMessageCounts,
     `${BASE_URL_CHAT}/get_total_unread_message_counts`,
     'post',
-    payload
+    payload,
+    signal ?? undefined
   );
 
-export const getRoom = (payload: newnewapi.GetRoomRequest) =>
+export const getRoom = (
+  payload: newnewapi.GetRoomRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.GetRoomRequest,
     newnewapi.ChatRoom
@@ -92,5 +121,22 @@ export const getRoom = (payload: newnewapi.GetRoomRequest) =>
     newnewapi.ChatRoom,
     `${BASE_URL_CHAT}/get_room`,
     'post',
-    payload
+    payload,
+    signal ?? undefined
+  );
+
+export const getVisavisList = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.VisavisListResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.VisavisListResponse,
+    `${BASE_URL_CHAT}/get_visavis_list`,
+    'post',
+    payload,
+    signal ?? undefined
   );

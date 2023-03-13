@@ -1,17 +1,38 @@
 {
-  "paymentMethodTitle": "Payment method",
+  "paymentMethodTitle": "支付方式",
   "options": {
     "wallet": {
-      "subtitle": "Pay with",
-      "name": "NewNew wallet",
-      "fees": "No fees"
+      "subtitle": "支付方式",
+      "name": "NewNew錢包",
+      "fees": "無費用"
     },
     "card": {
-      "name": "Credit or debit card",
-      "fees": "up to 3% fees"
+      "name": "信用卡或借記卡",
+      "fees": "費率最高3%"
     }
   },
-  "payButton": "Pay",
-  "tocApplyLink": "Terms",
-  "tocApplyText": "apply"
+  "payButton": "支付",
+  "tocApplyLink": "條款",
+  "tocApplyText": "適用",
+  "reCaptchaTos": {
+    "siteProtectedBy": "本網站受reCAPTCHA和Google保護。",
+    "privacyPolicy": "隱私政策",
+    "and": "和",
+    "tos": "服務條款",
+    "apply": "適用。"
+  },
+  "primaryCard": "主卡",
+  "newCard": "新卡",
+  "saveCard": "保存卡片供以後使用",
+  "email": "電子郵件",
+  "errors": {
+    "wrongEmail": "電子郵件無法使用",
+    "paymentFailed": "付款失敗",
+    "requestFailed": "請求失敗",
+    "invalidFee": "出錯了。請重新載入此頁面並重試"
+  },
+  "errorCaptions": {
+    "emailRequired_NEED_TRANSLATION": "Email is required"
+  },
+  "processingFee": "處理費"
 }

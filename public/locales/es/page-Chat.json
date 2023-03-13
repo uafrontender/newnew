@@ -1,93 +1,98 @@
 {
   "meta": {
-    "title": "Direct Messages"
+    "title": "Mensajes directos"
   },
   "chat": {
-    "today": "Today",
-    "placeholder": "Type a message...",
-    "welcomeMessage": "You successfully subscribed! Now you can send a message to",
-    "noMessagesFirstLine": "No messages here yet...",
-    "noMessagesSecondLine": "Send a message to start conversation.",
-    "typing": "Typing..."
+    "today": "Hoy",
+    "placeholder": "Escribe un mensaje...",
+    "welcomeMessage": "Ahora puedes enviar un mensaje",
+    "noMessagesFirstLine": "No hay mensajes aquí todavía...",
+    "noMessagesSecondLine": "Envia un mensaje para iniciar la conversación.",
+    "typing": "Escribiendo..."
   },
   "userBlocked": {
-    "title": "You blocked ",
-    "message": "Unblock them to chat. Don’t worry, they can’t see that you blocked them...",
-    "buttonText": "Unblock"
+    "title": "Has bloqueado a ",
+    "message": "Tendrás que desbloquearlos para chatear con ellos. No te preocupes, no pueden ver que los has bloqueado...",
+    "buttonText": "Desbloquear"
   },
   "groupBlocked": {
-    "title": "Group blocked",
-    "message": "Unblock the group, to continue conversation.",
-    "buttonText": "Unblock"
+    "title": "Grupo bloqueado",
+    "message": "Desbloquea el grupo para continuar la conversación.",
+    "buttonText": "Desbloquear"
   },
   "subscriptionExpired": {
-    "title": "Subscription expired",
-    "message": "Only subscribers can send messages. Renew subscription.",
-    "buttonText": "Renew subscription"
+    "title": "La mensajería privada ha caducado",
+    "message": "Compra un nuevo bundle de Superpoll para enviar un mensaje",
+    "buttonText": "Comprar un bundle"
   },
   "messagingDisabled": {
-    "title": "Messaging turned off",
-    "message": " temporarily turned off their subscription. Check back soon!"
+    "title": "Mensajería desactivada",
+    "message": " desactivó temporalmente sus mensajes privados. ¡Regresa pronto!"
   },
   "accountDeleted": {
-    "title": "Account deleted",
-    "message": "Account is no longer available.",
-    "buttonText": "Delete chat"
+    "title": "Cuenta eliminada",
+    "message": "La cuenta ya no está disponible.",
+    "buttonText": "Eliminar conversación"
   },
   "toolbar": {
-    "searchPlaceholder": "Search for messages or users"
+    "searchPlaceholder": "Buscar usuarios"
   },
   "modal": {
     "blockUser": {
-      "title": "Block",
-      "messageFirstPart": "Are you sure you want to block",
-      "messageSecondPart": "from messaging you?",
+      "title": "Bloquear",
+      "messageFirstPart": "¿Estás seguro de que quieres bloquear a ",
+      "messageSecondPart": "de mandarte mensajes?",
       "button": {
-        "cancel": "Cancel",
-        "confirm": "Block"
+        "cancel": "Cancelar",
+        "confirm": "Bloquear"
       }
     },
     "blockGroup": {
-      "title": "Block group",
+      "title": "Bloquear grupo",
       "button": {
-        "confirm": "Block group"
+        "confirm": "Bloquear grupo"
       }
     },
     "newMessage": {
-      "title": "New message",
-      "searchPlaceholder": "Search",
-      "noResultsText": "No results for",
-      "noResultsSearchText": "Try a new name..."
+      "title": "Nuevo mensaje",
+      "searchPlaceholder": "Buscar",
+      "noResultsText": "No hay resultados para",
+      "noResultsSearchText": "Intenta un nuevo nombre..."
     },
-    "renewSubscriptionsSubtitle": "Renew subscription to"
+    "renewSubscriptionsSubtitle": "Renovar la suscripción a"
   },
   "emptyInbox": {
-    "title": "Your inbox is empty",
-    "text": "Once you start a new conversation, you’ll see it listed here"
+    "title": "Su bandeja de entrada está vacía",
+    "text": "Cuando inicies una conversación con el dueño de un Bundle, lo verás listado aquí"
   },
+  "selectChat": "Selecciona un chat para comenzar tu mensaje",
   "newAnnouncement": {
-    "title": "New announcement",
-    "text": "Only you can send messages to the group.",
-    "created": "You created the announcement",
-    "member": "member",
-    "members": "members"
+    "title": "Nuevo anuncio",
+    "text": "Solo tú puedes enviar mensajes al grupo.",
+    "created": "Tú creaste el anuncio",
+    "member": "miembro",
+    "members": "miembros",
+    "noAnnouncement": "Todavía no hay anuncios aquí..."
   },
   "default": {
-    "searchPlaceholder": "Search"
+    "searchPlaceholder": "Buscar"
   },
   "announcement": {
-    "title": "'s announcement",
-    "topMessageStart": "Only",
-    "topMessageEnd": "can send messages"
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "El anuncios de ",
+    "suffix": "",
+    "afterName": "",
+    "topMessageStart": "Solamente",
+    "topMessageEnd": "puede mandar mensajes"
   },
   "userTypes": {
-    "all": "All",
-    "subscribers": "My Subscribers",
-    "subscribing": "Creators"
+    "all": "Todos",
+    "bundleOwners": "Poseedores de bundles",
+    "creators": "Creadores"
   },
   "dates": {
-    "now": "now",
+    "now": "ahora",
     "min": "min",
-    "today": "Today"
+    "today": "hoy"
   }
 }

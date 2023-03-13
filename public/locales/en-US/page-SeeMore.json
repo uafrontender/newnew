@@ -1,8 +1,8 @@
 {
   "meta": {
     "ac": {
-      "title": "See more Events on NewNew",
-      "description": "See more Events creators posted on creator economy startup company NewNew"
+      "title": "See more Bids on NewNew",
+      "description": "See more Bids creators posted on creator economy startup company NewNew"
     },
     "mc": {
       "title": "See more Superpolls on NewNew",
@@ -48,11 +48,12 @@
   },
   "collection": {
     "title": {
-      "ac": "Events",
+      "ac": "Bids",
       "mc": "Superpolls",
       "cf": "Goals",
       "biggest": "Greatest of all Time",
-      "for-you": "For you"
+      "for-you": "For you",
+      "recent-activity": "Recent Activity"
     },
     "button": {
       "cancel": "Cancel"

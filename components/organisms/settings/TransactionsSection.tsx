@@ -1,7 +1,5 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable padded-blocks */
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import Button from '../../atoms/Button';
@@ -31,6 +29,15 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
   >([]);
   const theme = useTheme();
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [minHeight, setMinHeight] = useState(0);
+
+  useEffect(() => {
+    if (lastPage && myTransactions.length && wrapperRef.current && !minHeight) {
+      setMinHeight(wrapperRef.current.clientHeight);
+    }
+  }, [myTransactions, minHeight, lastPage]);
+
   const fetchMyTransactions = useCallback(async () => {
     try {
       const payload = new newnewapi.GetMyTransactionsRequest({
@@ -46,8 +53,9 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
   }, [currentPage, transactionsLimit]);
 
   useEffect(() => {
-    if (!lastPage && transactionsTotal > transactionsLimit)
+    if (!lastPage && transactionsTotal > transactionsLimit) {
       setLastPage(Math.ceil(transactionsTotal / transactionsLimit));
+    }
   }, [transactionsTotal, transactionsLimit, lastPage]);
 
   useEffect(() => {
@@ -73,7 +81,11 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
   }, [currentPage, prevPage]);
 
   return (
-    <SWrapper onMouseEnter={() => handleSetActive()}>
+    <SWrapper
+      ref={wrapperRef}
+      style={{ minHeight }}
+      onMouseEnter={() => handleSetActive()}
+    >
       {myTransactions.map((transaction) => (
         <TransactionCard
           key={transaction.id?.toString()}
@@ -120,7 +132,7 @@ export default TransactionsSection;
 const SWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 18px;
   padding-bottom: 25px;
 `;
 interface ISButton {
@@ -154,6 +166,7 @@ const SNav = styled.div`
   font-weight: bold;
   align-items: center;
   justify-content: center;
+  margin-top: auto;
 `;
 interface ISInlineSVG {
   type?: string;

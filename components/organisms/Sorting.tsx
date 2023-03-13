@@ -13,15 +13,15 @@ import SortIconAnimated from '../atoms/SortIconAnimated';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface ISorting {
   category: string;
-  options: any;
-  selected: any;
+  options: Record<string, string>[];
+  selected?: Record<string, string>;
   onChange: (selected: any) => void;
 }
 
@@ -32,12 +32,12 @@ export const Sorting: React.FC<ISorting> = (props) => {
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const selectedCount = Object.keys(selected).length;
+  const selectedCount = selected ? Object.keys(selected).length : 0;
 
   const handleToggleSortingClick = useCallback(() => {
     setFocused(!focused);
@@ -158,8 +158,10 @@ export const Sorting: React.FC<ISorting> = (props) => {
   );
 
   if (isMobile) {
-    if (animate) {
-      // @ts-ignore
+    if (
+      animate &&
+      (document?.getElementById('sorting-container') as HTMLElement)
+    ) {
       return createPortal(
         <AnimatedPresence
           start={animate}
@@ -168,7 +170,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         >
           {content}
         </AnimatedPresence>,
-        document.getElementById('sorting-container') as HTMLElement
+        document?.getElementById('sorting-container') as HTMLElement
       );
     }
     return <div />;

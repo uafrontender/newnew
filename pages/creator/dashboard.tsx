@@ -1,29 +1,32 @@
 import React, { ReactElement } from 'react';
 import Head from 'next/head';
-import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
-import { useUpdateEffect } from 'react-use';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useUpdateEffect } from 'react-use';
+import { useRouter } from 'next/router';
 
-import General from '../../components/templates/General';
 import Content from '../../components/organisms/creator/Dashboard';
 
 import { NextPageWithLayout } from '../_app';
-import { useAppSelector } from '../../redux-store/store';
 import assets from '../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import DashboardLayout from '../../components/templates/DashboardLayout';
+import ChatContainer from '../../components/organisms/direct-messages/ChatContainer';
+import { useGetChats } from '../../contexts/chatContext';
+import { useAppSelector } from '../../redux-store/store';
 
 export const Dashboard = () => {
-  const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { t } = useTranslation('page-Creator');
+  const { mobileChatOpened } = useGetChats();
+  const { userData } = useAppSelector((state) => state.user);
 
   useUpdateEffect(() => {
-    if (!user.loggedIn) {
-      router?.push('/sign-up?to=log-in');
+    if (!userData?.options?.isCreator) {
+      router.replace('/');
     }
-  }, [router, user.loggedIn]);
+  }, [userData?.options?.isCreator]);
 
   return (
     <>
@@ -38,22 +41,24 @@ export const Dashboard = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Content />
+      {mobileChatOpened && <ChatContainer />}
     </>
   );
 };
 
 (Dashboard as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <SGeneral withChat>{page}</SGeneral>
+  <DashboardLayout withChat>{page}</DashboardLayout>
 );
 
 export default Dashboard;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-Creator',
-    'page-Chat',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-Creator', 'page-Chat'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   const { req } = context;
 
@@ -74,17 +79,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
-
-const SGeneral = styled(General)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.secondary
-      : props.theme.colorsThemed.background.primary};
-
-  ${({ theme }) => theme.media.laptop} {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.white
-        : props.theme.colorsThemed.background.primary};
-  }
-`;

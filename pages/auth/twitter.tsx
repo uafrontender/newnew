@@ -4,10 +4,12 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useCookies } from 'react-cookie';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
 import { signInWithTwitter } from '../../api/endpoints/auth';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
@@ -31,18 +33,28 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { resumePushNotification } = usePushNotifications();
 
   useEffect(() => {
-    if (user.loggedIn) router?.push('/');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (user.loggedIn) router?.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
-        if (!oauth_token || !oauth_verifier) throw new Error('No token');
+        if (!oauth_token || !oauth_verifier) {
+          throw new Error('No token on twitter verification');
+        }
 
         const requestPayload = new newnewapi.TwitterSignInRequest({
           oauthToken: oauth_token,
@@ -52,7 +64,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         const res = await signInWithTwitter(requestPayload);
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -98,6 +110,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         dispatch(setUserLoggedIn(true));
 
+        resumePushNotification();
+
         setIsLoading(false);
         if (data.redirectUrl) {
           router?.push(data.redirectUrl);
@@ -115,7 +129,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   return (
     <div>
@@ -147,7 +161,9 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
 export default TwitterAuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  ITwitterAuthRedirectPage
+> = async (context) => {
   const { oauth_token, oauth_verifier } = context.query;
 
   if (

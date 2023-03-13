@@ -19,15 +19,27 @@ export const SearchResults = () => {
   const { t } = useTranslation('page-Search');
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState(router.query.query as string);
-  const [activeTab, setActiveTab] = useState<string>('posts');
+  const [searchType, setSearchType] = useState(router.query.type as string);
+  const [activeTab, setActiveTab] = useState<string>(
+    (router.query.tab as string) || 'posts'
+  );
 
   useEffect(() => {
     if (router) {
       if (router.query.query) setSearchValue(router.query.query as string);
       if (router.query.tab) {
-        router.query.tab === 'creators'
-          ? setActiveTab('creators')
-          : setActiveTab('posts');
+        if (router.query.tab === 'creators') {
+          setActiveTab('creators');
+        } else if (router.query.tab === 'tags') {
+          setActiveTab('tags');
+        } else {
+          setActiveTab('posts');
+        }
+      }
+      if (router.query.type) {
+        setSearchType(router.query.type as string);
+      } else if (router.query.tab === 'posts') {
+        setSearchType('');
       }
     }
   }, [router]);
@@ -53,12 +65,14 @@ export const SearchResults = () => {
           <STab
             active={activeTab === tab.id}
             key={tab.id}
-            onClick={() =>
-              router.push(`/search?query=${searchValue}&tab=${tab.id}`)
-            }
+            onClick={() => {
+              const clearedQuery = encodeURIComponent(searchValue);
+              router.push(
+                `/search?query=${clearedQuery}&type=${searchType}&tab=${tab.id}`
+              );
+            }}
           >
             <InlineSvg
-              // @ts-ignore
               svg={tab.id === activeTab ? StatisticsIconFilled : StatisticsIcon}
               fill={
                 tab.id === activeTab
@@ -86,12 +100,18 @@ export const SearchResults = () => {
     <SContainer>
       <SHeader>
         <SPageTitle>
-          {t('mainContent.title')} <span>{searchValue}</span>
+          {activeTab === 'posts' && searchType === 'hashtags' ? (
+            <SHashtag>#{searchValue}</SHashtag>
+          ) : (
+            <>
+              {t('mainContent.title')} <Query>{searchValue}</Query>
+            </>
+          )}
         </SPageTitle>
       </SHeader>
       <Tabs />
       {activeTab === 'posts' ? (
-        <SearchDecisions query={searchValue} />
+        <SearchDecisions query={searchValue} type={searchType} />
       ) : (
         <SearchCreators query={searchValue} />
       )}
@@ -128,9 +148,18 @@ const SPageTitle = styled.h1`
   line-height: 56px;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   margin: 0;
-  span {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
-  }
+`;
+
+const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+`;
+
+const Query = styled.span`
+  overflow-wrap: break-word;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
 const STabs = styled.div`

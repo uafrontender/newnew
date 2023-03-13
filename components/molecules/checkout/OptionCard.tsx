@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef } from 'react';
-import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import Lottie from '../../atoms/Lottie';
@@ -12,42 +11,56 @@ import checkBoxAnim from '../../../public/animations/checkbox.json';
 interface IOptionCard {
   selected?: boolean;
   handleClick: () => void;
+  label: string;
 }
 
 const OptionCard: React.FunctionComponent<IOptionCard> = ({
   selected,
   handleClick,
+  label,
 }) => {
-  const { t } = useTranslation('modal-PaymentModal');
   const ref: any = useRef();
+  const prevSelected = useRef(selected);
+  const isStoppedRef = useRef(true);
 
   useEffect(() => {
-    ref.current.anim.stop();
+    if (prevSelected.current !== selected) {
+      prevSelected.current = selected;
+      ref.current.anim.stop();
+      isStoppedRef.current = false;
 
-    if (selected) {
-      ref.current.anim.setSegment(0, 23);
-    } else {
-      ref.current.anim.setSegment(1, 1);
+      if (selected) {
+        ref.current.anim.setSegment(0, 23);
+      } else {
+        ref.current.anim.setSegment(1, 1);
+      }
+      ref.current.anim.play();
     }
-    ref.current.anim.play();
-  }, [ref, selected]);
+  }, [ref, selected, prevSelected]);
 
   return (
-    <SOptionCard selected={selected ?? false} onClick={handleClick}>
+    <SOptionCard
+      selected={selected ?? false}
+      onClick={handleClick}
+      type='button'
+    >
       <SAnimation>
         <Lottie
           ref={ref}
-          width={24}
-          height={24}
+          width={20}
+          height={20}
           options={{
             loop: false,
             autoplay: false,
             animationData: checkBoxAnim,
           }}
+          isStopped={isStoppedRef.current}
         />
       </SAnimation>
       <SLabelContent>
-        <Text variant={2}>{t('options.card.name')}</Text>
+        <Text variant={3} weight={600}>
+          {label}
+        </Text>
         {/* <SFeesText
           variant={2}
         >
@@ -84,9 +97,8 @@ const SOptionCard = styled.button<{
       ? 'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))'
       : theme.colorsThemed.background.tertiary};
 
-  padding: 16px 16px;
+  padding: 16px;
   margin-top: 12px;
-  margin-bottom: 12px;
 
   cursor: pointer;
   transition: 0.2s linear;

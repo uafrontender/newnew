@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import Tabs, { Tab } from '../Tabs';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IProfileTabs {
   tabs: Tab[];
@@ -47,10 +48,16 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = (props) => {
   const { t } = useTranslation('page-Profile');
   const router = useRouter();
 
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
   return (
     <Tabs
       t={t}
       tabs={tabs}
+      hideIndicatorOnResizing={!isMobile}
       activeTabIndex={findActiveTab(tabs, router.pathname, pageType)}
     />
   );

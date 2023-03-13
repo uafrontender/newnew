@@ -1,7 +1,17 @@
 {
   "meta": {
-    "title": "Anular la suscripción a NewNew"
+    "title": "Cancelar suscripción de NewNew"
   },
-  "heading": "Has anulado satisfactoriamente tu suscripción",
-  "subheading": "Gestiona las notificaciones por correo electrónico desde la página de configuración."
+  "success": {
+    "heading": "Has cancelado tu suscripción con éxito",
+    "subheading": "Administra las notificaciones por correo electrónico desde la página de configuración."
+  },
+  "fail": {
+    "heading": "No hemos podido cancelar tu suscripción",
+    "subheading": "Puedes seguir administrando las notificaciones por correo electrónico desde la página de configuración."
+  },
+  "confirm": "Ok",
+  "error": {
+    "requestFailed": "La solicitud ha fallado"
+  }
 }

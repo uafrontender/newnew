@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -9,47 +9,38 @@ import UserAvatar from '../UserAvatar';
 import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 import UserEllipseMenu from '../profile/UserEllipseMenu';
-import ReportModal, { ReportData } from '../chat/ReportModal';
+import ReportModal, { ReportData } from '../direct-messages/ReportModal';
 import BlockUserModalProfile from '../profile/BlockUserModalProfile';
-import UnsubscribeModal from '../profile/UnsubscribeModal';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-
-import { formatNumber } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import { markUser } from '../../../api/endpoints/user';
 import UserEllipseModal from '../profile/UserEllipseModal';
-import { getSubscriptionStatus } from '../../../api/endpoints/subscription';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { useBundles } from '../../../contexts/bundlesContext';
+import { formatNumber } from '../../../utils/format';
+import getDisplayname from '../../../utils/getDisplayname';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
-  // TODO: make sign creator specific, get more data
-  sign?: string;
-  subscriptionPrice?: number;
   withEllipseMenu?: boolean;
+  onBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
-  sign,
-  subscriptionPrice,
   withEllipseMenu,
+  onBundleClicked,
 }) => {
-  const router = useRouter();
   const { t } = useTranslation('common');
+  const router = useRouter();
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-
-  // Subscription status
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [wasSubscribed, setWasSubscribed] = useState(false);
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   // Ellipse menu
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -57,31 +48,22 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [unsubscribeModalOpen, setUnsubscribeModalOpen] = useState(false);
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
+  const { usersIBlocked, changeUserBlockedStatus } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(creator.uuid as string),
     [usersIBlocked, creator.uuid]
   );
 
-  const unblockUserAsync = async (uuid: string) => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-        userUuid: uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(uuid);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === creator.uuid),
+    [bundles, creator.uuid]
+  );
 
   const handleClickReport = useCallback(() => {
-    if (!currentUser.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -103,42 +85,10 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
-  useEffect(() => {
-    async function fetchIsSubscribed() {
-      try {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: creator.uuid,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        if (res.data?.status?.activeRenewsAt) {
-          setIsSubscribed(true);
-        } else {
-          setIsSubscribed(false);
-        }
-        if (res.data?.status?.activeCancelsAt) {
-          setWasSubscribed(true);
-        } else {
-          setWasSubscribed(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchIsSubscribed();
-
-    // TODO: After update GetCreatorsImSubscribedToResponse on backend remaster this section
-    // let isSub = undefined;
-    // if (creatorsImSubscribedTo && creatorsImSubscribedTo.length > 0) {
-    //   isSub = creatorsImSubscribedTo.find((cr) => cr.uuid === user.uuid);
-    // }
-    // isSub ? setIsSubscribed(true) : setIsSubscribed(false);
-  }, [creatorsImSubscribedTo, creator.uuid]);
+  const moreButtonRef: any = useRef();
 
   return (
-    <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
+    <SCard>
       {withEllipseMenu && (
         <SMoreButton
           view='transparent'
@@ -147,6 +97,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
             e.stopPropagation();
             handleOpenEllipseMenu();
           }}
+          ref={moreButtonRef}
         >
           <InlineSvg
             svg={MoreIconFilled}
@@ -159,7 +110,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       {!isMobile && (
         <UserEllipseMenu
           isVisible={ellipseMenuOpen}
-          isSubscribed={isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           top='48px'
@@ -167,48 +117,64 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUserAsync(creator.uuid as string);
+              changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
           }}
           handleClickReport={handleClickReport}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
+          anchorElement={moreButtonRef.current}
         />
       )}
       <SUserAvatarContainer>
         <SUserAvatar>
           <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
         </SUserAvatar>
-        {sign && isSubscribed && <AvatarSign>{sign}</AvatarSign>}
-        {wasSubscribed && <AvatarSign>{t('creatorCard.cancelled')}</AvatarSign>}
       </SUserAvatarContainer>
-      <SDisplayName>{creator.nickname}</SDisplayName>
+      <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
+        <SDisplayName>{getDisplayname(creator)}</SDisplayName>
+        {creator.options?.isVerified && (
+          <SInlineSVG
+            svg={VerificationCheckmark}
+            width='16px'
+            height='16px'
+            fill='none'
+          />
+        )}
+      </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
-      {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
-        <SSubscriptionPrice>
-          {t('creatorCard.subscriptionCost', {
-            amount: formatNumber(subscriptionPrice / 100, false),
-          })}
-        </SSubscriptionPrice>
+      {onBundleClicked && (
+        <SButton
+          highlighted={!!creatorsBundle}
+          onClick={(e) => {
+            e.stopPropagation();
+            onBundleClicked(creator);
+          }}
+        >
+          {creatorsBundle
+            ? t('creatorCard.purchasedVotes', {
+                value: formatNumber(
+                  creatorsBundle.bundle?.votesLeft || 0,
+                  true
+                ),
+              })
+            : t('creatorCard.buyBundle')}
+        </SButton>
       )}
       <SBackground>
-        <Image src={creator.coverUrl ?? ''} layout='fill' />
+        <SImage src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
       {/* Modals */}
       {isMobile && (
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUserAsync(creator.uuid as string);
+              changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
@@ -216,20 +182,8 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {
-            setUnsubscribeModalOpen(true);
-          }}
         />
       )}
-      <UnsubscribeModal
-        confirmUnsubscribe={unsubscribeModalOpen}
-        user={creator}
-        closeModal={() => setUnsubscribeModalOpen(false)}
-        onUnsubcribeSuccess={() => {
-          setIsSubscribed(false);
-          setWasSubscribed(true);
-        }}
-      />
       <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={creator}
@@ -237,9 +191,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          creator.nickname ? creator.nickname || `@${creator.username}` : ''
-        }
+        reportedDisplayname={getDisplayname(creator)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
@@ -249,12 +201,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
 
 export default CreatorCard;
 
-CreatorCard.defaultProps = {
-  sign: '',
-  subscriptionPrice: undefined,
-};
-
-const SCard = styled.div<{ showSubscriptionPrice: boolean }>`
+const SCard = styled.div`
   position: relative;
   padding: 10px;
   display: flex;
@@ -262,9 +209,9 @@ const SCard = styled.div<{ showSubscriptionPrice: boolean }>`
   align-items: center;
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
   position: relative;
-  height: ${({ showSubscriptionPrice }) =>
-    showSubscriptionPrice ? '185px' : '160px'};
+  height: auto;
   cursor: pointer;
   transition: 0.2s linear;
   &:hover {
@@ -280,6 +227,10 @@ const SBackground = styled.div`
   top: 10px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   overflow: hidden;
+`;
+
+const SImage = styled(Image)`
+  object-fit: cover;
 `;
 
 const SUserAvatarContainer = styled.div`
@@ -310,22 +261,13 @@ const SUserAvatar = styled.div`
   }
 `;
 
-const AvatarSign = styled.div`
-  position: absolute;
+const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
   display: flex;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  bottom: -5px;
-  padding: 0px 8px;
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  color: #2c2c33;
-  border-radius: 10px;
-  height: 20px;
-  font-size: 8px;
-  line-height: 8px;
-  font-weight: 800;
-  text-transform: uppercase;
-  z-index: 2;
+  overflow: hidden;
+  margin: 0 0 5px;
+  padding-left: ${({ isVerified }) => (isVerified ? '24px' : '0px')};
 `;
 
 const SDisplayName = styled.p`
@@ -334,7 +276,11 @@ const SDisplayName = styled.p`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  margin: 0 0 5px;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  min-width: 24px;
+  min-height: 24px;
 `;
 
 const SUserName = styled.p`
@@ -345,13 +291,41 @@ const SUserName = styled.p`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SSubscriptionPrice = styled.p`
-  text-align: center;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-  margin-top: 5px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+const SButton = styled.button<{ highlighted: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 8px 16px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+
+  color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colors.darkGray
+      : theme.colorsThemed.button.color.primary};
+  background: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : theme.colorsThemed.button.background.primaryGrad};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+
+  cursor: pointer;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;
 
 const SMoreButton = styled(Button)`

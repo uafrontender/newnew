@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -12,8 +12,9 @@ import Caption from '../atoms/Caption';
 import Container from '../atoms/Grid/Container';
 import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
+import SettingsColorModeSwitch from '../molecules/profile/SettingsColorModeSwitch';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 // import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
@@ -21,11 +22,18 @@ import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 // import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
+import {
+  setColorMode,
+  TColorMode,
+} from '../../redux-store/slices/uiStateSlice';
+import { I18nNamespaces } from '../../@types/i18next';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IFooter {}
 
 type TItem = {
-  key: string;
+  key: keyof I18nNamespaces['common']['footer'];
   url: string;
   iconSrc?: string;
   email?: boolean;
@@ -34,9 +42,12 @@ type TItem = {
 
 export const Footer: React.FC<IFooter> = React.memo(() => {
   const { t } = useTranslation();
+  const { t: tCommon } = useTranslation('common');
   const theme = useTheme();
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const dispatch = useAppDispatch();
+  const { colorMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const topItems: TItem[] = [
     {
@@ -71,7 +82,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
       iconSrc: twitterIcon,
     }, */
     {
-      key: 'email',
+      key: 'email' as any,
       url: 'hi@newnew.co',
       // external: true,
       email: true,
@@ -81,17 +92,38 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     resizeMode
   );
 
+  useEffect(() => {
+    Mixpanel.track_links(
+      'footer a',
+      'Navigation Item Clicked',
+      (e: HTMLLinkElement) => ({
+        _target: e?.getAttribute('href'),
+      })
+    );
+  }, []);
+
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      scroller.scrollTo('top-reload', {
+      animateScroll.scrollToTop({
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     } else {
       router.push('/', '/');
     }
   };
+
+  const handleSetColorMode = useCallback(
+    (mode: TColorMode) => {
+      Mixpanel.track('Color mode switched', {
+        _component: 'Footer',
+        _colorMode: mode,
+      });
+      dispatch(setColorMode(mode));
+    },
+    [dispatch]
+  );
+
   const renderItem = (item: TItem) => {
     if (item.external) {
       return (
@@ -137,14 +169,13 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
         <Row>
           <Col>
             <SContent>
-              <SIconHolder>
+              <SIconHolder onClick={handleLogoClick}>
                 <InlineSvg
                   clickable
                   svg={mobileLogo}
                   fill='#1D6AFF'
                   width='48px'
                   height='48px'
-                  onClick={handleLogoClick}
                 />
               </SIconHolder>
               <STopContent>
@@ -200,6 +231,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                     </Link>
                   </SBlockRow>
                 </SBlock> */}
+                {!isMobile && <SChangeLanguage />}
               </STopContent>
               <SSeparator />
               <SBlockBottomRow>
@@ -222,8 +254,25 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                 </SLeftBlock>
                 <SRightBlock>
                   <SRightBlockItemHolder>
-                    <ChangeLanguage />
+                    <SettingsColorModeSwitch
+                      theme={theme}
+                      currentlySelectedMode={colorMode}
+                      variant='horizontal'
+                      isMobile
+                      buttonsCaptions={{
+                        light: tCommon('colorModeSwitch.options.light'),
+                        dark: tCommon('colorModeSwitch.options.dark'),
+                        auto: tCommon('colorModeSwitch.options.auto'),
+                      }}
+                      handleSetColorMode={handleSetColorMode}
+                      backgroundColor={
+                        theme.name === 'light'
+                          ? theme.colorsThemed.button.background.changeLanguage
+                          : ''
+                      }
+                    />
                   </SRightBlockItemHolder>
+                  {isMobile && <ChangeLanguage />}
                 </SRightBlock>
               </SBlockBottomRow>
             </SContent>
@@ -237,6 +286,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 export default Footer;
 
 const SWrapper = styled.footer`
+  padding-bottom: 36px;
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.background.secondary
@@ -251,6 +301,7 @@ const SContent = styled.div`
 const STopContent = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
 
   ${(props) => props.theme.media.tablet} {
     flex-direction: row;
@@ -299,6 +350,12 @@ const SBlockOption = styled.a`
   &:hover {
     color: ${(props) => props.theme.colorsThemed.text.primary};
   }
+`;
+
+const SChangeLanguage = styled(ChangeLanguage)`
+  position: absolute;
+  right: 0;
+  bottom: 0;
 `;
 
 // const SBlockRow = styled.div`
@@ -364,6 +421,9 @@ const SIconHolder = styled.div`
   top: 32px;
   right: 0;
   position: absolute;
+  z-index: 1;
+
+  cursor: pointer;
 `;
 
 const SLeftBlock = styled.div`
@@ -377,6 +437,8 @@ const SLeftBlock = styled.div`
 const SRightBlock = styled.div`
   order: 1;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
 
   ${(props) => props.theme.media.tablet} {

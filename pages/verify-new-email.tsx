@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { GetServerSideProps, NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 
@@ -17,6 +16,7 @@ import { SocketContext } from '../contexts/socketContext';
 import { setUserData } from '../redux-store/slices/userStateSlice';
 import { becomeCreator } from '../api/endpoints/user';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 interface IVerifyNewEmail {}
 
@@ -34,8 +34,11 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   // Redirect if the user is not logged in
   useEffect(() => {
-    if (!user.loggedIn) router.push('/');
-  }, [user.loggedIn, router]);
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
+      router.push('/');
+    }
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
 
   // Listen to Me update event
   useEffect(() => {
@@ -45,14 +48,6 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
       if (!decoded) return;
 
-      if (redirect === 'settings') {
-        dispatch(
-          setUserData({
-            email: decoded.me?.email,
-          })
-        );
-      }
-
       if (redirect === 'dashboard') {
         const becomeCreatorPayload = new newnewapi.EmptyRequest({});
 
@@ -61,10 +56,11 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         if (!becomeCreatorRes.data || becomeCreatorRes.error)
           throw new Error('Become creator failed');
 
+        // TODO: ideally we want it happen in syncUserWrapper as well
         dispatch(
           setUserData({
-            email: decoded.me?.email,
             options: {
+              ...user.userData?.options,
               isActivityPrivate:
                 becomeCreatorRes.data.me?.options?.isActivityPrivate,
               isCreator: becomeCreatorRes.data.me?.options?.isCreator,
@@ -78,7 +74,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       if (redirect === 'settings') {
         router.push('/profile/settings');
       } else {
-        router.push('/creator/dashboard');
+        router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
     };
 
@@ -111,6 +107,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         newEmail={email as string}
         redirect={redirect as 'settings' | 'dashboard'}
         expirationTime={60}
+        allowLeave={!user.loggedIn && user._persist?.rehydrated}
       />
     </>
   );
@@ -124,12 +121,15 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
 export default VerifyNewEmail;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'page-VerifyEmail',
-  ]);
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<any> {
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

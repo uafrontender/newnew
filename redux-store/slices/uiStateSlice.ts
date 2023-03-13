@@ -3,6 +3,7 @@
 // TODO: adjust eslint no-param-reassign for Slices
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { cookiesInstance } from '../../api/apiConfigs';
+import isBrowser from '../../utils/isBrowser';
 import { AppThunk } from '../store';
 
 // This slice will be responsible for major UI state data:
@@ -15,18 +16,8 @@ import { AppThunk } from '../store';
 // maybe we could use something similar for the user "tutorials"?
 // NB!
 
-export type TOverlay = true | false;
 export type TColorMode = 'light' | 'dark' | 'auto';
 export type TGlobalSearchActive = true | false;
-export type TResizeMode =
-  | 'mobile'
-  | 'mobileS'
-  | 'mobileM'
-  | 'mobileL'
-  | 'tablet'
-  | 'laptop'
-  | 'laptopL'
-  | 'desktop';
 export type TBanner = {
   show: boolean;
   title: string;
@@ -34,9 +25,7 @@ export type TBanner = {
 
 export interface UIStateInterface {
   banner: TBanner;
-  overlay: TOverlay;
   colorMode: TColorMode;
-  resizeMode: TResizeMode;
   mutedMode: boolean;
   globalSearchActive: TGlobalSearchActive;
 }
@@ -48,10 +37,8 @@ export const defaultUIState: UIStateInterface = {
     title:
       'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
   },
-  overlay: false,
   colorMode: 'auto',
   // colorMode: 'dark',
-  resizeMode: 'laptop',
   mutedMode: true,
   globalSearchActive: false,
 };
@@ -63,17 +50,11 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     _setColorMode(state, { payload }: PayloadAction<TColorMode>) {
       state.colorMode = payload;
     },
-    setResizeMode(state, { payload }: PayloadAction<TResizeMode>) {
-      state.resizeMode = payload;
-    },
     setGlobalSearchActive(
       state,
       { payload }: PayloadAction<TGlobalSearchActive>
     ) {
       state.globalSearchActive = payload;
-    },
-    setOverlay(state, { payload }: PayloadAction<TOverlay>) {
-      state.overlay = payload;
     },
     setBanner(state, { payload }: PayloadAction<TBanner>) {
       state.banner = payload;
@@ -81,27 +62,45 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     toggleMutedMode(state) {
       state.mutedMode = !state.mutedMode;
     },
+    setMutedMode(state, { payload }) {
+      state.mutedMode = payload;
+    },
   },
 });
 
 export const {
   setBanner,
-  setOverlay,
   _setColorMode,
-  setResizeMode,
   toggleMutedMode,
+  setMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
 
-export const setColorMode = (payload: any): AppThunk =>
-(dispatch) => {
-  dispatch(_setColorMode(payload));
+export const setColorMode =
+  (payload: any): AppThunk =>
+  (dispatch) => {
+    dispatch(_setColorMode(payload));
 
-  cookiesInstance.set('colorMode', payload, {
-    // Expire in 10 years
-    maxAge: 10 * 365 * 24 * 60 * 60,
-    path: '/',
-  });
-};
+    cookiesInstance.set('colorMode', payload, {
+      // Expire in 10 years
+      maxAge: 10 * 365 * 24 * 60 * 60,
+      path: '/',
+    });
+
+    // Smooth theming
+    if (isBrowser()) {
+      document?.documentElement?.classList?.add('theming');
+      document?.documentElement?.addEventListener(
+        'transitionend',
+        () => {
+          if (document?.documentElement) {
+            document?.documentElement?.classList?.remove('theming');
+          }
+        },
+        { once: true }
+      );
+      // document?.documentElement?.classList?.toggle('theme-change');
+    }
+  };
 
 export default uiSlice.reducer;

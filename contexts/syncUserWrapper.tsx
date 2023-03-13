@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
+import { useCookies } from 'react-cookie';
 import React, {
   useCallback,
   useContext,
@@ -7,12 +8,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useQueryClient } from 'react-query';
+
 import {
   getMe,
-  getMyCreatorTags,
   getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
+  setMyTimeZone,
 } from '../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
@@ -25,7 +28,8 @@ import {
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
-import { loadStateLS, removeStateLS, saveStateLS } from '../utils/localStorage';
+import { loadStateLS, saveStateLS } from '../utils/localStorage';
+import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
 
 interface ISyncUserWrapper {
   children: React.ReactNode;
@@ -34,11 +38,14 @@ interface ISyncUserWrapper {
 const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   children,
 }) => {
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const socketConnection = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
   const userWasLoggedIn = useRef(false);
+
+  const queryClient = useQueryClient();
 
   const updateCreatorDataSteps = useCallback(
     () => setCreatorDataSteps((curr) => curr + 1),
@@ -46,20 +53,25 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   );
 
   // When user logs out, clear the state
+  // Don't clean local storage in tests
   useEffect(() => {
-    if (userWasLoggedIn.current && !user.loggedIn) {
+    if (
+      userWasLoggedIn.current &&
+      !user.loggedIn &&
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
+    ) {
       setCreatorDataSteps(0);
-      removeStateLS('userTutorialsProgress');
       userWasLoggedIn.current = false;
+      queryClient.removeQueries({ queryKey: ['private'] });
     }
 
     if (user.loggedIn) {
       userWasLoggedIn.current = true;
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, queryClient]);
 
   useEffect(() => {
-    if (creatorDataSteps === 2) {
+    if (creatorDataSteps === 1) {
       dispatch(
         setCreatorData({
           isLoaded: true,
@@ -116,87 +128,118 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    user.creatorData?.options.isCreatorConnectedToStripe,
-    user.creatorData?.options.stripeConnectStatus,
+    user.creatorData?.options?.isCreatorConnectedToStripe,
+    user.creatorData?.options?.stripeConnectStatus,
     user.creatorData?.options,
     socketConnection,
   ]);
 
+  const syncUserData = useCallback(async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest({});
+
+      const { data } = await getMe(payload);
+
+      if (data?.me) {
+        dispatch(
+          setUserData({
+            username: data.me?.username,
+            nickname: data.me?.nickname,
+            email: data.me?.email,
+            avatarUrl: data.me?.avatarUrl,
+            coverUrl: data.me?.coverUrl,
+            userUuid: data.me?.userUuid,
+            bio: data.me?.bio,
+            dateOfBirth: {
+              day: data.me?.dateOfBirth?.day,
+              month: data.me?.dateOfBirth?.month,
+              year: data.me?.dateOfBirth?.year,
+            },
+            countryCode: data.me?.countryCode,
+            usernameChangedAt: data.me.usernameChangedAt,
+            genderPronouns: data.me.genderPronouns,
+            phoneNumber: data.me.phoneNumber,
+
+            options: {
+              isActivityPrivate: data.me?.options?.isActivityPrivate,
+              isCreator: data.me?.options?.isCreator,
+              isVerified: data.me?.options?.isVerified,
+              creatorStatus: data.me?.options?.creatorStatus,
+              birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
+              isOfferingBundles: data.me.options?.isOfferingBundles,
+              isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
+              isWhiteListed: data.me.options?.isWhiteListed,
+            },
+          } as TUserData)
+        );
+      }
+      if (data?.me?.options?.isCreator) {
+        try {
+          const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
+          const res = await getMyOnboardingState(getMyOnboardingStatePayload);
+
+          if (res.data) {
+            dispatch(
+              setCreatorData({
+                options: {
+                  ...user.creatorData?.options,
+                  ...res.data,
+                },
+              })
+            );
+          }
+          updateCreatorDataSteps();
+        } catch (err) {
+          console.error(err);
+          updateCreatorDataSteps();
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(
+          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+        );
+      }
+    }
+  }, [dispatch, user.creatorData?.options, updateCreatorDataSteps]);
+
   useEffect(() => {
-    async function syncUserData() {
+    const setUserTimeZone = async () => {
+      const timezoneInRedux = user.userData?.timeZone;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      if (timezoneInRedux && timezoneInRedux === timezone) {
+        // No need to make the request
+        return;
+      }
+
       try {
-        const payload = new newnewapi.EmptyRequest({});
+        const payload = new newnewapi.SetMyTimeZoneRequest({
+          name: timezone,
+        });
 
-        const { data } = await getMe(payload);
+        const response = await setMyTimeZone(payload);
 
-        if (data?.me) {
-          dispatch(
-            setUserData({
-              username: data.me?.username,
-              nickname: data.me?.nickname,
-              email: data.me?.email,
-              avatarUrl: data.me?.avatarUrl,
-              coverUrl: data.me?.coverUrl,
-              userUuid: data.me?.userUuid,
-              bio: data.me?.bio,
-              dateOfBirth: {
-                day: data.me?.dateOfBirth?.day,
-                month: data.me?.dateOfBirth?.month,
-                year: data.me?.dateOfBirth?.year,
-              },
-              countryCode: data.me?.countryCode,
-              usernameChangedAt: data.me.usernameChangedAt,
-              genderPronouns: data.me.genderPronouns,
-
-              options: {
-                isActivityPrivate: data.me?.options?.isActivityPrivate,
-                isCreator: data.me?.options?.isCreator,
-                isVerified: data.me?.options?.isVerified,
-                creatorStatus: data.me?.options?.creatorStatus,
-                birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
-                isOfferingSubscription: data.me.options?.isOfferingSubscription,
-              },
-            } as TUserData)
-          );
+        if (response.error) {
+          throw new Error('Cannot set time zone');
         }
-        if (data?.me?.options?.isCreator) {
-          try {
-            const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
-            const res = await getMyOnboardingState(getMyOnboardingStatePayload);
 
-            if (res.data) {
-              dispatch(
-                setCreatorData({
-                  options: {
-                    ...user.creatorData?.options,
-                    ...res.data,
-                  },
-                })
-              );
-            }
-            updateCreatorDataSteps();
-          } catch (err) {
-            console.error(err);
-            updateCreatorDataSteps();
-          }
-
-          try {
-            const myTagsPayload = new newnewapi.EmptyRequest();
-            const tagsRes = await getMyCreatorTags(myTagsPayload);
-
-            if (tagsRes.data?.tags && tagsRes.data?.tags.length > 0) {
-              dispatch(
-                setCreatorData({
-                  hasCreatorTags: true,
-                })
-              );
-            }
-            updateCreatorDataSteps();
-          } catch (err) {
-            console.error(err);
-            updateCreatorDataSteps();
-          }
-        }
+        dispatch(
+          setUserData({
+            timeZone: timezone,
+          })
+        );
+        setCookie('timezone', timezone, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
@@ -210,7 +253,17 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           );
         }
       }
-    }
+    };
+
+    const setUserTimezoneCookieOnly = () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setCookie('timezone', timezone, {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      });
+    };
 
     async function syncUserTutorialsProgress(
       localUserTutorialsProgress: newnewapi.IGetTutorialsStatusResponse
@@ -385,6 +438,65 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
                 await markTutorialStepAsCompleted(payloadSetData);
               }
             }
+
+            if (
+              localUserTutorialsProgress.remainingAcResponseCurrentStep &&
+              syncedObj.remainingAcResponseCurrentStep &&
+              syncedObj.remainingAcResponseCurrentStep.length >
+                localUserTutorialsProgress.remainingAcResponseCurrentStep.length
+            ) {
+              const wrongLocalData =
+                localUserTutorialsProgress.remainingAcResponseCurrentStep
+                  .length > 0 &&
+                localUserTutorialsProgress.remainingAcResponseCurrentStep[
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep
+                    .length - 1
+                ] !== newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE;
+
+              if (!wrongLocalData) {
+                syncedObj.remainingAcResponseCurrentStep =
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    acResponseCurrentStep: localUserTutorialsProgress
+                      .remainingAcResponseCurrentStep[0]
+                      ? localUserTutorialsProgress
+                          .remainingAcResponseCurrentStep[0]
+                      : newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
+            }
+
+            if (
+              localUserTutorialsProgress.remainingMcResponseCurrentStep &&
+              syncedObj.remainingMcResponseCurrentStep &&
+              syncedObj.remainingMcResponseCurrentStep.length >
+                localUserTutorialsProgress.remainingMcResponseCurrentStep.length
+            ) {
+              const wrongLocalData =
+                localUserTutorialsProgress.remainingMcResponseCurrentStep
+                  .length > 0 &&
+                localUserTutorialsProgress.remainingMcResponseCurrentStep[
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep
+                    .length - 1
+                ] !== newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE;
+
+              if (!wrongLocalData) {
+                syncedObj.remainingMcResponseCurrentStep =
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    mcResponseCurrentStep: localUserTutorialsProgress
+                      .remainingMcResponseCurrentStep[0]
+                      ? localUserTutorialsProgress
+                          .remainingMcResponseCurrentStep[0]
+                      : newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
+            }
+
             dispatch(setUserTutorialsProgress(syncedObj));
             saveStateLS('userTutorialsProgress', syncedObj);
           } else {
@@ -412,6 +524,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
+      setUserTimeZone();
       syncUserData();
     } else {
       if (!localUserTutorialsProgress) {
@@ -426,9 +539,42 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         );
       }
       dispatch(setUserTutorialsProgressSynced(true));
+      setUserTimezoneCookieOnly();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    const handlerSocketMeUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MeUpdated.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      dispatch(setUserData(decoded.me));
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
+
+  const syncUserDataOnReturnOnTab = useCallback(() => {
+    if (user.loggedIn) {
+      syncUserData();
+    }
+  }, [user.loggedIn, syncUserData]);
+
+  useRunOnReturnOnTab(syncUserDataOnReturnOnTab);
 
   return <>{children}</>;
 };

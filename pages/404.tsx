@@ -8,7 +8,6 @@ import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
-import { useAppSelector } from '../redux-store/store';
 import D404 from '../public/images/404/404-Dark-Desktop.webp';
 import T404 from '../public/images/404/404-Dark-Tablet.webp';
 import M404 from '../public/images/404/404-Dark-Mobile.webp';
@@ -17,12 +16,14 @@ import LT404 from '../public/images/404/404-Light-Tablet.webp';
 import LM404 from '../public/images/404/404-Light-Mobile.webp';
 import Button from '../components/atoms/Button';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { useAppState } from '../contexts/appStateContext';
 
 // No sense to memorize
 const Custom404 = () => {
   const { t } = useTranslation('page-404');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -66,10 +67,12 @@ const Custom404 = () => {
 export default Custom404;
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'page-404',
-  ]);
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-404'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

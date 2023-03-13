@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface ISuggestionTextArea {
+  id?: string;
   value: string;
   placeholder: string;
   disabled?: boolean;
@@ -10,6 +11,7 @@ interface ISuggestionTextArea {
 }
 
 const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
+  id,
   value,
   placeholder,
   disabled,
@@ -21,15 +23,26 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   useEffect(() => {
     if (!value && textareaRef?.current) {
       textareaRef.current.style.height = '';
+    } else if (value && textareaRef?.current) {
+      // (textareaRef.current.scrollHeight % 24) need to prevent input jump. 24 is text line-height
+      textareaRef.current.style.height = `${
+        textareaRef.current.scrollHeight -
+        (textareaRef.current.scrollHeight % 24)
+      }px`;
     }
   }, [value]);
 
   useEffect(() => {
-    if (autofocus) textareaRef.current?.focus();
+    if (autofocus) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
   }, [autofocus]);
 
   return (
     <STextarea
+      id={id}
       ref={(el) => {
         textareaRef.current = el!!;
       }}
@@ -37,10 +50,19 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
       value={value}
       disabled={disabled}
       placeholder={placeholder}
+      // (textareaRef.current.scrollHeight % 24) need to prevent input jump. 24 is text line-height
       onChangeCapture={() => {
         if (textareaRef?.current) {
           textareaRef.current.style.height = '';
-          textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+          textareaRef.current.style.height = `${
+            textareaRef.current.scrollHeight -
+            (textareaRef.current.scrollHeight % 24)
+          }px`;
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
         }
       }}
       onChange={onChange}
@@ -64,6 +86,7 @@ const STextarea = styled.textarea`
   width: 277px;
 
   height: 48px;
+  max-height: 200px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};

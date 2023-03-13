@@ -3,7 +3,7 @@ module.exports = {
   // SUPPORTED_LANGUAGES: ['en-US', 'es-MX', 'fr'],
   SUPPORTED_LANGUAGES:
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
-      ? ['en-US' /*, 'es', 'zh'*/]
+      ? ['en-US', 'es', 'zh']
       : ['en-US', 'es', 'zh'],
   DEFAULT_CURRENCY: 'usd',
   SUPPORTED_CURRENCIES: ['usd', 'eur'],
@@ -12,10 +12,10 @@ module.exports = {
   MAX_VIDEO_SIZE: 10000000000, // 10 gb
   MIN_VIDEO_DURATION: 10, // 10 sec
   MAX_VIDEO_DURATION: 600, // 10 minutes
-  CREATION_TITLE_MIN: 5,
-  CREATION_TITLE_MAX: 70,
+  CREATION_TITLE_MIN: 3,
+  CREATION_TITLE_MAX: 80,
   CREATION_OPTION_MIN: 1,
-  CREATION_OPTION_MAX: 40,
+  CREATION_OPTION_MAX: 80,
   HOURS: [
     {
       name: '01',

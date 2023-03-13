@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -11,6 +12,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface ToDoItem {
   id: string;
@@ -33,15 +35,15 @@ export const YourToDos = () => {
       {
         id: 'complete-profile',
         title: t('dashboard.toDos.completeProfile'),
-        completed:
-          !!user.creatorData?.hasCreatorTags &&
-          !!user.userData?.bio &&
-          user.userData?.bio.length > 0,
+        completed: !!user.userData?.bio && user.userData?.bio.length > 0,
       },
       {
         id: 'add-cash-out-method',
         title: t('dashboard.toDos.addCashOutMethod'),
-        completed: user.creatorData?.options?.stripeConnectStatus === 2,
+        completed:
+          user.creatorData?.options?.stripeConnectStatus ===
+          newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+            .CONNECTED_ALL_GOOD,
       },
     ],
     [t, user.creatorData, user.userData]
@@ -71,7 +73,20 @@ export const YourToDos = () => {
         {!item.completed && item.id === 'complete-profile' && (
           <Link href='/creator-onboarding-about'>
             <a>
-              <SBottomActionButton withDim withShrink view='primaryGrad'>
+              <SBottomActionButton
+                withDim
+                withShrink
+                withShadow
+                view='primaryGrad'
+                onClick={() => {
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _button: 'Add',
+                    _info: 'Add bio',
+                    _stage: 'Dashboard',
+                    _target: '/creator-onboarding-about',
+                  });
+                }}
+              >
                 {t('dashboard.toDos.completeProfileButton')}
               </SBottomActionButton>
             </a>
@@ -80,7 +95,20 @@ export const YourToDos = () => {
         {!item.completed && item.id === 'add-cash-out-method' && (
           <Link href='/creator/get-paid'>
             <a>
-              <SBottomActionButton withDim withShrink view='primaryGrad'>
+              <SBottomActionButton
+                withDim
+                withShrink
+                withShadow
+                view='primaryGrad'
+                onClick={() => {
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _button: 'Add',
+                    _info: 'Add bank info',
+                    _stage: 'Dashboard',
+                    _target: '/creator/get-paid',
+                  });
+                }}
+              >
                 {t('dashboard.toDos.addCashOutMethodButton')}
               </SBottomActionButton>
             </a>
@@ -90,6 +118,7 @@ export const YourToDos = () => {
     ),
     [t, theme.name]
   );
+
   return (
     <SContainer>
       <SHeaderLine>

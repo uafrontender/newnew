@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useScrollGradients = (ref: any, reverse: boolean = false) => {
+export const useScrollGradients = (ref: any, loaded?: boolean, reverse: boolean = false,) => {
   const [showTopGradient, setShowTopGradient] = useState(false);
   const [showBottomGradient, setShowBottomGradient] = useState(false);
 
@@ -29,6 +29,20 @@ export const useScrollGradients = (ref: any, reverse: boolean = false) => {
 
     ref.current?.addEventListener('scroll', handleScroll);
   }, [ref, reverse]);
+
+  // Re-calculate after mounting
+  useEffect(() => {
+    setTimeout(() => {
+      if (reverse) {
+        setShowTopGradient(ref.current?.scrollHeight > ref.current?.clientHeight);
+      } else {
+        setShowBottomGradient(
+          ref.current?.scrollHeight > ref.current?.clientHeight
+        );
+      }
+    }, 2000 )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded])
 
   return {
     showTopGradient,

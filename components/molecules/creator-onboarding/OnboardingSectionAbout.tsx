@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -14,14 +20,17 @@ import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
-import OnboardingTagsSelection from './OnboardingTagsSelection';
-import { setMyCreatorTags, updateMe } from '../../../api/endpoints/user';
+import { updateMe } from '../../../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
-  setCreatorData,
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
+import validateInputText from '../../../utils/validateMessageText';
+import isSafari from '../../../utils/isSafari';
+import { I18nNamespaces } from '../../../@types/i18next';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -51,142 +60,58 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   return errorMsg;
 };
 
-interface IOnboardingSectionAbout {
-  availableTags: newnewapi.ICreatorTag[];
-  currentTags: newnewapi.ICreatorTag[];
-}
+interface IOnboardingSectionAbout {}
 
-const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
-  ({ availableTags, currentTags }) => {
-    const router = useRouter();
-    const { t } = useTranslation('page-CreatorOnboarding');
-    const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+const OnboardingSectionAbout: React.FunctionComponent<
+  IOnboardingSectionAbout
+> = () => {
+  const router = useRouter();
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
-    // Bio
-    const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
-    const [bioError, setBioError] = useState('');
-    const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-    const validateBioViaApi = useCallback(
-      async (text: string) => {
-        setIsAPIValidateLoading(true);
-        try {
-          const payload = new newnewapi.ValidateTextRequest({
-            kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
-            text,
-          });
+  // Bio
+  const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
+  const [bioError, setBioError] = useState('');
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
-          const res = await validateText(payload);
-
-          if (!res.data?.status) throw new Error('An error occured');
-
-          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setBioError(errorSwitch(res.data?.status));
-          } else {
-            setBioError('');
-          }
-
-          setIsAPIValidateLoading(false);
-        } catch (err) {
-          console.error(err);
-          setIsAPIValidateLoading(false);
-          if ((err as Error).message === 'No token') {
-            dispatch(logoutUserClearCookiesAndRedirect());
-          }
-          // Refresh token was present, session probably expired
-          // Redirect to sign up page
-          if ((err as Error).message === 'Refresh token invalid') {
-            dispatch(
-              logoutUserClearCookiesAndRedirect(
-                '/sign-up?reason=session_expired'
-              )
-            );
-          }
-        }
-      },
-      [setBioError, dispatch]
-    );
-
-    const validateBioViaApiDebounced = useMemo(
-      () =>
-        debounce((text: string) => {
-          validateBioViaApi(text);
-        }, 250),
-      [validateBioViaApi]
-    );
-
-    const handleUpdateBioInEdit = (
-      e: React.ChangeEvent<HTMLTextAreaElement>
-    ) => {
-      setBioInEdit(e.target.value);
-
-      validateBioViaApiDebounced(e.target.value);
-    };
-
-    // Tags
-    const [selectedTags, setSelectedTags] = useState(currentTags);
-
-    const handleAddTag = (tag: newnewapi.ICreatorTag) => {
-      if (selectedTags.find((i) => i.id?.toString() === tag.id?.toString()))
-        return;
-      setSelectedTags((tags) => [...tags, tag]);
-    };
-
-    const handleRemoveTag = (tag: newnewapi.ICreatorTag) => {
-      setSelectedTags((tags) =>
-        tags.filter((i) => i.id?.toString() !== tag.id?.toString())
-      );
-    };
-
-    // Is form valid
-    const [isFormValid, setIsFormValid] = useState(false);
-
-    const handleSubmit = useCallback(async () => {
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
+  const validateBioViaApi = useCallback(
+    async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
+      setIsAPIValidateLoading(true);
       try {
-        setLoadingModalOpen(true);
-
-        const updateBioPayload = new newnewapi.UpdateMeRequest({
-          bio: bioInEdit,
+        const payload = new newnewapi.ValidateTextRequest({
+          kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
+          text,
         });
 
-        const updateMeRes = await updateMe(updateBioPayload);
-
-        if (!updateMeRes.data || updateMeRes.error)
-          throw new Error(updateMeRes.error?.message ?? 'Request failed');
-
-        dispatch(
-          setUserData({
-            bio: updateMeRes.data.me?.bio,
-          })
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
         );
 
-        const updateTagsPayload = new newnewapi.SetMyCreatorTagsRequest({
-          tagIds: selectedTags.map((i) => i.id) as number[],
-        });
+        if (!res.data?.status) throw new Error('An error occurred');
 
-        const updateTagsRes = await setMyCreatorTags(updateTagsPayload);
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setBioError(errorSwitch(res.data?.status));
+        } else {
+          setBioError('');
+        }
 
-        if (!updateTagsRes.data || updateTagsRes.error)
-          throw new Error(updateTagsRes.error?.message ?? 'Request failed');
-
-        dispatch(
-          setCreatorData({
-            hasCreatorTags: true,
-          })
-        );
-
-        router.push('/creator-onboarding-stripe');
-
-        setLoadingModalOpen(false);
+        setIsAPIValidateLoading(false);
       } catch (err) {
-        console.log(err);
-        setLoadingModalOpen(false);
+        console.error(err);
+        setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
         }
@@ -198,73 +123,172 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
           );
         }
       }
-    }, [bioInEdit, dispatch, selectedTags, router]);
+    },
+    [setBioError, dispatch]
+  );
 
-    useEffect(() => {
-      if (selectedTags.length >= 3 && bioInEdit.length > 0 && bioError === '') {
-        setIsFormValid(true);
-      } else {
-        setIsFormValid(false);
-      }
-    }, [selectedTags, bioError, bioInEdit]);
+  const validateBioViaApiDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateBioViaApi(text.trim());
+      }, 250),
+    [validateBioViaApi]
+  );
 
-    return (
-      <>
-        <SContainer>
-          {isMobile && <SGoBackButton onClick={() => router.back()} />}
-          <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
-          <STopContainer>
-            <SFormItemContainer>
-              <OnboardingBioTextarea
-                value={bioInEdit}
-                isValid={bioError === ''}
-                errorCaption={t(`aboutSection.bio.errors.${bioError}`)}
-                placeholder={t('aboutSection.bio.placeholder')}
-                maxChars={150}
-                onChange={handleUpdateBioInEdit}
-              />
-            </SFormItemContainer>
-            <SSeparator />
-            <SFormItemContainer>
-              <OnboardingTagsSelection
-                availableTags={availableTags}
-                selectedTags={selectedTags}
-                handleAddTag={handleAddTag}
-                handleRemoveTag={handleRemoveTag}
-              />
-            </SFormItemContainer>
-          </STopContainer>
-          <SControlsDiv>
-            {!isMobile && (
-              <GoBackButton noArrow onClick={() => router.back()}>
-                {t('aboutSection.button.back')}
-              </GoBackButton>
-            )}
-            <Button
-              view='primaryGrad'
-              disabled={!isFormValid}
-              style={{
-                width: isMobile ? '100%' : 'initial',
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => handleSubmit()}
-            >
-              {t('aboutSection.button.submit')}
-            </Button>
-          </SControlsDiv>
-        </SContainer>
-        {/* Loading Modal */}
-        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-      </>
-    );
+  const handleUpdateBioInEdit = (value: string) => {
+    setBioInEdit(value);
+    validateBioViaApiDebounced(value);
   };
+
+  // Is form valid
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const handleSubmit = useCallback(async () => {
+    try {
+      Mixpanel.track('Submit Bio', {
+        _stage: 'Onboarding',
+        _button: 'Save Changes',
+        _component: 'OnboardingSectionAbout',
+      });
+
+      setLoadingModalOpen(true);
+
+      const updateBioPayload = new newnewapi.UpdateMeRequest({
+        bio: bioInEdit.trim(),
+      });
+
+      const updateMeRes = await updateMe(updateBioPayload);
+
+      if (!updateMeRes.data || updateMeRes.error)
+        throw new Error(updateMeRes.error?.message ?? 'Request failed');
+
+      dispatch(
+        setUserData({
+          bio: updateMeRes.data.me?.bio,
+        })
+      );
+
+      // redirect user to dashboard if Stripe is already connected
+      if (
+        user.creatorData?.options?.stripeConnectStatus ===
+        newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+          .CONNECTED_ALL_GOOD
+      ) {
+        router.replace('/creator/dashboard');
+      } else {
+        router.replace('/creator-onboarding-stripe');
+      }
+
+      setLoadingModalOpen(false);
+    } catch (err) {
+      console.log(err);
+      setLoadingModalOpen(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(
+          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+        );
+      }
+    }
+  }, [
+    bioInEdit,
+    dispatch,
+    router,
+    user.creatorData?.options?.stripeConnectStatus,
+  ]);
+
+  useEffect(() => {
+    if (validateInputText(bioInEdit) && bioError === '') {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  }, [bioError, bioInEdit]);
+
+  // fix issue with gap while keyboard is active on iOS
+  // function preventScroll(e: any) {
+  //   e.preventDefault();
+  // }
+  // const handleBlur = useCallback(() => {
+  //   if (isSafari() && isMobile)
+  //     document.body.removeEventListener('touchmove', preventScroll);
+  // }, [isMobile]);
+
+  // const handleFocus = useCallback(() => {
+  //   if (isSafari() && isMobile)
+  //     document.body.addEventListener('touchmove', preventScroll, {
+  //       passive: false,
+  //     });
+  // }, [isMobile]);
+
+  return (
+    <>
+      <SContainer>
+        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
+        <STopContainer>
+          <SFormItemContainer>
+            <OnboardingBioTextarea
+              value={bioInEdit}
+              isValid={bioError === ''}
+              errorCaption={t(
+                `aboutSection.bio.errors.${
+                  bioError as keyof I18nNamespaces['page-CreatorOnboarding']['aboutSection']['bio']['errors']
+                }`
+              )}
+              placeholder={t('aboutSection.bio.placeholder')}
+              maxChars={150}
+              onChange={(e) => handleUpdateBioInEdit(e.target.value)}
+              // onFocus={handleFocus}
+              // onBlur={handleBlur}
+            />
+          </SFormItemContainer>
+        </STopContainer>
+        <SControlsDiv>
+          {!isMobile && (
+            <GoBackButton
+              noArrow
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Onboarding',
+                  _button: 'Close',
+                  _component: 'OnboardingSectionAbout',
+                });
+                router.back();
+              }}
+            >
+              {t('aboutSection.button.back')}
+            </GoBackButton>
+          )}
+          <Button
+            view='primaryGrad'
+            disabled={!isFormValid}
+            style={{
+              width: isMobile ? '100%' : 'initial',
+              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+            }}
+            onClick={() => handleSubmit()}
+          >
+            {t('aboutSection.button.submit')}
+          </Button>
+        </SControlsDiv>
+      </SContainer>
+      {/* Loading Modal */}
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+    </>
+  );
+};
 
 export default OnboardingSectionAbout;
 
 const SContainer = styled.div`
   padding: 0 20px 20px;
   z-index: 2;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   ${({ theme }) => theme.media.tablet} {
@@ -322,12 +346,6 @@ const SFormItemContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     /* width: 296px; */
   }
-`;
-
-const SSeparator = styled.div`
-  border-bottom: 1px solid
-    ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-bottom: 16px;
 `;
 
 const SControlsDiv = styled.div`

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 type TEmailSignInButton = React.ComponentPropsWithoutRef<'button'> & {};
 
 const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
+  id,
   disabled,
   onClick,
   children,
@@ -20,6 +21,7 @@ const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
 
   return (
     <SEmailSignInButton
+      id={id}
       x={mousePosition.x}
       y={mousePosition.y}
       disabled={disabled}

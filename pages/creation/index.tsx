@@ -9,6 +9,7 @@ import CreationFirstStepContent from '../../components/organisms/creation/first/
 import { NextPageWithLayout } from '../_app';
 import General from '../../components/templates/General';
 import assets from '../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
 export const CreationFirstStep = () => {
   const { t } = useTranslation('page-Creation');
@@ -43,7 +44,9 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'page-Creation']
+    ['common', 'page-Creation'],
+    null,
+    SUPPORTED_LANGUAGES
   );
 
   // @ts-ignore
@@ -64,5 +67,7 @@ export async function getServerSideProps(
 }
 
 const SWrapper = styled.div`
-  padding: 100px 0;
+  ${(props) => props.theme.media.tablet} {
+    padding: 100px 0;
+  }
 `;

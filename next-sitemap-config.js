@@ -4,32 +4,39 @@ const disallow = [
   '/api/*',
   '/auth',
   '/auth/*',
+  '/bundles',
+  '/change-email',
+  '/edit-email',
   '/creation',
   '/creation/*',
-  '/creator',
-  '/creator/*',
-  '/direct-messages',
-  '/direct-messages/*',
-  '/*/forced_redirect_to_home',
-  '/profile',
-  '/profile/*',
-  '/change-email',
+  '*/creator',
+  '*/creator/*',
   '/creator-onboarding',
   '/creator-onboarding-about',
   '/creator-onboarding-stripe',
+  '/*/creator-onboarding-stripe',
   '/creator-onboarding-subrate',
+  '/dashboard',
+  '/get-paid',
+  '/direct-messages',
+  '/direct-messages/*',
   '/forced_redirect_to_home',
-  '/notifications',
+  '*/forced_redirect_to_home',
+  '*/notifications',
+  '/profile',
+  '/*/profile',
+  '/profile/*',
+  '/*/profile/*',
   '/search',
+  '/see-more',
+  '/sign-up',
   '/sign-up-payment',
-  '/subscription-success',
-  '/test',
-  '/unsubscribe',
   '/verify-email',
   '/verify-new-email',
+  '/*/verify-new-email',
+  '/unsubscribe',
   '/404',
-  '/es/*',
-  '/zh/*',
+  '*/404',
 ];
 
 module.exports = {
@@ -37,6 +44,17 @@ module.exports = {
   generateRobotsTxt: true,
   sitemapSize: 7000,
   exclude: disallow,
+  additionalPaths: async (config) => {
+    const result = [];
+
+    // Following urls are missing from generated sitemap
+    result.push(await config.transform(config, '/es'));
+    result.push(await config.transform(config, '/es/how-it-works'));
+    result.push(await config.transform(config, '/zh'));
+    result.push(await config.transform(config, '/zh/how-it-works'));
+
+    return result;
+  },
   robotsTxtOptions: {
     policies: [
       {

@@ -68,10 +68,10 @@
         }
       },
       "email": {
-        "placeholder": "電子郵寄地址",
-        "cantChangeInfoCaption": "不能改變此資訊",
+        "placeholder": "電子郵件地址",
+        "cantChangeInfoCaption_NEED_TRANSLATION": "You can edit your email in settings later",
         "errors": {
-          "invalidEmail": "請輸入一個有效的電子郵寄地址",
+          "invalidEmail": "請輸入一個有效的電子郵件地址",
           "emailTaken": "該電子郵件已經被佔用。請換一個試試"
         }
       },
@@ -79,7 +79,13 @@
         "label": "出生日期",
         "captions": {
           "twoTimesOnly": "生日只能更改2次,",
-          "cannotChange": "你不能改變生日,"
+          "cannotChange": "你不能改變生日,",
+          "instruction": "設定出生日期"
+        },
+        "units": {
+          "day": "天",
+          "month": "月",
+          "year": "年"
         },
         "errors": {
           "tooYoung": "必須年滿18歲或以上才能成為創作者"
@@ -106,7 +112,8 @@
       "back": "返回",
       "submit": "完成"
     },
-    "agreedToTosCheckbox": "我已閱讀並同意"
+    "agreedToTosCheckbox": "我已閱讀並同意",
+    "linkText": "NewNew條款"
   },
   "aboutSection": {
     "meta": {
@@ -118,7 +125,6 @@
       "back": "關閉"
     },
     "heading": "這是你的粉絲看到的",
-
     "bio": {
       "title": "個人簡介",
       "placeholder": "簡單介紹一下你自己...",
@@ -129,14 +135,11 @@
         "inappropriate": "禁止使用攻擊性詞語",
         "linksForbidden": "不允許插入連結"
       }
-    },
-    "tags": {
-      "title": "你最想發表的內容是什麼？至少選擇三個"
     }
   },
   "stripeSection": {
     "meta": {
-      "title": "獲得付款",
+      "title": "推薦獲得付款方式：",
       "description": "與Stripe帳戶綁定，即可按時獲得付款。"
     },
     "side": {
@@ -154,7 +157,8 @@
       "submit": "提交",
       "requestSetupLink": "與Stripe綁定",
       "stripeConnectedLink": "Stripe已綁定！",
-      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
+      "stripeConnecting": "連接中......",
+      "requireInformation": "Stripe需要資訊"
     }
   },
   "subRateSection": {

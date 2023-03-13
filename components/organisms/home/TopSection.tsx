@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Headline from '../../atoms/Headline';
@@ -12,12 +13,11 @@ import ScrollArrow from '../../atoms/ScrollArrow';
 
 import useScrollGradientsHorizontal from '../../../utils/hooks/useScrollGradientsHorizontal';
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
-import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TOP_10 } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import GradientMaskHorizontal from '../../atoms/GradientMaskHorizontal';
-import { usePostModalState } from '../../../contexts/postModalContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -27,11 +27,10 @@ const SCROLL_STEP = {
 
 interface ITopSection {
   collection: newnewapi.Post[];
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const TopSection: React.FC<ITopSection> = React.memo(
-  ({ collection, handlePostClicked }) => {
+  ({ collection }) => {
     const { t } = useTranslation('common');
     const ref: any = useRef();
     const scrollContainerRef: any = useRef();
@@ -45,9 +44,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
     const [isDragging, setIsDragging] = useState(false);
     const [mouseIsDown, setMouseIsDown] = useState(false);
 
-    const { postOverlayOpen } = usePostModalState();
-
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -109,28 +106,28 @@ export const TopSection: React.FC<ITopSection> = React.memo(
       }
     };
 
-    const renderItem = (item: any, index: number) => {
-      const handleItemClick = () => {
-        if (!isDragging) {
-          handlePostClicked(item);
-        }
-      };
-
-      return (
+    const renderItem = (item: newnewapi.Post, index: number) => (
+      <Link
+        href={`/p/${
+          switchPostType(item)[0].postShortId
+            ? switchPostType(item)[0].postShortId
+            : switchPostType(item)[0].postUuid
+        }`}
+        key={switchPostType(item)[0].postUuid}
+      >
         <SItemWrapper
-          key={switchPostType(item)[0].postUuid}
           name={`top-section-${index}`}
-          onClick={handleItemClick}
+          onClick={(e) => {
+            if (isDragging) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
         >
-          <PostCard
-            shouldStop={postOverlayOpen}
-            type='inside'
-            item={item}
-            index={index + 1}
-          />
+          <PostCard type='inside' item={item} index={index + 1} />
         </SItemWrapper>
-      );
-    };
+      </Link>
+    );
 
     const { renderLeftArrow, renderRightArrow } = useHoverArrows(ref);
     const { showLeftGradient, showRightGradient } =

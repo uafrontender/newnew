@@ -1,5 +1,5 @@
 import React from 'react';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -21,8 +21,12 @@ import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Earnin
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
 import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
+import iconBundlesOutlined from '../../public/images/svg/icons/outlined/Bundles.svg';
+import iconBundlesFilled from '../../public/images/svg/icons/filled/Bundles.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
+import { Mixpanel } from '../../utils/mixpanel';
+import { I18nNamespaces } from '../../@types/i18next';
 
 const icons: any = {
   outlined: {
@@ -33,6 +37,7 @@ const icons: any = {
     dashboard: dashboardIconOutlined,
     notifications: notificationsIconOutlined,
     dms: iconDirectMessages,
+    bundles: iconBundlesOutlined,
   },
   filled: {
     add: addIconFilled,
@@ -42,41 +47,52 @@ const icons: any = {
     dashboard: dashboardIconFilled,
     notifications: notificationsIconFilled,
     dms: iconDirectMessages,
+    bundles: iconBundlesFilled,
   },
 };
 
 export type TBottomNavigationItem = {
-  key: string;
+  key: keyof I18nNamespaces['common']['mobileBottomNavigation'];
   url: string;
-  width: string;
   counter?: number;
   actionHandler?: () => void;
 };
 
 interface IBottomNavigationItem {
   item: TBottomNavigationItem;
+  width: string;
 }
 
 const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
-  const { item } = props;
+  const { item, width } = props;
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
 
   const active = item.url === router.route;
 
-  const handleClick = () => {
+  const handleClick = (value: any) => {
     if (router.pathname === '/' && item.url === '/') {
-      scroller.scrollTo('top-reload', {
+      animateScroll.scrollToTop({
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
+      });
+    }
+    if (value.key === 'add') {
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Creation',
+        _button: 'New Post',
+      });
+    } else {
+      Mixpanel.track('Navigation Item Clicked', {
+        _component: 'BottomNavigation',
+        _target: item.url,
       });
     }
   };
 
   return item?.actionHandler ? (
-    <SContainer width={item.width} onClick={item?.actionHandler}>
+    <SContainer width={width} onClick={item?.actionHandler}>
       <SSVGContainer>
         <InlineSVG
           key={item.key}
@@ -100,7 +116,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
       </SCaption>
     </SContainer>
   ) : (
-    <SContainer width={item.width} onClick={handleClick}>
+    <SContainer width={width} onClick={() => handleClick(item)}>
       <Link href={item.url}>
         <a>
           <SSVGContainer>
@@ -138,7 +154,6 @@ interface ISContainer {
 
 const SContainer = styled.div<ISContainer>`
   width: ${(props) => props.width};
-  margin: 0 8px;
   cursor: pointer;
   padding: 8px 2px;
   display: flex;
@@ -146,13 +161,22 @@ const SContainer = styled.div<ISContainer>`
   flex-direction: column;
   justify-content: center;
 
-  max-width: 56px;
+  max-width: 63px;
+
   a {
     display: flex;
     width: 100%;
     align-items: center;
     flex-direction: column;
     justify-content: center;
+  }
+
+  ${({ theme }) => theme.media.mobileM} {
+    margin: 0 5px;
+  }
+
+  ${({ theme }) => theme.media.mobileL} {
+    margin: 0 8px;
   }
 `;
 
@@ -174,6 +198,7 @@ const SCaption = styled(Caption)<ISTitle>`
 
 const SSVGContainer = styled.div`
   position: relative;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SIndicatorContainer = styled.div`

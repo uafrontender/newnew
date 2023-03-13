@@ -16,8 +16,6 @@
     "followCreator": "Favorite creator",
     "unFollowDecision": "Unfavorite {{postType}}",
     "unFollowCreator": "Unfavorite creator",
-    "unsubscribe": "Unsubscribe",
-    "removeSubscription": "Remove subscription",
     "removeBid": "Remove bid",
     "removeOption": "Remove option",
     "view": "View profile",
@@ -37,7 +35,7 @@
     "cancel": "Cancel"
   },
   "postType": {
-    "ac": "Event",
+    "ac": "Bid",
     "mc": "Superpoll",
     "cf": "Goal"
   },
@@ -49,20 +47,22 @@
     "share": "Share",
     "dashboard": "Dashboard",
     "dms": "DMs",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "bundles": "Bundles"
   },
   "mobileTopNavigation": {
     "myBalance": "My Balance: ${{value}}",
     "profile": "Profile"
   },
   "button": {
+    "bundles": "Bundles",
     "createDecision": "New post",
     "create": "Create",
-    "loginIn": "Log in",
-    "signUp": "Sign up",
+    "signIn": "Sign in",
     "dashboard": "Dashboard",
     "createOnNewnew": "Create now",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "takeMeHome": "Take me home"
   },
   "footer": {
     "topTitle": "NewNew",
@@ -85,13 +85,11 @@
     "ddLanguageTitle": {
       "en-US": "English",
       "es": "Español",
-      "fr": "Français",
       "zh": "漢語"
     },
     "selectedLanguageTitle": {
       "en-US": "English",
       "es": "Español",
-      "fr": "Français (FR)",
       "zh": "漢語"
     }
   },
@@ -125,13 +123,65 @@
         "placeholder": "Please tell us a bit more..."
       },
       "button": {
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "report": "Report"
       }
     },
     "reportSent": {
       "title": "We’re on it!",
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
+    },
+    "buyBundle": {
+      "title": "Buy a Superpoll bundle for:",
+      "votes": "<0>{{amount}}</0> votes",
+      "access": "plus get {{amount}} {{unit}} of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buy": "Buy for ${{amount}}",
+      "terms": "*votes in a bundle never expire",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      },
+      "payment": {
+        "header": "<0/> Superpoll Bundle",
+        "suffix": "'s"
+      },
+      "error": {
+        "requestFailed": "Request failed"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes": "<0>{{amount}}</0> votes unlocked",
+      "for": "for <0/>",
+      "access": "plus {{amount}} {{unit}} of:",
+      "customOptions": "adding custom Superpoll options",
+      "chat": "1-on-1 private chat",
+      "button": "Sounds good!",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      }
+    },
+    "creatorsBundle": {
+      "accessExpired": "Your benefits have now expired. Buy another bundle for custom options and chat",
+      "votesLeft": "<0>{{amount}}</0> votes left",
+      "for": "for ",
+      "access": "<0/> left of:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " and ",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buyButton": "Buy more votes",
+      "unit": {
+        "day": "day",
+        "days": "days",
+        "month": "month",
+        "months": "months",
+        "year": "year",
+        "years": "years"
+      }
     }
   },
   "myLink": {
@@ -143,9 +193,11 @@
     "copied": "Link Copied!"
   },
   "search": {
+    "placeholder": "Search",
     "topPosts": "Top Posts",
     "popularCreators": "Popular Creators",
     "creatorSubtitle": "See posts",
+    "popularTags": "Popular Tags",
     "allResults": "All results",
     "noResults": {
       "title": "We didn’t find anything",
@@ -153,9 +205,95 @@
       "action": "Explore"
     }
   },
+  "gotIt": "Got it",
+  "sortingOption": {
+    "sortingtype": "Order",
+    "sortingtype-all": "All",
+    "sortingtype-num_bids": "Participants",
+    "sortingtype-num_bids-ac": "Number of bids",
+    "sortingtype-num_bids-mc": "Number of votes",
+    "sortingtype-num_bids-cf": "Number of backers",
+    "sortingtype-newest": "Newest",
+    "bid": "Bid",
+    "bid-lowest": "Lowest",
+    "bid-highest": "Highest",
+    "time": "Time",
+    "time-ending-soon": "Ending soonest",
+    "time-newest": "Newest",
+    "time-oldest": "Oldest",
+    "numbers-of-bids": "Numbers of bids",
+    "numbers-of-bids-fewest": "Fewest",
+    "numbers-of-bids-most-first": "Most first"
+  },
+  "toastErrors": {
+    "generic": "An error occurred, please try again later",
+    "serverError": "A server-side error occurred, please try again later",
+    "recaptchaError": "Recaptcha failed, please try again later",
+    "usupportedImageFormatError": "Image format not supported, please try another image",
+    "processingLimitReachedError": "Please wait until you can upload more videos",
+    "invalidDateError": "Please check date and time"
+  },
+  "smsNotifications": {
+    "title": "What's your number?",
+    "success": "Success",
+    "description": "This way, we can send you new updates from <0>{{subject}}</0>!",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "I accept NewNew’s <0>Terms</0> & <1>Privacy</1>. I opt-in and agree to receive updates from NewNew at the phone number provided. SMS and data rates may apply.",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid phone number",
+      "1": "Invalid country code",
+      "2": "The phone number is too short",
+      "3": "The phone number is too long",
+      "4": "Invalid phone number"
+    },
+    "error": {
+      "requestFailed": "Request failed"
+    }
+  },
   "creatorCard": {
-    "subscriptionCost": "${{amount}} Monthly",
-    "subscribed": "subscribed",
-    "cancelled": "cancelled"
-  }
+    "buyBundle": "Buy Bundle",
+    "purchasedVotes": "{{value}} votes"
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    }
+  },
+  "timer": {
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Ended on "
+  },
+  "pushNotification": {
+    "alert": {
+      "safari": {
+        "title": "Turn on web notifications",
+        "subtitle": "Safari > Preferences > Notification."
+      },
+      "nonSafari": {
+        "title": "Turn on web notifications by clicking the lock"
+      },
+      "windows": {
+        "subtitle": "or go to Start > Settings > System > Notifications"
+      }
+    },
+    "requestModal": {
+      "title": "Turn on notifications",
+      "description": "Turn on web notifications and get alerts about new posts on NewNew.",
+      "button": "Turn on"
+    },
+    "successModal": {
+      "title": "Cheers!",
+      "description": "Thank you, we will keep you updated about new posts on NewNew.",
+      "button": "Cool!"
+    }
+  },
+  "oops": "Oops!",
+  "somethingWentWrong": "Something went wrong...",
+  "goHome": "Go home"
 }

@@ -8,11 +8,11 @@
     },
     "withoutActivity": {
       "ac": "Bid now",
-      "mc": "Vote now",
+      "mc": "Be the first to vote!",
       "cf": "Back this Goal"
     },
     "seeResults": {
-      "ac": "See Event",
+      "ac": "See Bid",
       "mc": "See Superpoll",
       "cf": "See Goal"
     }
@@ -22,6 +22,8 @@
     "daysLeft": "d",
     "hoursLeft": "h",
     "minutesLeft": "m",
-    "endedOn": "Ended on "
+    "secondsLeft": "s",
+    "endedOn": "Ended on ",
+    "soon": "Coming Soon"
   }
 }

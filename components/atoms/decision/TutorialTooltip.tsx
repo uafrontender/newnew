@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 // eslint-disable-next-line no-shadow
 export enum DotPositionEnum {
@@ -16,6 +17,7 @@ interface ITutorialTooltip {
   text?: string;
   closeTooltip: () => void;
   dotPosition: DotPositionEnum;
+  buttonId?: string;
 }
 
 export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
@@ -24,13 +26,21 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
   text,
   closeTooltip,
   dotPosition,
+  buttonId,
 }) => {
-  const { t } = useTranslation('modal-Post');
-  return isTooltipVisible ? (
+  const { t } = useTranslation('page-Post');
+  const { overlayModeEnabled } = useOverlayMode();
+  return isTooltipVisible && !overlayModeEnabled ? (
     <SContainer>
       <STitle>{title}</STitle>
       {text && <SText>{text}</SText>}
       <SButton
+        // Optional id for tests
+        {...(buttonId
+          ? {
+              id: buttonId,
+            }
+          : {})}
         onClick={(e) => {
           e.stopPropagation();
           closeTooltip();

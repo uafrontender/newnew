@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
@@ -7,80 +7,103 @@ import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/search/SearchInput';
 import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
-import { useGetChats } from '../../../contexts/chatContext';
+import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 
+import { useGetChats } from '../../../contexts/chatContext';
 import { useAppSelector } from '../../../redux-store/store';
-// import { WalletContext } from '../../../contexts/walletContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import { useNotifications } from '../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useBundles } from '../../../contexts/bundlesContext';
+import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 
-interface ITablet {}
-
-export const Tablet: React.FC<ITablet> = React.memo(() => {
+export const Tablet: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
-  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
-
-  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
-
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
-  const handlerCopy = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/${user.userData?.username}`;
-
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            setIsCopiedUrl(false);
-          }, 1500);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <SContainer>
-      <Logo />
+      <Logo isShort />
       <SRightBlock>
+        {!user.loggedIn && <StaticSearchInput />}
         {user.loggedIn && (
           <>
-            {user.userData?.options?.isOfferingSubscription && (
+            {user.userData?.options?.isCreator && (
+              <Link href='/creator/dashboard'>
+                <a>
+                  <SDashboardButton
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Dashboard',
+                        _target: '/creator/dashboard',
+                      });
+                    }}
+                  >
+                    <SNavText variant={3} weight={600}>
+                      {t('button.dashboard')}
+                    </SNavText>
+                  </SDashboardButton>
+                </a>
+              </Link>
+            )}
+            <SItemWithMargin
+              style={{
+                position: 'static',
+              }}
+            >
+              <StaticSearchInput
+                width={
+                  user.userData?.options?.isCreator &&
+                  bundles &&
+                  bundles.length > 0
+                    ? '200px'
+                    : undefined
+                }
+              />
+            </SItemWithMargin>
+            {bundles && bundles.length > 0 && (
               <SItemWithMargin>
-                <SNavText variant={3} weight={600} onClick={handlerCopy}>
-                  {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
-                </SNavText>
+                <Link href='/bundles'>
+                  <a>
+                    <Button
+                      iconOnly
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Bundles',
+                          _target: '/bundles',
+                        });
+                      }}
+                    >
+                      <SIconButtonContent>
+                        <SBundleIcon
+                          src={
+                            theme.name === 'light'
+                              ? VoteIconLight.src
+                              : VoteIconDark.src
+                          }
+                        />
+                      </SIconButtonContent>
+                    </Button>
+                  </a>
+                </Link>
               </SItemWithMargin>
             )}
-            {((user.userData?.options?.isOfferingSubscription &&
-              mySubscribersTotal > 0) ||
-              creatorsImSubscribedTo.length > 0) && (
+            {directMessagesAvailable && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
@@ -100,44 +123,25 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                 }}
               />
             </SItemWithMargin>
-            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/profile/settings',
-                    key: 'my-balance-tablet',
-                    value: walletBalance?.usdCents
-                      ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ?? 0
-                      : undefined,
-                  }}
-                />
-              </SItemWithMargin>
-            )} */}
           </>
         )}
-        <SItemWithMargin
-          style={{
-            position: 'static',
-          }}
-        >
-          <SearchInput />
-        </SItemWithMargin>
+
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creation'>
                     <a>
                       <Button
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'New Post',
+                            _target: '/creation',
+                          });
+                        }}
                       >
                         {t('button.createDecision')}
                       </Button>
@@ -162,17 +166,17 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creator-onboarding'>
                     <a>
                       <Button
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Create now',
+                            _target: '/creator-onboarding',
+                          });
+                        }}
                       >
                         {t('button.createOnNewnew')}
                       </Button>
@@ -180,17 +184,16 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
+                  <Link href='/profile'>
                     <a>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile',
+                          });
+                        }}
                       />
                     </a>
                   </Link>
@@ -201,22 +204,36 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
         ) : (
           <>
             <SItemWithMargin>
-              <Link href='/sign-up?to=log-in'>
+              <Link href='/sign-up'>
                 <a>
-                  <Button view='quaternary'>{t('button.loginIn')}</Button>
+                  <Button
+                    view='quaternary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Sign in',
+                      });
+                    }}
+                  >
+                    {t('button.signIn')}
+                  </Button>
                 </a>
               </Link>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Link href='/sign-up'>
+              <Link href='/sign-up?to=create'>
                 <a>
                   <Button
                     withDim
                     withShrink
                     view='primaryGrad'
                     withShadow={!globalSearchActive}
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Create now',
+                      });
+                    }}
                   >
-                    {t('button.signUp')}
+                    {t('button.createOnNewnew')}
                   </Button>
                 </a>
               </Link>
@@ -244,13 +261,36 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 16px;
+  margin-left: 6px;
   position: relative;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-left: 16px;
+  }
+`;
+
+const SIconButtonContent = styled.div`
+  display: flex;
+`;
+
+const SBundleIcon = styled.img`
+  width: 24px;
+  height: 24px;
 `;
 
 const SNavText = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  opacity: 0.5;
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
   transition: opacity ease 0.5s;
   cursor: pointer;
+`;
+
+const SDashboardButton = styled.button`
+  padding: 8px 16px;
+  background: transparent;
+  border: 0;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  &:focus {
+    outline: none;
+  }
 `;

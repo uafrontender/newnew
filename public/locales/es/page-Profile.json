@@ -1,299 +1,322 @@
 {
   "Active": {
     "meta": {
-      "title": "NewNew Profile Page",
-      "description": "Customize your NewNew profile with username, display name, bio and more"
+      "title": "Página de perfil de NewNew",
+      "description": "Personaliza tu perfil de NewNew con un nombre de usuario, un nombre para mostrar, tu biografía y mucho más"
     },
     "noContent": {
-      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
+      "description": "Las publicaciones en las que estés\n ofertando o votando activamente se mostrarán aquí"
     }
   },
   "MyPosts": {
     "meta": {
-      "title": "My NewNew Posts",
-      "description": "Re-watch all of the posts you created on NewNew for the audience"
+      "title": "Mis publicaciones NewNew",
+      "description": "Vuelve a ver todas las publicaciones que creaste en NewNew para tu audiencia"
     },
     "noContent": {
-      "description": "Posts you created will be shown here"
+      "description": "Las publicaciones que hayas creado se mostrarán aquí"
     }
   },
   "Purchases": {
     "meta": {
-      "title": "My NewNew Purchases",
-      "description": "See what you buy on NewNew"
+      "title": "Mis compras NewNew",
+      "description": "Ve lo que has comprado en NewNew"
     },
     "noContent": {
-      "description": "Any purchases you make\nwill be shown here"
+      "description": "Las compras que realices\n se mostrarán aquí"
     }
   },
   "ViewingHistory": {
     "meta": {
-      "title": "NewNew History",
-      "description": "History of all posts you have ever visited on NewNew"
+      "title": "Historial de NewNew",
+      "description": "Historial de todas las publicaciones que has visitado en NewNew"
     },
     "noContent": {
-      "description": "All posts you previewed\nwill be kept here in your history"
-    }
-  },
-  "Subscriptions": {
-    "meta": {
-      "title": "NewNew Subscriptions",
-      "description": "Edit name, username, bio, profile photo and more in NewNew settings"
-    },
-    "noContent": {
-      "description": "You’re not subscribed\nto any creators yet"
+      "description": "Todos los mensajes que\n hayas previsualizado se mantendrán aquí en tu historial"
     }
   },
   "Favorites": {
     "meta": {
-      "title": "NewNew Favorites",
-      "description": "Browse through all of your saved favorite posts and creator"
+      "title": "Favoritos NewNew",
+      "description": "Navega tus publicaciones y creadores favoritos guardados"
     },
     "noContent": {
-      "description": "Any creators you favorite\nwill be shown here"
+      "description": "Los creadores que marques como favoritos\n aparecerán aquí"
     }
   },
-  "CreatorsDecisions": {
-    "noContent": {
-      "description": "Posts from the creator will be shown here"
-    }
-  },
-  "UserProfile": {
-    "noContent": {
-      "description": "{{username}} has no activity yet.",
-      "suggestion": "Explore what's new",
-      "button": "Explore"
+  "Profile": {
+    "meta": {
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description": "{{bio}} Haz una oferta y vota por lo que los creadores hagan a continuación"
+    },
+    "user": {
+      "noContent": {
+        "description": "{{username}} aún no tiene actividad.",
+        "suggestion": "Explore lo nuevo",
+        "button": "Explorar"
+      }
+    },
+    "creator": {
+      "noContent": {
+        "description": "Las publicaciones del creador se mostrarán aquí"
+      }
     }
   },
   "Activity": {
+    "meta": {
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description": "{{bio}} Haz una oferta y vota por lo que los creadores hagan a continuación"
+    },
     "noContent": {
-      "description": "Any creators activity will be shown here"
+      "description": "Cualquier actividad del creador se mostrará aquí"
     }
   },
   "tabs": {
-    "activelyBidding": "Active",
-    "purchases": "Purchases",
-    "viewHistory": "Viewing history",
-    "subscriptions": "Subscriptions",
-    "myposts": "My posts",
-    "favorites": "Favorites",
-    "userInitial": "Posts",
-    "activity": "Activity"
+    "activelyBidding": "Activo",
+    "purchases": "Compras",
+    "viewHistory": "Historial",
+    "myposts": "Mis publicaciones",
+    "favorites": "Favoritos",
+    "userInitial": "Publicaciones",
+    "activity": "Actividad"
   },
-  "accountPrivate": "{{username}}'s activity is private",
-  "subscribed-tag": "SUBSCRIBED",
+  "accountPrivate": "La actividad de {{username}} es privada",
   "modal": {
     "blockUser": {
-      "title": "Block user",
-      "messageFirstPart": "Do you really want to block",
+      "title": "Bloquear usuario",
+      "messageFirstPart": "¿De verdad quieres bloquear a ",
       "messageSecondPart": "?",
-      "button:": {
-        "cancel": "Cancel",
-        "confirm": "Block user"
-      }
-    },
-    "unsubscribeUser": {
-      "title": "Unsubscribe from creator",
-      "message": "Do you really want to unsubscribe from {{username}}?",
       "button": {
-        "cancel": "Cancel",
-        "confirm": "Unsubscribe"
+        "cancel": "Cancelar",
+        "confirm": "Bloquear usuario"
       }
     },
     "deleteMyAccount": {
-      "title": "Delete my account",
-      "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
+      "title": "Borrar mi cuenta",
+      "body": "¿Estás seguro de que quieres eliminar tu\n cuenta? No podrás acceder a tu cuenta en el futuro y todo\n tu historial se borrará.",
       "button": {
-        "confirm": "Delete my account",
-        "cancel": "Cancel"
+        "confirm": "Borrar mi cuenta",
+        "cancel": "Cancelar"
       }
     }
   },
   "profileLayout": {
     "headerButtons": {
-      "edit": "Edit Profile",
-      "settings": "Settings"
+      "edit": "Editar perfil",
+      "settings": "Configuración"
     },
     "buttons": {
-      "favorites": "Favorites",
-      "more": "More",
-      "sendMessage": "Send message",
-      "copied": "Link copied!"
+      "favorites": "Favoritos",
+      "enableSmsNotifications": "Notificarme",
+      "disableSmsNotifications": "Notificaciones ACTIVAS",
+      "buyBundles": "Comprar Bundles",
+      "votesLeft": "Quedan {{amount}} votos",
+      "sendMessage": "Escribir mensaje",
+      "copied": "¡Enlace copiado!"
     }
   },
   "editProfileMenu": {
     "button": {
-      "backToProfile": "Edit profile",
-      "backToImage": "Edit Profile Image",
-      "save": "Save changes",
-      "cancel": "Cancel"
+      "backToProfile": "Editar perfil",
+      "backToImage": "Editar imagen de perfil",
+      "save": "Guardar cambios",
+      "cancel": "Cancelar"
     },
-    "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
+    "confirmationWindow": "El cierre descartará los cambios. ¿Estás seguro de que quieres salir?",
     "inputs": {
       "coverImage": {
-        "changeCoverImage": "Change cover image"
+        "changeCoverImage": "Cambiar imagen de portada"
       },
       "nickname": {
-        "placeholder": "Display name",
+        "placeholder": "Nombre para mostrar",
         "errors": {
-          "generic": "Please check input",
-          "tooLong": "Name is too long",
-          "tooShort": "Name is too short",
-          "invalidChar": "Name has invalid characters",
-          "inappropriate": "Offensive words are forbidden",
-          "linksForbidden": "Links not allowed"
+          "generic": "Por favor, comprueba lo que introduciste",
+          "tooLong": "El nombre es demasiado largo",
+          "tooShort": "El nombre es demasiado corto",
+          "invalidChar": "El nombre tiene caracteres inválidos",
+          "inappropriate": "Las palabras ofensivas no están permitidas",
+          "linksForbidden": "Los enlaces no están permitidos"
         }
       },
       "username": {
-        "placeholder": "@username",
+        "placeholder": "@usuario",
         "frequencyCaption": "{{domain}}{{username}}",
-        "cannotBeChangedCaption": "Username can be changed once a month.",
+        "cannotBeChangedCaption": "El usuario solo puede ser cambiado una vez al mes.",
         "errors": {
-          "generic": "Please check input",
-          "tooLong": "Username is too long",
-          "tooShort": "Username is too short",
-          "invalidChar": "Username has invalid characters",
-          "inappropriate": "Offensive words are forbidden",
-          "taken": "Username is taken",
-          "linksForbidden": "Links not allowed"
+          "generic": "Por favor, comprueba lo que introduciste",
+          "tooLong": "El usuario es demasiado largo",
+          "tooShort": "El usuario es demasiado corto",
+          "invalidChar": "El usuario tiene caracteres inválidos",
+          "inappropriate": "Las palabras ofensivas no están permitidas",
+          "taken": "El nombre de usuario está ocupado",
+          "linksForbidden": "Los enlaces no están permitidos"
         },
         "points": {
-          "1": "2-25 characters length",
-          "2": "Lower case only",
-          "3": "No space and special characters"
+          "1": "Longitud de 2 a 25 caracteres",
+          "2": "Solo minúsculas",
+          "3": "No espacios ni caracteres especiales"
         }
       },
       "genderPronouns": {
-        "placeholder": "Gender",
-        "caption": "This can be changed or removed later"
+        "placeholder": "Género",
+        "caption": "Esto puede ser cambiado o eliminado más tarde"
       },
       "bio": {
         "placeholder": "Bio",
         "errors": {
-          "generic": "Please check input",
-          "tooLong": "Bio is too long",
-          "tooShort": "Bio is too short",
-          "inappropriate": "Offensive words are forbidden",
-          "linksForbidden": "No links allowed in bio"
+          "generic": "Por favor, comprueba lo que introduciste",
+          "tooLong": "La biografía es demasiado larga",
+          "tooShort": "La biografía es demasiado corta",
+          "inappropriate": "Las palabras ofensivas no están permitidas",
+          "linksForbidden": "Los enlaces no están permitidos en la biografía"
         }
       }
     }
   },
   "Settings": {
     "meta": {
-      "title": "NewNew Settings",
-      "description": "Customize your NewNew profile and settings"
+      "title": "Configuración de NewNew",
+      "description": "Personaliza tu perfil y configuración de NewNew"
     },
-    "heading": "Settings",
+    "heading": "Configuración",
     "button": {
-      "back": "Back"
+      "back": "Regresar"
     },
     "colorModeSwitch": {
       "options": {
-        "light": "Light",
-        "dark": "Dark",
-        "auto": "Auto"
+        "light": "Luz",
+        "dark": "Oscuro",
+        "auto": "Automático"
       }
     },
     "sections": {
       "wallet": {
-        "balance": "My balance",
-        "caption": "Add funds to vote and bid without any fees",
+        "balance": "Mi balance",
+        "caption": "Añade fondos para votar y ofertar sin comisiones",
         "button": {
-          "topUp": "Add funds"
+          "topUp": "Añade fondos"
         },
         "topUpWalletModal": {
-          "heading": "Add funds",
+          "heading": "Añade fondos",
           "button": {
-            "checkout": "Checkout",
-            "cancel": "Cancel"
+            "checkout": "Pagar",
+            "cancel": "Cancelar"
           }
+        }
+      },
+      "cards": {
+        "title": "Mis tarjetas",
+        "myPaymentMethods": "Mis métodos de pago",
+        "hint": "Necesitarás tener una tarjeta guardada para participar en las publicaciones",
+        "adding": "Añadiendo nueva tarjeta...",
+        "ooops": "¡Ups!",
+        "success": "¡Felicidades!",
+        "button": {
+          "addNewCard": "Agregar nueva tarjeta",
+          "addCard": "Agregar tarjeta"
+        },
+        "primary": "Primaria",
+        "ellipse": {
+          "makePrimary": "Convertir en primaria",
+          "removeCard": "Remover tarjeta"
+        },
+        "status": {
+          "added": "¡Éxito! Tu tarjeta ha sido guardada",
+          "cannotBeAdded": "¡Error! Tu tarjeta no se ha podido guardar",
+          "duplicate": "Esta tarjeta ya se ha guardado en tu perfil anteriormente",
+          "inProgress": "Guardando tu tarjeta. Por favor, espera",
+          "requestFailed": "Algo salió mal"
         }
       },
       "personalInformation": {
-        "title": "Personal information",
+        "title": "Información personal",
         "emailInput": {
-          "label": "Email Address",
+          "label": "Correo electrónico",
           "placeholder": "email@email.com",
           "errors": {
-            "invalidEmail": "Please enter a valid email address",
-            "emailTaken": "Email taken"
-          }
+            "invalidEmail": "Por favor, introduce un correo electrónico válido",
+            "emailTaken": "Alguien ya registró ese correo electrónico"
+          },
+          "whatsNew": "¿Cuál es tu correo electrónico nuevo?",
+          "confirmEmail": "Confirma el nuevo correo electrónico",
+          "verifyNewEmail": "Confirma tu nuevo correo electrónico",
+          "edit": "Editar"
         },
         "birthDateInput": {
-          "label": "Date of birth",
+          "label": "Fecha de nacimiento",
           "errors": {
-            "tooYoung": "You must be 18 years or older."
+            "tooYoung": "Debes tener 18 años o más."
           },
           "captions": {
-            "twoTimesOnly": "Birthday can be changed 2 times only",
-            "cannotChange": "You can only change this once"
+            "twoTimesOnly": "Tu fecha de nacimiento solo puede ser cambiada 2 veces",
+            "cannotChange": "Solo puedes cambiar esto una vez"
           }
         },
         "button": {
-          "save": "Save changes",
-          "cancel": "Cancel"
+          "save": "Guardar cambios",
+          "cancel": "Cancelar"
         }
       },
       "notifications": {
-        "title": "Notifications",
-        "email": "Email Notifications",
-        "push": "Push Notifications"
+        "title": "Notificaciones",
+        "email": "Notificaciones por correo electrónico",
+        "push": "Notificaciones Push"
       },
       "transactions": {
-        "title": "Transactions",
-        "you": "You",
+        "title": "Transacciones",
+        "you": "Tú",
         "type": {
-          "1": "event",
+          "1": "bid",
           "2": "superpoll",
           "3": "goal"
         },
         "actions": {
-          "topup": "top-up your wallet.",
-          "decision": "post.",
-          "1": "bid on",
-          "2": "voted on",
-          "3": "backed on",
-          "5": "subscribed to"
+          "topup": "recarga tu cartera.",
+          "decision": "publicación.",
+          "1": "hizo una oferta en",
+          "2": "votó en",
+          "3": "patrocinó",
+          "5": "se suscribió a",
+          "6": "bundle comprado en"
         }
       },
       "privacy": {
-        "title": "Privacy",
+        "title": "Privacidad",
         "privacySubsections": {
           "spendings": {
-            "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on events, superpolls and goals"
+            "title": "Ocultar mis gastos a los demás",
+            "caption": "Las personas no podrán ver cuánto has gastado en Bids ni en Superpolls."
           },
           "private": {
-            "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on events, superpolls and goals"
+            "title": "Hacer mi actividad privada",
+            "caption": "Las personas no podran ver tu actividad en Bids ni en Superpolls."
           }
         },
         "blockedUsers": {
-          "title": "Blocked users",
-          "noBlockedUsers": "No blocked users",
+          "title": "Usuarios bloqueados",
+          "noBlockedUsers": "No hay usuarios bloqueados",
           "button": {
-            "unblock": "Unblock"
+            "unblock": "Desbloquear"
           }
         },
         "closeAccount": {
-          "title": "Delete my account",
-          "caption": "Delete your account and account data.",
+          "title": "Eliminar mi cuenta",
+          "caption": "Elimina tu cuenta y todos los datos.",
           "button": {
-            "delete": "Delete"
+            "delete": "Eliminar"
           }
         }
       }
     },
     "bottomDiv": {
-      "help": "Help",
-      "logout": "Log out"
+      "help": "Ayuda",
+      "logout": "Cerrar sesión"
     }
   },
   "genderPronouns": {
-    "none": "None",
-    "feminine": "She/Her",
-    "masculine": "He/Him",
-    "neutral": "They/Them"
+    "none": "Ninguno",
+    "feminine": "Ella",
+    "masculine": "Él",
+    "neutral": "Elle"
   }
 }

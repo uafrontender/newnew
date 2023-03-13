@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "NewNew - Bid, Vote & Crowdfund Posts",
-    "description": "Decide what people do next. Vote, bid and crowdfund with the community to watch people do things IRL on NewNew"
+    "title": "NewNew",
+    "description": "決定人們接下來做什麼。與社區一起投票、出價投標和眾籌，觀看人們在NewNew上實際做的事情"
   },
-  "errorText": "Oops…Something went wrong",
-  "buttonText": "Go home"
+  "errorText": "糟糕......出錯了",
+  "buttonText": "返回首頁"
 }

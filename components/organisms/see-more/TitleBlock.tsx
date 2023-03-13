@@ -1,18 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useMemo, useCallback } from 'react';
-import _map from 'lodash/map';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
 
-import Button from '../../atoms/Button';
-import Sorting from '../Sorting';
-import InlineSVG from '../../atoms/InlineSVG';
 import ChangeCollectionType from '../../atoms/ChangeCollectionType';
 
-import { useAppSelector } from '../../../redux-store/store';
-
-// import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import closeCircleIcon from '../../../public/images/svg/icons/filled/CloseCircle.svg';
+import SortOption from '../../atoms/SortOption';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ITitleBlock {
   category: string;
@@ -25,22 +19,19 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   disabled,
   authenticated,
 }) => {
-  const { t } = useTranslation('page-SeeMore');
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  let { sort = '' } = router.query;
   // const category = router.query.category as string;
+  const { sort } = router.query;
 
-  if (sort) {
-    // @ts-ignore
-    sort = JSON.parse(sort);
-  }
+  const sorts: Record<string, string> = sort
+    ? JSON.parse(sort as string) || {}
+    : undefined;
 
-  const sortEnabled = !!Object.keys(sort).length;
   const sortOptions: any = useMemo(
     () => [
       {
@@ -59,22 +50,25 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   );
   const collectionTypeOptions: any = useMemo(
     () => [
-      {
-        key: 'ac',
-      },
-      {
-        key: 'mc',
-      },
-      {
-        key: 'cf',
-      },
+      // {
+      //   key: 'ac',
+      // },
+      // {
+      //   key: 'mc',
+      // },
+      // {
+      //   key: 'cf',
+      // },
       // {
       //   key: 'biggest',
       // },
       ...(authenticated
         ? [
+            // {
+            //   key: 'for-you',
+            // },
             {
-              key: 'for-you',
+              key: 'recent-activity',
             },
           ]
         : []),
@@ -83,10 +77,18 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   );
 
   const handleCollectionTypeChange = (newCategory: string) => {
-    const newQuery = {
+    const newQuery: {
+      category?: string;
+      sort?: string;
+    } = {
       ...router.query,
       category: newCategory,
     };
+
+    if (newCategory === 'for-you' && newQuery.sort) {
+      delete newQuery.sort;
+    }
+
     router.push({
       query: newQuery,
       pathname: router.pathname,
@@ -123,35 +125,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
     [router, handleClearSorting]
   );
 
-  const renderSortOption = useCallback(
-    (option: string, key: string) => {
-      const handleClick = () => {
-        handleClearSorting();
-      };
-
-      return (
-        <SButton
-          key={`${option}-${key}`}
-          view='primary'
-          disabled={disabled}
-          onClick={handleClick}
-        >
-          {t(`sortingOption.${key}`)} (
-          {t(
-            `sortingOption.${key}-${option}${
-              option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
-                ? `-${category}`
-                : ''
-            }`
-          )}
-          )
-          <InlineSVG svg={closeCircleIcon} width='16px' height='16px' />
-        </SButton>
-      );
-    },
-    [disabled, t, category, handleClearSorting]
-  );
-
   return (
     <SContainer>
       <SWrapper>
@@ -161,31 +134,24 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           disabled={disabled}
           onChange={handleCollectionTypeChange}
         />
-        {category !== 'biggest' && category !== 'for-you' && (
-          <Sorting
-            category={category}
-            options={sortOptions}
-            selected={sort}
-            onChange={handleSortChange}
-          />
-        )}
-      </SWrapper>
-      {sortEnabled && !isMobile && (
-        <SSortSelectedWrapper>
-          {/* <SButtonClear
-            view="tertiary"
-            onClick={handleClearSorting}
-            disabled={disabled}
-          >
-            Clear all
-            <InlineSVG
-              svg={closeIcon}
-              width="24px"
-              height="24px"
+        {/* {category !== 'biggest' &&
+          category !== 'for-you' &&
+          category !== 'recent-activity' && (
+            <Sorting
+              category={category}
+              options={sortOptions}
+              selected={sorts}
+              onChange={handleSortChange}
             />
-          </SButtonClear> */}
-          {_map(sort, renderSortOption)}
-        </SSortSelectedWrapper>
+          )} */}
+      </SWrapper>
+      {sorts && !isMobile && (
+        <SSortOption
+          sorts={sorts}
+          category={category}
+          disabled={disabled}
+          onClick={handleClearSorting}
+        />
       )}
     </SContainer>
   );
@@ -221,39 +187,6 @@ const SWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const SSortSelectedWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+const SSortOption = styled(SortOption)`
   margin-top: 24px;
-  align-items: center;
-  flex-direction: row;
 `;
-
-const SButton = styled(Button)`
-  padding: 8px 8px 8px 16px;
-  margin-right: 8px;
-  border-radius: 24px;
-
-  span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  svg {
-    min-width: 16px;
-    min-height: 16px;
-    margin-left: 4px;
-  }
-`;
-
-// const SButtonClear = styled(SButton)`
-//   color: ${(props) => props.theme.colorsThemed.text.secondary};
-
-//   svg {
-//     fill: ${(props) => props.theme.colorsThemed.text.secondary};
-//     min-width: 24px;
-//     min-height: 24px;
-//     margin-left: 0;
-//   }
-// `;

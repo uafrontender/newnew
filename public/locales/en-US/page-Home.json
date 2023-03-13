@@ -1,15 +1,16 @@
 {
   "meta": {
-    "title": "NewNew - Bid, Vote & Crowdfund Posts",
+    "title": "NewNew",
     "description": "Decide what people do next. Vote, bid and crowdfund with the community to watch people do things IRL on NewNew"
   },
   "cardsSection": {
     "title": {
-      "biggest": "Greatest of all Time",
+      "biggest": "Greatest of All Time",
       "for-you": "For you",
-      "ac": "Biggest Events",
+      "ac": "Biggest Bids",
       "mc": "Top Superpolls",
-      "cf": "Popular Goals"
+      "cf": "Popular Goals",
+      "recent-activity": "Recent Activity"
     },
     "button": {
       "showMore": "See more",
@@ -17,18 +18,80 @@
       "creatorOnTheRise": "On the Rise"
     }
   },
+  "section": {
+    "your": "Your posts",
+    "explore": "Explore"
+  },
   "tutorial": {
     "ac": {
-      "title": "Event",
-      "caption": "Send the creator a bid with what you want them to do, how much you're willing to spend, and see if they do your bid."
+      "title": "Bids",
+      "caption": "Send creators custom bids and see if they choose yours."
     },
     "mc": {
       "title": "Superpolls",
-      "caption": "A creator makes a Superpoll that you pay to vote on. When the time's up, watch the creator do the option that gets the most amount of votes."
+      "caption": "Vote on what a creator should do, then watch them do the option with the most amount of votes."
     },
     "cf": {
-      "title": "Goal",
+      "title": "Goals",
       "caption": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you'll watch the creator do it."
+    },
+    "for-you": {
+      "title": "For you",
+      "caption": "This section will display posts recommended to you."
+    },
+    "biggest": {
+      "title": "Greatest of All Time",
+      "caption": "This section will display the greatest of all time posts."
+    },
+    "recent-activity": {
+      "title": "Recent Activity",
+      "caption": "This section will display posts you are participating in"
     }
-  }
+  },
+  "faq": {
+    "title": "FAQs",
+    "learMore": "Want to learn more? Visit <0>NewNew Support</0>",
+    "items": [
+      {
+        "question": "What is NewNew?",
+        "answer": "NewNew is an interactive marketplace where you bid and vote on the outcomes of people’s lives. People make money letting others have a say in their life decisions."
+      },
+      {
+        "question": "Can I make money on NewNew?",
+        "answer": "Yes! <0>Sign up to become a creator</0> and have people pay to vote and bid on your life decisions!"
+      },
+      {
+        "question": "How do Bids work?",
+        "answer": "The audience sends you different bids on what you should do, and how much they’ll pay to see you do it. \nYou’ll choose your favorite bid and upload a video of yourself doing it! Don’t worry... you don’t have to choose the highest priced bid (but you can if you want to)! You can choose any bid you feel comfortable doing."
+      },
+      {
+        "question": "How do Superpolls work?",
+        "answer": "Post a video poll with different options for the audience to choose from. \nPeople pay to vote on their favorite option and you upload a video of yourself doing the option that got the most votes!"
+      },
+      {
+        "question": "What are Superpoll Bundles?",
+        "answer": "Creators can offer discounted bundles for their Superpolls. Buying a bundle is optional, but with buying a bundle you get: <2>A big discount on votes + more voting power to use in upcoming Superpolls</2> <2>The ability to add your own custom option to the creator’s Superpolls</2> <2>1-on-1 messages with the creator</2>"
+      },
+      {
+        "question": "Can brands use NewNew?",
+        "answer": "Yes! Brands are creators too. NewNew is a great place to engage with your customers on a hyper-interactive level. Your customers can help make major decisions for your brand and feel included and heard in the process of your next big product, launch etc. Besides, there’s no one better to get feedback than from those who are invested in your brand."
+      },
+      {
+        "question": "What if the creator doesn’t do what was voted on or bid on?",
+        "answer": "You won’t be charged if: <1>The creator never uploads a response video to a Superpoll or Bid</1> <1>The creator doesn’t choose your specific Bid</1>"
+      }
+    ]
+  },
+  "becomeCreator": {
+    "title": "Ready to create?"
+  },
+  "createFirstPost": {
+    "title": "Post your first Bid or Superpoll",
+    "filter": {
+      "active": "Active",
+      "ended": "Ended"
+    }
+  },
+  "ooops": "Ooops!",
+  "noPosts": "No posts found"
 }

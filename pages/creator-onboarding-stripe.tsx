@@ -1,10 +1,10 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { GetServerSidePropsContext } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -16,6 +16,7 @@ import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
 import assets from '../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 const OnboardingSectionStripe = dynamic(
   () =>
@@ -95,12 +96,15 @@ const CreatorOnboardingStripe = () => {
 
 export default CreatorOnboardingStripe;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'page-CreatorOnboarding',
-  ]);
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<any> {
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-CreatorOnboarding'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {

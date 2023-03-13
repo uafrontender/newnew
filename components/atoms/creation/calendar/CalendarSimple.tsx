@@ -3,11 +3,12 @@ import moment from 'moment';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Text from '../../Text';
 import InlineSVG from '../../InlineSVG';
 import { RenderDays } from './CalendarScrollableVertically';
-import AnimatedPresence, { TAnimation } from '../../AnimatedPresence';
+import AnimatedPresence, { TElementAnimations } from '../../AnimatedPresence';
 
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
@@ -21,22 +22,24 @@ import { DAYS } from '../../../../constants/general';
 
 interface ICalendarSimple {
   date: any;
+  maxDate?: Date;
   onChange: (date: any) => void;
 }
 
 export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
-  const { date, onChange } = props;
+  const { date, maxDate, onChange } = props;
   const monthsToRender = [
     moment().startOf('month'),
     moment().startOf('month').add(1, 'month'),
   ];
 
   const theme = useTheme();
+  const { locale } = useRouter();
   const { t } = useTranslation('page-Creation');
   const wrapperRef: any = useRef();
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState('o-12');
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const [visibleMonth, setVisibleMonth] = useState(
     monthsToRender.findIndex((m) => m.format('M') === moment(date).format('M'))
   );
@@ -51,7 +54,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     setOpen(true);
   }, []);
   const handleClose = useCallback(() => {
-    setAnimation('o-12-reversed');
+    setAnimation('o-12-reverse');
     setAnimate(true);
     setOpen(false);
   }, []);
@@ -77,7 +80,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     (el: any) => (
       <SDay key={el.value}>
         <SDayLabel variant={2} weight={500}>
-          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+          {t(`secondStep.field.startsAt.modal.days.${el.value}` as any)}
         </SDayLabel>
       </SDay>
     ),
@@ -87,6 +90,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     (el: moment.Moment, index: number) => {
       const opts: any = {
         date: el,
+        maxDate,
       };
 
       if (index === 0) {
@@ -104,7 +108,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
         </SDaysListItem>
       );
     },
-    [date, handleChange]
+    [date, maxDate, handleChange]
   );
 
   useOnClickEsc(wrapperRef, handleClose);
@@ -117,6 +121,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
       duration: 500,
       horizontal: true,
       containerId: 'monthsContainer',
+      ignoreCancelEvents: true,
     });
   }, [visibleMonth]);
 
@@ -124,7 +129,9 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     <SWrapper ref={wrapperRef}>
       <SContainer onClick={open ? handleClose : handleClick}>
         <SCalendarLabel variant={2} weight={500}>
-          {moment(date).format('MMMM DD')}
+          {moment(date)
+            .locale(locale || 'en-US')
+            .format('MMMM DD')}
         </SCalendarLabel>
         <InlineSVG
           svg={calendarIcon}
@@ -135,7 +142,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
       </SContainer>
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
       >
@@ -155,7 +162,10 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
               )}
             </SInlineSVGWrapper>
             <SMonth variant={2} weight={600}>
-              {moment().add(visibleMonth, 'month').format('MMMM YYYY')}
+              {moment()
+                .locale(locale || 'en-US')
+                .add(visibleMonth, 'month')
+                .format('MMMM YYYY')}
             </SMonth>
             <SInlineSVGWrapper
               onClick={handleNextMonth}

@@ -15,7 +15,6 @@ COPY ./docker/nginx/entrypoint.sh /app/entrypoint.sh
 # environment variable in the `RUN npm run build` command below. In this project
 # it is assigned to `assetPrefix` in `next.config.js`.
 ARG NEXT_JS_ASSET_URL
-ARG NEXT_PUBLIC_BITMOVIN_PLAYER_KEY
 
 ENV NODE_ENV=production
 

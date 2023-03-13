@@ -12,6 +12,8 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
   ({ className, placeholderSrc, videoSrcList }) => {
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [maxLoadedSrcIndex, setMaxLoadedSrcIndex] = useState(0);
+    const [placeholderLoaded, setPlaceholderLoaded] = useState(false);
+    const [videoLoaded, setVideoLoaded] = useState(false);
 
     const getPreviousIndex = useCallback(
       (index: number) => (index > 0 ? index - 1 : videoSrcList.length - 1),
@@ -35,6 +37,13 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
 
       return 0;
     }
+
+    // Clear state on data changed
+    useEffect(() => {
+      setCurrentVideoIndex(0);
+      setMaxLoadedSrcIndex(0);
+      setPlaceholderLoaded(false);
+    }, [placeholderSrc, videoSrcList]);
 
     useEffect(() => {
       const previousVideoIndex = getPreviousIndex(currentVideoIndex);
@@ -63,9 +72,30 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
       }
     }, [videoSrcList, currentVideoIndex, getPreviousIndex]);
 
+    useEffect(() => {
+      // Show it anyway after 2s
+      const RESERVE_SHOW_TIMEOUT = 2000;
+      const reserveShowTimer = setTimeout(() => {
+        setPlaceholderLoaded(true);
+      }, RESERVE_SHOW_TIMEOUT);
+
+      return () => {
+        clearTimeout(reserveShowTimer);
+      };
+    }, []);
+
     return (
-      <Container className={className}>
-        <Placeholder src={placeholderSrc} />
+      <Container
+        className={className}
+        visible={placeholderLoaded || videoLoaded}
+      >
+        <Placeholder
+          key={placeholderSrc}
+          src={placeholderSrc}
+          onLoad={() => {
+            setPlaceholderLoaded(true);
+          }}
+        />
         {videoSrcList.slice(0, maxLoadedSrcIndex + 1).map((videoSrc, index) => (
           <Video
             id={videoSrc}
@@ -79,6 +109,9 @@ const AnimationChain: React.FC<ReactChainI> = React.memo(
             playsInline
             onPlay={() => {
               setMaxLoadedSrcIndex((curr) => (curr === 0 ? 1 : curr));
+            }}
+            onLoadedData={() => {
+              setVideoLoaded(true);
             }}
             onEnded={() => {
               const nextIndex = getNextIndex(index);
@@ -103,8 +136,11 @@ AnimationChain.defaultProps = {
 
 export default AnimationChain;
 
-const Container = styled.div`
+const Container = styled.div<{ visible: boolean }>`
   position: relative;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
+  transition: opacity ease;
+  transition-duration: ${({ visible }) => (visible ? '1s' : '0s')};
 `;
 
 const Placeholder = styled.img`
@@ -120,6 +156,7 @@ const Video = styled.video<{ visibility?: 'play' | 'hold' }>`
 
   // Chrome can't show white background, needs brightness fix
   @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    -webkit-filter: brightness(101%);
+    -webkit-filter: ${({ theme }) =>
+      theme.name === 'light' ? 'brightness(101%)' : undefined};
   }
 `;

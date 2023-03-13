@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme, css } from 'styled-components';
@@ -48,6 +54,13 @@ import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
+import validateInputText from '../../utils/validateMessageText';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../utils/hooks/useErrorToasts';
+import { I18nNamespaces } from '../../@types/i18next';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -147,11 +160,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
+  const { t: tCommon } = useTranslation('common');
+  const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
-  const { user, ui } = useAppSelector((state) => state);
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    ui.resizeMode
+    resizeMode
   );
 
   // Common
@@ -174,17 +190,27 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     bioError: '',
   });
 
+  const validateUsernameAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
   const validateUsernameViaAPI = useCallback(
     async (text: string) => {
+      if (validateUsernameAbortControllerRef.current) {
+        validateUsernameAbortControllerRef.current?.abort();
+      }
+      validateUsernameAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateUsernameRequest({
           username: text,
         });
 
-        const res = await validateUsernameTextField(payload);
+        const res = await validateUsernameTextField(
+          payload,
+          validateUsernameAbortControllerRef.current?.signal
+        );
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -228,18 +254,26 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     [validateUsernameViaAPI]
   );
 
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(
     async (kind: newnewapi.ValidateTextRequest.Kind, text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
           kind,
-          text,
+          text: text.trim(),
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef.current?.signal
+        );
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
 
         if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
@@ -256,6 +290,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             });
           }
         } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
+          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.bioError = errorSwitch(res.data?.status!!);
+              return errorsWorking;
+            });
+          } else {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.bioError = '';
+              return errorsWorking;
+            });
+          }
+        } else if (kind === newnewapi.ValidateTextRequest.Kind.CREATOR_BIO) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
             setFormErrors((errors) => {
               const errorsWorking = { ...errors };
@@ -303,8 +351,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       key: T,
       value: ModalMenuUserData[T]
     ) => {
-      setIsDataValid(false);
-
       const workingData: ModalMenuUserData = { ...dataInEdit };
       workingData[key] = value;
 
@@ -331,7 +377,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
-          newnewapi.ValidateTextRequest.Kind.USER_BIO,
+          user.userData?.options?.isCreator
+            ? newnewapi.ValidateTextRequest.Kind.CREATOR_BIO
+            : newnewapi.ValidateTextRequest.Kind.USER_BIO,
           value as ModalMenuUserData['bio']
         );
       }
@@ -339,10 +387,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     [
       dataInEdit,
       user.userData?.username,
-      setDataInEdit,
+      user.userData?.options?.isCreator,
       validateTextViaAPIDebounced,
       validateUsernameViaAPIDebounced,
-      setIsDataValid,
     ]
   );
 
@@ -352,18 +399,27 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
   const [coverUrlInEditAnimated, setCoverUrlInEditAnimated] = useState(false);
+  const [coverUrlInEditAnimatedExtension, setCoverUrlInEditAnimatedExtension] =
+    useState('');
+  const [coverUrlInEditAnimatedMimeType, setCoverUrlInEditAnimatedMimeType] =
+    useState('');
   const [coverImageInitialObjectFit, setCoverImageInitialObjectFit] =
     useState<CropperObjectFit>('horizontal-cover');
   const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
 
-  const handleSetBackgroundPictureInEdit = (files: FileList | null) => {
+  const handleSetBackgroundPictureInEdit = async (files: FileList | null) => {
     if (files?.length === 1) {
       const file = files[0];
 
       // Return if file is not an image
-      if (!isImage(file.name)) return;
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
       // Return if original image is larger than 10 Mb
       // if ((file.size / (1024 * 1024)) > 10) return;
 
@@ -378,7 +434,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           img.src = properlySizedImage.url;
 
           // eslint-disable-next-line func-names
-          img.addEventListener('load', function () {
+          img.addEventListener('load', async function () {
             // eslint-disable-next-line react/no-this-in-sfc
             if (this.width < this.height * 2.5) {
               setCoverImageInitialObjectFit('horizontal-cover');
@@ -394,7 +450,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
             setCropCoverImage({ x: 0, y: 0 });
             setCoverUrlInEdit(properlySizedImage.url);
-            setCoverUrlInEditAnimated(isAnimatedImage(file.name));
+
+            const imageMeta = await isAnimatedImage(file);
+
+            if (imageMeta && imageMeta.animated) {
+              setCoverUrlInEditAnimated(imageMeta.animated);
+              setCoverUrlInEditAnimatedExtension(imageMeta.ext);
+              setCoverUrlInEditAnimatedMimeType(imageMeta.mime);
+            } else {
+              setCoverUrlInEditAnimated(false);
+              setCoverUrlInEditAnimatedExtension('');
+              setCoverUrlInEditAnimatedMimeType('');
+            }
           });
         }
       });
@@ -431,7 +498,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               0,
               'coverImage.jpeg'
             )
-          : await urlToFile(coverUrlInEdit, 'coverImage.webp', 'image/webp');
+          : await urlToFile(
+              coverUrlInEdit,
+              `coverImage.${coverUrlInEditAnimatedExtension}`,
+              coverUrlInEditAnimatedMimeType
+            );
 
         // API request would be here
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
@@ -441,7 +512,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         const res = await getImageUploadUrl(imageUrlPayload);
 
         if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'An error occured');
+          throw new Error(res.error?.message ?? 'An error occurred');
 
         const uploadResponse = await fetch(res.data.uploadUrl, {
           method: 'PUT',
@@ -460,7 +531,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const payload = new newnewapi.UpdateMeRequest({
         nickname: dataInEdit.nickname,
-        bio: dataInEdit.bio,
+        bio: dataInEdit.bio.trim(),
         // Update avatar
         ...(avatarUrlInEdit && avatarUrlInEdit !== user.userData?.avatarUrl
           ? { avatarUrl: avatarUrlInEdit }
@@ -503,29 +574,33 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
+      } else if ((err as Error).message === 'Refresh token invalid') {
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+      } else {
+        showErrorToastPredefined(undefined);
       }
     }
   }, [
-    setIsLoading,
-    handleClose,
-    dispatch,
-    dataInEdit,
-    avatarUrlInEdit,
+    isAPIValidateLoading,
     coverUrlInEdit,
+    user.userData?.coverUrl,
+    user.userData?.avatarUrl,
+    user.userData?.username,
+    user.userData?.options,
+    dataInEdit.nickname,
+    dataInEdit.bio,
+    dataInEdit.username,
+    dataInEdit.genderPronouns,
+    avatarUrlInEdit,
+    dispatch,
+    handleClose,
     coverUrlInEditAnimated,
     croppedAreaCoverImage,
-    user.userData?.username,
-    user.userData?.avatarUrl,
-    user.userData?.coverUrl,
-    user.userData?.options,
-    isAPIValidateLoading,
+    coverUrlInEditAnimatedExtension,
+    coverUrlInEditAnimatedMimeType,
+    showErrorToastPredefined,
   ]);
 
   // Profile image editing
@@ -537,6 +612,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
     useState<Area>();
   const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
   const [updateProfileImageLoading, setUpdateProfileImageLoading] =
     useState(false);
 
@@ -549,7 +625,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (files?.length === 1) {
       const file = files[0];
 
-      if (!isImage(file.name)) return;
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
       // if ((file.size / (1024 * 1024)) > 3) return;
 
       // Read uploaded file as data URL
@@ -565,6 +646,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
           // eslint-disable-next-line react/no-this-in-sfc
           setOriginalProfileImageWidth(properlySizedImage.width);
+          const minZoom =
+            Math.max(properlySizedImage.height, properlySizedImage.width) /
+            Math.min(properlySizedImage.height, properlySizedImage.width);
+
+          setMinZoomProfileImage(minZoom);
+          setZoomProfileImage(minZoom);
           setAvatarUrlInEdit(properlySizedImage.url);
           handleSetStageToEditingProfilePicture();
         }
@@ -576,22 +663,22 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral();
     setAvatarUrlInEdit('');
     setZoomProfileImage(1);
+    setMinZoomProfileImage(1);
   };
 
   const handleZoomOutProfileImage = () => {
-    if (zoomProfileImage <= 1) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage - 0.2 <= 1) return 1;
-      return z - 0.2;
-    });
+    setZoomProfileImage((z) => Math.max(z - 0.2, minZoomProfileImage));
   };
 
   const handleZoomInProfileImage = () => {
-    if (zoomProfileImage >= 3) return;
+    if (zoomProfileImage >= minZoomProfileImage + 2) {
+      return;
+    }
 
     setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= 3) return 3;
+      if (zoomProfileImage + 0.2 >= minZoomProfileImage + 2) {
+        return minZoomProfileImage + 2;
+      }
       return z + 0.2;
     });
   };
@@ -621,7 +708,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const res = await getImageUploadUrl(imageUrlPayload);
 
       if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'An error occured');
+        throw new Error(res.error?.message ?? 'An error occurred');
 
       const uploadResponse = await fetch(res.data.uploadUrl, {
         method: 'PUT',
@@ -657,8 +744,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral,
     dispatch,
   ]);
+  const scrollPosition = useRef(0);
 
-  // Effects
   useEffect(() => {
     const verify = () => {
       if (!isBrowser()) return;
@@ -693,7 +780,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (
       (!avatarUrlInEdit ||
         isEqual(avatarUrlInEdit, user.userData?.avatarUrl)) &&
-      isEqual(dataInEdit, initialData) &&
+      dataInEdit.bio.trim() === initialData.bio &&
+      dataInEdit.genderPronouns === initialData.genderPronouns &&
+      dataInEdit.nickname.trim() === initialData.nickname &&
+      dataInEdit.username.trim() === initialData.username &&
       isEqual(coverUrlInEdit, user.userData?.coverUrl)
     ) {
       handleSetWasModified(false);
@@ -709,11 +799,24 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
 
   useEffect(() => {
-    if (Object.values(formErrors).every((v) => v === '')) {
-      setIsDataValid(true);
-    } else {
+    if (
+      Object.entries(dataInEdit).some(
+        ([key, value]) =>
+          key !== 'genderPronouns' &&
+          key !== 'bio' &&
+          !validateInputText(value as string)
+      )
+    ) {
       setIsDataValid(false);
+      return;
     }
+
+    if (Object.values(formErrors).some((v) => v !== '')) {
+      setIsDataValid(false);
+      return;
+    }
+
+    setIsDataValid(true);
   }, [formErrors, dataInEdit]);
 
   // Gender Pronouns
@@ -724,7 +827,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           (genderP) => genderP.value !== newnewapi.User.GenderPronouns.UNKNOWN
         )
         .map((genderP) => ({
-          name: t(`genderPronouns.${genderP.name}`),
+          name: t(
+            `genderPronouns.${
+              genderP.name as keyof I18nNamespaces['page-Profile']['genderPronouns']
+            }`
+          ),
           value: genderP.value,
         })),
     [t]
@@ -788,7 +895,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   disabled={isLoading}
                   placeholder={t('editProfileMenu.inputs.nickname.placeholder')}
                   errorCaption={t(
-                    `editProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
+                    `editProfileMenu.inputs.nickname.errors.${
+                      formErrors.nicknameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['nickname']['errors']
+                    }`
                   )}
                   isValid={!formErrors.nicknameError}
                   onChange={(e) =>
@@ -825,11 +934,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     />
                   }
                   errorCaption={t(
-                    `editProfileMenu.inputs.username.errors.${formErrors.usernameError}`
+                    `editProfileMenu.inputs.username.errors.${
+                      formErrors.usernameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['username']['errors']
+                    }`
                   )}
                   placeholder={t('editProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
-                  onChange={(value) => {
+                  onChange={(value: any) => {
                     handleUpdateDataInEdit('username', value as string);
                   }}
                 />
@@ -842,7 +953,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                         ? genderOptions.find(
                             (o) => o.value === dataInEdit.genderPronouns
                           )?.name!!
-                        : 'Gender'
+                        : t('editProfileMenu.inputs.genderPronouns.placeholder')
                     }
                     options={genderOptions}
                     selected={dataInEdit.genderPronouns}
@@ -861,7 +972,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   disabled={isLoading}
                   placeholder={t('editProfileMenu.inputs.bio.placeholder')}
                   errorCaption={t(
-                    `editProfileMenu.inputs.bio.errors.${formErrors.bioError}`
+                    `editProfileMenu.inputs.bio.errors.${
+                      formErrors.bioError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['bio']['errors']
+                    }`
                   )}
                   isValid={!formErrors.bioError}
                   onChange={(e) =>
@@ -872,7 +985,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </ProfileGeneralContent>
             <SControlsWrapper>
               {!isMobile ? (
-                <Button view='secondary' onClick={() => handleClose()}>
+                <Button
+                  view='secondary'
+                  onClick={() => handleClose()}
+                  onClickCapture={() => {
+                    Mixpanel.track('Click Cancel Editing Profile Button', {
+                      _stage: 'MyProfile',
+                      _component: 'EditProfileMenu',
+                    });
+                  }}
+                >
                   {t('editProfileMenu.button.cancel')}
                 </Button>
               ) : null}
@@ -886,6 +1008,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
                 onClick={() => handleUpdateUserData()}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Profile Changes Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.save')}
               </Button>
@@ -921,6 +1049,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <ProfileImageCropper
                 crop={cropProfileImage}
                 zoom={zoomProfileImage}
+                minZoom={minZoomProfileImage}
+                maxZoom={minZoomProfileImage + 2}
                 avatarUrlInEdit={avatarUrlInEdit}
                 originalImageWidth={originalProfileImageWidth}
                 disabled={updateProfileImageLoading}
@@ -928,51 +1058,67 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 onCropComplete={onCropCompleteProfileImage}
                 onZoomChange={setZoomProfileImage}
               />
-              <SSliderWrapper>
-                <Button
-                  iconOnly
-                  size='sm'
-                  view='transparent'
-                  disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
-                  onClick={handleZoomOutProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomOutIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='24px'
-                    height='24px'
-                  />
-                </Button>
-                <ProfileImageZoomSlider
-                  value={zoomProfileImage}
-                  min={1}
-                  max={3}
-                  step={0.1}
-                  ariaLabel='Zoom'
-                  disabled={updateProfileImageLoading}
-                  onChange={(e) => setZoomProfileImage(Number(e.target.value))}
-                />
-                <Button
-                  iconOnly
-                  size='sm'
-                  view='transparent'
-                  disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
-                  onClick={handleZoomInProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomInIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='24px'
-                    height='24px'
-                  />
-                </Button>
-              </SSliderWrapper>
             </ProfilePictureContent>
+            <SSliderWrapper>
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomProfileImage <= minZoomProfileImage ||
+                  updateProfileImageLoading
+                }
+                onClick={handleZoomOutProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomOutIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+              <ProfileImageZoomSlider
+                value={zoomProfileImage}
+                min={minZoomProfileImage}
+                max={minZoomProfileImage + 2}
+                step={0.1}
+                ariaLabel='Zoom'
+                disabled={updateProfileImageLoading}
+                onChange={(e) =>
+                  setZoomProfileImage(
+                    Math.max(Number(e.target.value), minZoomProfileImage)
+                  )
+                }
+              />
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomProfileImage >= minZoomProfileImage + 2 ||
+                  updateProfileImageLoading
+                }
+                onClick={handleZoomInProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomInIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+            </SSliderWrapper>
             <SControlsWrapperPicture>
               <Button
                 view='secondary'
                 disabled={updateProfileImageLoading}
                 onClick={handleSetStageToEditingGeneralUnsetPicture}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Cancel Profile Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.cancel')}
               </Button>
@@ -980,6 +1126,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 withShadow
                 disabled={updateProfileImageLoading}
                 onClick={completeProfileImageCropAndSave}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Profile Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
               >
                 {t('editProfileMenu.button.save')}
               </Button>
@@ -1036,12 +1188,12 @@ const SEditProfileMenu = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: min(15vh, 136px);
+    top: max(min((100vh - 690px) / 2, 136px), 0px);
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 75vh;
-    max-height: 684px;
+    height: 100%;
+    max-height: 690px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
@@ -1115,22 +1267,24 @@ const STextInputsWrapper = styled.div`
 const ProfilePictureContent = styled.div`
   overflow-y: auto;
   padding: 0 20px;
+  height: 100%;
 `;
 
 const SSliderWrapper = styled.div`
   display: none;
-
   ${({ theme }) => theme.media.tablet} {
+    z-index: 1;
+    background-color: ${({ theme }) =>
+      theme.name === 'light'
+        ? 'rgba(255, 255, 255, 0.5)'
+        : 'rgba(11, 10, 19, 0.5)'};
     display: flex;
     flex-direction: row;
     justify-content: center;
-
     margin-top: 24px;
-    padding: 0px 24px;
-
+    padding: 0 24px;
     button {
       background: transparent;
-
       &:hover:enabled {
         background: transparent;
         cursor: pointer;
@@ -1163,7 +1317,10 @@ const SControlsWrapper = styled.div`
 const SEditProfilePicture = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  height: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 100%;
+  }
 `;
 
 const SControlsWrapperPicture = styled.div`
@@ -1171,6 +1328,7 @@ const SControlsWrapperPicture = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  margin-top: auto;
   padding: 16px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -1197,37 +1355,30 @@ const UsernamePopupList = ({
   </SUsernamePopupList>
 );
 
-const SUsernamePopupListItem = styled.div<{
-  isValid: boolean;
-}>`
+const SUsernamePopupListItem = styled.div<{ isValid: boolean }>`
   display: flex;
   justify-content: flex-start;
   align-items: center;
 
   &:before {
     content: '✓';
-    color: ${({ isValid }) => (isValid ? '#FFFFFF' : 'transparent')};
+    color: ${({ isValid }) => (isValid ? '#fff' : 'transparent')};
     font-size: 8px;
     text-align: center;
     line-height: 13px;
     display: block;
-
     position: relative;
     top: -1px;
-
     width: 13px;
     height: 13px;
     margin-right: 4px;
-
     border-radius: 50%;
     border-width: 1.5px;
     border-style: solid;
     border-color: ${({ theme, isValid }) =>
       isValid ? 'transparent' : theme.colorsThemed.text.secondary};
-
     background-color: ${({ theme, isValid }) =>
       isValid ? theme.colorsThemed.accent.success : 'transparent'};
-
     transition: 0.2s ease-in-out;
   }
 `;
@@ -1236,36 +1387,14 @@ const SUsernamePopupList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
-
-  color: #ffffff;
+  color: #fff;
 `;
 
 const SDropdownSelectWrapper = styled.div`
   margin-bottom: 16px;
-`;
-
-const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  margin-top: 6px;
-  margin-bottom: 16px;
-
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  & > div {
-    margin-right: 4px;
-  }
 `;
 
 const SDropdownSelect = styled(DropdownSelect)`

@@ -1,4 +1,3 @@
-/* eslint-disable default-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
@@ -6,20 +5,22 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useUpdateEffect } from 'react-use';
 
 import Button from '../../atoms/Button';
-import Sorting from '../Sorting';
 
-import { searchPosts } from '../../../api/endpoints/search';
-import isBrowser from '../../../utils/isBrowser';
-import switchPostType from '../../../utils/switchPostType';
+import { useAppSelector } from '../../../redux-store/store';
+import SortOption from '../../atoms/SortOption';
+import useSearchPosts from '../../../utils/hooks/useSearchPosts';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const PostList = dynamic(() => import('./PostList'));
-const PostModal = dynamic(() => import('../decision/PostModal'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 
-interface IFunction {
+interface ISearchDecisions {
   query: string;
+  type: string;
 }
 
 const parseFilterToArray = (filter: string): newnewapi.Post.Filter[] => {
@@ -50,60 +51,29 @@ const getSortingValue = (sorting: string) => {
   switch (sorting) {
     case 'num_bids':
       return newnewapi.PostSorting.MOST_VOTED_FIRST;
-      break;
     case 'all':
       return newnewapi.PostSorting.MOST_FUNDED_FIRST;
-      break;
     case 'newest':
       return newnewapi.PostSorting.NEWEST_FIRST;
-      break;
     default:
       return newnewapi.PostSorting.MOST_FUNDED_FIRST;
   }
 };
 
-const sortOptions: any = [
-  {
-    key: 'sortingtype',
-    options: [
-      {
-        key: 'all',
-      },
-      {
-        key: 'num_bids',
-      },
-      {
-        key: 'newest',
-      },
-    ],
-  },
-];
-
-export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
+export const SearchDecisions: React.FC<ISearchDecisions> = ({
+  query,
+  type,
+}) => {
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<
-    newnewapi.IPost | undefined
-  >();
+  const { showErrorToastPredefined } = useErrorToasts();
 
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-  const handleClosePostModal = () => {
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
-
-  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  }, []);
-
-  // Loading state
-  const { ref: loadingRef, inView } = useInView();
+  const { loggedIn } = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const { sorting = '', filter = '' } = router.query;
 
@@ -122,90 +92,53 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     [postSorting]
   );
 
-  const [hasNoResults, setHasNoResults] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(false);
-  const [loadingPosts, setLoadingPosts] = useState(false);
-  const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] = useState<
-    string | undefined | null
-  >('');
+  const onLoadingCreatorsError = useCallback((err: any) => {
+    console.error(err);
+    showErrorToastPredefined(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const getSearchResult = useCallback(
-    async (pageToken?: string) => {
-      try {
-        setLoadingPosts(true);
-
-        const payload = new newnewapi.SearchPostsRequest({
-          query,
-          paging: {
-            limit: 20,
-            pageToken: pageToken ?? null,
-          },
-          sorting: getSortingValue(postSorting),
-          filters: activeTabs,
-        });
-
-        const res = await searchPosts(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (!initialLoad) setInitialLoad(true);
-
-        if (res.data.posts && res.data.posts.length > 0) {
-          if (hasNoResults) setHasNoResults(false);
-
-          setResultsPosts((curr) => {
-            if (!pageToken) {
-              return res.data?.posts || [];
-            }
-
-            const arr = [...curr, ...(res.data?.posts as newnewapi.IPost[])];
-
-            return arr;
-          });
-          setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else {
-          setResultsPosts([]);
-          setHasNoResults(true);
-        }
-
-        if (!res.data.paging?.nextPageToken) {
-          setPostsRoomsNextPageToken(null);
-        }
-
-        setLoadingPosts(false);
-      } catch (err) {
-        setLoadingPosts(false);
-        console.error(err);
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useSearchPosts(
+      {
+        loggedInUser: loggedIn,
+        query,
+        searchType:
+          type === 'hashtags'
+            ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
+            : newnewapi.SearchPostsRequest.SearchType.UNSET,
+        sorting: getSortingValue(postSorting),
+        filters: activeTabs,
+      },
+      {
+        onError: onLoadingCreatorsError,
       }
-    },
+    );
 
-    [postSorting, query, initialLoad, activeTabs, hasNoResults]
+  const posts = useMemo(
+    () => (data?.pages ? data?.pages.map((page) => page.posts).flat() : []),
+    [data]
   );
 
-  const handleRemovePostFromState = (postUuid: string) => {
-    setResultsPosts((curr) => {
-      const updated = curr.filter(
-        (post) => switchPostType(post)[0].postUuid !== postUuid
-      );
-      return updated;
-    });
-  };
+  const hasNoResults = useMemo(
+    () => !isLoading && posts?.length === 0,
+    [isLoading, posts?.length]
+  );
+
+  // Loading state
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
-    setPostsRoomsNextPageToken(null);
-    getSearchResult();
-  }, [getSearchResult]);
-
-  useEffect(() => {
-    if (inView && !loadingPosts && postsNextPageToken) {
-      getSearchResult(postsNextPageToken);
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loadingPosts, postsNextPageToken]);
+  }, [inView, fetchNextPage]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (router.query.tab !== 'posts') {
+      return;
+    }
+
     const routerArr: string[] = [];
     activeTabs.forEach((filterValue) => {
       switch (filterValue) {
@@ -215,22 +148,28 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         case newnewapi.Post.Filter.MULTIPLE_CHOICES:
           routerArr.push('mc');
           break;
-        case newnewapi.Post.Filter.CROWDFUNDINGS:
-          routerArr.push('cf');
+        default:
+          // Do nothing
           break;
       }
     });
-    router.push({
-      pathname: '/search',
-      query: {
-        query,
-        tab: 'posts',
-        filter: routerArr.length > 0 ? routerArr.join('-') : '',
-        sorting: postSorting,
+
+    router.push(
+      {
+        pathname: '/search',
+        query: {
+          query,
+          type,
+          tab: 'posts',
+          filter: routerArr.length > 0 ? routerArr.join('-') : '',
+          sorting: postSorting,
+        },
       },
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postSorting, activeTabs, query]);
+      undefined,
+      // Avoid page reload as we stay on the same page
+      { shallow: true }
+    );
+  }, [postSorting, activeTabs, query, type]);
 
   const tabTypes = useMemo(
     () => [
@@ -244,34 +183,26 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         id: 'multipleChoice',
         title: tCommon('postType.mc'),
       },
-      {
-        type: newnewapi.Post.Filter.CROWDFUNDINGS,
-        id: 'crowdfunding',
-        title: tCommon('postType.cf'),
-      },
     ],
     [tCommon]
   );
 
-  const updateActiveTabs = useCallback(
-    (type: newnewapi.Post.Filter) => {
-      if (!loadingPosts) {
-        setActiveTabs((curr) => {
-          const arr = [...curr];
-          const index = arr.findIndex((item) => item === type);
+  const updateActiveTabs = useCallback((tabType: newnewapi.Post.Filter) => {
+    setActiveTabs((curr) => {
+      const index = curr.findIndex((item) => item === tabType);
 
-          if (index < 0) {
-            arr.push(type);
-          } else {
-            arr.splice(index, 1);
-          }
-
-          return arr;
-        });
+      // While we have only 2 tabs, there is no way to enable 2 at a time
+      if (index < 0) {
+        return [tabType];
       }
-    },
-    [loadingPosts]
-  );
+
+      return [];
+    });
+  }, []);
+
+  const clearSorting = useCallback(() => {
+    setPostSorting('all');
+  }, []);
 
   const Tabs = useCallback(
     () => (
@@ -287,18 +218,25 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             {tab.title}
           </STab>
         ))}
+        {selectedSorting &&
+          selectedSorting.sortingtype !== 'all' &&
+          !isMobile && (
+            <SortOption
+              sorts={selectedSorting}
+              category=''
+              onClick={clearSorting}
+            />
+          )}
       </STabs>
     ),
-    [activeTabs, tabTypes, updateActiveTabs]
-  );
-
-  const handleTypeChange = useCallback(
-    (newSort: { sortingtype: string }) => {
-      if (!loadingPosts) {
-        setPostSorting(newSort.sortingtype);
-      }
-    },
-    [loadingPosts]
+    [
+      activeTabs,
+      tabTypes,
+      selectedSorting,
+      isMobile,
+      clearSorting,
+      updateActiveTabs,
+    ]
   );
 
   return (
@@ -310,39 +248,16 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       ) && (
         <SToolBar disabled={false}>
           <Tabs />
-          <Sorting
-            category=''
-            options={sortOptions}
-            selected={selectedSorting}
-            onChange={handleTypeChange}
-          />
         </SToolBar>
       )}
-
       <SCardsSection>
         <PostList
-          loading={loadingPosts}
-          collection={resultsPosts}
-          handlePostClicked={handleOpenPostModal}
+          loading={isLoading || isFetchingNextPage}
+          collection={posts}
         />
       </SCardsSection>
-      {postsNextPageToken && !loadingPosts && (
-        <SRef ref={loadingRef}>Loading...</SRef>
-      )}
-      {displayedPost && postModalOpen && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          manualCurrLocation={isBrowser() ? window.location.href : ''}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-          handleRemovePostFromState={() =>
-            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
-          }
-        />
-      )}
-
-      {hasNoResults && initialLoad && (
+      {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
+      {hasNoResults && !isLoading && (
         <SNoResults>
           <NoResults />
         </SNoResults>
@@ -417,8 +332,7 @@ const SCardsSection = styled.div`
 `;
 
 const SRef = styled.span`
-  text-indent: -9999px;
-  height: 0;
+  height: 10px;
   overflow: hidden;
 `;
 

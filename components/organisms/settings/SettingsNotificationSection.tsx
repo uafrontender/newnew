@@ -2,6 +2,7 @@ import { newnewapi } from 'newnew-api';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+
 import {
   getMyNotificationsState,
   updateMyNotificationsState,
@@ -10,12 +11,27 @@ import Lottie from '../../atoms/Lottie';
 import Text from '../../atoms/Text';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import Toggle from '../../atoms/Toggle';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const [isLoading, setLoading] = useState<boolean | null>(null);
-  const [myNotificationState, setMyNotificationState] =
-    useState<newnewapi.INotificationState[] | null>(null);
+  const [myNotificationState, setMyNotificationState] = useState<
+    newnewapi.INotificationState[] | null
+  >(null);
+
+  const {
+    isSubscribed,
+    isPushNotificationSupported,
+    isLoading: isStateLoading,
+    unsubscribe,
+    requestPermission,
+  } = usePushNotifications();
 
   const fetchMyNotificationState = async () => {
     if (isLoading) return;
@@ -38,6 +54,12 @@ const SettingsNotificationsSection = () => {
   const updateMyNotificationState = async (
     item: newnewapi.INotificationState
   ) => {
+    Mixpanel.track('Update My Notification State', {
+      _stage: 'Settings',
+      _source: item.notificationSource,
+      _isEnabled: item.isEnabled,
+    });
+
     if (isLoading) return;
     try {
       const payload = new newnewapi.UpdateMyNotificationsStateRequest({
@@ -47,6 +69,7 @@ const SettingsNotificationsSection = () => {
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
     } catch (err) {
       console.error(err);
+      showErrorToastPredefined(undefined);
     }
   };
 
@@ -71,9 +94,23 @@ const SettingsNotificationsSection = () => {
     });
   };
 
+  const turnOnPushNotifications = () => {
+    Mixpanel.track('Turn On Push Notifications', {
+      _stage: 'Settings',
+    });
+    requestPermission();
+  };
+
+  const turnOffPushNotification = () => {
+    Mixpanel.track('Turn Off Push Notifications', {
+      _stage: 'Settings',
+    });
+    unsubscribe();
+  };
+
   return (
     <SWrapper>
-      {isLoading !== false ? (
+      {isLoading !== false || isStateLoading ? (
         <Lottie
           width={64}
           height={64}
@@ -84,29 +121,48 @@ const SettingsNotificationsSection = () => {
           }}
         />
       ) : (
-        myNotificationState !== null &&
-        myNotificationState.map((subsection, idx) => (
-          <SSubsection
-            key={`notificationsource-${subsection.notificationSource}`}
-          >
-            <Text variant={2} weight={600}>
-              {subsection.notificationSource &&
-              subsection.notificationSource === 1
-                ? t('Settings.sections.notifications.email')
-                : t('Settings.sections.notifications.push')}
-            </Text>
-            <Toggle
-              title={
+        <>
+          {myNotificationState !== null &&
+            myNotificationState.map((subsection, idx) => {
+              if (
                 subsection.notificationSource &&
                 subsection.notificationSource === 1
-                  ? t('Settings.sections.notifications.email')
-                  : t('Settings.sections.notifications.push')
+              ) {
+                return (
+                  <SSubsection
+                    key={`notificationsource-${subsection.notificationSource}`}
+                  >
+                    <Text variant={2} weight={600}>
+                      {t('Settings.sections.notifications.email')}
+                    </Text>
+                    <Toggle
+                      title={t('Settings.sections.notifications.email')}
+                      checked={subsection.isEnabled ?? false}
+                      onChange={() => handleUpdateItem(idx)}
+                    />
+                  </SSubsection>
+                );
               }
-              checked={subsection.isEnabled ?? false}
-              onChange={() => handleUpdateItem(idx)}
-            />
-          </SSubsection>
-        ))
+
+              return null;
+            })}
+          {isPushNotificationSupported && (
+            <SSubsection>
+              <Text variant={2} weight={600}>
+                {t('Settings.sections.notifications.push')}
+              </Text>
+              <Toggle
+                title={t('Settings.sections.notifications.push')}
+                checked={isSubscribed}
+                onChange={
+                  isSubscribed
+                    ? turnOffPushNotification
+                    : turnOnPushNotifications
+                }
+              />
+            </SSubsection>
+          )}
+        </>
       )}
     </SWrapper>
   );
@@ -120,13 +176,9 @@ const SWrapper = styled.div`
 
 const SSubsection = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
 
   padding-top: 16px;
   padding-bottom: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    justify-content: space-between;
-  }
 `;

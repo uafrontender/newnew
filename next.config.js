@@ -38,6 +38,35 @@ const moduleExports = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/mp/lib.min.js',
+        destination: 'https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js',
+      },
+      {
+        source: '/mp/lib.js',
+        destination: 'https://cdn.mxpnl.com/libs/mixpanel-2-latest.js',
+      },
+      {
+        source: '/mp/:slug',
+        // use "api-eu.mixpanel.com" if you need to use EU servers
+        destination: 'https://api.mixpanel.com/:slug',
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: '/post/:path*',
+        destination: '/p/:path*',
+        permanent: true
+      },
+    ]
+  },
+  experimental: {
+    scrollRestoration: true,
+  },
 };
 
 const sentryWebpackPluginOptions = {

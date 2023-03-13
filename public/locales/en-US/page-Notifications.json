@@ -3,5 +3,11 @@
     "title": "Notifications on NewNew",
     "description": "NewNew notifications for creators to stay up-to-date with the audience"
   },
-  "noNotifications": "Any new notifications you receive\nwill appear here"
+  "noNotifications": "Any new notifications you receive\nwill appear here",
+  "title": {
+    "newMessage": "New Message"
+  },
+  "button": {
+    "markAllAsRead": "Mark all as read"
+  }
 }

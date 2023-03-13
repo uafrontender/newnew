@@ -1,28 +1,27 @@
 /* eslint-disable react/jsx-boolean-value */
 import React from 'react';
 import { LayoutGroup } from 'framer-motion';
+import styled from 'styled-components';
 
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import GeneralTemplate from './General';
 
 interface IHomeLayout {
+  restrictMaxWidth?: boolean;
   children: React.ReactNode;
 }
 
-const HomeLayout: React.FC<IHomeLayout> = (props) => {
-  const { children } = props;
+const HomeLayout: React.FC<IHomeLayout> = ({ restrictMaxWidth, children }) => (
+  <LayoutGroup>
+    <SGeneralTemplate restrictMaxWidth={restrictMaxWidth}>
+      {children}
+    </SGeneralTemplate>
+  </LayoutGroup>
+);
 
-  return (
-    <ErrorBoundary>
-      <LayoutGroup>
-        <GeneralTemplate
-        // restrictMaxWidth={true}
-        >
-          {children}
-        </GeneralTemplate>
-      </LayoutGroup>
-    </ErrorBoundary>
-  );
-};
+const SGeneralTemplate = styled(GeneralTemplate)`
+  & > main {
+    padding-bottom: 0;
+  }
+`;
 
 export default HomeLayout;

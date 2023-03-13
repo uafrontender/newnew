@@ -20,7 +20,7 @@ export interface ICreationStateInterface {
       type: string;
       date: string;
       time: string;
-      'hours-format': string;
+      'hours-format': 'am' | 'pm';
     };
     expiresAt: string;
     options: {
@@ -58,6 +58,7 @@ export interface ICreationStateInterface {
     progress: number;
     eta: number;
   };
+  customCoverImageUrl?: string;
 }
 
 const defaultUIState: ICreationStateInterface = {
@@ -67,7 +68,7 @@ const defaultUIState: ICreationStateInterface = {
       type: 'right-away',
       date: moment().format(),
       time: moment().format('hh:mm'),
-      'hours-format': moment().format('a'),
+      'hours-format': moment().format('a') as 'am' | 'pm',
     },
     expiresAt: '1-hour',
     options: {
@@ -75,12 +76,12 @@ const defaultUIState: ICreationStateInterface = {
     },
     announcementVideoUrl: '',
     thumbnailParameters: {
-      startTime: 0,
-      endTime: 3,
+      startTime: 1,
+      endTime: 30,
     },
   },
   auction: {
-    minimalBid: 5,
+    minimalBid: 2,
   },
   crowdfunding: {
     targetBackerCount: undefined,
@@ -116,6 +117,7 @@ const defaultUIState: ICreationStateInterface = {
     progress: 0,
     eta: 0,
   },
+  customCoverImageUrl: undefined,
 };
 
 export const creationSlice: Slice<ICreationStateInterface> = createSlice({
@@ -194,15 +196,25 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     ) {
       state.videoProcessing = payload;
     },
-    clearCreation(state) {
+    setCustomCoverImageUrl(state, { payload }: PayloadAction<string>) {
+      state.customCoverImageUrl = payload;
+    },
+    unsetCustomCoverImageUrl(state) {
+      state.customCoverImageUrl = undefined;
+    },
+    clearCreation(state, { payload }: PayloadAction<number | undefined>) {
       state.post = { ...defaultUIState.post };
       state.auction = { ...defaultUIState.auction };
+      if (payload) {
+        state.auction.minimalBid = payload;
+      }
       state.crowdfunding = { ...defaultUIState.crowdfunding };
       state.multiplechoice = { ...defaultUIState.multiplechoice };
       state.fileUpload = { ...defaultUIState.fileUpload };
       state.fileProcessing = { ...defaultUIState.fileProcessing };
       // @ts-ignore
       state.videoProcessing = { ...defaultUIState.videoProcessing };
+      state.customCoverImageUrl = undefined;
     },
     clearPostData(state) {
       state.postData = {};
@@ -233,6 +245,8 @@ export const {
   setCreationFileProcessingError,
   setCreationFileProcessingProgress,
   setCreationFileProcessingETA,
+  setCustomCoverImageUrl,
+  unsetCustomCoverImageUrl,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;

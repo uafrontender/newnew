@@ -10,7 +10,7 @@ import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import InlineSVG from '../../atoms/InlineSVG';
+import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -21,6 +21,10 @@ import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
+import PostTitleContent from '../../atoms/PostTitleContent';
+import { Mixpanel } from '../../../utils/mixpanel';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -30,7 +34,7 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -51,10 +55,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  const preventCLick = (e: any) => {
+  const preventClick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
   const socialButtons = useMemo(
     () => [
       // {
@@ -76,16 +81,26 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     []
   );
 
+  // No need in translation as these are reserved words
   const postTypeText = useCallback(() => {
     if (postData) {
-      if (postData.auction) return 'Event';
-      if (postData.crowdfunding) return 'Goal';
+      if (postData.auction) {
+        return 'Bid';
+      }
+      if (postData.crowdfunding) {
+        return 'Goal';
+      }
       return 'Superpoll';
     }
-    return 'Event';
+
+    return 'Bid';
   }, [postData]);
 
   async function copyPostUrlToClipboard(url: string) {
+    Mixpanel.track('Copy Post Url to Clipboard', {
+      _stage: 'Creation',
+      _url: url,
+    });
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
@@ -93,29 +108,28 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     }
   }
 
-  interface IItemButtonAttrs extends NamedNodeMap {
-    type?: {
-      value: string;
-    };
-  }
-
   const socialBtnClickHandler = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const attr: IItemButtonAttrs = (e.target as HTMLDivElement).attributes;
-      const val = attr.type?.value;
+    (buttonType: string) => {
+      const val = buttonType;
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
-              url += postData.auction.postUuid;
+              url += postData.auction.postShortId
+                ? postData.auction.postShortId
+                : postData.auction.postUuid;
             }
             if (postData.crowdfunding) {
-              url += postData.crowdfunding.postUuid;
+              url += postData.crowdfunding.postShortId
+                ? postData.crowdfunding.postShortId
+                : postData.crowdfunding.postUuid;
             }
             if (postData.multipleChoice) {
-              url += postData.multipleChoice.postUuid;
+              url += postData.multipleChoice.postShortId
+                ? postData.multipleChoice.postShortId
+                : postData.multipleChoice.postUuid;
             }
 
             copyPostUrlToClipboard(url)
@@ -138,22 +152,29 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const handleViewMyPost = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (postData) {
+        Mixpanel.track('See My Post Click');
         let url;
         if (window) {
-          url = `${window.location.origin}/post/`;
+          url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
-              url += postData.auction.postUuid;
+              url += postData.auction.postShortId
+                ? postData.auction.postShortId
+                : postData.auction.postUuid;
             }
             if (postData.crowdfunding) {
-              url += postData.crowdfunding.postUuid;
+              url += postData.crowdfunding.postShortId
+                ? postData.crowdfunding.postShortId
+                : postData.crowdfunding.postUuid;
             }
             if (postData.multipleChoice) {
-              url += postData.multipleChoice.postUuid;
+              url += postData.multipleChoice.postShortId
+                ? postData.multipleChoice.postShortId
+                : postData.multipleChoice.postUuid;
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation({}));
+              dispatch(clearCreation(undefined));
             });
           }
         }
@@ -167,6 +188,8 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
+    } else if (post.expiresAt === '3-hours') {
+      dateValue.add(3, 'h');
     } else if (post.expiresAt === '6-hours') {
       dateValue.add(6, 'h');
     } else if (post.expiresAt === '12-hours') {
@@ -179,6 +202,12 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       dateValue.add(5, 'd');
     } else if (post.expiresAt === '7-days') {
       dateValue.add(7, 'd');
+    } else if (post.expiresAt === '2-minutes') {
+      dateValue.add(2, 'm');
+    } else if (post.expiresAt === '5-minutes') {
+      dateValue.add(5, 'm');
+    } else if (post.expiresAt === '10-minutes') {
+      dateValue.add(10, 'm');
     }
 
     return dateValue;
@@ -186,11 +215,17 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
   const renderItem = (item: any) => (
     <SItem key={item.key} type={item.key}>
-      <SItemButton type={item.key} onClick={socialBtnClickHandler}>
+      <SItemButton
+        buttonType={item.key}
+        onClick={() => socialBtnClickHandler(item.key)}
+      >
         <InlineSVG
           svg={SOCIAL_ICONS[item.key] as string}
           width='25px'
           height='25px'
+          onClick={() => {
+            socialBtnClickHandler(item.key);
+          }}
         />
       </SItemButton>
       <SItemTitle
@@ -201,24 +236,28 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}`)}
+          : t(`published.socials.${item.key}` as any)}
       </SItemTitle>
     </SItem>
   );
 
+  // TODO: Integrate DisplayName component instead
+  const displayName = getDisplayname(user.userData);
+
   return (
     <Modal show={open} onClose={handleClose}>
-      <SMobileContainer onClick={preventCLick}>
+      <SMobileContainer onClick={preventClick}>
         <SContent>
           <SPlayerWrapper>
             {open ? (
               fileProcessing.progress === 100 ? (
-                <BitmovinPlayer
+                <VideojsPlayer
                   id='published-modal'
-                  muted={false}
+                  muted
                   resources={videoProcessing?.targetUrls}
-                  thumbnails={post.thumbnailParameters}
                   borderRadius='16px'
+                  showPlayButton
+                  withMuteControl
                 />
               ) : (
                 <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
@@ -227,19 +266,32 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
           </SPlayerWrapper>
           <SUserBlock>
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-            <SUserTitle variant={3} weight={600}>
-              {user.userData?.nickname && user.userData?.nickname?.length > 8
-                ? `${user.userData?.nickname?.substring(0, 8)}...`
-                : user.userData?.nickname}
-            </SUserTitle>
+            <SUserTitleContainer>
+              <SUserTitle variant={3} weight={600}>
+                {displayName && displayName.length > 8
+                  ? `${displayName.substring(0, 8)}...`
+                  : displayName}
+              </SUserTitle>
+              {user.userData?.options?.isVerified && (
+                <InlineSvg
+                  svg={VerificationCheckmark}
+                  width='20px'
+                  height='20px'
+                  fill='none'
+                />
+              )}
+            </SUserTitleContainer>
             <SCaption variant={2} weight={700}>
-              {t('secondStep.card.left', {
-                time: formatExpiresAtNoStartsAt().fromNow(true),
-              })}
+              {post.startsAt.type === 'right-away'
+                ? t('secondStep.card.left', {
+                    time: formatExpiresAtNoStartsAt().fromNow(true),
+                  })
+                : t('secondStep.card.soon')}
             </SCaption>
           </SUserBlock>
           <SPostTitleText variant={3} weight={600}>
-            {post?.title}
+            {/* Navigation here only works when done through the router */}
+            <PostTitleContent target='router'>{post.title}</PostTitleContent>
           </SPostTitleText>
           <STitle variant={6}>
             {t(
@@ -249,7 +301,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             )}
           </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
-          <SButtonWrapper onClick={handleViewMyPost}>
+          <SButtonWrapper id='see-post' onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
                 `published.button.submit-${
@@ -323,10 +375,10 @@ const SItem = styled.div<{
 `;
 
 interface ISItemButton {
-  type: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
+  buttonType: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
 }
 
-const SItemButton = styled.div<ISItemButton>`
+const SItemButton = styled.button<ISItemButton>`
   cursor: pointer;
   width: 224px;
   height: 48px;
@@ -335,7 +387,16 @@ const SItemButton = styled.div<ISItemButton>`
   align-items: center;
   border-radius: 16px;
   justify-content: center;
-  background: ${(props) => props.theme.colorsThemed.social[props.type].main};
+  background: ${(props) =>
+    props.theme.colorsThemed.social[props.buttonType].main};
+
+  border: transparent;
+  cursor: pointer;
+
+  &:hover:enabled,
+  &:focus:enabled {
+    outline: none;
+  }
 `;
 
 const SItemTitle = styled(Caption)<{
@@ -363,7 +424,7 @@ const SButtonTitle = styled.div`
 
 const SUserBlock = styled.div`
   width: 224px;
-  margin: 16px auto 0 auto;
+  margin: 16px auto 16px auto;
   display: grid;
   align-items: center;
   flex-direction: row;
@@ -378,14 +439,20 @@ const SUserAvatar = styled(UserAvatar)`
   min-height: 36px;
 `;
 
-const SUserTitle = styled(Text)`
-  max-width: 188px;
-  display: -webkit-box;
+const SUserTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   overflow: hidden;
-  position: relative;
+`;
+
+const SUserTitle = styled(Text)`
   padding-left: 12px;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  margin-right: 2px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SText = styled(Text)`
@@ -398,6 +465,8 @@ const SPostTitleText = styled(Text)`
   width: 224px;
   margin-left: auto;
   margin-right: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const SCaption = styled(Caption)`

@@ -1,22 +1,23 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import moment from 'moment';
+
 import { useAppSelector } from '../../../redux-store/store';
-import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { getMyPosts } from '../../../api/endpoints/user';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
 import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
 import { getMyEarnings } from '../../../api/endpoints/payments';
 import dateToTimestamp from '../../../utils/dateToTimestamp';
+import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -25,77 +26,73 @@ const DynamicSection = dynamic(
 const ExpirationPosts = dynamic(
   () => import('../../molecules/creator/dashboard/ExpirationPosts')
 );
-const EnableSubscription = dynamic(
-  () => import('../../molecules/creator/dashboard/EnableSubscription')
-);
-const SubscriptionStats = dynamic(
-  () => import('../../molecules/creator/dashboard/SubscriptionStats')
-);
-const EmptySubscriptionStats = dynamic(
-  () => import('../../molecules/creator/dashboard/EmptySubscriptionStats')
-);
 const Earnings = dynamic(
   () => import('../../molecules/creator/dashboard/Earnings')
 );
 const YourToDos = dynamic(
   () => import('../../molecules/creator/dashboard/YourToDos')
 );
+const AboutBundles = dynamic(
+  () => import('../../molecules/creator/dashboard/AboutBundles')
+);
 
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
+  const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { promptUserWithPushNotificationsPermissionModal } =
+    usePushNotifications();
 
-  const { mySubscribers } = useGetSubscriptions();
-  const [mySubscriptionProduct, setMySubscriptionProduct] =
-    useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isToDosCompleted, setIsToDosCompleted] =
-    useState<boolean | undefined>(undefined);
+  const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
-  const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
-    useState(true);
   const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
   const filter = '7_days';
-  const [myEarnings, setMyEarnings] =
-    useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [myEarnings, setMyEarnings] = useState<
+    newnewapi.GetMyEarningsResponse | undefined
+  >();
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
 
   useEffect(() => {
-    if (user.creatorData?.isLoaded) {
-      user.creatorData?.hasCreatorTags &&
+    if (router.query.askPushNotificationPermission === 'true') {
+      setTimeout(() => promptUserWithPushNotificationsPermissionModal(), 200);
+      router.replace(router.pathname);
+    }
+  }, [promptUserWithPushNotificationsPermissionModal, router]);
+
+  useEffect(() => {
+    if (
+      user.creatorData?.isLoaded &&
       user.userData?.bio &&
       user.userData?.bio.length > 0 &&
       user.creatorData?.options?.isCreatorConnectedToStripe
-        ? setIsToDosCompleted(true)
-        : setIsToDosCompleted(false);
+    ) {
+      setIsToDosCompleted(true);
+    } else if (user.creatorData?.isLoaded) {
+      setIsToDosCompleted(false);
     }
   }, [user.creatorData, user.userData?.bio]);
-
-  const fetchMySubscriptionProduct = async () => {
-    try {
-      const payload = new newnewapi.EmptyRequest();
-      const res = await getMySubscriptionProduct(payload);
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
-      setIsMySubscriptionProductLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsMySubscriptionProductLoading(false);
-    }
-  };
 
   const fetchMyExpirationPosts = async () => {
     try {
       const payload = new newnewapi.PagedRequest();
       const res = await getMyUrgentPosts(payload);
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.posts) setExpirationPosts(res.data?.posts);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      if (res.data?.posts) {
+        setExpirationPosts(res.data?.posts);
+      }
       setIsLoadingExpirationPosts(false);
     } catch (err) {
       setIsLoadingExpirationPosts(false);
@@ -108,12 +105,6 @@ export const Dashboard: React.FC = React.memo(() => {
       fetchMyExpirationPosts();
     }
   }, [isLoadingExpirationPosts]);
-
-  useEffect(() => {
-    if (!mySubscriptionProduct) {
-      fetchMySubscriptionProduct();
-    }
-  }, [mySubscriptionProduct]);
 
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
@@ -178,27 +169,9 @@ export const Dashboard: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('dashboard.title')}</STitle>
-          {!isMobile && <DynamicSection />}
+          {!isMobile && <DynamicSection baseUrl='/creator/dashboard' />}
         </STitleBlock>
-        {!user.creatorData?.isLoaded ? (
-          <SBlock>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SBlock>
-        ) : (
-          !isToDosCompleted && (
-            <SBlock name='your-todos'>
-              <YourToDos />
-            </SBlock>
-          )
-        )}
+
         {isLoadingExpirationPosts ? (
           <SBlock>
             <Lottie
@@ -218,26 +191,18 @@ export const Dashboard: React.FC = React.memo(() => {
             </SBlock>
           )
         )}
-        <SBlock>
-          {!isEarningsLoading ? (
-            isToDosCompleted !== undefined ? (
-              isToDosCompleted ? (
-                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
-              ) : (
-                <FinishProfileSetup />
-              )
-            ) : (
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            )
-          ) : (
+
+        {user.creatorData?.options.stripeConnectStatus &&
+          user.creatorData.options.stripeConnectStatus ===
+            newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
+              .CONNECTED_NEEDS_ATTENTION && (
+            <SBlock>
+              <StripeIssueBanner />
+            </SBlock>
+          )}
+
+        {!user.creatorData?.isLoaded ? (
+          <SBlock>
             <Lottie
               width={64}
               height={64}
@@ -247,33 +212,41 @@ export const Dashboard: React.FC = React.memo(() => {
                 animationData: loadingAnimation,
               }}
             />
-          )}
-        </SBlock>
-        {!isMySubscriptionProductLoading ? (
-          !mySubscriptionProduct ? (
-            <SBlock noMargin>
-              <EnableSubscription />
-            </SBlock>
-          ) : (
-            <SBlock noMargin>
-              {mySubscribers.length > 0 ? (
-                <SubscriptionStats />
-              ) : (
-                <EmptySubscriptionStats />
-              )}
+          </SBlock>
+        ) : (
+          !isToDosCompleted &&
+          !user.userData?.options?.isWhiteListed && (
+            <SBlock name='your-todos'>
+              <YourToDos />
             </SBlock>
           )
-        ) : (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
         )}
+        {!user.userData?.options?.isWhiteListed && (
+          <SBlock>
+            {!isEarningsLoading &&
+              (isToDosCompleted ? (
+                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+              ) : (
+                <FinishProfileSetup />
+              ))}
+
+            {/* Loader */}
+            {(isEarningsLoading || isToDosCompleted === undefined) && (
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
+            )}
+          </SBlock>
+        )}
+        <SBlock noMargin>
+          <AboutBundles />
+        </SBlock>
       </SContent>
     </SContainer>
   );
@@ -284,6 +257,7 @@ export default Dashboard;
 const SContainer = styled.div`
   position: relative;
   margin-top: -16px;
+  margin-bottom: -24px;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
@@ -296,18 +270,17 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
-  min-height: 840px;
-
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
+    min-height: 840px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 320px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
     border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
   }
 `;
 

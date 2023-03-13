@@ -1,12 +1,51 @@
+/* eslint-disable no-async-promise-executor */
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
+import isBrowser from '../utils/isBrowser';
+
+const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Initialize global Cookies instance available throughout the whole app
 export const cookiesInstance = new Cookies();
+
+// eslint-disable-next-line import/no-mutable-exports
+export let fetchInitialized = false;
+let fetchInitializationTriggered = false;
+
+// eslint-disable-next-line no-async-promise-executor
+const customFetch = async (...args: any): Promise<any> =>
+  new Promise(async (resolve) => {
+    const [resource, config] = args;
+
+    // request interceptor starts
+    if (!fetchInitialized) {
+      if (!fetchInitializationTriggered) {
+        try {
+          fetchInitializationTriggered = true;
+          await fetch(process.env.NEXT_PUBLIC_SOCKET_URL!!);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          // set global state
+          fetchInitialized = true;
+        }
+      }
+
+      setTimeout(() => {
+        resolve(customFetch(...args));
+      }, 500);
+    } else {
+      try {
+        resolve(await fetch(resource, config));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  });
 
 /**
  * Universal interface for RESTful API responses
@@ -29,6 +68,7 @@ interface JsonConvertible {
  * All the protobufjs-generated class **objects** conform to this interface.
  */
 interface EncDec<T = keyof NewnewapiType> {
+  name: string;
   encode(message: T, writer?: $protobuf.Writer): $protobuf.Writer;
   decode(
     reader: $protobuf.Reader | Uint8Array,
@@ -53,10 +93,13 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
     ) {
       resolve(response.arrayBuffer());
     }
+    if (response.status === 452) {
+      reject(new Error('Processing limit reached'));
+    }
     if (response.status >= 401 && response.status < 404) {
       reject(new Error('Access token invalid'));
     }
-    reject(new Error('An error occured'));
+    reject(new Error('An error occurred'));
   });
 };
 
@@ -87,30 +130,91 @@ export async function fetchProtobuf<
   payload?: RequestType,
   headers: any = {},
   mode: Request['mode'] = 'cors',
-  credentials: Request['credentials'] = 'same-origin'
+  credentials: Request['credentials'] = 'same-origin',
+  signal: RequestInit['signal'] = undefined
 ): Promise<APIResponse<ResponseType>> {
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
   try {
-    const buff: ArrayBuffer = await fetch(url, {
+    const buff: ArrayBuffer = await customFetch(url, {
       method,
       headers: {
         'Content-type': 'application/x-protobuf',
+        ...(!isBrowser() || process.env.NEXT_PUBLIC_ENVIRONMENT === 'test'
+          ? {
+              // TODO: should it come from env var and be a secret?
+              'x-from': 'web',
+            }
+          : {}),
         ...headers,
       },
       mode,
-      credentials,
+      // credentials,
+      credentials: 'include',
       ...(encoded ? { body: encoded } : {}),
+      ...(signal ? { signal } : {}),
     })
       .then((response) => handleProtobufResponse(response))
       .catch((err) => {
         throw err;
       });
 
+    const data = resT.decode(new Uint8Array(buff));
+
+    if (logsOn) {
+      console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
+      console.debug(
+        `
+      %c Payload Type: %c ${reqT?.name}
+      %c Payload: %c ${JSON.stringify(payload, null, 2)}
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;'
+      );
+      console.debug(
+        `
+      %c Response Type: %c ${resT?.name}
+      %c Response: %c ${JSON.stringify(data, null, 2)}
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;'
+      );
+      console.groupEnd();
+    }
+
     return {
-      data: resT.decode(new Uint8Array(buff)),
+      data,
     };
   } catch (err) {
+    if (logsOn) {
+      console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
+      console.debug(
+        `
+      %c Payload Type: %c ${reqT?.name}
+      %c Payload: %c ${JSON.stringify(payload, null, 2)}
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;'
+      );
+      console.debug(
+        `
+      %c Response Type: %c ${resT?.name}
+      %c Error: %c ${err}
+      `,
+        'font-size: 14px; color: blue;',
+        'font-size: 12px; color: black;',
+        'font-size: 14px; color: red;',
+        'font-size: 12px; color: black;'
+      );
+      console.groupEnd();
+    }
+
     return {
       error: err as Error,
     };
@@ -162,6 +266,7 @@ export async function fetchProtobufProtectedIntercepted<
   url: string,
   method: Request['method'],
   payload?: RequestType,
+  signal?: RequestInit['signal'],
   serverSideTokens?: {
     accessToken: string;
     refreshToken: string;
@@ -177,7 +282,9 @@ export async function fetchProtobufProtectedIntercepted<
     serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
 
   try {
-    if (!accessToken && !refreshToken) throw new Error('No token');
+    if (!accessToken && !refreshToken) {
+      throw new Error('No token');
+    }
     if (!accessToken && refreshToken) throw new Error('Access token invalid');
 
     // Try to make request if access and refresh tokens are present
@@ -189,7 +296,10 @@ export async function fetchProtobufProtectedIntercepted<
       payload,
       {
         'x-auth-token': accessToken,
-      }
+      },
+      'cors',
+      'same-origin',
+      signal ?? undefined
     );
 
     // Throw an error if the access token was invalid
@@ -213,7 +323,7 @@ export async function fetchProtobufProtectedIntercepted<
         if (!resRefresh.data || resRefresh.error)
           throw new Error('Refresh token invalid');
 
-        // Refreshed succeded, re-set access and refresh tokens
+        // Refreshed succeeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
           if (resRefresh.data.credential?.expiresAt?.seconds)
@@ -237,24 +347,22 @@ export async function fetchProtobufProtectedIntercepted<
               path: '/',
             }
           );
-        } else {
+        } else if (resRefresh.data.credential?.expiresAt?.seconds) {
           // Server-side
-          if (resRefresh.data.credential?.expiresAt?.seconds)
-            updateCookieServerSideCallback?.([
-              {
-                name: 'accessToken',
-                value: resRefresh.data.credential?.accessToken!!,
-                expires: new Date(
-                  (resRefresh.data.credential.expiresAt.seconds as number) *
-                    1000
-                ).toUTCString(),
-              },
-              {
-                name: 'refreshToken',
-                value: resRefresh.data.credential?.refreshToken!!,
-                maxAge: (10 * 365 * 24 * 60 * 60).toString(),
-              },
-            ]);
+          updateCookieServerSideCallback?.([
+            {
+              name: 'accessToken',
+              value: resRefresh.data.credential?.accessToken!!,
+              expires: new Date(
+                (resRefresh.data.credential.expiresAt.seconds as number) * 1000
+              ).toUTCString(),
+            },
+            {
+              name: 'refreshToken',
+              value: resRefresh.data.credential?.refreshToken!!,
+              maxAge: (10 * 365 * 24 * 60 * 60).toString(),
+            },
+          ]);
         }
         // Try request again with new credentials
         res = await fetchProtobuf<RequestType, ResponseType>(

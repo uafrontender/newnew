@@ -1,7 +1,13 @@
 {
   "meta": {
-    "title": "Notifications on NewNew",
-    "description": "NewNew notifications for creators to stay up-to-date with the audience"
+    "title": "關於NewNew的通知",
+    "description": "創作者的通過NewNew通知保持與觀衆同步"
   },
-  "noNotifications": "Any new notifications you receive\nwill appear here"
+  "noNotifications": "你收到的所有新通知\n都將在這裏顯示",
+  "title": {
+    "newMessage": "新訊息"
+  },
+  "button": {
+    "markAllAsRead": "將所有標記為已讀"
+  }
 }

@@ -5,6 +5,8 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
+import { useRouter } from 'next/dist/client/router';
+
 import Text from '../../atoms/Text';
 // Icons
 // import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
@@ -20,6 +22,7 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   transaction,
 }) => {
   const { t } = useTranslation('page-Profile');
+  const { locale } = useRouter();
   const user = useAppSelector((state) => state.user);
 
   return (
@@ -30,38 +33,41 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       <SActor variant={3} weight={600}>
         {t('Settings.sections.transactions.you')}
       </SActor>
-      {transaction.transactionType === 5 ? (
+      {transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.SUBSCRIPTION ||
+      transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.BUNDLE ? (
         <SAction variant={2}>
           {`${t(
             `Settings.sections.transactions.actions.${transaction.transactionType}`
           )} `}
-          <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
           </Link>
         </SAction>
       ) : (
         <SAction variant={2}>
           {`${t(
-            `Settings.sections.transactions.actions.${transaction.transactionType}`
+            `Settings.sections.transactions.actions.${transaction.transactionType}` as any
           )} `}
-          <Link href={`/${transaction.relatedCreator?.nicknameOrUsername}`}>
-            {`@${transaction.relatedCreator?.nicknameOrUsername}`}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
           </Link>
           {`'s ${t(
-            `Settings.sections.transactions.type.${transaction.transactionType}`
+            `Settings.sections.transactions.type.${transaction.transactionType}` as any
           )}`}
         </SAction>
       )}
       {transaction?.amount?.usdCents && (
         <SAmount variant={3} weight={600} direction='from'>
-          <span>- </span>
+          <span>-&nbsp;</span>
           {`$${formatNumber(transaction?.amount.usdCents / 100 ?? 0, false)}`}
         </SAmount>
       )}
       <SDate variant={2}>
-        {moment((transaction.createdAt?.seconds as number) * 1000).format(
-          'MMM DD YYYY'
-        )}
+        {moment((transaction.createdAt?.seconds as number) * 1000)
+          .locale(locale || 'en-US')
+          .format('MMM DD YYYY')}
       </SDate>
     </STransactionCard>
   );
@@ -74,7 +80,7 @@ const STransactionCard = styled.div`
   grid-template-areas:
     'actor actor amount'
     'action action date';
-  grid-template-columns: 4fr 4fr 2fr;
+  grid-template-columns: 4fr 4fr 4fr;
   align-items: center;
 
   height: 38px;

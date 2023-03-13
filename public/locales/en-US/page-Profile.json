@@ -5,7 +5,7 @@
       "description": "Customize your NewNew profile with username, display name, bio and more"
     },
     "noContent": {
-      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
+      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
     }
   },
   "MyPosts": {
@@ -35,15 +35,6 @@
       "description": "All posts you previewed\nwill be kept here in your history"
     }
   },
-  "Subscriptions": {
-    "meta": {
-      "title": "NewNew Subscriptions",
-      "description": "Edit name, username, bio, profile photo and more in NewNew settings"
-    },
-    "noContent": {
-      "description": "You’re not subscribed\nto any creators yet"
-    }
-  },
   "Favorites": {
     "meta": {
       "title": "NewNew Favorites",
@@ -53,19 +44,29 @@
       "description": "Any creators you favorite\nwill be shown here"
     }
   },
-  "CreatorsDecisions": {
-    "noContent": {
-      "description": "Posts from the creator will be shown here"
-    }
-  },
-  "UserProfile": {
-    "noContent": {
-      "description": "{{username}} has no activity yet.",
-      "suggestion": "Explore what's new",
-      "button": "Explore"
+  "Profile": {
+    "meta": {
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description": "{{bio}} Bid and Vote on what people do next"
+    },
+    "user": {
+      "noContent": {
+        "description": "{{username}} has no activity yet.",
+        "suggestion": "Explore what's new",
+        "button": "Explore"
+      }
+    },
+    "creator": {
+      "noContent": {
+        "description": "Posts from the creator will be shown here"
+      }
     }
   },
   "Activity": {
+    "meta": {
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description": "{{bio}} Bid and Vote on what people do next"
+    },
     "noContent": {
       "description": "Any creators activity will be shown here"
     }
@@ -74,30 +75,20 @@
     "activelyBidding": "Active",
     "purchases": "Purchases",
     "viewHistory": "Viewing history",
-    "subscriptions": "Subscriptions",
     "myposts": "My posts",
     "favorites": "Favorites",
     "userInitial": "Posts",
     "activity": "Activity"
   },
   "accountPrivate": "{{username}}'s activity is private",
-  "subscribed-tag": "SUBSCRIBED",
   "modal": {
     "blockUser": {
       "title": "Block user",
-      "messageFirstPart": "Do you really want to block",
+      "messageFirstPart": "Do you really want to block ",
       "messageSecondPart": "?",
       "button": {
         "cancel": "Cancel",
         "confirm": "Block user"
-      }
-    },
-    "unsubscribeUser": {
-      "title": "Unsubscribe from creator",
-      "message": "Do you really want to unsubscribe from {{username}}?",
-      "button": {
-        "cancel": "Cancel",
-        "confirm": "Unsubscribe"
       }
     },
     "deleteMyAccount": {
@@ -116,7 +107,10 @@
     },
     "buttons": {
       "favorites": "Favorites",
-      "more": "More",
+      "enableSmsNotifications": "Notify me",
+      "disableSmsNotifications": "Notifications ON",
+      "buyBundles": "Buy Bundles",
+      "votesLeft": "{{amount}} votes left",
       "sendMessage": "Send message",
       "copied": "Link copied!"
     }
@@ -210,15 +204,43 @@
           }
         }
       },
+      "cards": {
+        "title": "My cards",
+        "myPaymentMethods": "My payment methods",
+        "hint": "You’ll need a card on file to participate in posts",
+        "adding": "Adding a new card...",
+        "ooops": "Ooops!",
+        "success": "Congratulations!",
+        "button": {
+          "addNewCard": "Add a new card",
+          "addCard": "Add card"
+        },
+        "primary": "Primary",
+        "ellipse": {
+          "makePrimary": "Make it primary",
+          "removeCard": "Remove card"
+        },
+        "status": {
+          "added": "Success! Your card has been saved",
+          "cannotBeAdded": "Failure! Your card cannot be saved",
+          "duplicate": "This card has been already saved in your profile",
+          "inProgress": "Saving your card. Please wait",
+          "requestFailed": "Something went wrong"
+        }
+      },
       "personalInformation": {
         "title": "Personal information",
         "emailInput": {
-          "label": "Email Address",
+          "label": "Email address",
           "placeholder": "email@email.com",
           "errors": {
             "invalidEmail": "Please enter a valid email address",
             "emailTaken": "Email taken"
-          }
+          },
+          "whatsNew": "What’s your new email address?",
+          "confirmEmail": "Confirm new email",
+          "verifyNewEmail": "Confirm your new email",
+          "edit": "Edit"
         },
         "birthDateInput": {
           "label": "Date of birth",
@@ -244,7 +266,7 @@
         "title": "Transactions",
         "you": "You",
         "type": {
-          "1": "event",
+          "1": "bid",
           "2": "superpoll",
           "3": "goal"
         },
@@ -254,7 +276,8 @@
           "1": "bid on",
           "2": "voted on",
           "3": "backed on",
-          "5": "subscribed to"
+          "5": "subscribed to",
+          "6": "purchased bundle from"
         }
       },
       "privacy": {
@@ -262,11 +285,11 @@
         "privacySubsections": {
           "spendings": {
             "title": "Hide my spending from others",
-            "caption": "People will not be able to see how much you spent on events, superpolls and goals"
+            "caption": "People will not be able to see how much you spent on Bids and Superpolls"
           },
           "private": {
             "title": "Make my activity private",
-            "caption": "People will not be able to see any of your activity on events, superpolls and goals"
+            "caption": "People will not be able to see any of your activity on Bids and Superpolls"
           }
         },
         "blockedUsers": {

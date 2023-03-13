@@ -7,6 +7,7 @@ import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useInView } from 'react-intersection-observer';
 import Link from 'next/link';
+import { useRouter } from 'next/dist/client/router';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
@@ -17,12 +18,18 @@ import NoResults from './notifications/NoResults';
 import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
+  markAllAsRead,
   markAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import { useNotifications } from '../../../../contexts/notificationsContext';
 import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
+import usePagination, {
+  PaginatedResponse,
+  Paging,
+} from '../../../../utils/hooks/usePagination';
+import findName from '../../../../utils/findName';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -34,137 +41,118 @@ export const NotificationsList: React.FC<IFunction> = ({
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
-  const [notifications, setNotifications] =
-    useState<newnewapi.INotification[] | null>(null);
-  const [unreadNotifications, setUnreadNotifications] =
-    useState<number[] | null>(null);
-  const [notificationsNextPageToken, setNotificationsNextPageToken] =
-    useState<string | undefined | null>('');
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
-  const [initialLoad, setInitialLoad] = useState<boolean>(true);
-  const [defaultLimit, setDefaultLimit] = useState<number>(11);
-  const { unreadNotificationCount } = useNotifications();
-  const [localUnreadNotificationCount, setLocalUnreadNotificationCount] =
-    useState<number>(0);
+  const { locale } = useRouter();
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    number[] | null
+  >(null);
 
-  const fetchNotification = useCallback(
-    async (args?: any) => {
-      if (loading) return;
-      setLoading(true);
-      const limit: number = args && args.limit ? args.limit : defaultLimit;
-      const pageToken: string = args && args.pageToken ? args.pageToken : null;
-      try {
-        if (!pageToken && limit === defaultLimit) setNotifications([]);
-        const payload = new newnewapi.GetMyNotificationsRequest({
-          paging: {
-            limit,
-            pageToken,
-          },
-        });
-        const res = await getMyNotifications(payload);
+  // Used to update notification timers
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data.notifications.length > 0) {
-          if (limit === defaultLimit) {
-            setNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              res.data?.notifications.forEach((item) => {
-                arr.push(item);
-              });
-              return arr;
-            });
-            setUnreadNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              res.data?.notifications.forEach((item) => {
-                if (!item.isRead) {
-                  arr.push(item.id as number);
-                }
-              });
-              return arr;
-            });
-            setNotificationsNextPageToken(res.data.paging?.nextPageToken);
-          } else {
-            setNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              if (res.data) arr.unshift(res.data.notifications[0]);
-              return arr;
-            });
-            setUnreadNotifications((curr) => {
-              const arr = curr ? [...curr] : [];
-              if (res.data) arr.push(res.data.notifications[0].id as number);
-              return arr;
-            });
+  // TODO: return a list of new notifications once WS message can be used
+  // const [newNotifications, setNewNotifications] = useState<
+  //   newnewapi.INotification[]
+  // >([]);
+
+  const loadData = useCallback(
+    async (
+      paging: Paging
+    ): Promise<PaginatedResponse<newnewapi.INotification>> => {
+      const payload = new newnewapi.GetMyNotificationsRequest({
+        paging,
+      });
+
+      const res = await getMyNotifications(payload);
+
+      if (!res.data || res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      setUnreadNotifications((curr) => {
+        const arr = curr ? [...curr] : [];
+        res.data?.notifications.forEach((item) => {
+          if (!item.isRead) {
+            arr.push(item.id as number);
           }
-        }
-        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
-          setNotificationsNextPageToken(null);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading]
-  );
-
-  const readNotification = useCallback(
-    async () => {
-      try {
-        const payload = new newnewapi.MarkAsReadRequest({
-          notificationIds: unreadNotifications,
         });
-        const res = await markAsRead(payload);
+        return arr;
+      });
 
-        if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setUnreadNotifications(null);
-      } catch (err) {
-        console.error(err);
-      }
+      return {
+        nextData: res.data.notifications,
+        nextPageToken: res.data.paging?.nextPageToken,
+      };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadNotifications, markReadNotifications]
+    []
   );
 
-  useEffect(() => {
-    if (!notifications) {
-      fetchNotification();
-    }
-  }, [notifications, fetchNotification]);
+  const {
+    data: notifications,
+    loading,
+    hasMore,
+    initialLoadDone,
+    loadMore,
+  } = usePagination(loadData, 6);
 
-  useEffect(() => {
-    if (
-      markReadNotifications &&
-      unreadNotifications &&
-      unreadNotifications.length > 0
-    ) {
-      readNotification();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markReadNotifications]);
+  const markAllNotifications = useCallback(async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest();
+      const res = await markAllAsRead(payload);
 
-  useEffect(() => {
-    if (inView && !loading && notificationsNextPageToken) {
-      fetchNotification({ pageToken: notificationsNextPageToken });
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      setUnreadNotifications(null);
+    } catch (err) {
+      console.error(err);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loading, notificationsNextPageToken]);
+  }, []);
 
-  useEffect(() => {
-    if (initialLoad) {
-      setLocalUnreadNotificationCount(unreadNotificationCount);
-      setInitialLoad(false);
-    } else {
-      if (unreadNotificationCount > localUnreadNotificationCount) {
-        fetchNotification({ limit: 1 });
-      } else {
-        setLocalUnreadNotificationCount(unreadNotificationCount);
+  const markNotificationAsRead = useCallback(async (notificationId: number) => {
+    if (!notificationId) {
+      return;
+    }
+
+    try {
+      const payload = new newnewapi.MarkAsReadRequest({
+        notificationIds: [notificationId],
+      });
+      const res = await markAsRead(payload);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLoad, unreadNotificationCount]);
 
+      setUnreadNotifications((curr) => {
+        const arr = curr ? [...curr] : [];
+        const result = arr.filter((item) => item !== notificationId);
+        return result;
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (markReadNotifications) {
+      markAllNotifications();
+    }
+  }, [markReadNotifications, markAllNotifications]);
+
+  useEffect(() => {
+    if (inView && !loading && hasMore) {
+      loadMore().catch((e) => console.error(e));
+    }
+  }, [inView, loading, hasMore, loadMore]);
+
+  useEffect(() => {
+    const updateTimeInterval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000);
+    return () => {
+      clearInterval(updateTimeInterval);
+    };
+  }, []);
+
+  // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2)
@@ -176,140 +164,173 @@ export const NotificationsList: React.FC<IFunction> = ({
       if (target.userProfile && target?.userProfile.userUsername)
         return `/direct-messages/${target.userProfile.userUsername}`;
 
-      if (target.postResponse && target?.postResponse.postUuid)
-        return `/post/${target.postResponse.postUuid}`;
+      if (
+        target.postResponse &&
+        (target?.postResponse.postShortId || target?.postResponse.postUuid)
+      )
+        return `/p/${
+          target?.postResponse.postShortId || target?.postResponse.postUuid
+        }`;
 
-      if (target.postAnnounce && target?.postAnnounce.postUuid)
-        return `/post/${target.postAnnounce.postUuid}`;
+      if (
+        target.postAnnounce &&
+        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
+      )
+        return `/p/${
+          target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
+        }`;
     }
-    return '';
+    return '/direct-messages';
   };
 
-  const renderNotificationItem = useCallback(
-    (item: newnewapi.INotification) => (
-      <Link href={getUrl(item.target)} key={item.id as number}>
-        <a>
-          <SNotificationItem key={`notification-item-${item.id}`}>
-            {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
-              <SNotificationItemAvatar
-                withClick
-                avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
+  const getEnrichedNotificationMessage = useCallback(
+    (notification: newnewapi.INotification) => {
+      if (!notification.content?.message) {
+        return undefined;
+      }
+
+      if (
+        notification.content.relatedUser &&
+        notification.content.relatedUser.isVerified
+      ) {
+        const name = findName(
+          notification.content.message,
+          notification.content.relatedUser
+        );
+
+        if (name) {
+          const beforeName = notification.content.message.slice(
+            0,
+            name.startsAtIndex
+          );
+          const afterName = notification.content.message.slice(
+            name.startsAtIndex + name.text.length
+          );
+          return (
+            <>
+              {beforeName}
+              {name.text}
+              <SInlineSvg
+                svg={VerificationCheckmark}
+                width='16px'
+                height='16px'
               />
-            ) : (
-              <SIconHolder>
-                <InlineSvg
-                  clickable
-                  svg={mobileLogo}
-                  fill='#fff'
-                  width='24px'
-                  height='24px'
-                />
-              </SIconHolder>
-            )}
-            <SNotificationItemCenter>
-              {item.content && (
-                <SNotificationItemText variant={3} weight={600}>
-                  {item.content.message}
-                </SNotificationItemText>
-              )}
-              <SNotificationItemTime variant={2} weight={600}>
-                {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
-              </SNotificationItemTime>
-            </SNotificationItemCenter>
-            {unreadNotifications &&
-              unreadNotifications.length > 0 &&
-              unreadNotifications.findIndex(
-                (unreadNotificationId) => unreadNotificationId === item.id
-              ) > -1 && <SNotificationItemIndicator minified />}
-          </SNotificationItem>
-        </a>
-      </Link>
-    ),
-    [unreadNotifications, user.userData?.userUuid]
+              {afterName}
+            </>
+          );
+        }
+      }
+
+      return notification.content.message;
+    },
+    []
   );
 
-  return (
-    <>
-      <SSectionContent ref={scrollRef}>
-        {loading === undefined ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : !notifications && loading ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : notifications && notifications.length < 1 ? (
-          <NoResults />
-        ) : (
-          notifications && notifications.map(renderNotificationItem)
-        )}
-        {notificationsNextPageToken && !loading && (
-          <SRef ref={scrollRefNotifications}>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
+  const renderNotificationItem = useCallback(
+    (item: newnewapi.INotification, itemCurrentTime: number) => {
+      const message = getEnrichedNotificationMessage(item);
+
+      return (
+        <Link href={getUrl(item.target)} key={item.id as number}>
+          <a>
+            <SNotificationItem
+              key={`notification-item-${item.id}`}
+              onClick={() => {
+                markNotificationAsRead(item.id as number);
               }}
-            />
-          </SRef>
-        )}
-      </SSectionContent>
-    </>
+            >
+              {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+                <SNotificationItemAvatar
+                  withClick
+                  avatarUrl={
+                    item.content?.relatedUser?.thumbnailAvatarUrl ?? ''
+                  }
+                />
+              ) : (
+                <SIconHolder>
+                  <InlineSvg
+                    clickable
+                    svg={mobileLogo}
+                    fill='#fff'
+                    width='24px'
+                    height='24px'
+                  />
+                </SIconHolder>
+              )}
+              <SNotificationItemCenter>
+                {message && (
+                  <SNotificationItemText variant={3} weight={600}>
+                    {message}
+                  </SNotificationItemText>
+                )}
+                <SNotificationItemTime variant={2} weight={600}>
+                  {moment((item.createdAt?.seconds as number) * 1000)
+                    .locale(locale || 'en-US')
+                    .from(itemCurrentTime)}
+                </SNotificationItemTime>
+              </SNotificationItemCenter>
+              {unreadNotifications &&
+                unreadNotifications.length > 0 &&
+                unreadNotifications.findIndex(
+                  (unreadNotificationId) => unreadNotificationId === item.id
+                ) > -1 && <SNotificationItemIndicator minified />}
+            </SNotificationItem>
+          </a>
+        </Link>
+      );
+    },
+    [
+      user.userData?.userUuid,
+      locale,
+      unreadNotifications,
+      getEnrichedNotificationMessage,
+      markNotificationAsRead,
+    ]
+  );
+
+  // TODO: return a list of new notifications once WS message can be used
+  // const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
+  //   return  [...newNotifications, ...notifications];
+  // }, [notifications, newNotifications]);
+
+  return (
+    <div ref={scrollRef}>
+      {!notifications?.length && (loading || !initialLoadDone) ? (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      ) : notifications && notifications.length < 1 ? (
+        <NoResults />
+      ) : (
+        notifications &&
+        notifications.map((notification) =>
+          renderNotificationItem(notification, currentTime)
+        )
+      )}
+      {hasMore && !loading && initialLoadDone && (
+        <SRef ref={scrollRefNotifications}>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SRef>
+      )}
+    </div>
   );
 };
 
 export default NotificationsList;
-
-const SSectionContent = styled.div`
-  height: calc(100% - 48px);
-  padding: 0 24px;
-  display: flex;
-  position: relative;
-  overflow-y: auto;
-  flex-direction: column;
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  scrollbar-width: none;
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-
-  &:hover {
-    scrollbar-width: thin;
-    &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
-    }
-  }
-`;
 
 const SNotificationItem = styled.div`
   cursor: pointer;
@@ -338,6 +359,7 @@ const SNotificationItemCenter = styled.div`
 `;
 
 const SNotificationItemText = styled(Text)`
+  display: inline;
   margin-bottom: 4px;
 `;
 
@@ -360,4 +382,14 @@ const SNotificationItemIndicator = styled(Indicator)`
 const SRef = styled.span`
   overflow: hidden;
   text-align: center;
+  flex-shrink: 0;
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  display: inline-flex;
+  transform: translateY(6px);
+  margin-left: 2px;
+  margin-top: -6px;
+  width: 20px;
+  height: 20px;
 `;

@@ -13,38 +13,42 @@
       "new": "新的",
       "earlier": "更早"
     },
-    "enableSubscription": {
-      "title": "通過訂閱賺取更多",
-      "description": "啟用訂閱功能，賺取穩定的收入，並與你最❤️的人互聯",
-      "learnMore": "瞭解更多",
-      "submit": "開啟訂閱"
-    },
     "earnings": {
       "title": "我的收入",
       "earned": "上次賺的",
       "earnedToday": "今天賺的",
       "earnedYesterday": "昨天賺的",
+      "units": {
+        "days": "天",
+        "months": "個月"
+      },
       "insights": "深入瞭解",
       "insightsTablet": "轉至深入瞭解",
       "cashOut": {
-        "amount": "你的下一次付款",
+        "amount": "你的Stripe收入為",
+        "amountSecondLine": "在Stripe上管理你的餘額。",
+        "stripeButton": "轉至Stripe",
         "date": "將於{{date}}自動發送,",
         "submit": "瞭解更多",
         "noPayouts": "沒有任何即將支付的款項"
       },
       "toDosIssue": {
         "text": "添加個人簡介和銀行資訊以支取你的收入",
-        "button": "添加"
+        "textBio": "添加個人簡介和銀行資訊以支取你的收入",
+        "textBank": "添加個人簡介和銀行資訊以支取你的收入",
+        "button": "添加",
+        "stripeIssue": "您的Stripe帳戶有問題",
+        "stripeIssueButton": "查看Stripe帳戶"
       },
       "makeDecision": {
         "text": "發佈一個帖子。開始賺取收入。",
         "button": "發佈一個帖子"
       },
       "list": {
-        "ac": "Event",
-        "cf": "Superpoll",
-        "mc": "Goal",
-        "subscriptions": "訂閱"
+        "ac": "Bid",
+        "mc": "Superpoll",
+        "cf": "Goal",
+        "bundles": "Bundles"
       },
       "filter": {
         "today": "今天",
@@ -70,7 +74,7 @@
         }
       },
       "postTypes": {
-        "auction": "Event",
+        "auction": "Bid",
         "multipleChoice": "Superpoll",
         "crowdfunding": "Goal"
       },
@@ -80,62 +84,75 @@
         "minutes": "分鐘",
         "seconds": "秒",
         "leftToRespond": "內回應"
-      }
-    },
-    "subscriptionStats": {
-      "title": "訂閱",
-      "noSubs": "為你的業務帶來更多曝光度，與你的網路分享",
-      "newTitle": "最近訂閱的",
-      "newLink": "訂閱",
-      "seeAll": "查看所有新的訂閱者",
-      "prevWeek": "與前一周相比",
-      "banner": {
-        "description": "給你的新訂閱者發送歡迎資訊",
-        "submit": "發送消息"
       },
-      "list": {
-        "subscribers": "訂閱者",
-        "activeSubs": "活躍的訂閱者",
-        "views": "流覽量"
-      },
-      "filter": {
-        "today": "今天",
-        "yesterday": "昨天",
-        "last_7_days": "過去7天",
-        "last_30_days": "過去30天",
-        "last_90_days": "最近90天",
-        "last_12_months": "過去12個月"
-      },
-      "copyLink": "複製你的連結",
-      "copied": "已複製的"
+      "linkCopied": "連結已複製！"
     },
     "toDos": {
-      "title": "完成這些步驟並獲得報酬",
-      "subtitle": "賺到💰？完成下列步驟即可提取你的收入...",
+      "title": "完成這些步驟以獲得報酬",
+      "subtitle": "已經賺到💰了？完成下列步驟即可提取你的收入......",
       "signUp": "註冊成為創作者",
       "completeProfile": "添加個人簡介",
       "completeProfileButton": "添加",
       "addCashOutMethod": "添加銀行資訊",
       "addCashOutMethodButton": "添加"
+    },
+    "aboutBundles": {
+      "title": "Superpoll Bundles",
+      "text": "賺取更多，樂趣更多！\nSuperpoll Bundle讓大家共贏！",
+      "button": "瞭解更多！"
     }
-  },
-  "subscriptions": {
-    "meta": {
-      "title": "創作者訂閱"
-    },
-    "title": "我的訂閱者",
-    "table": {
-      "subscribers": "訂閱者",
-      "date": "訂閱日期",
-      "updateSub": "更新訂閱"
-    },
-    "messageAll": "私訊全部"
   },
   "earnings": {
     "meta": {
       "title": "創作者收入"
     },
     "title": "收入"
+  },
+  "myBundles": {
+    "meta": {
+      "title": "我的Bundle",
+      "description": "查看你的NewNewBundle"
+    },
+    "title": "我的Bundle",
+    "buttonTurnOn": "開啟Bundle",
+    "buttonTurnOff": "關掉Bundle",
+    "earnings": {
+      "title": "Bundle收入",
+      "payPeriod": "當前支付期",
+      "unitName": "bundle",
+      "earned": "收入",
+      "noSoldYet": "還沒有賣出Bundle",
+      "sold": "已售出"
+    },
+    "bundlesSet": {
+      "title": "Superpoll Bundle",
+      "subTitle": "提供Superpoll Bundle來增加收入，還能拉近與觀眾距離。",
+      "votes": "票數",
+      "description": "此外，大家可獲{{duration}}個月的：",
+      "descriptionSingular": "此外，大家可獲1個月的：",
+      "firstOption": "在自己的Superpoll中添加定制選項",
+      "secondOption": "私人聊天發送中",
+      "perBundle": "每個Bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title": "開啟Bundle",
+        "text": "確定要啟動Bundle嗎？"
+      },
+      "turnoff": {
+        "title": "關閉Bundle",
+        "text": "確定要停用Bundle嗎？"
+      },
+      "activated": {
+        "title": "恭喜！",
+        "text": "你已成功啟動Bundle。"
+      },
+      "deactivated": {
+        "title": "好傷心啊！",
+        "text": "但你可以隨時啟動Bundle"
+      },
+      "button": "不錯！"
+    }
   },
   "getPaid": {
     "meta": {
@@ -151,10 +168,10 @@
   },
   "navigation": {
     "dashboard": "儀錶板",
-    "subscriptions": "訂閱者",
     "myPosts": "我的帖子",
     "insights": "深入瞭解",
     "earnings": "收入",
+    "bundles": "Bundles",
     "getPaid": "添加銀行",
     "getPaidEdit": "編輯銀行",
     "transactions": "交易",
@@ -167,10 +184,10 @@
   "chat": {
     "today": "今天",
     "placeholder": "輸入訊息......",
-    "noMessagesFirstLine": "沒有訊息...",
+    "noMessagesFirstLine": "沒有訊息......",
     "typing": "正在輸入......",
     "toolbar": {
-      "searchPlaceholder": "搜索訊息或用戶"
+      "searchPlaceholder": "搜索用戶"
     },
     "modal": {
       "newMessage": {
@@ -180,48 +197,11 @@
     },
     "emptyInbox": {
       "title": "收件箱為空",
-      "text": "開啓新的對話後，對話會列在此處"
+      "text": "你與某位Bundle所有者的對話開始後，對話將在此處列出"
     },
     "default": {
       "searchPlaceholder": "搜索"
     }
-  },
-  "subRateSection": {
-    "heading": "設置訂閱價格",
-    "selectInput": {
-      "perMonth": "/月",
-      "select": "選擇",
-      "featured": "熱門"
-    },
-    "button": {
-      "enable": "開啟訂閱",
-      "update": "保存",
-      "back": "取消"
-    },
-    "removeSubscription": "刪除訂閱"
-  },
-  "subscribersFeatures": {
-    "title": "通過訂閱你，你的訂閱者將能夠：",
-    "firstFeature": "直接給你發私訊",
-    "secondFeature": "在你的Superpoll中獲得免費投票",
-    "thirdFeature": "向你的Superpoll添加自訂建議",
-    "note": "不用擔心--開啟訂閱不會限制大家參與你的Event、Superpoll或Goal"
-  },
-  "enableSubModal": {
-    "title": "開啓訂閱",
-    "note": "該訂閱價格從啟用之日起鎖定30天",
-    "button": "確認，開啟訂閱",
-    "confirmationTextFirstPart": "確認",
-    "confirmationTextSecondPart": "按月訂閱"
-  },
-  "removeSubModal": {
-    "title": "刪除我的訂閱",
-    "note": "如果你刪除你的訂閱，你將無法獲得新的用戶，你目前的用戶的訂閱也將結束。你也將無法與你的用戶聊天的。你可以在任何時候重新開啟你的訂閱。",
-    "button": "刪除我的訂閱"
-  },
-  "noResults": {
-    "text": "分享你的個人資料，讓其他人\n瞭解知道你的訂閱",
-    "updateSub": "更新訂閱"
   },
   "modal": {
     "newMessage": {
@@ -237,12 +217,15 @@
     "members": "成員"
   },
   "announcement": {
-    "title": "的公告"
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "",
+    "afterName": "的公告"
   },
   "stripe": {
     "meta": {
-      "title": "使用Stripe，支付更輕鬆",
-      "description": "與Stripe帳戶綁定，即可按時獲得付款,"
+      "title": "使用Stripe，收付更輕鬆",
+      "description": "與Stripe帳戶綁定，即可按時獲得付款。"
     },
     "titleSetUpStripe": "獲得付款",
     "bullets": {
@@ -253,10 +236,11 @@
     "button": {
       "submit": "完成",
       "update": "更新支付資訊",
-      "requestSetupLink": "與Stripe連接",
-      "stripeConnectedLink": "Stripe已連接！",
+      "requestSetupLink": "與Stripe綁定",
+      "stripeConnectedLink": "Stripe已綁定！",
       "back": "關閉",
-      "stripeConnecting_NEED_TRANSLATION": "Connecting..."
+      "stripeConnecting": "連接中......",
+      "requireInformation": "Stripe需要資訊"
     }
   },
   "noNotifications": "你收到的任何新通知\n都會出現在這裡"

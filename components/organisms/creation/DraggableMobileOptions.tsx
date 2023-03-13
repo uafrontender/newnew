@@ -8,6 +8,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import DraggableOptionItem from '../../molecules/creation/DraggableOptionItem';
 
 import plusIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IDraggableMobileOptions {
   id: string;
@@ -47,6 +48,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
 
   const renderItem = (item: any, index: number) => (
     <DraggableOptionItem
+      id={`option-${index}`}
       key={`draggable-option-${item.id}`}
       item={item}
       index={index}
@@ -56,6 +58,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
     />
   );
   const handleAddNewOption = () => {
+    Mixpanel.track('Superpoll Add New Option');
     onChange(id, [
       ...options,
       {
@@ -71,7 +74,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
         {options.map(renderItem)}
       </SList>
       {options.length < 4 && (
-        <SNewOption onClick={handleAddNewOption}>
+        <SNewOption id='add-option' onClick={handleAddNewOption}>
           <InlineSVG
             svg={plusIcon}
             fill={theme.colorsThemed.text.secondary}

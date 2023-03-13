@@ -1,13 +1,15 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import usePageVisibility from '../../../utils/hooks/usePageVisibility';
+import isBrowser from '../../../utils/isBrowser';
+import { Mixpanel } from '../../../utils/mixpanel';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-import textTrim from '../../../utils/textTrim';
 import UserAvatar from '../../molecules/UserAvatar';
+import PostTitleContent from '../PostTitleContent';
+import DisplayName from '../../DisplayName';
 
 interface IFunction {
   posts: newnewapi.IPost[];
@@ -15,59 +17,99 @@ interface IFunction {
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const { t } = useTranslation('common');
-  const renderItem = useCallback((post: newnewapi.IPost) => {
-    const postType = Object.keys(post)[0];
-    const data = Object.values(post)[0] as
-      | newnewapi.Auction
-      | newnewapi.Crowdfunding
-      | newnewapi.MultipleChoice;
-
-    let postTypeConverted = '';
-
-    const timestampSeconds = new Date(
-      (data.expiresAt?.seconds as number) * 1000
-    ).getTime();
-
-    const parsed = secondsToDHMS((timestampSeconds - Date.now()) / 1000);
-
-    switch (postType) {
-      case 'auction':
-        postTypeConverted = 'Event';
-        break;
-      case 'crowdfunding':
-        postTypeConverted = 'Goal';
-        break;
-      default:
-        postTypeConverted = 'Superpoll';
+  const [updateTimer, setUpdateTimer] = useState<boolean>(false);
+  const interval = useRef<number>();
+  const isPageVisible = usePageVisibility();
+  useEffect(() => {
+    if (isBrowser() && isPageVisible) {
+      interval.current = window.setInterval(() => {
+        setUpdateTimer((curr) => !curr);
+      }, 1000);
     }
+    return () => clearInterval(interval.current);
+  }, [isPageVisible]);
 
-    return (
-      <Link href={`/post/${data.postUuid}`} key={data.postUuid}>
-        <a>
-          <SPost>
-            <SLeftSide>
-              <SUserAvatar>
-                <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
-              </SUserAvatar>
-              <SPostData>
-                {data.title && (
-                  <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
+  const renderItem = useCallback(
+    (post: newnewapi.IPost) => {
+      const data = Object.values(post)[0] as
+        | newnewapi.Auction
+        | newnewapi.Crowdfunding
+        | newnewapi.MultipleChoice;
+
+      const timestampSeconds = new Date(
+        (data.expiresAt?.seconds as number) * 1000
+      ).getTime();
+
+      const hasEnded = Date.now() > timestampSeconds;
+
+      const parsed = secondsToDHMS(
+        (timestampSeconds - Date.now()) / 1000,
+        'noTrim'
+      );
+
+      return (
+        <Link
+          href={`/p/${data.postShortId ? data.postShortId : data.postUuid}`}
+          key={data.postUuid}
+        >
+          <a>
+            <SPost
+              onClick={() => {
+                Mixpanel.track('Search Result Post Clicked', {
+                  _postUuid: data.postUuid,
+                });
+              }}
+            >
+              <SLeftSide>
+                <SUserAvatar>
+                  <UserAvatar avatarUrl={data.creator?.avatarUrl ?? ''} />
+                </SUserAvatar>
+                <SPostData>
+                  {data.title && (
+                    <SPostTitle>
+                      <PostTitleContent>{data.title}</PostTitleContent>
+                    </SPostTitle>
+                  )}
+                  <SCreatorInfo>
+                    <DisplayName user={data.creator} />
+                  </SCreatorInfo>
+                </SPostData>
+              </SLeftSide>
+              <SPostDetails>
+                {!hasEnded ? (
+                  <STimeLeft>
+                    {parsed.days !== '00' &&
+                      `${parsed.days}${t('timer.daysLeft')}`}{' '}
+                    {`${
+                      parsed.hours !== '00' ||
+                      (parsed.days !== '00' && parsed.hours === '00')
+                        ? `${parsed.hours}${t('timer.hoursLeft')}`
+                        : ''
+                    } ${parsed.minutes}${t('timer.minutesLeft')}
+                    ${
+                      parsed.days === '00'
+                        ? `${parsed.seconds}${t('timer.secondsLeft')}`
+                        : ''
+                    }`}
+                  </STimeLeft>
+                ) : (
+                  <SPostEnded>
+                    {t('timer.endedOn')}
+                    <br />
+                    {new Date(
+                      (data.expiresAt?.seconds as number) * 1000
+                    ).toLocaleDateString()}
+                  </SPostEnded>
                 )}
-                <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
-              </SPostData>
-            </SLeftSide>
-            <SPostDetails>
-              <SPostType>{postTypeConverted}</SPostType>
-              <SPostEnded>
-                {parsed.days !== '00' && `${parsed.days}d`}{' '}
-                {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
-              </SPostEnded>
-            </SPostDetails>
-          </SPost>
-        </a>
-      </Link>
-    );
-  }, []);
+              </SPostDetails>
+            </SPost>
+          </a>
+        </Link>
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t, updateTimer]
+  );
 
   return (
     <SContainer>
@@ -101,6 +143,7 @@ const SPost = styled.div`
   padding: 8px 16px;
   margin: 0 -16px;
   cursor: pointer;
+
   &:hover {
     background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
@@ -108,11 +151,14 @@ const SPost = styled.div`
 
 const SLeftSide = styled.div`
   display: flex;
+  overflow: hidden;
+  padding-right: 12px;
 `;
 
 const SPostData = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SUserAvatar = styled.div`
@@ -132,17 +178,26 @@ const SUserAvatar = styled.div`
 
 const SPostTitle = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
 `;
 
-const SCreatorUsername = styled.span`
+const SCreatorInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SPostType = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+const STimeLeft = styled.span`
+  white-space: nowrap;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SPostEnded = styled.span`
+  white-space: nowrap;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 

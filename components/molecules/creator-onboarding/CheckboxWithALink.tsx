@@ -1,8 +1,12 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 import styled from 'styled-components';
+import Text from '../../atoms/Text';
 import CheckMark from '../CheckMark';
 
 interface ICheckboxWithALink {
+  id?: string;
   label: string;
   linkText: string;
   value: boolean;
@@ -11,6 +15,7 @@ interface ICheckboxWithALink {
 }
 
 const CheckboxWithALink: React.FC<ICheckboxWithALink> = ({
+  id,
   label,
   linkText,
   value,
@@ -18,12 +23,11 @@ const CheckboxWithALink: React.FC<ICheckboxWithALink> = ({
   onLinkClicked,
 }) => (
   <AgreedToTosSection>
-    <CheckMark
-      label={label}
-      selected={value}
-      handleChange={() => onToggled()}
-    />
-    <TextTrigger onClick={() => onLinkClicked()}> {linkText}</TextTrigger>
+    <CheckMark id={id} selected={value} handleChange={() => onToggled()} />
+    <Text variant={3} weight={600}>
+      <span onClick={onToggled}>{label}</span>
+      <TextTrigger onClick={() => onLinkClicked()}> {linkText}</TextTrigger>
+    </Text>
   </AgreedToTosSection>
 );
 
@@ -33,14 +37,14 @@ const AgreedToTosSection = styled('div')`
   margin-right: 24px;
 `;
 
-const TextTrigger = styled('p')`
+const TextTrigger = styled('span')`
   cursor: pointer;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 600;
-  white-space: pre-wrap;
 
   color: ${({ theme }) => theme.colorsThemed.accent.blue};
 `;
+
+CheckboxWithALink.defaultProps = {
+  id: undefined,
+};
 
 export default CheckboxWithALink;

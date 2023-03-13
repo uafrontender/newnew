@@ -18,3 +18,6 @@ import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+// Enable to see logs for failed posts
+require('cypress-terminal-report/src/installLogsCollector')();

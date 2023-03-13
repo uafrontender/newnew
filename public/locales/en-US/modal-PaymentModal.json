@@ -13,5 +13,26 @@
   },
   "payButton": "Pay",
   "tocApplyLink": "Terms",
-  "tocApplyText": "apply"
+  "tocApplyText": "apply",
+  "reCaptchaTos": {
+    "siteProtectedBy": "This site is protected by reCAPTCHA and the Google",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "tos": "Terms of Service",
+    "apply": "apply."
+  },
+  "primaryCard": "Primary card",
+  "newCard": "New card",
+  "saveCard": "Save card for future use",
+  "email": "Email",
+  "errors": {
+    "wrongEmail": "Email can't be used",
+    "paymentFailed": "Payment failed",
+    "requestFailed": "Request failed",
+    "invalidFee": "Something went wrong. Please reload the page and try again"
+  },
+  "errorCaptions": {
+    "emailRequired": "Email is required"
+  },
+  "processingFee": "Processing fee"
 }

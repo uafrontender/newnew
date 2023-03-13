@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -20,6 +21,9 @@ import CommentTextArea from './CommentTextArea';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
+import validateInputText from '../../../utils/validateMessageText';
+import { I18nNamespaces } from '../../../@types/i18next';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -50,7 +54,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
 };
 
 interface ICommentForm {
-  postUuid?: string;
+  postUuidOrShortId?: string;
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
@@ -60,15 +64,27 @@ interface ICommentForm {
 }
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
-  ({ postUuid, position, zIndex, isRoot, onBlur, onFocus, onSubmit }, ref) => {
+  (
+    { postUuidOrShortId, position, zIndex, isRoot, onBlur, onFocus, onSubmit },
+    ref
+  ) => {
     const theme = useTheme();
     const router = useRouter();
-    const { t } = useTranslation('modal-Post');
+    const { t } = useTranslation('page-Post');
     const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Comment content from URL
     const { newCommentContentFromUrl, handleResetNewCommentContentFromUrl } =
@@ -79,8 +95,16 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [commentText, setCommentText] = useState('');
     const [commentTextError, setCommentTextError] = useState('');
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+    const [commentToSend, setCommentToSend] = useState('');
 
+    const validateTextAbortControllerRef = useRef<
+      AbortController | undefined
+    >();
     const validateTextViaAPI = useCallback(async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
+      }
+      validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
         const payload = new newnewapi.ValidateTextRequest({
@@ -88,14 +112,28 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           text,
         });
 
-        const res = await validateText(payload);
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
+        );
 
-        if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occurred');
 
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setCommentTextError(errorSwitch(res.data?.status));
         } else {
           setCommentTextError('');
+        }
+
+        if (text.length > 0) {
+          const isValidLocal = validateInputText(text);
+          if (!isValidLocal) {
+            setCommentTextError(
+              errorSwitch(newnewapi.ValidateTextResponse.Status.TOO_SHORT)
+            );
+            setIsAPIValidateLoading(false);
+            return;
+          }
         }
 
         setIsAPIValidateLoading(false);
@@ -124,9 +162,8 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const handleSubmit = useCallback(
       async (e: React.MouseEvent | React.KeyboardEvent) => {
         e.preventDefault();
-        if (isAPIValidateLoading) return;
-
-        if (!user.loggedIn) {
+        // Redirect only after the persist data is pulled
+        if (!user.loggedIn && user._persist?.rehydrated) {
           if (!isRoot) {
             router.push(
               `/sign-up?reason=comment&redirect=${encodeURIComponent(
@@ -138,7 +175,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
               `/sign-up?reason=comment&redirect=${encodeURIComponent(
                 `${process.env.NEXT_PUBLIC_APP_URL}/${
                   router.locale !== 'en-US' ? `${router.locale}/` : ''
-                }post/${postUuid}?comment_content=${commentText}#comments`
+                }p/${postUuidOrShortId}?comment_content=${commentText}#comments`
               )}`
             );
           }
@@ -146,12 +183,51 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           return;
         }
 
-        await onSubmit(commentText);
-        setCommentText('');
+        setCommentToSend(commentText);
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [commentText, user.loggedIn, isAPIValidateLoading, onSubmit, isRoot]
+      [commentText, user.loggedIn, user._persist?.rehydrated, onSubmit, isRoot]
     );
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLFormElement>) => {
+        if (!isMobileOrTablet) {
+          if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
+            if (commentText.charCodeAt(commentText.length - 1) === 10) {
+              setCommentText((curr) => curr.slice(0, -1));
+            }
+          } else if (e.key === 'Enter') {
+            handleSubmit(e);
+          }
+        } else if (e.key === 'Enter' && commentText.length > 0) {
+          if (commentText.charCodeAt(commentText.length - 1) === 10) {
+            setCommentText((curr) => curr.slice(0, -1));
+          }
+        }
+      },
+      [commentText, handleSubmit, isMobileOrTablet]
+    );
+
+    // TODO: Add loading state for mobile button on mobile
+    useEffect(() => {
+      if (!commentToSend || !!commentTextError) {
+        return;
+      }
+
+      if (isAPIValidateLoading) {
+        return;
+      }
+
+      const handleOnSubmit = async () => {
+        setIsSubmitting(true);
+        await onSubmit(commentToSend);
+        setIsSubmitting(false);
+        setCommentText('');
+        setCommentToSend('');
+      };
+
+      handleOnSubmit();
+    }, [commentToSend, commentTextError, isAPIValidateLoading, onSubmit]);
 
     const handleBlur = useCallback(() => {
       setFocusedInput(false);
@@ -179,20 +255,22 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         }}
         position={position}
         zIndex={zIndex}
-        onKeyDown={(e) => {
-          if (e.shiftKey && e.key === 'Enter') {
-            handleSubmit(e);
-          }
-        }}
+        onKeyDown={handleKeyDown}
       >
         <SInputWrapper>
           <CommentTextArea
             id='title'
-            maxlength={150}
+            maxlength={500}
             value={commentText}
             focus={focusedInput}
             error={
-              commentTextError ? t(`comments.errors.${commentTextError}`) : ''
+              commentTextError
+                ? t(
+                    `comments.errors.${
+                      commentTextError as keyof I18nNamespaces['page-Post']['comments']['errors']
+                    }`
+                  )
+                : ''
             }
             onFocus={() => {
               setFocusedInput(true);
@@ -208,13 +286,15 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
             withShadow
             view={commentText ? 'primaryGrad' : 'quaternary'}
             onClick={handleSubmit}
-            disabled={!commentText || !!commentTextError}
+            disabled={!commentText || !!commentTextError || isSubmitting}
             style={{
               ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
             }}
+            loading={isSubmitting}
+            loadingAnimationColor='blue'
           >
             <SInlineSVG
-              svg={sendIcon}
+              svg={!isSubmitting ? sendIcon : ''}
               fill={
                 commentText
                   ? theme.colors.white
@@ -238,7 +318,7 @@ CommentForm.defaultProps = {
   zIndex: undefined,
   position: undefined,
   isRoot: false,
-  postUuid: '',
+  postUuidOrShortId: '',
 };
 
 const SInlineSVG = styled(InlineSVG)``;
@@ -276,13 +356,6 @@ const SCommentsForm = styled.form<{
   top: 0;
   z-index: ${({ zIndex }) => zIndex ?? 'unset'};
   background: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  ${(props) => props.theme.media.tablet} {
-    background-color: ${({ theme }) =>
-      theme.name === 'dark'
-        ? theme.colorsThemed.background.secondary
-        : theme.colorsThemed.background.primary};
-  }
 `;
 
 interface ISInputWrapper {}

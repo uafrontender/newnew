@@ -2,20 +2,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-interface IVerficationInput {
+interface IVerificationInput {
+  id?: string;
   length: number;
   initialValue?: string[];
   error?: boolean;
   disabled: boolean;
   onComplete: (completeCode: string) => void;
+  isInputFocused?: boolean;
 }
 
-const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
+const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
+  id,
   length,
   initialValue,
   error,
   disabled,
   onComplete,
+  isInputFocused,
 }) => {
   const [code, setCode] = useState(
     initialValue ?? new Array(length).join('.').split('.')
@@ -111,6 +115,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
         }}
       />
       <SVerficationInput
+        id={id}
         errorBordersShown={error}
         role='textbox'
         ref={(el) => {
@@ -141,7 +146,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
             autoComplete='off'
             // We need this one to be focused once page opens
             // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={!code[0].length && i === 0}
+            autoFocus={isInputFocused && !code[0].length && i === 0}
             disabled={disabled}
             readOnly={code[i].length > 0}
             onChange={(e) => handleSlotInput(e, i)}
@@ -164,12 +169,13 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
   );
 };
 
-VerficationCodeInput.defaultProps = {
+VerificationCodeInput.defaultProps = {
   initialValue: undefined,
   error: undefined,
+  isInputFocused: true,
 };
 
-export default VerficationCodeInput;
+export default VerificationCodeInput;
 
 interface ISVerficationInput {
   errorBordersShown?: boolean;
@@ -200,8 +206,10 @@ const SVerficationInput = styled.div<ISVerficationInput>`
       return theme.colorsThemed.accent.error;
     }};
 
-    width: 52px;
-    height: 72px;
+    // 32px - left and right padding, 6px - gap between inputs
+    width: calc((100vw - 32px - (6px * 5)) / 6);
+    max-width: 52px;
+    height: 68px;
 
     padding: 14px;
 
@@ -213,6 +221,11 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     background: transparent;
 
     caret-color: transparent;
+
+    ${({ theme }) => theme.media.mobileM} {
+      width: 52px;
+      height: 72px;
+    }
 
     &:read-only {
       outline: none;

@@ -1,90 +1,82 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { formatNumber } from '../../../utils/format';
 
 interface IVotesAmountInputModal {
   value: string;
+  customPaymentWithFeeInCents: number;
   minAmount: number;
   disabled?: boolean;
   autofocus?: boolean;
-  inputAlign: 'left' | 'center';
-  bottomPlaceholder?: string;
-  placeholder: string;
-  pseudoPlaceholder: string;
   onChange: (newValue: string) => void;
 }
 
-const VotesAmountInputModal: React.FunctionComponent<IVotesAmountInputModal> =
-  ({
-    value,
-    minAmount,
-    disabled,
-    autofocus,
-    inputAlign,
-    bottomPlaceholder,
-    placeholder,
-    pseudoPlaceholder,
-    onChange,
-  }) => {
-    const inputRef = useRef<HTMLInputElement>();
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue =
-        value.length > 0
-          ? e.target.value
-              .split(',')
-              .filter((v) => v !== ',')
-              .join('')
-          : e.target.value;
-      if (/[^0-9]/.test(newValue)) return;
+const VotesAmountInputModal: React.FunctionComponent<
+  IVotesAmountInputModal
+> = ({
+  value,
+  customPaymentWithFeeInCents,
+  minAmount,
+  disabled,
+  autofocus,
+  onChange,
+}) => {
+  const { t } = useTranslation('page-Post');
 
-      if (newValue.length > 5) return;
+  const inputRef = useRef<HTMLInputElement>();
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue =
+      value.length > 0
+        ? e.target.value
+            .split(',')
+            .filter((v) => v !== ',')
+            .join('')
+        : e.target.value;
+    if (/[^0-9]/.test(newValue)) return;
 
-      // @ts-ignore
-      onChange(newValue ? (newValue as number) : '');
-    };
+    if (newValue.length > 5) return;
 
-    useEffect(() => {
-      if (autofocus) inputRef.current?.focus();
-    }, [autofocus]);
-
-    return (
-      <SWrapper>
-        <SInput
-          ref={(el) => {
-            inputRef.current = el!!;
-          }}
-          value={value ? `${formatNumber(parseInt(value), true)}` : value}
-          disabled={disabled ?? false}
-          align={inputAlign}
-          inputMode='numeric'
-          placeholder={`${minAmount.toString()} ${placeholder}`}
-          onChange={handleOnChange}
-          style={{
-            width: `calc(86px + ${Math.floor(value.length / 1.4)}em)`,
-          }}
-        />
-        <SPseudoPlaceholder
-          onClick={() => {
-            inputRef.current?.focus();
-          }}
-          style={{
-            left: `calc(${Math.floor(value.length / 1.8)}em + 1.3em + 16px`,
-          }}
-        >
-          {value ? pseudoPlaceholder : ''}
-        </SPseudoPlaceholder>
-        {bottomPlaceholder && (
-          <SBottomPlaceholder>{bottomPlaceholder}</SBottomPlaceholder>
-        )}
-      </SWrapper>
-    );
+    onChange(newValue);
   };
+
+  useEffect(() => {
+    if (autofocus) inputRef.current?.focus();
+  }, [autofocus]);
+
+  return (
+    <SWrapper>
+      <SInput
+        id='custom-votes-input'
+        ref={(el) => {
+          inputRef.current = el!!;
+        }}
+        value={value ? `${formatNumber(parseInt(value), true)}` : value}
+        disabled={disabled ?? false}
+        inputMode='numeric'
+        placeholder={t('mcPost.optionsTab.actionSection.votesAmount', {
+          minAmount,
+        })}
+        onChange={handleOnChange}
+      />
+      <SBottomPlaceholder id='custom-votes-price'>
+        {value && customPaymentWithFeeInCents
+          ? `${t(
+              'mcPost.optionsTab.actionSection.totalAmountCustomVotesPayment'
+            )}: $${formatNumber(
+              customPaymentWithFeeInCents / 100,
+              customPaymentWithFeeInCents % 1 === 0
+            )}`
+          : '$--'}
+      </SBottomPlaceholder>
+    </SWrapper>
+  );
+};
 
 VotesAmountInputModal.defaultProps = {
   disabled: undefined,
   autofocus: undefined,
-  bottomPlaceholder: undefined,
 };
 
 export default VotesAmountInputModal;
@@ -97,21 +89,20 @@ const SWrapper = styled.div`
   justify-content: center;
   gap: 12px;
 
+  width: 100%;
+
   margin-top: 24px;
 `;
 
-const SInput = styled.input<{
-  align: string;
-}>`
+const SInput = styled.input`
   font-weight: 600;
   font-size: 32px;
   line-height: 40px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  text-align: left;
+  text-align: center;
 
   padding: 12.5px 16px;
-  padding-right: 4em;
   width: 100%;
 
   background-color: transparent;
@@ -130,32 +121,10 @@ const SInput = styled.input<{
   font-weight: 500;
   font-size: 16px;
   line-height: 24px;
-  min-width: 80px;
-
-  padding-right: 0px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  text-align: ${({ align }) => align};
 
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-`;
-
-const SPseudoPlaceholder = styled.div`
-  position: absolute;
-  top: 12.5px;
-
-  font-weight: 600;
-  font-size: 32px;
-  line-height: 40px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  top: 14px;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-
-  padding: 0px;
 `;
 
 const SBottomPlaceholder = styled.div`
