@@ -283,7 +283,7 @@
       "privacy": {
         "title": "Privacy",
         "privacySubsections": {
-          "spendings": {
+          "spending": {
             "title": "Hide my spending from others",
             "caption": "People will not be able to see how much you spent on Bids and Superpolls"
           },

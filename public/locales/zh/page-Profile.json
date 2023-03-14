@@ -283,7 +283,7 @@
       "privacy": {
         "title": "隱私",
         "privacySubsections": {
-          "spendings": {
+          "spending": {
             "title": "不讓別人查看我的消費",
             "caption": "其他人看不到你為Bids或Superpolls上花了多少錢"
           },
