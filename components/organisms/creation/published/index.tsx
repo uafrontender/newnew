@@ -16,8 +16,7 @@ import UserAvatar from '../../../molecules/UserAvatar';
 
 import { I18nNamespaces } from '../../../../@types/i18next';
 import getDisplayname from '../../../../utils/getDisplayname';
-import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
@@ -27,6 +26,7 @@ import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../../contexts/postCreationContext';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -45,12 +45,14 @@ interface IPublishedContent {}
 export const PublishedContent: React.FC<IPublishedContent> = () => {
   const { t } = useTranslation('page-Creation');
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
-  const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
-    (state) => state.creation
+  const { postInCreation, clearCreation } = usePostCreationState();
+  const { post, videoProcessing, fileProcessing, postData } = useMemo(
+    () => postInCreation,
+    [postInCreation]
   );
+
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -146,13 +148,13 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation(undefined));
+              clearCreation();
             });
           }
         }
       }
     },
-    [postData, router, dispatch]
+    [postData, router, clearCreation]
   );
 
   const socialButtons = useMemo(
