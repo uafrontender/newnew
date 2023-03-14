@@ -1,6 +1,7 @@
 import React, {
   ReactElement,
   useCallback,
+  // useContext,
   useEffect,
   useMemo,
   useState,
@@ -41,6 +42,9 @@ import copyToClipboard from '../../utils/copyToClipboard';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../DisplayName';
+import { getMySpending } from '../../api/endpoints/payments';
+import { formatNumber } from '../../utils/format';
+// import { SocketContext } from '../../contexts/socketContext';
 
 type TPageType =
   | 'activelyBidding'
@@ -72,6 +76,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
+  // const socketConnection = useContext(SocketContext);
   const router = useRouter();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
@@ -311,6 +316,55 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Spending
+
+  const [mySpendingInCents, setMySpendingInCents] = useState<
+    number | undefined
+  >();
+
+  useEffect(() => {
+    if (user.userData?.options?.isWhiteListed) {
+      (async () => {
+        try {
+          const payload = new newnewapi.GetMySpendingRequest();
+
+          const res = await getMySpending(payload);
+
+          if (!res.data?.totalSpending?.usdCents || res.error) {
+            throw new Error(res.error?.message ?? 'Request failed');
+          }
+
+          setMySpendingInCents(res.data.totalSpending.usdCents);
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+  }, [user.userData?.options?.isWhiteListed]);
+
+  /* useEffect(() => {
+    const handleMySpendingChanged = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MySpendingChanged.decode(arr);
+
+      if (!decoded?.totalSpending?.usdCents) {
+        return;
+      }
+
+      setMySpendingInCents(decoded.totalSpending.usdCents);
+    };
+
+    if (socketConnection && user.loggedIn) {
+      socketConnection?.on('MySpendingChanged', handleMySpendingChanged);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+        socketConnection?.off('MySpendingChanged', handleMySpendingChanged);
+      }
+    };
+  }, [socketConnection, user.loggedIn]); */
+
   return (
     <SGeneral restrictMaxWidth>
       <SMyProfileLayout>
@@ -384,6 +438,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           <ProfileImage src={user.userData?.avatarUrl} />
         )}
         <SUserData>
+          {mySpendingInCents && (
+            <SSpending>{formatNumber(mySpendingInCents / 100)}$</SSpending>
+          )}
           <SUsernameWrapper>
             <SUsername variant={4}>
               <DisplayName user={user.userData} />
@@ -638,4 +695,12 @@ const SMyProfileLayout = styled.div`
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
   }
+`;
+
+const SSpending = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  // TODO: make hardly noticeable
+  color: red;
 `;
