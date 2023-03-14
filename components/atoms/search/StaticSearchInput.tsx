@@ -508,7 +508,6 @@ const SResultsDropMobile = styled.div`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
     padding: 16px 48px;
     top: 64px;
   }
