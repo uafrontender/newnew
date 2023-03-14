@@ -215,12 +215,14 @@ export const Dashboard: React.FC = React.memo(() => {
           </SBlock>
         ) : (
           !isToDosCompleted &&
+          // TODO: This should not require special logic. isCreatorConnectedToStripe should be true for WL creators
           !user.userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
               <YourToDos />
             </SBlock>
           )
         )}
+        {/* TODO: Why can't we show earnings for a case when WL creators "earns" something on the stream? */}
         {!user.userData?.options?.isWhiteListed && (
           <SBlock>
             {!isEarningsLoading &&
