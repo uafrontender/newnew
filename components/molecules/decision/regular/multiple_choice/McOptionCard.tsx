@@ -1276,6 +1276,8 @@ const SOptionInfo = styled(Text)`
   font-size: 14px;
   line-height: 20px;
 
+  word-break: break-word;
+
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;
   }
@@ -1477,6 +1479,7 @@ const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
+  word-break: break-word;
 `;
 
 const STutorialTooltipHolder = styled.div`

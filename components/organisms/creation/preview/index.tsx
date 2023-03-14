@@ -26,12 +26,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
-import {
-  clearCreation,
-  setCreationStartDate,
-  setPostData,
-} from '../../../../redux-store/slices/creationStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import {
   CREATION_TITLE_MIN,
@@ -52,6 +47,7 @@ import useErrorToasts, {
 import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../../contexts/postCreationContext';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -68,11 +64,12 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const playerRef: any = useRef(null);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const [showModal, setShowModal] = useState(false);
+  const { postInCreation, setPostData, setCreationStartDate, clearCreation } =
+    usePostCreationState();
   const {
     post,
     auction,
@@ -81,7 +78,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     videoProcessing,
     fileProcessing,
     customCoverImageUrl,
-  } = useAppSelector((state) => state.creation);
+  } = useMemo(() => postInCreation, [postInCreation]);
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
@@ -219,8 +216,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     setIsGoingToHomepage(true);
     setShowModal(false);
     router.push('/');
-    dispatch(clearCreation(undefined));
-  }, [dispatch, router]);
+    clearCreation();
+  }, [clearCreation, router]);
 
   const handleSubmit = useCallback(async () => {
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
@@ -317,6 +314,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       if (
         !data ||
+        !data.post ||
         error ||
         data?.createPostStatus ===
           newnewapi.CreatePostResponse.CreatePostStatus.INVALID_VALUE
@@ -324,7 +322,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         throw new Error(error?.message ?? 'Request failed');
       }
 
-      dispatch(setPostData(data?.post));
+      setPostData(data.post);
 
       if (isMobile) {
         setIsDisabledAdditionally(true);
@@ -355,7 +353,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     formatStartsAt,
     formatExpiresAt,
     tab,
-    dispatch,
+    setPostData,
     isMobile,
     auction.minimalBid,
     multiplechoice.choices,
@@ -502,14 +500,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           time: moment().format('hh:mm'),
           'hours-format': post.startsAt['hours-format'],
         };
-        dispatch(setCreationStartDate(newStartAt));
+        setCreationStartDate(newStartAt);
       }, 1000);
     }
 
     return () => {
       clearInterval(updateStartDate);
     };
-  }, [post.startsAt, dispatch]);
+  }, [post.startsAt, setCreationStartDate]);
 
   // Redirect if post state is empty
   useEffect(() => {

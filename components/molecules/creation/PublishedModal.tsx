@@ -13,18 +13,18 @@ import Headline from '../../atoms/Headline';
 import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { useAppSelector } from '../../../redux-store/store';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
-import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import getDisplayname from '../../../utils/getDisplayname';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -47,10 +47,11 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const router = useRouter();
   const { t } = useTranslation('page-Creation');
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
-    (state) => state.creation
+  const { postInCreation, clearCreation } = usePostCreationState();
+  const { post, videoProcessing, fileProcessing, postData } = useMemo(
+    () => postInCreation,
+    [postInCreation]
   );
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -174,13 +175,13 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             }
 
             router.push(url).then(() => {
-              dispatch(clearCreation(undefined));
+              clearCreation();
             });
           }
         }
       }
     },
-    [postData, router, dispatch]
+    [postData, router, clearCreation]
   );
 
   const formatExpiresAtNoStartsAt = useCallback(() => {
