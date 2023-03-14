@@ -80,11 +80,12 @@ const DisplayName: React.FC<IDisplayName> = ({
           <SInlineSvg
             gap={gap}
             height={`${size}px`}
-            width='auto'
+            width={`${size}px`}
             svg={
               inverted ? VerificationCheckmarkInverted : VerificationCheckmark
             }
             fill='none'
+            wrapperType='span'
             onClick={onClick}
           />
         )}
@@ -103,9 +104,10 @@ const DisplayName: React.FC<IDisplayName> = ({
         <SInlineSvg
           gap={gap}
           height={`${size}px`}
-          width='auto'
+          width={`${size}px`}
           svg={inverted ? VerificationCheckmarkInverted : VerificationCheckmark}
           fill='none'
+          wrapperType='span'
           onClick={onClick}
         />
       )}

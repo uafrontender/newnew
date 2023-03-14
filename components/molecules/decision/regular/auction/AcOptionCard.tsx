@@ -971,6 +971,8 @@ const SOptionInfo = styled(Text)<{
   font-size: 14px;
   line-height: 20px;
 
+  word-break: break-word;
+
   ${({ isWhite }) =>
     isWhite
       ? css`
@@ -1182,6 +1184,8 @@ const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  word-break: break-word;
 `;
 
 // Tutorial

@@ -239,7 +239,9 @@ export const lightTheme: DefaultTheme = {
       tertiary:
         'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
       quaternary:
-        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);',
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+      blended:
+        'linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)',
     },
     listBottom: {
       primary:
@@ -249,7 +251,9 @@ export const lightTheme: DefaultTheme = {
       tertiary:
         'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
       quaternary:
-        'linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);',
+        'linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)',
+      blended:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
     },
     listLeft: {
       primary:
@@ -481,23 +485,27 @@ export const darkTheme: DefaultTheme = {
       'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
     listTop: {
       primary:
-        'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+        'linear-gradient(180deg, rgba(12, 11, 20, 0.9),  rgba(20, 21, 31, 0) 100%)',
       secondary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
       quaternary:
         'linear-gradient(180deg, rgba(11, 10, 19, 0) 0%, rgba(11, 10, 19, 1) 100%)',
+      blended:
+        'linear-gradient(180deg, #0B0A13 0%, rgba(11, 10, 19, 0.4) 90%, rgba(11, 10, 19, 0.2) 95%,  rgba(11, 10, 19, 0) 100%)',
     },
     listBottom: {
       primary:
-        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(12, 11, 20, 0.9) 100%)',
       secondary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
       tertiary:
         'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
       quaternary:
         'linear-gradient(180deg, rgba(11, 10, 19, 1) 0%, rgba(11, 10, 19, 0) 100%)',
+      blended:
+        'linear-gradient(180deg, rgba(11, 10, 19, 0) 0%, rgba(11, 10, 19, 0.2) 5%, rgba(11, 10, 19, 0.4) 10%,  #0B0A13 100%)',
     },
     listLeft: {
       primary:

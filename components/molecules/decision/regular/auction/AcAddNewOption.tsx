@@ -716,6 +716,8 @@ const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  word-break: break-word;
 `;
 
 const SPaymentSign = styled(Text)`
