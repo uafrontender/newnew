@@ -74,6 +74,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       'mobileL',
       'tablet',
     ].includes(resizeMode);
+    const isSmallDesktop = ['laptop'].includes(resizeMode);
 
     const handleSeeResults = (query: string) => {
       Mixpanel.track('Search All Results Clicked', {
@@ -291,7 +292,11 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
               value={searchValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder={t('search.placeholder')}
+              placeholder={
+                !isMobileOrTablet && !isSmallDesktop
+                  ? t('search.placeholderLong')
+                  : t('search.placeholder')
+              }
             />
           </SInputWrapper>
 

@@ -8,7 +8,7 @@ import DisplayName from '../../../DisplayName';
 interface IOptionCardUsernameSpan {
   // String used for own user case only, when we want "I", "me" or "my"
   // Also accepts 'deleted' for users we know are deleted
-  user: newnewapi.IUser | string | undefined;
+  user: newnewapi.IUser | string | undefined | null;
   isBlue: boolean;
 }
 

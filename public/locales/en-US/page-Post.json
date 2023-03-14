@@ -1,6 +1,7 @@
 {
   "meta": {
     "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "deletedPost": "Deleted post",
     "description": {
       "ac": "${{totalInBids}} in bids on NewNew",
       "mc": "{{totalVotes}} votes on NewNew",
