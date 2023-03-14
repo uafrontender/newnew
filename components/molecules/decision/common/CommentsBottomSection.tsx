@@ -241,6 +241,7 @@ const CommentsBottomSection: React.FunctionComponent<
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
+
       if (size) {
         setHeightDelta(size);
       }
@@ -340,12 +341,7 @@ const CommentsBottomSection: React.FunctionComponent<
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <SActionSection
-          id='comments-scrolling-container'
-          ref={(el) => {
-            scrollRef.current = el!!;
-          }}
-        >
+        <SActionSection>
           <CommentForm
             isRoot
             postUuidOrShortId={postShortId || postUuid}
@@ -358,77 +354,88 @@ const CommentsBottomSection: React.FunctionComponent<
             onBlur={onFormBlur ?? undefined}
             onFocus={onFormFocus ?? undefined}
           />
-          <SCommentsWrapper>
-            {comments.length === 0 && !commentsLoading ? (
-              <SNoCommentsYet>
-                <SNoCommentsImgContainer>
-                  <img src={NoContentYetImg.src} alt='No content yet' />
-                </SNoCommentsImgContainer>
-                <SNoCommentsCaption variant={3}>
-                  {t('comments.noCommentsCaption')}
-                </SNoCommentsCaption>
-                {!isMobile && (
-                  <SMakeBidArrowSvg
-                    svg={MakeFirstBidArrow}
-                    fill={theme.colorsThemed.background.quinary}
-                    width='36px'
-                  />
-                )}
-              </SNoCommentsYet>
-            ) : null}
-            {comments &&
-              comments.map((item, index) => (
-                <Comment
-                  key={item.id.toString()}
-                  canDeleteComment={canDeleteComments}
-                  lastChild={index === comments.length - 1}
-                  comment={item}
-                  isDeletingComment={isDeletingComment}
-                  handleAddComment={(newMsg: string) =>
-                    handleAddComment(newMsg, item.id as number)
-                  }
-                  handleDeleteComment={handleDeleteComment}
-                  onFormBlur={onFormBlur ?? undefined}
-                  onFormFocus={onFormFocus ?? undefined}
-                />
-              ))}
-            <SLoaderDiv
-              ref={loadingRef}
-              style={{
-                ...(commentsLoading || isMobile
-                  ? {
-                      display: 'none',
+          <SScrollContainer
+            ref={(el) => {
+              scrollRef.current = el!!;
+            }}
+            id='comments-scrolling-container'
+          >
+            <SCommentsWrapper>
+              {comments.length === 0 && !commentsLoading ? (
+                <SNoCommentsYet>
+                  <SNoCommentsImgContainer>
+                    <img src={NoContentYetImg.src} alt='No content yet' />
+                  </SNoCommentsImgContainer>
+                  <SNoCommentsCaption variant={3}>
+                    {t('comments.noCommentsCaption')}
+                  </SNoCommentsCaption>
+                  {!isMobile && (
+                    <SMakeBidArrowSvg
+                      svg={MakeFirstBidArrow}
+                      fill={theme.colorsThemed.background.quinary}
+                      width='36px'
+                    />
+                  )}
+                </SNoCommentsYet>
+              ) : null}
+              {comments &&
+                comments.map((item, index) => (
+                  <Comment
+                    key={item.id.toString()}
+                    canDeleteComment={canDeleteComments}
+                    lastChild={index === comments.length - 1}
+                    comment={item}
+                    isDeletingComment={isDeletingComment}
+                    handleAddComment={(newMsg: string) =>
+                      handleAddComment(newMsg, item.id as number)
                     }
-                  : {}),
-              }}
-            />
-            {isMobile && hasNextPage && (
-              <SLoadMoreButton
-                view='secondary'
-                disabled={commentsLoading}
-                onClick={() => {
-                  Mixpanel.track('Click Load More Comments', {
-                    _stage: 'Post',
-                    _postUuid: postUuid,
-                  });
-                  fetchNextPage();
+                    handleDeleteComment={handleDeleteComment}
+                    onFormBlur={onFormBlur ?? undefined}
+                    onFormFocus={onFormFocus ?? undefined}
+                  />
+                ))}
+              <SLoaderDiv
+                ref={loadingRef}
+                style={{
+                  ...(commentsLoading || isMobile
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
                 }}
-              >
-                {t('comments.seeMore')}
-              </SLoadMoreButton>
-            )}
-          </SCommentsWrapper>
+              />
+              {isMobile && hasNextPage && (
+                <SLoadMoreButton
+                  view='secondary'
+                  disabled={commentsLoading}
+                  onClick={() => {
+                    Mixpanel.track('Click Load More Comments', {
+                      _stage: 'Post',
+                      _postUuid: postUuid,
+                    });
+                    fetchNextPage();
+                  }}
+                >
+                  {t('comments.seeMore')}
+                </SLoadMoreButton>
+              )}
+            </SCommentsWrapper>
+          </SScrollContainer>
         </SActionSection>
         <GradientMask
-          gradientType='primary'
+          gradientType='blended'
           positionTop={heightDelta}
           active={showTopGradient}
           width='calc(100% - 4px)'
+          height='100px'
+          animateOpacity
         />
         <GradientMask
-          gradientType='primary'
+          gradientType='blended'
           active={showBottomGradient}
           width='calc(100% - 4px)'
+          height='100px'
+          animateOpacity
         />
       </STabContainer>
     </>
@@ -450,43 +457,53 @@ const STabContainer = styled(motion.div)`
   align-self: flex-end;
 
   margin-bottom: 40px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 56px;
   }
 `;
 
-const SActionSection = styled.div`
-  padding-right: 0;
-  height: 100%;
+const SScrollContainer = styled.div`
+  ${({ theme }) => theme.media.tablet} {
+    padding-right: 0;
+    max-height: 500px;
+    height: 100%;
 
-  max-height: 500px;
+    overflow-y: auto;
 
-  overflow-y: auto;
-
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  scrollbar-width: none;
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: 0.2s linear;
-  }
-
-  &:hover {
-    scrollbar-width: thin;
-    &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    // Scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
     }
-
+    scrollbar-width: none;
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+    }
     &::-webkit-scrollbar-thumb {
-      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+    }
+  }
+`;
+
+const SActionSection = styled.div`
+  &:hover {
+    ${SScrollContainer} {
+      scrollbar-width: thin;
+      &::-webkit-scrollbar-track {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
     }
   }
 `;
@@ -495,6 +512,14 @@ const SCommentsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 0 16px 0 32px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    padding: 0 16px;
+  }
 `;
 
 const SLoaderDiv = styled.div`
@@ -551,6 +576,6 @@ const SMakeBidArrowSvg = styled(InlineSvg)`
 `;
 
 const SLoadMoreButton = styled(Button)`
-  width: calc(100% - 12px);
+  width: 100%;
   margin-bottom: 12px;
 `;
