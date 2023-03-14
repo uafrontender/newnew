@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -14,7 +14,6 @@ import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
@@ -25,20 +24,13 @@ import {
   removeUploadedFile,
   stopVideoProcessing,
 } from '../../../api/endpoints/upload';
-import {
-  setCreationFileProcessingError,
-  setCreationFileProcessingLoading,
-  setCreationFileProcessingProgress,
-  setCreationFileUploadError,
-  setCreationFileUploadLoading,
-  setCreationFileUploadProgress,
-  setCreationVideo,
-  setCreationVideoProcessing,
-  TThumbnailParameters,
-} from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
 import CoverImagePreviewEdit from './CoverImagePreviewEdit';
 import { useAppState } from '../../../contexts/appStateContext';
+import {
+  TThumbnailParameters,
+  usePostCreationState,
+} from '../../../contexts/postCreationContext';
 
 const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -79,8 +71,23 @@ const FileUpload: React.FC<IFileUpload> = ({
 }) => {
   const { t } = useTranslation('page-Creation');
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
-  const dispatch = useAppDispatch();
-  const { post, videoProcessing } = useAppSelector((state) => state.creation);
+
+  const {
+    postInCreation,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
+  } = usePostCreationState();
+  const { post, videoProcessing } = useMemo(
+    () => postInCreation,
+    [postInCreation]
+  );
+
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -239,23 +246,30 @@ const FileUpload: React.FC<IFileUpload> = ({
 
       setLocalFile(null);
       onChange(id, null);
-      dispatch(setCreationVideo(''));
-      dispatch(setCreationVideoProcessing({}));
-      dispatch(setCreationFileUploadError(false));
-      dispatch(setCreationFileUploadLoading(false));
-      dispatch(setCreationFileUploadProgress(0));
-      dispatch(setCreationFileProcessingError(false));
-      dispatch(setCreationFileProcessingLoading(false));
-      dispatch(setCreationFileProcessingProgress(0));
+      setCreationVideo('');
+      setCreationVideoProcessing({} as any);
+      setCreationFileUploadError(false);
+      setCreationFileUploadLoading(false);
+      setCreationFileUploadProgress(0);
+      setCreationFileProcessingError(false);
+      setCreationFileProcessingLoading(false);
+      setCreationFileProcessingProgress(0);
     } catch (err) {
       console.error(err);
       showErrorToastPredefined(undefined);
     }
   }, [
-    dispatch,
     id,
     onChange,
     post?.announcementVideoUrl,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
     showErrorToastPredefined,
     videoProcessing?.taskUuid,
   ]);

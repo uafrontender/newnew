@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 
-import { TVideoProcessingData } from '../redux-store/slices/creationStateSlice';
 import { SocketContext } from './socketContext';
 import {
   getCoverImageUploadUrl,
@@ -30,6 +29,7 @@ import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../utils/hooks/useErrorToasts';
 import urltoFile from '../utils/urlToFile';
+import { TVideoProcessingData } from './postCreationContext';
 
 interface IPostModerationResponsesContext {
   // Tabs

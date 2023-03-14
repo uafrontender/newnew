@@ -12,18 +12,19 @@ import SecondStepContent from '../../../components/organisms/creation/second';
 import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 import { NextPageWithLayout } from '../../_app';
-import { useAppDispatch } from '../../../redux-store/store';
-import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
+
 import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { I18nNamespaces } from '../../../@types/i18next';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
 
 interface ICreationSecondStep {}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
   const router = useRouter();
   const { t } = useTranslation('page-Creation');
-  const dispatch = useAppDispatch();
+
+  const { clearCreation } = usePostCreationState();
 
   useLeavePageConfirm(
     true,
@@ -41,7 +42,7 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
       '/creation/crowdfunding/published',
     ],
     () => {
-      dispatch(clearCreation(undefined));
+      clearCreation();
     }
   );
 
