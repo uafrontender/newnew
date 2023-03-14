@@ -194,6 +194,7 @@
   },
   "search": {
     "placeholder": "Search",
+    "placeholderLong": "Search creators and hashtags",
     "topPosts": "Top Posts",
     "popularCreators": "Popular Creators",
     "creatorSubtitle": "See posts",
