@@ -7,6 +7,7 @@ import DisplayName from '../../../DisplayName';
 
 interface IOptionCardUsernameSpan {
   // String used for own user case only, when we want "I", "me" or "my"
+  // Also accepts 'deleted' for users we know are deleted
   user: newnewapi.IUser | string | undefined;
   isBlue: boolean;
 }
@@ -16,6 +17,14 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
   isBlue,
 }) => {
   const currentUser = useAppSelector((state) => state.user);
+
+  if (user === 'deleted') {
+    return (
+      <SContainer>
+        <DeletedUserSpan>deleted user</DeletedUserSpan>
+      </SContainer>
+    );
+  }
 
   if (typeof user === 'string') {
     return (
@@ -38,7 +47,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
     );
   }
 
-  if (user?.options?.isVerified)
+  if (user?.options?.isVerified) {
     return (
       <SContainer>
         <SHighlightedDisplayName
@@ -52,7 +61,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
         />
       </SContainer>
     );
-
+  }
   // No navigation for non verified other users
   return (
     <SContainer>
@@ -79,6 +88,10 @@ const SHighlightedDisplayName = styled(DisplayName)<{
     isBlue ? '#FFFFFF' : theme.colorsThemed.text.secondary};
 
   cursor: pointer;
+`;
+
+const DeletedUserSpan = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SRegularDisplayName = styled(DisplayName)`
