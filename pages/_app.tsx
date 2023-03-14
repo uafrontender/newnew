@@ -67,6 +67,7 @@ import PushNotificationModalContainer from '../components/organisms/PushNotifica
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
 import AppStateContextProvider from '../contexts/appStateContext';
+import PostCreationContextProvider from '../contexts/postCreationContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -240,29 +241,32 @@ const MyApp = (props: IMyApp): ReactElement => {
                                         <ChatsProvider>
                                           <OverlayModeProvider>
                                             <MultipleBeforePopStateContextProvider>
-                                              <>
-                                                <ToastContainer containerId='toast-container' />
-                                                <VideoProcessingWrapper>
-                                                  {!pageProps.error ? (
-                                                    getLayout(
-                                                      <Component
-                                                        {...pageProps}
+                                              <PostCreationContextProvider>
+                                                <>
+                                                  <ToastContainer containerId='toast-container' />
+                                                  <VideoProcessingWrapper>
+                                                    {!pageProps.error ? (
+                                                      getLayout(
+                                                        <Component
+                                                          {...pageProps}
+                                                        />
+                                                      )
+                                                    ) : (
+                                                      <Error
+                                                        title={
+                                                          pageProps.error
+                                                            ?.message
+                                                        }
+                                                        statusCode={
+                                                          pageProps.error
+                                                            ?.statusCode ?? 500
+                                                        }
                                                       />
-                                                    )
-                                                  ) : (
-                                                    <Error
-                                                      title={
-                                                        pageProps.error?.message
-                                                      }
-                                                      statusCode={
-                                                        pageProps.error
-                                                          ?.statusCode ?? 500
-                                                      }
-                                                    />
-                                                  )}
-                                                  <PushNotificationModalContainer />
-                                                </VideoProcessingWrapper>
-                                              </>
+                                                    )}
+                                                    <PushNotificationModalContainer />
+                                                  </VideoProcessingWrapper>
+                                                </>
+                                              </PostCreationContextProvider>
                                             </MultipleBeforePopStateContextProvider>
                                           </OverlayModeProvider>
                                         </ChatsProvider>

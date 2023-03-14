@@ -212,7 +212,7 @@ const TimePickerMobileModal: React.FunctionComponent<
                   : {}),
               }}
             >
-              {d.value}
+              {d.name}
             </SScrollerItem>
           ))}
         </SScroller>
