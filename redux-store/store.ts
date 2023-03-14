@@ -28,7 +28,6 @@ import { createWrapper } from 'next-redux-wrapper';
 // Import reducers
 import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
-// import creationReducer from './slices/creationStateSlice';
 
 import isBrowser from '../utils/isBrowser';
 

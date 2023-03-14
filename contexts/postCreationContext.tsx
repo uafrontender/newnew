@@ -394,7 +394,6 @@ const PostCreationContextProvider: React.FunctionComponent<
   }, []);
 
   const clearCreation = useCallback(() => {
-    console.log('Clearing creation');
     setPostInCreation((curr) => {
       const workingObj = { ...curr };
       workingObj.post = { ...defaultPostState.post };
@@ -422,7 +421,6 @@ const PostCreationContextProvider: React.FunctionComponent<
       };
       workingObj.customCoverImageUrl = undefined;
 
-      console.log(workingObj);
       return workingObj;
     });
   }, [appConstants.minAcBid]);
@@ -440,6 +438,7 @@ const PostCreationContextProvider: React.FunctionComponent<
     if (defaultMinAcBid) {
       setCreationMinBid(defaultMinAcBid / 100);
     }
+    // Linter wants `setCreationMinBid`, however it's not necessary here
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultMinAcBid]);
 
