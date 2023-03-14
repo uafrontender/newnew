@@ -20,6 +20,7 @@ import VerificationPassedInverted from '../../../public/images/svg/icons/filled/
 import GoBackButton from '../../molecules/GoBackButton';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import opnUrlInNewTab from '../../../utils/openUrlInNewTab';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -112,7 +113,7 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
 
       const url = res.data.setupUrl;
       // Open in a separate tab to keep navigation history intact
-      window.open(url);
+      opnUrlInNewTab(url);
     } catch (err) {
       console.error(err);
     }

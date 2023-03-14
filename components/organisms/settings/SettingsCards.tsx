@@ -75,6 +75,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         >
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
+        {/* TODO: make cards section look more real, handle WL creator adds aa card case */}
         {!!cards?.length && !user.userData?.options?.isWhiteListed && (
           <>
             <SButtonSecondaryDesktop

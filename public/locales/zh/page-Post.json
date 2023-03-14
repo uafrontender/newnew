@@ -1,6 +1,7 @@
 {
   "meta": {
     "title": "NewNew上的{{postTitle}} | {{displayName}}",
+    "deletedPost_NEED_TRANSLATION": "Deleted post",
     "description": {
       "ac": "NewNew上出價共有${{totalInBids}}",
       "mc": "NewNew上投票共有{{totalVotes}}",
