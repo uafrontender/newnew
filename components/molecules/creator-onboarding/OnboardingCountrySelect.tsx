@@ -11,6 +11,7 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import InlineSvg from '../../atoms/InlineSVG';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 interface IOnboardingCountrySelect {
   selected: string;
@@ -34,6 +35,7 @@ const OnboardingCountrySelect = ({
   onSelect,
 }: IOnboardingCountrySelect): ReactElement => {
   const theme = useTheme();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>();
   const optionsContainerRef = useRef<HTMLDivElement>();
@@ -69,6 +71,18 @@ const OnboardingCountrySelect = ({
       }
     }
   }, [selected, options, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      enableOverlayMode();
+    } else {
+      disableOverlayMode();
+    }
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [isOpen, enableOverlayMode, disableOverlayMode]);
 
   // eslint-disable-next-line no-nested-ternary
   const currentLocale = locale ? (locale === 'en-US' ? 'en' : locale) : 'en';
