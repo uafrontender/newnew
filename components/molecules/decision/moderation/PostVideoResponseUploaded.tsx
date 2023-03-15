@@ -79,6 +79,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
                   soundBtnBottomOverriden + (!isEditingStories ? 72 : 24),
               }
             : {})}
+          videoDurationWithTime={!isEditingStories}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
           handleDeleteAdditionalVideo={handleDeleteAdditionalResponse}
           handleDeleteUnuploadedAdditonalResponse={
@@ -91,6 +92,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
           resources={coreResponse}
           muted={isMuted}
           showPlayButton
+          videoDurationWithTime
         />
       )}
       <PostVideoSoundButton
