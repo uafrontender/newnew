@@ -70,6 +70,15 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const router = useRouter();
 
   const [usernameQuery, setUsernameQuery] = useState('');
@@ -211,7 +220,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal, targetChatrooms]);
 
-  const openMyAnnouncement = useCallback(() => {
+  const openMyAnnouncement = useCallback(async () => {
     Mixpanel.track('My Announcement Clicked', {
       _stage: 'Direct Messages',
       _component: 'NewMessageModal',
@@ -227,17 +236,29 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     });
 
     if (!isDashboard) {
-      router.push(`/direct-messages/${user.userData?.username}-announcement`);
+      await router.push(
+        `/direct-messages/${user.userData?.username}-announcement`
+      );
+      if (isMobileOrTablet) {
+        setHiddenMessagesArea(false);
+      }
       closeModal();
     } else {
       user.userData?.username && setUsernameQuery(user.userData?.username);
       setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE);
     }
-  }, [closeModal, router, isDashboard, user.userData?.username]);
+  }, [
+    isMobileOrTablet,
+    router,
+    isDashboard,
+    user.userData?.username,
+    closeModal,
+    setHiddenMessagesArea,
+  ]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
-      const handleItemClick = () => {
+      const handleItemClick = async () => {
         Mixpanel.track('Chat Item Clicked', {
           _stage: 'Direct Messages',
           _component: 'NewMessageModal',
@@ -254,7 +275,11 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         });
 
         if (!isDashboard) {
-          router.push(`/direct-messages/${chat.user?.username}`);
+          await router.push(`/direct-messages/${chat.user?.username}`);
+
+          if (isMobileOrTablet) {
+            setHiddenMessagesArea(false);
+          }
           closeModal();
         } else {
           setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
@@ -287,7 +312,15 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         </SChatItemContainer>
       );
     },
-    [chatRooms, filteredChatrooms, router, closeModal, isDashboard]
+    [
+      filteredChatrooms.length,
+      chatRooms,
+      isDashboard,
+      router,
+      isMobileOrTablet,
+      closeModal,
+      setHiddenMessagesArea,
+    ]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
