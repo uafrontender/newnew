@@ -25,7 +25,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
+import WinningOptionAcCreator from '../../../molecules/decision/common/WinningOptionAcCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
@@ -234,11 +234,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                   <SSeparator />
                   {winningOption && (
                     <>
-                      <WinningOptionCreator
-                        type='ac'
-                        postCreator={post.creator!!}
-                        winningOptionAc={winningOption}
-                      />
+                      <WinningOptionAcCreator winningOption={winningOption} />
                       {winningOption.totalAmount?.usdCents && (
                         <SWinningOptionAmount variant={4}>
                           {`$${formatNumber(
@@ -256,7 +252,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           onClick={() => {
                             setOpenedMainSection('bids');
 
-                            if (activitiesContainerRef.current && isMobile) {
+                            if (activitiesContainerRef.current) {
                               activitiesContainerRef.current.scrollIntoView({
                                 behavior: 'smooth',
                               });

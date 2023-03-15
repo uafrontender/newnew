@@ -27,7 +27,9 @@ const processComments = (
 
   const workingArr = uniqBy(commentsRaw, 'id');
 
-  workingArr.forEach((rawItem, i) => {
+  const workingArrFiltered = workingArr.filter((c) => !c.isDeleted);
+
+  workingArrFiltered.forEach((rawItem, i) => {
     const workingItem = { ...rawItem };
 
     if (!rawItem.parentId || rawItem.parentId === 0) {

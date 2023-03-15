@@ -225,6 +225,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               resources={videoProcessing.targetUrls!!}
               muted={isMuted}
               showPlayButton
+              videoDurationWithTime
             />
             <SReuploadButton onClick={() => handleVideoDelete()}>
               {t('postVideo.reuploadButton')}

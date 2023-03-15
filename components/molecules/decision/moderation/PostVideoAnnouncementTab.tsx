@@ -45,6 +45,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
         resources={announcement}
         muted={isMuted}
         showPlayButton
+        videoDurationWithTime
       />
       {isSetThumbnailButtonIconOnly ? (
         <SetThumbnailButtonIconOnly

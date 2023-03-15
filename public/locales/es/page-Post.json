@@ -1,6 +1,7 @@
 {
   "meta": {
     "title": "{{postTitle}} | {{displayName}} en NewNew",
+    "deletedPost_NEED_TRANSLATION": "Deleted post",
     "description": {
       "ac": "${{totalInBids}} en ofertas en NewNew",
       "mc": "{{totalVotes}} votos en NewNew",

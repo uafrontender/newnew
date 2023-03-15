@@ -76,21 +76,26 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
-      // Pause the player when scrubbing
-      // to avoid double playback start
-      setIsScrubberTimeChanging(true);
-      playerRef.current?.pause();
-      setPlaybackTime(newValue);
-      playerRef.current?.currentTime(newValue);
+      if (!isPaused) {
+        // Pause the player when scrubbing
+        // to avoid double playback start
+        setIsScrubberTimeChanging(true);
+        playerRef.current?.pause();
+        setPlaybackTime(newValue);
+        playerRef.current?.currentTime(newValue);
 
-      setTimeout(() => {
-        setIsScrubberTimeChanging(false);
-        playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
-        });
-      }, 100);
+        setTimeout(() => {
+          setIsScrubberTimeChanging(false);
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
+        }, 100);
+      } else {
+        setPlaybackTime(newValue);
+        playerRef.current?.currentTime(newValue);
+      }
     },
-    [handleSetIsPaused]
+    [handleSetIsPaused, isPaused]
   );
 
   const options: videojs.PlayerOptions = useMemo(
@@ -296,7 +301,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
           isHovered={isHovered}
           currentTime={playbackTime}
           videoDuration={playerRef?.current?.duration() || 10}
-          withTime={false}
+          withTime
           handleChangeTime={handlePlayerScrubberChangeTime}
         />
       ) : null}
