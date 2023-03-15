@@ -259,7 +259,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                           onClick={() => {
                             setOpenedMainSection('options');
 
-                            if (activitiesContainerRef.current && isMobile) {
+                            if (activitiesContainerRef.current) {
                               activitiesContainerRef.current.scrollIntoView({
                                 behavior: 'smooth',
                               });
