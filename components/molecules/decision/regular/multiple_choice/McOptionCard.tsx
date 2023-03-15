@@ -1013,9 +1013,8 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               />
             ) : firstVoter ? (
               <OptionCardUsernameSpan user={firstVoter} isBlue={isBlue} />
-            ) : (
-              <OptionCardUsernameSpan user='deleted' isBlue={isBlue} />
-            )}
+            ) : /* TODO: if user is deleted, only 'voted' is shown */
+            null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>

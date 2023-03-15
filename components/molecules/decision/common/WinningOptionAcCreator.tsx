@@ -31,6 +31,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
     }
 
     // If whitelisted user supported the option, show them
+    // TODO: if user is deleted, only 'voted' is shown
     if (winningOption.whitelistSupporter) {
       return winningOption.whitelistSupporter;
     }
