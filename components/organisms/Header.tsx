@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 
 import Col from '../atoms/Grid/Col';
@@ -10,9 +10,11 @@ import Banner from '../molecules/Banner';
 import Desktop from '../molecules/header/Desktop';
 import Container from '../atoms/Grid/Container';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useAppState } from '../../contexts/appStateContext';
+import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
+import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 
 interface IHeader {
   visible: boolean;
@@ -23,11 +25,19 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
   const { banner } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppState();
 
+  const dispatch = useAppDispatch();
+
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTabletOrSmallDesktop = ['tablet', 'laptop'].includes(resizeMode);
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
+
+  const headerRef = useRef(null);
+
+  useOnClickOutside(headerRef, () => {
+    dispatch(setGlobalSearchActive(false));
+  });
 
   const hasMounted = useHasMounted();
 
@@ -39,6 +49,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       id='top-nav-header'
       visible={visible}
       withBanner={!!banner.show}
+      ref={headerRef}
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>
