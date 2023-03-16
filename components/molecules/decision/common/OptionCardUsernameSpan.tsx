@@ -38,7 +38,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
     );
   }
 
-  if (user?.options?.isVerified)
+  if (user?.options?.isVerified) {
     return (
       <SContainer>
         <SHighlightedDisplayName
@@ -52,7 +52,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
         />
       </SContainer>
     );
-
+  }
   // No navigation for non verified other users
   return (
     <SContainer>
