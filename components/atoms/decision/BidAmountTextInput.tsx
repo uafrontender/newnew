@@ -4,6 +4,7 @@ import { formatNumber } from '../../../utils/format';
 
 interface IBidAmountTextInput {
   id?: string;
+  className?: string;
   value: string;
   minAmount: number;
   disabled?: boolean;

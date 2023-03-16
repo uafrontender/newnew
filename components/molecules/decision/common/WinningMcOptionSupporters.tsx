@@ -16,10 +16,10 @@ interface IWinningMcOptionCreator {
 const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
   ({ postCreator, winningOption }) => {
     const { t } = useTranslation('page-Post');
-    const userData = useAppSelector((state) => state.user?.userData);
+    const user = useAppSelector((state) => state.user);
 
     const userToRender = useMemo(() => {
-      if (!userData?.userUuid) {
+      if (user.loggedIn && !user.userData?.userUuid) {
         return null;
       }
 
@@ -34,6 +34,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
       }
 
       // If the option created by post creator then return first voter
+      // TODO: if user is deleted, only 'voted' is shown
       if (winningOption.creator?.uuid === postCreator?.uuid) {
         return winningOption.firstVoter;
       }
@@ -44,7 +45,8 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
       winningOption.whitelistSupporter,
       winningOption.creator,
       winningOption.firstVoter,
-      userData?.userUuid,
+      user.loggedIn,
+      user.userData?.userUuid,
       winningOption.isSupportedByMe,
       postCreator?.uuid,
     ]);
@@ -66,11 +68,11 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
 
     const avatarSrc: string = useMemo(() => {
       if (userToRender === 'me') {
-        return userData?.avatarUrl ?? '';
+        return user.userData?.avatarUrl ?? '';
       }
 
       return userToRender?.avatarUrl ?? '';
-    }, [userToRender, userData]);
+    }, [userToRender, user.userData?.avatarUrl]);
 
     return (
       <SWinningBidCreator>
@@ -85,7 +87,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
 
           <SWinningBidCreatorText>
             <SDisplayName
-              user={userToRender === 'me' ? userData : userToRender}
+              user={userToRender === 'me' ? user.userData : userToRender}
               href={href}
               altName={
                 // eslint-disable-next-line no-nested-ternary
