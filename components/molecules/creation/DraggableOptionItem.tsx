@@ -15,8 +15,8 @@ import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import changeOrderIcon from '../../../public/images/svg/icons/outlined/ChangeOrder.svg';
 
 import {
-  CREATION_OPTION_MAX,
-  CREATION_OPTION_MIN,
+  OPTION_LENGTH_MAX,
+  OPTION_LENGTH_MIN,
 } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -78,8 +78,8 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     setError(
       await validation(
         clearedValue,
-        CREATION_OPTION_MIN,
-        CREATION_OPTION_MAX,
+        OPTION_LENGTH_MIN,
+        OPTION_LENGTH_MAX,
         newnewapi.ValidateTextRequest.Kind.POST_OPTION,
         index
       )
@@ -112,8 +112,8 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
         setError(
           await validation(
             trimmedTitle,
-            CREATION_OPTION_MIN,
-            CREATION_OPTION_MAX,
+            OPTION_LENGTH_MIN,
+            OPTION_LENGTH_MAX,
             newnewapi.ValidateTextRequest.Kind.POST_OPTION,
             index
           )

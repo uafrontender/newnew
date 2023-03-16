@@ -31,8 +31,8 @@ import { useAppSelector } from '../../../../redux-store/store';
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
-  CREATION_OPTION_MIN,
-  CREATION_OPTION_MAX,
+  OPTION_LENGTH_MIN,
+  OPTION_LENGTH_MAX,
 } from '../../../../constants/general';
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
@@ -138,11 +138,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     tab !== 'multiple-choice' ||
     multiplechoice.choices.findIndex(
       (item: newnewapi.CreateMultipleChoiceBody.IOption) =>
-        validateText(
-          item.text as string,
-          CREATION_OPTION_MIN,
-          CREATION_OPTION_MAX
-        )
+        validateText(item.text as string, OPTION_LENGTH_MIN, OPTION_LENGTH_MAX)
     ) === -1;
 
   const formatStartsAt: () => any = useCallback(() => {
