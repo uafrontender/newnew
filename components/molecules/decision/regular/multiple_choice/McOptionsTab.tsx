@@ -255,6 +255,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             setNewOptionErrorText(
               tCommon('error.text.max', { value: CUSTOM_OPTION_MAX })
             );
+          } else if (
+            res.data.status ===
+            newnewapi.ValidateTextResponse.Status.INAPPROPRIATE
+          ) {
+            setNewOptionErrorText(tCommon('error.text.badWords'));
+          } else if (
+            res.data.status ===
+            newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION
+          ) {
+            setNewOptionErrorText(tCommon('error.text.containsLinks'));
           } else {
             setNewOptionErrorText(undefined);
           }
