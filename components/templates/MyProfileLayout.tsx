@@ -718,7 +718,6 @@ const SSpending = styled.div`
   cursor: default;
 
   :hover {
-    // TODO: fix light theme color to the one from designs
-    color: ${({ theme }) => (theme.name === 'light' ? '#FAFAFA' : '#323444')};
+    color: ${({ theme }) => (theme.name === 'light' ? '#B3BBCA' : '#323444')};
   }
 `;
