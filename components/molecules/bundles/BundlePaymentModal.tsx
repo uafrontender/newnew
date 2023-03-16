@@ -9,10 +9,10 @@ import { usePushNotifications } from '../../../contexts/pushNotificationsContext
 import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
-import getDisplayname from '../../../utils/getDisplayname';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
+import DisplayName from '../../DisplayName';
 import { ModalType } from '../../organisms/Modal';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
@@ -186,9 +186,17 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         handlePayWithCard={handlePayWithCard}
       >
         <ModalTitle>
-          {t('modal.buyBundle.payment.header', {
-            creator: getDisplayname(creator),
-          })}
+          <Trans
+            t={t}
+            i18nKey='modal.buyBundle.payment.header'
+            // @ts-ignore
+            components={[
+              <DisplayName
+                user={creator}
+                suffix={t('modal.buyBundle.payment.suffix')}
+              />,
+            ]}
+          />
         </ModalTitle>
         <SVotesNumber>
           <Trans
@@ -241,6 +249,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
 export default BundlePaymentModal;
 
 const ModalTitle = styled.h4`
+  display: inline-flex;
+  white-space: pre;
   font-weight: 600;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -14,32 +14,25 @@ import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import dropboxIcon from '../../../public/images/svg/icons/outlined/upload-cloud.svg';
 
 import {
   removeUploadedFile,
   stopVideoProcessing,
 } from '../../../api/endpoints/upload';
-import {
-  setCreationFileProcessingError,
-  setCreationFileProcessingLoading,
-  setCreationFileProcessingProgress,
-  setCreationFileUploadError,
-  setCreationFileUploadLoading,
-  setCreationFileUploadProgress,
-  setCreationVideo,
-  setCreationVideoProcessing,
-  TThumbnailParameters,
-} from '../../../redux-store/slices/creationStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
 import CoverImagePreviewEdit from './CoverImagePreviewEdit';
 import { useAppState } from '../../../contexts/appStateContext';
+import {
+  TThumbnailParameters,
+  usePostCreationState,
+} from '../../../contexts/postCreationContext';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -78,8 +71,23 @@ const FileUpload: React.FC<IFileUpload> = ({
 }) => {
   const { t } = useTranslation('page-Creation');
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
-  const dispatch = useAppDispatch();
-  const { post, videoProcessing } = useAppSelector((state) => state.creation);
+
+  const {
+    postInCreation,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
+  } = usePostCreationState();
+  const { post, videoProcessing } = useMemo(
+    () => postInCreation,
+    [postInCreation]
+  );
+
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -238,30 +246,93 @@ const FileUpload: React.FC<IFileUpload> = ({
 
       setLocalFile(null);
       onChange(id, null);
-      dispatch(setCreationVideo(''));
-      dispatch(setCreationVideoProcessing({}));
-      dispatch(setCreationFileUploadError(false));
-      dispatch(setCreationFileUploadLoading(false));
-      dispatch(setCreationFileUploadProgress(0));
-      dispatch(setCreationFileProcessingError(false));
-      dispatch(setCreationFileProcessingLoading(false));
-      dispatch(setCreationFileProcessingProgress(0));
+      setCreationVideo('');
+      setCreationVideoProcessing({} as any);
+      setCreationFileUploadError(false);
+      setCreationFileUploadLoading(false);
+      setCreationFileUploadProgress(0);
+      setCreationFileProcessingError(false);
+      setCreationFileProcessingLoading(false);
+      setCreationFileProcessingProgress(0);
     } catch (err) {
       console.error(err);
       showErrorToastPredefined(undefined);
     }
   }, [
-    dispatch,
     id,
     onChange,
     post?.announcementVideoUrl,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
     showErrorToastPredefined,
     videoProcessing?.taskUuid,
   ]);
 
+  // Drag & Drop support
+  const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
+
+  const handleOnDragOver = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setDropZoneHighlighted(true);
+    },
+    []
+  );
+
+  const handleOnDragLeave = useCallback(() => {
+    setDropZoneHighlighted(false);
+  }, []);
+
+  const handleOnDrop = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+
+      const { files } = e.dataTransfer;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
+
+      Mixpanel.track('Video Selected with drag and drop', {
+        _stage: 'Creation',
+        _file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+      });
+
+      if (file.size > MAX_VIDEO_SIZE) {
+        showErrorToastCustom(t('secondStep.video.error.maxSize'));
+      } else {
+        Mixpanel.track('Video Loading', { _stage: 'Creation' });
+
+        setLocalFile(file);
+        onChange(id, file);
+      }
+
+      setDropZoneHighlighted(false);
+    },
+    [id, onChange, showErrorToastCustom, t]
+  );
+
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox htmlFor='file'>
+      <SDropBox
+        htmlFor='file'
+        isHighlighted={dropZoneHighlighted}
+        onDragOver={(e) => handleOnDragOver(e)}
+        onDragLeave={() => handleOnDragLeave()}
+        onDrop={(e) => handleOnDrop(e)}
+      >
         <input
           id='file'
           ref={inputRef}
@@ -276,9 +347,24 @@ const FileUpload: React.FC<IFileUpload> = ({
             }
           }}
         />
-        <SPlaceholder weight={600} variant={2}>
-          {t('secondStep.fileUpload.description')}
-        </SPlaceholder>
+        {!isMobile && !isTablet ? (
+          <SInlineSVGDropBox
+            svg={dropboxIcon}
+            fill='none'
+            width='48px'
+            height='48px'
+          />
+        ) : null}
+        <SDropBoxWrapper>
+          <SPseudoHeadline variant={3} weight={600}>
+            {isMobile || isTablet
+              ? t('secondStep.fileUpload.titleMobile')
+              : t('secondStep.fileUpload.titleDesktop')}
+          </SPseudoHeadline>
+          <SPlaceholder weight={600} variant={2}>
+            {t('secondStep.fileUpload.description')}
+          </SPlaceholder>
+        </SDropBoxWrapper>
         <SButton view='primaryGrad' onClick={handleUploadButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
@@ -381,11 +467,10 @@ const FileUpload: React.FC<IFileUpload> = ({
                 draggable={false}
               />
             )}
-            <BitmovinPlayer
+            <VideojsPlayer
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
-              thumbnails={thumbnails}
               borderRadius='8px'
               showPlayButton={showPlayButton}
               playButtonSize='small'
@@ -420,6 +505,9 @@ const FileUpload: React.FC<IFileUpload> = ({
 
     return content;
   }, [
+    dropZoneHighlighted,
+    isMobile,
+    isTablet,
     t,
     handleUploadButtonClick,
     loadingUpload,
@@ -428,21 +516,23 @@ const FileUpload: React.FC<IFileUpload> = ({
     loadingProcessing,
     progressProcessing,
     localFile,
+    handleOnDragOver,
+    handleOnDragLeave,
+    handleOnDrop,
     handleFileChange,
     etaUpload,
     progressUpload,
     handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    value,
-    thumbnails,
     customCoverImageUrl,
+    value,
+    showPlayButton,
     showEllipseMenu,
     handleOpenEllipseMenu,
     handleDeleteVideoShow,
     isDesktop,
     handleFullPreview,
-    showPlayButton,
   ]);
 
   return (
@@ -505,25 +595,39 @@ const SWrapper = styled.div`
   width: 100%;
 `;
 
-const SDropBox = styled.label`
+const SDropBox = styled.label<{
+  isHighlighted: boolean;
+}>`
   width: 100%;
   cursor: copy;
   display: flex;
   padding: 16px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  background: ${({ theme, isHighlighted }) =>
+    isHighlighted
+      ? 'rgba(29, 106, 255, 0.2)'
+      : theme.colorsThemed.background.tertiary};
   align-items: center;
   border-radius: 16px;
-  flex-direction: column;
-  justify-content: center;
+  border: 1.5px dashed ${({ theme }) => theme.colors.blue};
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
   }
 `;
 
+const SInlineSVGDropBox = styled(InlineSVG)``;
+
+const SDropBoxWrapper = styled.div`
+  flex-grow: 3;
+`;
+
+const SPseudoHeadline = styled(Text)``;
+
 const SPlaceholder = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-bottom: 12px;
 `;
 
 const SButton = styled(Button)`

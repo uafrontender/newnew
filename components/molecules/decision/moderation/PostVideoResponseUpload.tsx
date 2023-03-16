@@ -24,7 +24,7 @@ import { usePostModerationResponsesContext } from '../../../../contexts/postMode
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -291,11 +291,10 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             }}
           />
           <SPlayerWrapper>
-            <BitmovinPlayer
+            <VideojsPlayer
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
-              thumbnails={{}}
               borderRadius='8px'
               showPlayButton={showPlayButton}
             />

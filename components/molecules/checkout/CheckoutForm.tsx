@@ -98,7 +98,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       }
 
       if (!loggedIn && !email) {
-        setEmailError('Email is required');
+        setEmailError(t('errorCaptions.emailRequired'));
         return;
       }
 
@@ -216,11 +216,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
-            label={
-              userData?.options?.isWhiteListed
-                ? t('primaryCard')
-                : `${t('primaryCard')} **** ${primaryCard.last4}`
-            }
+            label={`${t('primaryCard')} **** ${primaryCard.last4}`}
           />
           {!userData?.options?.isWhiteListed && (
             <OptionCard

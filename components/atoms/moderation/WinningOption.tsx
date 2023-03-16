@@ -3,20 +3,15 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
-import Link, { LinkProps } from 'next/link';
 
 import Headline from '../Headline';
 import Text from '../Text';
-import InlineSvg from '../InlineSVG';
 import GenericSkeleton from '../../molecules/GenericSkeleton';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { TPostType } from '../../../utils/switchPostType';
 import { formatNumber } from '../../../utils/format';
-import getDisplayname from '../../../utils/getDisplayname';
-
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../DisplayName';
 
 interface IWinningOption {
   postType: TPostType;
@@ -32,10 +27,6 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const theme = useTheme();
-  const { resizeMode } = useAppState();
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
 
   if (postType === 'ac' && winningOptionAc) {
     return (
@@ -68,18 +59,11 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                   t={t}
                   // @ts-ignore
                   components={[
-                    <CreatorLink
+                    <DisplayName
+                      user={winningOptionAc.creator}
+                      suffix={t('postResponseTabModeration.winner.ac.suffix')}
                       href={`/${winningOptionAc.creator?.username}`}
                     />,
-                    winningOptionAc.creator?.options?.isVerified ? (
-                      <SInlineSvg
-                        svg={VerificationCheckmark}
-                        width={isMobile ? '18px' : '22px'}
-                        height={isMobile ? '18px' : '22px'}
-                        fill='none'
-                      />
-                    ) : null,
-                    { nickname: getDisplayname(winningOptionAc.creator!!) },
                   ]}
                 />
               </SSpan>
@@ -123,20 +107,11 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                   t={t}
                   // @ts-ignore
                   components={[
-                    <CreatorLink
+                    <DisplayName
+                      user={winningOptionMc.creator}
+                      suffix={t('postResponseTabModeration.winner.ac.suffix')}
                       href={`/${winningOptionMc.creator?.username}`}
                     />,
-                    winningOptionMc.creator?.options?.isVerified ? (
-                      <SInlineSvg
-                        svg={VerificationCheckmark}
-                        width='22px'
-                        height='22px'
-                        fill='none'
-                      />
-                    ) : null,
-                    {
-                      nickname: getDisplayname(winningOptionMc.creator!!),
-                    },
                   ]}
                 />
               </SSpan>
@@ -165,27 +140,6 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
 };
 
 export default WinningOption;
-
-const SCreatorLink = styled(Link)``;
-
-type TCreatorLink<T> = React.AnchorHTMLAttributes<HTMLAnchorElement> &
-  React.PropsWithChildren<T>;
-
-const CreatorLink = ({
-  href,
-  children,
-  ...restProps
-}: TCreatorLink<LinkProps>) => (
-  <SCreatorLink href={href || ''}>
-    <a {...restProps} className='creatorLinkAnchor'>
-      {children}
-    </a>
-  </SCreatorLink>
-);
-
-const SInlineSvg = styled(InlineSvg)`
-  flex-shrink: 0;
-`;
 
 const SText = styled(Text)`
   margin-top: 24px;

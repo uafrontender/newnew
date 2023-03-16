@@ -26,7 +26,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet', 'laptop'].includes(resizeMode);
+  const isTabletOrSmallDesktop = ['tablet', 'laptop'].includes(resizeMode);
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
 
   const hasMounted = useHasMounted();
@@ -46,7 +46,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
           <Row>
             <Col>
               {isMobile && <Mobile />}
-              {isTablet && <Tablet />}
+              {isTabletOrSmallDesktop && <Tablet />}
               {isDesktop && <Desktop />}
             </Col>
           </Row>
@@ -69,7 +69,7 @@ const SWrapper = styled.header<ISWrapper>`
     props.visible ? `${props.withBanner ? 0 : '-40px'}` : '-96px'};
   left: 0;
   width: 100vw;
-  z-index: 10;
+  z-index: 11;
   position: fixed;
   transition: top ease 0.5s;
   background-color: ${(props) =>

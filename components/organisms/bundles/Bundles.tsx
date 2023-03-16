@@ -27,6 +27,7 @@ import AnimatedBackground from '../../atoms/AnimationBackground';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import BundleCreatorsList from '../../molecules/bundles/BundleCreatorsList';
 import { useAppState } from '../../../contexts/appStateContext';
+import MobileBundleCreatorsList from '../../molecules/bundles/MobileBundleCreatorsList';
 
 export const Bundles: React.FC = React.memo(() => {
   const router = useRouter();
@@ -206,26 +207,49 @@ export const Bundles: React.FC = React.memo(() => {
             : t('search.topCreators')}
           {searchValue !== '' ? <SQuerySpan>{searchValue}</SQuerySpan> : null}
         </SSearchResultsTitle>
-        <SBundleCreatorsList
-          creators={sortedCreators}
-          loading={paginatedCreators.loading}
-          hasMore={paginatedCreators.hasMore}
-          initialLoadDone={paginatedCreators.initialLoadDone}
-          loadMore={() => {
-            paginatedCreators.loadMore().catch((e) => console.error(e));
-          }}
-          onBundleClicked={(creator) => {
-            const creatorsBundle = bundles?.find(
-              (bundle) => bundle.creator?.uuid === creator.uuid
-            );
+        {isMobile ? (
+          <MobileBundleCreatorsList
+            creators={sortedCreators}
+            loading={paginatedCreators.loading}
+            hasMore={paginatedCreators.hasMore}
+            initialLoadDone={paginatedCreators.initialLoadDone}
+            loadMore={() => {
+              paginatedCreators.loadMore().catch((e) => console.error(e));
+            }}
+            onBundleClicked={(creator) => {
+              const creatorsBundle = bundles?.find(
+                (bundle) => bundle.creator?.uuid === creator.uuid
+              );
 
-            if (creatorsBundle) {
-              setShownCreatorBundle(creatorsBundle);
-            } else {
-              setOfferedCreator(creator);
-            }
-          }}
-        />
+              if (creatorsBundle) {
+                setShownCreatorBundle(creatorsBundle);
+              } else {
+                setOfferedCreator(creator);
+              }
+            }}
+          />
+        ) : (
+          <SBundleCreatorsList
+            creators={sortedCreators}
+            loading={paginatedCreators.loading}
+            hasMore={paginatedCreators.hasMore}
+            initialLoadDone={paginatedCreators.initialLoadDone}
+            loadMore={() => {
+              paginatedCreators.loadMore().catch((e) => console.error(e));
+            }}
+            onBundleClicked={(creator) => {
+              const creatorsBundle = bundles?.find(
+                (bundle) => bundle.creator?.uuid === creator.uuid
+              );
+
+              if (creatorsBundle) {
+                setShownCreatorBundle(creatorsBundle);
+              } else {
+                setOfferedCreator(creator);
+              }
+            }}
+          />
+        )}
       </Container>
       {bundles && (
         <AllBundlesModal
@@ -459,6 +483,6 @@ const SQuerySpan = styled.span`
 `;
 
 const SBundleCreatorsList = styled(BundleCreatorsList)`
-  height: 600px;
   width: 100%;
+  height: 600px;
 `;

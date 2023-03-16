@@ -75,7 +75,6 @@ export const Desktop: React.FC = React.memo(() => {
           </SItemWithMargin>
         )}
         <SItemWithMargin>
-          {/* <SearchInput /> */}
           <StaticSearchInput
             width={
               user.userData?.options?.isCreator &&

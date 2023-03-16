@@ -31,5 +31,8 @@
     "requestFailed": "Request failed",
     "invalidFee": "Something went wrong. Please reload the page and try again"
   },
+  "errorCaptions": {
+    "emailRequired": "Email is required"
+  },
   "processingFee": "Processing fee"
 }

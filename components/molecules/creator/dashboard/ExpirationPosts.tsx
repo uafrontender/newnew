@@ -16,6 +16,7 @@ import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useAppState } from '../../../../contexts/appStateContext';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 const ResponseTimer = dynamic(
   () => import('../../../atoms/dashboard/ResponseTimer')
@@ -120,7 +121,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                   )}
                   <SListItemTitleWrapper>
                     <SListItemTitle variant={3} weight={600}>
-                      {data.title}
+                      <PostTitleContent>{data.title}</PostTitleContent>
                     </SListItemTitle>
                     <SListItemDate variant={2} weight={600}>
                       <ResponseTimer

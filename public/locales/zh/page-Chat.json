@@ -40,7 +40,7 @@
   "modal": {
     "blockUser": {
       "title": "阻止",
-      "messageFirstPart": "你確定要阻止",
+      "messageFirstPart": "你確定要阻止 ",
       "messageSecondPart": "給你發訊息？",
       "button": {
         "cancel": "取消",

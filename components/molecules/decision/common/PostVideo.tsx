@@ -12,7 +12,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
 
-const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
+const PostVideojsPlayer = dynamic(() => import('./PostVideojsPlayer'), {
   ssr: false,
 });
 
@@ -137,7 +137,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
     <SVideoWrapper>
       {openedTab === 'response' && response ? (
         <>
-          <PostBitmovinPlayer
+          <PostVideojsPlayer
             key={`${postUuid}--${isMuted ? 'muted' : 'sound'}`}
             id={`video-${postUuid}`}
             resources={response}
@@ -154,7 +154,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         </>
       ) : (
         <>
-          <PostBitmovinPlayer
+          <PostVideojsPlayer
             id={postUuid}
             resources={announcement}
             muted={isMuted}

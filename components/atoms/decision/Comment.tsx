@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
 import React, {
   useCallback,
   useEffect,
@@ -7,7 +6,7 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import styled, { keyframes, useTheme } from 'styled-components';
+import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -15,16 +14,18 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Button from '../Button';
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { useAppSelector } from '../../../redux-store/store';
-import InlineSVG, { InlineSvg } from '../InlineSVG';
+import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
+
+import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import { useAppState } from '../../../contexts/appStateContext';
+
+import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import DisplayName from '../../DisplayName';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -105,9 +106,32 @@ const Comment: React.FC<IComment> = ({
     setConfirmDeleteComment(true);
   };
 
+  const commentFormRef = useRef<HTMLFormElement | null>(null);
+
   const replyHandler = () => {
-    setIsReplyFormOpen(!isReplyFormOpen);
+    setIsReplyFormOpen((prevState) => !prevState);
   };
+
+  const isReplyFormOpenRef = useRef(isReplyFormOpen);
+
+  useEffect(() => {
+    if (
+      isReplyFormOpen &&
+      !isReplyFormOpenRef.current &&
+      commentFormRef.current
+    ) {
+      commentFormRef.current.scrollIntoView({
+        block: 'center',
+        inline: 'end',
+        behavior: 'smooth',
+      });
+      isReplyFormOpenRef.current = true;
+    }
+
+    if (!isReplyFormOpen) {
+      isReplyFormOpenRef.current = false;
+    }
+  }, [isReplyFormOpen]);
 
   useEffect(() => {
     if (comment.isOpen) {
@@ -121,12 +145,18 @@ const Comment: React.FC<IComment> = ({
 
   return (
     <>
-      <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
+      <SComment
+        key={comment.id.toString()}
+        id={`comment_id_${comment.id}`}
+        isMoreMenuOpened={ellipseMenuOpen}
+      >
         {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
           comment.sender?.options?.isVerified ||
           comment.sender?.uuid === user.userData?.userUuid ? (
             <Link href={`/${comment.sender?.username}`}>
-              <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+              <a>
+                <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+              </a>
             </Link>
           ) : (
             <SUserAvatar noHover avatarUrl={comment.sender?.avatarUrl ?? ''} />
@@ -140,32 +170,29 @@ const Comment: React.FC<IComment> = ({
               <>
                 {comment.sender?.options?.isVerified ||
                 comment.sender?.uuid === user.userData?.userUuid ? (
-                  <Link href={`/${comment.sender?.username}`}>
-                    <SNickname>
-                      {comment.sender?.uuid === user.userData?.userUuid
+                  <SDisplayName
+                    user={comment.sender}
+                    altName={
+                      comment.sender?.uuid === user.userData?.userUuid
                         ? t('comments.me')
-                        : getDisplayname(comment.sender)}
-                    </SNickname>
-                  </Link>
+                        : undefined
+                    }
+                    href={`/${comment.sender?.username}`}
+                  />
                 ) : (
-                  <SNickname noHover>
-                    {comment.sender?.uuid === user.userData?.userUuid
-                      ? t('comments.me')
-                      : getDisplayname(comment.sender)}
-                  </SNickname>
+                  <SDisplayName
+                    user={comment.sender}
+                    altName={
+                      comment.sender?.uuid === user.userData?.userUuid
+                        ? t('comments.me')
+                        : undefined
+                    }
+                    noHover
+                  />
                 )}
-                {comment.sender?.options?.isVerified &&
-                  !comment.sender?.options?.isTombstone && (
-                    <SInlineSvg
-                      svg={VerificationCheckmark}
-                      width='20px'
-                      height='20px'
-                      fill='none'
-                    />
-                  )}
               </>
             ) : (
-              <SNickname noHover>{t('comments.commentDeleted')}</SNickname>
+              <SCommentDeleted>{t('comments.commentDeleted')}</SCommentDeleted>
             )}
             <SBid> </SBid>
             {!comment.isDeleted && (
@@ -228,6 +255,7 @@ const Comment: React.FC<IComment> = ({
                   onSubmit={(newMsg: string) => handleAddComment(newMsg)}
                   onBlur={onFormBlur ?? undefined}
                   onFocus={onFormFocus ?? undefined}
+                  ref={commentFormRef}
                 />
               </>
             ))}
@@ -326,11 +354,39 @@ const OpenedFlash = keyframes`
   }
 `;
 
-const SComment = styled.div`
+const SMoreButton = styled(Button)`
+  padding: 2px;
+
+  background: none;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    opacity: 0;
+
+    padding: 8px;
+  }
+
+  @media (hover: none) {
+    &:active:enabled {
+      background: none;
+    }
+  }
+`;
+
+const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
   position: relative;
   display: flex;
 
   width: 100%;
+
+  padding-top: 12px;
 
   // For scrollIntoView when comment_id is provided in URL
   scroll-margin-top: -320px;
@@ -351,6 +407,23 @@ const SComment = styled.div`
       box-shadow: 4px 4px 100px 75px rgba(34, 60, 80, 0.2);
       animation: ${OpenedFlash} 1.5s forwards linear;
     }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    &:hover {
+      ${SMoreButton} {
+        opacity: 1;
+      }
+    }
+
+    ${({ isMoreMenuOpened }) =>
+      isMoreMenuOpened
+        ? css`
+            ${SMoreButton} {
+              opacity: 1;
+            }
+          `
+        : null}
   }
 `;
 
@@ -374,19 +447,7 @@ const SActionsDiv = styled.div`
   margin-left: auto;
 `;
 
-const SMoreButton = styled(Button)`
-  background: none;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  padding: 8px;
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
-const SNickname = styled.span<{
+const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
@@ -402,8 +463,8 @@ const SNickname = styled.span<{
   }
 `;
 
-const SInlineSvg = styled(InlineSvg)`
-  margin-left: 2px;
+const SCommentDeleted = styled.span`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
 `;
 
 const SBid = styled.span`
@@ -441,7 +502,6 @@ const SReply = styled.div`
 `;
 
 const SSeparator = styled.div`
-  margin: 0 0 12px;
   height: 1px;
   overflow: hidden;
   background: ${(props) =>

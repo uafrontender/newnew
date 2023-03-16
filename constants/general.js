@@ -16,6 +16,7 @@ module.exports = {
   CREATION_TITLE_MAX: 80,
   CREATION_OPTION_MIN: 1,
   CREATION_OPTION_MAX: 80,
+  CUSTOM_OPTION_MAX: 300,
   HOURS: [
     {
       name: '01',
