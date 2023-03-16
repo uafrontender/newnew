@@ -543,7 +543,8 @@ const SSignInBackButton = styled(GoBackButton)`
 
     width: fit-content;
 
-    margin-top: 142px;
+    margin-top: 62px;
+    margin-bottom: 80px;
     padding: 0;
 
     span {

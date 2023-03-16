@@ -332,6 +332,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       <SActionSection>
         <SuggestionTextArea
           id='text-input'
+          className='suggestion-text-area'
           value={newBidText}
           placeholder={t(
             'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
@@ -341,6 +342,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         />
         <BidAmountTextInput
           id='bid-input'
+          className='bid-amount-text-input'
           value={newBidAmount}
           inputAlign='center'
           onChange={(newValue: string) => setNewBidAmount(newValue)}
@@ -446,6 +448,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         >
           <SSuggestNewContainer>
             <SuggestionTextArea
+              className='suggestion-text-area'
               value={newBidText}
               autofocus={suggestNewMobileOpen}
               placeholder={t(
@@ -589,11 +592,13 @@ const SActionSection = styled.div`
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
 
-    textarea {
+    // TODO: Quit using child selectors, bad practice, makes code fragile
+
+    .suggestion-text-area {
       width: calc(80% - 8px) !important;
     }
 
-    div {
+    .bid-amount-text-input {
       width: 20%;
 
       input {
@@ -653,7 +658,7 @@ const SSuggestNewContainer = styled.div`
 
   padding: 16px;
 
-  textarea {
+  .suggestion-text-area {
     width: 100%;
   }
 `;
