@@ -1,7 +1,7 @@
 import React, {
   ReactElement,
   useCallback,
-  // useContext,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -43,8 +43,7 @@ import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../DisplayName';
 import { getMySpending } from '../../api/endpoints/payments';
-import { formatNumber } from '../../utils/format';
-// import { SocketContext } from '../../contexts/socketContext';
+import { SocketContext } from '../../contexts/socketContext';
 
 type TPageType =
   | 'activelyBidding'
@@ -76,7 +75,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
-  // const socketConnection = useContext(SocketContext);
+  const socketConnection = useContext(SocketContext);
   const router = useRouter();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
@@ -342,11 +341,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [user.userData?.options?.isWhiteListed]);
 
-  /* useEffect(() => {
+  // Test WS events, had a bug with the event data coming from finalized transactions only
+  useEffect(() => {
     const handleMySpendingChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.MySpendingChanged.decode(arr);
-
       if (!decoded?.totalSpending?.usdCents) {
         return;
       }
@@ -363,7 +362,21 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         socketConnection?.off('MySpendingChanged', handleMySpendingChanged);
       }
     };
-  }, [socketConnection, user.loggedIn]); */
+  }, [socketConnection, user.loggedIn]);
+
+  const mySpendingFormatted = useMemo(() => {
+    if (mySpendingInCents === undefined) {
+      return undefined;
+    }
+
+    const mySpendingInDollars = Math.floor(mySpendingInCents / 100);
+
+    if (mySpendingInDollars < 10000) {
+      return Math.floor(mySpendingInDollars / 1000);
+    }
+
+    return Math.floor(mySpendingInDollars / 10000) * 10;
+  }, [mySpendingInCents]);
 
   return (
     <SGeneral restrictMaxWidth>
@@ -438,9 +451,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           <ProfileImage src={user.userData?.avatarUrl} />
         )}
         <SUserData>
-          {mySpendingInCents && (
-            <SSpending>{formatNumber(mySpendingInCents / 100)}$</SSpending>
-          )}
           <SUsernameWrapper>
             <SUsername variant={4}>
               <DisplayName user={user.userData} />
@@ -512,6 +522,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           ) : null}
         </SUserData>
         <ProfileTabs pageType='myProfile' tabs={tabs} />
+        {mySpendingFormatted !== undefined && (
+          <SSpending>{mySpendingFormatted}</SSpending>
+        )}
         {/* Edit Profile modal menu */}
         <Modal
           show={isEditProfileMenuOpen}
@@ -699,8 +712,13 @@ const SMyProfileLayout = styled.div`
 
 const SSpending = styled.div`
   position: absolute;
-  top: 10px;
-  right: 10px;
-  // TODO: make hardly noticeable
-  color: red;
+  bottom: 12px;
+  right: 12px;
+  color: transparent;
+  cursor: default;
+
+  :hover {
+    // TODO: fix light theme color to the one from designs
+    color: ${({ theme }) => (theme.name === 'light' ? '#FAFAFA' : '#323444')};
+  }
 `;
