@@ -509,7 +509,6 @@ const SResultsDropMobile = styled.div`
   height: fill-available;
   top: 56px;
   left: 0;
-  padding: 16px;
   overflow: auto;
 
   @supports (-webkit-touch-callout: none) {
