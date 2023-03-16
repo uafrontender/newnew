@@ -52,7 +52,7 @@ import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBundleAfterStripeRedirect';
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../../contexts/appStateContext';
-import { CUSTOM_OPTION_MAX } from '../../../../../constants/general';
+import { OPTION_LENGTH_MAX } from '../../../../../constants/general';
 
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
@@ -253,7 +253,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             res.data.status === newnewapi.ValidateTextResponse.Status.TOO_LONG
           ) {
             setNewOptionErrorText(
-              tCommon('error.text.max', { value: CUSTOM_OPTION_MAX })
+              tCommon('error.text.max', { value: OPTION_LENGTH_MAX })
             );
           } else if (
             res.data.status ===
