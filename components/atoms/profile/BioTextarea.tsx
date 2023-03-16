@@ -130,6 +130,7 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
 
   textarea {
     display: block;
+    white-space: break-spaces;
 
     width: 100%;
 

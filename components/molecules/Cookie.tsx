@@ -136,4 +136,9 @@ const STextLink = styled.div`
 const SInlineSVG = styled(InlineSVG)`
   top: -1px;
   position: relative;
+  margin-left: 4px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 8px;
+  }
 `;

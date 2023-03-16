@@ -18,10 +18,10 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
   winningOption,
 }) => {
   const { t } = useTranslation('page-Post');
-  const userData = useAppSelector((state) => state.user?.userData);
+  const user = useAppSelector((state) => state.user);
 
   const userToRender = useMemo(() => {
-    if (!userData?.userUuid) {
+    if (user.loggedIn && !user.userData?.userUuid) {
       return null;
     }
 
@@ -31,6 +31,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
     }
 
     // If whitelisted user supported the option, show them
+    // TODO: if user is deleted, only 'voted' is shown
     if (winningOption.whitelistSupporter) {
       return winningOption.whitelistSupporter;
     }
@@ -40,7 +41,8 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
   }, [
     winningOption.whitelistSupporter,
     winningOption.creator,
-    userData?.userUuid,
+    user.loggedIn,
+    user.userData?.userUuid,
     winningOption.isSupportedByMe,
   ]);
 
@@ -61,11 +63,11 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
 
   const avatarSrc: string = useMemo(() => {
     if (userToRender === 'me') {
-      return userData?.avatarUrl ?? '';
+      return user.userData?.avatarUrl ?? '';
     }
 
     return userToRender?.avatarUrl ?? '';
-  }, [userToRender, userData]);
+  }, [userToRender, user.userData?.avatarUrl]);
 
   return (
     <SWinningBidCreator>
@@ -79,7 +81,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
         )}
         <SWinningBidCreatorText>
           <SDisplayName
-            user={userToRender === 'me' ? userData : userToRender}
+            user={userToRender === 'me' ? user.userData : userToRender}
             href={href}
             altName={
               // eslint-disable-next-line no-nested-ternary

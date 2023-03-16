@@ -41,7 +41,7 @@
       "description": "Browse through all of your saved favorite posts and creator"
     },
     "noContent": {
-      "description": "Any creators you favorite\nwill be shown here"
+      "description": "Posts that you 'favorite'\nwill be shown here"
     }
   },
   "Profile": {

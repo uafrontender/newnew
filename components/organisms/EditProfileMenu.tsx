@@ -1001,13 +1001,23 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <Button
                 withShadow
                 disabled={
-                  !wasModified || !isDataValid || isLoading || !coverUrlInEdit
+                  (!wasModified && dataInEdit.bio === user.userData?.bio) ||
+                  !isDataValid ||
+                  isLoading ||
+                  !coverUrlInEdit
                 }
                 style={{
                   width: isMobile ? '100%' : 'initial',
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
-                onClick={() => handleUpdateUserData()}
+                onClick={() => {
+                  // If trimmable spaces were added, allow to click the button and close modal
+                  if (!wasModified && dataInEdit.bio !== user.userData?.bio) {
+                    handleClose();
+                  } else {
+                    handleUpdateUserData();
+                  }
+                }}
                 onClickCapture={() => {
                   Mixpanel.track('Click Save Profile Changes Button', {
                     _stage: 'MyProfile',
