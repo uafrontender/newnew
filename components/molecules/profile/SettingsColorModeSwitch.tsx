@@ -99,7 +99,8 @@ const SettingsColorModeSwitch: React.FunctionComponent<
     };
 
     setIndicatorStyle(updatedIndicatorStyle);
-  }, [activeIcon, variant, setIndicatorStyle]);
+    // Need a dependency to buttonsCaptions, as it affects width of the element
+  }, [activeIcon, variant, buttonsCaptions, setIndicatorStyle]);
 
   return (
     <SSettingsColorModeSwitchWrapper
