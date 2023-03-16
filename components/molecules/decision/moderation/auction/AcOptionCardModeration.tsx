@@ -140,22 +140,10 @@ const AcOptionCardModeration: React.FunctionComponent<
               {option.title}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              {!option.whitelistSupporter ? (
-                <OptionCardUsernameSpan
-                  type='otherUser'
-                  user={option.creator!!}
-                  isBlue={!!isWinner}
-                />
-              ) : (
-                <OptionCardUsernameSpan
-                  type='otherUser'
-                  user={{
-                    ...option.whitelistSupporter,
-                    options: { ...option.whitelistSupporter, isVerified: true },
-                  }}
-                  isBlue={!!isWinner}
-                />
-              )}
+              <OptionCardUsernameSpan
+                user={option.whitelistSupporter ?? option.creator!!}
+                isBlue={!!isWinner}
+              />
               {option.supporterCount > 1 ? (
                 <>
                   <SSpanBiddersRegular className='spanRegular'>
@@ -292,22 +280,10 @@ const AcOptionCardModeration: React.FunctionComponent<
           </SBidAmount>
           <SOptionInfo variant={3}>{option.title}</SOptionInfo>
           <SBiddersInfo variant={3}>
-            {!option.whitelistSupporter ? (
-              <OptionCardUsernameSpan
-                type='otherUser'
-                user={option.creator!!}
-                isBlue={!!isWinner}
-              />
-            ) : (
-              <OptionCardUsernameSpan
-                type='otherUser'
-                user={{
-                  ...option.whitelistSupporter,
-                  options: { ...option.whitelistSupporter, isVerified: true },
-                }}
-                isBlue={!!isWinner}
-              />
-            )}
+            <OptionCardUsernameSpan
+              user={option.whitelistSupporter ?? option.creator}
+              isBlue={!!isWinner}
+            />
             {option.supporterCount > 1 ? (
               <>
                 <SSpanBiddersRegular className='spanRegular'>
@@ -482,6 +458,8 @@ const SOptionInfo = styled(Text)<{
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  word-break: break-word;
 
   ${({ isWhite }) =>
     isWhite

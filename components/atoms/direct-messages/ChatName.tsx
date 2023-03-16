@@ -1,16 +1,10 @@
 import { newnewapi } from 'newnew-api';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 
-import {
-  SChatItemInfo,
-  SChatItemLine,
-  SChatItemText,
-  SVerificationSVG,
-} from './styles';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { SChatItemInfo, SChatItemLine, SChatItemText } from './styles';
 import { useAppSelector } from '../../../redux-store/store';
-import getDisplayname from '../../../utils/getDisplayname';
+import DisplayName from '../../DisplayName';
 
 interface IChatName {
   chat: newnewapi.IChatRoom;
@@ -19,11 +13,14 @@ const ChatName: React.FC<IChatName> = ({ chat }) => {
   const { t } = useTranslation('page-Chat');
   const user = useAppSelector((state) => state.user);
 
-  const visaviName =
-    chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
-    chat.myRole === newnewapi.ChatRoom.MyRole.CREATOR
-      ? getDisplayname(user.userData)
-      : getDisplayname(chat.visavis?.user);
+  const chatUser = useMemo(
+    () =>
+      chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
+      chat.myRole === newnewapi.ChatRoom.MyRole.CREATOR
+        ? user.userData
+        : chat.visavis?.user,
+    [chat, user.userData]
+  );
 
   const beforeName =
     chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
@@ -49,19 +46,8 @@ const ChatName: React.FC<IChatName> = ({ chat }) => {
       )}
       <SChatItemLine>
         <SChatItemText variant={3} weight={600}>
-          {`${visaviName}${suffix}`}
+          <DisplayName user={chatUser} suffix={suffix} />
         </SChatItemText>
-        {(chat.visavis?.user?.options?.isVerified ||
-          (chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
-            chat.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
-            user.userData?.options?.isVerified)) && (
-          <SVerificationSVG
-            svg={VerificationCheckmark}
-            width='20px'
-            height='20px'
-            fill='none'
-          />
-        )}
       </SChatItemLine>
       {afterName && (
         <SChatItemLine>

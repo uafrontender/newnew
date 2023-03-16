@@ -13,7 +13,7 @@ import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.s
 
 import { useAppState } from '../../../contexts/appStateContext';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -56,7 +56,7 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
         )}
         <SModalVideoWrapper>
           {open && (
-            <BitmovinPlayer
+            <VideojsPlayer
               withMuteControl
               id='full-preview'
               resources={value}

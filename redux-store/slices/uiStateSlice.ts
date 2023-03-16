@@ -62,6 +62,9 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     toggleMutedMode(state) {
       state.mutedMode = !state.mutedMode;
     },
+    setMutedMode(state, { payload }) {
+      state.mutedMode = payload;
+    },
   },
 });
 
@@ -69,6 +72,7 @@ export const {
   setBanner,
   _setColorMode,
   toggleMutedMode,
+  setMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
 

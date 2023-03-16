@@ -11,7 +11,6 @@ import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 
-import { TVideoProcessingData } from '../redux-store/slices/creationStateSlice';
 import { SocketContext } from './socketContext';
 import {
   getVideoUploadUrl,
@@ -29,6 +28,7 @@ import { usePostInnerState } from './postInnerContext';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../utils/hooks/useErrorToasts';
+import { TVideoProcessingData } from './postCreationContext';
 
 interface IPostModerationResponsesContext {
   // Tabs

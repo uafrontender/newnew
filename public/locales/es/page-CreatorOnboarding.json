@@ -94,7 +94,7 @@
       "profilePicture": {
         "label": "Foto de perfil",
         "captionMobile": "*resolución recomendada 200x200 px",
-        "captionDesktop": "resolución recomendada 200x200 px",
+        "captionDesktop": "Resolución recomendada 200x200 px",
         "button": {
           "upload": "Subir foto",
           "uploadNew": "Subir nueva imagen"

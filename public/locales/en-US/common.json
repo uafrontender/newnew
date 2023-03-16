@@ -145,7 +145,8 @@
         "months": "months"
       },
       "payment": {
-        "header": "{{creator}}'s Superpoll Bundle"
+        "header": "<0/> Superpoll Bundle",
+        "suffix": "'s"
       },
       "error": {
         "requestFailed": "Request failed"
@@ -153,7 +154,7 @@
     },
     "buyBundleSuccess": {
       "votes": "<0>{{amount}}</0> votes unlocked",
-      "for": "for <0>{{creator}}</0>",
+      "for": "for <0/>",
       "access": "plus {{amount}} {{unit}} of:",
       "customOptions": "adding custom Superpoll options",
       "chat": "1-on-1 private chat",
@@ -193,6 +194,7 @@
   },
   "search": {
     "placeholder": "Search",
+    "placeholderLong": "Search creators and hashtags",
     "topPosts": "Top Posts",
     "popularCreators": "Popular Creators",
     "creatorSubtitle": "See posts",

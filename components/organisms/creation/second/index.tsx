@@ -26,7 +26,7 @@ import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { minLength, maxLength } from '../../../../utils/validation';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import {
   getVideoUploadUrl,
@@ -34,26 +34,6 @@ import {
   stopVideoProcessing,
   startVideoProcessing,
 } from '../../../../api/endpoints/upload';
-import {
-  setCreationVideo,
-  setCreationTitle,
-  setCreationMinBid,
-  setCreationChoices,
-  setCreationComments,
-  setCreationStartDate,
-  setCreationExpireDate,
-  setCreationFileUploadETA,
-  setCreationFileUploadError,
-  setCreationVideoThumbnails,
-  setCreationVideoProcessing,
-  setCreationTargetBackerCount,
-  setCreationFileUploadLoading,
-  setCreationFileUploadProgress,
-  setCreationFileProcessingETA,
-  setCreationFileProcessingProgress,
-  setCreationFileProcessingError,
-  setCreationFileProcessingLoading,
-} from '../../../../redux-store/slices/creationStateSlice';
 
 import {
   CREATION_TITLE_MIN,
@@ -76,8 +56,9 @@ import useErrorToasts, {
 import getDisplayname from '../../../../utils/getDisplayname';
 import RichTextInput from '../../../atoms/creation/RichTextInput';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../../contexts/postCreationContext';
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 const HeroPopup = dynamic(
@@ -108,9 +89,30 @@ export const CreationSecondStepContent: React.FC<
   const { showErrorToastPredefined } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const playerRef: any = useRef(null);
   const xhrRef = useRef<XMLHttpRequest>();
+  const {
+    postInCreation,
+    setCreationVideo,
+    setCreationTitle,
+    setCreationMinBid,
+    setCreationChoices,
+    setCreationComments,
+    setCreationStartDate,
+    setCreationExpireDate,
+    setCreationFileUploadETA,
+    setCreationFileUploadError,
+    setCreationVideoThumbnails,
+    setCreationVideoProcessing,
+    setCreationTargetBackerCount,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationFileProcessingETA,
+    setCreationFileProcessingProgress,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+  } = usePostCreationState();
+
   const {
     post,
     auction,
@@ -120,7 +122,8 @@ export const CreationSecondStepContent: React.FC<
     multiplechoice,
     videoProcessing,
     customCoverImageUrl,
-  } = useAppSelector((state) => state.creation);
+  } = useMemo(() => postInCreation, [postInCreation]);
+
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
   const { overlayModeEnabled } = useOverlayMode();
@@ -431,20 +434,27 @@ export const CreationSecondStepContent: React.FC<
         throw new Error(resProcessing.error?.message ?? 'An error occurred');
       }
 
-      dispatch(setCreationVideo(''));
-      dispatch(setCreationVideoProcessing({}));
-      dispatch(setCreationFileUploadError(false));
-      dispatch(setCreationFileUploadLoading(false));
-      dispatch(setCreationFileUploadProgress(0));
-      dispatch(setCreationFileProcessingError(false));
-      dispatch(setCreationFileProcessingLoading(false));
-      dispatch(setCreationFileProcessingProgress(0));
+      setCreationVideo('');
+      setCreationVideoProcessing({} as any);
+      setCreationFileUploadError(false);
+      setCreationFileUploadLoading(false);
+      setCreationFileUploadProgress(0);
+      setCreationFileProcessingError(false);
+      setCreationFileProcessingLoading(false);
+      setCreationFileProcessingProgress(0);
     } catch (error: any) {
       showErrorToastPredefined(undefined);
     }
   }, [
-    dispatch,
     post?.announcementVideoUrl,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
     showErrorToastPredefined,
     videoProcessing?.taskUuid,
   ]);
@@ -456,10 +466,10 @@ export const CreationSecondStepContent: React.FC<
         _filename: value.name,
       });
       try {
-        dispatch(setCreationFileUploadETA(100));
-        dispatch(setCreationFileUploadProgress(1));
-        dispatch(setCreationFileUploadLoading(true));
-        dispatch(setCreationFileUploadError(false));
+        setCreationFileUploadETA(100);
+        setCreationFileUploadProgress(1);
+        setCreationFileUploadLoading(true);
+        setCreationFileUploadError(false);
 
         const payload = new newnewapi.GetVideoUploadUrlRequest({
           filename: value.name,
@@ -486,24 +496,24 @@ export const CreationSecondStepContent: React.FC<
               );
               const factor = secondsPassed / uploadProgress;
               const eta = Math.round(factor * percentageLeft);
-              dispatch(setCreationFileUploadProgress(uploadProgress));
-              dispatch(setCreationFileUploadETA(eta));
+              setCreationFileUploadProgress(uploadProgress);
+              setCreationFileUploadETA(eta);
             }
           });
           xhr.addEventListener('loadstart', (event) => {
             uploadStartTimestamp = event.timeStamp;
           });
           xhr.addEventListener('loadend', () => {
-            dispatch(setCreationFileUploadProgress(100));
+            setCreationFileUploadProgress(100);
             resolve(xhr.readyState === 4 && xhr.status === 200);
           });
           xhr.addEventListener('error', () => {
-            dispatch(setCreationFileUploadProgress(0));
+            setCreationFileUploadProgress(0);
             reject(new Error('Upload failed'));
           });
           xhr.addEventListener('abort', () => {
             // console.log('Aborted');
-            dispatch(setCreationFileUploadProgress(0));
+            setCreationFileUploadProgress(0);
             reject(new Error('Upload aborted'));
           });
           xhr.open('PUT', res.data!.uploadUrl, true);
@@ -525,35 +535,32 @@ export const CreationSecondStepContent: React.FC<
           throw new Error(resProcessing.error?.message ?? 'An error occurred');
         }
 
-        dispatch(
-          setCreationVideoProcessing({
-            taskUuid: resProcessing.data.taskUuid,
-            targetUrls: {
-              thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-              hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-              dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-              originalVideoUrl:
-                resProcessing?.data?.targetUrls?.originalVideoUrl,
-              thumbnailImageUrl:
-                resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-            },
-          })
-        );
+        setCreationVideoProcessing({
+          taskUuid: resProcessing.data.taskUuid,
+          targetUrls: {
+            thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+            hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+            dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
+            originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
+            thumbnailImageUrl:
+              resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+          },
+        });
 
-        dispatch(setCreationFileUploadLoading(false));
+        setCreationFileUploadLoading(false);
 
-        dispatch(setCreationFileProcessingProgress(10));
-        dispatch(setCreationFileProcessingETA(80));
-        dispatch(setCreationFileProcessingLoading(true));
-        dispatch(setCreationFileProcessingError(false));
-        dispatch(setCreationVideo(res.data.publicUrl ?? ''));
+        setCreationFileProcessingProgress(10);
+        setCreationFileProcessingETA(80);
+        setCreationFileProcessingLoading(true);
+        setCreationFileProcessingError(false);
+        setCreationVideo(res.data.publicUrl ?? '');
         xhrRef.current = undefined;
       } catch (error: any) {
         if (error.message === 'Upload failed') {
-          dispatch(setCreationFileUploadError(true));
+          setCreationFileUploadError(true);
           showErrorToastPredefined(undefined);
         } else if (error.message === 'Processing limit reached') {
-          dispatch(setCreationFileUploadError(true));
+          setCreationFileUploadError(true);
           showErrorToastPredefined(
             ErrorToastPredefinedMessage.ProcessingLimitReachedError
           );
@@ -561,10 +568,22 @@ export const CreationSecondStepContent: React.FC<
           console.log('Upload aborted');
         }
         xhrRef.current = undefined;
-        dispatch(setCreationFileUploadLoading(false));
+        setCreationFileUploadLoading(false);
       }
     },
-    [dispatch, showErrorToastPredefined]
+    [
+      setCreationFileProcessingETA,
+      setCreationFileProcessingError,
+      setCreationFileProcessingLoading,
+      setCreationFileProcessingProgress,
+      setCreationFileUploadETA,
+      setCreationFileUploadError,
+      setCreationFileUploadLoading,
+      setCreationFileUploadProgress,
+      setCreationVideo,
+      setCreationVideoProcessing,
+      showErrorToastPredefined,
+    ]
   );
 
   const handleItemFocus = useCallback((key: string) => {
@@ -600,43 +619,43 @@ export const CreationSecondStepContent: React.FC<
         //   _stage: 'Creation',
         //   _value: value,
         // });
-        dispatch(setCreationTitle(value.trim() ? value : ''));
+        setCreationTitle(value.trim() ? value : '');
       } else if (key === 'minimalBid') {
         Mixpanel.track('Minimal Bid Change', {
           _stage: 'Creation',
           _value: value,
         });
-        dispatch(setCreationMinBid(value));
+        setCreationMinBid(value);
       } else if (key === 'comments') {
         Mixpanel.track('Post Creation Comments Change', {
           _stage: 'Creation',
           _value: value,
         });
-        dispatch(setCreationComments(value));
+        setCreationComments(value);
       } else if (key === 'expiresAt') {
         Mixpanel.track('Post expiresAt Change', {
           _stage: 'Creation',
           _value: value,
         });
-        dispatch(setCreationExpireDate(value));
+        setCreationExpireDate(value);
       } else if (key === 'startsAt') {
         Mixpanel.track('Post startsAt Change', {
           _stage: 'Creation',
           _value: value,
         });
-        dispatch(setCreationStartDate(value));
+        setCreationStartDate(value);
       } else if (key === 'targetBackerCount') {
         Mixpanel.track('Backer Count Change', {
           _stage: 'Creation',
           _value: value,
         });
-        dispatch(setCreationTargetBackerCount(value));
+        setCreationTargetBackerCount(value);
       } else if (key === 'choices') {
         Mixpanel.track('Post Creation Choices Change', {
           _stage: 'Creation',
           _value: value,
         });
-        dispatch(setCreationChoices(value));
+        setCreationChoices(value);
       } else if (key === 'video') {
         if (value) {
           await handleVideoUpload(value);
@@ -644,10 +663,21 @@ export const CreationSecondStepContent: React.FC<
           await handleVideoDelete();
         }
       } else if (key === 'thumbnailParameters') {
-        dispatch(setCreationVideoThumbnails(value));
+        setCreationVideoThumbnails(value);
       }
     },
-    [dispatch, handleVideoUpload, handleVideoDelete]
+    [
+      setCreationTitle,
+      setCreationMinBid,
+      setCreationComments,
+      setCreationExpireDate,
+      setCreationStartDate,
+      setCreationTargetBackerCount,
+      setCreationChoices,
+      handleVideoUpload,
+      handleVideoDelete,
+      setCreationVideoThumbnails,
+    ]
   );
   const expireOptions = useMemo(
     () => [
@@ -928,15 +958,16 @@ export const CreationSecondStepContent: React.FC<
 
       if (!decoded) return;
 
-      if (decoded.taskUuid === videoProcessing?.taskUuid) {
-        dispatch(
-          setCreationFileProcessingETA(decoded.estimatedTimeLeft?.seconds)
+      if (
+        decoded.taskUuid === videoProcessing?.taskUuid &&
+        decoded?.estimatedTimeLeft?.seconds
+      ) {
+        setCreationFileProcessingETA(
+          decoded.estimatedTimeLeft.seconds as number
         );
 
         if (decoded.fractionCompleted > fileProcessing.progress) {
-          dispatch(
-            setCreationFileProcessingProgress(decoded.fractionCompleted)
-          );
+          setCreationFileProcessingProgress(decoded.fractionCompleted);
         }
 
         if (
@@ -954,36 +985,45 @@ export const CreationSecondStepContent: React.FC<
           );
 
           if (available) {
-            dispatch(setCreationFileProcessingLoading(false));
+            setCreationFileProcessingLoading(false);
           } else {
-            dispatch(setCreationFileUploadError(true));
+            setCreationFileUploadError(true);
             showErrorToastPredefined(undefined);
           }
         } else if (
           decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
         ) {
-          dispatch(setCreationFileUploadError(true));
+          setCreationFileUploadError(true);
           showErrorToastPredefined(undefined);
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [videoProcessing, fileProcessing, dispatch]
+    [videoProcessing, fileProcessing]
   );
 
+  const videoProcessingFallbackAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
   // Video processing fallback
   useEffect(() => {
     async function videoProcessingFallback(hlsUrl: string) {
-      const available = await waitResourceIsAvailable(hlsUrl, {
-        maxAttempts: 720,
-        retryTimeMs: 5000,
-      });
+      videoProcessingFallbackAbortControllerRef.current = new AbortController();
+
+      const available = await waitResourceIsAvailable(
+        hlsUrl,
+        {
+          maxAttempts: 720,
+          retryTimeMs: 5000,
+        },
+        videoProcessingFallbackAbortControllerRef?.current.signal
+      );
 
       if (available) {
-        dispatch(setCreationFileProcessingLoading(false));
-        dispatch(setCreationFileProcessingProgress(100));
+        setCreationFileProcessingLoading(false);
+        setCreationFileProcessingProgress(100);
       } else {
-        dispatch(setCreationFileUploadError(true));
+        setCreationFileUploadError(true);
         showErrorToastPredefined(undefined);
       }
     }
@@ -991,6 +1031,10 @@ export const CreationSecondStepContent: React.FC<
     if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
       videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
     }
+
+    return () => {
+      videoProcessingFallbackAbortControllerRef?.current?.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileProcessing.loading, videoProcessing?.targetUrls?.hlsStreamUrl]);
 
@@ -1084,13 +1128,11 @@ export const CreationSecondStepContent: React.FC<
             mcCrCurrentStep:
               user.userTutorialsProgress.remainingMcCrCurrentStep[0],
           });
-          dispatch(
-            setUserTutorialsProgress({
-              remainingMcCrCurrentStep: [
-                ...user.userTutorialsProgress.remainingMcCrCurrentStep,
-              ].slice(1),
-            })
-          );
+          setUserTutorialsProgress({
+            remainingMcCrCurrentStep: [
+              ...user.userTutorialsProgress.remainingMcCrCurrentStep,
+            ].slice(1),
+          });
         }
         break;
       case 'CF':
@@ -1102,13 +1144,12 @@ export const CreationSecondStepContent: React.FC<
             cfCrCurrentStep:
               user.userTutorialsProgress.remainingCfCrCurrentStep[0],
           });
-          dispatch(
-            setUserTutorialsProgress({
-              remainingCfCrCurrentStep: [
-                ...user.userTutorialsProgress.remainingCfCrCurrentStep,
-              ].slice(1),
-            })
-          );
+
+          setUserTutorialsProgress({
+            remainingCfCrCurrentStep: [
+              ...user.userTutorialsProgress.remainingCfCrCurrentStep,
+            ].slice(1),
+          });
         }
         break;
       default:
@@ -1120,13 +1161,12 @@ export const CreationSecondStepContent: React.FC<
             acCrCurrentStep:
               user.userTutorialsProgress.remainingAcCrCurrentStep[0],
           });
-          dispatch(
-            setUserTutorialsProgress({
-              remainingAcCrCurrentStep: [
-                ...user.userTutorialsProgress.remainingAcCrCurrentStep,
-              ].slice(1),
-            })
-          );
+
+          setUserTutorialsProgress({
+            remainingAcCrCurrentStep: [
+              ...user.userTutorialsProgress.remainingAcCrCurrentStep,
+            ].slice(1),
+          });
         }
     }
     if (payload) markTutorialStepAsCompleted(payload);
@@ -1147,14 +1187,21 @@ export const CreationSecondStepContent: React.FC<
           time: moment().format('hh:mm'),
           'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
         };
-        dispatch(setCreationStartDate(newStartAt));
+        setCreationStartDate(newStartAt);
       }
     }, 1000);
 
     return () => {
       clearInterval(updateTime);
     };
-  }, [post.startsAt, dispatch]);
+  }, [post.startsAt, setCreationStartDate]);
+
+  useEffect(
+    () => () => {
+      xhrRef?.current?.abort();
+    },
+    []
+  );
 
   return (
     <>
@@ -1286,7 +1333,7 @@ export const CreationSecondStepContent: React.FC<
                   !fileProcessing.loading ? (
                     <SFloatingSubSectionWithPlayer>
                       <SFloatingSubSectionPlayer>
-                        <BitmovinPlayer
+                        <VideojsPlayer
                           withMuteControl
                           id='floating-preview'
                           innerRef={playerRef}

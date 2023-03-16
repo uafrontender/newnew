@@ -485,28 +485,23 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
+            {/* TODO: add logic that accepts option and returns users (me) to show */}
             {!option.whitelistSupporter ||
             option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
               isMyBid ? (
                 <OptionCardUsernameSpan
-                  type='me'
-                  usernameText={option.supporterCount > 1 ? t('me') : t('my')}
+                  user={option.supporterCount > 1 ? t('me') : t('my')}
                   isBlue={isBlue}
                 />
               ) : (
                 <OptionCardUsernameSpan
-                  type='otherUser'
                   user={option.creator!!}
                   isBlue={isBlue}
                 />
               )
             ) : (
               <OptionCardUsernameSpan
-                type='otherUser'
-                user={{
-                  ...option.whitelistSupporter,
-                  options: { ...option.whitelistSupporter, isVerified: true },
-                }}
+                user={option.whitelistSupporter}
                 isBlue={isBlue}
               />
             )}
@@ -514,11 +509,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             (isSupportedByMe &&
               !!option.whitelistSupporter &&
               option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
-              <OptionCardUsernameSpan
-                type='me'
-                usernameText={`, ${t('me')}`}
-                isBlue={isBlue}
-              />
+              <OptionCardUsernameSpan user={`, ${t('me')}`} isBlue={isBlue} />
             ) : null}
             {option.supporterCount >
             ((isSupportedByMe && !isMyBid) ||
@@ -978,6 +969,8 @@ const SOptionInfo = styled(Text)<{
   font-size: 14px;
   line-height: 20px;
 
+  word-break: break-word;
+
   ${({ isWhite }) =>
     isWhite
       ? css`
@@ -1189,6 +1182,8 @@ const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  word-break: break-word;
 `;
 
 // Tutorial

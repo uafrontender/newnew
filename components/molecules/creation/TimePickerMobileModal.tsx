@@ -62,7 +62,7 @@ const TimePickerMobileModal: React.FunctionComponent<
   const minutes: TDropdownSelectItem<string>[] = useMemo(() => {
     const minutesAll = new Array(60).fill('').map((_, i) => ({
       value: i.toString().length > 1 ? i.toString() : `0${i.toString()}`,
-      name: i.toString(),
+      name: i.toString().length > 1 ? i.toString() : `0${i.toString()}`,
     }));
 
     if (isDaySame && isHourSame && minutesOffset) {
@@ -212,7 +212,7 @@ const TimePickerMobileModal: React.FunctionComponent<
                   : {}),
               }}
             >
-              {d.value}
+              {d.name}
             </SScrollerItem>
           ))}
         </SScroller>

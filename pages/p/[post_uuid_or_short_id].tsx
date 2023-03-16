@@ -505,20 +505,24 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {
+    const controller = new AbortController();
+
     async function markAsViewed() {
       if (
-        !postParsed ||
+        !postParsed?.postUuid ||
         !user.loggedIn ||
         user.userData?.userUuid === postParsed?.creator?.uuid
-      )
+      ) {
         return;
+      }
+
       try {
         const markAsViewedPayload = new newnewapi.MarkPostRequest({
           markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
           postUuid: postParsed?.postUuid,
         });
 
-        const res = await markPost(markAsViewedPayload);
+        const res = await markPost(markAsViewedPayload, controller.signal);
 
         if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
@@ -526,14 +530,17 @@ const PostPage: NextPage<IPostPage> = ({
       }
     }
 
-    // setTimeout used to fix the React memory leak warning
-    const timer = setTimeout(() => {
-      markAsViewed();
-    });
+    markAsViewed();
     return () => {
-      clearTimeout(timer);
+      controller.abort();
     };
-  }, [post, postParsed, user.loggedIn, user.userData?.userUuid]);
+  }, [
+    post,
+    postParsed?.postUuid,
+    postParsed?.creator?.uuid,
+    user.loggedIn,
+    user.userData?.userUuid,
+  ]);
 
   // Infinite scroll
   useEffect(() => {
@@ -710,7 +717,9 @@ const PostPage: NextPage<IPostPage> = ({
             {postParsed
               ? t(`meta.title`, {
                   displayName: getDisplayname(postParsed.creator),
-                  postTitle: postParsed.title,
+                  postTitle: deletedByCreator
+                    ? t('meta.deletedPost')
+                    : postParsed.title,
                 })
               : ''}
           </title>
@@ -735,7 +744,9 @@ const PostPage: NextPage<IPostPage> = ({
               postParsed
                 ? t(`meta.title`, {
                     displayName: getDisplayname(postParsed.creator),
-                    postTitle: postParsed.title,
+                    postTitle: deletedByCreator
+                      ? t('meta.deletedPost')
+                      : postParsed.title,
                   })
                 : ''
             }

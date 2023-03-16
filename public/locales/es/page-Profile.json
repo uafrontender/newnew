@@ -41,7 +41,7 @@
       "description": "Navega tus publicaciones y creadores favoritos guardados"
     },
     "noContent": {
-      "description": "Los creadores que marques como favoritos\n aparecerán aquí"
+      "description_NEED_TRANSLATION": "Posts that you 'favorite'\nwill be shown here"
     }
   },
   "Profile": {
@@ -84,7 +84,7 @@
   "modal": {
     "blockUser": {
       "title": "Bloquear usuario",
-      "messageFirstPart": "¿De verdad quieres bloquear a",
+      "messageFirstPart": "¿De verdad quieres bloquear a ",
       "messageSecondPart": "?",
       "button": {
         "cancel": "Cancelar",

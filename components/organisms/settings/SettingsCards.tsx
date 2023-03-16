@@ -75,6 +75,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         >
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
+        {/* TODO: make cards section look more real, handle WL creator adds aa card case */}
         {!!cards?.length && !user.userData?.options?.isWhiteListed && (
           <>
             <SButtonSecondaryDesktop
@@ -147,11 +148,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   isPrimary={!!card.isPrimary}
                   brand={card.brand as newnewapi.Card.CardBrand}
                   funding={card.funding as newnewapi.Card.CardFunding}
-                  lastFourDigits={
-                    !user.userData?.options?.isWhiteListed
-                      ? (card.last4 as string)
-                      : ''
-                  }
+                  lastFourDigits={card.last4 as string}
                   backgroundImg={
                     backgroundsByCardUuid
                       ? backgroundsByCardUuid[card.cardUuid! as string]

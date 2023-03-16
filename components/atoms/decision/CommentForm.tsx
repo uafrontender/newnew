@@ -351,11 +351,15 @@ const SCommentsForm = styled.form<{
   zIndex: number | undefined;
 }>`
   display: flex;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
   position: ${({ position }) => position ?? 'relative'};
   top: 0;
   z-index: ${({ zIndex }) => zIndex ?? 'unset'};
   background: ${({ theme }) => theme.colorsThemed.background.primary};
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-bottom: 22px;
+  }
 `;
 
 interface ISInputWrapper {}

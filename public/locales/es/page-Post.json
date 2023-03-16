@@ -1,6 +1,7 @@
 {
   "meta": {
     "title": "{{postTitle}} | {{displayName}} en NewNew",
+    "deletedPost_NEED_TRANSLATION": "Deleted post",
     "description": {
       "ac": "${{totalInBids}} en ofertas en NewNew",
       "mc": "{{totalVotes}} votos en NewNew",
@@ -236,7 +237,7 @@
   },
   "blockUserModal": {
     "title": "Bloquear usuario",
-    "messageFirstPart": "¿Estás seguro de que quieres bloquear a",
+    "messageFirstPart": "¿Estás seguro de que quieres bloquear a ",
     "messageSecondPart": "?",
     "button": {
       "cancel": "Cancelar",
@@ -743,13 +744,15 @@
       "ac": {
         "numBiddersChoseSingular": "{{amount}} patrocinador escogió",
         "numBiddersChose": "{{amount}} patrocinadores escogieron",
-        "optionCreator": "la oferta de <0>{{nickname}}</0><1/>"
+        "optionCreator": "la oferta de <0/>",
+        "suffix": ""
       },
       "mc": {
         "numBiddersChoseSingular": "{{amount}} votante escogió",
         "numBiddersChose": "{{amount}} votantes escogieron",
         "optionOwn": "la opción",
-        "optionCreator": "la opción de <0>{{nickname}}</0><1/>"
+        "optionCreator": "la opción de <0/>",
+        "suffix": ""
       }
     }
   },

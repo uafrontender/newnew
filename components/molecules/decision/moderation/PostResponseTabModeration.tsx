@@ -591,7 +591,7 @@ const SHeadline = styled(Headline)<{
     ${({ undimmed }) =>
       undimmed
         ? css`
-            z-index: 11;
+            z-index: 10;
           `
         : null}
   }

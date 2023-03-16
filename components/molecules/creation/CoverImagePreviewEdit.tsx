@@ -11,7 +11,6 @@ import Headline from '../../atoms/Headline';
 import CoverImageUpload from './CoverImageUpload';
 import CoverImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import CoverImageCropper from './CoverImageCropper';
 import getCroppedImg from '../../../utils/cropImage';
 
@@ -19,11 +18,8 @@ import getCroppedImg from '../../../utils/cropImage';
 import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
 import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import {
-  setCustomCoverImageUrl,
-  unsetCustomCoverImageUrl,
-} from '../../../redux-store/slices/creationStateSlice';
 import { useAppState } from '../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
 
 interface ICoverImagePreviewEdit {
   open: boolean;
@@ -36,8 +32,14 @@ const CoverImagePreviewEdit: React.FunctionComponent<
 > = ({ open, handleClose, handleSubmit }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creation');
-  const dispatch = useAppDispatch();
-  const { customCoverImageUrl } = useAppSelector((state) => state.creation);
+
+  const { postInCreation, setCustomCoverImageUrl, unsetCustomCoverImageUrl } =
+    usePostCreationState();
+  const { customCoverImageUrl } = useMemo(
+    () => postInCreation,
+    [postInCreation]
+  );
+
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
@@ -117,27 +119,27 @@ const CoverImagePreviewEdit: React.FunctionComponent<
 
       const newImageUrl = URL.createObjectURL(croppedImage);
 
-      dispatch(setCustomCoverImageUrl(newImageUrl));
+      setCustomCoverImageUrl(newImageUrl);
       setCoverImageInEdit('');
     } catch (e) {
       console.error(e);
     } finally {
       setUpdateCoverImageLoading(false);
     }
-  }, [coverImageInEdit, croppedAreaCoverImage, dispatch]);
+  }, [coverImageInEdit, croppedAreaCoverImage, setCustomCoverImageUrl]);
 
   const onSubmit = useCallback(async () => {
     if (coverImageToBeSaved) {
       await completeCoverImageCropAndSave();
     } else {
-      dispatch(unsetCustomCoverImageUrl({}));
+      unsetCustomCoverImageUrl();
     }
     handleSubmit();
   }, [
     completeCoverImageCropAndSave,
     coverImageToBeSaved,
-    dispatch,
     handleSubmit,
+    unsetCustomCoverImageUrl,
   ]);
 
   useEffect(() => {
