@@ -16,7 +16,7 @@ import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
 // eslint-disable-next-line import/no-duplicates
 import { QualityLevel, QualityLevelList } from 'videojs-contrib-quality-levels';
-// NB! We have to import these twice
+// NB! We have to import these twice due to package issues
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';

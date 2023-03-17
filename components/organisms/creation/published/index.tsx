@@ -266,6 +266,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               resources={videoProcessing?.targetUrls}
               showPlayButton
               withMuteControl
+              borderRadius='16px'
             />
           ) : (
             <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>

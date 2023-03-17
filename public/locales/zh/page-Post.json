@@ -139,7 +139,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "你的觀眾在等著呢！",
-        "title_2": "馬上上傳你的回應視頻......",
+        "title_2_NEED_TRANSLATION": "Select a file",
+        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
         "description": "視頻的最大尺寸為10GB",
         "button": "選擇檔案"
       },

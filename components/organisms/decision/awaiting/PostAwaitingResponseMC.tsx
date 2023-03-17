@@ -150,6 +150,23 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       'main' | 'options'
     >('main');
 
+    const handleOpenOptionsSection = useCallback(() => {
+      setOpenedMainSection('options');
+
+      let top = activitiesContainerRef.current?.offsetTop;
+
+      if (top) {
+        top -= isMobile ? 16 : 84;
+
+        if (top) {
+          window?.scrollTo({
+            top,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }, [isMobile]);
+
     // Update timer
     useEffect(() => {
       if (isBrowser() && isPageVisible) {
@@ -312,15 +329,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                               _component: 'PostAwaitingResponseMC',
                             });
                           }}
-                          onClick={() => {
-                            setOpenedMainSection('options');
-
-                            if (activitiesContainerRef.current && isMobile) {
-                              activitiesContainerRef.current.scrollIntoView({
-                                behavior: 'smooth',
-                              });
-                            }
-                          }}
+                          onClick={handleOpenOptionsSection}
                         >
                           {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
