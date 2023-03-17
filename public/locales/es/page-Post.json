@@ -139,7 +139,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "¡Tu audiencia está esperando!",
-        "title_2": "Sube tu respuesta en video ahora..",
+        "title_2_NEED_TRANSLATION": "Select a file",
+        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
         "description": "El tamaño máximo del video es de 10 GB",
         "button": "Seleccionar archivo"
       },
