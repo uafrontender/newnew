@@ -19,7 +19,6 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
-// import TopDecisionsResults from './TopDecisionsResults';
 import PopularCreatorsResults from './PopularCreatorsResults';
 import Button from '../Button';
 import NoResults from './NoResults';
@@ -321,9 +320,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
                     closeSearch();
                   }}
                 >
-                  {/* resultsPosts.length > 0 && (
-                    <TopDecisionsResults posts={resultsPosts} />
-                  ) */}
                   {resultsCreators.length > 0 && (
                     <PopularCreatorsResults creators={resultsCreators} />
                   )}
@@ -363,9 +359,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
               )
             ) : (
               <div onClick={() => closeSearch()}>
-                {/* resultsPosts.length > 0 && (
-                  <TopDecisionsResults posts={resultsPosts} />
-                ) */}
                 {resultsCreators.length > 0 && (
                   <PopularCreatorsResults creators={resultsCreators} />
                 )}

@@ -20,7 +20,6 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
-// import TopDecisionsResults from './TopDecisionsResults';
 import PopularCreatorsResults from './PopularCreatorsResults';
 import Button from '../Button';
 import Lottie from '../Lottie';
@@ -340,9 +339,6 @@ const SearchInput: React.FC = React.memo(() => {
                   closeSearch();
                 }}
               >
-                {/* resultsPosts.length > 0 && (
-                  <TopDecisionsResults posts={resultsPosts} />
-                ) */}
                 {resultsCreators.length > 0 && (
                   <PopularCreatorsResults creators={resultsCreators} />
                 )}
@@ -390,9 +386,6 @@ const SearchInput: React.FC = React.memo(() => {
             )
           ) : (
             <div onClick={() => closeSearch()}>
-              {/* resultsPosts.length > 0 && (
-                <TopDecisionsResults posts={resultsPosts} />
-              ) */}
               {resultsCreators.length > 0 && (
                 <PopularCreatorsResults creators={resultsCreators} />
               )}

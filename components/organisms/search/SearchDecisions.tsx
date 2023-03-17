@@ -10,17 +10,14 @@ import { useUpdateEffect } from 'react-use';
 import Button from '../../atoms/Button';
 
 import { useAppSelector } from '../../../redux-store/store';
-import SortOption from '../../atoms/SortOption';
 import useSearchPosts from '../../../utils/hooks/useSearchPosts';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
-import { useAppState } from '../../../contexts/appStateContext';
 
 const PostList = dynamic(() => import('./PostList'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 
 interface ISearchDecisions {
   query: string;
-  type: string;
 }
 
 const parseFilterToArray = (filter: string): newnewapi.Post.Filter[] => {
@@ -47,49 +44,18 @@ const parseFilterToArray = (filter: string): newnewapi.Post.Filter[] => {
   return arr;
 };
 
-const getSortingValue = (sorting: string) => {
-  switch (sorting) {
-    case 'num_bids':
-      return newnewapi.PostSorting.MOST_VOTED_FIRST;
-    case 'all':
-      return newnewapi.PostSorting.MOST_FUNDED_FIRST;
-    case 'newest':
-      return newnewapi.PostSorting.NEWEST_FIRST;
-    default:
-      return newnewapi.PostSorting.MOST_FUNDED_FIRST;
-  }
-};
-
-export const SearchDecisions: React.FC<ISearchDecisions> = ({
-  query,
-  type,
-}) => {
+export const SearchDecisions: React.FC<ISearchDecisions> = ({ query }) => {
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
   const { showErrorToastPredefined } = useErrorToasts();
 
   const { loggedIn } = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
 
-  const { sorting = '', filter = '' } = router.query;
+  const { filter = '' } = router.query;
 
   const [activeTabs, setActiveTabs] = useState<newnewapi.Post.Filter[]>(
     parseFilterToArray(filter as string)
-  );
-
-  const [postSorting, setPostSorting] = useState<string>(
-    (sorting as string) || 'all'
-  );
-
-  const selectedSorting = useMemo(
-    () => ({
-      sortingtype: postSorting,
-    }),
-    [postSorting]
   );
 
   const onLoadingCreatorsError = useCallback((err: any) => {
@@ -103,11 +69,8 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
       {
         loggedInUser: loggedIn,
         query,
-        searchType:
-          type === 'hashtags'
-            ? newnewapi.SearchPostsRequest.SearchType.HASHTAGS
-            : newnewapi.SearchPostsRequest.SearchType.UNSET,
-        sorting: getSortingValue(postSorting),
+        searchType: newnewapi.SearchPostsRequest.SearchType.HASHTAGS,
+        sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
         filters: activeTabs,
       },
       {
@@ -159,17 +122,15 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
         pathname: '/search',
         query: {
           query,
-          type,
           tab: 'posts',
           filter: routerArr.length > 0 ? routerArr.join('-') : '',
-          sorting: postSorting,
         },
       },
       undefined,
       // Avoid page reload as we stay on the same page
       { shallow: true }
     );
-  }, [postSorting, activeTabs, query, type]);
+  }, [activeTabs, query]);
 
   const tabTypes = useMemo(
     () => [
@@ -200,10 +161,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
     });
   }, []);
 
-  const clearSorting = useCallback(() => {
-    setPostSorting('all');
-  }, []);
-
   const Tabs = useCallback(
     () => (
       <STabs>
@@ -218,25 +175,9 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({
             {tab.title}
           </STab>
         ))}
-        {selectedSorting &&
-          selectedSorting.sortingtype !== 'all' &&
-          !isMobile && (
-            <SortOption
-              sorts={selectedSorting}
-              category=''
-              onClick={clearSorting}
-            />
-          )}
       </STabs>
     ),
-    [
-      activeTabs,
-      tabTypes,
-      selectedSorting,
-      isMobile,
-      clearSorting,
-      updateActiveTabs,
-    ]
+    [activeTabs, tabTypes, updateActiveTabs]
   );
 
   return (

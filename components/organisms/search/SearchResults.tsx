@@ -19,7 +19,6 @@ export const SearchResults = () => {
   const { t } = useTranslation('page-Search');
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState(router.query.query as string);
-  const [searchType, setSearchType] = useState(router.query.type as string);
   const [activeTab, setActiveTab] = useState<string>(
     (router.query.tab as string) || 'posts'
   );
@@ -30,16 +29,9 @@ export const SearchResults = () => {
       if (router.query.tab) {
         if (router.query.tab === 'creators') {
           setActiveTab('creators');
-        } else if (router.query.tab === 'tags') {
-          setActiveTab('tags');
         } else {
           setActiveTab('posts');
         }
-      }
-      if (router.query.type) {
-        setSearchType(router.query.type as string);
-      } else if (router.query.tab === 'posts') {
-        setSearchType('');
       }
     }
   }, [router]);
@@ -48,7 +40,7 @@ export const SearchResults = () => {
     () => [
       {
         id: 'posts',
-        title: t('mainContent.tabs.decisions'),
+        title: t('mainContent.tabs.hashtags'),
       },
       {
         id: 'creators',
@@ -67,9 +59,7 @@ export const SearchResults = () => {
             key={tab.id}
             onClick={() => {
               const clearedQuery = encodeURIComponent(searchValue);
-              router.push(
-                `/search?query=${clearedQuery}&type=${searchType}&tab=${tab.id}`
-              );
+              router.push(`/search?query=${clearedQuery}&tab=${tab.id}`);
             }}
           >
             <InlineSvg
@@ -100,8 +90,10 @@ export const SearchResults = () => {
     <SContainer>
       <SHeader>
         <SPageTitle>
-          {activeTab === 'posts' && searchType === 'hashtags' ? (
-            <SHashtag>#{searchValue}</SHashtag>
+          {activeTab === 'posts' ? (
+            <>
+              {t('mainContent.title')} <SHashtag>#{searchValue}</SHashtag>
+            </>
           ) : (
             <>
               {t('mainContent.title')} <Query>{searchValue}</Query>
@@ -111,7 +103,7 @@ export const SearchResults = () => {
       </SHeader>
       <Tabs />
       {activeTab === 'posts' ? (
-        <SearchDecisions query={searchValue} type={searchType} />
+        <SearchDecisions query={searchValue} />
       ) : (
         <SearchCreators query={searchValue} />
       )}
