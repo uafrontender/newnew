@@ -30,7 +30,6 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
     true,
     t('secondStep.modal.leave.message'),
     [
-      '/creation',
       '/creation/auction',
       '/creation/multiple-choice',
       '/creation/crowdfunding',
