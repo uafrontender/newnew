@@ -102,6 +102,23 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
       'main' | 'options'
     >('main');
 
+    const handleOpenOptionsSection = useCallback(() => {
+      setOpenedMainSection('options');
+
+      let top = activitiesContainerRef.current?.offsetTop;
+
+      if (top) {
+        top -= isMobile ? 16 : 84;
+
+        if (top) {
+          window?.scrollTo({
+            top,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }, [isMobile]);
+
     // Check if the response has been viewed
     useEffect(() => {
       fetchPostLatestData();
@@ -256,15 +273,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                               _component: 'PostSuccessMC',
                             });
                           }}
-                          onClick={() => {
-                            setOpenedMainSection('options');
-
-                            if (activitiesContainerRef.current) {
-                              activitiesContainerRef.current.scrollIntoView({
-                                behavior: 'smooth',
-                              });
-                            }
-                          }}
+                          onClick={handleOpenOptionsSection}
                         >
                           {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
