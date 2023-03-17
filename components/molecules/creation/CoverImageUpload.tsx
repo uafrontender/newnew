@@ -122,9 +122,7 @@ const SCaption = styled(Caption)`
 
 const SUploadButton = styled(Button)``;
 
-const SDeleteButton = styled(Button)`
-  background: transparent;
-`;
+const SDeleteButton = styled(Button)``;
 
 const SImageInput = styled.input`
   display: none;
