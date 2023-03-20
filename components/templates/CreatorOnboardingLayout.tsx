@@ -141,7 +141,7 @@ const SContentContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     position: relative;
     min-width: 662px;
-    width: 40%;
+    width: 50%;
     margin-left: auto;
     margin-right: -22px;
     top: 0;
