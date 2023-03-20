@@ -283,7 +283,7 @@
       "privacy": {
         "title": "Privacidad",
         "privacySubsections": {
-          "spendings": {
+          "spending": {
             "title": "Ocultar mis gastos a los demás",
             "caption": "Las personas no podrán ver cuánto has gastado en Bids ni en Superpolls."
           },
