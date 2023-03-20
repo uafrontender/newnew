@@ -15,6 +15,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface IList {
+  className?: string;
   collection: any;
   loading: boolean;
   skeletonsBgColor?: string;
@@ -22,6 +23,7 @@ interface IList {
 }
 
 export const PostList: React.FC<IList> = ({
+  className,
   collection,
   loading,
   skeletonsBgColor,
@@ -61,7 +63,7 @@ export const PostList: React.FC<IList> = ({
 
   return (
     <>
-      <SListWrapper>
+      <SListWrapper className={className}>
         {collection?.map(renderItem)}
         {collection.length === 0 &&
           loading &&
@@ -109,25 +111,22 @@ export default PostList;
 const SListWrapper = styled.div`
   width: 100%;
   display: flex;
-  padding: 8px 0 0 0;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  // Needed for bump up animation
+  padding-top: 8px;
+  // Not sure these are needed on this level (should come from className)
+  padding-left: 16px;
+  padding-right: 16px;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(100% + 26px);
-    padding: 0;
+    margin: 0 -8px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
-  ${(props) => props.theme.media.laptop} {
-    width: calc(100% + 32px);
-    padding: 0 !important;
-    margin: 0 -16px;
-  }
-
-  ${(props) => props.theme.media.laptopL} {
+  ${(props) => props.theme.media.laptopM} {
     margin: 0 -16px;
   }
 

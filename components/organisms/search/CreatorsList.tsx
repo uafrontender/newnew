@@ -14,6 +14,7 @@ import { useAppSelector } from '../../../redux-store/store';
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
+  className?: string;
   collection: newnewapi.IUser[];
   loading: boolean;
   skeletonsBgColor?: string;
@@ -23,6 +24,7 @@ interface IList {
 }
 
 export const CreatorsList: React.FC<IList> = ({
+  className,
   collection,
   loading,
   skeletonsBgColor,
@@ -54,7 +56,7 @@ export const CreatorsList: React.FC<IList> = ({
   };
 
   return (
-    <SListWrapper>
+    <SListWrapper className={className}>
       {collection?.map(renderItem)}
       {collection.length > 0 &&
         loading &&
@@ -103,25 +105,22 @@ const SListWrapper = styled.div`
   width: 100%;
   cursor: grab;
   display: flex;
-  padding: 8px 0 0 0;
+  // Needed for bump up animation
+  padding-top: 8px;
+  // Not sure these are needed on this level (should come from className)
+  padding-left: 16px;
+  padding-right: 16px;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    width: calc(100% + 26px);
-    padding: 0;
+    margin: 0 -8px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100% + 32px);
-    padding: 0 !important;
-    margin: 0 -16px;
-  }
-
-  ${(props) => props.theme.media.laptopL} {
     margin: 0 -16px;
   }
 
