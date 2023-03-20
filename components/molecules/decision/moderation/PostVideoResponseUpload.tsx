@@ -13,7 +13,8 @@ import DeleteVideo from '../../creation/DeleteVideo';
 import { MAX_VIDEO_SIZE } from '../../../../constants/general';
 
 import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
-// import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+import dropboxIcon from '../../../../public/images/svg/icons/outlined/upload-cloud.svg';
+
 import Headline from '../../../atoms/Headline';
 import {
   removeUploadedFile,
@@ -23,6 +24,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -36,6 +38,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   id,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const { showErrorToastCustom } = useErrorToasts();
   const { postStatus } = usePostInnerState();
   const {
@@ -154,9 +165,69 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     handleResetVideoUploadAndProcessingState,
   ]);
 
+  // Drag & Drop support
+  const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
+
+  const handleOnDragOver = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setDropZoneHighlighted(true);
+    },
+    []
+  );
+
+  const handleOnDragLeave = useCallback(() => {
+    setDropZoneHighlighted(false);
+  }, []);
+
+  const handleOnDrop = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+
+      const { files } = e.dataTransfer;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
+
+      Mixpanel.track('Video Selected with drag and drop', {
+        _stage: 'Post Video Response Upload',
+        _file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+      });
+
+      if (file.size > MAX_VIDEO_SIZE) {
+        showErrorToastCustom(
+          t('postVideo.uploadResponseForm.video.error.maxSize')
+        );
+      } else {
+        Mixpanel.track('Video Loading', {
+          _stage: 'Post Video Response Upload',
+        });
+
+        setLocalFile(file);
+        handleItemChange(id, file);
+      }
+
+      setDropZoneHighlighted(false);
+    },
+    [handleItemChange, id, showErrorToastCustom, t]
+  );
+
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox htmlFor='file'>
+      <SDropBox
+        htmlFor='file'
+        isHighlighted={dropZoneHighlighted}
+        onDragOver={(e) => handleOnDragOver(e)}
+        onDragLeave={() => handleOnDragLeave()}
+        onDrop={(e) => handleOnDrop(e)}
+      >
         <input
           id='file'
           ref={inputRef}
@@ -171,10 +242,20 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             }
           }}
         />
+        {!isMobileOrTablet ? (
+          <SInlineSVGDropBox
+            svg={dropboxIcon}
+            fill='none'
+            width='48px'
+            height='48px'
+          />
+        ) : null}
         <SHeadline variant={6}>
           {t('postVideo.uploadResponseForm.fileUpload.title_1')}
           <br />
-          {t('postVideo.uploadResponseForm.fileUpload.title_2')}
+          {isMobileOrTablet
+            ? t('postVideo.uploadResponseForm.fileUpload.title_2')
+            : t('postVideo.uploadResponseForm.fileUpload.title_2Long')}
         </SHeadline>
         <SButton
           id='upload-response-button'
@@ -314,7 +395,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
 
     return content;
   }, [
+    dropZoneHighlighted,
     t,
+    isMobileOrTablet,
     handleButtonClick,
     responseFileUploadLoading,
     responseFileUploadError,
@@ -323,6 +406,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     responseFileProcessingLoading,
     responseFileProcessingProgress,
     localFile,
+    handleOnDragOver,
+    handleOnDragLeave,
+    handleOnDrop,
     handleFileChange,
     responseFileUploadETA,
     responseFileUploadProgress,
@@ -330,8 +416,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     value,
-    handleDeleteVideoShow,
     showPlayButton,
+    handleDeleteVideoShow,
   ]);
 
   return (
@@ -360,13 +446,20 @@ const SWrapper = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
 `;
 
-const SDropBox = styled.label`
+const SDropBox = styled.label<{
+  isHighlighted: boolean;
+}>`
   width: 100%;
   height: 100%;
   cursor: copy;
   display: flex;
   padding: 16px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  background: ${({ theme, isHighlighted }) =>
+    isHighlighted
+      ? 'rgba(29, 106, 255, 0.2)'
+      : theme.colorsThemed.background.tertiary};
+  border: 1.5px dashed ${({ theme }) => theme.colors.blue};
+
   align-items: center;
   border-radius: 16px;
   flex-direction: column;
@@ -554,20 +647,9 @@ const SLoadingProgress = styled.div`
   border-radius: 16px;
 `;
 
-// const SSpinnerWrapper = styled.div`
-//   @keyframes spin {
-//     from {
-//       transform: rotate(0deg);
-//     }
-//     to {
-//       transform: rotate(360deg);
-//     }
-//   }
-
-//   div {
-//     animation: spin 0.7s linear infinite;
-//   }
-// `;
+const SInlineSVGDropBox = styled(InlineSVG)`
+  margin-bottom: 16px;
+`;
 
 interface ISProgress {
   progress?: number;

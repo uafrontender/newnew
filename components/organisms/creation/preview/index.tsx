@@ -105,22 +105,22 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const [isDisabledAdditionally, setIsDisabledAdditionally] = useState(false);
   const [isGoingToHomepage, setIsGoingToHomepage] = useState(false);
 
-  const allowedRoutes = [
-    '/creation',
-    '/creation/auction',
-    '/creation/multiple-choice',
-    '/creation/crowdfunding',
-    '/creation/auction/preview',
-    '/creation/multiple-choice/preview',
-    '/creation/crowdfunding/preview',
-    '/creation/auction/published',
-    '/creation/multiple-choice/published',
-    '/creation/crowdfunding/published',
-  ];
-
-  if (isDesktop) {
-    allowedRoutes.push('/');
-  }
+  const allowedRoutes = useMemo(
+    () => [
+      '/creation',
+      '/creation/auction',
+      '/creation/multiple-choice',
+      '/creation/crowdfunding',
+      '/creation/auction/preview',
+      '/creation/multiple-choice/preview',
+      '/creation/crowdfunding/preview',
+      '/creation/auction/published',
+      '/creation/multiple-choice/published',
+      '/creation/crowdfunding/published',
+      ...(isDesktop ? ['/'] : []),
+    ],
+    [isDesktop]
+  );
 
   useLeavePageConfirm(
     showModal || !post.title ? false : true,
