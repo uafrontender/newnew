@@ -90,11 +90,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
       {/* <SHidingSubsectionsContainer> */}
       {/* <SHidingSubsection>
           <SHidingSubsectionTitle variant={2}>
-            {t('Settings.sections.privacy.privacySubsections.spendings.title')}
+            {t('Settings.sections.privacy.privacySubsections.spending.title')}
           </SHidingSubsectionTitle>
           <SHidingSubsectionCaption variant={2}>
             {t(
-              'Settings.sections.privacy.privacySubsections.spendings.caption'
+              'Settings.sections.privacy.privacySubsections.spending.caption'
             )}
           </SHidingSubsectionCaption>
           <Toggle

@@ -155,3 +155,19 @@ export const getMyEarningsByPosts = (
     payload,
     signal ?? undefined
   );
+
+export const getMySpending = (
+  payload: newnewapi.GetMySpendingRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetMySpendingRequest,
+    newnewapi.GetMySpendingResponse
+  >(
+    newnewapi.GetMySpendingRequest,
+    newnewapi.GetMySpendingResponse,
+    `${BASE_URL_PAYMENTS}/get_my_spending`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
