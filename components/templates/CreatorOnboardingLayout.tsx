@@ -139,9 +139,11 @@ const SContentContainer = styled.div`
   height: 100%;
 
   ${({ theme }) => theme.media.laptop} {
-    position: absolute;
-    min-width: 706px;
-    width: 50%;
+    position: relative;
+    min-width: 662px;
+    width: 40%;
+    margin-left: auto;
+    margin-right: -22px;
     top: 0;
     left: unset;
     right: 0;
