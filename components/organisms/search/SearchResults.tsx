@@ -111,7 +111,15 @@ const SContainer = styled.div`
 `;
 
 const SHeader = styled.div`
-  padding: 0 0 24px;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-bottom: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 24px;
+  }
 `;
 
 const SPageTitle = styled.h1`
@@ -136,7 +144,14 @@ const Query = styled.span`
 
 const STabs = styled.div`
   display: flex;
-  margin-bottom: 32px;
+  margin-left: 16px;
+  margin-right: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 32px;
+  }
 `;
 
 interface ISTab {
