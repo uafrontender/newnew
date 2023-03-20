@@ -38,7 +38,7 @@ import {
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
-  CREATION_OPTION_MIN,
+  OPTION_LENGTH_MIN,
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
@@ -275,9 +275,8 @@ export const CreationSecondStepContent: React.FC<
     () =>
       tab !== 'multiple-choice' ||
       (invalidMcOptionsIndicies.size === 0 &&
-        multiplechoice.choices.filter(
-          (o) => o.text.length < CREATION_OPTION_MIN
-        ).length === 0),
+        multiplechoice.choices.filter((o) => o.text.length < OPTION_LENGTH_MIN)
+          .length === 0),
     [tab, invalidMcOptionsIndicies.size, multiplechoice.choices]
   );
 

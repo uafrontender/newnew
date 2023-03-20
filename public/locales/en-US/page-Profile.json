@@ -41,7 +41,7 @@
       "description": "Browse through all of your saved favorite posts and creator"
     },
     "noContent": {
-      "description": "Any creators you favorite\nwill be shown here"
+      "description": "Posts that you 'favorite'\nwill be shown here"
     }
   },
   "Profile": {
@@ -283,7 +283,7 @@
       "privacy": {
         "title": "Privacy",
         "privacySubsections": {
-          "spendings": {
+          "spending": {
             "title": "Hide my spending from others",
             "caption": "People will not be able to see how much you spent on Bids and Superpolls"
           },

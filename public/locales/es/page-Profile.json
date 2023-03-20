@@ -41,7 +41,7 @@
       "description": "Navega tus publicaciones y creadores favoritos guardados"
     },
     "noContent": {
-      "description": "Los creadores que marques como favoritos\n aparecerán aquí"
+      "description_NEED_TRANSLATION": "Posts that you 'favorite'\nwill be shown here"
     }
   },
   "Profile": {
@@ -283,7 +283,7 @@
       "privacy": {
         "title": "Privacidad",
         "privacySubsections": {
-          "spendings": {
+          "spending": {
             "title": "Ocultar mis gastos a los demás",
             "caption": "Las personas no podrán ver cuánto has gastado en Bids ni en Superpolls."
           },

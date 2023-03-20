@@ -1238,6 +1238,7 @@ const SUsername = styled(Text)`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: normal;
 `;
 
 const SCardTimer = styled(CardTimer)`

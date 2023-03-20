@@ -168,7 +168,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           containerRef.current = el!!;
         }}
       >
-        {videos.map((video, i) => (
+        {videos.map((video, i, arr) => (
           <PostVideoStoryItem
             key={video?.uuid ?? i}
             video={video}
@@ -176,7 +176,10 @@ const PostVideoResponsesSlider: React.FunctionComponent<
             isVisible={currentVideo === i}
             isMuted={isMuted}
             videoDurationWithTime={videoDurationWithTime}
-            onPlaybackFinished={autoscroll ? handleScrollRight : undefined}
+            onPlaybackFinished={
+              // If the last video in story mode, continue loop
+              autoscroll && i !== arr.length - 1 ? handleScrollRight : undefined
+            }
           />
         ))}
       </SContainer>

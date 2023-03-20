@@ -198,15 +198,18 @@ const SInput = styled.input<ISInput>`
   padding-left: ${(props) => (props.withLabel ? '9px' : '0')};
 
   -webkit-appearance: none;
-  -moz-appearance: none;
   -ms-appearance: none;
   -o-appearance: none;
   appearance: none;
 
+  /* Works for Chrome, Safari, Edge, Opera */
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
+
+  /* Works for Firefox */
+  -moz-appearance: textfield;
 
   &::placeholder {
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};

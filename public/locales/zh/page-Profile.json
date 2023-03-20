@@ -41,7 +41,7 @@
       "description": "瀏覽你保存的所有喜愛的帖子和創作者"
     },
     "noContent": {
-      "description": "所有你喜歡的創作者\n都在這裡顯示"
+      "description_NEED_TRANSLATION": "Posts that you 'favorite'\nwill be shown here"
     }
   },
   "Profile": {
@@ -283,7 +283,7 @@
       "privacy": {
         "title": "隱私",
         "privacySubsections": {
-          "spendings": {
+          "spending": {
             "title": "不讓別人查看我的消費",
             "caption": "其他人看不到你為Bids或Superpolls上花了多少錢"
           },
