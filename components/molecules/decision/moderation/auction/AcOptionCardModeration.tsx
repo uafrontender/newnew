@@ -140,20 +140,10 @@ const AcOptionCardModeration: React.FunctionComponent<
               {option.title}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              {!option.whitelistSupporter ? (
-                <OptionCardUsernameSpan
-                  user={option.creator!!}
-                  isBlue={!!isWinner}
-                />
-              ) : (
-                <OptionCardUsernameSpan
-                  user={{
-                    ...option.whitelistSupporter,
-                    options: { ...option.whitelistSupporter, isVerified: true },
-                  }}
-                  isBlue={!!isWinner}
-                />
-              )}
+              <OptionCardUsernameSpan
+                user={option.whitelistSupporter ?? option.creator!!}
+                isBlue={!!isWinner}
+              />
               {option.supporterCount > 1 ? (
                 <>
                   <SSpanBiddersRegular className='spanRegular'>
@@ -290,20 +280,10 @@ const AcOptionCardModeration: React.FunctionComponent<
           </SBidAmount>
           <SOptionInfo variant={3}>{option.title}</SOptionInfo>
           <SBiddersInfo variant={3}>
-            {!option.whitelistSupporter ? (
-              <OptionCardUsernameSpan
-                user={option.creator!!}
-                isBlue={!!isWinner}
-              />
-            ) : (
-              <OptionCardUsernameSpan
-                user={{
-                  ...option.whitelistSupporter,
-                  options: { ...option.whitelistSupporter, isVerified: true },
-                }}
-                isBlue={!!isWinner}
-              />
-            )}
+            <OptionCardUsernameSpan
+              user={option.whitelistSupporter ?? option.creator}
+              isBlue={!!isWinner}
+            />
             {option.supporterCount > 1 ? (
               <>
                 <SSpanBiddersRegular className='spanRegular'>

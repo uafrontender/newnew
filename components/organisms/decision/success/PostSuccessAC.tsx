@@ -25,7 +25,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import assets from '../../../../constants/assets';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
+import WinningOptionAcCreator from '../../../molecules/decision/common/WinningOptionAcCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
@@ -98,6 +98,23 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const [openedMainSection, setOpenedMainSection] = useState<'main' | 'bids'>(
       'main'
     );
+
+    const handleOpenBidsSection = useCallback(() => {
+      setOpenedMainSection('bids');
+
+      let top = activitiesContainerRef.current?.offsetTop;
+
+      if (top) {
+        top -= isMobile ? 16 : 84;
+
+        if (top) {
+          window?.scrollTo({
+            top,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }, [isMobile]);
 
     // Check if the response has been viewed
     useEffect(() => {
@@ -234,11 +251,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                   <SSeparator />
                   {winningOption && (
                     <>
-                      <WinningOptionCreator
-                        type='ac'
-                        postCreator={post.creator!!}
-                        winningOptionAc={winningOption}
-                      />
+                      <WinningOptionAcCreator winningOption={winningOption} />
                       {winningOption.totalAmount?.usdCents && (
                         <SWinningOptionAmount variant={4}>
                           {`$${formatNumber(
@@ -253,15 +266,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           {t('acPostSuccess.bidChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
-                          onClick={() => {
-                            setOpenedMainSection('bids');
-
-                            if (activitiesContainerRef.current && isMobile) {
-                              activitiesContainerRef.current.scrollIntoView({
-                                behavior: 'smooth',
-                              });
-                            }
-                          }}
+                          onClick={handleOpenBidsSection}
                         >
                           {t('acPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>

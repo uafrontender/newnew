@@ -16,7 +16,7 @@ import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
 // eslint-disable-next-line import/no-duplicates
 import { QualityLevel, QualityLevelList } from 'videojs-contrib-quality-levels';
-// NB! We have to import these twice
+// NB! We have to import these twice due to package issues
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -85,25 +85,30 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
   // NB! Commented out for now
-  // const [bufferedPercent, setBufferedPercent] = useState(0);
+  const [bufferedPercent, setBufferedPercent] = useState(0);
 
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
-      // Pause the player when scrubbing
-      // to avoid double playback start
-      setIsScrubberTimeChanging(true);
-      playerRef.current?.pause();
-      setPlaybackTime(newValue);
-      playerRef.current?.currentTime(newValue);
+      if (!isPaused) {
+        // Pause the player when scrubbing
+        // to avoid double playback start
+        setIsScrubberTimeChanging(true);
+        playerRef.current?.pause();
+        setPlaybackTime(newValue);
+        playerRef.current?.currentTime(newValue);
 
-      setTimeout(() => {
-        setIsScrubberTimeChanging(false);
-        playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
-        });
-      }, 100);
+        setTimeout(() => {
+          setIsScrubberTimeChanging(false);
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
+        }, 100);
+      } else {
+        setPlaybackTime(newValue);
+        playerRef.current?.currentTime(newValue);
+      }
     },
-    [handleSetIsPaused]
+    [handleSetIsPaused, isPaused]
   );
 
   const options: videojs.PlayerOptions = useMemo(
@@ -197,11 +202,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         }
 
         // Buffered percent
-        // p.on('progress', () => {
-        //   if (p?.bufferedPercent()) {
-        //     setBufferedPercent(p.bufferedPercent() * 100);
-        //   }
-        // });
+        p.on('progress', () => {
+          if (p?.bufferedPercent()) {
+            setBufferedPercent(p.bufferedPercent() * 100);
+          }
+        });
 
         // NB! Commented out for now
         // Fulscreen
@@ -376,7 +381,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         currentTime={playbackTime}
         videoDuration={playerRef?.current?.duration() || 10}
         withTime={videoDurationWithTime}
-        // bufferedPercent={bufferedPercent || undefined}
+        bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
       {/* {isFulscreen ? (

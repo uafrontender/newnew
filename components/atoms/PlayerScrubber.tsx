@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import moment from 'moment';
 import 'moment-duration-format';
 
@@ -73,7 +73,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
   }, [progress]);
 
   return (
-    <SContainer isHovered={isHovered}>
+    <SContainer isHovered={isHovered} isChanging={isChanging}>
       <SSlider
         ref={(el) => {
           sliderRef.current = el!!;
@@ -87,6 +87,9 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
         onTouchStart={() => setIsChanging(true)}
         onTouchEnd={() => setIsChanging(false)}
         onTouchCancel={() => setIsChanging(false)}
+        onMouseEnter={() => setIsChanging(true)}
+        onMouseLeave={() => setIsChanging(false)}
+        onBlur={() => setIsChanging(false)}
         onChange={handleChange}
       />
       {withTime ? (
@@ -102,6 +105,7 @@ export default PlayerScrubber;
 
 const SContainer = styled.div<{
   isHovered: boolean;
+  isChanging: boolean;
 }>`
   position: absolute;
   bottom: 0px;
@@ -109,11 +113,58 @@ const SContainer = styled.div<{
 
   width: 100%;
 
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    background-color: rgb(0, 0, 0, 0.8);
+    box-shadow: 0px 0px 34px 32px rgb(0 0 0 / 85%);
+    z-index: 2;
+    opacity: 0;
+    overflow: hidden;
+    border-bottom-left-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-bottom-right-radius: ${({ theme }) => theme.borderRadius.medium};
+    transition: linear 0.3s;
+  }
+
+  ${({ isChanging }) =>
+    isChanging
+      ? css`
+          &::before {
+            opacity: 1;
+            height: 1px;
+          }
+        `
+      : null};
+
   ${({ theme }) => theme.media.tablet} {
     width: calc(100% - 24px);
     left: 12px;
 
     bottom: 6px;
+
+    &::before {
+      width: calc(100% + 24px);
+      left: -12px;
+      bottom: -5px;
+      overflow: hidden;
+      height: 0px;
+      background-color: rgba(0, 0, 0, 0.62);
+      box-shadow: 0px -18px 18px 4px rgba(0, 0, 0, 0.62);
+      transition: opacity linear 0.3s;
+    }
+
+    ${({ isChanging }) =>
+      isChanging
+        ? css`
+            &::before {
+              opacity: 1;
+              height: 46px;
+            }
+          `
+        : null};
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -126,12 +177,15 @@ const SContainer = styled.div<{
 const SSlider = styled.input.attrs({ type: 'range' })<{
   bufferedPercent?: number;
 }>`
+  position: relative;
   -webkit-appearance: none;
   display: block;
 
   background-color: transparent;
 
   width: 100%;
+
+  z-index: 3;
 
   &:focus {
     outline: none;
@@ -212,6 +266,24 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
     cursor: pointer;
   }
 
+  ${({ bufferedPercent }) =>
+    bufferedPercent
+      ? css`
+          &::before {
+            content: '';
+
+            z-index: -1;
+            position: absolute;
+            bottom: 0;
+
+            width: ${bufferedPercent}%;
+            height: 4px;
+
+            background-color: rgba(255, 255, 255, 0.4);
+          }
+        `
+      : null};
+
   ${({ theme }) => theme.media.tablet} {
     &:hover::-webkit-slider-runnable-track {
       height: 6px;
@@ -264,6 +336,15 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
     &:hover::-moz-range-thumb {
       transform: scale(1.1);
     }
+
+    ${({ bufferedPercent }) =>
+      bufferedPercent
+        ? css`
+            &::before {
+              height: 4px;
+            }
+          `
+        : null};
   }
 `;
 
@@ -279,8 +360,9 @@ const STime = styled.div<{
 
   display: ${({ show }) => (show ? 'block' : 'none')};
 
+  z-index: 2;
+
   ${({ theme }) => theme.media.laptop} {
-    display: block;
     left: initial;
   }
 `;

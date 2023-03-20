@@ -30,12 +30,12 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
-import WinningOptionCreator from '../../../molecules/decision/common/WinningOptionCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import isBrowser from '../../../../utils/isBrowser';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useAppState } from '../../../../contexts/appStateContext';
+import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -150,6 +150,23 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
       'main' | 'options'
     >('main');
 
+    const handleOpenOptionsSection = useCallback(() => {
+      setOpenedMainSection('options');
+
+      let top = activitiesContainerRef.current?.offsetTop;
+
+      if (top) {
+        top -= isMobile ? 16 : 84;
+
+        if (top) {
+          window?.scrollTo({
+            top,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }, [isMobile]);
+
     // Update timer
     useEffect(() => {
       if (isBrowser() && isPageVisible) {
@@ -188,9 +205,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
           const payload = new newnewapi.GetMcOptionRequest({
             optionId: id,
           });
-
           const res = await getMcOption(payload);
-
           if (res.data?.option) {
             setWinningOption(
               res.data.option as newnewapi.MultipleChoice.Option
@@ -291,10 +306,9 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                   <SSeparator />
                   {winningOption ? (
                     <>
-                      <WinningOptionCreator
-                        type='mc'
+                      <WinningMcOptionSupporters
                         postCreator={post.creator!!}
-                        winningOptionMc={winningOption}
+                        winningOption={winningOption}
                       />
                       <SWinningOptionAmount variant={4}>
                         {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
@@ -315,15 +329,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                               _component: 'PostAwaitingResponseMC',
                             });
                           }}
-                          onClick={() => {
-                            setOpenedMainSection('options');
-
-                            if (activitiesContainerRef.current && isMobile) {
-                              activitiesContainerRef.current.scrollIntoView({
-                                behavior: 'smooth',
-                              });
-                            }
-                          }}
+                          onClick={handleOpenOptionsSection}
                         >
                           {t('mcPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>
