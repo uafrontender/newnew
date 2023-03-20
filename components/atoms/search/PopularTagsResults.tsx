@@ -19,7 +19,7 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
       <SBlockTitle>{t('search.popularTags')}</SBlockTitle>
       {hashtags.map((hashtag) => (
         <Link
-          href={`/search?query=${hashtag.text}&type=hashtags&tab=posts`}
+          href={`/search?query=${hashtag.text}&tab=posts`}
           key={hashtag.text}
         >
           <a>
