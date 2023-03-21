@@ -4,15 +4,14 @@ import enterVerificationCode from './utils/enterVerificationCode';
 
 import { fetchProtobuf } from '../../api/apiConfigs';
 import { newnewapi } from 'newnew-api';
+import getShortPostIdFromUrl from './utils/getShortPostIdFromUrl';
 
 const VERIFICATION_CODE = '111111';
-const postShortIdRegex = /p\/([^\/]{1,14})/;
 
-// TODO: Make every actor do a bid?
-
-context('Main flow', () => {
+context('Creator flow', () => {
   const testSeed = Date.now();
 
+  const WL_USER_EMAIL = `test_user_wl_${testSeed}@newnew.co`;
   const CREATOR_EMAIL = `test_creator_${testSeed}@newnew.co`;
 
   let creatorUsername = '';
@@ -271,7 +270,7 @@ context('Main flow', () => {
       cy.url()
         .should('include', '/p/')
         .then((urlstring) => {
-          eventShortId = urlstring.match(postShortIdRegex)[1];
+          eventShortId = getShortPostIdFromUrl(urlstring);
         });
     });
 
@@ -323,7 +322,7 @@ context('Main flow', () => {
       cy.url()
         .should('include', '/p/')
         .then((urlstring) => {
-          superpollShortId = urlstring.match(postShortIdRegex)[1];
+          superpollShortId = getShortPostIdFromUrl(urlstring);
         });
     });
 
@@ -338,6 +337,193 @@ context('Main flow', () => {
       cy.dGet('#turn-on-bundles-button').click();
       cy.dGet('#turn-on-bundles-modal-button').click();
       cy.dGet('#success-bundle-modal').should('be.visible');
+    });
+  });
+
+  describe('Whitelisted user willing to contribute', () => {
+    const USER_EMAIL = WL_USER_EMAIL;
+
+    // Ignore tutorials
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can sign in', () => {
+      cy.dGet('#log-in').click();
+      cy.url().should('include', '/sign-up');
+
+      cy.dGet('#authenticate-input').type(USER_EMAIL);
+      cy.dGet('#authenticate-form').submit();
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+
+      enterVerificationCode(VERIFICATION_CODE);
+      cy.url().should('eq', `${Cypress.env('NEXT_PUBLIC_APP_URL')}/`, {
+        timeout: 15000,
+      });
+    });
+
+    it('can contribute to an event', () => {
+      const BID_OPTION_TEXT = getBidOptionText();
+      const BID_OPTION_AMOUNT = 15;
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = bidOnEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.contains(BID_OPTION_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can contribute to a superpoll ', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll(1, 2);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.dGet('#support-button-supported').should('be.visible');
+    });
+
+    it('can make a custom contribution to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 'custom', 3856);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+    });
+
+    it('can buy a bundle from a post page and contribute to a superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      // Wait for bundle offers to load
+      cy.wait(4000);
+      cy.dGet('#buy-bundle-button').click();
+      cy.dGet('#buy-bundle-1-button').click();
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#bundleSuccess', {
+        timeout: 15000,
+      }).click();
+      cy.dGet('#bundles');
+
+      cy.dGet('#support-button-supported').click();
+      cy.dGet('#vote-option-bundle').click();
+      cy.dGet('#bundle-votes-number').clear().type('10');
+      cy.dGet('#use-bundle-votes').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+    });
+
+    it('can add a custom option to a superpoll', () => {
+      const CUSTOM_OPTION = getNextCustomOptionText();
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#bundles');
+
+      cy.dGet('#add-option-button').click();
+      cy.dGet('#add-option-input').type(CUSTOM_OPTION);
+      cy.dGet('#add-option-submit').should('be.enabled').click();
+      cy.dGet('#add-option-confirm').click();
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.dGet('#support-button-suggested').should('be.visible');
+    });
+
+    it('can`t add another custom option to the same superpoll', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#add-option-button').should('not.exist');
+    });
+
+    it('can delete own custom option', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      cy.dGet('#suggested-option-container').click();
+      cy.dGet('#option-ellipse-menu-delete').click();
+      cy.dGet('#confirm-delete-option').click();
+
+      cy.dGet('#support-button-suggested').should('not.exist');
+      cy.dGet('#add-option-button').should('be.visible');
+    });
+
+    it('can add a new custom option after deleting old one', () => {
+      const CUSTOM_OPTION = getNextCustomOptionText();
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#bundles');
+
+      cy.dGet('#add-option-button').click();
+      cy.dGet('#add-option-input').type(CUSTOM_OPTION);
+      cy.dGet('#add-option-submit').should('be.enabled').click();
+      cy.dGet('#add-option-confirm').click();
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      }).click();
+
+      cy.dGet('#support-button-suggested').should('be.visible');
     });
   });
 
