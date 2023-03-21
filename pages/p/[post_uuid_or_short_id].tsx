@@ -652,6 +652,35 @@ const PostPage: NextPage<IPostPage> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const description = useMemo(() => {
+    if (typeOfPost === 'ac') {
+      const totalInBids = (postParsed.totalAmount?.usdCents ?? 0) / 100;
+
+      if (totalInBids > 0) {
+        return t('meta.description.ac.withContributions', {
+          totalInBids,
+        });
+      }
+
+      return t('meta.description.ac.default');
+    }
+
+    if (typeOfPost === 'mc') {
+      const totalVotes =
+        (postParsed as newnewapi.MultipleChoice).totalVotes ?? 0;
+
+      if (totalVotes > 0) {
+        return t('meta.description.mc.withContributions', {
+          totalVotes,
+        });
+      }
+
+      return t('meta.description.mc.default');
+    }
+
+    return t('meta.description.cf.default');
+  }, [typeOfPost, postParsed, t]);
+
   return (
     <motion.div
       key={postUuidOrShortId}
@@ -723,21 +752,7 @@ const PostPage: NextPage<IPostPage> = ({
                 })
               : ''}
           </title>
-          <meta
-            name='description'
-            content={
-              typeOfPost === 'ac'
-                ? t(`meta.description.ac`, {
-                    totalInBids: (postParsed.totalAmount?.usdCents ?? 0) / 100,
-                  })
-                : typeOfPost === 'mc'
-                ? t(`meta.description.mc`, {
-                    totalVotes: (postParsed as newnewapi.MultipleChoice)
-                      .totalVotes,
-                  })
-                : ''
-            }
-          />
+          <meta name='description' content={description} />
           <meta
             property='og:title'
             content={
@@ -751,21 +766,7 @@ const PostPage: NextPage<IPostPage> = ({
                 : ''
             }
           />
-          <meta
-            property='og:description'
-            content={
-              typeOfPost === 'ac'
-                ? t(`meta.description.ac`, {
-                    totalInBids: (postParsed.totalAmount?.usdCents ?? 0) / 100,
-                  })
-                : typeOfPost === 'mc'
-                ? t(`meta.description.mc`, {
-                    totalVotes: (postParsed as newnewapi.MultipleChoice)
-                      .totalVotes,
-                  })
-                : ''
-            }
-          />
+          <meta property='og:description' content={description} />
           <meta
             property='og:url'
             content={`${process.env.NEXT_PUBLIC_APP_URL}/p/${postUuidOrShortId}`}

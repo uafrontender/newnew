@@ -826,7 +826,7 @@ const SLoadMoreBtn = styled(Button)`
 
 const SActionButton = styled(Button)`
   position: fixed;
-  z-index: 2;
+  z-index: 3;
 
   width: calc(100% - 32px);
   bottom: 16px;

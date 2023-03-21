@@ -119,7 +119,7 @@ const SContainer = styled.div<{
     bottom: 0px;
     left: 0;
     width: 100%;
-    height: 1px;
+    background-color: rgb(0, 0, 0, 0.8);
     box-shadow: 0px 0px 34px 32px rgb(0 0 0 / 85%);
     z-index: 2;
     opacity: 0;
@@ -134,6 +134,7 @@ const SContainer = styled.div<{
       ? css`
           &::before {
             opacity: 1;
+            height: 1px;
           }
         `
       : null};
@@ -149,10 +150,21 @@ const SContainer = styled.div<{
       left: -12px;
       bottom: -5px;
       overflow: hidden;
-      height: 24px;
-      background-color: rgba(0, 0, 0, 0.65);
-      box-shadow: 0px -10px 8px 4px rgba(0, 0, 0, 0.65);
+      height: 0px;
+      background-color: rgba(0, 0, 0, 0.62);
+      box-shadow: 0px -18px 18px 4px rgba(0, 0, 0, 0.62);
+      transition: opacity linear 0.3s;
     }
+
+    ${({ isChanging }) =>
+      isChanging
+        ? css`
+            &::before {
+              opacity: 1;
+              height: 46px;
+            }
+          `
+        : null};
   }
 
   ${({ theme }) => theme.media.laptop} {

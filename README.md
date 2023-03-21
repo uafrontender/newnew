@@ -65,7 +65,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## Tests
 
-We use cypress tests that run locally and on CI pipeline. to run tests use `npm run cypress` command. After a test you can find a video of it running in `cypress/video` folder. In order to see test running in browser use `npm run cypress:open` command.
+We use cypress tests that run locally and on CI pipeline. to run tests use `npm run cypress` command. After a test you can find a video of it running in `cypress/video` folder. In order to see test running in browser use `npm run cypress:open` command. When tests run locally, all test suits run.
+
+To run tests in ci mode run `npm run cypress:ci` command. In ci mode only major test suits will run. Test suits with `.local` suffix are ignored as they take too much time.
 
 If you want to know what use cases are covered and what exactly tests do:
 

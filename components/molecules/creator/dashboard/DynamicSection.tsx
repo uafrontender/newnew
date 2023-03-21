@@ -183,7 +183,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     }
   });
   useOnClickOutside(containerRef, () => {
-    if (tab && !isDesktop) {
+    if (tab && !isDesktop && !showNewMessageModal) {
       handleMinimizeClick();
     }
   });

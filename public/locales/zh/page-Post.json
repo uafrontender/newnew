@@ -3,9 +3,18 @@
     "title": "NewNew上的{{postTitle}} | {{displayName}}",
     "deletedPost_NEED_TRANSLATION": "Deleted post",
     "description": {
-      "ac": "NewNew上出價共有${{totalInBids}}",
-      "mc": "NewNew上投票共有{{totalVotes}}",
-      "cf": ""
+      "ac": {
+        "withContributions": "NewNew上出價共有${{totalInBids}}",
+        "default": "賺錢，與朋友一起出價競拍，支持NewNew上的創作者"
+      },
+      "mc": {
+        "withContributions": "NewNew上投票共有{{totalVotes}}",
+        "default": "賺錢，與朋友一起投票，支持NewNew上的創作者"
+      },
+      "cf": {
+        "withContributions": "",
+        "default": ""
+      }
     }
   },
   "at": "，",
@@ -139,7 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "你的觀眾在等著呢！",
-        "title_2": "馬上上傳你的回應視頻......",
+        "title_2_NEED_TRANSLATION": "Select a file",
+        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
         "description": "視頻的最大尺寸為10GB",
         "button": "選擇檔案"
       },

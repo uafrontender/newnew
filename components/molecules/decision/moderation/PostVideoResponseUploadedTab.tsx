@@ -31,7 +31,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 interface IPostVideoResponseUploadedTab {
   id: string;
   isMuted: boolean;
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   isEditingStories: boolean;
   handleToggleMuted: () => void;
   handleToggleEditingStories: () => void;
@@ -44,7 +44,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   id,
   isMuted,
   isEditingStories,
-  soundBtnBottomOverriden,
+  uiOffset,
   handleToggleMuted,
   handleToggleEditingStories,
   handleUnsetEditingStories,
@@ -345,7 +345,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         <PostVideoResponseUploaded
           isMuted={isMuted}
           isEditingStories={isEditingStories}
-          soundBtnBottomOverriden={soundBtnBottomOverriden}
+          uiOffset={uiOffset}
           handleToggleMuted={handleToggleMuted}
           handleDeleteUnuploadedAdditonalResponse={
             handleDeleteUnuploadedAdditonalResponse
@@ -380,7 +380,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       responses?.length > 1 ? (
         <PostVideoEditStoryButton
           active={isEditingStories}
-          bottomOverriden={soundBtnBottomOverriden}
+          uiOffset={uiOffset}
           handleClick={handleToggleEditingStories}
         />
       ) : null}

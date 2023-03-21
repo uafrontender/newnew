@@ -3,9 +3,18 @@
     "title": "{{postTitle}} | {{displayName}} on NewNew",
     "deletedPost": "Deleted post",
     "description": {
-      "ac": "${{totalInBids}} in bids on NewNew",
-      "mc": "{{totalVotes}} votes on NewNew",
-      "cf": ""
+      "ac": {
+        "withContributions": "${{totalInBids}} in bids on NewNew",
+        "default": "Make money, bid in auctions with friends and support creators on NewNew"
+      },
+      "mc": {
+        "withContributions": "{{totalVotes}} votes on NewNew",
+        "default": "Make money, vote with friends and support creators on NewNew"
+      },
+      "cf": {
+        "withContributions": "",
+        "default": ""
+      }
     }
   },
   "at": " at ",
@@ -139,7 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "Your audience is waiting!",
-        "title_2": "Upload your video response now..",
+        "title_2": "Select a file",
+        "title_2Long": "Select a file or drag and drop here",
         "description": "Max size of the video 10 GB",
         "button": "Select file"
       },

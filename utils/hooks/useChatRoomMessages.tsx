@@ -20,7 +20,7 @@ const useChatRoomMessages = (
 ) => {
   const query = useInfiniteQuery(
     ['private', 'getMessages', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetMessagesRequest({
         roomId: params.roomId,
         paging: {
@@ -29,7 +29,7 @@ const useChatRoomMessages = (
         },
       });
 
-      const chatroomMessagesResponse = await getMessages(payload);
+      const chatroomMessagesResponse = await getMessages(payload, signal);
 
       if (!chatroomMessagesResponse.data || chatroomMessagesResponse.error) {
         throw new Error('Request failed');

@@ -13,14 +13,14 @@ import { useAppState } from '../../../contexts/appStateContext';
 interface IPostVideoSoundButton {
   postUuid: string;
   isMuted?: boolean;
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   handleToggleMuted: () => void;
 }
 
 const PostVideoSoundButton: React.FunctionComponent<IPostVideoSoundButton> = ({
   postUuid,
   isMuted,
-  soundBtnBottomOverriden,
+  uiOffset,
   handleToggleMuted,
 }) => {
   const { resizeMode } = useAppState();
@@ -46,9 +46,9 @@ const PostVideoSoundButton: React.FunctionComponent<IPostVideoSoundButton> = ({
         handleToggleMuted();
       }}
       style={{
-        ...(soundBtnBottomOverriden
+        ...(uiOffset
           ? {
-              bottom: soundBtnBottomOverriden,
+              transform: `translateY(-${uiOffset}px)`,
             }
           : {}),
       }}

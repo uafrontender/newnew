@@ -24,7 +24,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
-  dotsBottom?: number;
+  uiOffset?: number;
   isMuted?: boolean;
   isEditingStories?: boolean;
   isDeletingAdditionalResponse: boolean;
@@ -38,7 +38,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   IPostVideoResponsesSlider
 > = ({
   videos,
-  dotsBottom,
+  uiOffset,
   isMuted,
   isEditingStories,
   isDeletingAdditionalResponse,
@@ -168,7 +168,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           containerRef.current = el!!;
         }}
       >
-        {videos.map((video, i) => (
+        {videos.map((video, i, arr) => (
           <PostVideoStoryItem
             key={video?.uuid ?? i}
             video={video}
@@ -176,16 +176,19 @@ const PostVideoResponsesSlider: React.FunctionComponent<
             isVisible={currentVideo === i}
             isMuted={isMuted}
             videoDurationWithTime={videoDurationWithTime}
-            onPlaybackFinished={autoscroll ? handleScrollRight : undefined}
+            onPlaybackFinished={
+              // If the last video in story mode, continue loop
+              autoscroll && i !== arr.length - 1 ? handleScrollRight : undefined
+            }
           />
         ))}
       </SContainer>
       <SDotsContainer
         isEditingStories={isEditingStories}
         style={{
-          ...(dotsBottom
+          ...(uiOffset
             ? {
-                bottom: `${dotsBottom}px`,
+                transform: `translateY(-${uiOffset}px)`,
               }
             : {}),
         }}
@@ -256,7 +259,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         <PostVideoStoriesPreviewSlider
           videos={videos}
           currentActive={currentVideo}
-          offsetBottom={dotsBottom ?? 0}
+          uiOffset={uiOffset ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
           handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
