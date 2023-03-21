@@ -801,8 +801,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (
       Object.entries(dataInEdit).some(
         ([key, value]) =>
-          value !== (user.userData && (user.userData as any)[key]) &&
-          !validateInputText(value as string)
+          value !==
+            (user.userData &&
+            (user.userData as any)[key] &&
+            (user.userData as any)[key] !== null
+              ? (user.userData as any)[key]
+              : '') && !validateInputText(value as string)
       )
     ) {
       setIsDataValid(false);
