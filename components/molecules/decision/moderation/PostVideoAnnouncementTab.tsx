@@ -24,7 +24,7 @@ interface IPostVideoAnnouncementTab {
   isMuted: boolean;
   isSetThumbnailButtonIconOnly: boolean;
   ellipseButtonRef: any;
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   handleOpenEllipseMenu: () => void;
   handleToggleMuted: () => void;
 }
@@ -38,7 +38,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
   isMuted,
   isSetThumbnailButtonIconOnly,
   ellipseButtonRef,
-  soundBtnBottomOverriden,
+  uiOffset,
   handleOpenEllipseMenu,
   handleToggleMuted,
 }) => {
@@ -75,9 +75,9 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
             handleOpenEllipseMenu();
           }}
           style={{
-            ...(soundBtnBottomOverriden
+            ...(uiOffset
               ? {
-                  bottom: soundBtnBottomOverriden,
+                  transform: `translateY(-${uiOffset}px)`,
                 }
               : {}),
           }}
@@ -102,9 +102,9 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
             handleOpenEllipseMenu();
           }}
           style={{
-            ...(soundBtnBottomOverriden
+            ...(uiOffset
               ? {
-                  bottom: soundBtnBottomOverriden,
+                  transform: `translateY(-${uiOffset}px)`,
                 }
               : {}),
           }}
@@ -117,7 +117,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
       <PostVideoSoundButton
         postUuid={postUuid}
         isMuted={isMuted}
-        soundBtnBottomOverriden={soundBtnBottomOverriden}
+        uiOffset={uiOffset}
         handleToggleMuted={handleToggleMuted}
       />
     </>
