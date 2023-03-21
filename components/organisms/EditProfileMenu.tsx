@@ -160,7 +160,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { t: tCommon } = useTranslation('common');
   const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
@@ -802,8 +801,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (
       Object.entries(dataInEdit).some(
         ([key, value]) =>
-          key !== 'genderPronouns' &&
-          key !== 'bio' &&
+          value !== (user.userData && (user.userData as any)[key]) &&
           !validateInputText(value as string)
       )
     ) {
@@ -817,7 +815,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
 
     setIsDataValid(true);
-  }, [formErrors, dataInEdit]);
+  }, [formErrors, dataInEdit, user.userData]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(

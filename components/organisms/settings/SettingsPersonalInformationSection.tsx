@@ -174,6 +174,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
               !user.userData?.options?.birthDateUpdatesLeft ||
               user.userData.options.birthDateUpdatesLeft <= 0
             }
+            // TODO: Change error text to 13 or older
             submitError={
               dateError
                 ? t(
