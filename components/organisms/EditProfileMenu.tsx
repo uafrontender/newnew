@@ -160,7 +160,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { t: tCommon } = useTranslation('common');
   const { showErrorToastPredefined } = useErrorToasts();
 
   const dispatch = useAppDispatch();
@@ -799,14 +798,29 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
 
   useEffect(() => {
-    if (
-      Object.entries(dataInEdit).some(
-        ([key, value]) =>
-          key !== 'genderPronouns' &&
-          key !== 'bio' &&
-          !validateInputText(value as string)
-      )
-    ) {
+    const hasInvalidFields = Object.entries(dataInEdit).some(([key, value]) => {
+      // Skip these fields
+      if (key === 'genderPronouns' || key === 'bio') {
+        return false;
+      }
+
+      // Return true if we have no initial values (should not happen often)
+      if (!user.userData) {
+        return true;
+      }
+
+      const initialValue = (user.userData as any)[key] ?? '';
+
+      if (value === initialValue) {
+        return false;
+      }
+
+      return !validateInputText(value as string);
+    });
+
+    console.log('');
+
+    if (hasInvalidFields) {
       setIsDataValid(false);
       return;
     }
@@ -817,7 +831,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
 
     setIsDataValid(true);
-  }, [formErrors, dataInEdit]);
+  }, [formErrors, dataInEdit, user.userData]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -836,6 +850,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         })),
     [t]
   );
+
+  console.log(
+    (!wasModified &&
+      ((!user.userData?.bio && dataInEdit.bio === '') ||
+        dataInEdit.bio === user.userData?.bio)) ||
+      !isDataValid ||
+      isLoading ||
+      !coverUrlInEdit
+  );
+  console.log('FIELDS');
+  console.log(isDataValid);
 
   return (
     <SEditProfileMenu
@@ -1001,7 +1026,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <Button
                 withShadow
                 disabled={
-                  (!wasModified && dataInEdit.bio === user.userData?.bio) ||
+                  (!wasModified &&
+                    ((!user.userData?.bio && dataInEdit.bio === '') ||
+                      dataInEdit.bio === user.userData?.bio)) ||
                   !isDataValid ||
                   isLoading ||
                   !coverUrlInEdit
