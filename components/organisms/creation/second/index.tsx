@@ -680,7 +680,8 @@ export const CreationSecondStepContent: React.FC<
   );
   const expireOptions = useMemo(
     () => [
-      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production'
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production' &&
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
         ? [
             {
               id: '2-minutes',
@@ -690,6 +691,15 @@ export const CreationSecondStepContent: React.FC<
               id: '5-minutes',
               title: t('secondStep.field.expiresAt.options.5-minutes'),
             },
+            {
+              id: '10-minutes',
+              title: t('secondStep.field.expiresAt.options.10-minutes'),
+            },
+          ]
+        : []),
+      // Debatable, but reserve ability to make 10 minutes for staging, as well
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? [
             {
               id: '10-minutes',
               title: t('secondStep.field.expiresAt.options.10-minutes'),

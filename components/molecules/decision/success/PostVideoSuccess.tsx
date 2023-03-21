@@ -55,9 +55,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   ].includes(resizeMode);
 
   // Show controls on shorter screens
-  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] = useState<
-    number | undefined
-  >(undefined);
+  const [uiOffset, setUiOffset] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     async function markResponseAsViewed() {
@@ -112,9 +110,9 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       if (rect && videoRect) {
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
-          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+          setUiOffset(Math.abs(delta));
         } else {
-          setSoundBtnBottomOverriden(undefined);
+          setUiOffset(undefined);
         }
       }
     };
@@ -131,9 +129,9 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
 
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
-          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+          setUiOffset(Math.abs(delta));
         } else {
-          setSoundBtnBottomOverriden(undefined);
+          setUiOffset(undefined);
         }
       }
 
@@ -141,7 +139,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     }
 
     return () => {
-      setSoundBtnBottomOverriden(undefined);
+      setUiOffset(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
         document?.removeEventListener('scroll', handleScroll);
@@ -167,6 +165,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               isDeletingAdditionalResponse={false}
               videos={[response, ...additionalResponses]}
               isMuted={isMuted}
+              uiOffset={uiOffset}
               videoDurationWithTime
               autoscroll
             />
@@ -174,7 +173,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           <PostVideoSoundButton
             postUuid={postUuid}
             isMuted={isMuted}
-            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            uiOffset={uiOffset}
             handleToggleMuted={handleToggleMuted}
           />
         </>
@@ -190,7 +189,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           <PostVideoSoundButton
             postUuid={postUuid}
             isMuted={isMuted}
-            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            uiOffset={uiOffset}
             handleToggleMuted={handleToggleMuted}
           />
         </>

@@ -24,7 +24,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
-  dotsBottom?: number;
+  uiOffset?: number;
   isMuted?: boolean;
   isEditingStories?: boolean;
   isDeletingAdditionalResponse: boolean;
@@ -38,7 +38,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   IPostVideoResponsesSlider
 > = ({
   videos,
-  dotsBottom,
+  uiOffset,
   isMuted,
   isEditingStories,
   isDeletingAdditionalResponse,
@@ -186,9 +186,9 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       <SDotsContainer
         isEditingStories={isEditingStories}
         style={{
-          ...(dotsBottom
+          ...(uiOffset
             ? {
-                bottom: `${dotsBottom}px`,
+                transform: `translateY(-${uiOffset}px)`,
               }
             : {}),
         }}
@@ -259,7 +259,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         <PostVideoStoriesPreviewSlider
           videos={videos}
           currentActive={currentVideo}
-          offsetBottom={dotsBottom ?? 0}
+          uiOffset={uiOffset ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
           handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
