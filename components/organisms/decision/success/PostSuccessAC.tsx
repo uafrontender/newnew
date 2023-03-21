@@ -99,6 +99,23 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       'main'
     );
 
+    const handleOpenBidsSection = useCallback(() => {
+      setOpenedMainSection('bids');
+
+      let top = activitiesContainerRef.current?.offsetTop;
+
+      if (top) {
+        top -= isMobile ? 16 : 84;
+
+        if (top) {
+          window?.scrollTo({
+            top,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }, [isMobile]);
+
     // Check if the response has been viewed
     useEffect(() => {
       fetchPostLatestData();
@@ -249,15 +266,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           {t('acPostSuccess.bidChosen')}
                         </SWinningOptionDetailsBidChosen>
                         <SWinningOptionDetailsSeeAll
-                          onClick={() => {
-                            setOpenedMainSection('bids');
-
-                            if (activitiesContainerRef.current) {
-                              activitiesContainerRef.current.scrollIntoView({
-                                behavior: 'smooth',
-                              });
-                            }
-                          }}
+                          onClick={handleOpenBidsSection}
                         >
                           {t('acPostSuccess.seeAll')}
                         </SWinningOptionDetailsSeeAll>

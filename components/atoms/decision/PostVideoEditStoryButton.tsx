@@ -12,13 +12,13 @@ import { useAppState } from '../../../contexts/appStateContext';
 
 interface IPostVideoEditStoryButton {
   active: boolean;
-  bottomOverriden?: number;
+  uiOffset?: number;
   handleClick: () => void;
 }
 
 const PostVideoEditStoryButton: React.FunctionComponent<
   IPostVideoEditStoryButton
-> = ({ active, bottomOverriden, handleClick }) => {
+> = ({ active, uiOffset, handleClick }) => {
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
@@ -51,9 +51,9 @@ const PostVideoEditStoryButton: React.FunctionComponent<
       view='transparent'
       onClick={handleClickPostVideoStoryButton}
       style={{
-        ...(bottomOverriden
+        ...(uiOffset
           ? {
-              bottom: bottomOverriden,
+              transform: `translateY(-${uiOffset}px)`,
             }
           : {}),
       }}

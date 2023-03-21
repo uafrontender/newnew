@@ -15,7 +15,7 @@ const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
 
 interface IPostVideoResponseUploaded {
   isMuted: boolean;
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   isEditingStories?: boolean;
   handleToggleMuted: () => void;
   handleDeleteUnuploadedAdditonalResponse?: () => void;
@@ -25,7 +25,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
   IPostVideoResponseUploaded
 > = ({
   isMuted,
-  soundBtnBottomOverriden,
+  uiOffset,
   isEditingStories,
   handleToggleMuted,
   handleDeleteUnuploadedAdditonalResponse,
@@ -73,10 +73,9 @@ const PostVideoResponseUploaded: React.FunctionComponent<
           videos={responses as newnewapi.IVideoUrls[]}
           isMuted={isMuted}
           isEditingStories={isEditingStories}
-          {...(soundBtnBottomOverriden && !isMobileOrTablet
+          {...(uiOffset && !isMobileOrTablet
             ? {
-                dotsBottom:
-                  soundBtnBottomOverriden + (!isEditingStories ? 72 : 24),
+                uiOffset,
               }
             : {})}
           videoDurationWithTime={!isEditingStories}
@@ -98,7 +97,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
       <PostVideoSoundButton
         postUuid={postParsed?.postUuid ?? ''}
         isMuted={isMuted}
-        soundBtnBottomOverriden={soundBtnBottomOverriden}
+        uiOffset={uiOffset}
         handleToggleMuted={handleToggleMuted}
       />
     </>

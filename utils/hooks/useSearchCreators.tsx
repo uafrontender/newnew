@@ -22,7 +22,7 @@ const useSearchCreators = (
 ) => {
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getSearchCreators', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.SearchCreatorsRequest({
         query: params.query,
         paging: {
@@ -32,7 +32,7 @@ const useSearchCreators = (
         ...(params.filter ? { filter: params.filter } : {}),
       });
 
-      const creatorsResponse = await searchCreators(payload);
+      const creatorsResponse = await searchCreators(payload, signal);
 
       if (!creatorsResponse.data || creatorsResponse.error) {
         throw new Error('Request failed');
