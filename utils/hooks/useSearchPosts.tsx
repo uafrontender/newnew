@@ -24,7 +24,7 @@ const useSearchPosts = (
 ) => {
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getSearchPosts', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.SearchPostsRequest({
         query: params.query,
         searchType: params.searchType,
@@ -36,7 +36,7 @@ const useSearchPosts = (
         },
       });
 
-      const postsResponse = await searchPosts(payload);
+      const postsResponse = await searchPosts(payload, signal);
 
       if (!postsResponse.data || postsResponse.error) {
         throw new Error('Request failed');

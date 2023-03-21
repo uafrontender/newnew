@@ -94,7 +94,7 @@ const useMcOptions = (
 
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getMcOptions', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetMcOptionsRequest({
         postUuid: params.postUuid,
         paging: {
@@ -102,7 +102,10 @@ const useMcOptions = (
         },
       });
 
-      const optionsResponse = await fetchCurrentOptionsForMCPost(payload);
+      const optionsResponse = await fetchCurrentOptionsForMCPost(
+        payload,
+        signal
+      );
 
       if (!optionsResponse.data || optionsResponse.error) {
         throw new Error('Request failed');

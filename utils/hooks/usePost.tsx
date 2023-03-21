@@ -47,12 +47,12 @@ const usePost = (
       'fetchPostByUUID',
       params.postUuid,
     ],
-    async () => {
+    async ({ signal }) => {
       const getPostPayload = new newnewapi.GetPostRequest({
         postUuid: params.postUuid,
       });
 
-      const res = await fetchPostByUUID(getPostPayload);
+      const res = await fetchPostByUUID(getPostPayload, signal);
 
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Post not found');
