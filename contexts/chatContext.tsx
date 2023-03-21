@@ -110,11 +110,16 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function getUnread() {
       if (!user.loggedIn) return;
       try {
         const payload = new newnewapi.EmptyRequest();
-        const res = await getTotalUnreadMessageCounts(payload);
+        const res = await getTotalUnreadMessageCounts(
+          payload,
+          controller.signal
+        );
 
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
@@ -126,6 +131,12 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       }
     }
     getUnread();
+
+    return () => {
+      if (controller) {
+        controller.abort();
+      }
+    };
   }, [user.loggedIn, setData, bundles?.length]);
 
   useEffect(() => {
