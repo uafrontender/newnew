@@ -12,7 +12,6 @@ import { SChatSeparator } from '../../atoms/direct-messages/styles';
 import { useGetChats } from '../../../contexts/chatContext';
 import Loader from '../../atoms/Loader';
 import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
-import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
 
 const NoResults = dynamic(
@@ -55,12 +54,10 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
     justSentMessage,
   } = useGetChats();
 
-  const searchChatroomDebounced = useDebouncedValue(searchChatroom, 500);
-
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
-      myRole: activeTab,
-      searchQuery: searchChatroomDebounced,
+      myRole: searchChatroom ? undefined : activeTab,
+      searchQuery: searchChatroom,
     });
 
   const chatrooms = useMemo(
@@ -142,11 +139,11 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
           )}
 
           {/* Empty inbox */}
-          {chatrooms.length === 0 && !searchChatroomDebounced && <EmptyInbox />}
+          {chatrooms.length === 0 && !searchChatroom && <EmptyInbox />}
 
           {/* No Search Results */}
-          {chatrooms.length === 0 && searchChatroomDebounced && (
-            <NoResults text={searchChatroomDebounced} />
+          {chatrooms.length === 0 && searchChatroom && (
+            <NoResults text={searchChatroom} />
           )}
         </>
       )}
