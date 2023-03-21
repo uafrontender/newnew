@@ -22,7 +22,7 @@ const useMyPosts = (
 ) => {
   const query = useInfiniteQuery(
     ['private', 'getMyPosts', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: params.relation,
         paging: {
@@ -34,7 +34,7 @@ const useMyPosts = (
         ...(params.statusFilter ? { statusFilter: params.statusFilter } : {}),
       });
 
-      const postsResponse = await getMyPosts(payload);
+      const postsResponse = await getMyPosts(payload, signal);
 
       if (!postsResponse.data || postsResponse.error) {
         throw new Error('Request failed');

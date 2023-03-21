@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { createContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   useMutation,
   useQuery,
@@ -35,10 +35,10 @@ const useCards = (): CardsData => {
 
   const query = useQuery(
     ['private', 'getCards'],
-    async () => {
+    async ({ signal }) => {
       const payload = new newnewapi.EmptyRequest({});
 
-      const res = await getCards(payload);
+      const res = await getCards(payload, signal);
 
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');

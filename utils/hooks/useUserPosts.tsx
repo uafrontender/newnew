@@ -23,7 +23,7 @@ const useUserPosts = (
 ) => {
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getUserPosts', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetUserPostsRequest({
         userUuid: params.userUuid,
         relation: params.relation,
@@ -35,7 +35,7 @@ const useUserPosts = (
         ...(params.postsFilter ? { filter: params.postsFilter } : {}),
       });
 
-      const postsResponse = await fetchUsersPosts(payload);
+      const postsResponse = await fetchUsersPosts(payload, signal);
 
       if (!postsResponse.data || postsResponse.error) {
         throw new Error('Request failed');
