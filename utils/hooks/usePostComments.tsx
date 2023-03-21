@@ -71,7 +71,7 @@ const usePostComments = (
 
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetMessagesRequest({
         roomId: params.commentsRoomId,
         paging: {
@@ -79,7 +79,7 @@ const usePostComments = (
         },
       });
 
-      const postsResponse = await getMessages(payload);
+      const postsResponse = await getMessages(payload, signal);
 
       if (!postsResponse.data || postsResponse.error) {
         throw new Error('Request failed');
