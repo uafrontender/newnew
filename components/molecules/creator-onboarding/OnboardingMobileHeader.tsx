@@ -44,7 +44,7 @@ const SOnboardingProgressBarContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    padding-bottom: 80px;
+    padding-bottom: 0;
   }
 `;
 
