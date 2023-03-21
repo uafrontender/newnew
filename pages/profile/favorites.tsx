@@ -35,7 +35,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
     fetchNextPage,
     isLoading,
     isFetchingNextPage,
-    refetch,
+    removePostMutation,
   } = useMyPosts({
     relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
     postsFilter,
@@ -55,8 +55,8 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({ postsFilter }) => {
     }
   }, [inView, fetchNextPage]);
 
-  const handleRemovePostFromState = () => {
-    refetch();
+  const handleRemovePostFromState = (postUuid: string) => {
+    removePostMutation.mutate(postUuid);
   };
 
   return (
