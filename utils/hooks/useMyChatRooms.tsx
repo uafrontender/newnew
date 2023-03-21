@@ -27,7 +27,7 @@ const useMyChatRooms = (
       ...(additionalKey ? [additionalKey] : []),
       params,
     ],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetMyRoomsRequest({
         ...(params.roomKind ? { roomKind: params.roomKind } : {}),
         ...(params.searchQuery ? { searchQuery: params.searchQuery } : {}),
@@ -38,7 +38,7 @@ const useMyChatRooms = (
         },
       });
 
-      const chatroomResponse = await getMyRooms(payload);
+      const chatroomResponse = await getMyRooms(payload, signal);
 
       if (!chatroomResponse.data || chatroomResponse.error) {
         throw new Error('Request failed');
