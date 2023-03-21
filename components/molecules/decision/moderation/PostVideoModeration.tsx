@@ -117,7 +117,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   }, []);
 
   // Show controls on shorter screens
-  const [bottomOffset, setBottomOffset] = useState<number | undefined>(24);
+  const [uiOffset, setUiOffset] = useState<number | undefined>(24);
 
   const isSetThumbnailButtonIconOnly = useMemo(
     () =>
@@ -153,9 +153,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       if (rect && videoRect) {
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
-          setBottomOffset(Math.abs(delta) + 24);
+          setUiOffset(Math.abs(delta) + 24);
         } else {
-          setBottomOffset(undefined);
+          setUiOffset(undefined);
         }
       }
     };
@@ -172,9 +172,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
-          setBottomOffset(Math.abs(delta) + 24);
+          setUiOffset(Math.abs(delta) + 24);
         } else {
-          setBottomOffset(undefined);
+          setUiOffset(undefined);
         }
       }
 
@@ -182,7 +182,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     }
 
     return () => {
-      setBottomOffset(undefined);
+      setUiOffset(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
         document?.removeEventListener('scroll', handleScroll);
@@ -200,7 +200,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             hasCoverImage={!!currentCoverUrl}
             isMuted={isMuted}
             isSetThumbnailButtonIconOnly={isSetThumbnailButtonIconOnly}
-            soundBtnBottomOverriden={bottomOffset}
+            uiOffset={uiOffset}
             handleOpenEditCoverImageMenu={handleOpenEditCoverImageMenu}
             handleToggleMuted={handleToggleMuted}
           />
@@ -209,7 +209,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             id='video'
             isMuted={isMuted}
             isEditingStories={isEditingStories}
-            soundBtnBottomOverriden={bottomOffset}
+            uiOffset={uiOffset}
             handleToggleMuted={handleToggleMuted}
             handleToggleEditingStories={handleToggleEditingStories}
             handleUnsetEditingStories={handleUnsetEditingStories}
@@ -233,12 +233,12 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             <PostVideoSoundButton
               postUuid={postUuid}
               isMuted={isMuted}
-              soundBtnBottomOverriden={bottomOffset}
+              uiOffset={uiOffset}
               handleToggleMuted={handleToggleMuted}
             />
             <SetThumbnailButtonIconOnly
               handleClick={handleOpenEditImageInitialResponse}
-              soundBtnBottomOverriden={bottomOffset}
+              uiOffset={uiOffset}
             />
           </>
         ) : (
@@ -255,9 +255,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           <SlidingToggleVideoWidget
             disabled={responseFileUploadLoading || responseFileUploadLoading}
             wrapperCSS={{
-              ...(bottomOffset
+              ...(uiOffset
                 ? {
-                    bottom: bottomOffset + 8,
+                    transform: `translateY(-${uiOffset + 8}px)`,
                   }
                 : {}),
             }}

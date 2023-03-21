@@ -3,6 +3,11 @@ import { getServerSideSitemap } from 'next-sitemap';
 // import { searchPosts } from '../../api/endpoints/search';
 
 export const getServerSideProps = async (ctx) => {
+  // Return nothing, if staging
+  if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
+    return getServerSideSitemap(ctx, []);
+  }
+
   // TODO: return see more?
   /* const SEE_MORE_CATEGORIES = ['ac', 'mc'];
 

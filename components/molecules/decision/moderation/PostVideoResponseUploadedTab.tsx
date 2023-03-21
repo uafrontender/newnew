@@ -33,7 +33,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 interface IPostVideoResponseUploadedTab {
   id: string;
   isMuted: boolean;
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   isEditingStories: boolean;
   handleToggleMuted: () => void;
   handleToggleEditingStories: () => void;
@@ -47,7 +47,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   id,
   isMuted,
   isEditingStories,
-  soundBtnBottomOverriden,
+  uiOffset,
   handleToggleMuted,
   handleToggleEditingStories,
   handleUnsetEditingStories,
@@ -334,9 +334,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   const thumbnailButtonBottomOverriden = useMemo(
     () =>
       responses && responses?.length > 1
-        ? (soundBtnBottomOverriden || 0) + (isMobile ? 64 : 84)
-        : soundBtnBottomOverriden,
-    [isMobile, responses, soundBtnBottomOverriden]
+        ? (uiOffset || 0) + (isMobile ? 48 : 64)
+        : uiOffset,
+    [isMobile, responses, uiOffset]
   );
 
   useEffect(() => {
@@ -363,7 +363,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         <PostVideoResponseUploaded
           isMuted={isMuted}
           isEditingStories={isEditingStories}
-          soundBtnBottomOverriden={soundBtnBottomOverriden}
+          uiOffset={uiOffset}
           handleToggleMuted={handleToggleMuted}
           handleDeleteUnuploadedAdditonalResponse={
             handleDeleteUnuploadedAdditonalResponse
@@ -398,7 +398,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       responses?.length > 1 ? (
         <PostVideoEditStoryButton
           active={isEditingStories}
-          bottomOverriden={soundBtnBottomOverriden}
+          uiOffset={uiOffset}
           handleClick={handleToggleEditingStories}
         />
       ) : null}
@@ -407,9 +407,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       !responseFileProcessingLoading ? (
         <SetThumbnailButtonIconOnly
           handleClick={handleOpenEditCoverImageMenu}
-          soundBtnBottomOverriden={
-            !isTablet ? thumbnailButtonBottomOverriden : soundBtnBottomOverriden
-          }
+          uiOffset={!isTablet ? thumbnailButtonBottomOverriden : uiOffset}
           positionLeftOverriden={
             responses && responses?.length > 1 && isTablet ? 64 : 0
           }

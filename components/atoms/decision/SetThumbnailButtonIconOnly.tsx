@@ -8,14 +8,14 @@ import ThumbnailIcon from '../../../public/images/svg/icons/filled/AddImage.svg'
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface ISetThumbnailButtonIconOnly {
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   positionLeftOverriden?: number;
   handleClick: () => void;
 }
 
 const SetThumbnailButtonIconOnly: React.FunctionComponent<
   ISetThumbnailButtonIconOnly
-> = ({ soundBtnBottomOverriden, positionLeftOverriden, handleClick }) => {
+> = ({ uiOffset, positionLeftOverriden, handleClick }) => {
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
@@ -33,9 +33,9 @@ const SetThumbnailButtonIconOnly: React.FunctionComponent<
         handleClick();
       }}
       style={{
-        ...(soundBtnBottomOverriden
+        ...(uiOffset
           ? {
-              bottom: soundBtnBottomOverriden,
+              transform: `translateY(-${uiOffset}px)`,
             }
           : {}),
         ...(positionLeftOverriden

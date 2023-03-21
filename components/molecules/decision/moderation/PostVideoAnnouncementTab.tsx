@@ -19,7 +19,7 @@ interface IPostVideoAnnouncementTab {
   hasCoverImage: boolean;
   isMuted: boolean;
   isSetThumbnailButtonIconOnly: boolean;
-  soundBtnBottomOverriden?: number;
+  uiOffset?: number;
   handleOpenEditCoverImageMenu: () => void;
   handleToggleMuted: () => void;
 }
@@ -32,7 +32,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
   hasCoverImage,
   isMuted,
   isSetThumbnailButtonIconOnly,
-  soundBtnBottomOverriden,
+  uiOffset,
   handleOpenEditCoverImageMenu,
   handleToggleMuted,
 }) => {
@@ -50,16 +50,16 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
       {isSetThumbnailButtonIconOnly ? (
         <SetThumbnailButtonIconOnly
           handleClick={handleOpenEditCoverImageMenu}
-          soundBtnBottomOverriden={soundBtnBottomOverriden}
+          uiOffset={uiOffset}
         />
       ) : (
         <SSetThumbnailButton
           view='transparent'
           onClick={handleOpenEditCoverImageMenu}
           style={{
-            ...(soundBtnBottomOverriden
+            ...(uiOffset
               ? {
-                  bottom: soundBtnBottomOverriden,
+                  transform: `translateY(-${uiOffset}px)`,
                 }
               : {}),
           }}
@@ -72,7 +72,7 @@ const PostVideoAnnouncementTab: React.FunctionComponent<
       <PostVideoSoundButton
         postUuid={postUuid}
         isMuted={isMuted}
-        soundBtnBottomOverriden={soundBtnBottomOverriden}
+        uiOffset={uiOffset}
         handleToggleMuted={handleToggleMuted}
       />
     </>
