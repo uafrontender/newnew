@@ -192,7 +192,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 )}
                 <SListItemTitleWrapper>
                   <SListItemTitle variant={3} weight={600}>
-                    {data.title}
+                    <PostTitleContent>{data.title}</PostTitleContent>
                   </SListItemTitle>
                   <SListItemDate variant={2} weight={600}>
                     <ResponseTimer

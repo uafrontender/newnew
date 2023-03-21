@@ -63,11 +63,11 @@ const GlobalStyle = createGlobalStyle`
     text-decoration: none;
   }
 
-  .iti__flag {background-image: url("../../flags.png");}
+  /* .iti__flag {background-image: url("../../flags.png");}
 
   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .iti__flag {background-image: url("../../flags.png");}
-  }
+  } */
 
   #nprogress .bar {
     background: repeating-linear-gradient(to right, #1D6AFF 0%, rgba(29, 180, 255, 0.85) 50%, #1D6AFF 100%);
