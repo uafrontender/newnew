@@ -1012,7 +1012,6 @@ const SContainer = styled.div<{
 
     padding-left: 152px;
     padding-right: 152px;
-
     margin-bottom: 44px;
   }
 
@@ -1020,8 +1019,7 @@ const SContainer = styled.div<{
     height: fit-content;
 
     padding-left: 0;
-    padding-right: 104px;
-
+    padding-right: 0;
     margin-bottom: 130px;
   }
 `;
@@ -1116,7 +1114,6 @@ const SControlsDiv = styled.div`
     position: static;
 
     padding-left: 152px;
-    padding-right: 152px;
     padding-bottom: 24px;
 
     margin-left: 0;
@@ -1126,7 +1123,6 @@ const SControlsDiv = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     padding-left: 0;
-    padding-right: 104px;
   }
 `;
 
