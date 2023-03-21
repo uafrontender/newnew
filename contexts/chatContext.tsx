@@ -13,6 +13,7 @@ import { SocketContext } from './socketContext';
 import { getTotalUnreadMessageCounts } from '../api/endpoints/chat';
 import { useBundles } from './bundlesContext';
 import { useAppState } from './appStateContext';
+import useDebouncedValue from '../utils/hooks/useDebouncedValue';
 
 interface IChatsContext {
   unreadCountForUser: number;
@@ -240,6 +241,8 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     }
   }, [user.loggedIn, resetState]);
 
+  const searchChatroomDebounced = useDebouncedValue(searchChatroom, 500);
+
   const contextValue = useMemo(
     () => ({
       unreadCountForUser,
@@ -248,7 +251,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       mobileChatOpened,
       hiddenMessagesArea,
       activeChatRoom,
-      searchChatroom,
+      searchChatroom: searchChatroomDebounced,
       activeTab,
       justSentMessage,
       chatsDraft,
@@ -269,7 +272,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       activeChatRoom,
       mobileChatOpened,
       hiddenMessagesArea,
-      searchChatroom,
+      searchChatroomDebounced,
       activeTab,
       justSentMessage,
       chatsDraft,
