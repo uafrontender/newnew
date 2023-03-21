@@ -12,7 +12,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 interface IPostVideoStoriesPreviewSlider {
   videos: newnewapi.IVideoUrls[];
   currentActive: number;
-  offsetBottom: number;
+  uiOffset: number;
   canDeleteOnlyNonUploaded?: boolean;
   isDeletingAdditionalResponse: boolean;
   handleChangeCurrentActive: (idx: number) => void;
@@ -25,7 +25,7 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
 > = ({
   videos,
   currentActive,
-  offsetBottom,
+  uiOffset,
   isDeletingAdditionalResponse,
   handleChangeCurrentActive,
   handleDeleteAdditionalVideo,
@@ -39,6 +39,8 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  console.log(uiOffset);
 
   const { readyToUploadAdditionalResponse } =
     usePostModerationResponsesContext();
@@ -60,9 +62,9 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   return (
     <SWrapper
       style={{
-        ...(offsetBottom && !isMobileOrTablet
+        ...(uiOffset && !isMobileOrTablet
           ? {
-              bottom: offsetBottom + 48,
+              transform: `translateY(-${uiOffset}px)`,
             }
           : {}),
       }}

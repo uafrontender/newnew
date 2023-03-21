@@ -47,9 +47,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   ].includes(resizeMode);
 
   // Show controls on shorter screens
-  const [soundBtnBottomOverriden, setSoundBtnBottomOverriden] = useState<
-    number | undefined
-  >(undefined);
+  const [uiOffset, setUiOffset] = useState<number | undefined>(undefined);
 
   // Tabs
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -96,9 +94,9 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       if (rect && videoRect) {
         const delta = window.innerHeight - videoRect.bottom;
         if (delta < 0) {
-          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+          setUiOffset(Math.abs(delta));
         } else {
-          setSoundBtnBottomOverriden(undefined);
+          setUiOffset(undefined);
         }
       }
     };
@@ -115,9 +113,9 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
 
         if (!isInViewPort) {
           const delta = window.innerHeight - rect.bottom;
-          setSoundBtnBottomOverriden(Math.abs(delta) + 24);
+          setUiOffset(Math.abs(delta));
         } else {
-          setSoundBtnBottomOverriden(undefined);
+          setUiOffset(undefined);
         }
       }
 
@@ -125,7 +123,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
     }
 
     return () => {
-      setSoundBtnBottomOverriden(undefined);
+      setUiOffset(undefined);
 
       if (isBrowser() && !isMobileOrTablet) {
         document?.removeEventListener('scroll', handleScroll);
@@ -148,7 +146,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
           <PostVideoSoundButton
             postUuid={postUuid}
             isMuted={isMuted}
-            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            uiOffset={uiOffset}
             handleToggleMuted={handleToggleMuted}
           />
         </>
@@ -164,7 +162,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
           <PostVideoSoundButton
             postUuid={postUuid}
             isMuted={isMuted}
-            soundBtnBottomOverriden={soundBtnBottomOverriden}
+            uiOffset={uiOffset}
             handleToggleMuted={handleToggleMuted}
           />
         </>
