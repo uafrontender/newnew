@@ -1,7 +1,17 @@
+/* eslint-disable no-plusplus */
+import { cloneDeep } from 'lodash';
 import { newnewapi } from 'newnew-api';
-import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useMutation,
+  useQueryClient,
+} from 'react-query';
 
 import { getMyPosts } from '../../api/endpoints/user';
+import switchPostType from '../switchPostType';
+import useErrorToasts from './useErrorToasts';
 
 interface IUseMyPosts {
   relation: newnewapi.GetRelatedToMePostsRequest.Relation;
@@ -20,6 +30,9 @@ const useMyPosts = (
     'queryKey' | 'queryFn'
   >
 ) => {
+  const queryClient = useQueryClient();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
+
   const query = useInfiniteQuery(
     ['private', 'getMyPosts', params],
     async ({ pageParam }) => {
@@ -60,7 +73,55 @@ const useMyPosts = (
     >
   );
 
-  return query;
+  const removePostMutation = useMutation({
+    mutationFn: (postUuid: string) =>
+      new Promise((res) => {
+        res(postUuid);
+      }),
+    onSuccess: (_, postUuid) => {
+      queryClient.setQueryData(
+        ['private', 'getMyPosts', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                posts: newnewapi.IPost[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const msgIndex = workingData.pages[k].posts.findIndex(
+                (c) => switchPostType(c)[0].postUuid === postUuid
+              );
+
+              if (msgIndex !== -1) {
+                workingData.pages[k].posts = workingData.pages[k].posts.filter(
+                  (c) => switchPostType(c)[0].postUuid !== postUuid
+                );
+                break;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
+  });
+
+  return { ...query, removePostMutation };
 };
 
 export default useMyPosts;
