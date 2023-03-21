@@ -56,14 +56,18 @@ module.exports = {
     return result;
   },
   robotsTxtOptions: {
-    policies: [
-      {
-        userAgent: '*',
-        disallow: disallow,
-      },
-      { userAgent: '*', allow: '/' },
-    ],
-    additionalSitemaps: [
+    policies:
+      // If staging, disallow all
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ? [
+        { userAgent: '*', disallow: '/' },
+      ] : [
+        {
+          userAgent: '*',
+          disallow: disallow,
+        },
+        { userAgent: '*', allow: '/' },
+      ],
+    additionalSitemaps: process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ? [] : [
       `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
       `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
     ],
