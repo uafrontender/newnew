@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -51,7 +51,10 @@ const DisplayName: React.FC<IDisplayName> = ({
   const gap = useMemo(() => Math.round(size / 10), [size]);
 
   // Might not re-calculate size on parent size changed
-  useLayoutEffect(() => {
+  // useEffect => verified icon delayed
+  // useLayoutEffect => warning about it doing nothing on ssr
+  // useLayoutEffect + Component delayed => same as just useEffect
+  useEffect(() => {
     if (!isVerified) {
       return;
     }

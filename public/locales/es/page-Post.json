@@ -3,9 +3,18 @@
     "title": "{{postTitle}} | {{displayName}} en NewNew",
     "deletedPost_NEED_TRANSLATION": "Deleted post",
     "description": {
-      "ac": "${{totalInBids}} en ofertas en NewNew",
-      "mc": "{{totalVotes}} votos en NewNew",
-      "cf": ""
+      "ac": {
+        "withContributions": "${{totalInBids}} en ofertas en NewNew",
+        "default": "Gana dinero, haz ofertas en subastas con amigos y apoya creadores en NewNew"
+      },
+      "mc": {
+        "withContributions": "{{totalVotes}} votos en NewNew",
+        "default": "Gana dinero, vota con tus amigos y apoya creadores en NewNew"
+      },
+      "cf": {
+        "withContributions": "",
+        "default": ""
+      }
     }
   },
   "at": " en ",
