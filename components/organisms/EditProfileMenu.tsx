@@ -798,17 +798,29 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
 
   useEffect(() => {
-    if (
-      Object.entries(dataInEdit).some(
-        ([key, value]) =>
-          value !==
-            (user.userData &&
-            (user.userData as any)[key] &&
-            (user.userData as any)[key] !== null
-              ? (user.userData as any)[key]
-              : '') && !validateInputText(value as string)
-      )
-    ) {
+    const hasInvalidFields = Object.entries(dataInEdit).some(([key, value]) => {
+      // Skip these fields
+      if (key === 'genderPronouns' || key === 'bio') {
+        return false;
+      }
+
+      // Return true if we have no initial values (should not happen often)
+      if (!user.userData) {
+        return true;
+      }
+
+      const initialValue = (user.userData as any)[key] ?? '';
+
+      if (value === initialValue) {
+        return false;
+      }
+
+      return !validateInputText(value as string);
+    });
+
+    console.log('');
+
+    if (hasInvalidFields) {
       setIsDataValid(false);
       return;
     }
@@ -838,6 +850,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         })),
     [t]
   );
+
+  console.log(
+    (!wasModified &&
+      ((!user.userData?.bio && dataInEdit.bio === '') ||
+        dataInEdit.bio === user.userData?.bio)) ||
+      !isDataValid ||
+      isLoading ||
+      !coverUrlInEdit
+  );
+  console.log('FIELDS');
+  console.log(isDataValid);
 
   return (
     <SEditProfileMenu
@@ -1003,7 +1026,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <Button
                 withShadow
                 disabled={
-                  (!wasModified && dataInEdit.bio === user.userData?.bio) ||
+                  (!wasModified &&
+                    ((!user.userData?.bio && dataInEdit.bio === '') ||
+                      dataInEdit.bio === user.userData?.bio)) ||
                   !isDataValid ||
                   isLoading ||
                   !coverUrlInEdit
