@@ -40,8 +40,6 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
     'tablet',
   ].includes(resizeMode);
 
-  console.log(uiOffset);
-
   const { readyToUploadAdditionalResponse } =
     usePostModerationResponsesContext();
 
