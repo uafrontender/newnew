@@ -97,7 +97,7 @@ const Home: NextPage<IHome> = ({
             },
           }
         : {}),
-      enabled: user.loggedIn,
+      enabled: isUserLoggedIn,
     }
   );
 
@@ -136,7 +136,7 @@ const Home: NextPage<IHome> = ({
         </>
       )}
 
-      {user.loggedIn && (
+      {isUserLoggedIn && (
         <>
           {user.userData?.options?.isCreator && collectionRA?.length > 0 && (
             <SHeading style={{ marginTop: '80px' }}>
@@ -154,7 +154,7 @@ const Home: NextPage<IHome> = ({
               category='recent-activity'
               collection={collectionRA}
               tutorialCard={
-                user.loggedIn ? (
+                isUserLoggedIn ? (
                   <STutorialCard
                     image={
                       theme.name === 'dark'
@@ -166,7 +166,7 @@ const Home: NextPage<IHome> = ({
                   />
                 ) : undefined
               }
-              padding={user.loggedIn ? 'small' : 'large'}
+              padding={isUserLoggedIn ? 'small' : 'large'}
               onReachEnd={loadMoreCollectionRA}
               seeMoreLink='/profile/purchases'
             />
@@ -187,7 +187,7 @@ const Home: NextPage<IHome> = ({
         posts={staticSuperpolls}
         isStatic
         // loading={collectionMCInitialLoading}
-        padding={user.loggedIn ? 'small' : 'large'}
+        padding={isUserLoggedIn ? 'small' : 'large'}
       />
 
       {/* AC posts example */}
@@ -203,7 +203,7 @@ const Home: NextPage<IHome> = ({
         posts={staticBids}
         isStatic
         // loading={collectionACInitialLoading}
-        padding={user.loggedIn ? 'small' : 'large'}
+        padding={isUserLoggedIn ? 'small' : 'large'}
       />
 
       {/* Greatest of all time posts */}
@@ -231,7 +231,9 @@ const Home: NextPage<IHome> = ({
         />
       ) : null} */}
 
-      {(!user.loggedIn || !user.userData?.options?.isCreator) && <FaqSection />}
+      {(!isUserLoggedIn || !user.userData?.options?.isCreator) && (
+        <FaqSection />
+      )}
 
       {!user.userData?.options?.isCreator && <BecomeCreatorSection />}
     </>
