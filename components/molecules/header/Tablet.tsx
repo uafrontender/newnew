@@ -21,6 +21,8 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
+import canBecomeCreator from '../../../utils/canBecomeCreator';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 export const Tablet: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -30,6 +32,7 @@ export const Tablet: React.FC = React.memo(() => {
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
+  const { appConstants } = useGetAppConstants();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -128,7 +131,7 @@ export const Tablet: React.FC = React.memo(() => {
 
         {user.loggedIn ? (
           <>
-            {user.userData?.options?.isCreator ? (
+            {user.userData?.options?.isCreator && (
               <>
                 <SItemWithMargin>
                   <Link href='/creation'>
@@ -163,43 +166,48 @@ export const Tablet: React.FC = React.memo(() => {
                   />
                 </SItemWithMargin>
               </>
-            ) : (
-              <>
-                <SItemWithMargin>
-                  <Link href='/creator-onboarding'>
-                    <a>
-                      <Button
-                        view='primaryGrad'
-                        withShadow={!globalSearchActive}
-                        onClick={() => {
-                          Mixpanel.track('Navigation Item Clicked', {
-                            _button: 'Create now',
-                            _target: '/creator-onboarding',
-                          });
-                        }}
-                      >
-                        {t('button.createOnNewnew')}
-                      </Button>
-                    </a>
-                  </Link>
-                </SItemWithMargin>
-                <SItemWithMargin>
-                  <Link href='/profile'>
-                    <a>
-                      <UserAvatar
-                        withClick
-                        avatarUrl={user.userData?.avatarUrl}
-                        onClick={() => {
-                          Mixpanel.track('My Avatar Clicked', {
-                            _target: '/profile',
-                          });
-                        }}
-                      />
-                    </a>
-                  </Link>
-                </SItemWithMargin>
-              </>
             )}
+            {!user.userData?.options?.isCreator &&
+              canBecomeCreator(
+                user.userData?.dateOfBirth,
+                appConstants.minCreatorAgeYears
+              ) && (
+                <>
+                  <SItemWithMargin>
+                    <Link href='/creator-onboarding'>
+                      <a>
+                        <Button
+                          view='primaryGrad'
+                          withShadow={!globalSearchActive}
+                          onClick={() => {
+                            Mixpanel.track('Navigation Item Clicked', {
+                              _button: 'Create now',
+                              _target: '/creator-onboarding',
+                            });
+                          }}
+                        >
+                          {t('button.createOnNewnew')}
+                        </Button>
+                      </a>
+                    </Link>
+                  </SItemWithMargin>
+                  <SItemWithMargin>
+                    <Link href='/profile'>
+                      <a>
+                        <UserAvatar
+                          withClick
+                          avatarUrl={user.userData?.avatarUrl}
+                          onClick={() => {
+                            Mixpanel.track('My Avatar Clicked', {
+                              _target: '/profile',
+                            });
+                          }}
+                        />
+                      </a>
+                    </Link>
+                  </SItemWithMargin>
+                </>
+              )}
           </>
         ) : (
           <>

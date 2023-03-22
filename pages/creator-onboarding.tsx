@@ -18,6 +18,8 @@ import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { setCreatorData } from '../redux-store/slices/userStateSlice';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import canBecomeCreator from '../utils/canBecomeCreator';
+import { useGetAppConstants } from '../contexts/appConstantsContext';
 
 const OnboardingSectionDetails = dynamic(
   () =>
@@ -43,6 +45,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   availableCountriesRes,
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
+  const { appConstants } = useGetAppConstants();
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -56,13 +59,26 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
 
-  // Redirect if onboarded
+  // Redirect if onboarded or underaged
   useEffect(() => {
     if (user.userData?.options?.isCreator) {
       router.push('/creator/dashboard');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    if (
+      !canBecomeCreator(
+        user.userData?.dateOfBirth,
+        appConstants.minCreatorAgeYears
+      )
+    ) {
+      router.push('/');
+    }
+  }, [
+    user.userData?.options?.isCreator,
+    user.userData?.dateOfBirth,
+    appConstants.minCreatorAgeYears,
+    router,
+  ]);
 
   // Try to pre-fetch the content
   useEffect(() => {

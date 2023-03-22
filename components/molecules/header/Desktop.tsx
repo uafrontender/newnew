@@ -18,12 +18,15 @@ import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 import { useAppState } from '../../../contexts/appStateContext';
+import canBecomeCreator from '../../../utils/canBecomeCreator';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
   const theme = useTheme();
+  const { appConstants } = useGetAppConstants();
 
   const isDesktopL = ['laptopL', 'desktop'].includes(resizeMode);
 
@@ -199,45 +202,49 @@ export const Desktop: React.FC = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
-            {!user.userData?.options?.isCreator && (
-              <>
-                <SItemWithMargin>
-                  <Link href='/creator-onboarding'>
-                    <a>
-                      <Button
-                        withDim
-                        withShadow
-                        withShrink
-                        view='primaryGrad'
-                        onClick={() => {
-                          Mixpanel.track('Navigation Item Clicked', {
-                            _button: 'Create now',
-                            _target: '/creator-onboarding',
-                          });
-                        }}
-                      >
-                        {t('button.createOnNewnew')}
-                      </Button>
-                    </a>
-                  </Link>
-                </SItemWithMargin>
-                <SItemWithMargin>
-                  <Link href='/profile'>
-                    <a id='profile-link'>
-                      <UserAvatar
-                        withClick
-                        avatarUrl={user.userData?.avatarUrl}
-                        onClick={() => {
-                          Mixpanel.track('My Avatar Clicked', {
-                            _target: '/profile',
-                          });
-                        }}
-                      />
-                    </a>
-                  </Link>
-                </SItemWithMargin>
-              </>
-            )}
+            {!user.userData?.options?.isCreator &&
+              canBecomeCreator(
+                user.userData?.dateOfBirth,
+                appConstants.minCreatorAgeYears
+              ) && (
+                <>
+                  <SItemWithMargin>
+                    <Link href='/creator-onboarding'>
+                      <a>
+                        <Button
+                          withDim
+                          withShadow
+                          withShrink
+                          view='primaryGrad'
+                          onClick={() => {
+                            Mixpanel.track('Navigation Item Clicked', {
+                              _button: 'Create now',
+                              _target: '/creator-onboarding',
+                            });
+                          }}
+                        >
+                          {t('button.createOnNewnew')}
+                        </Button>
+                      </a>
+                    </Link>
+                  </SItemWithMargin>
+                  <SItemWithMargin>
+                    <Link href='/profile'>
+                      <a id='profile-link'>
+                        <UserAvatar
+                          withClick
+                          avatarUrl={user.userData?.avatarUrl}
+                          onClick={() => {
+                            Mixpanel.track('My Avatar Clicked', {
+                              _target: '/profile',
+                            });
+                          }}
+                        />
+                      </a>
+                    </Link>
+                  </SItemWithMargin>
+                </>
+              )}
           </>
         ) : (
           <>
