@@ -80,18 +80,20 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
         _query: query,
       });
 
-      const chunks = getChunks(query);
+      const clearedQuery = query.replace(/^#+/, '#');
+
+      const chunks = getChunks(clearedQuery);
       const firstChunk = chunks[0];
       const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
 
       if (isHashtag) {
-        router.push(`/search?query=${firstChunk.text}&type=hashtags&tab=posts`);
+        router.push(`/search?query=${firstChunk.text}&tab=posts`);
       } else {
-        const clearedQuery = encodeURIComponent(query);
+        const encodedQuery = encodeURIComponent(query);
         if (resultsPosts.length === 0 && resultsCreators.length > 0) {
-          router.push(`/search?query=${clearedQuery}&tab=creators`);
+          router.push(`/search?query=${encodedQuery}&tab=creators`);
         } else {
-          router.push(`/search?query=${clearedQuery}&tab=posts`);
+          router.push(`/search?query=${encodedQuery}&tab=posts`);
         }
       }
     };
