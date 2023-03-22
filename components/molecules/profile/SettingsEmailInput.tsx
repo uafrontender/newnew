@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+
 import InlineSvg from '../../atoms/InlineSVG';
 
 import AnimatedPresence from '../../atoms/AnimatedPresence';
@@ -34,7 +35,6 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
 
   return (
     <SContainer>
-      <SLabel htmlFor='settings_email_input'>{labelCaption}</SLabel>
       <SSettingsEmailInput
         id='settings_email_input'
         type='email'
@@ -82,17 +82,6 @@ const SContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     width: 352px;
   }
-`;
-
-const SLabel = styled.label`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
 `;
 
 interface ISSettingsEmailInput {

@@ -1,0 +1,300 @@
+{
+  "welcome": "Bienvenido a {{NEXT_PUBLIC_APP_NAME}}!",
+  "topSectionTitle": "Top 10 en {{country}}",
+  "heroSection": {
+    "title": "¡Únete y moldea\n la realidad!",
+    "subTitle": "Haz ofertas y vota por lo que sucederá a continuación en el mundo",
+    "signIn": "Iniciar sesión",
+    "explore": "Explorar Ahora",
+    "exploreNow": "Explorar ahora"
+  },
+  "shareTo": "Compartir a",
+  "ellipse": {
+    "copyLink": "Copiar enlace",
+    "linkCopied": "¡Enlace copiado!",
+    "followDecision": "Marcar {{postType}} como favorito",
+    "followCreator": "Marcar seguidor como favorito",
+    "unFollowDecision": "Quitar {{postType}} de favoritos",
+    "unFollowCreator": "Quitar creador de favoritos",
+    "removeBid": "Eliminar oferta",
+    "removeOption": "Eliminar opción",
+    "view": "Ver perfil",
+    "report": "Reportar",
+    "reportUser": "Reportar usuario",
+    "reportGroup": "Reportar grupo",
+    "reportBid": "Reportar oferta",
+    "reportOption": "Reportar opción",
+    "block": "Bloquear",
+    "blockUser": "Bloquear usuario",
+    "blockGroup": "Bloquear grupo",
+    "unblock": "Desbloquear",
+    "unblockUser": "Desbloquear usuario",
+    "unblockGroup": "Desbloquear grupo",
+    "delete": "Borrar",
+    "deleteDecision": "Borrar {{postType}}",
+    "cancel": "Cancelar"
+  },
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
+  "dragToReposition": "Arrastra para reposicionar la imagen",
+  "mobileBottomNavigation": {
+    "add": "Crear",
+    "home": "Inicio",
+    "more": "Más",
+    "share": "Compartir",
+    "dashboard": "Panel",
+    "dms": "Mensajes",
+    "notifications": "Notificaciones",
+    "bundles": "Bundles"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "Mi balance: ${{value}}",
+    "profile": "Perfil"
+  },
+  "button": {
+    "bundles": "Bundles",
+    "createDecision": "Nueva publicación",
+    "create": "Crear",
+    "signIn": "Iniciar sesión",
+    "dashboard": "Panel",
+    "createOnNewnew": "Crear ahora",
+    "cancel": "Cancelar",
+    "takeMeHome": "Regresar a la página de inicio"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "Conecta con nosotros",
+    "bottomTitle": "Social",
+    "about": "Acerca de nosotros",
+    "press": "Prensa",
+    "jobs": "Trabaja en NewNew",
+    "help": "Ayuda",
+    "faq": "Preguntas frecuentes",
+    "twitter": "Twitter",
+    "howItWorks": "Cómo funciona",
+    "guidelines": "Normas comunitarias",
+    "accessibility": "Accesibilidad",
+    "inc": "© NewNew Inc",
+    "terms": "Términos",
+    "privacy": "Privacidad"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    }
+  },
+  "cookie": {
+    "text": "Usamos",
+    "link": "Más información"
+  },
+  "reportBug": "Reportar un error",
+  "error": {
+    "text": {
+      "min": "El texto es demasiado corto, mínimo {{value}} caracteres",
+      "max": "El texto es demasiado largo, máximo {{value}} caracteres",
+      "badWords": "El texto contiene malas palabras",
+      "containsLinks": "Enlaces no permitidos"
+    }
+  },
+  "modal": {
+    "reportUser": {
+      "title": "Reportar",
+      "subtitle": "Ayúdanos a entender para que podamos investigar...",
+      "options": {
+        "spam": "Sospechoso o spam",
+        "abuse": "Abusivo o dañino",
+        "suicide": "Expresa intenciones de autolesionarse o suicidarse",
+        "hateSpeech": "Discurso de odio",
+        "harassment": "Acoso o intimidación",
+        "copyright": "Derechos de autor",
+        "other": "Otro"
+      },
+      "additionalInfo": {
+        "placeholder": "Por favor, cuéntanos un poco más..."
+      },
+      "button": {
+        "cancel": "Cancelar",
+        "report": "Reportar"
+      }
+    },
+    "reportSent": {
+      "title": "¡Estamos en ello!",
+      "subtitle": "Te agradecemos que te pongas en contacto con nosotros. Investigaremos tu reporte lo antes posible y tomaremos las medidas necesarias para garantizar la seguridad de todos.",
+      "button": "Aceptar"
+    },
+    "buyBundle": {
+      "title": "Comprar un bundle de Superpoll por:",
+      "votes": "<0>{{amount}}</0> votos",
+      "access": "además obtén {{amount}} {{unit}} de:",
+      "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
+      "chat": "chat privado 1-a-1",
+      "buy": "Comprar por ${{amount}}",
+      "terms": "*los votos de los bundles nunca expiran",
+      "unit": {
+        "month": "mes",
+        "months": "meses"
+      },
+      "payment": {
+        "header": "Bundle de Superpoll de <0/>",
+        "suffix": ""
+      },
+      "error": {
+        "requestFailed": "La solicitud ha fallado"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes": "<0>{{amount}}</0> votos desbloqueados",
+      "for": "para <0/>",
+      "access": "Quedan {{amount}} {{unit}} de:",
+      "customOptions": "añadir opciones personalizadas a la Superpoll",
+      "chat": "chat privado 1-a-1",
+      "button": "¡Suena bien!",
+      "unit": {
+        "month": "mes",
+        "months": "meses"
+      }
+    },
+    "creatorsBundle": {
+      "accessExpired": "Tus beneficios han caducado. Compra otro bundle para tener opciones personalizadas y acceder al chat",
+      "votesLeft": "Quedan <0>{{amount}}</0> votos",
+      "for": "para ",
+      "access": "Quedan <0/> de:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " y las ",
+      "customOptions": "agregar opciones personalizadas a cualquier Superpoll",
+      "chat": "chat privado 1-a-1",
+      "buyButton": "Comprar más votos",
+      "unit": {
+        "day": "día",
+        "days": "días",
+        "month": "mes",
+        "months": "meses",
+        "year": "año",
+        "years": "años"
+      }
+    }
+  },
+  "myLink": {
+    "copy": "Mi enlace",
+    "copied": "¡Copiado!"
+  },
+  "socials": {
+    "copy": "Copiar enlace",
+    "copied": "¡Enlace copiado!"
+  },
+  "search": {
+    "placeholder": "Búsqueda",
+    "placeholderLong_NEED_TRANSLATION": "Search creators and hashtags",
+    "topPosts": "Publicaciones populares",
+    "popularCreators": "Creadores populares",
+    "creatorSubtitle": "Ver publicaciones",
+    "popularTags": "Etiquetas populares",
+    "allResults": "Todos los resultados",
+    "noResults": {
+      "title": "No encontramos nada",
+      "description": "Intenta cambiar tu búsqueda o explora las novedades",
+      "action": "Explorar"
+    }
+  },
+  "gotIt": "Aceptar",
+  "sortingOption": {
+    "sortingtype": "Ordenar",
+    "sortingtype-all": "Todos",
+    "sortingtype-num_bids": "Participantes",
+    "sortingtype-num_bids-ac": "Número de ofertas",
+    "sortingtype-num_bids-mc": "Número de votos",
+    "sortingtype-num_bids-cf": "Número de patrocinadores",
+    "sortingtype-newest": "Más reciente",
+    "bid": "Bid",
+    "bid-lowest": "Más baja",
+    "bid-highest": "Más alta",
+    "time": "Tiempo",
+    "time-ending-soon": "Terminando pronto",
+    "time-newest": "Más reciente",
+    "time-oldest": "Más antigüa",
+    "numbers-of-bids": "Número de ofertas",
+    "numbers-of-bids-fewest": "El menor número de ofertas primero",
+    "numbers-of-bids-most-first": "El mayor número de ofertas primero"
+  },
+  "toastErrors": {
+    "generic": "Se ha producido un error, inténtalo de nuevo más tarde",
+    "serverError": "Se ha producido un error en el servidor, inténtalo de nuevo más tarde.",
+    "recaptchaError": "El recaptcha ha fallado, por favor inténtalo más tarde",
+    "usupportedImageFormatError": "Formato de imagen no soportado, por favor intenta con otra imagen",
+    "processingLimitReachedError": "Por favor, espera hasta que puedas subir más vídeos",
+    "invalidDateError": "Comprueba la fecha y la hora"
+  },
+  "smsNotifications": {
+    "title": "¿Cuál es tu número telefónico?",
+    "success": "Éxito",
+    "description": "De esta manera, podemos enviarte nuevas actualizaciones de <0>{{subject}}</0>!",
+    "confirmation": "Se ha enviado un SMS de confirmación al número {{phoneNumber}}.",
+    "tos": "Acepto los <0>Términos</0> & <1>Condiciones de privacidad</1> de NewNew. Acepto recibir actualizaciones de NewNew en el número de teléfono proporcionado. Pueden aplicarse tarifas de SMS y datos.",
+    "button": { "continue": "Continuar", "close": "¡Genial!" },
+    "phoneError": {
+      "0": "Número teléfonico inválido",
+      "1": "Código de país inválido",
+      "2": "El número de teléfono es demasiado corto",
+      "3": "El número de teléfono es demasiado largo",
+      "4": "Número de teléfono inválido"
+    },
+    "error": {
+      "requestFailed": "La solicitud ha fallado"
+    }
+  },
+  "creatorCard": {
+    "buyBundle": "Comprar bundle",
+    "purchasedVotes": "{{value}} votos"
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "Luz",
+      "dark": "Oscuro",
+      "auto": "Automático"
+    }
+  },
+  "timer": {
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Terminó el "
+  },
+  "pushNotification": {
+    "alert": {
+      "safari": {
+        "title": "Activar las notificaciones web",
+        "subtitle": " Safari > Preferencias > Notificaciones."
+      },
+      "nonSafari": {
+        "title": "Activa las notificaciones web haciendo clic en el candado"
+      },
+      "windows": {
+        "subtitle": "o ve a Inicio > Configuración > Sistema > Notificaciones"
+      }
+    },
+    "requestModal": {
+      "title": "Activar las notificaciones",
+      "description": "Activa las notificaciones web y recibe alertas cuando haya nuevas publicaciones en NewNew.",
+      "button": "Turn on"
+    },
+    "successModal": {
+      "title": "¡Hurra!",
+      "description": "Gracias, te mantendremos informado de las novedades en NewNew.",
+      "button": "¡Genial!"
+    }
+  },
+  "oops": "¡Ups!",
+  "somethingWentWrong": "Algo salió mal...",
+  "goHome": "Ir al inicio"
+}

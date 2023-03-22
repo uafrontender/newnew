@@ -1,0 +1,247 @@
+{
+  "dashboard": {
+    "meta": {
+      "title": "Panel de control de creadores Newnew",
+      "description": "Ve tus ganancias y publicaciones de Newnew, gestiona tus suscriptores y mucho más"
+    },
+    "title": "Mi panel de control",
+    "button": {
+      "notifications": "Notificaciones",
+      "directMessages": "Mensajes directos",
+      "markAllAsRead": "Marcar como leído",
+      "minimize": "Minimizar",
+      "new": "Nuevo",
+      "earlier": "Anteriores"
+    },
+    "earnings": {
+      "title": "Mis ingresos",
+      "earned": "ganados en el último",
+      "earnedToday": "ganados hoy",
+      "earnedYesterday": "ganados ayer",
+      "units": {
+        "days": "días",
+        "months": "meses"
+      },
+      "insights": "Estadísticas",
+      "insightsTablet": "Ir a estadísticas",
+      "cashOut": {
+        "amount": "Tus ganancias en Stripe son",
+        "amountSecondLine": "Gestiona tu saldo en Stripe.",
+        "stripeButton": "Dirígeme a Stripe",
+        "date": "se enviará automáticamente el {{date}}.",
+        "submit": "Más información",
+        "noPayouts": "No tienes ningún pago pendiente"
+      },
+      "toDosIssue": {
+        "text": "Añade una biografía y tus datos bancarios para retirar tus ganancias",
+        "textBio": "Añade una biografía para retirar tus ganancias",
+        "textBank": "Añade tus datos bancarios para retirar tus ganancias",
+        "button": "Añadir",
+        "stripeIssue": "Hay un problema con tu cuenta de Stripe",
+        "stripeIssueButton": "Ver cuenta de Stripe"
+      },
+      "makeDecision": {
+        "text": "Haz una publicación. Empieza a ganar dinero.",
+        "button": "Haz una publicación"
+      },
+      "list": {
+        "ac": "Bids",
+        "mc": "Superpolls",
+        "cf": "Goals",
+        "bundles": "Bundles"
+      },
+      "filter": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "last_7_days": "Últimos 7 días",
+        "last_30_days": "Últimos 30 días",
+        "last_90_days": "Últimos 90 días",
+        "last_12_months": "Últimos 12 meses"
+      }
+    },
+    "expirationPosts": {
+      "title": "Esperando tu respuesta",
+      "submit": "Mostrar 10 publicaciones más",
+      "decide": {
+        "desktop": "Responder ahora",
+        "mobile": "Responder"
+      },
+      "table": {
+        "header": {
+          "post": "Mis publicaciones",
+          "type": "Tipo",
+          "total": "Total actual"
+        }
+      },
+      "postTypes": {
+        "auction": "Bid",
+        "multipleChoice": "Superpoll",
+        "crowdfunding": "Goal"
+      },
+      "expiresTime": {
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s",
+        "leftToRespond": "restantes para responder"
+      },
+      "linkCopied": "¡Enlace copiado!"
+    },
+    "toDos": {
+      "title": "Completa estos pasos para recibir tu pago",
+      "subtitle": "¿Ganaste 💰? Sigue estos pasos para retirar tus ganancias...",
+      "signUp": "Regístrate como creador",
+      "completeProfile": "Añadir biografía",
+      "completeProfileButton": "Añádir",
+      "addCashOutMethod": "Añadir información bancaria",
+      "addCashOutMethodButton": "Añadir"
+    },
+    "aboutBundles": {
+      "title": "Bundles de Superpoll",
+      "text": "Gana más dinero. Diviértete más.\n¡Los bundles de Superpoll benefician a todos!",
+      "button": "¡Cuéntame más!"
+    }
+  },
+  "earnings": {
+    "meta": {
+      "title": "Ganancias del creador"
+    },
+    "title": "Ganancias"
+  },
+  "myBundles": {
+    "meta": {
+      "title": "Mis Bundles",
+      "description": "Ver tus Bundles de NewNew"
+    },
+    "title": "Mis Bundles",
+    "buttonTurnOn": "Activar bundles",
+    "buttonTurnOff": "Desactivar bundles",
+    "earnings": {
+      "title": "Ganancias de Bundles",
+      "payPeriod": "este periodo de pago",
+      "unitName": "bundle",
+      "earned": "ha generado",
+      "noSoldYet": "Todavía no se ha vendido ningún Bundle",
+      "sold": "vendidos"
+    },
+    "bundlesSet": {
+      "title": "Bundles de Superpoll",
+      "subTitle": "Ofrece Bundles de Superpoll para aumentar tus ganancias y acercarte a tu audiencia. ",
+      "votes": "votos",
+      "description": "Además, la gente obtiene {{duration}} meses de:",
+      "descriptionSingular": "Además, la gente obtiene 1 mes de:",
+      "firstOption": "añadir opciones personalizadas a tus Superpolls",
+      "secondOption": "enviarte chats privados",
+      "perBundle": "por bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title": "Activar bundles",
+        "text": "¿Estás seguro de que quieres activar los bundles?"
+      },
+      "turnoff": {
+        "title": "Desactivar bundles",
+        "text": "¿Estás seguro de que quieres desactivar los bundles?"
+      },
+      "activated": {
+        "title": "¡Felicidades!",
+        "text": "Has activado correctamente los bundles"
+      },
+      "deactivated": {
+        "title": "¡Qué triste!",
+        "text": "Pero puedes activar los bundles en cualquier momento"
+      },
+      "button": "¡Suena bien!"
+    }
+  },
+  "getPaid": {
+    "meta": {
+      "title": "Recibe dinero en NewNew",
+      "description": "Obtén ingresos a través de subastas pagadas, encuestas, crowdfunding y suscripciones"
+    }
+  },
+  "transactions": {
+    "meta": {
+      "title": "Transacciones del creador"
+    },
+    "title": "Transacciones"
+  },
+  "navigation": {
+    "dashboard": "Panel de control",
+    "myPosts": "Mis publicaciones",
+    "insights": "Estadísticas",
+    "earnings": "Ingresos",
+    "bundles": "Bundles",
+    "getPaid": "Añadir información bancaria",
+    "getPaidEdit": "Editar información bancaria",
+    "transactions": "Transacciones",
+    "newPost": "Nueva publicación"
+  },
+  "tabs": {
+    "chat": "Mensajes",
+    "notifications": "Notificaciones"
+  },
+  "chat": {
+    "today": "Hoy",
+    "placeholder": "Escribir un mensaje...",
+    "noMessagesFirstLine": "Todavía no hay mensajes aquí...",
+    "typing": "Escribiendo...",
+    "toolbar": {
+      "searchPlaceholder": "Busca usuarios"
+    },
+    "modal": {
+      "newMessage": {
+        "title": "Nuevo mensaje",
+        "searchPlaceholder": "Buscar"
+      }
+    },
+    "emptyInbox": {
+      "title": "Tu bandeja de entrada está vacía",
+      "text": "Cuando inicies una conversación con el dueño de un Bundle, lo verás listado aquí"
+    },
+    "default": {
+      "searchPlaceholder": "Buscar"
+    }
+  },
+  "modal": {
+    "newMessage": {
+      "title": "Nuevo mensaje",
+      "searchPlaceholder": "Buscar"
+    }
+  },
+  "newAnnouncement": {
+    "title": "Nuevo anuncio",
+    "text": "Solo tú puedes enviar mensajes al grupo.",
+    "created": "Tú creaste el anuncio",
+    "member": "miembro",
+    "members": "miembros"
+  },
+  "announcement": {
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "El anuncios de ",
+    "suffix": "",
+    "afterName": ""
+  },
+  "stripe": {
+    "meta": {
+      "title": "Pagos fáciles con Stripe",
+      "description": "Conecta una cuenta de Stripe para recibir tus pagos rápido."
+    },
+    "titleSetUpStripe": "Recibir tu pago a través de",
+    "bullets": {
+      "1": "Configurar una cuenta de Stripe es rápido y sencillo",
+      "2": "Retira tus ganancias de NewNew directamente a tu cuenta bancaria",
+      "3": "Stripe mantiene tu información privada y segura"
+    },
+    "button": {
+      "submit": "Hecho",
+      "update": "Actualizar información de pago",
+      "requestSetupLink": "Conectar con Stripe",
+      "stripeConnectedLink": "¡Stripe conectado!",
+      "back": "Cerrar",
+      "stripeConnecting": "Conectando...",
+      "requireInformation": "Stripe requiere información"
+    }
+  },
+  "noNotifications": "Las nuevas notificaciones que recibas\naparecerán aquí"
+}

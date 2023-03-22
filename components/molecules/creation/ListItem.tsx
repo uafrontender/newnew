@@ -1,25 +1,40 @@
+/* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import Caption from '../../atoms/Caption';
 
-import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
 
-const IMAGES: any = {
-  auction: assets.creation.AcAnimated,
-  crowdfunding: assets.creation.CfAnimated,
-  'multiple-choice': assets.creation.McAnimated,
+const DARK_IMAGES_ANIMATED: Record<string, () => string> = {
+  auction: assets.common.ac.darkAcAnimated,
+  crowdfunding: assets.creation.darkCfAnimated,
+  'multiple-choice': assets.common.mc.darkMcAnimated,
 };
 
-const IMAGES_STATIC: any = {
-  auction: assets.creation.AcStatic,
-  crowdfunding: assets.creation.CfStatic,
-  'multiple-choice': assets.creation.McStatic,
+const DARK_IMAGES_STATIC: any = {
+  auction: assets.common.ac.darkAcStatic,
+  crowdfunding: assets.creation.darkCfStatic,
+  'multiple-choice': assets.common.mc.darkMcStatic,
+};
+
+const LIGHT_IMAGES_ANIMATED: Record<string, () => string> = {
+  auction: assets.common.ac.lightAcAnimated,
+  crowdfunding: assets.creation.lightCfAnimated,
+  'multiple-choice': assets.common.mc.lightMcAnimated,
+};
+
+const LIGHT_IMAGES_STATIC: any = {
+  auction: assets.common.ac.lightAcStatic,
+  crowdfunding: assets.creation.lightCfStatic,
+  'multiple-choice': assets.common.mc.lightMcStatic,
 };
 
 interface IListItem {
@@ -27,9 +42,11 @@ interface IListItem {
 }
 
 const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
+  const theme = useTheme();
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { clearCreation, clearPostData } = usePostCreationState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -46,30 +63,51 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
   return (
     <Link href={link}>
       <a
+        id={itemKey}
+        role='button'
         onMouseEnter={() => {
           setMouseEntered(true);
         }}
         onMouseLeave={() => {
           setMouseEntered(false);
         }}
+        onClick={() => {
+          Mixpanel.track('Post Type Selected', {
+            _stage: 'Creation',
+            _postType: itemKey,
+          });
+
+          clearCreation();
+
+          clearPostData();
+        }}
+        onKeyUp={(e) => {
+          if (e.key === 'Enter') {
+            clearCreation();
+
+            clearPostData();
+          }
+        }}
       >
         <SWrapper>
           <SContent>
             <STitle variant={1} weight={700}>
-              {t(`first-step-${itemKey}-title`)}
+              {t(`first-step-${itemKey}-title` as any)}
             </STitle>
             <SDescription variant={2} weight={600}>
-              {t(`first-step-${itemKey}-sub-title`)}
+              {t(`first-step-${itemKey}-sub-title` as any)}
             </SDescription>
           </SContent>
           <SImageWrapper>
             <img
               src={
-                isMobile || isTablet
-                  ? IMAGES[itemKey]
-                  : mouseEntered
-                  ? IMAGES[itemKey]
-                  : IMAGES_STATIC[itemKey]
+                isMobile || isTablet || mouseEntered
+                  ? theme.name === 'light'
+                    ? LIGHT_IMAGES_ANIMATED[itemKey]()
+                    : DARK_IMAGES_ANIMATED[itemKey]()
+                  : theme.name === 'light'
+                  ? LIGHT_IMAGES_STATIC[itemKey]
+                  : DARK_IMAGES_STATIC[itemKey]
               }
               alt='Post type'
               width={isMobile ? 80 : 120}
@@ -98,8 +136,11 @@ const SWrapper = styled.div`
   justify-content: center;
   background-color: ${(props) => props.theme.colorsThemed.background.secondary};
 
-  :hover {
-    background-color: ${(props) => props.theme.colorsThemed.background.quinary};
+  @media (hover: hover) {
+    :hover {
+      background-color: ${(props) =>
+        props.theme.colorsThemed.background.quinary};
+    }
   }
 
   ${(props) => props.theme.media.tablet} {

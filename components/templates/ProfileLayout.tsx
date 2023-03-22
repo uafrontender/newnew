@@ -1,85 +1,78 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import React, {
-  ReactElement,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import Link from 'next/link';
 
 import { useAppSelector } from '../../redux-store/store';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
+import CustomLink from '../atoms/CustomLink';
 import General from './General';
-import { Tab } from '../molecules/Tabs';
+// import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
-import ProfileTabs from '../molecules/profile/ProfileTabs';
+// import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
+import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
+import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
+import UserEllipseModal from '../molecules/profile/UserEllipseModal';
+import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
+import ReportModal, {
+  ReportData,
+} from '../molecules/direct-messages/ReportModal';
+// import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
-import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
-import { getSubscriptionStatus } from '../../api/endpoints/subscription';
-import { FollowingsContext } from '../../contexts/followingContext';
-import { markUser } from '../../api/endpoints/user';
+import BackButtonIcon from '../../public/images/svg/icons/filled/Back.svg';
+import mockProfileBg from '../../public/images/mock/profile-bg.png';
 
-import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
-import UserEllipseModal from '../molecules/profile/UserEllipseModal';
-import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
-import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
-import BackButton from '../molecules/profile/BackButton';
-
-type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
+import getGenderPronouns, {
+  isGenderPronounsDefined,
+} from '../../utils/genderPronouns';
+import { useBundles } from '../../contexts/bundlesContext';
+import getDisplayname from '../../utils/getDisplayname';
+import { Mixpanel } from '../../utils/mixpanel';
+import DisplayName from '../DisplayName';
+import { useAppState } from '../../contexts/appStateContext';
+import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
+import { useGetChats } from '../../contexts/chatContext';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
-  renderedPage: TPageType;
-  postsCachedCreatorDecisions?: newnewapi.Post[];
-  postsCachedCreatorDecisionsFilter?: newnewapi.Post.Filter;
-  postsCachedCreatorDecisionsPageToken?: string | null | undefined;
-  postsCachedCreatorDecisionsCount?: number;
-  postsCachedActivity?: newnewapi.Post[];
-  postsCachedActivityFilter?: newnewapi.Post.Filter;
-  postsCachedActivityPageToken?: string | null | undefined;
-  postsCachedActivityCount?: number;
+  children: React.ReactNode;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
-  renderedPage,
-  postsCachedCreatorDecisions,
-  postsCachedCreatorDecisionsFilter,
-  postsCachedCreatorDecisionsPageToken,
-  postsCachedCreatorDecisionsCount,
-  postsCachedActivity,
-  postsCachedActivityFilter,
-  postsCachedActivityPageToken,
-  postsCachedActivityCount,
   children,
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
+    resizeMode
+  );
+
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -88,10 +81,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+  const { setHiddenMessagesArea } = useGetChats();
 
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === user.uuid),
+    [bundles, user.uuid]
+  );
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -116,158 +113,73 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           }, 1500);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   }, [user.username]);
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
+  const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
+  const {
+    usersIBlocked,
+    usersBlockedMe,
+    usersBlockedLoaded,
+    changeUserBlockedStatus,
+  } = useGetBlockedUsers();
   const isUserBlocked = useMemo(
     () => usersIBlocked.includes(user.uuid),
     [usersIBlocked, user.uuid]
   );
 
-  const unblockUserAsync = async (uuid: string) => {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
-        userUuid: uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(uuid);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const tabs: Tab[] = useMemo(() => {
+  // Consider user here blocked until we know they are not
+  // Only if user logged in
+  const isBlocked = useMemo(
+    () =>
+      currentUser.loggedIn &&
+      (!usersBlockedLoaded ||
+        usersIBlocked.includes(user.uuid) ||
+        usersBlockedMe.includes(user.uuid)),
+    [
+      currentUser.loggedIn,
+      usersBlockedLoaded,
+      usersIBlocked,
+      user.uuid,
+      usersBlockedMe,
+    ]
+  );
+  // NOTE: activity is temporarily disabled
+  /* const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
-      // if (true) {
       return [
         {
           nameToken: 'userInitial',
           url: `/${user.username}`,
         },
-        {
+        
+         {
           nameToken: 'activity',
           url: `/${user.username}/activity`,
         },
       ];
     }
     return [];
-  }, [user]);
+  }, [user]); */
 
-  // Posts
-  const [creatorsDecisions, setCreatorsDecisions] = useState(
-    postsCachedCreatorDecisions ?? []
-  );
-  const [creatorsDecisionsFilter, setCreatorsDecisionsFilter] = useState(
-    postsCachedCreatorDecisionsFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [creatorsDecisionsToken, setCreatorsDecisionsPageToken] = useState(
-    postsCachedCreatorDecisionsPageToken
-  );
-  const [creatorsDecisionsCount, setCreatorsDecisionsCount] = useState(
-    postsCachedCreatorDecisionsCount
-  );
-
-  const [activityDecisions, setActivityDecisions] = useState(
-    postsCachedActivity ?? []
-  );
-  const [activityDecisionsFilter, setActivityDecisionsFilter] = useState(
-    postsCachedActivityFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [activityDecisionsToken, setActivityDecisionsPageToken] = useState(
-    postsCachedActivityPageToken
-  );
-  const [activityDecisionsCount, setActivityDecisionsCount] = useState(
-    postsCachedActivityCount
-  );
-
-  const handleSetPostsCreatorsDecisions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setCreatorsDecisions, [setCreatorsDecisions]);
-
-  const handleSetActivityDecisions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setActivityDecisions, [setActivityDecisions]);
-
-  const handleUpdateFilter = useCallback(
-    (value: newnewapi.Post.Filter) => {
-      switch (renderedPage) {
-        case 'activity': {
-          setActivityDecisionsFilter(value);
-          break;
-        }
-        case 'activityHidden': {
-          setActivityDecisionsFilter(value);
-          break;
-        }
-        case 'creatorsDecisions': {
-          setCreatorsDecisionsFilter(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
-  const handleUpdatePageToken = useCallback(
-    (value: string | null | undefined) => {
-      switch (renderedPage) {
-        case 'activity': {
-          setActivityDecisionsPageToken(value);
-          break;
-        }
-        case 'activityHidden': {
-          setActivityDecisionsPageToken(value);
-          break;
-        }
-        case 'creatorsDecisions': {
-          setCreatorsDecisionsPageToken(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
-  const handleUpdateCount = useCallback(
-    (value: number) => {
-      switch (renderedPage) {
-        case 'activity': {
-          setActivityDecisionsCount(value);
-          break;
-        }
-        case 'activityHidden': {
-          setActivityDecisionsCount(value);
-          break;
-        }
-        case 'creatorsDecisions': {
-          setCreatorsDecisionsCount(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
+  // TODO: Re-enable once new SMS service is integrated
+  /* const subscription: SubscriptionToCreator = useMemo(
+    () => ({
+      type: 'creator',
+      userId: user.uuid,
+      username: user.username,
+    }),
+    [user.uuid, user.username]
+  );  */
 
   const handleClickReport = useCallback(() => {
-    if (!currentUser.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -289,88 +201,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
-  const renderChildren = () => {
-    let postsForPage = {};
-    let postsForPageFilter;
-    let pageToken;
-    let handleSetPosts;
-    let totalCount;
-
-    switch (renderedPage) {
-      case 'creatorsDecisions': {
-        postsForPage = creatorsDecisions;
-        postsForPageFilter = creatorsDecisionsFilter;
-        pageToken = creatorsDecisionsToken;
-        totalCount = creatorsDecisionsCount;
-        handleSetPosts = handleSetPostsCreatorsDecisions;
-        break;
-      }
-      case 'activity': {
-        postsForPage = activityDecisions;
-        postsForPageFilter = activityDecisionsFilter;
-        pageToken = activityDecisionsToken;
-        totalCount = activityDecisionsCount;
-        handleSetPosts = handleSetActivityDecisions;
-        break;
-      }
-      case 'activityHidden': {
-        postsForPage = [];
-        postsForPageFilter = activityDecisionsFilter;
-        pageToken = undefined;
-        totalCount = 0;
-        handleSetPosts = handleSetActivityDecisions;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
-    return React.cloneElement(children as ReactElement, {
-      ...(postsForPage ? { posts: postsForPage } : {}),
-      ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
-      pageToken,
-      totalCount,
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
-      handleUpdateFilter,
-    });
-  };
-
-  const handleToggleFollowingCreator = async () => {
-    try {
-      if (!currentUser.loggedIn) {
-        router.push(
-          `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-      }
-
-      const payload = new newnewapi.MarkUserRequest({
-        userUuid: user.uuid,
-        markAs: followingsIds.includes(user.uuid as string)
-          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
-          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-      });
-
-      console.log(payload);
-
-      const res = await markUser(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (followingsIds.includes(user.uuid as string)) {
-        removeId(user.uuid as string);
-      } else {
-        addId(user.uuid as string);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/sign-up?reason=follow-creator');
@@ -386,7 +216,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       currentUser.loggedIn &&
       currentUser.userData?.userUuid?.toString() === user.uuid.toString()
     ) {
-      router.push(
+      router.replace(
         currentUser.userData?.options?.isCreator
           ? '/profile/my-posts'
           : '/profile'
@@ -400,106 +230,107 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     user.uuid,
   ]);
 
-  useEffect(() => {
-    async function fetchIsSubscribed() {
-      try {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: user.uuid,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        if (res.data?.status?.activeRenewsAt) {
-          setIsSubscribed(true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
+  const handleSendMessageClick = useCallback(() => {
+    if (isMobileOrTablet) {
+      setHiddenMessagesArea(false);
     }
+  }, [isMobileOrTablet, setHiddenMessagesArea]);
 
-    fetchIsSubscribed();
-  }, [user.uuid]);
+  const moreButtonRef = useRef() as any;
+
+  const bundleExpired = useMemo(() => {
+    if (!creatorsBundle || !creatorsBundle.bundle?.accessExpiresAt?.seconds) {
+      return false;
+    }
+    const expiresAtTime =
+      (creatorsBundle.bundle!.accessExpiresAt!.seconds as number) * 1000;
+    return expiresAtTime < Date.now();
+  }, [creatorsBundle]);
 
   return (
-    <ErrorBoundary>
+    <>
       <SGeneral restrictMaxWidth>
         <SProfileLayout>
-          <ProfileBackground
-            pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
-          />
+          <ProfileBackground pictureURL={user.coverUrl ?? mockProfileBg.src} />
           {/* Favorites and more options buttons */}
-          <SBackButton
+          <SButtonBack
+            view='transparent'
+            withDim
+            withShrink
+            iconOnly
             onClick={() => {
               router.back();
             }}
-          />
-          <SFavoritesButton
-            view='transparent'
-            iconOnly
-            onClick={() => handleToggleFollowingCreator()}
+            onClickCapture={() => {
+              Mixpanel.track('Click Back Button', {
+                _stage: 'Profile',
+                _component: 'ProfileLayout',
+              });
+            }}
           >
-            <SSVGContainer active={false}>
-              <InlineSvg
-                svg={
-                  followingsIds.includes(user.uuid as string)
-                    ? FavouritesIconFilled
-                    : FavouritesIconOutlined
-                }
-                fill={
-                  followingsIds.includes(user.uuid as string)
-                    ? theme.colorsThemed.accent.blue
-                    : 'none'
-                }
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-            </SSVGContainer>
-            {t('ProfileLayout.buttons.favorites')}
-          </SFavoritesButton>
-          <SMoreButton
-            view='transparent'
-            iconOnly
-            onClick={() => setIsEllipseMenuOpen(true)}
-          >
-            <SSVGContainer active={ellipseMenuOpen}>
-              <InlineSvg
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.primary}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-            </SSVGContainer>
-            {t('ProfileLayout.buttons.more')}
-          </SMoreButton>
+            <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
+          </SButtonBack>
+          <SSideButtons>
+            {
+              // TODO: Re-enable once new SMS service is integrated
+              /* user.options?.isCreator && !isBlocked ? (
+              <SmsNotificationsButton subscription={subscription} />
+            ) : ( */
+              <div />
+              /* ) */
+            }
+            <RightSideButtons>
+              {!isMobile && !isUserBlocked && (
+                <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
+              )}
+              <SIconButton
+                active={ellipseMenuOpen}
+                ref={moreButtonRef}
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SIconButton>
+            </RightSideButtons>
+          </SSideButtons>
           {!isMobile && (
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
-              isSubscribed={isSubscribed}
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleClickBlock={() => {
                 if (isUserBlocked) {
-                  unblockUserAsync(user.uuid);
+                  changeUserBlockedStatus(user.uuid, false);
                 } else {
                   setBlockUserModalOpen(true);
                 }
               }}
               handleClickReport={handleClickReport}
-              handleClickUnsubscribe={() => {}}
+              anchorElement={moreButtonRef.current}
+              offsetTop={isDesktop ? '-25px' : '0'}
             />
           )}
           <ProfileImage src={user.avatarUrl ?? ''} />
-          {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <SUsername variant={4}>{user.nickname}</SUsername>
+          <SUserData>
+            <SUsernameWrapper>
+              <SUsername variant={4}>
+                <DisplayName user={user} />
+              </SUsername>
+              {isGenderPronounsDefined(user.genderPronouns) && (
+                <SGenderPronouns variant={2}>
+                  {t(
+                    `genderPronouns.${
+                      getGenderPronouns(user.genderPronouns!!).name
+                    }` as any
+                  )}
+                </SGenderPronouns>
+              )}
+            </SUsernameWrapper>
             <SShareDiv>
               <SUsernameButton
                 view='tertiary'
@@ -531,9 +362,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   padding: '8px',
                 }}
                 onClick={() => handleCopyLink()}
+                onClickCapture={() => {
+                  Mixpanel.track('Copy Link User', {
+                    _stage: 'Profile',
+                    _postUuid: user.uuid,
+                    _component: 'ProfileLayout',
+                  });
+                }}
               >
                 {isCopiedUrl ? (
-                  t('ProfileLayout.buttons.copied')
+                  t('profileLayout.buttons.copied')
                 ) : (
                   <InlineSvg
                     svg={ShareIconFilled}
@@ -544,41 +382,73 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isOfferingSubscription ? (
-              <Link
-                href={
-                  !isSubscribed
-                    ? `/${user.username}/subscribe`
-                    : `/direct-messages/${user.username}`
-                }
-              >
-                <SSendButton withShadow view='primaryGrad'>
-                  {t('ProfileLayout.buttons.sendMessage')}
-                </SSendButton>
-              </Link>
-            ) : null}
+
+            {
+              // eslint-disable-next-line no-nested-ternary
+              creatorsBundle && user.options?.isOfferingBundles ? (
+                !bundleExpired ? (
+                  <CustomLink href={`/direct-messages/${user.username}`}>
+                    <SSendButton
+                      view='brandYellow'
+                      onClickCapture={() => {
+                        Mixpanel.track('Send Message Button Clicked', {
+                          _stage: 'Profile',
+                          _creatorUuid: user.uuid,
+                          _component: 'ProfileLayout',
+                        });
+                      }}
+                      onClick={handleSendMessageClick}
+                    >
+                      {t('profileLayout.buttons.sendMessage')}
+                    </SSendButton>
+                  </CustomLink>
+                ) : (
+                  <SSendButton
+                    view='brandYellow'
+                    onClick={() => {
+                      setBuyBundleModalOpen(true);
+                    }}
+                    onClickCapture={() => {
+                      Mixpanel.track('Send Message Button Clicked', {
+                        _stage: 'Profile',
+                        _creatorUuid: user.uuid,
+                        _component: 'ProfileLayout',
+                      });
+                    }}
+                  >
+                    {t('profileLayout.buttons.sendMessage')}
+                  </SSendButton>
+                )
+              ) : null
+            }
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-          </div>
-          {/* Temp, all creactors for now */}
+            {isMobile && !isUserBlocked && (
+              <SMobileSeeBundleButton
+                user={user}
+                creatorBundle={creatorsBundle}
+              />
+            )}
+          </SUserData>
+          {/* Temp, all creators for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0 ? (
+          {/* NOTE: activity is temporarily disabled */}
+          {/* tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
-          ) : null}
+          ) : null */}
         </SProfileLayout>
-        {renderChildren()}
+        {!isBlocked && children}
       </SGeneral>
       {/* Modals */}
       {isMobile && (
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
-          isSubscribed={isSubscribed}
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
           handleClickBlock={() => {
             if (isUserBlocked) {
-              unblockUserAsync(user.uuid);
+              changeUserBlockedStatus(user.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
@@ -586,39 +456,36 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           handleClickReport={() => {
             setConfirmReportUser(true);
           }}
-          handleClickUnsubscribe={() => {}}
         />
       )}
-      <BlockUserModal
+      <BlockUserModalProfile
         confirmBlockUser={blockUserModalOpen}
         user={user}
         closeModal={() => setBlockUserModalOpen(false)}
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={
-          currentUser.userData
-            ? currentUser.userData.nickname ||
-              `@${currentUser.userData.username}`
-            : ''
-        }
+        reportedDisplayname={getDisplayname(user)}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
-    </ErrorBoundary>
+      {creatorsBundle && user.options?.isOfferingBundles && bundleExpired ? (
+        <BuyBundleModal
+          show={buyBundleModalOpen}
+          modalType='initial'
+          creator={user}
+          // Irrelevant since guests wont see it
+          successPath={`/${user.username}`}
+          onClose={() => {
+            setBuyBundleModalOpen(false);
+          }}
+        />
+      ) : null}
+    </>
   );
 };
 
-ProfileLayout.defaultProps = {
-  postsCachedCreatorDecisions: undefined,
-  postsCachedCreatorDecisionsFilter: undefined,
-  postsCachedCreatorDecisionsPageToken: undefined,
-  postsCachedCreatorDecisionsCount: undefined,
-  postsCachedActivity: undefined,
-  postsCachedActivityFilter: undefined,
-  postsCachedActivityPageToken: undefined,
-  postsCachedActivityCount: undefined,
-};
+ProfileLayout.defaultProps = {};
 
 export default ProfileLayout;
 
@@ -631,23 +498,99 @@ const SGeneral = styled(General)`
 
   @media (max-width: 768px) {
     main {
-      div:first-child {
+      > div:first-child {
         padding-left: 0;
         padding-right: 0;
 
-        div:first-child {
-          margin-left: 0;
-          margin-right: 0;
+        > div:first-child {
+          padding-left: 0;
+          padding-right: 0;
+
+          > div:first-child {
+            padding-left: 0;
+            padding-right: 0;
+          }
         }
       }
     }
   }
 `;
 
+const SProfileLayout = styled.div`
+  position: relative;
+  /* overflow: hidden; */
+
+  margin-top: -28px;
+  margin-bottom: 24px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: -8px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: -16px;
+  }
+`;
+
+const SButtonBack = styled(Button)`
+  background: rgba(11, 10, 19, 0.1);
+
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    top: 24px;
+    left: 24px;
+  }
+`;
+
+const SSideButtons = styled.div`
+  display: flex;
+  position: absolute;
+  width: 100%;
+  gap: 16px;
+  padding: 16px;
+
+  top: 164px;
+  justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    top: 204px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    top: 244px;
+    justify-content: flex-end;
+  }
+`;
+
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 36px;
+`;
+
+const SUsernameWrapper = styled.div`
+  margin-bottom: 12px;
+`;
+
 const SUsername = styled(Headline)`
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-  margin-bottom: 12px;
+const SGenderPronouns = styled(Text)`
+  text-align: center;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SShareDiv = styled.div`
@@ -690,178 +633,95 @@ const SShareButton = styled(Button)`
 `;
 
 const SSendButton = styled(Button)`
-  margin-bottom: 16px;
-  background: ${(props) => props.theme.colorsThemed.accent.yellow};
+  margin: 0 auto 16px;
   color: #2c2c33;
-
-  :after {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
-  }
-
-  &:hover {
-    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
-    box-shadow: none !important;
-  }
 `;
 
 const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  user-select: unset;
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
-
+  margin: 0 auto 16px;
+  width: 100%;
   max-width: 480px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SSVGContainer = styled.div<{
+const RightSideButtons = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+`;
+
+const SSeeBundleButton = styled(SeeBundlesButton)`
+  margin-right: 16px;
+`;
+
+const SMobileSeeBundleButton = styled(SeeBundlesButton)`
+  margin: auto;
+  margin-bottom: 16px;
+`;
+
+const SIconButton = styled.div<{
   active: boolean;
 }>`
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
 
-  ${({ theme }) => theme.media.laptop} {
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 8px;
-    background: ${({ theme, active }) =>
-      active
-        ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
-        : theme.colorsThemed.background.quinary};
-    transition: 0.2s linear;
-  }
+  padding: 12px;
+  border-radius: 16px;
+  cursor: pointer;
+
+  user-select: none;
+  transition: background 0.2s linear;
+  background: ${({ theme, active }) =>
+    active
+      ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
+      : theme.colorsThemed.background.quinary};
+
+  // TODO: add hover/active effects
 `;
 
-const SBackButton = styled(BackButton)`
-  position: absolute;
-  top: 16px;
-  left: 16px;
+// const SFavoritesButton = styled(Button)`
+//   position: absolute;
+//   top: 164px;
+//   right: 4px;
 
-  ${(props) => props.theme.media.laptop} {
-    top: 24px;
-    left: 24px;
-  }
-`;
+//   background: none;
+//   &:active:enabled,
+//   &:hover:enabled,
+//   &:focus:enabled {
+//     background: none;
+//   }
 
-const SFavoritesButton = styled(Button)`
-  position: absolute;
-  top: 164px;
-  right: 4px;
+//   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  background: none;
-  &:active:enabled,
-  &:hover:enabled,
-  &:focus:enabled {
-    background: none;
-  }
+//   span {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     font-weight: 600;
+//     font-size: 10px;
+//     line-height: 12px;
+//   }
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+//   ${(props) => props.theme.media.tablet} {
+//     top: 204px;
+//     right: calc(4px + 56px);
+//   }
 
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 12px;
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-    right: calc(4px + 56px);
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-    right: calc(4px + 68px);
-  }
-`;
-
-const SMoreButton = styled(Button)`
-  position: absolute;
-  top: 164px;
-  left: 4px;
-
-  background: none;
-  &:active:enabled,
-  &:hover:enabled,
-  &:focus:enabled {
-    background: none;
-  }
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 12px;
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-    left: initial;
-    right: 4px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-  }
-`;
-
-const SProfileLayout = styled.div`
-  position: relative;
-  /* overflow: hidden; */
-
-  margin-top: -28px;
-  margin-bottom: 24px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  ${(props) => props.theme.media.tablet} {
-    margin-top: -8px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-top: -16px;
-  }
-`;
-
-const SSubcribedTag = styled.div`
-  position: absolute;
-  top: 195px;
-  left: calc(50% - 38px);
-
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-
-  width: 76px;
-  padding: 6px 8px;
-  border-radius: 50px;
-
-  color: ${({ theme }) => theme.colors.dark};
-  text-align: center;
-  font-weight: 700;
-  font-size: 10px;
-  line-height: 12px;
-
-  z-index: 5;
-
-  ${({ theme }) => theme.media.tablet} {
-    top: 235px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    top: 275px;
-  }
-`;
+//   ${(props) => props.theme.media.laptop} {
+//     top: 244px;
+//     right: calc(4px + 68px);
+//   }
+// `;

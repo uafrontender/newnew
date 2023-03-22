@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import moment from 'moment';
 
 import InlineSVG from '../../atoms/InlineSVG';
 
@@ -16,11 +17,23 @@ export interface ITimeComponents {
 interface ITimePicker {
   value: string;
   disabled?: boolean;
+  isDaySame: boolean;
+  isTimeOfTheDaySame: boolean;
+  hoursFormat: 'am' | 'pm';
+  localTimeOfTheDay: 'am' | 'pm';
   onChange: (e: any) => void;
 }
 
 export const TimePicker: React.FC<ITimePicker> = (props) => {
-  const { value, disabled, onChange } = props;
+  const {
+    value,
+    disabled,
+    isDaySame,
+    isTimeOfTheDaySame,
+    hoursFormat,
+    localTimeOfTheDay,
+    onChange,
+  } = props;
   const theme = useTheme();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,26 +47,38 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     };
   }, [value]);
 
-  const hours: TDropdownSelectItem<string>[] = useMemo(
-    () =>
-      new Array(12).fill('').map((_, i) => ({
-        value:
-          (i + 1).toString().length > 1
-            ? (i + 1).toString()
-            : `0${(i + 1).toString()}`,
-        name: (i + 1).toString(),
-      })),
-    []
-  );
+  const hours: TDropdownSelectItem<string>[] = useMemo(() => {
+    let offset;
+    const hoursArray = new Array(12).fill('').map((_, i) => ({
+      value:
+        (i + 1).toString().length > 1
+          ? (i + 1).toString()
+          : `0${(i + 1).toString()}`,
+      name: (i + 1).toString(),
+    }));
 
-  const minutes: TDropdownSelectItem<string>[] = useMemo(
-    () =>
-      new Array(60).fill('').map((_, i) => ({
-        value: i.toString().length > 1 ? i.toString() : `0${i.toString()}`,
-        name: i.toString(),
-      })),
-    []
-  );
+    if (isDaySame) {
+      const h = moment().hour();
+
+      if (isTimeOfTheDaySame && localTimeOfTheDay === 'pm' && h !== 12) {
+        const hCorrected = h - 13;
+
+        offset = hCorrected;
+      } else if (isTimeOfTheDaySame && localTimeOfTheDay === 'am' && h !== 0) {
+        offset = h - 1;
+
+        if (h > 0) {
+          return hoursArray.slice(offset, hoursArray.length - 1);
+        }
+      }
+    }
+
+    if (offset) {
+      return hoursArray.slice(offset);
+    }
+
+    return hoursArray;
+  }, [isDaySame, isTimeOfTheDaySame, localTimeOfTheDay]);
 
   const handleChangeTime = (newValue: ITimeComponents) => {
     const val = `${newValue.hours}:${newValue.minutes}`;
@@ -75,7 +100,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         }
       }}
     >
-      <SInput type='time' value={value} readOnly />
+      <SInput type='text' value={value} readOnly />
       <SInlineSVG
         svg={chevronDown}
         fill={theme.colorsThemed.text.secondary}
@@ -84,13 +109,15 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       />
       <Modal
         show={modalOpen}
-        customBackdropFilterValue={1}
+        custombackdropfiltervalue={1}
         onClose={() => setModalOpen(false)}
       >
         {modalOpen && (
           <TimePickerMobileModal
+            isDaySame={isDaySame}
             hours={hours}
-            minutes={minutes}
+            // minutes={minutes}
+            hoursFormat={hoursFormat}
             currentTime={currentTime}
             handleClose={() => setModalOpen(false)}
             handleChangeTime={handleChangeTime}
@@ -137,19 +164,7 @@ const SInput = styled.input`
   font-weight: 500;
   line-height: 24px;
   background-color: transparent;
-  -webkit-appearance: none;
-
-  ::-webkit-calendar-picker-indicator {
-    background: none;
-  }
-
-  ::-webkit-datetime-edit-ampm-field {
-    display: none;
-  }
-
-  ::-webkit-date-and-time-value {
-    text-align: left;
-  }
+  pointer-events: none;
 `;
 
 const SInlineSVG = styled(InlineSVG)`

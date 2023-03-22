@@ -1,42 +1,45 @@
 /* eslint-disable no-nested-ternary */
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { scroller } from 'react-scroll';
+import { animateScroll } from 'react-scroll';
 import styled from 'styled-components';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import Button from '../Button';
 
 interface IFunctionProps {
+  className?: string;
   closeDrop?: () => void;
 }
 
-const NoResults: React.FC<IFunctionProps> = ({ closeDrop }) => {
+const NoResults: React.FC<IFunctionProps> = ({ className, closeDrop }) => {
+  const { t } = useTranslation('common');
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const exploreHandler = () => {
+    if (closeDrop) {
+      closeDrop();
+    }
+
     if (router.pathname !== '/') {
       router.push('/');
     } else {
-      if (closeDrop) closeDrop();
-      scroller.scrollTo('topSection', {
+      animateScroll.scrollToTop({
         offset: isMobile ? -20 : -100,
         smooth: 'ease',
         duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
       });
     }
   };
   return (
-    <SNoResults>
-      <SEmptyInboxTitle>We didn’t find anything</SEmptyInboxTitle>
-      <SEmptyInboxText>
-        Try searching for something else or explore what’s new
-      </SEmptyInboxText>
-      <Button onClick={exploreHandler}>Explore</Button>
+    <SNoResults className={className}>
+      <SEmptyInboxTitle>{t('search.noResults.title')}</SEmptyInboxTitle>
+      <SEmptyInboxText>{t('search.noResults.description')}</SEmptyInboxText>
+      <Button onClick={exploreHandler}>{t('search.noResults.action')}</Button>
     </SNoResults>
   );
 };

@@ -28,7 +28,6 @@ import { createWrapper } from 'next-redux-wrapper';
 // Import reducers
 import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
-import creationReducer from './slices/creationStateSlice';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -53,22 +52,14 @@ const userPersistConfig = {
   whitelist: ['loggedIn', 'userData'],
 };
 
-const creationPersistConfig = {
-  key: 'creation',
-  storage,
-  whitelist: [],
-};
-
 const reducers = {
   ui: persistReducer(uiPersistConfig, uiReducer),
   user: persistReducer(userPersistConfig, userReducer),
-  creation: persistReducer(creationPersistConfig, creationReducer),
 };
 
 const combinedReducer = combineReducers({
   ui: uiReducer,
   user: userReducer,
-  creation: creationReducer,
 });
 
 export type EnhancedStoreWithPersistor = EnhancedStore & {
@@ -104,6 +95,7 @@ const makeStore = () => {
       getDefaultMiddleware({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+          ignoredPaths: ['user.userData.dateOfBirth'],
         },
       }),
   });
@@ -124,7 +116,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 
-export const useAppDispatch = (): any => useDispatch<AppDispatch>();
+export const useAppDispatch = (): any => useDispatch<any>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 type AppStore = ReturnType<typeof makeStore>;

@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -13,11 +12,15 @@ import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../UserAvatar';
 
-import { useAppSelector } from '../../../../redux-store/store';
-
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
-import secondsToDHMS from '../../../../utils/secondsToDHMS';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { useAppState } from '../../../../contexts/appStateContext';
+import PostTitleContent from '../../../atoms/PostTitleContent';
+
+const ResponseTimer = dynamic(
+  () => import('../../../atoms/dashboard/ResponseTimer')
+);
 
 interface IExpirationPosts {
   expirationPosts: newnewapi.IPost[];
@@ -26,9 +29,9 @@ interface IExpirationPosts {
 export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   expirationPosts,
 }) => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -38,91 +41,65 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   const router = useRouter();
 
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
+  const [isCopiedUrlIndex, setIsCopiedUrlIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (expirationPosts) {
-      // eslint-disable-next-line no-param-reassign
-      if (expirationPosts.length > 3) expirationPosts.length = 3;
       setPosts(expirationPosts);
     }
   }, [expirationPosts]);
 
-  const getCountdown = (
-    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
-  ) => {
-    const end = (data.responseUploadDeadline?.seconds as number) * 1000;
-    const parsed = (end - Date.now()) / 1000;
-    const dhms = secondsToDHMS(parsed, 'noTrim');
-
-    let countdownsrt = `${dhms.days}${t(
-      'dashboard.expirationPosts.expiresTime.days'
-    )} ${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')}`;
-
-    if (dhms.days === '0') {
-      countdownsrt = `${dhms.hours}${t(
-        'dashboard.expirationPosts.expiresTime.hours'
-      )} ${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')}`;
-      if (dhms.hours === '0') {
-        countdownsrt = `${dhms.minutes}${t(
-          'dashboard.expirationPosts.expiresTime.minutes'
-        )} ${dhms.seconds}${t(
-          'dashboard.expirationPosts.expiresTime.seconds'
-        )}`;
-        if (dhms.minutes === '0') {
-          countdownsrt = `${dhms.seconds}${t(
-            'dashboard.expirationPosts.expiresTime.seconds'
-          )}`;
-        }
-      }
-    }
-    countdownsrt = `${countdownsrt} ${t(
-      'dashboard.expirationPosts.expiresTime.left_to_respond'
-    )}`;
-    return countdownsrt;
-  };
-
   const getAmountValue = (
-    postType: string,
     data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
   ) => {
     let centsQty = 0;
 
-    postType === 'multipleChoice'
-      ? (centsQty =
-          (data as newnewapi.MultipleChoice).totalVotes *
-          (data as newnewapi.MultipleChoice).votePrice!!.usdCents!!)
-      : (centsQty = (data as newnewapi.Crowdfunding | newnewapi.Auction)
-          .totalAmount?.usdCents!!);
+    const localData = data as
+      | newnewapi.MultipleChoice
+      | newnewapi.Crowdfunding
+      | newnewapi.Auction;
 
-    return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
+    if (localData.totalAmount?.usdCents) {
+      centsQty = localData.totalAmount.usdCents;
+    }
+
+    return `$${formatNumber(centsQty / 100 ?? 0, false)}`;
   };
 
-  async function copyPostUrlToClipboard(url: string) {
+  const copyPostUrlToClipboard = useCallback(async (url: string) => {
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
       document.execCommand('copy', true, url);
     }
-  }
+  }, []);
 
   const renderItem = useCallback(
-    (item, index) => {
+    (item: newnewapi.IPost, index: number) => {
       const postType = Object.keys(item)[0];
       const data = Object.values(item)[0] as
         | newnewapi.Auction
         | newnewapi.Crowdfunding
         | newnewapi.MultipleChoice;
-
       const handleShareClick = () => {
-        let url;
         if (window) {
-          url = `${window.location.origin}/post/${data.postUuid}`;
-          copyPostUrlToClipboard(url);
+          const url = `${window.location.origin}/p/${
+            data.postShortId ? data.postShortId : data.postUuid
+          }`;
+          copyPostUrlToClipboard(url)
+            .then(() => {
+              setIsCopiedUrlIndex(index);
+              setTimeout(() => {
+                setIsCopiedUrlIndex(null);
+              }, 1000);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         }
       };
 
-      const countdownsrt = getCountdown(data);
-      const money = getAmountValue(postType, data);
+      const money = getAmountValue(data);
 
       return (
         <SListItemWrapper key={data.postUuid}>
@@ -144,17 +121,24 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                   )}
                   <SListItemTitleWrapper>
                     <SListItemTitle variant={3} weight={600}>
-                      {data.title}
+                      <PostTitleContent>{data.title}</PostTitleContent>
                     </SListItemTitle>
                     <SListItemDate variant={2} weight={600}>
-                      {countdownsrt}
+                      <ResponseTimer
+                        timestampSeconds={new Date(
+                          (data.responseUploadDeadline?.seconds as number) *
+                            1000
+                        ).getTime()}
+                      />
                     </SListItemDate>
                   </SListItemTitleWrapper>
                 </SListBodyItem>
 
                 <SListBodyItem width='100px' align='flex-start'>
                   <SListBodyItemText variant={3} weight={600}>
-                    {t(`dashboard.expirationPosts.postTypes.${postType}`)}
+                    {t(
+                      `dashboard.expirationPosts.postTypes.${postType}` as any
+                    )}
                   </SListBodyItemText>
                 </SListBodyItem>
 
@@ -165,9 +149,27 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 </SListBodyItem>
 
                 <SListBodyItem width='150px' align='center'>
-                  <Link href={`/post/${data.postUuid}`}>
+                  <Link
+                    href={`/p/${
+                      data.postShortId ? data.postShortId : data.postUuid
+                    }`}
+                  >
                     <a>
-                      <SListDecideButton view='primary'>
+                      <SListDecideButton
+                        view='primary'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _stage: 'Dashboard',
+                            _button: 'Response Now',
+                            _target: `/p/${
+                              data.postShortId
+                                ? data.postShortId
+                                : data.postUuid
+                            }`,
+                            _postUuid: data.postUuid,
+                          });
+                        }}
+                      >
                         {t('dashboard.expirationPosts.decide.desktop')}
                       </SListDecideButton>
                     </a>
@@ -190,21 +192,33 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 )}
                 <SListItemTitleWrapper>
                   <SListItemTitle variant={3} weight={600}>
-                    {data.title}
+                    <PostTitleContent>{data.title}</PostTitleContent>
                   </SListItemTitle>
                   <SListItemDate variant={2} weight={600}>
-                    {countdownsrt}
+                    <ResponseTimer
+                      timestampSeconds={new Date(
+                        (data.responseUploadDeadline?.seconds as number) * 1000
+                      ).getTime()}
+                    />
                   </SListItemDate>
                 </SListItemTitleWrapper>
                 <SListShareButton view='secondary' onClick={handleShareClick}>
-                  <InlineSVG
-                    svg={shareIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width='20px'
-                    height='20px'
-                  />
+                  {isCopiedUrlIndex === index ? (
+                    t('dashboard.expirationPosts.linkCopied')
+                  ) : (
+                    <InlineSVG
+                      svg={shareIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width='20px'
+                      height='20px'
+                    />
+                  )}
                 </SListShareButton>
-                <Link href={`/post/${data.postUuid}`}>
+                <Link
+                  href={`/p/${
+                    data.postShortId ? data.postShortId : data.postUuid
+                  }`}
+                >
                   <a>
                     <SListDecideButton view='primary'>
                       {t('dashboard.expirationPosts.decide.mobile')}
@@ -226,6 +240,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       posts.length,
       theme.colorsThemed.text.primary,
       router,
+      isCopiedUrlIndex,
     ]
   );
 
@@ -299,6 +314,7 @@ const SContainer = styled.div`
     left: unset;
     padding: 24px;
     border-radius: 24px;
+    width: 100%;
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -433,11 +449,24 @@ const SListItemDate = styled(Caption)`
 
 const SListShareButton = styled(Button)`
   padding: 8px;
-  min-width: 36px;
+  /* min-width: 36px; */
   margin-right: 12px;
   border-radius: 12px;
   overflow: visible;
+  position: relative;
 `;
+
+// const SCopiedTooltip = styled.div`
+//   position: absolute;
+//   left: -25px;
+//   top: -45px;
+//   background: ${(props) =>
+//     props.theme.name === 'light'
+//       ? props.theme.colorsThemed.background.secondary
+//       : props.theme.colorsThemed.background.tertiary};
+//   border-radius: ${({ theme }) => theme.borderRadius.medium};
+//   padding: 8px;
+// `;
 
 const SListDecideButton = styled(Button)`
   min-width: 94px;

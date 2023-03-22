@@ -2,25 +2,29 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { useCookies } from 'react-cookie';
 
 import Text from './Text';
 import Modal from '../organisms/Modal';
 import Button from './Button';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IChangeLanguage {}
 
-export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
-  const { t } = useTranslation();
+export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
+  const { t } = useTranslation('common');
   const ref: any = useRef();
-  const { push, locale, pathname } = useRouter();
+  const { locale } = useRouter();
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
+
+  const [, setCookie] = useCookies();
 
   const options = SUPPORTED_LANGUAGES;
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -29,17 +33,29 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const isTablet = ['tablet'].includes(resizeMode);
 
   const ddHeight =
-    (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
+    (options.length > 6 ? 372 : options.length * (isTablet ? 54 : 56)) + 20;
 
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
   };
+
   const handleCloseClick = () => {
     setFocused(false);
   };
+
   const renderItem = (item: string) => {
     const handleItemClick = () => {
-      push(pathname, pathname, { locale: item });
+      Mixpanel.track('Language Changed', {
+        _component: 'ChangeLanguage',
+        _language: item,
+      });
+
+      setCookie('preferredLocale', item, {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      });
+      handleCloseClick();
     };
 
     return (
@@ -50,7 +66,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
         selected={item === locale}
       >
         <SItemTitle variant={3} weight={600}>
-          {t(`dd-language-title-${item}`)}
+          {t(`language.ddLanguageTitle.${item as 'en-US' | 'zh' | 'es'}`)}
         </SItemTitle>
       </SButton>
     );
@@ -63,17 +79,21 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
     }
   });
 
+  if (options.length < 2) {
+    return null;
+  }
+
   return (
-    <SContainer ref={ref}>
+    <SContainer ref={ref} {...props}>
       <Button view='changeLanguage' onClick={handleChangeLanguageClick}>
-        {t(`selected-language-title-${locale}`)}
+        {t(`language.selectedLanguageTitle.${locale as 'en-US' | 'zh' | 'es'}`)}
       </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
             <SMobileList>{options.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
-              {t('button-cancel')}
+              {t('button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
@@ -92,7 +112,8 @@ const SContainer = styled.div`
   position: relative;
 
   /* TEMP */
-  display: none;
+  // Enabled for vlad/apply-translations branch
+  // display: none;
 `;
 
 interface ISListHolder {
@@ -165,6 +186,11 @@ interface ISButton {
 const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 16px;
+  margin-bottom: 4px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   ${(props) => props.theme.media.tablet} {
     min-width: 136px;

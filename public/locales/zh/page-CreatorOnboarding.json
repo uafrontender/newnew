@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "title": "成為NewNew的創作者",
+    "description": "成為最好的創作者經濟初創公司的創作者"
+  },
+  "tosSection": {
+    "heading": "開始在NewNew上掙錢",
+    "subheading": "請查閱我們的條款......",
+    "close": "完成"
+  },
+  "detailsSection": {
+    "leaveMsg": "你確定要離開嗎？更改的內容將被放棄",
+    "side": {
+      "heading": "跟我們說說你自己。",
+      "subheading": "這些說明將顯示在你的個人資料頁上。"
+    },
+    "heading": "準備好創作了嗎？我們只需要一些細節...",
+    "form": {
+      "firstName": {
+        "placeholder": "名",
+        "errors": {
+          "generic": "請檢查輸入",
+          "tooLong": "名太長",
+          "tooShort": "名太短",
+          "invalidChar": "有無效字元",
+          "inappropriate": "禁止使用冒犯性詞語",
+          "linksForbidden": "不允許插入連結"
+        }
+      },
+      "lastName": {
+        "placeholder": "姓",
+        "errors": {
+          "generic": "請檢查輸入",
+          "tooLong": "姓太長",
+          "tooShort": "姓太短",
+          "invalidChar": "有無效字元",
+          "inappropriate": "禁止使用冒犯性詞語",
+          "linksForbidden": "不允許插入連結"
+        }
+      },
+      "username": {
+        "placeholder": "用戶名",
+        "frequencyCaption": "每月可更改一次用戶名。",
+        "errors": {
+          "generic": "請檢查輸入",
+          "tooLong": "用戶名太長",
+          "tooShort": "用戶名太短",
+          "invalidChar": "用戶名有無效字元",
+          "inappropriate": "禁止使用攻擊性詞語",
+          "taken": "用戶名已被佔用，請換一個試試",
+          "linksForbidden": "不允許插入連結"
+        },
+        "points": {
+          "1": "2-25個字元長度",
+          "2": "只允許小寫",
+          "3": "不得有空格和特殊字元"
+        }
+      },
+      "nickname": {
+        "placeholder": "顯示姓名",
+        "errors": {
+          "generic": "請檢查輸入",
+          "tooLong": "姓名太長",
+          "tooShort": "姓名太短",
+          "invalidChar": "姓名有無效字元",
+          "inappropriate": "禁止使用攻擊性詞語",
+          "linksForbidden": "不允許插入連結"
+        }
+      },
+      "email": {
+        "placeholder": "電子郵件地址",
+        "cantChangeInfoCaption_NEED_TRANSLATION": "You can edit your email in settings later",
+        "errors": {
+          "invalidEmail": "請輸入一個有效的電子郵件地址",
+          "emailTaken": "該電子郵件已經被佔用。請換一個試試"
+        }
+      },
+      "dateOfBirth": {
+        "label": "出生日期",
+        "captions": {
+          "twoTimesOnly": "生日只能更改2次,",
+          "cannotChange": "你不能改變生日,",
+          "instruction": "設定出生日期"
+        },
+        "units": {
+          "day": "天",
+          "month": "月",
+          "year": "年"
+        },
+        "errors": {
+          "tooYoung": "必須年滿18歲或以上才能成為創作者"
+        }
+      },
+      "profilePicture": {
+        "label": "個人資料照片",
+        "captionMobile": "*推薦200x200 像解析度",
+        "captionDesktop": "推薦200x200 像解析度",
+        "button": {
+          "upload": "上傳照片",
+          "uploadNew": "上傳新圖片"
+        }
+      }
+    },
+    "editProfileImageModal": {
+      "button": {
+        "back": "編輯個人資料圖片",
+        "save": "保存更改",
+        "cancel": "取消"
+      }
+    },
+    "button": {
+      "back": "返回",
+      "submit": "完成"
+    },
+    "agreedToTosCheckbox": "我已閱讀並同意",
+    "linkText": "NewNew條款"
+  },
+  "aboutSection": {
+    "meta": {
+      "title": "成為NewNew的創作者",
+      "description": "成為創作者並在NewNew上賺取收入"
+    },
+    "button": {
+      "submit": "保存更改",
+      "back": "關閉"
+    },
+    "heading": "這是你的粉絲看到的",
+    "bio": {
+      "title": "個人簡介",
+      "placeholder": "簡單介紹一下你自己...",
+      "errors": {
+        "generic": "請檢查輸入",
+        "tooLong": "個人簡介太長",
+        "tooShort": "個人簡介太短",
+        "inappropriate": "禁止使用攻擊性詞語",
+        "linksForbidden": "不允許插入連結"
+      }
+    }
+  },
+  "stripeSection": {
+    "meta": {
+      "title": "推薦獲得付款方式：",
+      "description": "與Stripe帳戶綁定，即可按時獲得付款。"
+    },
+    "side": {
+      "heading": "使用Stripe，收付更輕鬆",
+      "subheading": "與Stripe帳戶綁定，即可按時獲得付款。"
+    },
+    "titleSetUpStripe": "設置支付系統",
+    "bullets": {
+      "1": "Stripe的帳戶設置快速而簡單",
+      "2": "你的NewNew收入可直接提取並存入你的銀行帳戶",
+      "3": "Stripe會保護你的資訊的隱私和安全"
+    },
+
+    "button": {
+      "submit": "提交",
+      "requestSetupLink": "與Stripe綁定",
+      "stripeConnectedLink": "Stripe已綁定！",
+      "stripeConnecting": "連接中......",
+      "requireInformation": "Stripe需要資訊"
+    }
+  },
+  "subRateSection": {
+    "meta": {
+      "title": "增加你的被動收入。",
+      "description": "為你的頻道啟用訂閱功能，按月獲得報酬。"
+    },
+    "side": {
+      "heading": "增加你的被動收入,",
+      "subheading": "為你的頻道啟用訂閱功能，按月獲得報酬。"
+    },
+    "heading": "設置訂閱費率",
+    "selectInput": {
+      "perMonth": "/月",
+      "select": "選擇",
+      "featured": "受歡迎",
+      "noProduct": "沒有訂閱"
+    },
+    "button": {
+      "submit": "保存更改",
+      "back": "關閉"
+    }
+  }
+}

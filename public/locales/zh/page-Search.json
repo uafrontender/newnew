@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "搜索"
+  },
+  "mainContent": {
+    "title": "結果",
+    "tabs": {
+      "hashtags_NEED_TRANSLATION": "Hashtags",
+      "creators": "創作者"
+    }
+  },
+  "decisions": {
+    "sort": {
+      "title": "排序",
+      "all": "全部",
+      "numberOfParticipants": "參與者人數",
+      "newest": "最新"
+    }
+  }
+}

@@ -1,26 +1,57 @@
-import React from 'react';
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-nested-ternary */
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { scroller } from 'react-scroll';
+import Link from 'next/link';
 import Button from '../Button';
 import Text from '../Text';
-
 import money from '../../../public/images/svg/icons/filled/Money.svg';
-
-import { SCROLL_TO_TOP } from '../../../constants/timings';
 import InlineSVG from '../InlineSVG';
+import { useAppSelector } from '../../../redux-store/store';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const FinishProfileSetup = () => {
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const theme = useTheme();
+  const user = useAppSelector((state) => state.user);
 
-  const handleClick = () => {
-    scroller.scrollTo('top-reload', {
-      smooth: 'easeInOutQuart',
-      duration: SCROLL_TO_TOP,
-      containerId: 'generalScrollContainer',
-    });
-  };
+  const [isAccountDetailsCompleted, setAccountDetailsCompleted] =
+    useState(false);
+  const [isCreatorConnectedToStripe, setIisCreatorConnectedToStripe] =
+    useState(false);
+
+  useEffect(() => {
+    if (user.creatorData?.isLoaded) {
+      user.userData?.bio && user.userData?.bio.length > 0
+        ? setAccountDetailsCompleted(true)
+        : setAccountDetailsCompleted(false);
+    }
+  }, [user.creatorData?.isLoaded, user.userData?.bio]);
+
+  useEffect(() => {
+    if (user.creatorData?.isLoaded) {
+      user.creatorData?.options?.isCreatorConnectedToStripe
+        ? setIisCreatorConnectedToStripe(true)
+        : setIisCreatorConnectedToStripe(false);
+    }
+  }, [
+    user.creatorData?.options?.isCreatorConnectedToStripe,
+    user.creatorData?.isLoaded,
+  ]);
+
+  const getString = useCallback(() => {
+    if (!isAccountDetailsCompleted && !isCreatorConnectedToStripe)
+      return t('dashboard.earnings.toDosIssue.text');
+
+    if (!isCreatorConnectedToStripe)
+      return t('dashboard.earnings.toDosIssue.textBank');
+
+    if (!isAccountDetailsCompleted)
+      return t('dashboard.earnings.toDosIssue.textBio');
+
+    return '';
+  }, [isAccountDetailsCompleted, isCreatorConnectedToStripe, t]);
 
   return (
     <SCashOutContainer>
@@ -35,13 +66,38 @@ export const FinishProfileSetup = () => {
         </SImageWrapper>
         <SDescriptionWrapper>
           <SDescription variant={2} weight={600}>
-            {t('dashboard.earnings.todosIssue.text')}
+            {getString()}
           </SDescription>
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <SButton view='primaryGrad' onClick={handleClick}>
-        {t('dashboard.earnings.todosIssue.btnText')}
-      </SButton>
+      <Link
+        href={
+          !isAccountDetailsCompleted
+            ? '/creator-onboarding-about'
+            : !isCreatorConnectedToStripe
+            ? '/creator/get-paid'
+            : ''
+        }
+      >
+        <a>
+          <SButton
+            view='common'
+            onClick={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _button: 'Add',
+                _stage: 'Dashboard',
+                _target: !isAccountDetailsCompleted
+                  ? '/creator-onboarding-about'
+                  : !isCreatorConnectedToStripe
+                  ? '/creator/get-paid'
+                  : '',
+              });
+            }}
+          >
+            {t('dashboard.earnings.toDosIssue.button')}
+          </SButton>
+        </a>
+      </Link>
     </SCashOutContainer>
   );
 };
@@ -87,24 +143,19 @@ const SButton = styled(Button)`
   width: auto;
   display: block;
   flex-shrink: 0;
-  color: #2c2c33;
   padding: 16px 20px;
   margin-top: 16px;
-  background: ${(props) => props.theme.colors.white};
-
-  &:after {
-    display: none;
-  }
-
-  &:focus:enabled,
-  &:hover:enabled {
-    background: ${(props) => props.theme.colors.white};
-  }
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
     margin-top: unset;
     margin-left: 16px;
+  }
+
+  &:hover:enabled {
+    background-color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colorsThemed.button.color.common};
+    box-shadow: ${({ theme }) => theme.shadows.lightBlue};
   }
 `;

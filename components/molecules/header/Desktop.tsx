@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 
@@ -7,24 +7,29 @@ import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-// import { WalletContext } from '../../../contexts/walletContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useBundles } from '../../../contexts/bundlesContext';
+import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
+import StaticSearchInput from '../../atoms/search/StaticSearchInput';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
+  const theme = useTheme();
+
+  const isDesktopL = ['laptopL', 'desktop'].includes(resizeMode);
 
   const { unreadCount } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
-  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
+  const { bundles, directMessagesAvailable } = useBundles();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -40,6 +45,10 @@ export const Desktop: React.FC = React.memo(() => {
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
 
+      Mixpanel.track('Copy My Link', {
+        _stage: 'Header',
+      });
+
       copyPostUrlToClipboard(url)
         .then(() => {
           setIsCopiedUrl(true);
@@ -51,24 +60,35 @@ export const Desktop: React.FC = React.memo(() => {
           console.log(err);
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user.userData?.username]);
 
   return (
     <SContainer>
-      <Logo />
+      <Logo isShort={!isDesktopL} />
       <SRightBlock>
-        {user.loggedIn && !globalSearchActive && (
+        {process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' && 'TEST'}
+        {user.loggedIn && user.userData?.options?.isCreator && (
+          <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 12 }}>
+            <SNavText variant={3} weight={600} onClick={handlerCopy}>
+              {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
+            </SNavText>
+          </SItemWithMargin>
+        )}
+        <SItemWithMargin>
+          <StaticSearchInput
+            width={
+              user.userData?.options?.isCreator &&
+              bundles &&
+              bundles.length > 0 &&
+              !isDesktopL
+                ? '250px'
+                : undefined
+            }
+          />
+        </SItemWithMargin>
+        {user.loggedIn && (
           <>
-            {user.userData?.options?.isCreator && (
-              <SItemWithMargin style={{ paddingRight: 16 }}>
-                <SNavText variant={3} weight={600} onClick={handlerCopy}>
-                  {isCopiedUrl ? t('my-link-copied') : t('my-link')}
-                </SNavText>
-              </SItemWithMargin>
-            )}
-            {(user.userData?.options?.isOfferingSubscription ||
-              creatorsImSubscribedTo.length > 0) && (
+            {directMessagesAvailable && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
@@ -88,98 +108,130 @@ export const Desktop: React.FC = React.memo(() => {
                 }}
               />
             </SItemWithMargin>
-            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/profile/settings',
-                    key: 'my-balance',
-                    value:
-                      walletBalance && walletBalance?.usdCents !== undefined
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          0
-                        : undefined,
-                  }}
-                />
-              </SItemWithMargin>
-            )} */}
           </>
         )}
-        <SItemWithMargin>
-          <SearchInput />
-        </SItemWithMargin>
+
         {user.loggedIn ? (
           <>
-            {user.userData?.options?.isCreator ? (
+            {user.userData?.options?.isCreator && (
+              <SItemWithMargin>
+                <Link href='/creator/dashboard'>
+                  <a>
+                    <Button
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Dashboard',
+                          _target: '/creator/dashboard',
+                        });
+                      }}
+                    >
+                      {t('button.dashboard')}
+                    </Button>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+            {bundles && bundles.length > 0 && (
+              <SItemWithMargin>
+                <Link href='/bundles'>
+                  <a>
+                    <SButton
+                      id='bundles'
+                      view='quaternary'
+                      onClick={() => {
+                        Mixpanel.track('Navigation Item Clicked', {
+                          _button: 'Bundles',
+                          _target: '/bundles',
+                        });
+                      }}
+                    >
+                      <SButtonContent>
+                        <SBundleIcon
+                          src={
+                            theme.name === 'light'
+                              ? VoteIconLight.src
+                              : VoteIconDark.src
+                          }
+                        />
+                        {t('button.bundles')}
+                      </SButtonContent>
+                    </SButton>
+                  </a>
+                </Link>
+              </SItemWithMargin>
+            )}
+            {user.userData?.options?.isCreator && (
               <>
                 <SItemWithMargin>
-                  <Link href='/creator/dashboard'>
+                  <Link href='/creation'>
                     <a>
-                      <Button view='quaternary'>{t('button-dashboard')}</Button>
-                    </a>
-                  </Link>
-                </SItemWithMargin>
-                <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
-                    <a>
-                      <Button withShadow view='primaryGrad'>
-                        {t('button-create-decision')}
+                      <Button
+                        id='create'
+                        withShadow
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'New Post',
+                            _target: '/creation',
+                          });
+                        }}
+                      >
+                        {t('button.createDecision')}
                       </Button>
                     </a>
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
+                  <Link href='/profile/my-posts'>
                     <a>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile/my-posts',
+                          });
+                        }}
                       />
                     </a>
                   </Link>
                 </SItemWithMargin>
               </>
-            ) : (
+            )}
+            {!user.userData?.options?.isCreator && (
               <>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      !user.userData?.options?.isCreator
-                        ? '/creator-onboarding'
-                        : '/creation'
-                    }
-                  >
+                  <Link href='/creator-onboarding'>
                     <a>
-                      <Button withDim withShadow withShrink view='primaryGrad'>
-                        {t('button-create-on-newnew')}
+                      <Button
+                        withDim
+                        withShadow
+                        withShrink
+                        view='primaryGrad'
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Create now',
+                            _target: '/creator-onboarding',
+                          });
+                        }}
+                      >
+                        {t('button.createOnNewnew')}
                       </Button>
                     </a>
                   </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Link
-                    href={
-                      user.userData?.options?.isCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                    }
-                  >
-                    <a>
+                  <Link href='/profile'>
+                    <a id='profile-link'>
                       <UserAvatar
                         withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile',
+                          });
+                        }}
                       />
                     </a>
                   </Link>
@@ -190,17 +242,40 @@ export const Desktop: React.FC = React.memo(() => {
         ) : (
           <>
             <SItemWithMargin>
-              <Link href='/sign-up?to=log-in'>
+              <Link href='/sign-up'>
                 <a>
-                  <Button view='quaternary'>{t('button-login-in')}</Button>
+                  <Button
+                    id='log-in'
+                    view='quaternary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Sign in',
+                        _target: '/sign-up',
+                      });
+                    }}
+                  >
+                    {t('button.signIn')}
+                  </Button>
                 </a>
               </Link>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Link href='/sign-up'>
+              <Link href='/sign-up?to=create'>
                 <a>
-                  <Button withDim withShrink withShadow view='primaryGrad'>
-                    {t('button-sign-up')}
+                  <Button
+                    id='log-in-to-create'
+                    withDim
+                    withShrink
+                    withShadow
+                    view='primaryGrad'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Create now',
+                        _target: '/sign-up?to=create',
+                      });
+                    }}
+                  >
+                    {t('button.createOnNewnew')}
                   </Button>
                 </a>
               </Link>
@@ -233,8 +308,24 @@ const SItemWithMargin = styled.div`
 `;
 
 const SNavText = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  opacity: 0.5;
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
   transition: opacity ease 0.5s;
   cursor: pointer;
+  white-space: nowrap;
+`;
+
+const SButton = styled(Button)`
+  padding: 12px 16px;
+`;
+
+const SButtonContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const SBundleIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
 `;

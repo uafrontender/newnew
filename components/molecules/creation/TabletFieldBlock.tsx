@@ -6,7 +6,7 @@ import Text from '../../atoms/Text';
 import Caption from '../../atoms/Caption';
 import DropdownSelect from '../../atoms/DropdownSelect';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ITabletFieldBlock {
   id: string;
@@ -20,6 +20,7 @@ interface ITabletFieldBlock {
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
     max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
@@ -37,17 +38,11 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
     formattedDescription,
     onChange,
   } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const inputRef: any = useRef();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const handleChange = useCallback(
-    (e) => {
-      onChange(id, e?.target?.value || e);
-    },
-    [id, onChange]
-  );
   const handleBlur = useCallback(() => {
     if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
@@ -62,12 +57,12 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
       value: item.id,
     })) || [];
 
-  const inputLabel = t(`secondStep.field.${id}.label`);
+  const inputLabel = t(`secondStep.field.${id}.label` as any);
 
   return (
     <SContainer>
       <STitle variant={2} weight={600}>
-        {t(`secondStep.field.${id}.title`)}
+        {t(`secondStep.field.${id}.title` as any)}
       </STitle>
       <SContentPart>
         {type === 'input' ? (
@@ -81,28 +76,36 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                 ref={inputRef}
                 value={value}
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e) => {
+                  onChange(id, e?.target?.value);
+                }}
                 withLabel={!!inputLabel}
-                placeholder={t(`secondStep.field.${id}.placeholder`)}
+                placeholder={
+                  inputProps?.customPlaceholder ??
+                  t(`secondStep.field.${id}.placeholder` as any)
+                }
                 {...inputProps}
               />
             </SInputContent>
           </SInputWrapper>
         ) : (
-          <DropdownSelect<number>
+          <DropdownSelect<string>
+            id={id}
             closeOnSelect
             width={isTablet ? '200px' : '208px'}
-            label={t(`secondStep.field.${id}.value`, {
+            label={t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
             options={getSelectOptions()}
             selected={value}
             maxItems={maxItems}
-            onSelect={handleChange}
+            onSelect={(newValue) => {
+              onChange(id, newValue);
+            }}
           />
         )}
         <SDescription variant={3} weight={600}>
-          {t(`secondStep.field.${id}.description`, {
+          {t(`secondStep.field.${id}.description` as any, {
             value: formattedDescription || value,
           })}
         </SDescription>
@@ -195,14 +198,21 @@ const SInput = styled.input<ISInput>`
   padding-left: ${(props) => (props.withLabel ? '9px' : '0')};
 
   -webkit-appearance: none;
-  -moz-appearance: none;
   -ms-appearance: none;
   -o-appearance: none;
   appearance: none;
 
+  /* Works for Chrome, Safari, Edge, Opera */
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
     -webkit-appearance: none;
+  }
+
+  /* Works for Firefox */
+  -moz-appearance: textfield;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
   ${({ theme }) => theme.media.tablet} {

@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "Acerca de NewNew",
+    "description": "Conoce más sobre los inversionistas de la empresa de economía de creación NewNew y algunas apariciones especiales que ha hecho en la prensa y los medios de comunicación"
+  },
+  "intro": {
+    "title": "NewNew es el lugar donde la gente se reúne para ofertar y votar sobre las decisiones más importantes del mundo",
+    "text": "Permitimos a las personas tomar el control y tener experiencias más interactivas"
+  },
+  "press": {
+    "title": "Prensa",
+    "items": [
+      {
+        "title": "La aplicación que te permite pagar para controlar la vida de otra persona."
+      },
+      {
+        "title": "Para los creadores, todo está en venta"
+      },
+      {
+        "title": "Monetizando la 'economía del creador' con NewNew."
+      },
+      {
+        "title": "20 startups de economía de creadores a las que hay que prestar atención mientras el espacio se vuelve tendencia..."
+      },
+      {
+        "title": "Las empresas de capital de riesgo inteligentes reconocen que las fundadoras negras pueden ser líderes..."
+      },
+      {
+        "title": "Quicktake “Take the Lead” (03/25/2020)"
+      },
+      {
+        "title": "Cómo la aplicación de encuestas NewNew representa a la nueva clase de..."
+      },
+      {
+        "title": "Este director general de Toronto, que es un 'outsider' de la tecnología, pasó de..."
+      },
+      {
+        "title": "La exejecutiva de Drake habla de su transición a la tecnología y... "
+      }
+    ]
+  },
+  "backers": {
+    "title": "Patrocinadores"
+  },
+  "investors": {
+    "title": "Inversionistas individuales",
+    "participants": [
+      {
+        "name": "Michael Ovitz",
+        "description": "Fundador, Creative Artists Agency (CAA)"
+      },
+      {
+        "name": "Stephen Pagliuca",
+        "description": "Copresidente, Bain Capital"
+      },
+      {
+        "name": "Kevin Mayer",
+        "description": "Presidente, DAZN Group (Former TikTok CEO  & Disney Chairman)"
+      },
+      {
+        "name": "Steven Galanis",
+        "description": "Fundador, Cameo"
+      }
+    ]
+  }
+}

@@ -2,11 +2,12 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import { markUser } from '../../../api/endpoints/user';
+
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import getDisplayname from '../../../utils/getDisplayname';
+import preventParentClick from '../../../utils/preventParentClick';
+import DisplayName from '../../DisplayName';
 
 interface IBlockUserModalProfile {
   user: newnewapi.IUser;
@@ -19,43 +20,29 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   user,
   closeModal,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
 
-  const { blockUser } = useGetBlockedUsers();
-
-  async function blockUserRequest() {
-    try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: 3,
-        userUuid: user.uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-      blockUser(user.uuid!!);
-      closeModal();
-    } catch (err) {
-      console.error(err);
-    }
-  }
+  const { changeUserBlockedStatus } = useGetBlockedUsers();
   const handleConfirmClick = () => {
-    blockUserRequest();
+    changeUserBlockedStatus(user.uuid, true);
+    closeModal();
   };
   return (
     <Modal show={confirmBlockUser} onClose={closeModal}>
-      <SContainer>
+      <SContainer onClick={preventParentClick()}>
         <SModal>
-          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
+          <SModalTitle>{t('modal.blockUser.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {getDisplayname(user)}{' '}
-            {t('modal.block-user.message-second-part')}
+            {t('modal.blockUser.messageFirstPart')}
+            <DisplayName user={user} />
+            {t('modal.blockUser.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton onClick={closeModal}>
-              {t('modal.block-user.button-cancel')}
+            <SCancelButton view='secondary' onClick={closeModal}>
+              {t('modal.blockUser.button.cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.block-user.button-confirm')}
+            <SConfirmButton view='danger' onClick={handleConfirmClick}>
+              {t('modal.blockUser.button.confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -102,6 +89,8 @@ const SModalTitle = styled.strong`
 `;
 
 const SModalMessage = styled.p`
+  display: inline-flex;
+  white-space: pre;
   font-size: 16px;
   margin-bottom: 24px;
 `;
@@ -116,19 +105,6 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  color: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  &:hover {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
-    color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
-  }
 `;
 
 const SConfirmButton = styled(Button)`
@@ -137,8 +113,4 @@ const SConfirmButton = styled(Button)`
   font-size: 14px;
   margin-left: auto;
   flex-shrink: 0;
-  background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  &:hover {
-    background-color: ${(props) => props.theme.colorsThemed.accent.error};
-  }
 `;

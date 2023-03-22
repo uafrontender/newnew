@@ -8,11 +8,11 @@ import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 
 import { useOnClickEsc } from '../../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../../redux-store/store';
 import useDropDownDirection from '../../../utils/hooks/useDropDownDirection';
 import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 type TItem = {
   id: string;
@@ -28,11 +28,11 @@ interface IDropDown {
 
 export const DropDown: React.FC<IDropDown> = (props) => {
   const { value, options, disabled, handleChange } = props;
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const ref: any = useRef();
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const selectedItem = options.find((el) => el.id === value);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -41,7 +41,7 @@ export const DropDown: React.FC<IDropDown> = (props) => {
   const isTablet = ['tablet'].includes(resizeMode);
 
   const ddHeight =
-    (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
+    (options.length > 6 ? 372 : options.length * (isTablet ? 54 : 56)) + 20;
 
   const direction = useDropDownDirection(ref, ddHeight);
 
@@ -82,6 +82,12 @@ export const DropDown: React.FC<IDropDown> = (props) => {
     }
   });
 
+  const mobileViewRef = useRef(null);
+
+  useOnClickOutside(mobileViewRef, () => {
+    handleCloseClick();
+  });
+
   return (
     <SContainer ref={ref}>
       <SLabelButton onClick={handleDropDownClick} disabled={disabled ?? false}>
@@ -97,9 +103,11 @@ export const DropDown: React.FC<IDropDown> = (props) => {
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>{options.map(renderItem)}</SMobileList>
+            <SMobileList ref={mobileViewRef}>
+              {options.map(renderItem)}
+            </SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
-              {t('button-cancel')}
+              {t('button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
@@ -204,6 +212,11 @@ interface ISButton {
 const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 16px;
+  margin-bottom: 4px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   ${(props) => props.theme.media.tablet} {
     min-width: 136px;

@@ -1,66 +1,217 @@
 import { newnewapi } from 'newnew-api';
-import React from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
+
 import UserAvatar from '../UserAvatar';
+import InlineSvg from '../../atoms/InlineSVG';
+import Button from '../../atoms/Button';
+import UserEllipseMenu from '../profile/UserEllipseMenu';
+import ReportModal, { ReportData } from '../direct-messages/ReportModal';
+import BlockUserModalProfile from '../profile/BlockUserModalProfile';
+
+import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import { useAppSelector } from '../../../redux-store/store';
+import { reportUser } from '../../../api/endpoints/report';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import UserEllipseModal from '../profile/UserEllipseModal';
+import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
+import { useBundles } from '../../../contexts/bundlesContext';
 import { formatNumber } from '../../../utils/format';
+import getDisplayname from '../../../utils/getDisplayname';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
-  // TODO: make sign creator specific, get more data
-  sign?: string;
-  subscriptionPrice?: number;
+  withEllipseMenu?: boolean;
+  onBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorCard: React.FC<ICreatorCard> = ({
   creator,
-  sign,
-  subscriptionPrice,
+  withEllipseMenu,
+  onBundleClicked,
 }) => {
   const { t } = useTranslation('common');
+  const router = useRouter();
+  const currentUser = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
+  // Ellipse menu
+  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+  const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
+
+  // Modals
+  const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
+  const [confirmReportUser, setConfirmReportUser] = useState(false);
+  const { usersIBlocked, changeUserBlockedStatus } = useGetBlockedUsers();
+  const isUserBlocked = useMemo(
+    () => usersIBlocked.includes(creator.uuid as string),
+    [usersIBlocked, creator.uuid]
+  );
+
+  const { bundles } = useBundles();
+  const creatorsBundle = useMemo(
+    () => bundles?.find((bundle) => bundle.creator?.uuid === creator.uuid),
+    [bundles, creator.uuid]
+  );
+
+  const handleClickReport = useCallback(() => {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
+
+    setConfirmReportUser(true);
+  }, [currentUser, router]);
+
+  const handleReportSubmit = useCallback(
+    async ({ reasons, message }: ReportData) => {
+      await reportUser(creator.uuid as string, reasons, message).catch((e) =>
+        console.error(e)
+      );
+    },
+    [creator.uuid]
+  );
+  const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
+
+  const moreButtonRef: any = useRef();
 
   return (
-    <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
+    <SCard>
+      {withEllipseMenu && (
+        <SMoreButton
+          view='transparent'
+          iconOnly
+          onClick={(e) => {
+            e.stopPropagation();
+            handleOpenEllipseMenu();
+          }}
+          ref={moreButtonRef}
+        >
+          <InlineSvg
+            svg={MoreIconFilled}
+            fill='#FFFFFF'
+            width='20px'
+            height='20px'
+          />
+        </SMoreButton>
+      )}
+      {!isMobile && (
+        <UserEllipseMenu
+          isVisible={ellipseMenuOpen}
+          isBlocked={isUserBlocked}
+          loggedIn={currentUser.loggedIn}
+          top='48px'
+          right='0px'
+          handleClose={() => setEllipseMenuOpen(false)}
+          handleClickBlock={() => {
+            if (isUserBlocked) {
+              changeUserBlockedStatus(creator.uuid, false);
+            } else {
+              setBlockUserModalOpen(true);
+            }
+          }}
+          handleClickReport={handleClickReport}
+          anchorElement={moreButtonRef.current}
+        />
+      )}
       <SUserAvatarContainer>
         <SUserAvatar>
-          <UserAvatar avatarUrl={creator.avatarUrl!!} />
+          <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
         </SUserAvatar>
-        {sign && <AvatarSign>{sign}</AvatarSign>}
       </SUserAvatarContainer>
-      <SDisplayName>{creator.nickname}</SDisplayName>
+      <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
+        <SDisplayName>{getDisplayname(creator)}</SDisplayName>
+        {creator.options?.isVerified && (
+          <SInlineSVG
+            svg={VerificationCheckmark}
+            width='16px'
+            height='16px'
+            fill='none'
+          />
+        )}
+      </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
-      {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
-        <SSubscriptionPrice>
-          {t('creator-card.subscription-cost', {
-            amount: formatNumber(subscriptionPrice / 100, true),
-          })}
-        </SSubscriptionPrice>
+      {onBundleClicked && (
+        <SButton
+          highlighted={!!creatorsBundle}
+          onClick={(e) => {
+            e.stopPropagation();
+            onBundleClicked(creator);
+          }}
+        >
+          {creatorsBundle
+            ? t('creatorCard.purchasedVotes', {
+                value: formatNumber(
+                  creatorsBundle.bundle?.votesLeft || 0,
+                  true
+                ),
+              })
+            : t('creatorCard.buyBundle')}
+        </SButton>
       )}
       <SBackground>
-        <Image src={creator.coverUrl!!} layout='fill' />
+        <SImage src={creator.coverUrl ?? ''} layout='fill' />
       </SBackground>
+      {/* Modals */}
+      {isMobile && (
+        <UserEllipseModal
+          isOpen={ellipseMenuOpen}
+          zIndex={10}
+          isBlocked={isUserBlocked}
+          loggedIn={currentUser.loggedIn}
+          onClose={() => setEllipseMenuOpen(false)}
+          handleClickBlock={() => {
+            if (isUserBlocked) {
+              changeUserBlockedStatus(creator.uuid, false);
+            } else {
+              setBlockUserModalOpen(true);
+            }
+          }}
+          handleClickReport={() => {
+            setConfirmReportUser(true);
+          }}
+        />
+      )}
+      <BlockUserModalProfile
+        confirmBlockUser={blockUserModalOpen}
+        user={creator}
+        closeModal={() => setBlockUserModalOpen(false)}
+      />
+      <ReportModal
+        show={confirmReportUser}
+        reportedDisplayname={getDisplayname(creator)}
+        onSubmit={handleReportSubmit}
+        onClose={handleReportClose}
+      />
     </SCard>
   );
 };
 
 export default CreatorCard;
 
-CreatorCard.defaultProps = {
-  sign: '',
-  subscriptionPrice: undefined,
-};
-
-const SCard = styled.div<{ showSubscriptionPrice: boolean }>`
+const SCard = styled.div`
+  position: relative;
   padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
   position: relative;
-  height: ${({ showSubscriptionPrice }) =>
-    showSubscriptionPrice ? '185px' : '160px'};
+  height: auto;
   cursor: pointer;
   transition: 0.2s linear;
   &:hover {
@@ -76,6 +227,10 @@ const SBackground = styled.div`
   top: 10px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   overflow: hidden;
+`;
+
+const SImage = styled(Image)`
+  object-fit: cover;
 `;
 
 const SUserAvatarContainer = styled.div`
@@ -106,22 +261,13 @@ const SUserAvatar = styled.div`
   }
 `;
 
-const AvatarSign = styled.div`
-  position: absolute;
+const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
   display: flex;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  bottom: -5px;
-  padding: 0px 8px;
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
-  color: #2c2c33;
-  border-radius: 10px;
-  height: 20px;
-  font-size: 8px;
-  line-height: 8px;
-  font-weight: 800;
-  text-transform: uppercase;
-  z-index: 2;
+  overflow: hidden;
+  margin: 0 0 5px;
+  padding-left: ${({ isVerified }) => (isVerified ? '24px' : '0px')};
 `;
 
 const SDisplayName = styled.p`
@@ -130,7 +276,11 @@ const SDisplayName = styled.p`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  margin: 0 0 5px;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  min-width: 24px;
+  min-height: 24px;
 `;
 
 const SUserName = styled.p`
@@ -141,11 +291,61 @@ const SUserName = styled.p`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SSubscriptionPrice = styled.p`
-  text-align: center;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-  margin-top: 5px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+const SButton = styled.button<{ highlighted: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: bold;
+
+  padding: 8px 16px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+
+  color: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colors.darkGray
+      : theme.colorsThemed.button.color.primary};
+  background: ${({ theme, highlighted }) =>
+    highlighted
+      ? theme.colorsThemed.accent.yellow
+      : theme.colorsThemed.button.background.primaryGrad};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border: transparent;
+
+  cursor: pointer;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+`;
+
+const SMoreButton = styled(Button)`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  z-index: 1;
+
+  border-radius: 12px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  padding: 8px;
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 50px;
+  }
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 `;

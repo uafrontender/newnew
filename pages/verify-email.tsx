@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useContext, useEffect } from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { NextPage } from 'next';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -13,32 +14,71 @@ import AuthLayout, {
   AuthLayoutContext,
 } from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
+import assets from '../constants/assets';
+import { useAppSelector } from '../redux-store/store';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { SignupReason, signupReasons } from '../utils/signUpReasons';
+import { useAppState } from '../contexts/appStateContext';
 
-interface IVerifyEmail {}
+interface IVerifyEmail {
+  reason?: SignupReason;
+  redirectURL?: string;
+  goal?: string;
+}
 
-const VerifyEmail: NextPage<IVerifyEmail> = () => {
-  const { t } = useTranslation('verify-email');
+const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
+  const { t } = useTranslation('page-VerifyEmail');
+  const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
-
+  const { resizeMode } = useAppState();
+  const { signupEmailInput } = useAppSelector((state) => state.user);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   // Redirect if the user is logged in
   // useEffect(() => {
-  //   if (loggedIn) router.push('/');
+  //   if (loggedIn) router.replace('/');
   // }, [loggedIn, router]);
+
+  useEffect(() => {
+    if (!signupEmailInput) {
+      router?.replace('/');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     authLayoutContext.setShouldHeroUnmount(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleBack = useCallback(() => {
+    const parameters = {
+      to: goal,
+      reason,
+      redirectUrl: redirectURL,
+    };
+    const queryString = Object.entries(parameters)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
+      .join('&');
+
+    const signUpPath = `/sign-up${queryString ? `?${queryString}` : ''}`;
+    router.replace(signUpPath);
+  }, [goal, reason, redirectURL, router]);
+
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
         <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <motion.div
         initial={{
-          x: 500,
+          x: isMobile ? 0 : 500,
           y: 0,
           opacity: 0,
         }}
@@ -47,11 +87,16 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
           y: 0,
           opacity: 1,
           transition: {
-            duration: 1,
+            duration: isMobile ? 1.7 : 1,
           },
         }}
       >
-        <CodeVerificationMenu expirationTime={60} />
+        <CodeVerificationMenu
+          expirationTime={60}
+          allowLeave={!signupEmailInput}
+          redirectUserTo={goal === 'create' ? '/creator-onboarding' : undefined}
+          onBack={handleBack}
+        />
       </motion.div>
     </>
   );
@@ -65,17 +110,56 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
 
 export default VerifyEmail;
 
-export async function getStaticProps(context: {
-  locale: string;
-}): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, [
-    'sign-up',
-    'verify-email',
-  ]);
+export const getServerSideProps: GetServerSideProps<IVerifyEmail> = async (
+  context
+) => {
+  const { to, reason, redirect } = context.query;
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-SignUp', 'page-VerifyEmail'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
+
+  const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';
+  const goal = to && !Array.isArray(to) ? to : '';
+
+  if (
+    reason &&
+    !Array.isArray(reason) &&
+    signupReasons.find((validT) => validT === reason)
+  ) {
+    return {
+      props: {
+        reason: reason as SignupReason,
+        ...(redirectURL
+          ? {
+              redirectURL,
+            }
+          : {}),
+        ...(goal
+          ? {
+              goal,
+            }
+          : {}),
+        ...translationContext,
+      },
+    };
+  }
 
   return {
     props: {
+      ...(redirectURL
+        ? {
+            redirectURL,
+          }
+        : {}),
+      ...(goal
+        ? {
+            goal,
+          }
+        : {}),
       ...translationContext,
     },
   };
-}
+};

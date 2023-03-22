@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -9,19 +9,21 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import CreationLayout from '../../../components/templates/CreationLayout';
 import PublishedContent from '../../../components/organisms/creation/published';
 
-import { useAppSelector } from '../../../redux-store/store';
 import { NextPageWithLayout } from '../../_app';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
 
 interface ICreationPublished {}
 
 export const CreationPublished: React.FC<ICreationPublished> = (props) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const router = useRouter();
+  const { postInCreation } = usePostCreationState();
   const {
     post: {
       startsAt: { type },
     },
-  } = useAppSelector((state) => state.creation);
+  } = useMemo(() => postInCreation, [postInCreation]);
 
   return (
     <SWrapper>
@@ -30,7 +32,7 @@ export const CreationPublished: React.FC<ICreationPublished> = (props) => {
           {t(
             `published.meta.title-${router?.query?.tab}-${
               type === 'right-away' ? 'published' : 'scheduled'
-            }`
+            }` as any
           )}
         </title>
       </Head>
@@ -50,7 +52,9 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation']
+    ['common', 'page-Creation'],
+    null,
+    SUPPORTED_LANGUAGES
   );
 
   // @ts-ignore

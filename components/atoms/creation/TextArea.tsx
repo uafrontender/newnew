@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, useCallback, FocusEvent } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
 
@@ -14,7 +14,7 @@ interface ITextArea {
   maxlength?: number;
   onBlur?: (key: string, value: string) => void;
   onFocus?: (key: string) => void;
-  onChange: (key: string, value: string | boolean) => void;
+  onChange: (key: string, value: string) => void;
   placeholder: string;
 }
 
@@ -31,7 +31,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   } = props;
 
   const handleChange = useCallback(
-    (e) => {
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
@@ -40,7 +40,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     onFocus(id);
   }, [id, onFocus]);
   const handleBlur = useCallback(
-    (e) => {
+    (e: FocusEvent<HTMLTextAreaElement>) => {
       onBlur(id, e.target.value);
     },
     [id, onBlur]

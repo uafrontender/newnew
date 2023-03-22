@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "title": "Be a Creator on NewNew",
+    "description": "Become a Creator at the best creator economy startup company"
+  },
+  "tosSection": {
+    "heading": "Start making money on NewNew",
+    "subheading": "Please review our terms...",
+    "close": "Done"
+  },
+  "detailsSection": {
+    "leaveMsg": "Are you sure you want to leave? The changes will be discarded",
+    "side": {
+      "heading": "Tell us a little about yourself.",
+      "subheading": "This is the description that will show on your profile page."
+    },
+    "heading": "Ready to create? We'll just need a few details...",
+    "form": {
+      "firstName": {
+        "placeholder": "First name",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Firstname is too long",
+          "tooShort": "Firstname is too short",
+          "invalidChar": "Firstname has invalid characters",
+          "inappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
+        }
+      },
+      "lastName": {
+        "placeholder": "Last name",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Lastname is too long",
+          "tooShort": "Lastname is too short",
+          "invalidChar": "Lastname has invalid characters",
+          "inappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
+        }
+      },
+      "username": {
+        "placeholder": "Username",
+        "frequencyCaption": "Username can be changed once a month.",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Username is too long",
+          "tooShort": "Username is too short",
+          "invalidChar": "Username has invalid characters",
+          "inappropriate": "Offensive words are forbidden",
+          "taken": "This username is already taken. Try another one",
+          "linksForbidden": "Links not allowed"
+        },
+        "points": {
+          "1": "2-25 characters length",
+          "2": "Lower case only",
+          "3": "No space and special characters"
+        }
+      },
+      "nickname": {
+        "placeholder": "Display name",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Name is too long",
+          "tooShort": "Name is too short",
+          "invalidChar": "Name has invalid characters",
+          "inappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
+        }
+      },
+      "email": {
+        "placeholder": "Email address",
+        "cantChangeInfoCaption": "You can edit your email in settings later",
+        "errors": {
+          "invalidEmail": "Please enter a valid email address",
+          "emailTaken": "This email is already taken. Try another one"
+        }
+      },
+      "dateOfBirth": {
+        "label": "Date of birth",
+        "captions": {
+          "twoTimesOnly": "Birthday can be changed 2 times only.",
+          "cannotChange": "You can’t change birthday.",
+          "instruction": "Set your date of birth"
+        },
+        "units": {
+          "day": "Day",
+          "month": "Month",
+          "year": "Year"
+        },
+        "errors": {
+          "tooYoung": "You must be 18 or older to become a creator"
+        }
+      },
+      "profilePicture": {
+        "label": "Profile photo",
+        "captionMobile": "*recommended resolution 200x200 px",
+        "captionDesktop": "Recommended resolution 200x200 px",
+        "button": {
+          "upload": "Upload photo",
+          "uploadNew": "Upload new image"
+        }
+      }
+    },
+    "editProfileImageModal": {
+      "button": {
+        "back": "Edit Profile Image",
+        "save": "Save changes",
+        "cancel": "Cancel"
+      }
+    },
+    "button": {
+      "back": "Back",
+      "submit": "Done"
+    },
+    "agreedToTosCheckbox": "I have read and agree to",
+    "linkText": "NewNew's terms"
+  },
+  "aboutSection": {
+    "meta": {
+      "title": "Become a NewNew creator",
+      "description": "Become a creator and make money on NewNew"
+    },
+    "button": {
+      "submit": "Save changes",
+      "back": "Close"
+    },
+    "heading": "This is what your fans see",
+    "bio": {
+      "title": "Bio",
+      "placeholder": "Tell a few words about yourself...",
+      "errors": {
+        "generic": "Please check input",
+        "tooLong": "Bio is too long",
+        "tooShort": "Bio is too short",
+        "inappropriate": "Offensive words are forbidden",
+        "linksForbidden": "Links not allowed"
+      }
+    }
+  },
+  "stripeSection": {
+    "meta": {
+      "title": "Get paid through",
+      "description": "Connect a Stripe account to get paid on time."
+    },
+    "side": {
+      "heading": "Payments made easy with Stripe",
+      "subheading": "Connect a Stripe account to get paid on time."
+    },
+    "titleSetUpStripe": "Set payment system",
+    "bullets": {
+      "1": "Setting up a Stripe account is quick and easy",
+      "2": "Withdraw your NewNew earnings directly to your bank account",
+      "3": "Stripe keeps your information private and secure"
+    },
+
+    "button": {
+      "submit": "Submit",
+      "requestSetupLink": "Connect with Stripe",
+      "stripeConnectedLink": "Stripe connected!",
+      "stripeConnecting": "Connecting...",
+      "requireInformation": "Stripe requires info"
+    }
+  }
+}

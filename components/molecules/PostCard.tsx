@@ -1,15 +1,24 @@
 /* eslint-disable no-nested-ternary */
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  Fragment,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
 import InlineSVG from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
+import Loader from '../atoms/Loader';
 
 import { formatNumber } from '../../utils/format';
 import { useAppSelector } from '../../redux-store/store';
@@ -37,11 +46,21 @@ import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 
 // Utils
-import switchPostType from '../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
+import PostCardEllipseMenu from './PostCardEllipseMenu';
+import getDisplayname from '../../utils/getDisplayname';
+import ReportModal, { ReportData } from './direct-messages/ReportModal';
+import { reportPost } from '../../api/endpoints/report';
+import PostCardEllipseModal from './PostCardEllipseModal';
+import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
+import getChunks from '../../utils/getChunks/getChunks';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
+import DisplayName from '../DisplayName';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -76,34 +95,65 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
-  shouldStop?: boolean;
+  maxWidthTablet?: string;
+  handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 export const PostCard: React.FC<ICard> = React.memo(
-  ({ item, type, index, width, height, shouldStop }) => {
-    const { t } = useTranslation('home');
+  ({
+    item,
+    type,
+    index,
+    width,
+    height,
+    maxWidthTablet,
+    handleRemovePostFromState,
+    handleAddPostToState,
+  }) => {
+    const { t } = useTranslation('component-PostCard');
     const theme = useTheme();
     const router = useRouter();
-    const { resizeMode } = useAppSelector((state) => state.ui);
+    const user = useAppSelector((state) => state.user);
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
 
+    const wrapperRef = useRef<HTMLDivElement>();
+
     // Check if video is ready to avoid errors
+    const videoRef = useRef<HTMLVideoElement>();
+
+    // Hovered state
+    const [hovered, setHovered] = useState(false);
     const [videoReady, setVideoReady] = useState(false);
+    const [isVideoLoading, setIsVideoLoading] = useState(false);
+
+    const handleSetHovered = () => setHovered(true);
+    const handleSetUnhovered = () => {
+      setHovered(false);
+    };
+
+    const handleClickOutsideMobile = () => {
+      if (isMobile) {
+        handleSetUnhovered();
+      }
+    };
+
+    useOnTouchStartOutside(wrapperRef, handleClickOutsideMobile);
+
+    const handleVideoEnded = useCallback(() => {
+      if (hovered) {
+        videoRef?.current?.play().catch(() => {
+          console.error('Autoplay is not allowed');
+        });
+      }
+    }, [hovered]);
 
     // Socket
     const socketConnection = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
-
-    const {
-      ref: cardRef,
-      inView,
-      entry: ioEntry,
-    } = useInView({
-      threshold: [0, 0.55],
-    });
-    const videoRef = useRef<HTMLVideoElement>();
 
     const [postParsed, typeOfPost] = switchPostType(item);
     // Live updates stored in local state
@@ -123,7 +173,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         : 0
     );
 
-    const timestampSeconds = useMemo(() => {
+    const endsAtTime = useMemo(() => {
       if (postParsed.expiresAt?.seconds) {
         return (postParsed.expiresAt.seconds as number) * 1000;
       }
@@ -131,50 +181,94 @@ export const PostCard: React.FC<ICard> = React.memo(
       return 0;
     }, [postParsed.expiresAt?.seconds]);
 
+    const startsAtTime = useMemo(() => {
+      if (postParsed.startsAt?.seconds) {
+        return (postParsed.startsAt.seconds as number) * 1000;
+      }
+
+      return 0;
+    }, [postParsed.startsAt?.seconds]);
+
+    const [thumbnailUrl, setThumbnailUrl] = useState(
+      postParsed.announcement?.thumbnailUrl ?? ''
+    );
+
+    const [coverImageUrl, setCoverImageUrl] = useState<
+      string | undefined | null
+    >(postParsed.announcement?.coverImageUrl ?? undefined);
+
     const handleUserClick = (username: string) => {
+      Mixpanel.track('Go To Creator Profile', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
       router.push(`/${username}`);
     };
+
+    // Ellipse menu
+    const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
     const handleMoreClick = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.preventDefault();
       e.stopPropagation();
+      Mixpanel.track('Open Ellipse Menu Post Card', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
+      setIsEllipseMenuOpen(true);
     };
 
-    const handleBidClick = () => {};
+    const handleEllipseMenuClose = () => {
+      Mixpanel.track('Closed Ellipse Menu Post Card', {
+        _stage: 'Post Card',
+        _postUuid: switchPostType(item)[0].postUuid,
+      });
+      setIsEllipseMenuOpen(false);
+    };
 
-    useEffect(() => {
-      const handleCanplay = () => {
-        setVideoReady(true);
-      };
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-      videoRef.current?.addEventListener('canplay', handleCanplay);
-      videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
-
-      return () => {
-        videoRef.current?.removeEventListener('canplay', handleCanplay);
-        videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
-      };
-    }, [inView]);
-
-    useEffect(() => {
-      try {
-        if (videoReady) {
-          if (
-            ioEntry?.intersectionRatio &&
-            ioEntry?.intersectionRatio > 0.55 &&
-            !shouldStop
-          ) {
-            videoRef.current?.play();
-          } else {
-            videoRef.current?.pause();
-          }
-        }
-      } catch (err) {
-        console.error(err);
+    const handleReportOpen = useCallback(() => {
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
+        router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+              postParsed.postShortId
+                ? postParsed.postShortId
+                : postParsed.postUuid
+            }`
+          )}`
+        );
+        return;
       }
-    }, [ioEntry?.intersectionRatio, videoReady, shouldStop]);
+      setIsReportModalOpen(true);
+    }, [
+      user.loggedIn,
+      user._persist?.rehydrated,
+      router,
+      postParsed.postShortId,
+      postParsed.postUuid,
+    ]);
+
+    const handleReportClose = useCallback(() => {
+      setIsReportModalOpen(false);
+    }, []);
+
+    const handleReportSubmit = useCallback(
+      async ({ reasons, message }: ReportData) => {
+        if (postParsed) {
+          await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
+            console.error(e)
+          );
+        }
+      },
+      [postParsed]
+    );
+
+    const handleBidClick = () => {};
 
     // Increment channel subs after mounting
     // Decrement when unmounting
@@ -200,35 +294,184 @@ export const PostCard: React.FC<ICard> = React.memo(
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === postParsed.postUuid) {
-          if (typeOfPost === 'ac') {
-            setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+          if (
+            typeOfPost === 'ac' &&
+            decoded.post?.auction?.totalAmount?.usdCents
+          ) {
+            setTotalAmount(decoded.post.auction.totalAmount?.usdCents);
           }
-          if (typeOfPost === 'cf') {
-            setCurrentBackerCount(
-              decoded.post?.crowdfunding?.currentBackerCount!!
-            );
+          if (
+            typeOfPost === 'cf' &&
+            decoded.post?.crowdfunding?.currentBackerCount
+          ) {
+            setCurrentBackerCount(decoded.post.crowdfunding.currentBackerCount);
           }
-          if (typeOfPost === 'mc') {
-            setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
+          if (typeOfPost === 'mc' && decoded.post?.multipleChoice?.totalVotes) {
+            setTotalVotes(decoded.post.multipleChoice.totalVotes);
           }
         }
       };
 
+      const handlerSocketThumbnailUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostThumbnailUpdated.decode(arr);
+
+        if (
+          !decoded ||
+          !decoded.thumbnailUrl ||
+          decoded.postUuid !== postParsed.postUuid
+        )
+          return;
+
+        // Wait to make sure that cloudfare cache has been invalidated
+        setTimeout(() => {
+          fetch(decoded.thumbnailUrl)
+            .then((res) => res.blob())
+            .then((blobFromFetch) => {
+              const url = URL.createObjectURL(blobFromFetch);
+
+              setThumbnailUrl(url);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        }, 10000);
+      };
+
+      const handlerSocketPostCoverImageUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
+
+        if (decoded.postUuid !== postParsed.postUuid) return;
+
+        if (decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED) {
+          // Wait to make sure that cloudfare cache has been invalidated
+          setTimeout(() => {
+            fetch(decoded.coverImageUrl as string)
+              .then((res) => res.blob())
+              .then((blobFromFetch) => {
+                const url = URL.createObjectURL(blobFromFetch);
+
+                setCoverImageUrl(url);
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          }, 5000);
+        } else if (
+          decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
+        ) {
+          setCoverImageUrl(undefined);
+        }
+      };
+
       if (socketConnection) {
-        socketConnection.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
+        socketConnection?.on(
+          'PostThumbnailUpdated',
+          handlerSocketThumbnailUpdated
+        );
+        socketConnection.on(
+          'PostCoverImageUpdated',
+          handlerSocketPostCoverImageUpdated
+        );
       }
 
       return () => {
-        if (socketConnection && socketConnection.connected) {
-          socketConnection.off('PostUpdated', handlerSocketPostUpdated);
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
+          socketConnection?.off(
+            'PostThumbnailUpdated',
+            handlerSocketThumbnailUpdated
+          );
+          socketConnection.off(
+            'PostCoverImageUpdated',
+            handlerSocketPostCoverImageUpdated
+          );
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection]);
 
+    useEffect(() => {
+      if (hovered) {
+        videoRef.current?.play().catch(() => {
+          console.error('Autoplay is not allowed');
+        });
+      } else {
+        videoRef.current?.pause();
+      }
+
+      return () => {};
+    }, [hovered]);
+
+    useEffect(() => {
+      const handleCanPlay = () => {
+        setVideoReady(true);
+        setIsVideoLoading(false);
+      };
+
+      const handleLoadStart = () => {
+        setIsVideoLoading(true);
+      };
+
+      const handleLoadedData = () => {
+        setIsVideoLoading(false);
+      };
+
+      videoRef.current?.addEventListener('canplay', handleCanPlay);
+      videoRef.current?.addEventListener('loadstart', handleLoadStart);
+      videoRef.current?.addEventListener('loadeddata', handleLoadedData);
+      videoRef.current?.addEventListener('ended', handleVideoEnded);
+
+      return () => {
+        videoRef.current?.removeEventListener('canplay', handleCanPlay);
+        videoRef.current?.removeEventListener('loadstart', handleLoadStart);
+        videoRef.current?.removeEventListener('ended', handleVideoEnded);
+      };
+    }, [handleVideoEnded]);
+
+    useEffect(() => {
+      router.prefetch(
+        `/p/${
+          switchPostType(item)[0].postShortId
+            ? switchPostType(item)[0].postShortId
+            : switchPostType(item)[0].postUuid
+        }`
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const moreButtonInsideRef: any = useRef();
+    const moreButtonRef: any = useRef();
+
+    function getTitleContent(title: string) {
+      return (
+        <>
+          {getChunks(title).map((chunk, chunkIndex) => {
+            if (chunk.type === 'hashtag') {
+              return <SHashtag key={chunkIndex}>#{chunk.text}</SHashtag>;
+            }
+
+            return <Fragment key={chunkIndex}>{chunk.text}</Fragment>;
+          })}
+        </>
+      );
+    }
+
     if (type === 'inside') {
       return (
-        <SWrapper ref={cardRef} index={index} width={width}>
+        <SWrapper
+          ref={(el) => {
+            wrapperRef.current = el!!;
+          }}
+          className='postcard-identifier'
+          onMouseEnter={() => handleSetHovered()}
+          onTouchStart={() => handleSetHovered()}
+          onMouseLeave={() => handleSetUnhovered()}
+          index={index}
+          width={width}
+        >
           <SContent>
             {!isMobile && (
               <SNumberImageHolder index={index}>
@@ -240,34 +483,43 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SNumberImageHolder>
             )}
             <SImageHolder index={index}>
-              {ioEntry?.isIntersecting ? (
-                <video
-                  ref={(el) => {
-                    videoRef.current = el!!;
-                  }}
-                  loop
-                  muted
-                  playsInline
-                  poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
-                >
-                  <source
-                    src={postParsed.announcement?.thumbnailUrl ?? ''}
-                    type='video/mp4'
-                  />
-                </video>
-              ) : (
-                <img
-                  className='thumnailHolder'
-                  src={postParsed.announcement?.thumbnailImageUrl ?? ''}
-                  alt='Post'
+              {isVideoLoading && hovered && !videoReady ? (
+                <SLoaderContainer>
+                  <Loader size='sm' />
+                </SLoaderContainer>
+              ) : null}
+              <SThumbnailHolder
+                className='thumnailHolder'
+                src={
+                  (coverImageUrl ||
+                    postParsed.announcement?.thumbnailImageUrl) ??
+                  ''
+                }
+                alt='Post'
+                draggable={false}
+                hovered={hovered && videoReady && !isVideoLoading}
+              />
+              <video
+                ref={(el) => {
+                  videoRef.current = el!!;
+                }}
+                key={thumbnailUrl}
+                muted
+                playsInline
+              >
+                <source
+                  key={thumbnailUrl}
+                  src={thumbnailUrl}
+                  type='video/mp4'
                 />
-              )}
+              </video>
               <SImageMask />
               <STopContent>
                 <SButtonIcon
                   iconOnly
                   id='showMore'
                   view='transparent'
+                  ref={moreButtonInsideRef}
                   onClick={handleMoreClick}
                 >
                   <InlineSVG
@@ -277,58 +529,109 @@ export const PostCard: React.FC<ICard> = React.memo(
                     height='20px'
                   />
                 </SButtonIcon>
+                {!isMobile && isEllipseMenuOpen && (
+                  <PostCardEllipseMenu
+                    postUuid={postParsed.postUuid}
+                    postShortId={postParsed.postShortId ?? ''}
+                    postType={typeOfPost as TPostType}
+                    isVisible={isEllipseMenuOpen}
+                    postCreator={postParsed.creator as newnewapi.User}
+                    handleReportOpen={handleReportOpen}
+                    onClose={handleEllipseMenuClose}
+                    anchorElement={moreButtonInsideRef.current}
+                  />
+                )}
               </STopContent>
               <SBottomContent>
                 <SUserAvatar
                   withClick
-                  avatarUrl={postParsed.creator?.avatarUrl!!}
+                  avatarUrl={
+                    postParsed.creator?.avatarUrl
+                      ? postParsed.creator.avatarUrl
+                      : ''
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     handleUserClick(postParsed.creator?.username!!);
                   }}
                 />
                 <SText variant={3} weight={600}>
-                  {postParsed.title}
+                  {getTitleContent(postParsed.title)}
                 </SText>
               </SBottomContent>
             </SImageHolder>
           </SContent>
+          {postParsed?.creator && isReportModalOpen && (
+            <ReportModal
+              show={isReportModalOpen}
+              reportedDisplayname={getDisplayname(postParsed?.creator)}
+              onSubmit={handleReportSubmit}
+              onClose={handleReportClose}
+            />
+          )}
+          {isMobile && isEllipseMenuOpen && (
+            <PostCardEllipseModal
+              isOpen={isEllipseMenuOpen}
+              zIndex={11}
+              postUuid={postParsed.postUuid}
+              postShortId={postParsed.postShortId ?? ''}
+              postType={typeOfPost as TPostType}
+              postCreator={postParsed.creator as newnewapi.User}
+              handleReportOpen={handleReportOpen}
+              onClose={handleEllipseMenuClose}
+            />
+          )}
         </SWrapper>
       );
     }
 
     return (
-      <SWrapperOutside ref={cardRef} width={width}>
+      <SWrapperOutside
+        ref={(el) => {
+          wrapperRef.current = el!!;
+        }}
+        className='postcard-identifier'
+        onMouseEnter={() => handleSetHovered()}
+        onTouchStart={() => handleSetHovered()}
+        onMouseLeave={() => handleSetUnhovered()}
+        width={width}
+        maxWidthTablet={maxWidthTablet ?? undefined}
+      >
         <SImageBG id='backgroundPart' height={height}>
           <SImageHolderOutside id='animatedPart'>
-            {ioEntry?.isIntersecting ? (
-              <video
-                ref={(el) => {
-                  videoRef.current = el!!;
-                }}
-                loop
-                muted
-                playsInline
-                poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
-              >
-                <source
-                  src={postParsed.announcement?.thumbnailUrl ?? ''}
-                  type='video/mp4'
-                />
-              </video>
-            ) : (
-              <img
-                className='thumnailHolder'
-                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
-                alt='Post'
-              />
-            )}
+            {isVideoLoading && hovered && !videoReady ? (
+              <SLoaderContainer>
+                <Loader size='sm' />
+              </SLoaderContainer>
+            ) : null}
+            <SThumbnailHolder
+              className='thumnailHolder'
+              src={
+                (coverImageUrl || postParsed.announcement?.thumbnailImageUrl) ??
+                ''
+              }
+              alt='Post'
+              draggable={false}
+              hovered={hovered && videoReady && !isVideoLoading}
+            />
+            <video
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              key={thumbnailUrl}
+              muted
+              playsInline
+              preload='none'
+            >
+              <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
+            </video>
             <STopContent>
               <SButtonIcon
                 iconOnly
                 id='showMore'
                 view='transparent'
                 onClick={handleMoreClick}
+                ref={moreButtonRef}
               >
                 <InlineSVG
                   svg={moreIcon}
@@ -337,80 +640,138 @@ export const PostCard: React.FC<ICard> = React.memo(
                   height='20px'
                 />
               </SButtonIcon>
+              {!isMobile && (
+                <PostCardEllipseMenu
+                  postUuid={postParsed.postUuid}
+                  postShortId={postParsed.postShortId ?? ''}
+                  postType={typeOfPost as TPostType}
+                  isVisible={isEllipseMenuOpen}
+                  postCreator={postParsed.creator as newnewapi.User}
+                  handleReportOpen={handleReportOpen}
+                  handleRemovePostFromState={
+                    handleRemovePostFromState ?? undefined
+                  }
+                  handleAddPostToState={handleAddPostToState ?? undefined}
+                  onClose={handleEllipseMenuClose}
+                  anchorElement={moreButtonRef.current}
+                />
+              )}
             </STopContent>
           </SImageHolderOutside>
         </SImageBG>
         <SBottomContentOutside>
-          <SBottomStart hasEnded={Date.now() > timestampSeconds}>
+          <SBottomStart hasEnded={Date.now() > endsAtTime}>
             <SUserAvatarOutside
-              avatarUrl={postParsed?.creator?.avatarUrl!!}
+              avatarUrl={
+                postParsed?.creator?.avatarUrl
+                  ? postParsed.creator.avatarUrl
+                  : ''
+              }
               withClick
               onClick={(e) => {
                 e.stopPropagation();
                 handleUserClick(postParsed.creator?.username!!);
               }}
             />
-            <SUsername variant={2}>
-              {Date.now() > timestampSeconds
-                ? postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > (isMobile ? 7 : 5)
-                  ? `${postParsed.creator?.nickname?.substring(
-                      0,
-                      isMobile ? 5 : 3
-                    )}...`
-                  : postParsed.creator?.nickname
-                : postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > (isMobile ? 18 : 11)
-                ? `${postParsed.creator?.nickname?.substring(
-                    0,
-                    isMobile ? 15 : 9
-                  )}...`
-                : postParsed.creator?.nickname}
-            </SUsername>
-            <CardTimer timestampSeconds={timestampSeconds} />
+            <SUsernameContainer>
+              <SUsername variant={2}>
+                <DisplayName
+                  user={postParsed.creator}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUserClick(postParsed.creator?.username!!);
+                  }}
+                />
+              </SUsername>
+            </SUsernameContainer>
+            <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
-            {postParsed.title}
+            {getTitleContent(postParsed.title)}
           </STextOutside>
           <SBottomEnd type={typeOfPost}>
             {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
-              <SButton
-                withDim
-                withShrink
-                view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-                onClick={handleBidClick}
-                cardType={typeOfPost}
-                progress={
-                  typeOfPost === 'cf'
-                    ? Math.floor(
-                        (currentBackerCount * 100) /
-                          (postParsed as newnewapi.Crowdfunding)
-                            .targetBackerCount
-                      )
-                    : 0
-                }
-                withProgress={typeOfPost === 'cf'}
-              >
-                {t(`button-card-${typeOfPost}`, {
-                  votes: totalVotes,
-                  total: formatNumber(
-                    (postParsed as newnewapi.Crowdfunding).targetBackerCount ??
-                      0,
-                    true
-                  ),
-                  backed: formatNumber(currentBackerCount ?? 0, true),
-                  amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
-                })}
-              </SButton>
+              totalVotes === 1 && typeOfPost === 'mc' ? (
+                <SButton
+                  withDim
+                  withShrink
+                  view='primary'
+                  onClick={handleBidClick}
+                  cardType={typeOfPost}
+                >
+                  {t('button.withActivity.mcSingular', {
+                    votes: formatNumber(totalVotes ?? 0, true),
+                    total: formatNumber(
+                      (postParsed as newnewapi.Crowdfunding)
+                        .targetBackerCount ?? 0,
+                      true
+                    ),
+                    backed: formatNumber(currentBackerCount ?? 0, true),
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                  })}
+                </SButton>
+              ) : (
+                <SButton
+                  withDim
+                  withShrink
+                  view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                  onClick={handleBidClick}
+                  cardType={typeOfPost}
+                  progress={
+                    typeOfPost === 'cf'
+                      ? Math.floor(
+                          (currentBackerCount * 100) /
+                            (postParsed as newnewapi.Crowdfunding)
+                              .targetBackerCount
+                        )
+                      : 0
+                  }
+                  withProgress={typeOfPost === 'cf'}
+                >
+                  {t(`button.withActivity.${typeOfPost}`, {
+                    votes: formatNumber(totalVotes ?? 0, true),
+                    total: formatNumber(
+                      (postParsed as newnewapi.Crowdfunding)
+                        .targetBackerCount ?? 0,
+                      true
+                    ),
+                    backed: formatNumber(currentBackerCount ?? 0, true),
+                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                  })}
+                </SButton>
+              )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
-                {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
-                  ? t(`button-card-first-${typeOfPost}`)
-                  : t(`button-card-see-${typeOfPost}`)}
+                {switchPostStatus(typeOfPost, postParsed.status) === 'voting' &&
+                postParsed.creator?.uuid !== user.userData?.userUuid
+                  ? t(`button.withoutActivity.${typeOfPost}`)
+                  : t(`button.seeResults.${typeOfPost}`)}
               </SButtonFirst>
             )}
           </SBottomEnd>
         </SBottomContentOutside>
+        {postParsed?.creator && isReportModalOpen && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedDisplayname={getDisplayname(postParsed?.creator)}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
+        {isMobile && (
+          <PostCardEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={11}
+            postUuid={postParsed.postUuid}
+            postShortId={postParsed.postShortId ?? ''}
+            postType={typeOfPost as TPostType}
+            postCreator={postParsed.creator as newnewapi.User}
+            handleReportOpen={handleReportOpen}
+            onClose={handleEllipseMenuClose}
+            handleRemovePostFromState={handleRemovePostFromState ?? undefined}
+            handleAddPostToState={handleAddPostToState ?? undefined}
+          />
+        )}
       </SWrapperOutside>
     );
   }
@@ -422,12 +783,12 @@ PostCard.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
-  shouldStop: false,
 };
 
 interface ISWrapper {
   index?: number;
   width?: string;
+  maxWidthTablet?: string;
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -566,7 +927,7 @@ const SImageHolder = styled.div<ISWrapper>`
     object-fit: cover;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    /* z-index: -1; */
   }
 
   ${(props) => props.theme.media.tablet} {
@@ -625,6 +986,13 @@ const SImageHolder = styled.div<ISWrapper>`
   }
 `;
 
+const SThumbnailHolder = styled.img<{
+  hovered: boolean;
+}>`
+  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
+  transition: linear 0.3s;
+`;
+
 const SImageMask = styled.div`
   width: 100%;
 
@@ -654,6 +1022,11 @@ const STopContent = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  padding-right: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-right: initial;
+  }
 `;
 
 const SBottomContent = styled.div`
@@ -671,6 +1044,7 @@ const SText = styled(Text)`
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
 `;
 
 const SWrapperOutside = styled.div<ISWrapper>`
@@ -697,7 +1071,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 200px;
+    max-width: ${({ maxWidthTablet }) => maxWidthTablet ?? '100%'};
 
     transition: transform ease 0.5s;
 
@@ -770,18 +1144,29 @@ const SImageHolderOutside = styled.div`
     object-fit: cover;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    /* z-index: -1; */
   }
 `;
 
+const SLoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 10;
+`;
+
 const SBottomContentOutside = styled.div`
-  padding: 16px 10px 0;
+  padding: 8px 10px 0 10px;
   display: flex;
   flex-direction: column;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 8px 10px 0 10px;
-  }
+  word-break: break-word;
 `;
 
 const STextOutside = styled(Text)`
@@ -802,37 +1187,62 @@ const STextOutside = styled(Text)`
   height: 40px;
 `;
 
+const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+`;
+
 const SBottomStart = styled.div<{
   hasEnded: boolean;
 }>`
-  display: grid;
-  grid-template-areas: 'avatar nickname timer';
-  grid-template-columns: ${({ hasEnded }) =>
-    hasEnded ? '24px 3fr 9fr' : '24px 5fr 10fr'};
+  display: flex;
+  flex-direction: row;
   align-items: center;
 
-  height: 32px;
+  height: 24px;
 
   margin-bottom: 4px;
+  overflow: hidden;
 `;
 
 const SUserAvatarOutside = styled(UserAvatar)`
-  grid-area: avatar;
-
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
   min-width: 24px;
   min-height: 24px;
 `;
 
-const SUsername = styled(Text)`
-  grid-area: nickname;
+// Move all styles to here
+const SUsernameContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 1;
+  flex-grow: 1;
+  overflow: hidden;
+  margin-right: 2px;
+`;
 
+const SUsername = styled(Text)`
+  display: inline-flex;
+  flex-shrink: 1;
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
+  margin-left: 6px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: normal;
+`;
+
+const SCardTimer = styled(CardTimer)`
+  flex-shrink: 0;
   margin-left: 6px;
 `;
 
@@ -903,6 +1313,12 @@ const SButton = styled(Button)<ISButtonSpan>`
       font-size: 16px;
     }
   }
+
+  &&& {
+    &:hover {
+      box-shadow: none;
+    }
+  }
 `;
 
 const SButtonFirst = styled(Button)`
@@ -931,16 +1347,15 @@ const SButtonFirst = styled(Button)`
     }
   }
 
-  ${(props) => props.theme.media.laptop} {
-    span {
-      font-size: 16px;
-    }
-  }
+  &&& {
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: none;
 
-  &:hover,
-  &:active {
-    span {
-      color: #ffffff;
+      span {
+        color: #ffffff;
+      }
     }
   }
 `;

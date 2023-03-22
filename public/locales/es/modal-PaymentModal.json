@@ -1,0 +1,38 @@
+{
+  "paymentMethodTitle": "Método de pago",
+  "options": {
+    "wallet": {
+      "subtitle": "Pagar con",
+      "name": "Billetera NewNew",
+      "fees": "Sin comisiones"
+    },
+    "card": {
+      "name": "Tarjeta de débito o crédito",
+      "fees": "hasta un 3% de comisiones"
+    }
+  },
+  "payButton": "Pagar",
+  "tocApplyLink": "Términos",
+  "tocApplyText": "Aplicar",
+  "reCaptchaTos": {
+    "siteProtectedBy": "Este sitio está protegido por reCAPTCHA y se aplican la",
+    "privacyPolicy": "política de privacidad",
+    "and": "y las",
+    "tos": "condiciones de servicio",
+    "apply": "de Google."
+  },
+  "primaryCard": "Tarjeta primaria",
+  "newCard": "Nueva tarjeta",
+  "saveCard": "Guardar tarjeta para usos futuros",
+  "email": "Correo electrónico",
+  "errors": {
+    "wrongEmail": "Este correo electrónico no puede ser usado",
+    "paymentFailed": "El pago ha fallado",
+    "requestFailed": "La solicitud ha fallado",
+    "invalidFee": "Algo ha salido mal. Vuelve a cargar la página e inténtalo de nuevo"
+  },
+  "errorCaptions": {
+    "emailRequired_NEED_TRANSLATION": "Email is required"
+  },
+  "processingFee": "Cuota de procesamiento"
+}

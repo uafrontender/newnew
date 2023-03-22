@@ -8,45 +8,55 @@ import router from 'next/router';
 import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { CreatorCardWithSubscriptionPrice } from './CreatorCardWithSubscriptionPrice';
+import CreatorCard from '../../molecules/search/CreatorCard';
+import { useAppSelector } from '../../../redux-store/store';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
-  collection: any;
+  className?: string;
+  collection: newnewapi.IUser[];
   loading: boolean;
-  subscribedTo?: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  showSubscriptionPrice?: boolean;
+  withEllipseMenu?: boolean;
+  onBuyBundleClicked?: (creator: newnewapi.IUser) => void;
 }
 
 export const CreatorsList: React.FC<IList> = ({
+  className,
   collection,
   loading,
-  subscribedTo = false,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  showSubscriptionPrice = false,
+  withEllipseMenu = false,
+  onBuyBundleClicked,
 }) => {
-  const renderItem = (item: newnewapi.IUser) => {
+  const user = useAppSelector((state) => state.user);
+
+  const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
-      router.push(`/${item.username}`);
+      if (creator) {
+        router.push(`/${creator.username}`);
+      }
     };
 
+    const isCardWithEllipseMenu =
+      creator.uuid !== user.userData?.userUuid ? withEllipseMenu : false;
+
     return (
-      <SItemWrapper key={item.uuid} onClick={handleItemClick}>
-        <CreatorCardWithSubscriptionPrice
-          subscribedTo={subscribedTo}
-          showSubscriptionPrice={showSubscriptionPrice}
-          item={item}
+      <SItemWrapper key={creator.uuid} onClick={handleItemClick}>
+        <CreatorCard
+          creator={creator}
+          withEllipseMenu={isCardWithEllipseMenu}
+          onBundleClicked={onBuyBundleClicked}
         />
       </SItemWrapper>
     );
   };
 
   return (
-    <SListWrapper>
+    <SListWrapper className={className}>
       {collection?.map(renderItem)}
       {collection.length > 0 &&
         loading &&
@@ -84,10 +94,9 @@ export const CreatorsList: React.FC<IList> = ({
 };
 
 CreatorsList.defaultProps = {
-  subscribedTo: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
-  showSubscriptionPrice: undefined,
+  onBuyBundleClicked: undefined,
 };
 
 export default CreatorsList;
@@ -96,31 +105,28 @@ const SListWrapper = styled.div`
   width: 100%;
   cursor: grab;
   display: flex;
-  padding: 8px 0 0 0;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  // Needed for bump up animation
+  padding-top: 8px;
+  // Not sure these are needed on this level (should come from className)
+  padding-left: 16px;
+  padding-right: 16px;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(100% + 26px);
-    padding: 0;
+    margin: 0 -8px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100% + 32px);
-    padding: 0 !important;
-    margin: 0 -16px;
-  }
-
-  ${(props) => props.theme.media.laptopL} {
     margin: 0 -16px;
   }
 
   .skeletonsContainer {
     display: block;
-    height: 400px;
+    height: 229px;
 
     width: 100vw;
     margin: 16px 0;
@@ -137,10 +143,6 @@ const SListWrapper = styled.div`
 
     ${(props) => props.theme.media.laptopL} {
       width: calc(20% - 32px);
-    }
-
-    ${(props) => props.theme.media.desktop} {
-      width: calc(16.65% - 32px);
     }
 
     div {
@@ -169,10 +171,6 @@ const SItemWrapper = styled.div`
 
   ${(props) => props.theme.media.laptopL} {
     width: calc(20% - 32px);
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: calc(16.65% - 32px);
   }
 `;
 

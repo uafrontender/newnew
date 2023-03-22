@@ -1,7 +1,12 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { keyframes, useTheme } from 'styled-components';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
+import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -9,46 +14,58 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Button from '../Button';
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
+
+import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 
+import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import DisplayName from '../../DisplayName';
+
 const CommentEllipseMenu = dynamic(
-  () => import('../../molecules/decision/CommentEllipseMenu')
+  () => import('../../molecules/decision/common/CommentEllipseMenu')
 );
 const CommentEllipseModal = dynamic(
-  () => import('../../molecules/decision/CommentEllipseModal')
+  () => import('../../molecules/decision/common/CommentEllipseModal')
 );
-const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
+const ReportModal = dynamic(
+  () => import('../../molecules/direct-messages/ReportModal')
+);
 const DeleteCommentModal = dynamic(
-  () => import('../../molecules/decision/DeleteCommentModal')
+  () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
 interface IComment {
   lastChild?: boolean;
   comment: TCommentWithReplies;
+  isDeletingComment: boolean;
   canDeleteComment?: boolean;
   handleAddComment: (newMsg: string) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
+  onFormFocus?: () => void;
+  onFormBlur?: () => void;
 }
 
 const Comment: React.FC<IComment> = ({
   comment,
   lastChild,
   canDeleteComment,
+  isDeletingComment,
   handleAddComment,
   handleDeleteComment,
+  onFormFocus,
+  onFormBlur,
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -72,7 +89,8 @@ const Comment: React.FC<IComment> = ({
   const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
   const onUserReport = useCallback(() => {
-    if (!user.loggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -88,9 +106,32 @@ const Comment: React.FC<IComment> = ({
     setConfirmDeleteComment(true);
   };
 
+  const commentFormRef = useRef<HTMLFormElement | null>(null);
+
   const replyHandler = () => {
-    setIsReplyFormOpen(!isReplyFormOpen);
+    setIsReplyFormOpen((prevState) => !prevState);
   };
+
+  const isReplyFormOpenRef = useRef(isReplyFormOpen);
+
+  useEffect(() => {
+    if (
+      isReplyFormOpen &&
+      !isReplyFormOpenRef.current &&
+      commentFormRef.current
+    ) {
+      commentFormRef.current.scrollIntoView({
+        block: 'center',
+        inline: 'end',
+        behavior: 'smooth',
+      });
+      isReplyFormOpenRef.current = true;
+    }
+
+    if (!isReplyFormOpen) {
+      isReplyFormOpenRef.current = false;
+    }
+  }, [isReplyFormOpen]);
 
   useEffect(() => {
     if (comment.isOpen) {
@@ -98,53 +139,90 @@ const Comment: React.FC<IComment> = ({
     }
   }, [comment.isOpen]);
 
+  const moreButtonRef: any = useRef<HTMLButtonElement>();
+
+  if (comment.isDeleted || comment?.sender?.options?.isTombstone) return null;
+
   return (
     <>
-      <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
-        {!comment.isDeleted ? (
-          <Link href={`/${comment.sender?.username}`}>
-            <SUserAvatar
-              avatarUrl={
-                comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''
-              }
-            />
-          </Link>
+      <SComment
+        key={comment.id.toString()}
+        id={`comment_id_${comment.id}`}
+        isMoreMenuOpened={ellipseMenuOpen}
+      >
+        {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
+          comment.sender?.options?.isVerified ||
+          comment.sender?.uuid === user.userData?.userUuid ? (
+            <Link href={`/${comment.sender?.username}`}>
+              <a>
+                <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+              </a>
+            </Link>
+          ) : (
+            <SUserAvatar noHover avatarUrl={comment.sender?.avatarUrl ?? ''} />
+          )
         ) : (
-          <SUserAvatar avatarUrl='' onClick={() => {}} />
+          <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
         )}
         <SCommentContent>
           <SCommentHeader>
-            <Link href={`/${comment.sender?.username}`}>
-              <SNickname>
-                {!comment.isDeleted
-                  ? comment.sender?.uuid === user.userData?.userUuid
-                    ? t('comments.me')
-                    : comment.sender?.nickname ?? comment.sender?.username
-                  : t('comments.comment_deleted')}
-              </SNickname>
-            </Link>
+            {!comment.isDeleted ? (
+              <>
+                {comment.sender?.options?.isVerified ||
+                comment.sender?.uuid === user.userData?.userUuid ? (
+                  <SDisplayName
+                    user={comment.sender}
+                    altName={
+                      comment.sender?.uuid === user.userData?.userUuid
+                        ? t('comments.me')
+                        : undefined
+                    }
+                    href={`/${comment.sender?.username}`}
+                  />
+                ) : (
+                  <SDisplayName
+                    user={comment.sender}
+                    altName={
+                      comment.sender?.uuid === user.userData?.userUuid
+                        ? t('comments.me')
+                        : undefined
+                    }
+                    noHover
+                  />
+                )}
+              </>
+            ) : (
+              <SCommentDeleted>{t('comments.commentDeleted')}</SCommentDeleted>
+            )}
             <SBid> </SBid>
-            <SDate>
-              {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
-              &bull;{' '}
-              {moment((comment.createdAt?.seconds as number) * 1000).fromNow()}
-            </SDate>
+            {!comment.isDeleted && (
+              <SDate>
+                {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
+                &bull;{' '}
+                {moment((comment.createdAt?.seconds as number) * 1000)
+                  .locale(router.locale || 'en-US')
+                  .fromNow()}
+              </SDate>
+            )}
             <SActionsDiv>
-              <SMoreButton
-                view='transparent'
-                iconOnly
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenEllipseMenu();
-                }}
-              >
-                <InlineSVG
-                  svg={MoreIconFilled}
-                  fill={theme.colorsThemed.text.secondary}
-                  width='20px'
-                  height='20px'
-                />
-              </SMoreButton>
+              {!comment.isDeleted && (
+                <SMoreButton
+                  view='transparent'
+                  iconOnly
+                  ref={moreButtonRef}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenEllipseMenu();
+                  }}
+                >
+                  <InlineSVG
+                    svg={MoreIconFilled}
+                    fill={theme.colorsThemed.text.secondary}
+                    width='20px'
+                    height='20px'
+                  />
+                </SMoreButton>
+              )}
               {/* Ellipse menu */}
               {!isMobile && (
                 <CommentEllipseMenu
@@ -156,52 +234,62 @@ const Comment: React.FC<IComment> = ({
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
                   onUserReport={onUserReport}
+                  anchorElement={moreButtonRef.current}
                 />
               )}
             </SActionsDiv>
           </SCommentHeader>
-          <SText>{comment.content?.text}</SText>
+          {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
           {!comment.parentId &&
+            !comment.isDeleted &&
             (!isReplyFormOpen ? (
-              <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
+              <SReply onClick={replyHandler}>{t('comments.sendReply')}</SReply>
             ) : (
               <>
                 {replies.length === 0 ? (
                   <SReply onClick={replyHandler}>
-                    {t('comments.hide-replies')}
+                    {t('comments.hideReplies')}
                   </SReply>
                 ) : null}
                 <CommentForm
                   onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+                  onBlur={onFormBlur ?? undefined}
+                  onFocus={onFormFocus ?? undefined}
+                  ref={commentFormRef}
                 />
               </>
             ))}
-          {!comment.parentId && replies && replies.length > 0 && (
-            <SReply onClick={replyHandler}>
-              {isReplyFormOpen
-                ? t('comments.hide-replies')
-                : t('comments.view-replies')}{' '}
-              {replies.length}{' '}
-              {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
-            </SReply>
-          )}
+          {!comment.parentId &&
+            !comment.isDeleted &&
+            replies &&
+            replies.length > 0 && (
+              <SReply onClick={replyHandler}>
+                {isReplyFormOpen
+                  ? t('comments.hideReplies')
+                  : t('comments.viewReplies')}{' '}
+                {replies.length}{' '}
+                {replies.length > 1
+                  ? t('comments.replies')
+                  : t('comments.reply')}
+              </SReply>
+            )}
           {isReplyFormOpen &&
             replies &&
-            replies.map((item) => (
+            replies.map((item, index) => (
               <Comment
                 key={item.id.toString()}
-                canDeleteComment={
-                  isMyComment ? true : canDeleteComment ?? false
-                }
+                isDeletingComment={isDeletingComment}
+                canDeleteComment={canDeleteComment}
+                lastChild={index === replies.length - 1}
                 comment={item}
                 handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
                 handleDeleteComment={handleDeleteComment}
               />
             ))}
-          {!lastChild && <SSeparator />}
         </SCommentContent>
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
+          isDeletingComment={isDeletingComment}
           closeModal={() => setConfirmDeleteComment(false)}
           handleConfirmDelete={async () => {
             await handleDeleteComment(comment);
@@ -209,6 +297,7 @@ const Comment: React.FC<IComment> = ({
           }}
         />
       </SComment>
+      {!lastChild && <SSeparator />}
       {isMobile ? (
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
@@ -239,16 +328,21 @@ export default Comment;
 Comment.defaultProps = {
   lastChild: false,
   canDeleteComment: false,
+  onFormFocus: () => {},
+  onFormBlur: () => {},
 };
 
-const SUserAvatar = styled(UserAvatar)`
+const SUserAvatar = styled(UserAvatar)<{
+  noHover?: boolean;
+}>`
   width: 36px;
   height: 36px;
   min-width: 36px;
   min-height: 36px;
   flex-shrink: 0;
   margin-right: 12px;
-  cursor: pointer;
+  margin-bottom: 14px;
+  cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 `;
 
 const OpenedFlash = keyframes`
@@ -260,11 +354,42 @@ const OpenedFlash = keyframes`
   }
 `;
 
-const SComment = styled.div`
+const SMoreButton = styled(Button)`
+  padding: 2px;
+
+  background: none;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    opacity: 0;
+
+    padding: 8px;
+  }
+
+  @media (hover: none) {
+    &:active:enabled {
+      background: none;
+    }
+  }
+`;
+
+const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
   position: relative;
   display: flex;
 
   width: 100%;
+
+  padding-top: 12px;
+
+  // For scrollIntoView when comment_id is provided in URL
+  scroll-margin-top: -320px;
 
   &.opened-flash {
     &::before {
@@ -282,6 +407,23 @@ const SComment = styled.div`
       box-shadow: 4px 4px 100px 75px rgba(34, 60, 80, 0.2);
       animation: ${OpenedFlash} 1.5s forwards linear;
     }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    &:hover {
+      ${SMoreButton} {
+        opacity: 1;
+      }
+    }
+
+    ${({ isMoreMenuOpened }) =>
+      isMoreMenuOpened
+        ? css`
+            ${SMoreButton} {
+              opacity: 1;
+            }
+          `
+        : null}
   }
 `;
 
@@ -305,32 +447,29 @@ const SActionsDiv = styled.div`
   margin-left: auto;
 `;
 
-const SMoreButton = styled(Button)`
-  background: none;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  padding: 8px;
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
-const SNickname = styled.span`
+const SDisplayName = styled(DisplayName)<{
+  noHover?: boolean;
+}>`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  cursor: pointer;
-  margin-right: 5px;
+  cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
   transition: 0.2s linear;
 
   :hover {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
+    color: ${(props) =>
+      !props.noHover
+        ? props.theme.colorsThemed.text.primary
+        : props.theme.colorsThemed.text.secondary};
   }
+`;
+
+const SCommentDeleted = styled.span`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
 `;
 
 const SBid = styled.span`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  margin-left: 5px;
   span {
     color: ${(props) => props.theme.colors.white};
     margin: 0 5px;
@@ -341,12 +480,17 @@ const SDate = styled.span`
   font-size: 12px;
 `;
 
-const SText = styled.p`
+const SText = styled.div`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
   margin-bottom: 14px;
   cursor: text;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  user-select: text;
 `;
 
 const SReply = styled.div`
@@ -358,7 +502,6 @@ const SReply = styled.div`
 `;
 
 const SSeparator = styled.div`
-  margin: 0 0 12px;
   height: 1px;
   overflow: hidden;
   background: ${(props) =>

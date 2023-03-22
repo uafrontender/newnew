@@ -1,4 +1,10 @@
-import React, { useState, useRef, ReactElement, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  ReactElement,
+  useEffect,
+  useCallback,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -16,6 +22,7 @@ export type TDropdownSelectItem<T> = {
 };
 
 interface IDropdownSelect<T> {
+  id?: string;
   label: string;
   selected?: T;
   options: TDropdownSelectItem<T>[];
@@ -24,9 +31,11 @@ interface IDropdownSelect<T> {
   disabled?: boolean;
   closeOnSelect?: boolean;
   onSelect: (val: T) => void;
+  className?: string;
 }
 
 const DropdownSelect = <T,>({
+  id,
   label,
   selected,
   options,
@@ -35,12 +44,15 @@ const DropdownSelect = <T,>({
   disabled,
   closeOnSelect,
   onSelect,
+  className,
 }: IDropdownSelect<T>): ReactElement => {
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>();
   const optionsContainerRef = useRef<HTMLDivElement>();
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
+
+  const selectedRef = useRef<T | undefined>(selected);
 
   const handleToggle = () => setIsOpen((curr) => !curr);
   const handleClose = () => setIsOpen(false);
@@ -50,8 +62,20 @@ const DropdownSelect = <T,>({
     handleClose();
   });
 
+  const getOptionId = useCallback((value: T): string | undefined => {
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      return value.toString();
+    }
+
+    return undefined;
+  }, []);
+
   useEffect(() => {
-    if (isOpen && selected) {
+    if (isOpen && selected && selected !== selectedRef.current) {
       const itemTopPos =
         optionsRefs.current[options.findIndex((o) => o.value === selected)]
           .offsetTop;
@@ -59,6 +83,8 @@ const DropdownSelect = <T,>({
       if (optionsContainerRef.current) {
         optionsContainerRef.current.scrollTop = itemTopPos;
       }
+
+      selectedRef.current = selected;
     }
   }, [selected, options, isOpen]);
 
@@ -67,8 +93,10 @@ const DropdownSelect = <T,>({
       ref={(el) => {
         containerRef.current = el!!;
       }}
+      className={className}
     >
       <SLabelButton
+        id={id}
         disabled={disabled ?? false}
         onClick={() => handleToggle()}
         style={{
@@ -87,6 +115,7 @@ const DropdownSelect = <T,>({
       <AnimatePresence>
         {isOpen ? (
           <SOptionsContainer
+            id={`${id}-options`}
             ref={(el) => {
               optionsContainerRef.current = el!!;
             }}
@@ -104,6 +133,7 @@ const DropdownSelect = <T,>({
               {options &&
                 options.map((o, i) => (
                   <SOption
+                    id={getOptionId(o.value) || i.toString()}
                     key={o.name}
                     ref={(el) => {
                       optionsRefs.current[i] = el!!;
@@ -131,6 +161,7 @@ DropdownSelect.defaultProps = {
   maxItems: undefined,
   disabled: false,
   closeOnSelect: false,
+  className: '',
 };
 
 export default DropdownSelect;
@@ -214,6 +245,15 @@ const SOptionsContainer = styled(motion.div)<{
   }
 
   z-index: 4;
+
+  ${({ theme }) => theme.media.laptop} {
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 `;
 
 const SOption = styled.button<{

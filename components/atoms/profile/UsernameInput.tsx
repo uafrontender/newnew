@@ -1,15 +1,17 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../InlineSVG';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AnimatedPresence from '../AnimatedPresence';
+import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
 type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   popupCaption: ReactElement;
   errorCaption: string;
+  onChange: (value: string) => void;
 };
 
 const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
@@ -26,43 +28,92 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [focused, setFocused] = useState(false);
 
+  const containerRef = useRef(null);
+
+  const closePopup = () => {
+    setIsPopupVisible(false);
+  };
+
+  useOnClickOutside(containerRef, closePopup);
+
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue =
-      (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
+      e.target.value[0] === '@' ? e.target.value.slice(1) : e.target.value;
 
-    // @ts-ignore
-    onChange(newValue || '');
+    onChange(newValue);
   };
 
   useEffect(() => {
     if (focused) return;
     if (isValid) setErrorBordersShown(false);
-  }, [focused, isValid]);
+
+    if (!isValid && errorCaption) {
+      setErrorBordersShown(true);
+    }
+  }, [focused, isValid, errorCaption]);
 
   return (
     <SWrapper>
-      <SUsernameInput
-        value={(value as string).length > 0 ? `@${value}` : value}
-        disabled={disabled}
-        errorBordersShown={errorBordersShown}
-        onChange={handleOnChange}
-        onBlur={() => {
-          setIsPopupVisible(false);
-          setFocused(false);
-          if (!isValid && errorCaption) {
-            setErrorBordersShown(true);
-          } else {
+      <div ref={containerRef}>
+        <SUsernameInput
+          value={(value as string).length > 0 ? `@${value}` : value}
+          disabled={disabled}
+          errorBordersShown={errorBordersShown}
+          onChange={handleOnChange}
+          onBlur={() => {
+            setIsPopupVisible(false);
+            setFocused(false);
+          }}
+          onFocus={(e) => {
+            e.stopPropagation();
+            if (onFocus) onFocus(e);
+            setFocused(true);
+            setIsPopupVisible(true);
             setErrorBordersShown(false);
-          }
-        }}
-        onFocus={(e) => {
-          if (onFocus) onFocus(e);
-          setFocused(true);
-          setIsPopupVisible(true);
-          setErrorBordersShown(false);
-        }}
-        {...rest}
-      />
+          }}
+          {...rest}
+        />
+        <AnimatePresence>
+          {isPopupVisible ? (
+            <SPopup
+              initial={{
+                y: 30,
+                opacity: 0,
+              }}
+              animate={{
+                y: 0,
+                opacity: 1,
+                transition: {
+                  opacity: {
+                    duration: 0.1,
+                  },
+                  y: {
+                    type: 'spring',
+                    velocity: -300,
+                    stiffness: 100,
+                    delay: 0.1,
+                  },
+                },
+              }}
+              exit={{
+                y: 30,
+                opacity: 0,
+                transition: {
+                  duration: 0.1,
+                },
+              }}
+            >
+              {popupCaption}
+            </SPopup>
+          ) : null}
+        </AnimatePresence>
+        <SStyledButton
+          disabled={disabled}
+          onClick={() => setIsPopupVisible((curr) => !curr)}
+        >
+          <InlineSvg svg={AlertIcon} width='24px' height='24px' />
+        </SStyledButton>
+      </div>
       {!errorBordersShown ? (
         <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}/${value}`}</SPreviewDiv>
       ) : null}
@@ -74,46 +125,6 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
           </SErrorDiv>
         </AnimatedPresence>
       ) : null}
-      <AnimatePresence>
-        {isPopupVisible ? (
-          <SPopup
-            initial={{
-              y: 30,
-              opacity: 0,
-            }}
-            animate={{
-              y: 0,
-              opacity: 1,
-              transition: {
-                opacity: {
-                  duration: 0.1,
-                },
-                y: {
-                  type: 'spring',
-                  velocity: -300,
-                  stiffness: 100,
-                  delay: 0.1,
-                },
-              },
-            }}
-            exit={{
-              y: 30,
-              opacity: 0,
-              transition: {
-                duration: 0.1,
-              },
-            }}
-          >
-            {popupCaption}
-          </SPopup>
-        ) : null}
-      </AnimatePresence>
-      <SStyledButton
-        disabled={disabled}
-        onClick={() => setIsPopupVisible((curr) => !curr)}
-      >
-        <InlineSvg svg={AlertIcon} width='24px' height='24px' />
-      </SStyledButton>
     </SWrapper>
   );
 };
@@ -169,6 +180,7 @@ interface ISUsernameInput {
 
 const SUsernameInput = styled.input<ISUsernameInput>`
   display: block;
+  width: 100%;
 
   font-weight: 500;
   font-size: 16px;

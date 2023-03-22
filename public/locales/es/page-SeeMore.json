@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "ac": {
+      "title": "Ve más Bids en NewNew",
+      "description": "Ver más Bids de creadores publicados en la empresa emergente de economía de creadores NewNew"
+    },
+    "mc": {
+      "title": "Ver más Superpolls en NewNew",
+      "description": "Ver más creadores de Superpolls publicados en la empresa emergente de economía de creadores NewNew"
+    },
+    "cf": {
+      "title": "Ver más Goals en NewNew",
+      "description": "Ver más creadores de Goals publicados en la empresa emergente de economía de creadores NewNew"
+    },
+    "biggest": {
+      "title": "Ver más de las mejores publicaciones para ti",
+      "description": "Ve los videos y las publicaciones más importantes de los creadores que creemos que te gustarán"
+    },
+    "for-you": {
+      "title": "Ver más publicaciones para ti",
+      "description": "Ve videos y publicaciones de los creadores que creemos que te gustarán"
+    }
+  },
+  "sortingOption": {
+    "sortingtype": "Ordenar",
+    "sortingtype-all": "Todos",
+    "sortingtype-num_bids": "Participantes",
+    "sortingtype-num_bids-ac": "Número de ofertas",
+    "sortingtype-num_bids-mc": "Número de votos",
+    "sortingtype-num_bids-cf": "Número de patrocinadores",
+    "sortingtype-newest": "Más reciente",
+    "bid": "Oferta",
+    "bid-lowest": "Más baja",
+    "bid-highest": "Más alta",
+    "time": "Tiempo",
+    "time-ending-soon": "Terminando pronto",
+    "time-newest": "Más reciente",
+    "time-oldest": "Más antigüa",
+    "numbers-of-bids": "Número de ofertas",
+    "numbers-of-bids-fewest": "El menor número de ofertas primero",
+    "numbers-of-bids-most-first": "El mayor número de ofertas primero"
+  },
+  "sorting": {
+    "title": "Ordenar",
+    "button": {
+      "showResults": "Mostrar resultados"
+    }
+  },
+  "collection": {
+    "title": {
+      "ac": "Bids",
+      "mc": "Superpolls",
+      "cf": "Goals",
+      "biggest": "Lo mejor de todos los tiempos",
+      "for-you": "Para ti",
+      "recent-activity": "Actividad reciente"
+    },
+    "button": {
+      "cancel": "Cancelar"
+    }
+  }
+}

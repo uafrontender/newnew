@@ -11,9 +11,9 @@ import InlineSVG from '../../atoms/InlineSVG';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -27,8 +27,8 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
   const { open, value, handleClose } = props;
 
   const theme = useTheme();
-  const { t } = useTranslation('creation');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { t } = useTranslation('page-Creation');
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const preventCLick = (e: any) => {
@@ -56,11 +56,13 @@ const FullPreview: React.FC<IFullPreview> = (props) => {
         )}
         <SModalVideoWrapper>
           {open && (
-            <BitmovinPlayer
+            <VideojsPlayer
               withMuteControl
               id='full-preview'
               resources={value}
               borderRadius={isMobile ? '0' : '16px'}
+              showPlayButton
+              withScrubber
             />
           )}
         </SModalVideoWrapper>
@@ -87,7 +89,6 @@ const SMobileContainer = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-  min-height: 100vh;
 
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
@@ -140,12 +141,12 @@ const SModalCloseIcon = styled.div`
 
 const SModalTopLine = styled.div`
   display: flex;
-  padding: 18px 0;
+  padding: 18px 12px;
   align-items: center;
   margin-bottom: 16px;
 
   ${({ theme }) => theme.media.mobileL} {
-    padding: 10px 0;
+    padding: 10px 12px;
     margin-bottom: 24px;
     justify-content: space-between;
   }

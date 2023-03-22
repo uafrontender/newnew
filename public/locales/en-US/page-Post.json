@@ -1,0 +1,839 @@
+{
+  "meta": {
+    "title": "{{postTitle}} | {{displayName}} on NewNew",
+    "deletedPost": "Deleted post",
+    "description": {
+      "ac": {
+        "withContributions": "${{totalInBids}} in bids on NewNew",
+        "default": "Make money, bid in auctions with friends and support creators on NewNew"
+      },
+      "mc": {
+        "withContributions": "{{totalVotes}} votes on NewNew",
+        "default": "Make money, vote with friends and support creators on NewNew"
+      },
+      "cf": {
+        "withContributions": "",
+        "default": ""
+      }
+    }
+  },
+  "at": " at ",
+  "my": "my",
+  "me": "me",
+  "I": "I",
+  "back": "Back",
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal",
+    "multiple": {
+      "ac": "Bids",
+      "mc": "Superpolls",
+      "cf": "Goals"
+    }
+  },
+  "loadMoreButton": "Load more",
+  "expires": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "ended_on": "ended on",
+    "end_date": "End date:"
+  },
+  "expiresResponse": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "leftToRespond": "left to respond"
+  },
+  "socials": {
+    "share-to": "Share to",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "copy": "Copy Link",
+    "copied": "Link copied!"
+  },
+  "paymentSuccessModal": {
+    "title": {
+      "ac": "Bid is in!",
+      "mc": "Votes are in!",
+      "mc-single": "Vote is in!",
+      "cf": "You’re backing this goal!"
+    },
+    "doneButton": "Sounds good!",
+    "ac": "{{postCreator}} will pick their favorite one once the Bid is over.",
+    "mc": "{{postCreator}} will do the option with the most amount of votes when the Superpoll is over.",
+    "cf": "{{postCreator}} will do the goal once it gets enough backers."
+  },
+  "postFailedBoxModeration": {
+    "title": "{{postType}} is cancelled",
+    "reason": {
+      "no-response": "Response was not uploaded",
+      "ac-no-winner": "Winner was not selected",
+      "ac": "Time ran out before any bids were made",
+      "mc": "Time ran out before any votes were made",
+      "cf": "Time ran out before the goal was reached"
+    },
+    "buttonText": "New {{postType}}"
+  },
+  "postFailedBox": {
+    "title": "This {{postType}} is canceled",
+    "reason": {
+      "no-response": "{{creator}} didn't post a response video in time",
+      "ac-no-winner": "{{creator}} didn't choose a bid in time",
+      "ac": "Time ran out before any bids were made",
+      "mc": "Time ran out before any votes were made",
+      "cf": "Time ran out before the goal was reached"
+    },
+    "buttonText": "See new {{postTypeMultiple}}"
+  },
+  "postDeletedByMe": {
+    "title": "This {{postType}} has been deleted",
+    "body": {
+      "byCreator": "You deleted this {{postType}}",
+      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
+    },
+    "buttonText": "Make a new one"
+  },
+  "postDeleted": {
+    "title": "This {{postType}} has been deleted",
+    "body": {
+      "byCreator": "{{creator}} deleted this {{postType}}",
+      "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
+    },
+    "buttonText": "See new {{postTypeMultiple}}"
+  },
+  "postSuccessModeration": {
+    "title": "Your response is live!",
+    "body": "Let others see it",
+    "buttonText": "Share it",
+    "linkCopiedButtonText": "Link copied"
+  },
+  "postWaitingForResponse": {
+    "title": "Time for response",
+    "body": "Don't miss the update. Stay tuned!",
+    "buttonText": "Notify me"
+  },
+  "successCommon": {
+    "comments": {
+      "heading": "Comments"
+    }
+  },
+  "postSuccess": {
+    "title": "This {{postType}} is finished!",
+    "body": "Checkout more like it.",
+    "buttonText": "See more"
+  },
+  "postTopInfo": {
+    "notifyMe": "Notify me"
+  },
+  "postVideo": {
+    "tabs": {
+      "announcement": "Post",
+      "response": "Response",
+      "backToOriginalVideo": "Back to original",
+      "backToResponse": "Watch response"
+    },
+    "reuploadButton": "Re-upload",
+    "addVideoButton": "Add video",
+    "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
+    "floatingUploadResponseButton": "Make a response video",
+    "setThumbnail": "Set a thumbnail",
+    "changeThumbnail": "Change thumbnail",
+    "responseUploadedNonProcessed": "Success! Your response will be available once the video was processed",
+    "uploadResponseForm": {
+      "fileUpload": {
+        "title_1": "Your audience is waiting!",
+        "title_2": "Select a file",
+        "title_2Long": "Select a file or drag and drop here",
+        "description": "Max size of the video 10 GB",
+        "button": "Select file"
+      },
+      "button": {
+        "retry": "Retry",
+        "cancel": "Cancel"
+      },
+      "block": {
+        "title": {
+          "file": "Upload file",
+          "decision": "Post information",
+          "advanced": "Advanced settings",
+          "floating": "Preview"
+        },
+        "subTitle": {
+          "votesInfo": "All votes start at a $1 dollar by default",
+          "floating": "Upload file to preview your brand new post"
+        }
+      },
+      "modal": {
+        "leave": {
+          "message": "Are you sure want to leave this page?"
+        },
+        "deleteFile": {
+          "title": "Delete file",
+          "description": "Are you sure you want to delete this file?"
+        }
+      },
+      "video": {
+        "error": {
+          "minLength": "Video must be at least 10 seconds long",
+          "maxLength": "Video must be less than 10 minutes long",
+          "maxSize": "Video size too big, choose up to 10gb",
+          "title": "Ooops...",
+          "description": "There was an error and your file could not be uploaded. Would you like to try again."
+        },
+        "deleteFile": "Delete file",
+        "previewFull": "Preview",
+        "full": {
+          "title": "Preview",
+          "cancelButton": "Cancel",
+          "publishButton": "Publish"
+        },
+        "loading": {
+          "title": "Uploading video",
+          "description": "We're uploading your video response... hang tight!",
+          "process": "{{progress}}% • {{time}} left"
+        },
+        "processing": {
+          "title": "Processing the video",
+          "description": "Your video is being processed... hang tight!",
+          "process": "{{progress}}% • {{time}} left",
+          "uploadNonProcessed": "Publish"
+        },
+        "processingPublished": {
+          "title": "Processing the video",
+          "description": "Your video will be available once it's processed",
+          "process": "{{progress}}% • {{time}} left"
+        }
+      }
+    }
+  },
+  "postVideoSuccess": {
+    "tabs": {
+      "announcement": "Original",
+      "response": "Response",
+      "watchOriginal": "Watch original",
+      "watchResponse": "Watch response",
+      "watchResponseFirstTime": "Watch it happen!"
+    }
+  },
+  "deletePostModal": {
+    "title": "Delete {{postType}}",
+    "body": "Are you sure you want to delete this {{postType}}? You won't be able to restore it once it's deleted...",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "deleteVideoModal": {
+    "title": "Delete video",
+    "body": "Are you sure you want to delete this video?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "deleteCommentModal": {
+    "title": "Delete comment",
+    "body": "Are you sure you want to delete this comment?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "blockUserModal": {
+    "title": "Block user",
+    "messageFirstPart": "Do you really want to block ",
+    "messageSecondPart": "?",
+    "button": {
+      "cancel": "Cancel",
+      "confirm": "Block user"
+    }
+  },
+  "tabs": {
+    "comments": "Comments",
+    "bids": "Bids",
+    "bids_singular": "Bid",
+    "options": "Options",
+    "backers": "Backers",
+    "winner": "Winner",
+    "history": "History"
+  },
+  "optionsTabLine": {
+    "bundleVotes": "You have <0>{{amount}} votes</0>"
+  },
+  "postViewProcessingAnnouncement": {
+    "stayTuned": {
+      "ac": "This Bid will begin once the video \nhas been processed",
+      "mc": "This Superpoll will begin once the video \nhas been processed",
+      "cf": "This Goal will begin once the video \nhas been processed"
+    },
+    "videoHolder": {
+      "decision": {
+        "title": "Just a minute...",
+        "body": "The video is processing. This will only take a few minutes..."
+      },
+      "moderation": {
+        "title": "Just a minute...",
+        "body": "Your video is processing. This will only take a few minutes..."
+      }
+    }
+  },
+  "postScheduled": {
+    "decision": {
+      "title": "Coming soon...",
+      "subtitle_1": "{{postType}} will be live shortly.",
+      "subtitle_2": "Get notified once it's up!",
+      "timer": {
+        "days": "Days",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+      },
+      "followButton": "Favorite {{postType}}",
+      "unFollowButton": "Unfavorite {{postType}}"
+    },
+    "moderation": {
+      "title": "Coming soon",
+      "subtitle_1": "Your {{postType}} is not active yet.",
+      "subtitle_2": "It will start in",
+      "toggleButton": "See options",
+      "timer": {
+        "days": "Days",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+      }
+    },
+    "loading": {
+      "title": "Almost Done...",
+      "subtitle": "Just a little bit left!"
+    }
+  },
+  "acPost": {
+    "paymentModalHeader": {
+      "title": "{{creator}}'s Bid",
+      "subtitle": "Your bid"
+    },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} chooses your bid.",
+      "terms": "Terms",
+      "apply": "apply"
+    },
+    "paymentModalPayButton": "Bid",
+    "postTopInfo": {
+      "selectWinner": {
+        "title": "Time's up!",
+        "body": "Auction ended. Now it's time for the creator to choose a winner. Stay tuned!"
+      },
+      "inBids": "in total bids"
+    },
+    "optionsTab": {
+      "me": "me",
+      "noOptions": {
+        "caption_1": "No bids yet...",
+        "caption_2": "Place a bid below"
+      },
+      "tags": {
+        "my_vote": "My vote",
+        "my_bid": "My bid",
+        "highest": "Highest",
+        "vip": "VIP"
+      },
+      "optionCard": {
+        "by": "by",
+        "bidders": "bidders",
+        "others": "others",
+        "bid": "bid",
+        "supportButton": "Boost",
+        "supportAgainButton": "Boost \nagain",
+        "raiseBidButton": "Boost bid",
+        "placeABidButton": "Place bid",
+        "cancelButton": "Cancel",
+        "moreButton": "More"
+      },
+      "bidCard": {
+        "didABid": "bid"
+      },
+      "actionSection": {
+        "suggestionPlaceholder": "Add a suggestion ...",
+        "suggestionPlaceholderDesktop": "What should {{username}} do?",
+        "amountPlaceholderDesktop": "Min bid ${{amount}}",
+        "amountPlaceholderBoost": "Boost bid ${{amount}}",
+        "placeABidButton": "Place bid"
+      }
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "biddersBidAmount": "bidders bid",
+        "bidderBidAmount": "bidder bid",
+        "on": "on",
+        "suggestedByMe": "my bid",
+        "suggestedByUser": "{{username}}'s bid",
+        "to": "to"
+      }
+    },
+    "floatingActionButton": {
+      "suggestNewButton": "Place bid"
+    }
+  },
+  "mcPost": {
+    "postTopInfo": {
+      "vote": "vote",
+      "votes": "total votes"
+    },
+    "paymentModalHeader": {
+      "title": "{{creator}}'s Superpoll",
+      "subtitle": "Option you chose"
+    },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if the option you chose gets the most votes.",
+      "terms": "Terms",
+      "apply": "apply"
+    },
+    "paymentModalPayButton": "Vote for",
+    "optionsTab": {
+      "me": "me",
+      "tags": {
+        "my_vote": "My vote",
+        "my_bid": "My option",
+        "highest": "Highest",
+        "vip": "VIP"
+      },
+      "optionCard": {
+        "noVotes": "no votes",
+        "votes": "votes",
+        "vote": "vote",
+        "mySuggestion": "My suggestion",
+        "others": "others",
+        "voters": "voters",
+        "voted": "voted",
+        "supportButton": "Vote",
+        "supportAgainButton": "Vote \nagain",
+        "raiseBidButton": "Vote",
+        "placeABidButton": "Place a vote",
+        "cancelButton": "Cancel",
+        "moreButton": "More",
+        "selectVotesMenu": {
+          "title": "Buy votes",
+          "titleMoreVotes": "Buy more votes",
+          "vote": "vote",
+          "votes": "votes",
+          "custom": "Custom votes",
+          "useVotes": "Use my votes"
+        },
+        "confirmVoteModal": {
+          "vote": "vote",
+          "votes": "votes",
+          "custom": "Custom votes",
+          "buySingleVote": "Buy 1 vote to vote on {{creator}}'s Superpoll",
+          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{creator}}'s Superpoll",
+          "buyAnyVotes": "Buy any number of votes you want to vote on {{creator}}'s Superpoll",
+          "optionCaption": "Superpoll option",
+          "voteButton": "Vote"
+        }
+      },
+      "confirmCustomOptionModal": {
+        "title": "Add your custom option",
+        "line_1": "Ready to add your free custom option to this post?",
+        "line_2": "Once you do, you won't be able to add another one.",
+        "useFreeVoteButton": "Add custom option"
+      },
+      "useBundleVotesModal": {
+        "votesAvailable": "<0>{{amount}}</0> votes available",
+        "optionTitle": "Superpoll option",
+        "button": "Vote"
+      },
+      "actionSection": {
+        "votesAmount": "# of votes (minimum {{minAmount}} votes)",
+        "totalAmountCustomVotesPayment": "Total",
+        "suggestionPlaceholder": "Add your own option",
+        "suggestionPlaceholderDesktop": "Add an option ...",
+        "placeABidButton": "Add my option",
+        "offersBundles": "{{creator}} offers Superpoll Bundles",
+        "viewBundles": "View Bundles",
+        "getMoreBundles": "Get another Superpoll Bundle",
+        "getBundles": "Get it"
+      }
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "votersToldYou": "voters told to",
+        "voterToldYou": "voter told to",
+        "createdBy": "The option was created by"
+      }
+    },
+    "floatingActionButton": {
+      "suggestNewButton": "Add my option"
+    }
+  },
+  "cfPost": {
+    "backersStatsSection": {
+      "ofBackers": "of {{targetBackers}} backers",
+      "myBacking": "My backing:",
+      "my": "my",
+      "pledge": "pledge"
+    },
+    "backersTab": {
+      "info": {
+        "title": "Back {{creator}}'s Goal",
+        "caption": "You won't get charged until a post has been made."
+      },
+      "customPledge": {
+        "pledgeButton": "Pledge",
+        "continue": "Continue",
+        "cancelButton": "Cancel"
+      },
+      "freeSub": "FREE SUB",
+      "custom": "Custom",
+      "cancel": "Cancel"
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "backersFounded": "backers successfully funded",
+        "backerFounded": "backer successfully funded"
+      }
+    },
+    "paymentModalHeader": {
+      "title": "{{creator}}'s Goal"
+    },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} reaches their goal.",
+      "terms": "Terms",
+      "apply": "apply"
+    },
+    "paymentModalPayButton": "Back it for",
+    "floatingActionButton": {
+      "choosePledgeButton": "Back this goal"
+    }
+  },
+  "thumbnailEllipseMenu": {
+    "uploadImageButton": "Upload an image"
+  },
+  "postVideoThumbnailEdit": {
+    "title": "Set a thumbnail",
+    "description": "Select a snippet from the video",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "toast": {
+      "success": "Success! Thumbnail will be changed once processed",
+      "error": "An error occurred"
+    }
+  },
+  "postVideoCoverImageEdit": {
+    "title": "Upload an image",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "uploadCoverImage": {
+      "caption": "Select custom cover image",
+      "uploadBtn": "Select",
+      "deleteBtn": "Delete"
+    }
+  },
+  "acPostModeration": {
+    "postTopInfo": {
+      "selectWinner": {
+        "title": "Time to choose!",
+        "body": "Select your favorite bid then upload a response video before time runs out"
+      }
+    },
+    "optionsTab": {
+      "me": "me",
+      "noOptions": {
+        "caption_1": "Be the first to bid..."
+      },
+      "selectWinner": {
+        "title": "Confirm favorite bid",
+        "body": "If you choose this as your favorite bid you'll need to upload a video of yourself doing it!",
+        "button": {
+          "cancel": "Cancel",
+          "confirm": "Confirm favorite bid"
+        }
+      },
+      "optionCard": {
+        "pickButton": "Select",
+        "pickedButton": "Chosen"
+      }
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "biddersToldYou": "bidders told you to",
+        "bidderToldYou": "bidder told you to",
+        "youMade": "You made",
+        "createdBy": "The bid was created by"
+      }
+    },
+    "deleteOptionModal": {
+      "title": "Delete option",
+      "body": "Are you sure you want to delete this option?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
+    }
+  },
+  "mcPostModeration": {
+    "winnerTab": {
+      "winnerOptionCard": {
+        "votersToldYou": "voters told you to",
+        "voterToldYou": "voter told you to",
+        "youMade": "You made",
+        "createdBy": "The option was created by"
+      }
+    },
+    "deleteOptionModal": {
+      "title": "Delete option",
+      "body": "Are you sure you want to delete this option?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
+    }
+  },
+  "cfPostModeration": {
+    "moneyRaised": "Total raised",
+    "winnerTab": {
+      "winnerOptionCard": {
+        "backersToldYou": "backers successfully funded",
+        "backerToldYou": "backer successfully funded",
+        "youMade": "You made"
+      }
+    }
+  },
+  "acPostSuccess": {
+    "heroText": "Watch it happen!",
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
+    "inTotalBids": "in total bids",
+    "others": "others",
+    "bid": "bid",
+    "bidChosen": "Bid chosen",
+    "seeAll": "see all bids",
+    "optionsTab": {
+      "backButton": "Back"
+    }
+  },
+  "mcPostSuccess": {
+    "heroText": "Watch it happen!",
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
+    "inTotalVotes": "total votes",
+    "others": "others",
+    "voted": "voted",
+    "votes": "votes",
+    "vote": "vote",
+    "optionChosen": "Highest voted option",
+    "seeAll": "see all options",
+    "optionsTab": {
+      "backButton": "Back"
+    }
+  },
+  "cfPostSuccess": {
+    "heroText": "Watch it happen!",
+    "wantsToKnow": "{{creator}}'s<0/> Goal",
+    "creatorsBackers": "{{creator}}'s backers",
+    "ofTargetBackers": "of {{target_count}} backers",
+    "youBackedFor": "You backed it for"
+  },
+  "acPostAwaiting": {
+    "hero": {
+      "title": "Time's up!",
+      "body": "{{creator}} has {{time}} to select and do their favorite bid!",
+      "expires": {
+        "days": "days",
+        "days_singular": "day",
+        "hours": "hours",
+        "hours_singular": "hour",
+        "minutes": "minutes",
+        "minutes_singular": "minute",
+        "seconds": "seconds",
+        "seconds_singular": "second"
+      }
+    },
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
+    "inTotalBids": "in total bids",
+    "others": "others",
+    "bid": "bid",
+    "seeAll": "see all bids",
+    "optionsTab": {
+      "backButton": "Back"
+    }
+  },
+  "mcPostAwaiting": {
+    "hero": {
+      "title": "Votes are in!",
+      "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
+      "bodyNoResponse": "{{creator}} has {{time}} to do respond. Stay tuned!",
+      "expires": {
+        "days": "days",
+        "days_singular": "day",
+        "hours": "hours",
+        "hours_singular": "hour",
+        "minutes": "minutes",
+        "minutes_singular": "minute",
+        "seconds": "seconds",
+        "seconds_singular": "second"
+      }
+    },
+    "wantsToKnow": "{{creator}}<0/> wants to know...",
+    "inTotalVotes": "total votes",
+    "others": "others",
+    "voted": "voted",
+    "votes": "votes",
+    "vote": "vote",
+    "optionChosen": "Highest voted option",
+    "seeAll": "see all options",
+    "optionsTab": {
+      "backButton": "Back"
+    }
+  },
+  "recommendationsSection": {
+    "heading": "More like this"
+  },
+  "comments": {
+    "me": "me",
+    "title": "Comments",
+    "placeholder": "Add a comment...",
+    "commentDeleted": "Comment deleted",
+    "bid": "bid",
+    "report": "Report",
+    "sendReply": "Reply",
+    "reply": "reply",
+    "delete": "Delete",
+    "replies": "replies",
+    "viewReplies": "View",
+    "hideReplies": "Hide",
+    "view-more": "View more comments",
+    "comments": "Comments",
+    "seeMore": "See more",
+    "noCommentsCaption": "Be the first to comment...",
+    "errors": {
+      "generic": "Please check input",
+      "tooLong": "Comment is too long",
+      "tooShort": "Comment is too short",
+      "inappropriate": "Offensive words are forbidden",
+      "linksForbidden": "No links allowed in comments"
+    }
+  },
+  "heroPopupCommon": {
+    "heroButtonText": "Let's go",
+    "button": "Got it"
+  },
+  "heroPopupAC": {
+    "title": "Bids",
+    "text": "Control the outcome...\n Send the creator a bid with what you want them to do, how much you’d spend, then watch them do the bid!"
+  },
+  "heroPopupMC": {
+    "title": "Superpolls",
+    "text": "The creator makes a poll you pay to vote on.\n When the time’s up, watch the creator do the option that got the most amount of votes!"
+  },
+  "heroPopupCF": {
+    "title": "Goals",
+    "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
+  },
+  "postResponseTabModeration": {
+    "awaiting": {
+      "topHeader": "Time to post \nyour response!",
+      "postResponseBtn": "Post Response",
+      "youWillGet": "You'll get"
+    },
+    "succeeded": {
+      "topHeader": "Response \npublished!",
+      "youMade": "You made",
+      "shareBtn": "Share",
+      "linkCopied": "Link copied!"
+    },
+    "tutorialEditTitle": {
+      "title": "Edit title",
+      "body": "Click the title of the post and make your changes."
+    },
+    "winner": {
+      "inResponseToYourPost": "In response to your post",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} bidder chose",
+        "numBiddersChose": "{{amount}} bidders chose",
+        "optionCreator": "<0/> bid",
+        "suffix": "'s"
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} voter chose",
+        "numBiddersChose": "{{amount}} voters chose",
+        "optionOwn": "the option",
+        "optionCreator": "<0/> option",
+        "suffix": "'s"
+      }
+    }
+  },
+  "tutorials": {
+    "ac": {
+      "timer": {
+        "title": "Countdown",
+        "text": "When time’s up, the creator picks their favorite bid and posts a video doing the bid."
+      },
+      "peopleBids": {
+        "title": "All bids",
+        "text": "These are all the bids submitted for the creator to choose from."
+      },
+      "supportPeopleBids": {
+        "title": "Boost a bid",
+        "text": "Boost existing bids that you want to see happen IRL."
+      },
+      "createYourBid": {
+        "title": "Make your own!",
+        "text": "Come up with your own bid and set your price."
+      }
+    },
+    "mc": {
+      "timer": {
+        "title": "Countdown",
+        "text": "When time’s up, the creator posts a video doing the option with the most votes."
+      },
+      "peopleBids": {
+        "title": "All options",
+        "text": "These are all the options you can vote on."
+      },
+      "supportPeopleBids": {
+        "title": "Voting",
+        "text": "Vote on your favorite option. The option with the most amount of votes wins!"
+      },
+      "createYourBid": {
+        "title": "Make your own!",
+        "text": "Come up with your own bid and set your price."
+      }
+    },
+    "cf": {
+      "timer": {
+        "title": "Countdown",
+        "text": "If the Goal is reached before the time is up, the creator will post a video doing the Goal."
+      },
+      "peopleBids": {
+        "title": "Goal progress",
+        "text": "See how close the Creator is to reaching their Goal."
+      },
+      "createYourBid": {
+        "title": "Back the Goal",
+        "text": "Contribute to help the creator reach their Goal!"
+      }
+    }
+  },
+  "errors": {
+    "notEnoughMoney": "Not enough money",
+    "cardNotFound": "Card not found",
+    "cardCannotBeUsed": "This card can not be used",
+    "biddingNotStarted": "Bidding is not started yet",
+    "biddingIsEnded": "Bidding is ended already",
+    "mcCancelled": "Superpoll is cancelled",
+    "mcFinished": "Superpoll is finished already",
+    "mcNotStarted": "Superpoll is not started yet",
+    "alreadyVoted": "You are already voted",
+    "mcVoteCountTooSmall": "Vote count is too small",
+    "notAllowedToCreateNewOption": "New option is not allowed",
+    "optionNotUnique": "Option already exists",
+    "cfCancelled": "Goal is cancelled",
+    "cfFinished": "Goal is finished already",
+    "cfNotStarted": "Goal is not started yet",
+    "requestFailed": "Request failed"
+  }
+}

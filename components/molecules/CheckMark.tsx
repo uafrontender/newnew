@@ -4,30 +4,44 @@ import InlineSvg from '../atoms/InlineSVG';
 
 import Text from '../atoms/Text';
 
-import CheckmarkIcon from '../../public/images/svg/icons/filled/Checkmark.svg';
+import CheckmarkIcon from '../../public/images/svg/icons/outlined/Checkmark.svg';
 
 interface ICheckMark {
   id?: string;
-  label: string;
+  className?: string;
+  label?: string;
   selected?: boolean;
   disabled?: boolean;
-  handleChange: (e: any, id?: string) => void;
+  handleChange?: (e: any, id?: string) => void;
+  variant?: 1 | 2;
+  size?: 'small' | 'default';
 }
 
 const CheckMark: React.FC<ICheckMark> = (props) => {
-  const { id, label, selected, disabled, handleChange, ...rest } = props;
+  const {
+    id,
+    className,
+    label,
+    selected,
+    disabled,
+    handleChange,
+    variant,
+    size,
+    ...rest
+  } = props;
   const theme = useTheme();
 
   const onClick = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
       if (disabled) return;
-      handleChange(e, id);
+      handleChange?.(e, id);
     },
     [id, handleChange, disabled]
   );
 
   return (
     <SWrapper
+      className={className}
       onClick={onClick}
       style={{
         ...(disabled
@@ -40,8 +54,12 @@ const CheckMark: React.FC<ICheckMark> = (props) => {
     >
       <SAnimation>
         <SCheckmark
+          id={id}
           selected={selected ?? false}
           disabled={disabled}
+          variant={variant}
+          size={size}
+          type='button'
           style={{
             ...(disabled
               ? {
@@ -52,7 +70,11 @@ const CheckMark: React.FC<ICheckMark> = (props) => {
           }}
         >
           {selected && (
-            <InlineSvg svg={CheckmarkIcon} width='24px' height='24px' />
+            <InlineSvg
+              svg={CheckmarkIcon}
+              width={size === 'small' ? '10px' : '12px'}
+              height={size === 'small' ? '8px' : '10px'}
+            />
           )}
         </SCheckmark>
       </SAnimation>
@@ -67,8 +89,12 @@ export default CheckMark;
 
 CheckMark.defaultProps = {
   id: '',
+  className: undefined,
   selected: false,
   disabled: false,
+  handleChange: undefined,
+  variant: 1,
+  size: 'default',
 };
 
 const SWrapper = styled.div`
@@ -85,6 +111,8 @@ const SAnimation = styled.div`
 
 const SCheckmark = styled.button<{
   selected: boolean;
+  variant?: 1 | 2;
+  size?: 'small' | 'default';
 }>`
   position: relative;
   display: block;
@@ -98,14 +126,71 @@ const SCheckmark = styled.button<{
 
   border-style: solid;
   border-width: 2px;
-  border-radius: 12.5%;
+  border-radius: 14.5%;
   border-color: ${({ selected, theme }) =>
     !selected ? theme.colorsThemed.background.outlines2 : 'transparent'};
 
-  ${({ selected }) =>
+  ${({ size }) =>
+    size === 'small'
+      ? css`
+          width: 18px;
+          height: 18px;
+        `
+      : css`
+          width: 24px;
+          height: 24px;
+        `}
+
+  ${({ selected, variant }) => {
+    switch (variant) {
+      case 1: {
+        return css`
+          border-color: ${({ theme }) =>
+            !selected
+              ? theme.colorsThemed.background.outlines2
+              : 'transparent'};
+        `;
+      }
+      case 2: {
+        return css`
+          border-color: ${({ theme }) =>
+            !selected
+              ? theme.colorsThemed.background.outlines1
+              : 'transparent'};
+        `;
+      }
+      default: {
+        return css`
+          border-color: ${({ theme }) =>
+            !selected
+              ? theme.colorsThemed.background.outlines2
+              : 'transparent'};
+        `;
+      }
+    }
+  }}
+
+  ${({ selected, variant }) =>
     selected
       ? css`
           border: none;
+          border-radius: 26.5%;
+
+          background: ${({ theme }) => {
+            switch (variant) {
+              case 1: {
+                return theme.colorsThemed.button.background.primary;
+              }
+              case 2: {
+                return theme.name === 'dark'
+                  ? theme.colors.darkGray
+                  : theme.colorsThemed.background.outlines1;
+              }
+              default: {
+                return theme.colorsThemed.button.background.primary;
+              }
+            }
+          }};
         `
       : css`
           &:focus {
@@ -127,10 +212,52 @@ const SCheckmark = styled.button<{
     position: absolute;
     top: -4px;
     left: -4px;
-    width: 32px;
-    height: 32px;
+
+    ${({ size }) =>
+      size === 'small'
+        ? css`
+            width: 26px;
+            height: 26px;
+          `
+        : css`
+            width: 32px;
+            height: 32px;
+          `}
 
     animation: emerge 0.2s forwards;
+  }
+
+  svg {
+    ${({ size }) =>
+      size === 'small'
+        ? css`
+            width: 10px;
+            height: 8px;
+          `
+        : css`
+            width: 12px;
+            height: 10px;
+          `}
+
+    ${({ variant }) => {
+      switch (variant) {
+        case 1: {
+          return css`
+            color: ${({ theme }) => theme.colors.white};
+          `;
+        }
+        case 2: {
+          return css`
+            color: ${({ theme }) => theme.colorsThemed.text.secondary};
+          `;
+        }
+        default: {
+          return css`
+            color: ${({ theme }) => theme.colors.white};
+          `;
+        }
+      }
+    }}
   }
 
   @keyframes emerge {

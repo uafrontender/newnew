@@ -13,31 +13,31 @@ import SortIconAnimated from '../atoms/SortIconAnimated';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
-import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface ISorting {
   category: string;
-  options: any;
-  selected: any;
+  options: Record<string, string>[];
+  selected?: Record<string, string>;
   onChange: (selected: any) => void;
 }
 
 export const Sorting: React.FC<ISorting> = (props) => {
   const { category, options, selected, onChange } = props;
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('page-SeeMore');
   const ref: any = useRef();
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [focused, setFocused] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const selectedCount = Object.keys(selected).length;
+  const selectedCount = selected ? Object.keys(selected).length : 0;
 
   const handleToggleSortingClick = useCallback(() => {
     setFocused(!focused);
@@ -105,7 +105,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         onClick={handleToggleSortingClick}
       >
         <SButtonContent>
-          {/* {t('sort-title')} */}
+          {/* {t('sorting.title')} */}
           {!!selectedCount && isMobile && (
             <SSelectedCounter>
               <SSelectedCounterText variant={2} weight={700}>
@@ -134,7 +134,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
           <SMobileListContainer focused={focused}>
             <SMobileList>
               <STopLine>
-                <Headline variant={6}>{t('sort-title')}</Headline>
+                <Headline variant={6}>{t('sorting.title')}</Headline>
                 <SCloseIconWrapper onClick={handleCloseClick}>
                   <InlineSVG
                     svg={closeIcon}
@@ -147,7 +147,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
               {options.map(renderItem)}
             </SMobileList>
             <SCancelButton withShadow view='primaryGrad' onClick={handleSubmit}>
-              {t('button-show-results')}
+              {t('sorting.button.showResults')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
@@ -158,8 +158,10 @@ export const Sorting: React.FC<ISorting> = (props) => {
   );
 
   if (isMobile) {
-    if (animate) {
-      // @ts-ignore
+    if (
+      animate &&
+      (document?.getElementById('sorting-container') as HTMLElement)
+    ) {
       return createPortal(
         <AnimatedPresence
           start={animate}
@@ -168,7 +170,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         >
           {content}
         </AnimatedPresence>,
-        document.getElementById('sorting-container') as HTMLElement
+        document?.getElementById('sorting-container') as HTMLElement
       );
     }
     return <div />;

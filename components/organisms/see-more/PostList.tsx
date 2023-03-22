@@ -3,16 +3,16 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { usePostModalState } from '../../../contexts/postModalContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -23,7 +23,7 @@ interface IList {
   wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
+  handleRemovePostFromState?: (uuid: string) => void;
 }
 
 export const PostList: React.FC<IList> = ({
@@ -33,34 +33,35 @@ export const PostList: React.FC<IList> = ({
   wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
+  handleRemovePostFromState,
 }) => {
-  const { postOverlayOpen } = usePostModalState();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      handlePostClicked(item);
-    };
-
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
-      >
+  const renderItem = (item: newnewapi.Post, index: number) => (
+    <Link
+      href={`/p/${
+        switchPostType(item)[0].postShortId
+          ? switchPostType(item)[0].postShortId
+          : switchPostType(item)[0].postUuid
+      }`}
+      key={switchPostType(item)[0].postUuid}
+    >
+      <SItemWrapper id={`post-card-${switchPostType(item)[0].postShortId}`}>
         <PostCard
           item={item}
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
-          shouldStop={postOverlayOpen}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
+          }
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   return (
     <SListWrapper
@@ -112,7 +113,6 @@ export default PostList;
 
 const SListWrapper = styled.div`
   width: 100%;
-  cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
   padding-left: 16px !important;
@@ -162,10 +162,6 @@ const SListWrapper = styled.div`
       width: calc(20% - 32px);
     }
 
-    ${(props) => props.theme.media.desktop} {
-      width: calc(16.65% - 32px);
-    }
-
     div {
       .skeletonSpan {
         display: block;
@@ -185,17 +181,13 @@ const SItemWrapper = styled.div`
     margin: 0 8px 24px 8px;
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     width: calc(25% - 32px);
     margin: 0 16px 32px 16px;
   }
 
   ${(props) => props.theme.media.laptopL} {
     width: calc(20% - 32px);
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: calc(16.65% - 32px);
   }
 `;
 

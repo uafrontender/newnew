@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "title": "Direct Messages"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Type a message...",
+    "welcomeMessage": "You can now message",
+    "noMessagesFirstLine": "No messages here yet...",
+    "noMessagesSecondLine": "Send a message to start a conversation.",
+    "typing": "Typing..."
+  },
+  "userBlocked": {
+    "title": "You blocked ",
+    "message": "Unblock them to chat. Don’t worry, they can’t see that you blocked them...",
+    "buttonText": "Unblock"
+  },
+  "groupBlocked": {
+    "title": "Group blocked",
+    "message": "Unblock the group, to continue conversation.",
+    "buttonText": "Unblock"
+  },
+  "subscriptionExpired": {
+    "title": "Private Messaging is expired",
+    "message": "Buy a new Superpoll bundle to message",
+    "buttonText": "Buy a bundle"
+  },
+  "messagingDisabled": {
+    "title": "Messaging turned off",
+    "message": " temporarily turned off their private messages. Check back soon!"
+  },
+  "accountDeleted": {
+    "title": "Account deleted",
+    "message": "Account is no longer available.",
+    "buttonText": "Delete chat"
+  },
+  "toolbar": {
+    "searchPlaceholder": "Search for users"
+  },
+  "modal": {
+    "blockUser": {
+      "title": "Block",
+      "messageFirstPart": "Are you sure you want to block ",
+      "messageSecondPart": "from messaging you?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Block"
+      }
+    },
+    "blockGroup": {
+      "title": "Block group",
+      "button": {
+        "confirm": "Block group"
+      }
+    },
+    "newMessage": {
+      "title": "New message",
+      "searchPlaceholder": "Search",
+      "noResultsText": "No results for",
+      "noResultsSearchText": "Try a new name..."
+    },
+    "renewSubscriptionsSubtitle": "Renew subscription to"
+  },
+  "emptyInbox": {
+    "title": "Your inbox is empty",
+    "text": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
+  },
+  "selectChat": "Select a chat to start messaging",
+  "newAnnouncement": {
+    "title": "New announcement",
+    "text": "Only you can send messages to the group.",
+    "created": "You created the announcement",
+    "member": "member",
+    "members": "members",
+    "noAnnouncement": "No announcements here yet..."
+  },
+  "default": {
+    "searchPlaceholder": "Search"
+  },
+  "announcement": {
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "'s",
+    "afterName": "announcements",
+    "topMessageStart": "Only",
+    "topMessageEnd": "can send messages"
+  },
+  "userTypes": {
+    "all": "All",
+    "bundleOwners": "Bundle Owners",
+    "creators": "Creators"
+  },
+  "dates": {
+    "now": "now",
+    "min": "min",
+    "today": "Today"
+  }
+}

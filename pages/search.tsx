@@ -8,9 +8,10 @@ import General from '../components/templates/General';
 import SearchResults from '../components/organisms/search/SearchResults';
 
 import { NextPageWithLayout } from './_app';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 export const Search = () => {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation('page-Search');
 
   return (
     <>
@@ -29,12 +30,25 @@ export const Search = () => {
 export default Search;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'search',
-    'home',
-    'decision',
-  ]);
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=50, stale-while-revalidate=60'
+  );
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    [
+      'common',
+      'page-Search',
+      'page-Profile',
+      'component-PostCard',
+      'page-SeeMore',
+      'modal-PaymentModal',
+      'page-Post',
+      'modal-ResponseSuccessModal',
+    ],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {
@@ -43,16 +57,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-const SGeneral = styled(General)`
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.secondary
-      : props.theme.colorsThemed.background.primary};
-
-  ${({ theme }) => theme.media.laptop} {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.white
-        : props.theme.colorsThemed.background.primary};
-  }
-`;
+const SGeneral = styled(General)``;

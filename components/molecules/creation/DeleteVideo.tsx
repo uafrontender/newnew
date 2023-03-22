@@ -15,7 +15,7 @@ interface IDeleteVideo {
 
 const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
   const { open, handleClose, handleSubmit } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
 
   const preventCLick = (e: any) => {
     e.preventDefault();

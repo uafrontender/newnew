@@ -5,12 +5,14 @@ import styled, { keyframes } from 'styled-components';
 import Indicator from '../atoms/Indicator';
 
 import isBrowser from '../../utils/isBrowser';
+import { Mixpanel } from '../../utils/mixpanel';
 
 interface ITabs {
   t: any;
   tabs: Tab[];
   draggable?: boolean;
   activeTabIndex: number;
+  hideIndicatorOnResizing?: boolean;
   withTabIndicator?: boolean;
 }
 
@@ -21,16 +23,24 @@ export interface Tab {
 }
 
 const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
-  const { t, tabs, draggable, activeTabIndex, withTabIndicator } = props;
+  const {
+    t,
+    tabs,
+    draggable,
+    activeTabIndex,
+    withTabIndicator,
+    hideIndicatorOnResizing,
+  } = props;
   const router = useRouter();
 
+  const [isResizing, setIsResizing] = useState(false);
   const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth ?? 0,
-    height: window.innerHeight ?? 0,
+    width: isBrowser() ? window?.innerWidth : 0,
+    height: isBrowser() ? window?.innerHeight : 0,
   });
 
   const [containerWidth, setContainerWidth] = useState<number>(
-    isBrowser() ? window.innerWidth : 768
+    isBrowser() ? window?.innerWidth : 768
   );
   const [tabsWidth, setTabsWidth] = useState<number>(tabs.length * 100);
 
@@ -58,14 +68,14 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   // Route change
   const handleChangeRoute = useCallback(
     (path: string) => {
-      router.replace(path);
+      router.replace(path, undefined, { scroll: false });
     },
     [router]
   );
 
   // Scrolling the tabs with mouse & touch
   const extractPositionDelta = (e: any) => {
-    const left = e.clientX;
+    const left = e.clientX || e.deltaX;
 
     const delta = {
       left: left - prevLeft,
@@ -183,6 +193,39 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     }
   };
 
+  // Wheel event
+  // Tries to prevent back navigation gesture on MacOS
+  const preventBackNavigationOnScroll = () => {
+    if (window?.innerWidth >= tabsWidth) return;
+    if (isBrowser()) {
+      document.documentElement.style.overscrollBehaviorX = 'contain';
+      document.documentElement.style.overflowX = 'hidden';
+    }
+  };
+
+  const resumeBackNavigationOnScroll = () => {
+    if (window?.innerWidth >= tabsWidth) return;
+    if (isBrowser()) {
+      document.documentElement.style.overscrollBehaviorX = 'auto';
+      document.documentElement.style.overflowX = '';
+    }
+  };
+
+  const handleOnWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (window?.innerWidth >= tabsWidth || isDragging) return;
+
+    const newLeft = posLeft - e.deltaX;
+
+    // Too far to the right
+    if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) return;
+
+    // Too far to the left
+    if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) return;
+
+    setPosLeft(newLeft);
+  };
+
   // Button-specific handlers to prevent unwanted cliks on Mouse event
   const handleButtonMouseDownCapture = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -209,11 +252,20 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       return;
     }
     setMouseInitial(undefined);
+    Mixpanel.track('Tab Clicked', {
+      tabName: tab.nameToken,
+      tabUrl: tab.url,
+    });
     handleChangeRoute(tab.url);
   };
 
   useEffect(() => {
     const tabsWidthUpdated = tabRefs.current.reduce((acc, tabEl) => {
+      // This can be undefined if tab element was removed from DOM
+      if (!tabEl) {
+        return acc;
+      }
+
       const w = tabEl.getBoundingClientRect().width;
       return w + acc;
     }, 0);
@@ -223,21 +275,31 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
 
   useEffect(() => {
     let timeout: any;
+    let timeoutResizing: any;
 
     const updateContainerWidth = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        setContainerWidth(tabsRef.current?.getBoundingClientRect().width!!);
-        setWindowSize({
-          width: window.innerWidth ?? 0,
-          height: window.innerHeight ?? 0,
-        });
-      }, 1500);
+      if (isBrowser()) {
+        setIsResizing(true);
+        clearTimeout(timeout);
+        clearTimeout(timeoutResizing);
+
+        timeout = setTimeout(() => {
+          setContainerWidth(tabsRef.current?.getBoundingClientRect().width!!);
+          setWindowSize({
+            width: window?.innerWidth ?? 0,
+            height: window?.innerHeight ?? 0,
+          });
+        }, 250);
+
+        timeoutResizing = setTimeout(() => {
+          setIsResizing(false);
+        }, 500);
+      }
     };
 
-    window.addEventListener('resize', updateContainerWidth);
+    window?.addEventListener('resize', updateContainerWidth);
 
-    return () => window.removeEventListener('resize', updateContainerWidth);
+    return () => window?.removeEventListener('resize', updateContainerWidth);
   }, []);
 
   useEffect(() => {
@@ -245,10 +307,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     const boundingRect =
       tabRefs.current[activeTabIndex].getBoundingClientRect();
 
-    if (boundingRect.left < 0) {
+    if (boundingRect.left < 0 && !isResizing) {
       setPosLeft((curr) => curr + (0 - boundingRect.left) + 12);
       setPrevLeft((curr) => curr + (0 - boundingRect.left) + 12);
-    } else if (boundingRect.right > windowSize.width) {
+    } else if (boundingRect.right > windowSize.width && !isResizing) {
       setPosLeft((curr) => curr + windowSize.width - boundingRect.right - 12);
       setPrevLeft((curr) => curr + windowSize.width - boundingRect.right - 12);
     }
@@ -263,6 +325,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   }, [
     activeTabIndex,
     windowSize,
+    isResizing,
     setPrevLeft,
     setPosLeft,
     setActiveTabIndicator,
@@ -289,6 +352,9 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onWheel={handleOnWheel}
+      onMouseOver={preventBackNavigationOnScroll}
+      onMouseOut={resumeBackNavigationOnScroll}
     >
       <STabsContainer
         ref={(el) => {
@@ -328,6 +394,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
             style={{
               width: activeTabIndicator.width,
               left: activeTabIndicator.left,
+              ...(isResizing && hideIndicatorOnResizing
+                ? {
+                    background: 'transparent',
+                  }
+                : {}),
             }}
           />
         )}

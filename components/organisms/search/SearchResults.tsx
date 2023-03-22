@@ -1,33 +1,31 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import StatisticsIcon from '../../../public/images/svg/icons/outlined/Statistics.svg';
-import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
-import InlineSvg from '../../atoms/InlineSVG';
+import Button from '../../atoms/Button';
 
 const SearchDecisions = dynamic(() => import('./SearchDecisions'));
 const SearchCreators = dynamic(() => import('./SearchCreators'));
 
 export const SearchResults = () => {
   const router = useRouter();
-  const { t } = useTranslation('search');
-  const theme = useTheme();
-  const [searchValue, setSearchValue] = useState('');
-  const [activeTab, setActiveTab] = useState<string>('decisions');
+  const { t } = useTranslation('page-Search');
+  const [searchValue, setSearchValue] = useState(router.query.query as string);
+  const [activeTab, setActiveTab] = useState<string>(
+    (router.query.tab as string) || 'posts'
+  );
 
   useEffect(() => {
     if (router) {
       if (router.query.query) setSearchValue(router.query.query as string);
       if (router.query.tab) {
-        router.query.tab === 'creators'
-          ? setActiveTab('creators')
-          : setActiveTab('decisions');
+        if (router.query.tab === 'creators') {
+          setActiveTab('creators');
+        } else {
+          setActiveTab('posts');
+        }
       }
     }
   }, [router]);
@@ -35,8 +33,8 @@ export const SearchResults = () => {
   const tabTypes = useMemo(
     () => [
       {
-        id: 'decisions',
-        title: t('mainContent.tabs.decisions'),
+        id: 'posts',
+        title: t('mainContent.tabs.hashtags'),
       },
       {
         id: 'creators',
@@ -51,46 +49,40 @@ export const SearchResults = () => {
       <STabs>
         {tabTypes.map((tab) => (
           <STab
+            size='sm'
+            view='secondary'
             active={activeTab === tab.id}
             key={tab.id}
-            onClick={() =>
-              router.push(`/search?query=${searchValue}&tab=${tab.id}`)
-            }
+            onClick={() => {
+              const clearedQuery = encodeURIComponent(searchValue);
+              router.push(`/search?query=${clearedQuery}&tab=${tab.id}`);
+            }}
           >
-            <InlineSvg
-              // @ts-ignore
-              svg={tab.id === activeTab ? StatisticsIconFilled : StatisticsIcon}
-              fill={
-                tab.id === activeTab
-                  ? theme.colorsThemed.text.primary
-                  : theme.colorsThemed.text.secondary
-              }
-              width='24px'
-              height='24px'
-            />
             {tab.title}
           </STab>
         ))}
       </STabs>
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      activeTab,
-      tabTypes,
-      theme.colorsThemed.text.primary,
-      theme.colorsThemed.text.secondary,
-    ]
+    [activeTab, tabTypes, router, searchValue]
   );
 
   return (
     <SContainer>
       <SHeader>
         <SPageTitle>
-          {t('mainContent.title')} <span>{searchValue}</span>
+          {activeTab === 'posts' ? (
+            <>
+              {t('mainContent.title')} <SHashtag>#{searchValue}</SHashtag>
+            </>
+          ) : (
+            <>
+              {t('mainContent.title')} <Query>{searchValue}</Query>
+            </>
+          )}
         </SPageTitle>
       </SHeader>
       <Tabs />
-      {activeTab === 'decisions' ? (
+      {activeTab === 'posts' ? (
         <SearchDecisions query={searchValue} />
       ) : (
         <SearchCreators query={searchValue} />
@@ -119,7 +111,15 @@ const SContainer = styled.div`
 `;
 
 const SHeader = styled.div`
-  padding: 0 0 35px;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-bottom: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 24px;
+  }
 `;
 
 const SPageTitle = styled.h1`
@@ -128,52 +128,52 @@ const SPageTitle = styled.h1`
   line-height: 56px;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   margin: 0;
-  span {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
-  }
+`;
+
+const SHashtag = styled.span`
+  display: inline;
+  word-spacing: normal;
+  overflow-wrap: break-word;
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+`;
+
+const Query = styled.span`
+  overflow-wrap: break-word;
+  color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
 const STabs = styled.div`
-  border-bottom: 1px solid
-    ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;
-  margin-bottom: 24px;
-  font-size: 14px;
-  line-height: 24px;
-  font-weight: 600;
+  margin-left: 16px;
+  margin-right: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 32px;
+  }
 `;
 
 interface ISTab {
   active: boolean;
 }
-const STab = styled.div<ISTab>`
-  display: flex;
-  width: 150px;
-  padding: 15px;
+
+const STab = styled(Button)<ISTab>`
+  min-width: 96px;
+  padding: 8px;
   cursor: pointer;
-  justify-content: center;
-  position: relative;
-  div {
-    margin-right: 6px;
-  }
+  margin-right: 16px;
+  border-radius: 12px !important;
   ${(props) => {
     if (props.active) {
       return css`
-        color: ${props.theme.colorsThemed.text.primary};
-        &:after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 4px;
-          background: ${props.theme.colorsThemed.text.primary};
-          border-radius: 6px 6px 0 0;
-        }
+        color: ${props.theme.colorsThemed.background.tertiary} !important;
+        background: ${props.theme.colorsThemed.text.primary} !important;
       `;
     }
     return css`
-      color: ${props.theme.colorsThemed.text.secondary};
+      color: ${props.theme.colorsThemed.text.primary};
+      background: ${props.theme.colorsThemed.background.secondary};
     `;
   }}
 `;

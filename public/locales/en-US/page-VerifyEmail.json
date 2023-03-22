@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Email confirmation",
+    "description": "Confirm email"
+  },
+  "heading": {
+    "mainHeading": "Confirm your email",
+    "subHeading": "Please enter the code we sent to"
+  },
+  "expired": {
+    "noCodeReceived": "I didn't get a code.",
+    "resendButtonText": "Resend it"
+  },
+  "error": {
+    "invalidCode": "Wrong code. Try again...",
+    "emailTaken": "Email already taken",
+    "notConfirmedEmail": "Current email wasn't confirmed or time expired",
+    "noToken": "No token",
+    "invalidToken": "Invalid token"
+  },
+  "leaveAlert": "Are you sure you want to leave the page?",
+  "verifying": "Verifying your email...",
+  "backButton": "Back",
+  "updated": "We updated your email!",
+  "backToProfile": "Back to Profile"
+}

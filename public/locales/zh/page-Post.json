@@ -1,0 +1,839 @@
+{
+  "meta": {
+    "title": "NewNew上的{{postTitle}} | {{displayName}}",
+    "deletedPost_NEED_TRANSLATION": "Deleted post",
+    "description": {
+      "ac": {
+        "withContributions": "NewNew上出價共有${{totalInBids}}",
+        "default": "賺錢，與朋友一起出價競拍，支持NewNew上的創作者"
+      },
+      "mc": {
+        "withContributions": "NewNew上投票共有{{totalVotes}}",
+        "default": "賺錢，與朋友一起投票，支持NewNew上的創作者"
+      },
+      "cf": {
+        "withContributions": "",
+        "default": ""
+      }
+    }
+  },
+  "at": "，",
+  "my": "我的",
+  "me": "我",
+  "I": "我",
+  "back": "返回",
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal",
+    "multiple": {
+      "ac": "Bid",
+      "mc": "Superpoll",
+      "cf": "Goal"
+    }
+  },
+  "loadMoreButton": "載入更多",
+  "expires": {
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒",
+    "ended_on": "結束於",
+    "end_date": "結束日期:"
+  },
+  "expiresResponse": {
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒",
+    "leftToRespond": "後回應時間截止"
+  },
+  "socials": {
+    "share-to": "分享到",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "copy": "複製連結",
+    "copied": "連結已複製！"
+  },
+  "paymentSuccessModal": {
+    "title": {
+      "ac": "出價成功！",
+      "mc": "投票成功！",
+      "mc-single": "投票成功！",
+      "cf": "你選擇支持這個Goal！"
+    },
+    "doneButton": "聽起來不錯！",
+    "ac": "{{postCreator}}將在競標結束後挑選他們最喜歡的一個。",
+    "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
+    "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
+  },
+  "postFailedBoxModeration": {
+    "title": "{{postType}}被取消",
+    "reason": {
+      "no-response": "回應沒有上傳",
+      "ac-no-winner": "贏家尚未被選出",
+      "ac": "時間在進行出價之前已經用完",
+      "mc": "時間在進行投票之前已經用完",
+      "cf": "時間在達到Goal之前已經用完"
+    },
+    "buttonText": "新的{{postType}}"
+  },
+  "postFailedBox": {
+    "title": "該{{postType}}已被取消",
+    "reason": {
+      "no-response": "{{creator}}沒有及時發佈回應視頻",
+      "ac-no-winner": "{{creator}}沒有及時選擇出價",
+      "ac": "時間在出價之前已經用完",
+      "mc": "時間在進行投票之前已經用完",
+      "cf": "時間在達到Goal之前已經用完"
+    },
+    "buttonText": "查看新的{{postTypeMultiple}}"
+  },
+  "postDeletedByMe": {
+    "title": "該{{postType}}已被刪除",
+    "body": {
+      "byCreator": "你刪除了這個{{postType}}",
+      "byAdmin": "這個{{postType}}違反了我們的社區指南"
+    },
+    "buttonText": "發佈新的"
+  },
+  "postDeleted": {
+    "title": "該{{postType}}已被刪除",
+    "body": {
+      "byCreator": "{{creator}}刪除了這個{{postType}}",
+      "byAdmin": "該{{postType}}違反了我們的社區指南"
+    },
+    "buttonText": "查看新的{{postTypeMultiple}}"
+  },
+  "postSuccessModeration": {
+    "title": "你的回應已上線！",
+    "body": "讓其他人看到",
+    "buttonText": "分享該回應",
+    "linkCopiedButtonText": "連結已複製"
+  },
+  "postWaitingForResponse": {
+    "title": "現在是回應時間了",
+    "body": "不要錯過更新。請繼續關注！",
+    "buttonText": "通知我"
+  },
+  "successCommon": {
+    "comments": {
+      "heading": "評論"
+    }
+  },
+  "postSuccess": {
+    "title": "該{{postType}}已完成",
+    "body": "查看更多類似的。",
+    "buttonText": "查看更多"
+  },
+  "postTopInfo": {
+    "notifyMe": "通知我"
+  },
+  "postVideo": {
+    "tabs": {
+      "announcement": "帖子",
+      "response": "回應",
+      "backToOriginalVideo": "回到原帖",
+      "backToResponse": "觀看回應"
+    },
+    "reuploadButton": "重新上傳",
+    "addVideoButton": "添加視頻",
+    "cannotLeavePageMsg": "你確定要關閉這個頁面嗎？上傳進度會丟失",
+    "floatingUploadResponseButton": "製作回應視頻",
+    "setThumbnail": "設置縮略圖",
+    "changeThumbnail": "改變縮略圖",
+    "responseUploadedNonProcessed": "成功！你的回應將在視頻處理完畢後可見",
+    "uploadResponseForm": {
+      "fileUpload": {
+        "title_1": "你的觀眾在等著呢！",
+        "title_2_NEED_TRANSLATION": "Select a file",
+        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
+        "description": "視頻的最大尺寸為10GB",
+        "button": "選擇檔案"
+      },
+      "button": {
+        "retry": "重試",
+        "cancel": "取消"
+      },
+      "block": {
+        "title": {
+          "file": "上傳文件",
+          "decision": "帖子資訊",
+          "advanced": "高級設置",
+          "floating": "預覽"
+        },
+        "subTitle": {
+          "votesInfo": "所有投票默認1美元起",
+          "floating": "上傳文件以預覽你的全新帖子"
+        }
+      },
+      "modal": {
+        "leave": {
+          "message": "你確定要離開此頁面嗎？"
+        },
+        "deleteFile": {
+          "title": "刪除檔案",
+          "description": "你確定要刪除該檔案嗎？"
+        }
+      },
+      "video": {
+        "error": {
+          "minLength": "視頻時長太短，從10秒開始選擇",
+          "maxLength": "視頻時長太長，最多選擇10分鐘",
+          "maxSize": "視頻大小太大，最多選擇10gb",
+          "title": "糟糕…...",
+          "description": "出現錯誤，你的檔案未能上傳。想再試一次嗎。"
+        },
+        "deleteFile": "刪除檔案",
+        "previewFull": "預覽",
+        "full": {
+          "title": "預覽",
+          "cancelButton": "取消",
+          "publishButton": "發佈"
+        },
+        "loading": {
+          "title": "上傳視頻",
+          "description": "我們正在上傳你的視頻回復......馬上就好！",
+          "process": "{{progress}}% • 還需{{time}}"
+        },
+        "processing": {
+          "title": "處理視頻",
+          "description": "視頻正在處理中……稍等！",
+          "process": "{{progress}}% • 還需{{time}}",
+          "uploadNonProcessed": "發佈"
+        },
+        "processingPublished": {
+          "title": "處理視頻",
+          "description": "你的視頻處理完畢後即可以觀看",
+          "process": "{{progress}}% • 還需{{time}}"
+        }
+      }
+    }
+  },
+  "postVideoSuccess": {
+    "tabs": {
+      "announcement": "原帖",
+      "response": "回應",
+      "watchOriginal": "觀看原帖",
+      "watchResponse": "觀看回應",
+      "watchResponseFirstTime": "看它發生！"
+    }
+  },
+  "deletePostModal": {
+    "title": "刪除{{postType}}",
+    "body": "你確定要刪除這個{{postType}}嗎？刪除後將無法恢復......",
+    "button": {
+      "cancel": "取消",
+      "confirm": "刪除"
+    }
+  },
+  "deleteVideoModal": {
+    "title": "刪除視頻",
+    "body": "確定要刪除視頻嗎？",
+    "button": {
+      "cancel": "取消",
+      "confirm": "刪除"
+    }
+  },
+  "deleteCommentModal": {
+    "title": "刪除評論",
+    "body": "你確定要刪除這條評論嗎？",
+    "button": {
+      "cancel": "取消",
+      "confirm": "刪除"
+    }
+  },
+  "blockUserModal": {
+    "title": "屏蔽用戶",
+    "messageFirstPart": "你真的想屏蔽 ",
+    "messageSecondPart": "?",
+    "button": {
+      "cancel": "取消",
+      "confirm": "屏蔽用戶"
+    }
+  },
+  "tabs": {
+    "comments": "評論",
+    "bids": "出價",
+    "bids_singular": "出價",
+    "options": "選項",
+    "backers": "支持者",
+    "winner": "贏家",
+    "history": "歷史"
+  },
+  "optionsTabLine": {
+    "bundleVotes": "你有<0>{{amount}} 投票</0>"
+  },
+  "postViewProcessingAnnouncement": {
+    "stayTuned": {
+      "ac": "這個Bid將在\n視頻處理完成後開始",
+      "mc": "這個Superpoll將在\n視頻處理後開始",
+      "cf": "這個Goal將在\n視頻處理後開始"
+    },
+    "videoHolder": {
+      "decision": {
+        "title": "稍等......",
+        "body": "視頻處理中，只需要幾分鐘的時間......"
+      },
+      "moderation": {
+        "title": "稍等片刻......",
+        "body": "視頻處理中，只需要幾分鐘......"
+      }
+    }
+  },
+  "postScheduled": {
+    "decision": {
+      "title": "即將開始......",
+      "subtitle_1": "{{postType}}很快就會上線。",
+      "subtitle_2": "獲取上線通知！",
+      "timer": {
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分",
+        "seconds": "秒"
+      },
+      "followButton": "喜歡 {{postType}}",
+      "unFollowButton": "不喜歡 {{postType}}"
+    },
+    "moderation": {
+      "title": "即將開始",
+      "subtitle_1": "你的{{postType}}還沒有被啟動",
+      "subtitle_2": "距離啓動時間：",
+      "toggleButton": "查看選項",
+      "timer": {
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分鐘",
+        "seconds": "秒"
+      }
+    },
+    "loading": {
+      "title": "就快好了......",
+      "subtitle": "只剩一點點了！"
+    }
+  },
+  "acPost": {
+    "paymentModalHeader": {
+      "title": "{{creator}}的Bid",
+      "subtitle": "你的出價"
+    },
+    "paymentModalFooter": {
+      "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+      "terms": "條款",
+      "apply": "適用"
+    },
+    "paymentModalPayButton": "出價",
+    "postTopInfo": {
+      "selectWinner": {
+        "title": "時間到！",
+        "body": "拍賣結束。現在是創作者選擇贏家的時候了。請繼續關注！"
+      },
+      "inBids": "總出價"
+    },
+    "optionsTab": {
+      "me": "我",
+      "noOptions": {
+        "caption_1": "還沒有出價......",
+        "caption_2": "在下面出價"
+      },
+      "tags": {
+        "my_vote": "我的投票",
+        "my_bid": "我的出價",
+        "highest": "最高的",
+        "vip": "VIP"
+      },
+      "optionCard": {
+        "by": "由",
+        "bidders": "出價者",
+        "others": "其他",
+        "bid": "出價",
+        "supportButton": "提高",
+        "supportAgainButton": "再次\n提高",
+        "raiseBidButton": "提高出價",
+        "placeABidButton": "出價",
+        "cancelButton": "取消",
+        "moreButton": "更多"
+      },
+      "bidCard": {
+        "didABid": "出價"
+      },
+      "actionSection": {
+        "suggestionPlaceholder": "增加一個建議......",
+        "suggestionPlaceholderDesktop": "{{username}}應該怎麼做？",
+        "amountPlaceholderDesktop": "最低出價 ${{amount}}",
+        "amountPlaceholderBoost": "提高出價 ${{amount}}",
+        "placeABidButton": "出價"
+      }
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "biddersBidAmount": "出價人出價",
+        "bidderBidAmount": "出價人出價",
+        "on": "對",
+        "suggestedByMe": "我的出價",
+        "suggestedByUser": "{{username}}的出價",
+        "to": "目標"
+      }
+    },
+    "floatingActionButton": {
+      "suggestNewButton": "出價"
+    }
+  },
+  "mcPost": {
+    "postTopInfo": {
+      "vote": "票",
+      "votes": "票"
+    },
+    "paymentModalHeader": {
+      "title": "{{creator}}的Superpoll",
+      "subtitle": "你選擇的選項"
+    },
+    "paymentModalFooter": {
+      "body": "你的銀行卡信息將被暫時保留。只有當你選擇的選項獲得最多的票數時，你才會被扣款。",
+      "terms": "條款",
+      "apply": "適用"
+    },
+    "paymentModalPayButton": "投票給",
+    "optionsTab": {
+      "me": "我",
+      "tags": {
+        "my_vote": "我的投票",
+        "my_bid": "我的選項",
+        "highest": "最高",
+        "vip": "VIP"
+      },
+      "optionCard": {
+        "noVotes": "沒有投票",
+        "votes": "票",
+        "vote": "票",
+        "mySuggestion": "我的建議",
+        "others": "其他",
+        "voters": "投票者",
+        "voted": "投票",
+        "supportButton": "投票",
+        "supportAgainButton": "再次\n投票",
+        "raiseBidButton": "投票",
+        "placeABidButton": "投一票",
+        "cancelButton": "取消",
+        "moreButton": "更多",
+        "selectVotesMenu": {
+          "title": "購買投票",
+          "titleMoreVotes": "購買更多的投票",
+          "vote": "票",
+          "votes": "票",
+          "custom": "自定義票數",
+          "useVotes": "使用我的投票"
+        },
+        "confirmVoteModal": {
+          "vote": "票",
+          "votes": "票",
+          "custom": "自定義投票",
+          "buySingleVote": "購買1票，在{{creator}}的Superpoll中投票",
+          "buyMultipleVotes": "購買{{amount}}票，在{{creator}}的Superpoll中投票",
+          "buyAnyVotes": "購買任意數量的票數並在{{creator}}的Superpoll上投票",
+          "optionCaption": "Superpoll選項",
+          "voteButton": "投票"
+        }
+      },
+      "confirmCustomOptionModal": {
+        "title": "添加自訂選項",
+        "line_1": "添加自訂選項",
+        "line_2": "一旦添加，就不能再次添加其他的了。",
+        "useFreeVoteButton": "添加自訂選項"
+      },
+      "useBundleVotesModal": {
+        "votesAvailable": "還有<0>{{amount}}</0> 票",
+        "optionTitle": "Superpoll選項",
+        "button": "投票"
+      },
+      "actionSection": {
+        "votesAmount": "投票票數 (最少{{minAmount}}投票)",
+        "totalAmountCustomVotesPayment": "共計",
+        "suggestionPlaceholder": "添加你自己的選項",
+        "suggestionPlaceholderDesktop": "添加選……",
+        "placeABidButton": "添加我的選項",
+        "offersBundles": "{{creator}} 提供Superpoll Bundle",
+        "viewBundles": "查看Bundle",
+        "getMoreBundles": "獲得另一個Superpoll Bundle",
+        "getBundles": "獲取"
+      }
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "votersToldYou": "投票者被告知",
+        "voterToldYou": "投票者被告知",
+        "createdBy": "該選項的創建者是"
+      }
+    },
+    "floatingActionButton": {
+      "suggestNewButton": "添加我的選項"
+    }
+  },
+  "cfPost": {
+    "backersStatsSection": {
+      "ofBackers": "共需{{targetBackers}}位支持者",
+      "myBacking": "我的支持：",
+      "my": "我的",
+      "pledge": "確認"
+    },
+    "backersTab": {
+      "info": {
+        "title": "支持{{creator}}的Goal",
+        "caption": "在做出決定之前，不會向你收費。"
+      },
+      "customPledge": {
+        "pledgeButton": "確認",
+        "continue": "繼續",
+        "cancelButton": "取消"
+      },
+      "freeSub": "免費訂閲",
+      "custom": "自定義",
+      "cancel": "取消"
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "backersFounded": "支持者注資成功",
+        "backerFounded": "支持者注資成功"
+      }
+    },
+    "paymentModalHeader": {
+      "title": "{{creator}}的Goal"
+    },
+    "paymentModalFooter": {
+      "body": "你的銀行卡信息將被暫時保留。只有{{creator}}完成其Goal後，你才會被扣款。",
+      "terms": "條款",
+      "apply": "適用"
+    },
+    "paymentModalPayButton": "支持它",
+    "floatingActionButton": {
+      "choosePledgeButton": "支持這個Goal"
+    }
+  },
+  "thumbnailEllipseMenu": {
+    "uploadImageButton": "上傳圖片"
+  },
+  "postVideoThumbnailEdit": {
+    "title": "設置縮略圖",
+    "description": "從視頻中選擇一個片段",
+    "submit": "保存",
+    "cancel": "取消",
+    "toast": {
+      "success": "成功！縮略圖將在處理後更改",
+      "error": "發生錯誤"
+    }
+  },
+  "postVideoCoverImageEdit": {
+    "title": "上傳圖片",
+    "submit": "保存",
+    "cancel": "取消",
+    "uploadCoverImage": {
+      "caption": "選擇自訂封面圖片",
+      "uploadBtn": "選擇",
+      "deleteBtn": "刪除"
+    }
+  },
+  "acPostModeration": {
+    "postTopInfo": {
+      "selectWinner": {
+        "title": "做出選擇的時間到了！",
+        "body": "選擇你最喜歡的出價，然後在時間到期前上傳一個回應視頻"
+      }
+    },
+    "optionsTab": {
+      "me": "我",
+      "noOptions": {
+        "caption_1": "成為第一個出價的人......"
+      },
+      "selectWinner": {
+        "title": "確認最喜歡的出價",
+        "body": "如果你選擇這個作為你最喜歡的投標，你需要上傳一段你自己的視頻！",
+        "button": {
+          "cancel": "取消",
+          "confirm": "確認最喜歡的出價"
+        }
+      },
+      "optionCard": {
+        "pickButton": "選擇",
+        "pickedButton": "已選擇"
+      }
+    },
+    "winnerTab": {
+      "winnerOptionCard": {
+        "biddersToldYou": "出價者想讓你",
+        "bidderToldYou": "出價者想讓你",
+        "youMade": "你製作了",
+        "createdBy": "該出價的創建者是"
+      }
+    },
+    "deleteOptionModal": {
+      "title": "刪除選項",
+      "body": "確定要刪除這個選項嗎？",
+      "button": {
+        "cancel": "取消",
+        "confirm": "刪除"
+      }
+    }
+  },
+  "mcPostModeration": {
+    "winnerTab": {
+      "winnerOptionCard": {
+        "votersToldYou": "投票者想讓你",
+        "voterToldYou": "投票者想讓你",
+        "youMade": "你製作了",
+        "createdBy": "該選項的創建者是"
+      }
+    },
+    "deleteOptionModal": {
+      "title": "刪除選項",
+      "body": "確定要刪除這個選項嗎？",
+      "button": {
+        "cancel": "取消",
+        "confirm": "刪除"
+      }
+    }
+  },
+  "cfPostModeration": {
+    "moneyRaised": "總共籌到",
+    "winnerTab": {
+      "winnerOptionCard": {
+        "backersToldYou": "支持者注資成功",
+        "backerToldYou": "支持者注資成功",
+        "youMade": "你製作了"
+      }
+    }
+  },
+  "acPostSuccess": {
+    "heroText": "看它發生！",
+    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "inTotalBids": "在總的出價中",
+    "others": "其他",
+    "bid": "出價",
+    "bidChosen": "選擇的出價",
+    "seeAll": "查看所有出價",
+    "optionsTab": {
+      "backButton": "返回"
+    }
+  },
+  "mcPostSuccess": {
+    "heroText": "看它發生！",
+    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "inTotalVotes": "總票數",
+    "others": "其他",
+    "voted": "已投票",
+    "votes": "票",
+    "vote": "票",
+    "optionChosen": "最高票數的選項",
+    "seeAll": "查看所有選項",
+    "optionsTab": {
+      "backButton": "返回"
+    }
+  },
+  "cfPostSuccess": {
+    "heroText": "看它發生！",
+    "wantsToKnow": "{{creator}}的<0/>Goal",
+    "creatorsBackers": "{{creator}}的支持者",
+    "ofTargetBackers": "共需 {{target_count}}支持者",
+    "youBackedFor": "你支持的金額是"
+  },
+  "acPostAwaiting": {
+    "hero": {
+      "title": "時間到了！",
+      "body": "{{creator}}有{{time}} 進行選擇並完成他們最喜歡的投標！",
+      "expires": {
+        "days": "天",
+        "days_singular": "天",
+        "hours": "小時",
+        "hours_singular": "小時",
+        "minutes": "分",
+        "minutes_singular": "分",
+        "seconds": "秒",
+        "seconds_singular": "秒"
+      }
+    },
+    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "inTotalBids": "在總的出價中",
+    "others": "其他",
+    "bid": "出價",
+    "seeAll": "查看所有出價",
+    "optionsTab": {
+      "backButton": "返回"
+    }
+  },
+  "mcPostAwaiting": {
+    "hero": {
+      "title": "投票結果出來了！",
+      "body": "{{creator}}有{{time}}完成這個選項。請繼續關注！",
+      "bodyNoResponse": "{{creator}} 有 {{time}} 進行回應。敬請關注！",
+      "expires": {
+        "days": "天",
+        "days_singular": "天",
+        "hours": "小時",
+        "hours_singular": "小時",
+        "minutes": "分",
+        "minutes_singular": "分",
+        "seconds": "秒",
+        "seconds_singular": "秒"
+      }
+    },
+    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "inTotalVotes": "總票數",
+    "others": "其他",
+    "voted": "已投票",
+    "votes": "票",
+    "vote": "投票",
+    "optionChosen": "最高票數的選項",
+    "seeAll": "查看所有選項",
+    "optionsTab": {
+      "backButton": "返回"
+    }
+  },
+  "recommendationsSection": {
+    "heading": "更多類似"
+  },
+  "comments": {
+    "me": "我",
+    "title": "評論",
+    "placeholder": "添加評論......",
+    "commentDeleted": "評論被刪除",
+    "bid": "出價",
+    "report": "舉報",
+    "sendReply": "回復",
+    "reply": "回復",
+    "delete": "刪除",
+    "replies": "回復",
+    "viewReplies": "查看",
+    "hideReplies": "隱藏",
+    "view-more": "查看更多評論",
+    "comments": "評論",
+    "seeMore": "查看更多",
+    "noCommentsCaption": "成為第一個評論者......",
+    "errors": {
+      "generic": "請檢查輸入",
+      "tooLong": "評論太長",
+      "tooShort": "評論太短",
+      "inappropriate": "禁止使用冒犯性詞語",
+      "linksForbidden": "評論中不允許插入連結"
+    }
+  },
+  "heroPopupCommon": {
+    "heroButtonText": "我們開始吧",
+    "button": "知道了"
+  },
+  "heroPopupAC": {
+    "title": "Bid",
+    "text": "控制結果......\n給創作者發送出價，說明你想讓他們做什麼，你願意花多少錢，然後看他們完成！"
+  },
+  "heroPopupMC": {
+    "title": "Superpoll",
+    "text": "創作者發起投票，你花錢去投票。時間到期後，觀看創作者完成得到最多票的選項！"
+  },
+  "heroPopupCF": {
+    "title": "Goal",
+    "text": "與其他人集資，支持你喜歡的創作者的Goal。如果支援這個Goal的人足夠多，你就會看著創作者照做！"
+  },
+  "postResponseTabModeration": {
+    "awaiting": {
+      "topHeader": "是發布回應\n的時候了！",
+      "postResponseBtn": "發布回應",
+      "youWillGet": "你會得到"
+    },
+    "succeeded": {
+      "topHeader": "回應\n已發布！",
+      "youMade": "你做了",
+      "shareBtn": "分享",
+      "linkCopied": "鏈接已複製！"
+    },
+    "tutorialEditTitle": {
+      "title": "編輯標題",
+      "body": "點擊帖子標題可進行修改"
+    },
+    "winner": {
+      "inResponseToYourPost": "回應了你的帖子",
+      "ac": {
+        "numBiddersChoseSingular": "{{amount}} 位出價者選擇了",
+        "numBiddersChose": "{{amount}} 位出價者選擇了",
+        "optionCreator": "<0/> 的出價",
+        "suffix": ""
+      },
+      "mc": {
+        "numBiddersChoseSingular": "{{amount}} 位投票者選擇了",
+        "numBiddersChose": "{{amount}} 位投票者選擇了",
+        "optionOwn": "選項",
+        "optionCreator": "<0/> 的選擇",
+        "suffix": ""
+      }
+    }
+  },
+  "tutorials": {
+    "ac": {
+      "timer": {
+        "title": "倒計時",
+        "text": "時間到期後，創作者會選擇他們最喜歡的Goal，並發佈一個完成這個Goal的視頻。"
+      },
+      "peopleBids": {
+        "title": "所有出價",
+        "text": "此處是提交的所有出價，供創作者選擇。"
+      },
+      "supportPeopleBids": {
+        "title": "提高出價",
+        "text": "提高你想看到實際完成的現有出價。"
+      },
+      "createYourBid": {
+        "title": "製作你自己的！",
+        "text": "想一個你自己的出價並設定你的價格。"
+      }
+    },
+    "mc": {
+      "timer": {
+        "title": "倒計時",
+        "text": "時間到期後，創作者會發佈一個視頻，展示其完成做得最多的選項。"
+      },
+      "peopleBids": {
+        "title": "所有選項",
+        "text": "此處是你可以投票的所有選項。"
+      },
+      "supportPeopleBids": {
+        "title": "投票",
+        "text": "對你最喜歡的選項進行投票。得票最多的選項獲勝！"
+      },
+      "createYourBid": {
+        "title": "自己製作！",
+        "text": "想出你自己的出價，並設定你的價格。"
+      }
+    },
+    "cf": {
+      "timer": {
+        "title": "倒計時",
+        "text": "如果在時間到期前達到Goal，創作者將發佈一個做Goal的視頻。"
+      },
+      "peopleBids": {
+        "title": "Goal進度",
+        "text": "查看創作者距離完成他們的Goal還有多遠。"
+      },
+      "createYourBid": {
+        "title": "支持Goal",
+        "text": "捐款幫助創作者完成他們的Goal！"
+      }
+    }
+  },
+  "errors": {
+    "notEnoughMoney": "資金不足",
+    "cardNotFound": "未找到卡片",
+    "cardCannotBeUsed": "此卡不能使用",
+    "biddingNotStarted": "Bidding還未開始",
+    "biddingIsEnded": "Bidding已經結束",
+    "mcCancelled": "Superpoll被取消",
+    "mcFinished": "Superpoll已經結束",
+    "mcNotStarted": "Superpoll還未開始",
+    "alreadyVoted": "你已獲投票",
+    "mcVoteCountTooSmall": "票數太少",
+    "notAllowedToCreateNewOption": "不允許有新的選項",
+    "optionNotUnique": "選項已經存在",
+    "cfCancelled": "Goal被取消",
+    "cfFinished": "Goal已經完成",
+    "cfNotStarted": "Goal尚未開始",
+    "requestFailed": "請求失敗"
+  }
+}

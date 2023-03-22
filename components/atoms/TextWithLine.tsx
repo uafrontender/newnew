@@ -17,6 +17,7 @@ export default TextWithLine;
 
 interface ISTextWithLine {
   lineColor: string;
+  children: any;
 }
 
 const STextWithLine = styled.div<ISTextWithLine>`

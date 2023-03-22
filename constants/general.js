@@ -1,21 +1,21 @@
 module.exports = {
   DEFAULT_LANGUAGE: 'en-US',
-  SUPPORTED_LANGUAGES: ['en-US', 'es-MX', 'fr'],
+  // SUPPORTED_LANGUAGES: ['en-US', 'es-MX', 'fr'],
+  SUPPORTED_LANGUAGES:
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
+      ? ['en-US', 'es', 'zh']
+      : ['en-US', 'es', 'zh'],
   DEFAULT_CURRENCY: 'usd',
   SUPPORTED_CURRENCIES: ['usd', 'eur'],
-  SUPPORTED_AUTH_PROVIDERS: [
-    'google',
-    'apple',
-    'fb',
-    'twitter',
-  ],
-  MAX_VIDEO_SIZE: 104857600, // 100 mb
+  SUPPORTED_AUTH_PROVIDERS: ['google', 'apple', 'fb', 'twitter'],
+  // MAX_VIDEO_SIZE: 104857600, // 100 mb
+  MAX_VIDEO_SIZE: 10000000000, // 10 gb
   MIN_VIDEO_DURATION: 10, // 10 sec
   MAX_VIDEO_DURATION: 600, // 10 minutes
-  CREATION_TITLE_MIN: 5,
-  CREATION_TITLE_MAX: 70,
-  CREATION_OPTION_MIN: 1,
-  CREATION_OPTION_MAX: 40,
+  CREATION_TITLE_MIN: 3,
+  CREATION_TITLE_MAX: 80,
+  OPTION_LENGTH_MIN: 1,
+  OPTION_LENGTH_MAX: 300,
   HOURS: [
     {
       name: '01',

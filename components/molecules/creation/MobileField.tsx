@@ -17,7 +17,7 @@ interface IMobileField {
 
 const MobileField: React.FC<IMobileField> = (props) => {
   const { id, type, value, onChange } = props;
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const theme = useTheme();
 
   const handleChange = useCallback(() => {
@@ -29,7 +29,7 @@ const MobileField: React.FC<IMobileField> = (props) => {
   return (
     <SContainer>
       <STitle variant={3} weight={600}>
-        {t(`secondStep.field.${id}.title`)}
+        {t(`secondStep.field.${id}.title` as any)}
       </STitle>
       <SRightPart>
         {type === 'toggle' ? (

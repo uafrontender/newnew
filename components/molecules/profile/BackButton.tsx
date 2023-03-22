@@ -24,8 +24,11 @@ const Container = styled.div`
   padding: 8px;
   border-radius: 16px;
   cursor: pointer;
-  color: #2c2c33;
-  background: rgba(11, 10, 19, 0.2);
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? 'rgba(255, 255, 255, 0.06)'
+      : 'rgba(11, 10, 19, 0.2)'};
   transition: 0.2s linear;
 
   &:active {

@@ -1,25 +1,36 @@
 import { useEffect, useCallback } from 'react';
 
-export const useScrollPosition = (ref: any) => {
-  const setScrollPosition = useCallback(() => {
-    localStorage.setItem('scrollPosition', ref.current?.scrollTop);
-  }, [ref]);
+const SCROLL_POSITION_KEY = 'scrollPosition';
+
+export const useScrollPosition = () => {
+  const setScrollPosition = useCallback((event: PageTransitionEvent) => {
+    if (!event.persisted) {
+      sessionStorage.setItem(
+        SCROLL_POSITION_KEY,
+        document.documentElement.scrollTop.toString()
+      );
+    }
+  }, []);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', setScrollPosition);
+    const oldScrollPosition = Number(
+      sessionStorage.getItem(SCROLL_POSITION_KEY)
+    );
+    sessionStorage.removeItem(SCROLL_POSITION_KEY);
 
-    const oldScrollPosition = localStorage.getItem('scrollPosition');
-
-    if (typeof oldScrollPosition !== 'undefined') {
-      // eslint-disable-next-line no-param-reassign
-      ref.current.scrollTop = oldScrollPosition;
-      localStorage.removeItem('scrollPosition');
+    if (oldScrollPosition > 0) {
+      // A delay for letting page to load
+      setTimeout(() => {
+        window.scroll(0, oldScrollPosition);
+      }, 300);
     }
 
+    window.addEventListener('pagehide', setScrollPosition);
+
     return () => {
-      window.removeEventListener('beforeunload', setScrollPosition);
+      window.removeEventListener('pagehide', setScrollPosition);
     };
-  }, [ref, setScrollPosition]);
+  }, [setScrollPosition]);
 };
 
 export default useScrollPosition;

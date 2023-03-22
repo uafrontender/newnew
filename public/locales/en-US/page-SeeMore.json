@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "ac": {
+      "title": "See more Bids on NewNew",
+      "description": "See more Bids creators posted on creator economy startup company NewNew"
+    },
+    "mc": {
+      "title": "See more Superpolls on NewNew",
+      "description": "See more Superpolls creators posted on creator economy startup company NewNew"
+    },
+    "cf": {
+      "title": "See more Goals on NewNew",
+      "description": "See more Goals creators posted on creator economy startup company NewNew"
+    },
+    "biggest": {
+      "title": "See More of the Biggest Posts For You",
+      "description": "Watch the biggest videos and posts from creators that we think you will like"
+    },
+    "for-you": {
+      "title": "See More Posts For You",
+      "description": "Watch videos and posts from creators that we think you will like"
+    }
+  },
+  "sortingOption": {
+    "sortingtype": "Order",
+    "sortingtype-all": "All",
+    "sortingtype-num_bids": "Participants",
+    "sortingtype-num_bids-ac": "Number of bids",
+    "sortingtype-num_bids-mc": "Number of votes",
+    "sortingtype-num_bids-cf": "Number of backers",
+    "sortingtype-newest": "Newest",
+    "bid": "Bid",
+    "bid-lowest": "Lowest",
+    "bid-highest": "Highest",
+    "time": "Time",
+    "time-ending-soon": "Ending soonest",
+    "time-newest": "Newest",
+    "time-oldest": "Oldest",
+    "numbers-of-bids": "Numbers of bids",
+    "numbers-of-bids-fewest": "Fewest",
+    "numbers-of-bids-most-first": "Most first"
+  },
+  "sorting": {
+    "title": "Sort",
+    "button": {
+      "showResults": "Show results"
+    }
+  },
+  "collection": {
+    "title": {
+      "ac": "Bids",
+      "mc": "Superpolls",
+      "cf": "Goals",
+      "biggest": "Greatest of all Time",
+      "for-you": "For you",
+      "recent-activity": "Recent Activity"
+    },
+    "button": {
+      "cancel": "Cancel"
+    }
+  }
+}

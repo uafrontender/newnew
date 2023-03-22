@@ -1,0 +1,247 @@
+{
+  "dashboard": {
+    "meta": {
+      "title": "NewNew Creator Dashboard",
+      "description": "View your NewNew earnings, posts, manage your subscribers and more"
+    },
+    "title": "My Dashboard",
+    "button": {
+      "notifications": "Notifications",
+      "directMessages": "DMs",
+      "markAllAsRead": "Mark all as read",
+      "minimize": "Minimize",
+      "new": "New",
+      "earlier": "Earlier"
+    },
+    "earnings": {
+      "title": "My Earnings",
+      "earned": "earned in last",
+      "earnedToday": "earned today",
+      "earnedYesterday": "earned yesterday",
+      "units": {
+        "days": "days",
+        "months": "months"
+      },
+      "insights": "Insights",
+      "insightsTablet": "Go to insights",
+      "cashOut": {
+        "amount": "Your Stripe earnings are",
+        "amountSecondLine": "Manage your balance on Stripe.",
+        "stripeButton": "Take me to Stripe",
+        "date": "will automatically be sent on {{date}}.",
+        "submit": "Learn More",
+        "noPayouts": "You don’t have any upcoming payouts"
+      },
+      "toDosIssue": {
+        "text": "Add a bio and your bank info to withdraw your earnings",
+        "textBio": "Add a bio to withdraw your earnings",
+        "textBank": "Add your bank info to withdraw your earnings",
+        "button": "Add",
+        "stripeIssue": "There's an issue with your Stripe account",
+        "stripeIssueButton": "See Stripe account"
+      },
+      "makeDecision": {
+        "text": "Make a post. Start earning.",
+        "button": "Make a post"
+      },
+      "list": {
+        "ac": "Bids",
+        "mc": "Superpolls",
+        "cf": "Goals",
+        "bundles": "Bundles"
+      },
+      "filter": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last_7_days": "Last 7 days",
+        "last_30_days": "Last 30 days",
+        "last_90_days": "Last 90 days",
+        "last_12_months": "Last 12 months"
+      }
+    },
+    "expirationPosts": {
+      "title": "Awaiting your Response",
+      "submit": "Show 10 more posts",
+      "decide": {
+        "desktop": "Respond Now",
+        "mobile": "Respond"
+      },
+      "table": {
+        "header": {
+          "post": "My posts",
+          "type": "Type",
+          "total": "Current total"
+        }
+      },
+      "postTypes": {
+        "auction": "Bid",
+        "multipleChoice": "Superpoll",
+        "crowdfunding": "Goal"
+      },
+      "expiresTime": {
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s",
+        "leftToRespond": "left to respond"
+      },
+      "linkCopied": "Link copied!"
+    },
+    "toDos": {
+      "title": "Complete these steps to get paid",
+      "subtitle": "Made💰? Finish these steps to withdraw your earnings...",
+      "signUp": "Sign up as a Creator",
+      "completeProfile": "Add a bio",
+      "completeProfileButton": "Add",
+      "addCashOutMethod": "Add bank info",
+      "addCashOutMethodButton": "Add"
+    },
+    "aboutBundles": {
+      "title": "Superpoll Bundles",
+      "text": "Make more money. Have more fun.\nSuperpoll Bundles are a win-win for everyone!",
+      "button": "Tell me more!"
+    }
+  },
+  "earnings": {
+    "meta": {
+      "title": "Creator Earnings"
+    },
+    "title": "Earnings"
+  },
+  "myBundles": {
+    "meta": {
+      "title": "My Bundles",
+      "description": "View your NewNew Bundles"
+    },
+    "title": "My Bundles",
+    "buttonTurnOn": "Turn on bundles",
+    "buttonTurnOff": "Turn off bundles",
+    "earnings": {
+      "title": "Bundles Earnings",
+      "payPeriod": "this pay period",
+      "unitName": "bundle",
+      "earned": "earned",
+      "noSoldYet": "No bundles sold yet",
+      "sold": "sold"
+    },
+    "bundlesSet": {
+      "title": "Superpoll Bundles",
+      "subTitle": "Offer Superpoll bundles to increase your earnings and get closer to your audience. ",
+      "votes": "votes",
+      "description": "plus people get {{duration}} months of:",
+      "descriptionSingular": "plus people get 1 month of:",
+      "firstOption": "adding custom options to your Superpolls",
+      "secondOption": "sending you private chats",
+      "perBundle": "per bundle"
+    },
+    "modals": {
+      "turnon": {
+        "title": "Turn On bundles",
+        "text": "Are you sure you want to activate bundles?"
+      },
+      "turnoff": {
+        "title": "Turn Off bundles",
+        "text": "Are you sure you want to deactivate bundles?"
+      },
+      "activated": {
+        "title": "Congratulations!",
+        "text": "You have successfully activated bundles"
+      },
+      "deactivated": {
+        "title": "So sad!",
+        "text": "But you can activate bundles at any time"
+      },
+      "button": "Sounds good!"
+    }
+  },
+  "getPaid": {
+    "meta": {
+      "title": "Get Paid on NewNew",
+      "description": "Earn income through cash auctions, polls, crowdfunding and subscription memberships"
+    }
+  },
+  "transactions": {
+    "meta": {
+      "title": "Creator Transactions"
+    },
+    "title": "Transactions"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "myPosts": "My Posts",
+    "insights": "Insights",
+    "earnings": "Earnings",
+    "bundles": "Bundles",
+    "getPaid": "Add Bank",
+    "getPaidEdit": "Edit Bank",
+    "transactions": "Transactions",
+    "newPost": "Make a Decision"
+  },
+  "tabs": {
+    "chat": "DMs",
+    "notifications": "Notifications"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Type a message...",
+    "noMessagesFirstLine": "No messages here yet...",
+    "typing": "Typing...",
+    "toolbar": {
+      "searchPlaceholder": "Search for users"
+    },
+    "modal": {
+      "newMessage": {
+        "title": "New message",
+        "searchPlaceholder": "Search"
+      }
+    },
+    "emptyInbox": {
+      "title": "Your inbox is empty",
+      "text": "Once you start a conversation with a Bundle Owner, you’ll see it listed here"
+    },
+    "default": {
+      "searchPlaceholder": "Search"
+    }
+  },
+  "modal": {
+    "newMessage": {
+      "title": "New message",
+      "searchPlaceholder": "Search"
+    }
+  },
+  "newAnnouncement": {
+    "title": "New announcement",
+    "text": "Only you can send messages to the group.",
+    "created": "You created the announcement",
+    "member": "member",
+    "members": "members"
+  },
+  "announcement": {
+    "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "beforeName": "",
+    "suffix": "'s",
+    "afterName": "announcements"
+  },
+  "stripe": {
+    "meta": {
+      "title": "Payments made easy with Stripe",
+      "description": "Connect a Stripe account to get paid on time."
+    },
+    "titleSetUpStripe": "Get paid through",
+    "bullets": {
+      "1": "Setting up a Stripe account is quick and easy",
+      "2": "Withdraw your NewNew earnings directly to your bank account",
+      "3": "Stripe keeps your information private and secure"
+    },
+    "button": {
+      "submit": "Done",
+      "update": "Update payment info",
+      "requestSetupLink": "Connect with Stripe",
+      "stripeConnectedLink": "Stripe connected!",
+      "back": "Close",
+      "stripeConnecting": "Connecting...",
+      "requireInformation": "Stripe requires info"
+    }
+  },
+  "noNotifications": "Any new notifications you receive\nwill appear here"
+}
