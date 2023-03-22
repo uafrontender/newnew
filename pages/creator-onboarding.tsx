@@ -51,10 +51,14 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
-  useLeavePageConfirm(true, t('detailsSection.leaveMsg'), [
-    '/creator/dashboard',
-    '/verify-new-email',
-  ]);
+  useLeavePageConfirm(
+    canBecomeCreator(
+      user.userData?.dateOfBirth,
+      appConstants.minCreatorAgeYears
+    ),
+    t('detailsSection.leaveMsg'),
+    ['/creator/dashboard', '/verify-new-email']
+  );
 
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
