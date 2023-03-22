@@ -83,13 +83,14 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       const clearedQuery = query.replace(/^#+/, '#');
 
       const chunks = getChunks(clearedQuery);
+
       const firstChunk = chunks[0];
       const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
 
       if (isHashtag) {
         router.push(`/search?query=${firstChunk.text}&tab=posts`);
       } else {
-        const encodedQuery = encodeURIComponent(query);
+        const encodedQuery = encodeURIComponent(clearedQuery);
         if (resultsPosts.length === 0 && resultsCreators.length > 0) {
           router.push(`/search?query=${encodedQuery}&tab=creators`);
         } else {

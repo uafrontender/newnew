@@ -40,6 +40,26 @@ describe('parses hashtags', () => {
     expect(chunks[0].text).toBe('hashtag');
   });
 
+  it('in Spanish', () => {
+    const input = '#configuración';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('configuración');
+  });
+
+  it('in Chinese', () => {
+    const input = '#件通知';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('件通知');
+  });
+
   it('with undescore', () => {
     const input = '#another_hashtag';
     const chunks = getChunks(input);
@@ -90,11 +110,21 @@ describe('parses hashtags', () => {
     expect(chunks[0].text).toBe('1812');
   });
 
-  it('multiple', () => {
-    const input = '#hashtag #another_hashtag';
+  it('with complex emoji', () => {
+    const input = '#🤷🏿‍♀️';
     const chunks = getChunks(input);
 
-    expect(chunks.length).toBe(3);
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('🤷🏿‍♀️');
+  });
+
+  it('multiple', () => {
+    const input = '#hashtag #another_hashtag #one_more_hashtag';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(5);
 
     expect(chunks[0].type).toBe('hashtag');
     expect(chunks[0].text).toBe('hashtag');
@@ -104,6 +134,12 @@ describe('parses hashtags', () => {
 
     expect(chunks[2].type).toBe('hashtag');
     expect(chunks[2].text).toBe('another_hashtag');
+
+    expect(chunks[3].type).toBe('text');
+    expect(chunks[3].text).toBe(' ');
+
+    expect(chunks[4].type).toBe('hashtag');
+    expect(chunks[4].text).toBe('one_more_hashtag');
   });
 
   it('keeps spaces', () => {
