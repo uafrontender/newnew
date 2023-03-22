@@ -84,7 +84,8 @@ const SearchInput: React.FC = React.memo(() => {
     if (isHashtag) {
       router.push(`/search?query=${firstChunk.text}&tab=posts`);
     } else {
-      const encodedQuery = encodeURIComponent(clearedQuery);
+      const noHashQuery = clearedQuery.replace('#', '');
+      const encodedQuery = encodeURIComponent(noHashQuery);
       if (resultsPosts.length === 0 && resultsCreators.length > 0) {
         router.push(`/search?query=${encodedQuery}&tab=creators`);
       } else {
