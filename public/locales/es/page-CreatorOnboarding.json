@@ -88,7 +88,7 @@
           "year": "Año"
         },
         "errors": {
-          "tooYoung": "Debes tener 18 años o más para ser un creador"
+          "tooYoung": "Debes tener {{value}} años o más para ser un creador"
         }
       },
       "profilePicture": {

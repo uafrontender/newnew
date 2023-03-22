@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 const maxDate = new Date();
 
@@ -31,6 +32,7 @@ type TSettingsPersonalInformationSection = {
 };
 const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPersonalInformationSection> =
   React.memo(({ currentEmail, currentDate, isMobile }) => {
+    const { appConstants } = useGetAppConstants();
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { t } = useTranslation('page-Profile');
@@ -176,10 +178,18 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             }
             submitError={
               dateError
-                ? t(
-                    `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any,
-                    { value: user.userData?.options?.isCreator ? '18' : '13' }
-                  )
+                ? dateError === 'tooYoung'
+                  ? t(
+                      `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any,
+                      {
+                        value: user.userData?.options?.isCreator
+                          ? appConstants.minCreatorAgeYears
+                          : appConstants.minUserAgeYears,
+                      }
+                    )
+                  : t(
+                      `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any
+                    )
                 : undefined
             }
             handleResetSubmitError={handleResetSubmitError}
