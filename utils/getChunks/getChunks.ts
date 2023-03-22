@@ -6,8 +6,8 @@ function getChunks(text: string, ignoreStart: boolean): Chunk[] {
   }
 
   const regexp = ignoreStart
-    ? /(\s)(#[^\s.,?!:;\-\[\]{}\(\)"…\/\\|*+~=%#$@]+)(\s|$)/
-    : /(^|\s)(#[^\s.,?!:;\-\[\]{}\(\)"…\/\\|*+~=%#$@]+)(\s|$)/;
+    ? /(\s)(#[^\s.,?!:;—\-\[\]{}\(\)"…\/\\|*^+~=%#$@]+)(\s|$)/
+    : /(^|\s)(#[^\s.,?!:;—\-\[\]{}\(\)"…\/\\|*^+~=%#$@]+)(\s|$)/;
 
   const match = text.match(regexp);
 
