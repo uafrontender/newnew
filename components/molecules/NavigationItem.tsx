@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-// import { useCookies } from 'react-cookie';
-
 import Indicator from '../atoms/Indicator';
 import InlineSVG from '../atoms/InlineSVG';
 import Button from '../atoms/Button';
+
+import { Mixpanel } from '../../utils/mixpanel';
+
 import iconNotifications from '../../public/images/svg/icons/outlined/Notifications.svg';
 import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
 
@@ -29,33 +30,26 @@ export interface INavigationItem {
 export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const { item } = props;
   const theme = useTheme();
-  // const [cookies, setCookie] = useCookies();
-
-  // const cookieKey = `${item.key}-${item.counter}`;
-
-  // const handleAnimationEnd = () => {
-  //   setCookie(cookieKey, true);
-  // };
-
-  // useEffect(() => {
-  //   _map(cookies, (value, key) => {
-  //     if (key.includes(item.key) && key !== cookieKey) {
-  //       setCookie(key, '');
-  //     }
-  //   });
-  // }, [cookieKey, cookies, item.counter, item.key, setCookie]);
 
   return (
     <Link href={item.url}>
       <a>
-        <SNavItem iconOnly view='tertiary'>
+        <SNavItem
+          iconOnly
+          view='tertiary'
+          onClick={() => {
+            Mixpanel.track('Navigation Item Clicked', {
+              _target: item.url,
+            });
+          }}
+        >
           <InlineSVG
             fill={theme.colorsThemed.text.primary}
             svg={icons[item.key]}
             width='24px'
             height='24px'
           />
-          {!!item.counter && (
+          {item.counter !== undefined && item.counter > 0 && (
             <SIndicatorContainer>
               <Indicator counter={item.counter} animate={false} />
             </SIndicatorContainer>
@@ -71,7 +65,7 @@ export default NavigationItem;
 const SNavItem = styled(Button)`
   position: relative;
   overflow: visible;
-  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background: ${({ theme }) => theme.colorsThemed.background.secondary};
 `;
 
 const SIndicatorContainer = styled.div`

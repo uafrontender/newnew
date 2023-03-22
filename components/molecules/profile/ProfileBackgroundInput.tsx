@@ -14,6 +14,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import PencilIcon from '../../../public/images/svg/icons/filled/Edit.svg';
 import ImageIcon from '../../../public/images/svg/icons/filled/Image.svg';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IProfileBackgroundInput {
   originalPictureUrl?: string;
@@ -32,163 +33,171 @@ interface IProfileBackgroundInput {
   onZoomChange: ((zoom: number) => void) | undefined;
 }
 
-const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
-  ({
-    originalPictureUrl,
-    pictureInEditUrl,
-    coverUrlInEditAnimated,
-    zoom,
-    crop,
-    initialObjectFit,
-    disabled,
-    handleSetPictureInEdit,
-    handleUnsetPictureInEdit,
-    onCropChange,
-    onCropComplete,
-    onZoomChange,
-  }) => {
-    const theme = useTheme();
-    const { t } = useTranslation('profile');
+const ProfileBackgroundInput: React.FunctionComponent<
+  IProfileBackgroundInput
+> = ({
+  originalPictureUrl,
+  pictureInEditUrl,
+  coverUrlInEditAnimated,
+  zoom,
+  crop,
+  initialObjectFit,
+  disabled,
+  handleSetPictureInEdit,
+  handleUnsetPictureInEdit,
+  onCropChange,
+  onCropComplete,
+  onZoomChange,
+}) => {
+  const theme = useTheme();
+  const { t } = useTranslation('page-Profile');
 
-    const [mobileCropWidth, setMobileCropWidth] = useState(0);
-    const containerRef = useRef<HTMLDivElement>();
-    const inputRef = useRef<HTMLInputElement>(null);
+  const [mobileCropWidth, setMobileCropWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    // Drag & Drop support
-    const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
+  // Drag & Drop support
+  const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
 
-    const handleOnDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-      e.preventDefault();
-      setDropZoneHighlighted(true);
-    };
-
-    const handleOnDragLeave = () => {
-      setDropZoneHighlighted(false);
-    };
-
-    const handleOnDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-      e.preventDefault();
-
-      if (disabled) return;
-
-      const { files } = e.dataTransfer;
-      handleSetPictureInEdit(files);
-    };
-
-    useEffect(() => {
-      const initialValue =
-        containerRef.current?.getBoundingClientRect().width ?? 0;
-      setMobileCropWidth(initialValue);
-
-      const resetMobileCropWidth = () => {
-        const newValue =
-          containerRef.current?.getBoundingClientRect().width ?? 0;
-        setMobileCropWidth(newValue);
-      };
-
-      window.addEventListener('resize', resetMobileCropWidth);
-
-      return () => window.removeEventListener('resize', resetMobileCropWidth);
-    }, []);
-
-    return (
-      <SProfileBackgroundInput
-        ref={(el) => {
-          containerRef.current = el!!;
-        }}
-      >
-        {pictureInEditUrl ? (
-          <>
-            {originalPictureUrl === pictureInEditUrl ? (
-              <SOriginalImgDiv pictureUrl={originalPictureUrl}>
-                <img
-                  src={originalPictureUrl}
-                  alt='Profile cover'
-                  draggable={false}
-                />
-              </SOriginalImgDiv>
-            ) : !coverUrlInEditAnimated ? (
-              <ProfileBackgroundCropper
-                pictureUrlInEdit={pictureInEditUrl!!}
-                crop={crop}
-                zoom={zoom}
-                initialObjectFit={initialObjectFit}
-                mobileCropWidth={mobileCropWidth}
-                disabled={disabled}
-                onCropChange={disabled ? () => {} : onCropChange}
-                onCropComplete={disabled ? () => {} : onCropComplete}
-                onZoomChange={disabled ? () => {} : onZoomChange}
-              />
-            ) : (
-              <SOriginalImgDiv pictureUrl={pictureInEditUrl!!}>
-                <img
-                  src={pictureInEditUrl!!}
-                  alt='Profile cover'
-                  draggable={false}
-                />
-              </SOriginalImgDiv>
-            )}
-            <SDeleteImgButton
-              iconOnly
-              size='sm'
-              view='transparent'
-              withDim
-              withShrink
-              disabled={disabled}
-              onClick={() => {
-                handleUnsetPictureInEdit();
-              }}
-            >
-              <InlineSvg
-                svg={PencilIcon}
-                width='20px'
-                height='20px'
-                fill='#FFFFFF'
-              />
-            </SDeleteImgButton>
-          </>
-        ) : (
-          <SLabel
-            onDragOver={(e) => handleOnDragOver(e)}
-            onDragLeave={() => handleOnDragLeave()}
-            onDrop={(e) => handleOnDrop(e)}
-          >
-            <SImageInput
-              ref={inputRef}
-              type='file'
-              accept='image/*'
-              multiple={false}
-              disabled={disabled}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const { files } = e.target;
-                handleSetPictureInEdit(files);
-
-                if (inputRef.current) {
-                  inputRef.current.value = '';
-                }
-              }}
-            />
-            <SChangeImageCaption
-              style={{
-                transform:
-                  !disabled && dropZoneHighlighted ? 'scale(1.1)' : 'none',
-              }}
-            >
-              <InlineSvg
-                svg={ImageIcon}
-                fill={theme.colorsThemed.text.secondary}
-                width='24px'
-                height='24px'
-              />
-              <div>
-                {t('EditProfileMenu.inputs.coverImage.changeCoverImage')}
-              </div>
-            </SChangeImageCaption>
-          </SLabel>
-        )}
-      </SProfileBackgroundInput>
-    );
+  const handleOnDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setDropZoneHighlighted(true);
   };
+
+  const handleOnDragLeave = () => {
+    setDropZoneHighlighted(false);
+  };
+
+  const handleOnDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+
+    if (disabled) return;
+
+    const { files } = e.dataTransfer;
+    handleSetPictureInEdit(files);
+  };
+
+  useEffect(() => {
+    const initialValue =
+      containerRef.current?.getBoundingClientRect().width ?? 0;
+    setMobileCropWidth(initialValue);
+
+    const resetMobileCropWidth = () => {
+      const newValue = containerRef.current?.getBoundingClientRect().width ?? 0;
+      setMobileCropWidth(newValue);
+    };
+
+    window.addEventListener('resize', resetMobileCropWidth);
+
+    return () => window.removeEventListener('resize', resetMobileCropWidth);
+  }, []);
+
+  return (
+    <SProfileBackgroundInput
+      ref={(el) => {
+        containerRef.current = el!!;
+      }}
+    >
+      {pictureInEditUrl ? (
+        <>
+          {originalPictureUrl === pictureInEditUrl ? (
+            <SOriginalImgDiv pictureUrl={originalPictureUrl}>
+              <img
+                src={originalPictureUrl}
+                alt='Profile cover'
+                draggable={false}
+              />
+            </SOriginalImgDiv>
+          ) : !coverUrlInEditAnimated ? (
+            <ProfileBackgroundCropper
+              pictureUrlInEdit={pictureInEditUrl!!}
+              crop={crop}
+              zoom={zoom}
+              initialObjectFit={initialObjectFit}
+              mobileCropWidth={mobileCropWidth}
+              disabled={disabled}
+              onCropChange={disabled ? () => {} : onCropChange}
+              onCropComplete={disabled ? () => {} : onCropComplete}
+              onZoomChange={disabled ? () => {} : onZoomChange}
+            />
+          ) : (
+            <SOriginalImgDiv pictureUrl={pictureInEditUrl!!}>
+              <img
+                src={pictureInEditUrl!!}
+                alt='Profile cover'
+                draggable={false}
+              />
+            </SOriginalImgDiv>
+          )}
+          <SDeleteImgButton
+            iconOnly
+            size='sm'
+            view='transparent'
+            withDim
+            withShrink
+            disabled={disabled}
+            onClick={() => {
+              handleUnsetPictureInEdit();
+            }}
+            onClickCapture={() => {
+              Mixpanel.track('Click Clear Current Background Image Button', {
+                _stage: 'MyProfile',
+                _component: 'ProfileBackgroundInput',
+              });
+            }}
+          >
+            <InlineSvg
+              svg={PencilIcon}
+              width='20px'
+              height='20px'
+              fill='#FFFFFF'
+            />
+          </SDeleteImgButton>
+        </>
+      ) : (
+        <SLabel
+          onDragOver={(e) => handleOnDragOver(e)}
+          onDragLeave={() => handleOnDragLeave()}
+          onDrop={(e) => handleOnDrop(e)}
+        >
+          <SImageInput
+            ref={inputRef}
+            type='file'
+            accept='image/*'
+            multiple={false}
+            disabled={disabled}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const { files } = e.target;
+              Mixpanel.track('Add New Background Image', {
+                _stage: 'MyProfile',
+                _component: 'ProfileBackgroundInput',
+              });
+              handleSetPictureInEdit(files);
+
+              if (inputRef.current) {
+                inputRef.current.value = '';
+              }
+            }}
+          />
+          <SChangeImageCaption
+            style={{
+              transform:
+                !disabled && dropZoneHighlighted ? 'scale(1.1)' : 'none',
+            }}
+          >
+            <InlineSvg
+              svg={ImageIcon}
+              fill={theme.colorsThemed.text.secondary}
+              width='24px'
+              height='24px'
+            />
+            <div>{t('editProfileMenu.inputs.coverImage.changeCoverImage')}</div>
+          </SChangeImageCaption>
+        </SLabel>
+      )}
+    </SProfileBackgroundInput>
+  );
+};
 
 ProfileBackgroundInput.defaultProps = {
   originalPictureUrl: undefined,

@@ -1,39 +1,55 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useUpdateEffect } from 'react-use';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
+import ReCaptchaV2 from '../../../atoms/ReCaptchaV2';
+import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
+import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
-import {
-  clearCreation,
-  setPostData,
-} from '../../../../redux-store/slices/creationStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import {
   CREATION_TITLE_MIN,
   CREATION_TITLE_MAX,
-  CREATION_OPTION_MIN,
-  CREATION_OPTION_MAX,
+  OPTION_LENGTH_MIN,
+  OPTION_LENGTH_MAX,
 } from '../../../../constants/general';
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
+import urltoFile from '../../../../utils/urlToFile';
+import { getCoverImageUploadUrl } from '../../../../api/endpoints/upload';
 
-const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
+import { Mixpanel } from '../../../../utils/mixpanel';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../../utils/hooks/useErrorToasts';
+import { I18nNamespaces } from '../../../../@types/i18next';
+import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
+import { useAppState } from '../../../../contexts/appStateContext';
+import { usePostCreationState } from '../../../../contexts/postCreationContext';
+
+const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 const PublishedModal = dynamic(
@@ -44,13 +60,16 @@ interface IPreviewContent {}
 
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
+  const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const playerRef: any = useRef(null);
-  const [loading, setLoading] = useState(false);
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const [showModal, setShowModal] = useState(false);
+  const { postInCreation, setPostData, setCreationStartDate, clearCreation } =
+    usePostCreationState();
   const {
     post,
     auction,
@@ -58,7 +77,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     multiplechoice,
     videoProcessing,
     fileProcessing,
-  } = useAppSelector((state) => state.creation);
+    customCoverImageUrl,
+  } = useMemo(() => postInCreation, [postInCreation]);
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
@@ -72,7 +92,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     },
     [tCommon]
   );
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const {
     query: { tab },
   } = router;
@@ -82,25 +102,28 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
-  const allowedRoutes = [
-    '/creation',
-    '/creation/auction',
-    '/creation/multiple-choice',
-    '/creation/crowdfunding',
-    '/creation/auction/preview',
-    '/creation/multiple-choice/preview',
-    '/creation/crowdfunding/preview',
-    '/creation/auction/published',
-    '/creation/multiple-choice/published',
-    '/creation/crowdfunding/published',
-  ];
+  const [isDisabledAdditionally, setIsDisabledAdditionally] = useState(false);
+  const [isGoingToHomepage, setIsGoingToHomepage] = useState(false);
 
-  if (isDesktop) {
-    allowedRoutes.push('/');
-  }
+  const allowedRoutes = useMemo(
+    () => [
+      '/creation',
+      '/creation/auction',
+      '/creation/multiple-choice',
+      '/creation/crowdfunding',
+      '/creation/auction/preview',
+      '/creation/multiple-choice/preview',
+      '/creation/crowdfunding/preview',
+      '/creation/auction/published',
+      '/creation/multiple-choice/published',
+      '/creation/crowdfunding/published',
+      ...(isDesktop ? ['/'] : []),
+    ],
+    [isDesktop]
+  );
 
   useLeavePageConfirm(
-    showModal ? false : true,
+    showModal || !post.title ? false : true,
     t('secondStep.modal.leave.message'),
     allowedRoutes
   );
@@ -110,17 +133,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     CREATION_TITLE_MIN,
     CREATION_TITLE_MAX
   );
+
   const optionsAreValid =
     tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) =>
-      validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
+    multiplechoice.choices.findIndex(
+      (item: newnewapi.CreateMultipleChoiceBody.IOption) =>
+        validateText(item.text as string, OPTION_LENGTH_MIN, OPTION_LENGTH_MAX)
     ) === -1;
-  const disabled =
-    loading ||
-    !titleIsValid ||
-    !post.title ||
-    !post.announcementVideoUrl ||
-    !optionsAreValid;
 
   const formatStartsAt: () => any = useCallback(() => {
     const time = moment(
@@ -132,6 +151,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       .hours(time.hours())
       .minutes(time.minutes());
   }, [post.startsAt]);
+
   const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
     (inSeconds = false) => {
       const time = moment(
@@ -146,6 +166,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (post.expiresAt === '1-hour') {
         dateValue.add(1, 'h');
         seconds = 3600;
+      } else if (post.expiresAt === '3-hours') {
+        dateValue.add(3, 'h');
+        seconds = 10800;
       } else if (post.expiresAt === '6-hours') {
         seconds = 21600;
         dateValue.add(6, 'h');
@@ -164,23 +187,75 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       } else if (post.expiresAt === '7-days') {
         seconds = 604800;
         dateValue.add(7, 'd');
+      } else if (post.expiresAt === '2-minutes') {
+        seconds = 120;
+        dateValue.add(2, 'm');
+      } else if (post.expiresAt === '5-minutes') {
+        seconds = 300;
+        dateValue.add(5, 'm');
+      } else if (post.expiresAt === '10-minutes') {
+        seconds = 600;
+        dateValue.add(10, 'm');
       }
 
       return inSeconds ? seconds : dateValue;
     },
     [post.expiresAt, post.startsAt]
   );
+
   const handleClose = useCallback(() => {
+    Mixpanel.track('Post Edit', { _stage: 'Creation' });
     router.back();
   }, [router]);
+
   const handleCloseModal = useCallback(() => {
+    setIsGoingToHomepage(true);
     setShowModal(false);
     router.push('/');
-    dispatch(clearCreation({}));
-  }, [dispatch, router]);
+    clearCreation();
+  }, [clearCreation, router]);
+
   const handleSubmit = useCallback(async () => {
-    setLoading(true);
+    Mixpanel.track('Publish Post', { _stage: 'Creation' });
     try {
+      let hasCoverImage = false;
+
+      if (customCoverImageUrl) {
+        const coverImageFile = await urltoFile(
+          customCoverImageUrl,
+          'coverImage',
+          'image/jpeg'
+        );
+        const videoFileSubdirectory = post.announcementVideoUrl
+          .split('/')
+          .slice(-2, -1)
+          .join('');
+
+        const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+          videoFileSubdirectory,
+        });
+
+        const res = await getCoverImageUploadUrl(imageUrlPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'An error occured');
+
+        const uploadResponse = await fetch(res.data.uploadUrl, {
+          method: 'PUT',
+          body: coverImageFile,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        // Set hasCoverImage to true
+        hasCoverImage = true;
+      }
+
       const body: Omit<newnewapi.CreatePostRequest, 'toJSON'> = {
         post: {
           title: post.title,
@@ -203,6 +278,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             },
           },
           announcementVideoUrl: post.announcementVideoUrl,
+          hasCoverImage,
         },
       };
 
@@ -214,10 +290,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {
-          options: multiplechoice.choices.map((choice) => ({
-            text: choice.text,
-          })),
-          isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
+          options: multiplechoice.choices.map(
+            (choice: newnewapi.CreateMultipleChoiceBody.IOption) => ({
+              text: choice.text,
+            })
+          ),
+          // TODO: remove as unused
+          isSuggestionsAllowed: userData?.options?.isOfferingBundles,
         };
       } else if (tab === 'crowdfunding') {
         body.crowdfunding = {
@@ -229,35 +308,96 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       const { data, error } = await createPost(payload);
 
-      if (!data || error) {
+      if (
+        !data ||
+        !data.post ||
+        error ||
+        data?.createPostStatus ===
+          newnewapi.CreatePostResponse.CreatePostStatus.INVALID_VALUE
+      ) {
         throw new Error(error?.message ?? 'Request failed');
       }
 
-      dispatch(setPostData(data));
-      setLoading(false);
+      setPostData(data.post);
 
       if (isMobile) {
+        setIsDisabledAdditionally(true);
         router.push(`/creation/${tab}/published`);
       } else {
         playerRef?.current?.pause();
         setShowModal(true);
       }
     } catch (err: any) {
-      toast.error(err);
-      setLoading(false);
+      if (err.message === 'Processing limit reached') {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.ProcessingLimitReachedError
+        );
+      } else if (err.message === 'Invalid date') {
+        showErrorToastPredefined(ErrorToastPredefinedMessage.InvalidDateError);
+      } else {
+        showErrorToastCustom(err);
+      }
     }
   }, [
-    tab,
-    post,
-    router,
-    auction,
-    isMobile,
-    dispatch,
-    crowdfunding,
-    multiplechoice,
+    customCoverImageUrl,
+    post.title,
+    post.options,
+    post.startsAt.type,
+    post.thumbnailParameters.startTime,
+    post.thumbnailParameters.endTime,
+    post.announcementVideoUrl,
     formatStartsAt,
     formatExpiresAt,
+    tab,
+    setPostData,
+    isMobile,
+    auction.minimalBid,
+    multiplechoice.choices,
+    userData?.options?.isOfferingBundles,
+    crowdfunding.targetBackerCount,
+    router,
+    showErrorToastPredefined,
+    showErrorToastCustom,
   ]);
+
+  const recaptchaRef = useRef(null);
+
+  const {
+    onChangeRecaptchaV2,
+    isRecaptchaV2Required,
+    submitWithRecaptchaProtection: handleSubmitWithRecaptchaProtection,
+    errorMessage: recaptchaErrorMessage,
+    isSubmitting,
+  } = useRecaptcha(handleSubmit, recaptchaRef);
+
+  useEffect(() => {
+    if (recaptchaErrorMessage) {
+      showErrorToastPredefined(recaptchaErrorMessage);
+    }
+  }, [recaptchaErrorMessage, showErrorToastPredefined]);
+
+  const userTimezone = useMemo(() => {
+    if (userData?.countryCode) {
+      if (userData?.countryCode.toLocaleLowerCase() === 'us') {
+        if (!userData.timeZone || !userData.timeZone.includes('America')) {
+          return '';
+        }
+      }
+    }
+
+    return new Date()
+      .toLocaleString('en', { timeZoneName: 'short' })
+      .split(' ')
+      .pop();
+  }, [userData]);
+
+  const disabled =
+    isSubmitting ||
+    !titleIsValid ||
+    !post.title ||
+    !post.announcementVideoUrl ||
+    !optionsAreValid;
+
   const settings: any = useMemo(
     () =>
       _compact([
@@ -271,11 +411,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         },
         {
           key: 'startsAt',
-          value: formatStartsAt().format('DD MMM [at] hh:mm A'),
+          value: `${formatStartsAt()
+            .locale(router.locale || 'en-US')
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
         },
         {
           key: 'expiresAt',
-          value: formatExpiresAt(false).format('DD MMM [at] hh:mm A'),
+          value: `${formatExpiresAt(false)
+            .locale(router.locale || 'en-US')
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
         },
         {
           key: 'comments',
@@ -288,15 +432,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           ),
         },
         tab === 'multiple-choice' &&
-          userData?.options?.isOfferingSubscription && {
+          userData?.options?.isOfferingBundles && {
             key: 'allowSuggestions',
-            value: t(
-              `preview.values.${
-                multiplechoice.options.allowSuggestions
-                  ? 'allowSuggestions-allowed'
-                  : 'allowSuggestions-forbidden'
-              }`
-            ),
+            value: t(`preview.values.allowSuggestions-allowed`),
           },
       ]),
     [
@@ -306,9 +444,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
-      multiplechoice?.options?.allowSuggestions,
-      userData?.options?.isOfferingSubscription,
+      userData?.options?.isOfferingBundles,
+      router.locale,
       formatExpiresAt,
+      userTimezone,
     ]
   );
   const handleGoBack = useCallback(() => {
@@ -318,7 +457,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const renderSetting = (item: any) => (
     <SItem key={item.key}>
       <SItemTitle variant={2} weight={600}>
-        {t(`preview.settings.${item.key}`)}
+        {t(
+          `preview.settings.${
+            item.key as keyof I18nNamespaces['page-Creation']['preview']['settings']
+          }`
+        )}
       </SItemTitle>
       <SItemValue variant={2} weight={600}>
         {item.value}
@@ -333,9 +476,52 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     </SChoiceItem>
   );
 
+  useUpdateEffect(() => {
+    if (!post.title && !isGoingToHomepage) {
+      router?.push('/creation');
+    }
+  }, [post.title, router, isGoingToHomepage]);
+
+  // This effect results in the form re-rendering every second
+  // However, it re renders after every letter typed anyway
+  // TODO: optimize this view
+  useEffect(() => {
+    let updateStartDate: any;
+
+    if (post.startsAt.type === 'right-away') {
+      updateStartDate = setInterval(() => {
+        const newStartAt = {
+          type: post.startsAt.type,
+          date: moment().format(),
+          time: moment().format('hh:mm'),
+          'hours-format': post.startsAt['hours-format'],
+        };
+        setCreationStartDate(newStartAt);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(updateStartDate);
+    };
+  }, [post.startsAt, setCreationStartDate]);
+
+  // Redirect if post state is empty
+  useEffect(() => {
+    if (!post.title) {
+      router.push('/profile/my-posts');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!post.title) {
+    return <LoadingView />;
+  }
+
   if (isMobile) {
     return (
       <>
+        {isGoingToHomepage && <LoadingView />}
+        <PublishedModal open={showModal} handleClose={handleCloseModal} />
         <SContent>
           <STopLine>
             <SInlineSVG
@@ -347,7 +533,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
-              {post.title}
+              <PostTitleContent>{post.title}</PostTitleContent>
             </SHeadlineMobile>
           </STopLine>
           {tab === 'multiple-choice' && (
@@ -356,23 +542,28 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SPlayerWrapper>
             {fileProcessing.progress === 100 ? (
-              <BitmovinPlayer
+              <VideojsPlayer
                 id='preview-mobile'
-                muted={false}
+                withMuteControl
                 resources={videoProcessing?.targetUrls}
+                showPlayButton
+                withScrubber
               />
             ) : (
-              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+              <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
             )}
           </SPlayerWrapper>
         </SContent>
         <SButtonWrapper>
+          {isRecaptchaV2Required && (
+            <SReCaptchaV2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
+          )}
           <SButtonContent>
             <SButton
               view='primaryGrad'
-              loading={loading}
-              onClick={handleSubmit}
-              disabled={disabled}
+              loading={isSubmitting}
+              onClick={handleSubmitWithRecaptchaProtection}
+              disabled={disabled || isDisabledAdditionally}
             >
               {t('preview.button.submit')}
             </SButton>
@@ -384,46 +575,62 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   return (
     <>
+      {isGoingToHomepage && <LoadingView />}
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
-      <SHeadLine variant={3} weight={600}>
-        {t(`preview.title-${router?.query?.tab}`)}
-      </SHeadLine>
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>
             {fileProcessing.progress === 100 ? (
-              <BitmovinPlayer
+              <VideojsPlayer
                 withMuteControl
                 id='preview'
                 innerRef={playerRef}
                 resources={videoProcessing?.targetUrls}
                 mutePosition='left'
                 borderRadius='16px'
+                showPlayButton
+                withScrubber
               />
             ) : (
-              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+              <SText variant={2}>{t('videoBeingProcessedCaption')}</SText>
             )}
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
-          <SHeadline variant={5}>{post.title}</SHeadline>
+          <SHeadLine variant={3} weight={600}>
+            {t(`preview.title-${router?.query?.tab}` as any)}
+          </SHeadLine>
+          <SHeadline variant={5}>
+            <PostTitleContent>{post.title}</PostTitleContent>
+          </SHeadline>
           {tab === 'multiple-choice' && (
             <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
           )}
           <SSettings>{settings.map(renderSetting)}</SSettings>
-          <SButtonsWrapper>
-            <Button view='secondary' onClick={handleClose} disabled={loading}>
-              {t('preview.button.edit')}
-            </Button>
-            <Button
-              view='primaryGrad'
-              loading={loading}
-              onClick={handleSubmit}
-              disabled={disabled}
-            >
-              {t('preview.button.submit')}
-            </Button>
-          </SButtonsWrapper>
+
+          <SButtonsContainer>
+            {isRecaptchaV2Required && (
+              <SReCaptchaV2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
+            )}
+            <SButtonsWrapper>
+              <Button
+                view='secondary'
+                onClick={handleClose}
+                disabled={isSubmitting}
+              >
+                {t('preview.button.edit')}
+              </Button>
+              <Button
+                id='publish'
+                view='primaryGrad'
+                loading={isSubmitting}
+                onClick={handleSubmitWithRecaptchaProtection}
+                disabled={disabled}
+              >
+                {t('preview.button.submit')}
+              </Button>
+            </SButtonsWrapper>
+          </SButtonsContainer>
         </SRightPart>
       </STabletContent>
     </>
@@ -445,8 +652,10 @@ const STabletContent = styled.div`
 `;
 
 const SHeadLine = styled(Text)`
+  text-align: start;
+  white-space: pre-wrap;
+  word-break: break-word;
   padding: 26px 0;
-  text-align: center;
 
   ${({ theme }) => theme.media.laptop} {
     padding: 8px 0;
@@ -458,10 +667,12 @@ const SLeftPart = styled.div`
   flex: 1;
   max-width: calc(50% - 76px);
   margin-right: 76px;
+  margin-top: 70px;
 
   ${({ theme }) => theme.media.laptop} {
     max-width: 352px;
     margin-right: 16px;
+    margin-top: 86px;
   }
 `;
 
@@ -511,6 +722,7 @@ const SButtonWrapper = styled.div`
   bottom: 0;
   z-index: 5;
   display: flex;
+  flex-direction: column;
   padding: 24px 16px;
   position: fixed;
   background: ${(props) => props.theme.gradients.creationSubmit};
@@ -522,6 +734,7 @@ const SButtonContent = styled.div`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 18px;
+  word-break: break-word;
 `;
 
 const SHeadlineMobile = styled(Caption)`
@@ -529,6 +742,8 @@ const SHeadlineMobile = styled(Caption)`
   overflow: hidden;
   position: relative;
   padding-left: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 `;
@@ -553,9 +768,16 @@ const SItem = styled.div`
 
 const SItemTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 8px;
 `;
 
-const SItemValue = styled(Text)``;
+const SItemValue = styled(Text)`
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
 
 const SChoiceItem = styled.div`
   margin: 6px 0;
@@ -579,10 +801,14 @@ const SPlayerWrapper = styled.div`
   margin-top: 42px;
 `;
 
+const SButtonsContainer = styled.div`
+  position: relative;
+  margin-top: 26px;
+`;
+
 const SButtonsWrapper = styled.div`
   width: 100%;
   display: flex;
-  margin-top: 26px;
   align-items: center;
   justify-content: space-between;
 `;
@@ -601,9 +827,15 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  text-align: left;
+  text-align: center;
+`;
+
+const SReCaptchaV2 = styled(ReCaptchaV2)`
+  margin-bottom: 10px;
+  position: relative;
+  left: calc((100% - 304px) / 2);
 
   ${({ theme }) => theme.media.tablet} {
-    text-align: center;
+    left: 0;
   }
 `;

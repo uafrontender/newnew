@@ -1,0 +1,280 @@
+{
+  "back": "Regresar",
+  "at": " en ",
+  "first-step-title": "¿Qué publicarás?",
+  "first-step-auction-title": "Bid",
+  "first-step-auction-sub-title": "Las personas te envía ofertas para que hagas cosas que ellos quieren verte hacer",
+  "first-step-multiple-choice-title": "Superpoll",
+  "first-step-multiple-choice-sub-title": "Las personas te pagan por votar por su opción favorita y tú realizas la opción más votada",
+  "first-step-crowdfunding-title": "Goal",
+  "first-step-crowdfunding-sub-title": "Las personan reúnen dinero para respaldar tu objetivo",
+  "second-step-auction-title": "Bid",
+  "second-step-multiple-choice-title": "Superpoll",
+  "second-step-crowdfunding-title": "Goal",
+  "videoBeingProcessedCaption": "Tu video estará disponible una vez procesado",
+  "tabs": {
+    "auction": "Bid",
+    "multiple-choice": "Superpoll",
+    "crowdfunding": "Goal"
+  },
+  "firstStep": {
+    "meta": {
+      "title": "Crea una publicación en NewNew",
+      "description": "Crea un Bid, una Superpoll o un Goal en NewNew en unos pocos clics y gana dinero"
+    }
+  },
+  "secondStep": {
+    "meta": {
+      "title-auction": "Publica un Bid en Newnew",
+      "title-multiple-choice": "Publica un Superpoll en NewNew",
+      "title-crowdfunding": "Publica un Goal en NewNew",
+      "description-auction": "Los fans hacen ofertas en tus subastas y tú ganas dinero",
+      "description-multiple-choice": "Haz una encuesta pagada, gana dinero y cóbralo en NewNew",
+      "description-crowdfunding": "Utiliza campañas de crowdfunding para financiar tus metas de vida y gana dinero"
+    },
+    "input": {
+      "label": "Título",
+      "placeholder": "ej. ¿Dónde debería hacerme mi primer tatuaje? \uD83D\uDE4A"
+    },
+    "fileUpload": {
+      "titleMobile_NEED_TRANSLATION": "Select a file ",
+      "titleDesktop_NEED_TRANSLATION": "Select a file or drag and drop here",
+      "description": "El video puede ser de hasta 10 GB",
+      "button": "Seleccionar archivo"
+    },
+    "block": {
+      "title": {
+        "file": "Subir video",
+        "decision": "Detalles",
+        "advanced": "Duración",
+        "floating": "Preestrenar"
+      },
+      "subTitle": {
+        "votesInfo": "Las personas gastarán un mínimo de $1 para votar",
+        "floating": "Sube tu video para verlo aquí",
+        "floatingProcessing": "La vista previa estará disponible después de que tu video sea procesado"
+      }
+    },
+    "modal": {
+      "leave": {
+        "message": "¿Estás seguro de querer abandonar esta página?"
+      },
+      "deleteFile": {
+        "title": "Borrar video",
+        "description": "¿Estás seguro de que quieres borrar este video?"
+      }
+    },
+    "card": {
+      "left": "Quedan {{time}}",
+      "soon": "Próximamente"
+    },
+    "button": {
+      "retry": "Reintentar",
+      "cancel": "Cancelar",
+      "submit": "Publicar",
+      "preview": "Revisar",
+      "schedule": "Programar",
+      "delete": "Eliminar",
+      "card": {
+        "ac": "Hacer oferta",
+        "mc": "Hacer oferta",
+        "cf": "Hacer oferta"
+      }
+    },
+    "field": {
+      "minimalBid": {
+        "title": "Oferta mínima",
+        "value": "${{value}}",
+        "label": "$",
+        "placeholder": "1",
+        "description": "la oferta mínima que una persona puede hacer"
+      },
+      "targetBackerCount": {
+        "title": "Patrocinadores mínimos",
+        "value": "{{value}}",
+        "label": "",
+        "placeholder": "ej. 20",
+        "description": "${{value}} es la cantidad mínima que un patrocinador puede aportar"
+      },
+      "expiresAt": {
+        "title": "Termina en",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "options": {
+          "1-hour": "1 hora",
+          "3-hours": "3 horas",
+          "6-hours": "6 horas",
+          "12-hours": "12 horas",
+          "1-day": "1 día",
+          "3-days": "3 días",
+          "5-days": "5 días",
+          "7-days": "7 días"
+        }
+      },
+      "startsAt": {
+        "title": "Fecha de inicio",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "modal": {
+          "title": "Fecha de inicio",
+          "type": {
+            "schedule": "Programar",
+            "right-away": "Ahora mismo"
+          },
+          "hoursFormat": {
+            "pm": "PM",
+            "am": "AM"
+          },
+          "days": {
+            "sunday": "D",
+            "monday": "L",
+            "tuesday": "M",
+            "wednesday": "M",
+            "thursday": "J",
+            "friday": "V",
+            "saturday": "S"
+          }
+        },
+        "tablet": {
+          "type": {
+            "schedule": "Programar para una fecha en específico",
+            "right-away": "Publicar de inmediato una vez que lo publique"
+          }
+        }
+      },
+      "comments": {
+        "title": "Permitir comentarios de todos"
+      },
+      "allowSuggestions": {
+        "title": "Permitir sugerencias de suscriptores"
+      },
+      "choices": {
+        "add": "Agregar otra opción",
+        "option": {
+          "label": "Opción {{value}}"
+        }
+      }
+    },
+    "video": {
+      "error": {
+        "minLength": "La duración del video es demasiado corta, elija a partir de 10 segundos",
+        "maxLength": "La duración del video es demasiado larga, elija hasta 10 minutoss",
+        "maxSize": "El tamaño del video es demasiado grande, elija hasta 10gb",
+        "title": "Ups...",
+        "description": "Hubo un error y tu archivo no pudo ser cargado. ¿Quieres volver a intentarlo?."
+      },
+      "setThumbnail": "Establecer miniatura",
+      "thumbnailEllipseMenu": {
+        "uploadImageButton": "Subir una imagen"
+      },
+      "deleteFile": "Borrar archivo",
+      "previewFull": "Preestrenar",
+      "thumbnail": {
+        "info": "Más información",
+        "title": "Establecer una imagen miniatura del video",
+        "submit": "Guardar",
+        "description": "Selecciona un fragmento para tu miniatura. \nUna buena miniatura entusiasma a los espectadores..."
+      },
+      "coverImage": {
+        "title": "Subir una imagen",
+        "submit": "Guardar",
+        "uploadCoverImage": {
+          "caption": "Seleccionar una imagen de portada personalizada",
+          "uploadBtn": "Seleccionar",
+          "deleteBtn": "Borrar"
+        }
+      },
+      "full": {
+        "title": "Vista previa de video"
+      },
+      "loading": {
+        "title": "Subiendo video",
+        "description": "Tu archivo se está cargando. No tardará mucho...",
+        "process": "{{progress}}% • Quedan {{time}}"
+      },
+      "processing": {
+        "title": "Tu archivo se está procesando. No tardará mucho...",
+        "description": "Tu video se está procesando",
+        "process": "{{progress}}% • Quedan {{time}}"
+      }
+    }
+  },
+  "preview": {
+    "meta": {
+      "title-auction": "Creación | Bid | Vista previa",
+      "title-multiple-choice": "Creación | Superpoll | Vista previa",
+      "title-crowdfunding": "Creación | Goal | Vista previa"
+    },
+    "title-auction": "Revisar mi Bid",
+    "title-multiple-choice": "Revisar mi Superpoll",
+    "title-crowdfunding": "Revisar mi Goal",
+    "button": {
+      "submit": "Publicar",
+      "edit": "Editar"
+    },
+    "settings": {
+      "minimalBid": "Oferta mínima",
+      "targetBackerCount": "Patrocinadores",
+      "expiresAt": "Termina en",
+      "startsAt": "Fecha de inicio",
+      "comments": "Comentarios",
+      "allowSuggestions": "Sugerencias"
+    },
+    "values": {
+      "minimalBid": "${{value}}",
+      "comments-allowed": "Encendido",
+      "comments-forbidden": "Apagado",
+      "allowSuggestions-allowed": "Encendido",
+      "allowSuggestions-forbidden": "Apagado"
+    }
+  },
+  "published": {
+    "meta": {
+      "title-auction-published": "Creación | Bid | Publicado",
+      "title-multiple-choice-published": "Creación | Superpoll | Publicado",
+      "title-crowdfunding-published": "Creación | Goal | Publicado",
+      "title-auction-scheduled": "Creación | Bid | Programado",
+      "title-multiple-choice-scheduled": "Creación | Superpoll | Programado",
+      "title-crowdfunding-scheduled": "Creación | Goal | Programado"
+    },
+    "button": {
+      "submit-published": "Ver mi {{value}}",
+      "submit-scheduled": "Ver mi {{value}} programado"
+    },
+    "texts": {
+      "title-published": "Ahora está en vivo... ¡cómpartelo!",
+      "title-scheduled": "Ya está programado... ¡comparte la información!"
+    },
+    "socials": {
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "copy": "Copiar enlace",
+      "copied": "¡Enlace copiado!"
+    }
+  },
+  "tutorials": {
+    "heroPopupCommon": {
+      "heroButtonText": "Va"
+    },
+    "heroPopupAC": {
+      "title": "Bids",
+      "line1": "1. ¿Estás abierto a ideas? Publica un video y haz que el\n público te envíe ofertas sobre lo que deberías hacer",
+      "line2": "2. La gente te envía ofertas con sus ideas y\n cuánto pagarán para que lo hagas",
+      "line3": "3. Elige tu oferta favorita, ¡y\n sube un video tuyo haciéndola!"
+    },
+    "heroPopupMC": {
+      "title": "Superpolls",
+      "line1": "1. Publica una encuesta en video con algunas opciones\n para que el público elija una",
+      "line2": "2. La gente paga para votar por su opción favorita",
+      "line3": "3. Sube un video de respuesta haciendo\n la opción más votada."
+    },
+    "heroPopupCF": {
+      "title": "Goals",
+      "line1": "1. Publica un objetivo en video y elige el número\n de patrocinadores que necesitas para alcanzar ese objetivo",
+      "line2": "2. Cada patrocinador contribuirá con una cantidad\n de dólares personalizada a tu objetivo",
+      "line3": "3. ¡Sube un video cumpliendo tu objetivo \n cuando consigas suficientes patrocinadores!"
+    }
+  }
+}

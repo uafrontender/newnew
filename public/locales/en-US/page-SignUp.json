@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Sign in to NewNew",
+    "description": "Signing in to NewNew is fast and easy.",
+    "title-create": "Sign in to NewNew",
+    "description-create": "Signing up to NewNew is fast and easy. Join now to be a Creator"
+  },
+  "heading": {
+    "sign-in": "Sign in",
+    "sign-in-to": "Sign up to",
+    "reason": {
+      "comment": "comment",
+      "bid": "bid",
+      "pledge": "make pledge",
+      "follow-decision": "favorite post",
+      "follow-creator": "favorite creator",
+      "report": "make a report"
+    },
+    "subheading": "We'll log you in or create an account.",
+    "subheadingSessionExpired": "Session expired, please sign in again"
+  },
+  "signUpOptions": {
+    "google": "Continue with Google",
+    "apple": "Continue with Apple ID",
+    "facebook": "Continue with Facebook",
+    "twitter": "Continue with Twitter",
+    "orContinueWith": "or continue with",
+    "email": "Email",
+    "signInButton": "Sign in",
+    "logInButton": "Log in"
+  },
+  "error": {
+    "emailInvalid": "Invalid address",
+    "genericError": "An error occurred",
+    "Failed to fetch": "Failed to submit",
+    "An error occurred": "An error occurred"
+  },
+  "legalDisclaimer": {
+    "mainText": "By creating an account you agree to our ",
+    "privacyPolicy": "Privacy Policy, ",
+    "terms": "Terms",
+    "and": "and",
+    "communityGuidelines": "Community Guidelines"
+  },
+  "button": {
+    "back": "Go back"
+  }
+}

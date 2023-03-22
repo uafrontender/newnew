@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "Búsqueda"
+  },
+  "mainContent": {
+    "title": "Resultados para",
+    "tabs": {
+      "hashtags_NEED_TRANSLATION": "Hashtags",
+      "creators": "Creadores"
+    }
+  },
+  "decisions": {
+    "sort": {
+      "title": "Ordenar",
+      "all": "Todos",
+      "numberOfParticipants": "Número de participantes",
+      "newest": "Más reciente"
+    }
+  }
+}

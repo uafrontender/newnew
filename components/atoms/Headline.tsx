@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import AnimatedPresence, { TAnimation } from './AnimatedPresence';
+import AnimatedPresence, { TWordsAnimation } from './AnimatedPresence';
 
 interface IHeadline {
+  id?: string;
   variant?: 1 | 2 | 3 | 4 | 5 | 6;
   children: React.ReactNode;
-  animation?: TAnimation;
+  animation?: TWordsAnimation;
   animateWhenInView?: boolean;
   onClick?: () => void;
 }
@@ -31,7 +32,7 @@ const Headline: React.FC<IHeadline> = (props) => {
           animation={animation}
           animateWhenInView={animateWhenInView}
         >
-          {children}
+          {children as string}
         </AnimatedPresence>
       </Component>
     );

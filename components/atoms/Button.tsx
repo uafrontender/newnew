@@ -1,16 +1,17 @@
+/* eslint-disable no-nested-ternary */
 // @ts-nocheck
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
-import { useInView } from 'react-intersection-observer';
 import styled, { css } from 'styled-components';
 
 import Lottie from './Lottie';
 import RippleAnimation from './RippleAnimation';
 
 import logoAnimation from '../../public/animations/mobile_logo.json';
+import logoAnimationWhite from '../../public/animations/mobile_logo_white.json';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView =
+export type TView =
   | 'primary'
   | 'primaryGrad'
   | 'primaryProgress'
@@ -21,7 +22,9 @@ type TView =
   | 'quaternary'
   | 'changeLanguage'
   | 'transparent'
-  | 'danger';
+  | 'danger'
+  | 'common'
+  | 'brandYellow';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
@@ -36,119 +39,164 @@ interface IButton {
   withShrink?: boolean;
   withProgress?: boolean;
   customDebounce?: number;
+  loadingAnimationColor?: 'white' | 'blue';
 }
 
 // Arguable optimization, depends on unstable onClick, but works according to profiling (1.8% => 0%)
-const Button: React.FunctionComponent<IButton & TButton> = React.memo(
-  (props) => {
-    const {
-      loading,
-      children,
-      disabled,
-      withRipple,
-      withProgress,
-      customDebounce,
-      onClick,
-      ...rest
-    } = props;
-    const { ref, inView }: { ref: any; inView: boolean } = useInView();
-    // Progress effect
-    const [progress, setProgress] = useState(0);
-    // Ripple effect
-    const [rippleOrigin, setRippleOrigin] = useState<{ x: string; y: string }>({
-      x: '50%',
-      y: '50%',
-    });
-    const [isRippling, setIsRippling] = useState(false);
+const Button = React.memo(
+  React.forwardRef<HTMLAnchorElement & HTMLButtonElement, IButton & TButton>(
+    (props, parentRef) => {
+      const {
+        loading,
+        children,
+        disabled,
+        withRipple,
+        withProgress,
+        customDebounce,
+        loadingAnimationColor,
+        onClick,
+        ...rest
+      } = props;
 
-    const handleClickDebounced = useMemo(
-      () => debounce(onClick!!, 800),
-      [onClick]
-    );
-    const handleRestoreRippling = useMemo(
-      () =>
-        debounce(() => {
-          if (!withRipple) return;
-          setIsRippling(false);
-        }, customDebounce ?? 750),
-      [withRipple, setIsRippling, customDebounce]
-    );
+      const ref = useRef();
+      const [inView, setInView] = useState(false);
 
-    const handleOnBlurCapture = () => setIsRippling(false);
-    const handleOnMouseDown = (e: any) => {
-      if (disabled || !withRipple) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setRippleOrigin({
-        x: `${x}px`,
-        y: `${y}px`,
-      });
-      setIsRippling(true);
-    };
-    const handleOnTouchStart = (e: any) => {
-      if (disabled || !withRipple) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left;
-      const y = e.touches[0].clientY - rect.top;
-      setRippleOrigin({
-        x: `${x}px`,
-        y: `${y}px`,
-      });
-      setIsRippling(true);
-    };
-    const handleOnKeyDownCapture = () => {
-      if (disabled || !withRipple) return;
-      setRippleOrigin({
+      useEffect(() => {
+        if (withProgress) {
+          const obs = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+              setInView(entry.isIntersecting);
+            });
+          });
+
+          obs.observe(ref.current);
+        }
+      }, [withProgress]);
+
+      // Progress effect
+      const [progress, setProgress] = useState(0);
+      // Ripple effect
+      const [rippleOrigin, setRippleOrigin] = useState<{
+        x: string;
+        y: string;
+      }>({
         x: '50%',
         y: '50%',
       });
-      setIsRippling(true);
-    };
+      const [isRippling, setIsRippling] = useState(false);
 
-    useEffect(() => {
-      if (inView) {
-        setProgress(rest.progress ?? 0);
-      }
-    }, [rest.progress, inView]);
+      const handleClickDebounced = useMemo(
+        () => debounce(onClick!!, 800),
+        [onClick]
+      );
+      const handleRestoreRippling = useMemo(
+        () =>
+          debounce(() => {
+            if (!withRipple) return;
+            setIsRippling(false);
+          }, customDebounce ?? 750),
+        [withRipple, setIsRippling, customDebounce]
+      );
 
-    return (
-      <SButton
-        ref={ref}
-        onClick={!withRipple ? onClick : handleClickDebounced}
-        disabled={disabled}
-        withRipple={withRipple}
-        isRippling={!withRipple ? false : isRippling}
-        onMouseDown={handleOnMouseDown}
-        withProgress={withProgress}
-        rippleOrigin={rippleOrigin}
-        onTouchStart={handleOnTouchStart}
-        elementWidth={ref.current?.getBoundingClientRect()?.width ?? 800}
-        onBlurCapture={handleOnBlurCapture}
-        onKeyUpCapture={handleRestoreRippling}
-        onMouseUpCapture={handleRestoreRippling}
-        onKeyDownCapture={handleOnKeyDownCapture}
-        onTouchEndCapture={handleRestoreRippling}
-        {...rest}
-      >
-        <span>{children}</span>
-        {withProgress && <SProgress view={rest.view} progress={progress} />}
-        {loading && (
-          <SLoader size={rest.size}>
-            <Lottie
-              width={25}
-              height={20}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: logoAnimation,
-              }}
-            />
-          </SLoader>
-        )}
-      </SButton>
-    );
-  }
+      const handleOnBlurCapture = () => setIsRippling(false);
+      const handleOnMouseDown = (e: any) => {
+        if (disabled || !withRipple) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setRippleOrigin({
+          x: `${x}px`,
+          y: `${y}px`,
+        });
+        setIsRippling(true);
+      };
+      const handleOnTouchStart = (e: any) => {
+        if (disabled || !withRipple) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        setRippleOrigin({
+          x: `${x}px`,
+          y: `${y}px`,
+        });
+        setIsRippling(true);
+      };
+      const handleOnKeyDownCapture = () => {
+        if (disabled || !withRipple) return;
+        setRippleOrigin({
+          x: '50%',
+          y: '50%',
+        });
+        setIsRippling(true);
+      };
+
+      useEffect(() => {
+        if (inView) {
+          setProgress(rest.progress ?? 0);
+        }
+      }, [rest.progress, inView]);
+
+      return (
+        <SButton
+          ref={(el) => {
+            ref.current = el;
+
+            if (parentRef) {
+              // eslint-disable-next-line no-param-reassign
+              parentRef.current = el;
+            }
+          }}
+          onClick={!withRipple ? onClick : handleClickDebounced}
+          disabled={disabled}
+          withRipple={withRipple}
+          isRippling={!withRipple ? false : isRippling}
+          onMouseDown={handleOnMouseDown}
+          withProgress={withProgress}
+          rippleOrigin={rippleOrigin}
+          onTouchStart={handleOnTouchStart}
+          elementWidth={ref.current?.getBoundingClientRect()?.width ?? 800}
+          onBlurCapture={handleOnBlurCapture}
+          onKeyUpCapture={handleRestoreRippling}
+          onMouseUpCapture={handleRestoreRippling}
+          onKeyDownCapture={handleOnKeyDownCapture}
+          onTouchEndCapture={handleRestoreRippling}
+          {...rest}
+        >
+          <span
+            style={{
+              ...(loading
+                ? {
+                    color: 'transparent',
+                  }
+                : {}),
+            }}
+          >
+            {children}
+          </span>
+          {withProgress && <SProgress view={rest.view} progress={progress} />}
+          {loading && (
+            <SLoader size={rest.size}>
+              <Lottie
+                width={25}
+                height={20}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimationColor
+                    ? loadingAnimationColor === 'blue'
+                      ? logoAnimation
+                      : logoAnimationWhite
+                    : props.view === 'primary' || props.view === 'primaryGrad'
+                    ? logoAnimationWhite
+                    : logoAnimation,
+                }}
+              />
+            </SLoader>
+          )}
+        </SButton>
+      );
+    }
+  )
 );
 
 Button.defaultProps = {
@@ -283,23 +331,36 @@ const SButton = styled.button<ISButton>`
       props.theme.colorsThemed.button.active[props.view ?? 'primary']};
   }
 
-  &:focus:enabled,
-  &:hover:enabled {
+  &:focus:enabled {
     outline: none;
 
-    ${(props) =>
-      props.view === 'primaryGrad'
-        ? css`
+    ${(props) => {
+      switch (props.view) {
+        case 'primaryGrad': {
+          return css`
             // for gradient button background animation on hover
             :after {
               opacity: 1;
             }
-          `
-        : css`
+          `;
+        }
+        case 'common': {
+          return css`
+            color: ${({ theme }) => theme.colors.white};
             background: ${props.theme.colorsThemed.button.hover[
               props.view ?? 'primary'
             ]};
-          `}
+          `;
+        }
+        default: {
+          return css`
+            background: ${props.theme.colorsThemed.button.hover[
+              props.view ?? 'primary'
+            ]};
+          `;
+        }
+      }
+    }}
 
     ${(props) =>
       props.withShadow &&
@@ -308,10 +369,65 @@ const SButton = styled.button<ISButton>`
       `}
   }
 
+  &:hover:enabled {
+    outline: none;
+  }
+
+  @media (hover: hover) {
+    &:hover:enabled {
+      ${(props) => {
+        switch (props.view) {
+          case 'primaryGrad': {
+            return css`
+              // for gradient button background animation on hover
+              :after {
+                opacity: 1;
+              }
+            `;
+          }
+          case 'common': {
+            return css`
+              color: ${({ theme }) => theme.colors.white};
+              background: ${props.theme.colorsThemed.button.hover[
+                props.view ?? 'primary'
+              ]};
+            `;
+          }
+          default: {
+            return css`
+              background: ${props.theme.colorsThemed.button.hover[
+                props.view ?? 'primary'
+              ]};
+              box-shadow: ${({ theme, view }) =>
+                theme.colorsThemed.button.hoverShadow[view] || 'initial'};
+            `;
+          }
+        }
+      }}
+
+      ${(props) =>
+        props.withShadow &&
+        css`
+          box-shadow: ${props.theme.shadows.intenseBlue};
+        `}
+    }
+  }
+
   &:disabled {
     cursor: default;
-    opacity: 0.5;
     outline: none;
+
+    :after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+      opacity: 1;
+      z-index: 6;
+      position: absolute;
+      background: ${(props) => props.theme.colorsThemed.button.disabled};
+    }
   }
 
   span {
@@ -369,6 +485,13 @@ const SButton = styled.button<ISButton>`
         opacity: 0.5;
       }
     `}
+
+  ${({ theme, withProgress }) =>
+    withProgress && theme.name === 'dark'
+      ? css`
+          background: ${() => theme.colorsThemed.background.tertiary};
+        `
+      : null}
 `;
 
 interface ISLoader {
@@ -377,8 +500,8 @@ interface ISLoader {
 
 const SLoader = styled.div<ISLoader>`
   top: 50%;
-  right: ${(props) => (props.size === 'sm' ? '0px' : '16px')};
   z-index: 20;
   position: absolute;
   transform: translateY(-50%);
+  opacity: 1 !important;
 `;

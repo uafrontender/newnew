@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TextArea from 'react-textarea-autosize';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -15,11 +15,13 @@ import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import changeOrderIcon from '../../../public/images/svg/icons/outlined/ChangeOrder.svg';
 
 import {
-  CREATION_OPTION_MAX,
-  CREATION_OPTION_MIN,
+  OPTION_LENGTH_MAX,
+  OPTION_LENGTH_MIN,
 } from '../../../constants/general';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IOptionItem {
+  id?: string;
   item: {
     id: number;
     text: string;
@@ -30,40 +32,56 @@ interface IOptionItem {
     value: string,
     min: number,
     max: number,
-    kind: newnewapi.ValidateTextRequest.Kind
+    kind: newnewapi.ValidateTextRequest.Kind,
+    index: number
   ) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
 
 const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
-  const { item, index, withDelete, validation, handleChange } = props;
+  const { id, item, index, withDelete, validation, handleChange } = props;
   const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const y = useMotionValue(0);
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const dragControls = useDragControls();
 
+  const clearValue = useCallback((rawValue: string): string => {
+    if (!rawValue.trim()) {
+      return '';
+    }
+
+    return rawValue.replaceAll('\n', '');
+  }, []);
+
   const handleInputChange = (e: any) => {
-    setValue(e.target.value);
+    const clearedValue = clearValue(e.target.value);
+    setValue(clearedValue);
     handleChange(index, {
       ...item,
-      text: e.target.value,
+      text: clearedValue,
     });
   };
   const handleInputBlur = async (e: any) => {
-    if (e.target.value.length < 1 && index > 1) {
+    const clearedValue = clearValue(e.target.value);
+    Mixpanel.track('Superpoll Option Text Change', {
+      _stage: 'Creation',
+      _text: clearedValue,
+    });
+    if (clearedValue.length < 1 && index > 1) {
       handleChange(index, null);
       return;
     }
 
     setError(
       await validation(
-        e.target.value,
-        CREATION_OPTION_MIN,
-        CREATION_OPTION_MAX,
-        newnewapi.ValidateTextRequest.Kind.POST_OPTION
+        clearedValue,
+        OPTION_LENGTH_MIN,
+        OPTION_LENGTH_MAX,
+        newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        index
       )
     );
   };
@@ -71,13 +89,16 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     setError('');
   };
   const handleDelete = () => {
+    Mixpanel.track('Superpoll Delete Option', { _stage: 'Creation' });
     handleChange(index, null);
   };
   const handlePointerDown = (event: any) => {
+    Mixpanel.track('Superpoll Dragging Option Start', { _stage: 'Creation' });
     dragControls.start(event);
     setIsDragging(true);
   };
   const handlePointerUp = () => {
+    Mixpanel.track('Superpoll Dragging Option End', { _stage: 'Creation' });
     setIsDragging(false);
   };
 
@@ -86,19 +107,22 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   useEffect(() => {
     const func = async () => {
       if (validateTitleDebounced) {
+        const trimmedTitle = (validateTitleDebounced as string).trim();
+
         setError(
           await validation(
-            validateTitleDebounced,
-            CREATION_OPTION_MIN,
-            CREATION_OPTION_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_OPTION
+            trimmedTitle,
+            OPTION_LENGTH_MIN,
+            OPTION_LENGTH_MAX,
+            newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+            index
           )
         );
       }
     };
 
     func();
-  }, [validation, validateTitleDebounced]);
+  }, [validation, index, validateTitleDebounced]);
 
   return (
     <SWrapper
@@ -111,6 +135,7 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       <STextAreaWrapper>
         <SLeftPart error={!!error} isDragging={isDragging}>
           <STextArea
+            id={id}
             value={item.text}
             onBlur={handleInputBlur}
             onFocus={handleInputFocus}
@@ -246,7 +271,12 @@ const SLeftPart = styled.div<ISLeftPart>`
   }
 `;
 
-const STextArea = styled(TextArea)`
+interface ISTextArea {
+  value: string;
+}
+
+const STextArea = styled(TextArea)<ISTextArea>`
+  display: block;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
   border: none;
@@ -255,16 +285,35 @@ const STextArea = styled(TextArea)`
   background: transparent;
   margin-right: 12px;
 
+  &&& {
+    height: ${({ value }) => (!value ? '24px!important' : undefined)};
+  }
+
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
+  }
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
   }
 
   font-size: 14px;
   line-height: 20px;
 
+  // Prevents size changes on initial rendering
+  &&& {
+    height: ${({ value }) => (!value ? '20px!important' : undefined)};
+  }
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
+
+    // Prevents size changes on initial rendering
+    &&& {
+      height: ${({ value }) => (!value ? '24px!important' : undefined)};
+    }
   }
 `;
 

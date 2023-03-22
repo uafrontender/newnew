@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "ac": {
+      "title": "在NewNew上查看更多Bid",
+      "description": "查看更多創作者在創作者經濟初創公司NewNew上發佈的Bid"
+    },
+    "mc": {
+      "title": "在NewNew上查看更多Superpoll",
+      "description": "查看更多創作者在創作者經濟初創公司NewNew上的發佈的Superpoll"
+    },
+    "cf": {
+      "title": "在NewNew上查看更多Goal",
+      "description": "查看更多創作者在創作者經濟初創公司NewNew上發佈的Goal"
+    },
+    "biggest": {
+      "title": "查看更多為你而發的最熱門的帖子",
+      "description": "觀看我們認為你會喜歡的創作者的最大視頻和帖子"
+    },
+    "for-you": {
+      "title": "查看更多適合你的帖子",
+      "description": "查看我們認為你會喜歡的創作者的視頻和帖子"
+    }
+  },
+  "sortingOption": {
+    "sortingtype": "順序",
+    "sortingtype-all": "所有",
+    "sortingtype-num_bids": "參與者",
+    "sortingtype-num_bids-ac": "出價數量",
+    "sortingtype-num_bids-mc": "投票數量",
+    "sortingtype-num_bids-cf": "支持者人數",
+    "sortingtype-newest": "最新",
+    "bid": "出價",
+    "bid-lowest": "最低",
+    "bid-highest": "最高",
+    "time": "時間",
+    "time-ending-soon": "最快結束",
+    "time-newest": "最新",
+    "time-oldest": "最舊",
+    "numbers-of-bids": "出價數量",
+    "numbers-of-bids-fewest": "最少",
+    "numbers-of-bids-most-first": "最先"
+  },
+  "sorting": {
+    "title": "排序",
+    "button": {
+      "showResults": "顯示結果"
+    }
+  },
+  "collection": {
+    "title": {
+      "ac": "Bid",
+      "mc": "Superpoll",
+      "cf": "Goal",
+      "biggest": "史上最棒",
+      "for-you": "為你而設",
+      "recent-activity": "最近的活動"
+    },
+    "button": {
+      "cancel": "取消"
+    }
+  }
+}

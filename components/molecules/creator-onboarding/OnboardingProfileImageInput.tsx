@@ -2,83 +2,81 @@ import React, { useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 
 import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingProfileImageInput {
+  id?: string;
   imageInEditUrl: string;
   handleChangeImageInEdit: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileImageInput> =
-  ({ imageInEditUrl, handleChangeImageInEdit }) => {
-    const theme = useTheme();
-    const { t } = useTranslation('creator-onboarding');
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobileOrTablet = [
-      'mobile',
-      'mobileS',
-      'mobileM',
-      'mobileL',
-      'tablet',
-    ].includes(resizeMode);
+const OnboardingProfileImageInput: React.FunctionComponent<
+  IOnboardingProfileImageInput
+> = ({ id, imageInEditUrl, handleChangeImageInEdit }) => {
+  const theme = useTheme();
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
-    const imageInputRef = useRef<HTMLInputElement>();
+  const imageInputRef = useRef<HTMLInputElement>();
 
-    return (
-      <SContainer>
-        <SLabel>{t('DetailsSection.form.profilePicture.label')}</SLabel>
-        <SInputContainer>
-          {imageInEditUrl && (
-            <SProfileImage>
-              <img
-                alt='Profile avatar'
-                src={imageInEditUrl}
-                draggable={false}
-              />
-            </SProfileImage>
-          )}
-          <SUploadButton
-            view='secondary'
-            onClick={() => imageInputRef.current?.click()}
-          >
-            <InlineSvg
-              svg={DownloadIcon}
-              width='24px'
-              height='24px'
-              fill={theme.colorsThemed.text.primary}
-            />
-            {!imageInEditUrl
-              ? t('DetailsSection.form.profilePicture.uploadBtn')
-              : t('DetailsSection.form.profilePicture.uploadNewBtn')}
-          </SUploadButton>
-          <SImageInput
-            type='file'
-            accept='image/*'
-            multiple={false}
-            ref={(el) => {
-              imageInputRef.current = el!!;
-            }}
-            onChange={(e) => {
-              handleChangeImageInEdit(e);
-              if (imageInputRef.current) {
-                imageInputRef.current.value = '';
-              }
-            }}
+  return (
+    <SContainer>
+      <SLabel>{t('detailsSection.form.profilePicture.label')}</SLabel>
+      <SInputContainer>
+        {imageInEditUrl && (
+          <SProfileImage>
+            <img alt='Profile avatar' src={imageInEditUrl} draggable={false} />
+          </SProfileImage>
+        )}
+        <SUploadButton
+          view='secondary'
+          onClick={() => imageInputRef.current?.click()}
+        >
+          <InlineSvg
+            svg={DownloadIcon}
+            width='24px'
+            height='24px'
+            fill={theme.colorsThemed.text.primary}
           />
-        </SInputContainer>
-        <SCaption>
-          {isMobileOrTablet
-            ? t('DetailsSection.form.profilePicture.captionMobile')
-            : t('DetailsSection.form.profilePicture.captionDesktop')}
-        </SCaption>
-      </SContainer>
-    );
-  };
+          {!imageInEditUrl
+            ? t('detailsSection.form.profilePicture.button.upload')
+            : t('detailsSection.form.profilePicture.button.uploadNew')}
+        </SUploadButton>
+        <SImageInput
+          id={id}
+          type='file'
+          accept='image/*'
+          multiple={false}
+          ref={(el) => {
+            imageInputRef.current = el!!;
+          }}
+          onChange={(e) => {
+            handleChangeImageInEdit(e);
+            if (imageInputRef.current) {
+              imageInputRef.current.value = '';
+            }
+          }}
+        />
+      </SInputContainer>
+      <SCaption>
+        {isMobileOrTablet
+          ? t('detailsSection.form.profilePicture.captionMobile')
+          : t('detailsSection.form.profilePicture.captionDesktop')}
+      </SCaption>
+    </SContainer>
+  );
+};
 
 export default OnboardingProfileImageInput;
 

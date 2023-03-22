@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
@@ -10,15 +10,21 @@ import preventParentClick from '../../../utils/preventParentClick';
 import Button from '../../atoms/Button';
 import assets from '../../../constants/assets';
 
-const IMAGES: any = {
-  AC: assets.creation.AcAnimated,
-  CF: assets.creation.CfAnimated,
-  MC: assets.creation.McAnimated,
+const DARK_IMAGES: Record<string, () => string> = {
+  AC: assets.common.ac.darkAcAnimated,
+  CF: assets.creation.darkCfAnimated,
+  MC: assets.common.mc.darkMcAnimated,
+};
+
+const LIGHT_IMAGES: Record<string, () => string> = {
+  AC: assets.common.ac.lightAcAnimated,
+  CF: assets.creation.lightCfAnimated,
+  MC: assets.common.mc.lightMcAnimated,
 };
 
 interface IHeroPopup {
   isPopupVisible: boolean;
-  postType: string;
+  postType: 'AC' | 'MC' | 'CF';
   closeModal: () => void;
 }
 
@@ -27,15 +33,20 @@ const HeroPopup: React.FC<IHeroPopup> = ({
   postType,
   closeModal,
 }) => {
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
+  const theme = useTheme();
 
   return (
-    <Modal show={isPopupVisible} onClose={closeModal} additionalZ={99999}>
+    <Modal show={isPopupVisible} onClose={closeModal} additionalz={99999}>
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SImageWrapper>
             <img
-              src={IMAGES[postType]}
+              src={
+                theme.name === 'light'
+                  ? LIGHT_IMAGES[postType]()
+                  : DARK_IMAGES[postType]()
+              }
               alt='Post type'
               width={150}
               height={130}
@@ -49,7 +60,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line2`)}</SText>
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line3`)}</SText>
           <SButton view='primary' onClick={closeModal}>
-            {t('tutorials.heroPopupCommon.heroBtnText')}
+            {t('tutorials.heroPopupCommon.heroButtonText')}
           </SButton>
         </SModal>
       </SContainer>

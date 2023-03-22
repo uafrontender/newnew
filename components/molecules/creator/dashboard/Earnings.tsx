@@ -17,28 +17,39 @@ import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { formatNumber } from '../../../../utils/format';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import Lottie from '../../../atoms/Lottie';
+import { Mixpanel } from '../../../../utils/mixpanel';
 
 interface IFunctionProps {
   hasMyPosts: boolean;
   earnings: newnewapi.GetMyEarningsResponse | undefined;
 }
 
+const EARNINGS_FILTER_TYPES = [
+  '0_days',
+  '1_days',
+  '7_days',
+  '30_days',
+  '90_days',
+  '12_months',
+] as const;
+type EarningsFilterType = typeof EARNINGS_FILTER_TYPES[number];
+
 export const Earnings: React.FC<IFunctionProps> = ({
   hasMyPosts,
   earnings,
 }) => {
-  const { t } = useTranslation('creator');
-  const [filter, setFilter] = useState('7_days');
+  const { t } = useTranslation('page-Creator');
+  const [filter, setFilter] = useState<EarningsFilterType>('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
-  const [myEarnings, setMyEarnings] =
-    useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [myEarnings, setMyEarnings] = useState<
+    newnewapi.GetMyEarningsResponse | undefined
+  >();
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     async function fetchMyEarnings() {
       try {
-        setIsLoading(true);
         const payload = new newnewapi.GetMyEarningsRequest({
           beginDate: dateToTimestamp(
             moment()
@@ -51,9 +62,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
           endDate: dateToTimestamp(new Date()),
         });
         const res = await getMyEarnings(payload);
-
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
+
         setMyEarnings(res.data);
 
         setIsLoading(false);
@@ -77,12 +88,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
       let sum = 0;
       if (myEarnings.auEarnings?.usdCents)
         sum += myEarnings.auEarnings?.usdCents;
-      if (myEarnings.cfEarnings?.usdCents)
-        sum += myEarnings.cfEarnings?.usdCents;
       if (myEarnings.mcEarnings?.usdCents)
         sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.auEarnings?.usdCents)
-        sum += myEarnings.auEarnings?.usdCents;
+      if (myEarnings.bundleEarnings?.usdCents)
+        sum += myEarnings.bundleEarnings?.usdCents;
+
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
@@ -93,18 +103,15 @@ export const Earnings: React.FC<IFunctionProps> = ({
         id: 'ac',
       },
       {
-        id: 'cf',
-      },
-      {
         id: 'mc',
       },
       {
-        id: 'subscriptions',
+        id: 'bundles',
       },
     ],
     []
   );
-  const filterOptions = useMemo(
+  const filterOptions: { id: EarningsFilterType; label: string }[] = useMemo(
     () => [
       {
         id: '0_days',
@@ -141,15 +148,15 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.auEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.auEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
-        case 'cf':
-          return myEarnings?.cfEarnings?.usdCents
+        case 'bundles':
+          return myEarnings?.bundleEarnings?.usdCents
             ? `$${formatNumber(
-                myEarnings.cfEarnings.usdCents / 100 ?? 0,
-                true
+                myEarnings.bundleEarnings.usdCents / 100 ?? 0,
+                false
               )}`
             : '$0.00';
 
@@ -157,15 +164,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
           return myEarnings?.mcEarnings?.usdCents
             ? `$${formatNumber(
                 myEarnings.mcEarnings.usdCents / 100 ?? 0,
-                true
-              )}`
-            : '$0.00';
-
-        case 'subscriptions':
-          return myEarnings?.subsEarnings?.usdCents
-            ? `$${formatNumber(
-                myEarnings.subsEarnings.usdCents / 100 ?? 0,
-                true
+                false
               )}`
             : '$0.00';
 
@@ -177,10 +176,10 @@ export const Earnings: React.FC<IFunctionProps> = ({
   );
 
   const renderListItem = useCallback(
-    (item) => (
+    (item: { id: string }) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
-          {t(`dashboard.earnings.list.${item.id}`)}
+          {t(`dashboard.earnings.list.${item.id}` as any)}
         </SListItemTitle>
         <SListItemValue variant={6}>{getValue(item.id)}</SListItemValue>
       </SListItem>
@@ -189,6 +188,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
   );
 
   const handleChangeFilter = (e: any) => {
+    Mixpanel.track('Earning Filter Changed', {
+      _stage: 'Dashboard',
+      _value: e,
+    });
+
     if (filter !== e) {
       setIsLoading(null);
       setFilter(e);
@@ -199,7 +203,9 @@ export const Earnings: React.FC<IFunctionProps> = ({
     const arr = filter.split('_');
     if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
     if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
-    return `${t('dashboard.earnings.earned')} ${arr[0]} ${arr[1]}`;
+    return `${t('dashboard.earnings.earned')} ${arr[0]} ${t(
+      `dashboard.earnings.units.${arr[1]}` as any
+    )}`;
   };
   /* eslint-disable no-nested-ternary */
   return (
@@ -218,22 +224,11 @@ export const Earnings: React.FC<IFunctionProps> = ({
         <STotalTextWrapper>
           <STotal variant={4}>
             {totalEarnings
-              ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}`
+              ? `$${formatNumber(totalEarnings / 100 ?? 0, false)}`
               : '$0.00'}
           </STotal>
           <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
-        {/* <STotalInsights>
-          <STotalInsightsText>
-            {t(`dashboard.earnings.${isMobile ? 'insights' : 'insights_tablet'}`)}
-          </STotalInsightsText>
-          <STotalInsightsArrow
-            svg={arrowRightIcon}
-            fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
-          />
-        </STotalInsights> */}
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
       {isLoading || initialLoad ? (
@@ -248,8 +243,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <CashOut
-          nextCashoutAmount={myEarnings?.nextCashoutAmount}
-          nextCashoutDate={myEarnings?.nextCashoutDate}
+          nextCashOutAmount={myEarnings?.nextCashoutAmount}
+          nextCashOutDate={myEarnings?.nextCashoutDate}
         />
       ) : (
         <MakeDecision />
@@ -331,18 +326,6 @@ const STotalInsights = styled.div`
   flex-direction: row;
 `;
 
-// const STotalInsightsText = styled.div`
-//   color: ${(props) => props.theme.colorsThemed.text.secondary};
-//   font-size: 14px;
-//   line-height: 24px;
-//   margin-right: 4px;
-// `;
-
-// const STotalInsightsArrow = styled(InlineSVG)`
-//   min-width: 24px;
-//   min-height: 24px;
-// `;
-
 const SListHolder = styled.div`
   left: -8px;
   width: calc(100% + 16px);
@@ -365,12 +348,12 @@ const SListItem = styled.div`
   border-radius: 16px;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(25% - 12px);
+    width: calc(33.33% - 12px);
     margin: 6px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(25% - 20px);
+    width: calc(33.33% - 20px);
     margin: 10px;
   }
 `;

@@ -12,69 +12,82 @@ type TOnboardingBioTextarea = React.ComponentPropsWithoutRef<'textarea'> & {
   errorCaption: string;
 };
 
-const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> =
-  ({ maxChars, value, isValid, errorCaption, onChange, ...rest }) => {
-    const { t } = useTranslation('creator-onboarding');
-    const [charCounter, setCharCounter] = useState((value as string).length);
+const OnboardingBioTextarea: React.FunctionComponent<
+  TOnboardingBioTextarea
+> = ({ maxChars, value, isValid, errorCaption, onChange, ...rest }) => {
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const [charCounter, setCharCounter] = useState((value as string).length);
 
-    const [errorBordersShown, setErrorBordersShown] = useState(false);
-    const [focused, setFocused] = useState(false);
+  const [errorBordersShown, setErrorBordersShown] = useState(false);
+  const [focused, setFocused] = useState(false);
 
-    useEffect(() => {
-      if (focused) return;
-      if (isValid) setErrorBordersShown(false);
-    }, [focused, isValid]);
+  useEffect(() => {
+    if (focused) return;
+    if (isValid) setErrorBordersShown(false);
+  }, [focused, isValid]);
 
-    useEffect(() => {
-      setCharCounter((value as string).length);
-    }, [value, setCharCounter]);
+  useEffect(() => {
+    setCharCounter((value as string).length);
+  }, [value, setCharCounter]);
 
-    return (
-      <SWrapper>
-        <SLabelDiv>
-          <div>{t('AboutSection.bio.title')}</div>
-          <SCharCounter>
-            {charCounter}/{maxChars}
-          </SCharCounter>
-        </SLabelDiv>
-        <SOnboardingBioTextareaDiv>
-          <textarea
-            value={value}
-            maxLength={maxChars}
-            onChange={onChange}
-            onPaste={(e) => {
-              const data = e.clipboardData.getData('Text');
+  return (
+    <SWrapper>
+      <SLabelDiv>
+        <div>{t('aboutSection.bio.title')}</div>
+        <SCharCounter>
+          {charCounter}/{maxChars}
+        </SCharCounter>
+      </SLabelDiv>
+      <SOnboardingBioTextareaDiv>
+        <textarea
+          value={value}
+          maxLength={maxChars}
+          onChange={onChange}
+          onPaste={(e) => {
+            const data = e.clipboardData.getData('Text');
 
-              if (!data || data.length > maxChars) {
-                e.preventDefault();
-              }
-            }}
-            onBlur={() => {
-              setFocused(false);
-              if (!isValid) {
-                setErrorBordersShown(true);
-              } else {
-                setErrorBordersShown(false);
-              }
-            }}
-            onFocus={() => {
-              setFocused(true);
+            if (!data || data.length > maxChars) {
+              e.preventDefault();
+            }
+          }}
+          onBlur={() => {
+            setFocused(false);
+            if (!isValid) {
+              setErrorBordersShown(true);
+            } else {
               setErrorBordersShown(false);
-            }}
-            {...rest}
-          />
-        </SOnboardingBioTextareaDiv>
-        {errorBordersShown ? (
-          <AnimatedPresence animation='t-09'>
-            <SErrorDiv>
-              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-              {errorCaption}
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null}
-      </SWrapper>
-    );
-  };
+            }
+          }}
+          onFocus={() => {
+            setFocused(true);
+            setErrorBordersShown(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (value as string)?.length > 0) {
+              const localValue = value as string;
+              if (localValue.charCodeAt(localValue.length - 1) === 10) {
+                onChange?.({
+                  target: {
+                    value: localValue.slice(0, -1),
+                  },
+                } as any);
+              }
+            }
+          }}
+          {...rest}
+        />
+      </SOnboardingBioTextareaDiv>
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
+    </SWrapper>
+  );
+};
 
 export default OnboardingBioTextarea;
 

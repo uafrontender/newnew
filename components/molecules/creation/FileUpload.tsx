@@ -1,7 +1,6 @@
-import React, { useRef, useState, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -11,37 +10,29 @@ import Caption from '../../atoms/Caption';
 import InlineSVG from '../../atoms/InlineSVG';
 import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
+import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
+import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
-import { loadVideo } from '../../../utils/loadVideo';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
-import {
-  MAX_VIDEO_SIZE,
-  MIN_VIDEO_DURATION,
-  MAX_VIDEO_DURATION,
-} from '../../../constants/general';
+import { MAX_VIDEO_SIZE } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-// import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+import dropboxIcon from '../../../public/images/svg/icons/outlined/upload-cloud.svg';
+
 import {
   removeUploadedFile,
   stopVideoProcessing,
 } from '../../../api/endpoints/upload';
+import { Mixpanel } from '../../../utils/mixpanel';
+import CoverImagePreviewEdit from './CoverImagePreviewEdit';
+import { useAppState } from '../../../contexts/appStateContext';
 import {
-  setCreationFileProcessingError,
-  setCreationFileProcessingLoading,
-  setCreationFileProcessingProgress,
-  setCreationFileUploadError,
-  setCreationFileUploadLoading,
-  setCreationFileUploadProgress,
-  setCreationVideo,
-  setCreationVideoProcessing,
-} from '../../../redux-store/slices/creationStateSlice';
+  TThumbnailParameters,
+  usePostCreationState,
+} from '../../../contexts/postCreationContext';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
-  ssr: false,
-});
-const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
+const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
 });
 
@@ -56,7 +47,8 @@ interface IFileUpload {
   errorProcessing: boolean;
   loadingProcessing: boolean;
   progressProcessing: number;
-  thumbnails: any;
+  thumbnails: TThumbnailParameters;
+  customCoverImageUrl?: string;
   onChange: (id: string, value: any) => void;
   handleCancelVideoUpload: () => void;
 }
@@ -73,101 +65,164 @@ const FileUpload: React.FC<IFileUpload> = ({
   loadingProcessing,
   progressProcessing,
   thumbnails,
+  customCoverImageUrl,
   onChange,
   handleCancelVideoUpload,
 }) => {
-  const [showVideoDelete, setShowVideoDelete] = useState(false);
-  const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
-  const [showFullPreview, setShowFullPreview] = useState(false);
-  const { t } = useTranslation('creation');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef: any = useRef();
-  const [localFile, setLocalFile] = useState(null);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const { post, videoProcessing } = useAppSelector((state) => state.creation);
-  const dispatch = useAppDispatch();
+  const { t } = useTranslation('page-Creation');
+  const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
 
+  const {
+    postInCreation,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
+  } = usePostCreationState();
+  const { post, videoProcessing } = useMemo(
+    () => postInCreation,
+    [postInCreation]
+  );
+
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
-  const handleButtonClick = useCallback(() => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const playerRef: any = useRef();
+  const [localFile, setLocalFile] = useState<File | null>(null);
+
+  const [showVideoDelete, setShowVideoDelete] = useState(false);
+
+  const ellipseButtonRef = useRef<HTMLButtonElement>();
+  const [showEllipseMenu, setShowEllipseMenu] = useState(false);
+  const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
+
+  const [showFullPreview, setShowFullPreview] = useState(false);
+
+  const [showPlayButton, setShowPlayButton] = useState(false);
+
+  const handleUploadButtonClick = useCallback(() => {
+    Mixpanel.track('Select File Clicked', { _stage: 'Creation' });
     inputRef.current?.click();
   }, []);
 
   const handleFullPreview = useCallback(() => {
+    Mixpanel.track('Open Full Preview', { _stage: 'Creation' });
     setShowFullPreview(true);
     playerRef.current.pause();
   }, []);
 
   const handleCloseFullPreviewClick = useCallback(() => {
+    Mixpanel.track('Close Full Preview', { _stage: 'Creation' });
     setShowFullPreview(false);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
-  const handleEditThumb = useCallback(() => {
-    setShowThumbnailEdit(true);
+  const handleOpenEllipseMenu = useCallback(() => {
+    Mixpanel.track('Open Ellipse menu', { _stage: 'Creation' });
+    setShowEllipseMenu(true);
+  }, []);
+
+  const handleCloseEllipseMenu = useCallback(
+    () => setShowEllipseMenu(false),
+    []
+  );
+
+  const handleOpenEditCoverImageMenu = useCallback(() => {
+    Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
+    setCoverImageModalOpen(true);
+    setShowEllipseMenu(false);
     playerRef.current.pause();
   }, []);
 
-  const handleCloseThumbnailEditClick = useCallback(() => {
-    setShowThumbnailEdit(false);
-    playerRef.current.play();
+  const handleCloseCoverImageEditClick = useCallback(() => {
+    Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
+    setCoverImageModalOpen(false);
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
+    Mixpanel.track('Show Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(true);
-    playerRef.current.pause();
+    playerRef.current?.pause();
   }, []);
 
   const handleCloseDeleteVideoClick = useCallback(() => {
+    Mixpanel.track('Close Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(false);
-    playerRef.current.play();
+    playerRef.current.play().catch(() => {
+      setShowPlayButton(true);
+    });
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
+    Mixpanel.track('Delete Video Clicked', { _stage: 'Creation' });
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
 
-  const handlePreviewEditSubmit = useCallback(
-    (params) => {
-      handleCloseThumbnailEditClick();
-      onChange('thumbnailParameters', params);
-    },
-    [handleCloseThumbnailEditClick, onChange]
-  );
-
   const handleFileChange = useCallback(
-    async (e) => {
-      const file = e.target?.files[0];
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { files } = e.target;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
+
+      Mixpanel.track('Video Selected', {
+        _stage: 'Creation',
+        _file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+      });
 
       if (file.size > MAX_VIDEO_SIZE) {
-        toast.error(t('secondStep.video.error.maxSize'));
+        showErrorToastCustom(t('secondStep.video.error.maxSize'));
       } else {
-        const media: any = await loadVideo(file);
+        Mixpanel.track('Video Loading', { _stage: 'Creation' });
 
-        if (media.duration < MIN_VIDEO_DURATION) {
-          toast.error(t('secondStep.video.error.minLength'));
-        } else if (media.duration > MAX_VIDEO_DURATION) {
-          toast.error(t('secondStep.video.error.maxLength'));
-        } else {
-          setLocalFile(file);
-          onChange(id, file);
-        }
+        setLocalFile(file);
+        onChange(id, file);
       }
     },
-    [id, onChange, t]
+    [id, showErrorToastCustom, onChange, t]
   );
 
   const handleRetryVideoUpload = useCallback(() => {
+    Mixpanel.track('Retry Video Upload', {
+      _stage: 'Creation',
+      _video: localFile,
+    });
     onChange(id, localFile);
   }, [id, localFile, onChange]);
 
+  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+    handleCancelVideoUpload();
+    setLocalFile(null);
+  }, [handleCancelVideoUpload]);
+
   const handleCancelVideoProcessing = useCallback(async () => {
+    Mixpanel.track('Cancel Video Processing', {
+      _stage: 'Creation',
+      _publicUrl: post?.announcementVideoUrl,
+    });
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: post?.announcementVideoUrl,
@@ -191,28 +246,93 @@ const FileUpload: React.FC<IFileUpload> = ({
 
       setLocalFile(null);
       onChange(id, null);
-      dispatch(setCreationVideo(''));
-      dispatch(setCreationVideoProcessing({}));
-      dispatch(setCreationFileUploadError(false));
-      dispatch(setCreationFileUploadLoading(false));
-      dispatch(setCreationFileUploadProgress(0));
-      dispatch(setCreationFileProcessingError(false));
-      dispatch(setCreationFileProcessingLoading(false));
-      dispatch(setCreationFileProcessingProgress(0));
+      setCreationVideo('');
+      setCreationVideoProcessing({} as any);
+      setCreationFileUploadError(false);
+      setCreationFileUploadLoading(false);
+      setCreationFileUploadProgress(0);
+      setCreationFileProcessingError(false);
+      setCreationFileProcessingLoading(false);
+      setCreationFileProcessingProgress(0);
     } catch (err) {
       console.error(err);
+      showErrorToastPredefined(undefined);
     }
   }, [
-    dispatch,
     id,
     onChange,
     post?.announcementVideoUrl,
+    setCreationFileProcessingError,
+    setCreationFileProcessingLoading,
+    setCreationFileProcessingProgress,
+    setCreationFileUploadError,
+    setCreationFileUploadLoading,
+    setCreationFileUploadProgress,
+    setCreationVideo,
+    setCreationVideoProcessing,
+    showErrorToastPredefined,
     videoProcessing?.taskUuid,
   ]);
 
+  // Drag & Drop support
+  const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
+
+  const handleOnDragOver = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setDropZoneHighlighted(true);
+    },
+    []
+  );
+
+  const handleOnDragLeave = useCallback(() => {
+    setDropZoneHighlighted(false);
+  }, []);
+
+  const handleOnDrop = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+
+      const { files } = e.dataTransfer;
+
+      if (!files) {
+        return;
+      }
+
+      const file = files[0];
+
+      Mixpanel.track('Video Selected with drag and drop', {
+        _stage: 'Creation',
+        _file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+      });
+
+      if (file.size > MAX_VIDEO_SIZE) {
+        showErrorToastCustom(t('secondStep.video.error.maxSize'));
+      } else {
+        Mixpanel.track('Video Loading', { _stage: 'Creation' });
+
+        setLocalFile(file);
+        onChange(id, file);
+      }
+
+      setDropZoneHighlighted(false);
+    },
+    [id, onChange, showErrorToastCustom, t]
+  );
+
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox htmlFor='file'>
+      <SDropBox
+        htmlFor='file'
+        isHighlighted={dropZoneHighlighted}
+        onDragOver={(e) => handleOnDragOver(e)}
+        onDragLeave={() => handleOnDragLeave()}
+        onDrop={(e) => handleOnDrop(e)}
+      >
         <input
           id='file'
           ref={inputRef}
@@ -227,10 +347,25 @@ const FileUpload: React.FC<IFileUpload> = ({
             }
           }}
         />
-        <SPlaceholder weight={600} variant={2}>
-          {t('secondStep.fileUpload.description')}
-        </SPlaceholder>
-        <SButton view='primaryGrad' onClick={handleButtonClick}>
+        {!isMobile && !isTablet ? (
+          <SInlineSVGDropBox
+            svg={dropboxIcon}
+            fill='none'
+            width='48px'
+            height='48px'
+          />
+        ) : null}
+        <SDropBoxWrapper>
+          <SPseudoHeadline variant={3} weight={600}>
+            {isMobile || isTablet
+              ? t('secondStep.fileUpload.titleMobile')
+              : t('secondStep.fileUpload.titleDesktop')}
+          </SPseudoHeadline>
+          <SPlaceholder weight={600} variant={2}>
+            {t('secondStep.fileUpload.description')}
+          </SPlaceholder>
+        </SDropBoxWrapper>
+        <SButton view='primaryGrad' onClick={handleUploadButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
       </SDropBox>
@@ -252,14 +387,14 @@ const FileUpload: React.FC<IFileUpload> = ({
                 progress: progressUpload,
               })}
             </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => {
-                handleCancelVideoUpload();
-              }}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
+            {progressUpload !== 100 ? (
+              <SLoadingBottomBlockButton
+                view='secondary'
+                onClick={() => handleCancelUploadAndClearLocalFile()}
+              >
+                {t('secondStep.button.cancel')}
+              </SLoadingBottomBlockButton>
+            ) : null}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={progressUpload} />
@@ -304,26 +439,6 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SLoadingDescriptionWithEllipseAnimated variant={2} weight={600}>
             {t('secondStep.video.processing.description')}
           </SLoadingDescriptionWithEllipseAnimated>
-          {/* <SLoadingBottomBlock>
-            <SLoadingDescription variant={2} weight={600}>
-              {t('secondStep.video.processing.process', {
-                time: `${etaProcessing} seconds`,
-                progress: progressProcessing,
-              })}
-            </SLoadingDescription>
-            <SLoadingBottomBlockButton
-              view='secondary'
-              onClick={() => {
-                handleCancelVideoProcessing();
-              }}
-              disabled={!value?.hlsStreamUrl}
-            >
-              {t('secondStep.button.cancel')}
-            </SLoadingBottomBlockButton>
-          </SLoadingBottomBlock> */}
-          {/* <SSpinnerWrapper>
-            <InlineSVG svg={spinnerIcon} width='16px' />
-          </SSpinnerWrapper> */}
         </SLoadingBox>
       );
     } else if (progressProcessing === 100) {
@@ -344,17 +459,30 @@ const FileUpload: React.FC<IFileUpload> = ({
             }}
           />
           <SPlayerWrapper>
-            <BitmovinPlayer
+            {customCoverImageUrl && (
+              <SThumbnailHolder
+                className='thumnailHolder'
+                src={customCoverImageUrl ?? ''}
+                alt='Post preview'
+                draggable={false}
+              />
+            )}
+            <VideojsPlayer
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
-              thumbnails={thumbnails}
               borderRadius='8px'
+              showPlayButton={showPlayButton}
+              playButtonSize='small'
             />
           </SPlayerWrapper>
           <SButtonsContainer>
             <SButtonsContainerLeft>
-              <SVideoButton onClick={handleEditThumb}>
+              <SVideoButton
+                ref={ellipseButtonRef as any}
+                active={showEllipseMenu}
+                onClick={handleOpenEllipseMenu}
+              >
                 {t('secondStep.video.setThumbnail')}
               </SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
@@ -371,30 +499,40 @@ const FileUpload: React.FC<IFileUpload> = ({
           </SButtonsContainer>
         </SFileBox>
       );
+    } else if (localFile) {
+      return null;
     }
 
     return content;
   }, [
+    dropZoneHighlighted,
+    isMobile,
+    isTablet,
     t,
-    value,
-    etaUpload,
-    errorUpload,
+    handleUploadButtonClick,
     loadingUpload,
-    progressUpload,
+    errorUpload,
     errorProcessing,
     loadingProcessing,
     progressProcessing,
-    isDesktop,
     localFile,
-    thumbnails,
-    handleEditThumb,
+    handleOnDragOver,
+    handleOnDragLeave,
+    handleOnDrop,
     handleFileChange,
-    handleFullPreview,
-    handleButtonClick,
-    handleDeleteVideoShow,
-    handleRetryVideoUpload,
+    etaUpload,
+    progressUpload,
+    handleCancelUploadAndClearLocalFile,
     handleCancelVideoProcessing,
-    handleCancelVideoUpload,
+    handleRetryVideoUpload,
+    customCoverImageUrl,
+    value,
+    showPlayButton,
+    showEllipseMenu,
+    handleOpenEllipseMenu,
+    handleDeleteVideoShow,
+    isDesktop,
+    handleFullPreview,
   ]);
 
   return (
@@ -409,14 +547,42 @@ const FileUpload: React.FC<IFileUpload> = ({
         value={value}
         handleClose={handleCloseFullPreviewClick}
       />
-      <ThumbnailPreviewEdit
-        open={showThumbnailEdit}
-        value={value}
-        thumbnails={thumbnails}
-        handleClose={handleCloseThumbnailEditClick}
-        handleSubmit={handlePreviewEditSubmit}
-      />
+      {coverImageModalOpen && (
+        <CoverImagePreviewEdit
+          open={coverImageModalOpen}
+          handleClose={handleCloseCoverImageEditClick}
+          handleSubmit={handleCloseCoverImageEditClick}
+        />
+      )}
       {renderContent()}
+      {/* Ellipse menu */}
+      {!isMobile && (
+        <SEllipseMenu
+          isOpen={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+          anchorElement={ellipseButtonRef.current}
+          anchorOrigin={{
+            horizontal: 'right',
+            vertical: 'center',
+          }}
+          offsetRight='180px'
+        >
+          <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
+            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseMenuButton>
+        </SEllipseMenu>
+      )}
+      {isMobile && showEllipseMenu ? (
+        <EllipseModal
+          zIndex={10}
+          show={showEllipseMenu}
+          onClose={handleCloseEllipseMenu}
+        >
+          <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
+            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
+          </EllipseModalButton>
+        </EllipseModal>
+      ) : null}
     </SWrapper>
   );
 };
@@ -429,25 +595,39 @@ const SWrapper = styled.div`
   width: 100%;
 `;
 
-const SDropBox = styled.label`
+const SDropBox = styled.label<{
+  isHighlighted: boolean;
+}>`
   width: 100%;
   cursor: copy;
   display: flex;
   padding: 16px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  background: ${({ theme, isHighlighted }) =>
+    isHighlighted
+      ? 'rgba(29, 106, 255, 0.2)'
+      : theme.colorsThemed.background.tertiary};
   align-items: center;
   border-radius: 16px;
-  flex-direction: column;
-  justify-content: center;
+  border: 1.5px dashed ${({ theme }) => theme.colors.blue};
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
   }
 `;
 
+const SInlineSVGDropBox = styled(InlineSVG)``;
+
+const SDropBoxWrapper = styled.div`
+  flex-grow: 3;
+`;
+
+const SPseudoHeadline = styled(Text)``;
+
 const SPlaceholder = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-bottom: 12px;
 `;
 
 const SButton = styled(Button)`
@@ -477,13 +657,26 @@ const SFileBox = styled.div`
 `;
 
 const SPlayerWrapper = styled.div`
+  position: relative;
   width: 64px;
   height: 108px;
+  overflow: hidden;
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
     height: 124px;
   }
+`;
+
+const SThumbnailHolder = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: linear 0.3s;
+  z-index: 1;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 `;
 
 const SButtonsContainer = styled.div`
@@ -503,6 +696,7 @@ const SButtonsContainerLeft = styled.div`
 
 interface ISVideoButton {
   danger?: boolean;
+  active?: boolean;
 }
 
 const SVideoButton = styled.button<ISVideoButton>`
@@ -517,6 +711,26 @@ const SVideoButton = styled.button<ISVideoButton>`
   background: transparent;
   font-weight: bold;
   line-height: 24px;
+
+  padding: 0px 2px;
+
+  border-radius: 16px;
+
+  text-align: left;
+
+  ${({ active }) =>
+    active
+      ? css`
+          background-color: ${({ theme }) =>
+            theme.name === 'light'
+              ? theme.colorsThemed.background.secondary
+              : theme.colorsThemed.background.tertiary};
+        `
+      : ''}
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 8px 16px;
+  }
 `;
 
 const SLoadingBox = styled.div`
@@ -684,4 +898,15 @@ const SErrorBottomBlock = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
   }
+`;
+
+// Ellipse menu
+const SEllipseMenu = styled(EllipseMenu)`
+  max-width: 216px;
+  position: fixed !important;
+
+  background: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary} !important;
 `;

@@ -1,29 +1,29 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 
+import isBrowser from '../../../../utils/isBrowser';
+import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import Button from '../../../atoms/Button';
-import InlineSvg from '../../../atoms/InlineSVG';
+import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
+import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
+import { useAppState } from '../../../../contexts/appStateContext';
 
-import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg';
-import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
-import isSafari from '../../../../utils/isSafari';
-
-const PostBitmovinPlayer = dynamic(() => import('../PostBitmovinPlayer'), {
+const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
   ssr: false,
 });
 
 interface IPostVideoSuccess {
-  postId: string;
+  postUuid: string;
   announcement: newnewapi.IVideoUrls;
   response?: newnewapi.IVideoUrls;
   responseViewed: boolean;
+  additionalResponses?: newnewapi.IVideoUrls[];
   openedTab: 'announcement' | 'response';
   setOpenedTab: (tab: 'announcement' | 'response') => void;
   handleSetResponseViewed: (newValue: boolean) => void;
@@ -32,19 +32,20 @@ interface IPostVideoSuccess {
 }
 
 const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
-  postId,
+  postUuid,
   isMuted,
   announcement,
   response,
   responseViewed,
+  additionalResponses,
   openedTab,
   setOpenedTab,
   handleSetResponseViewed,
   handleToggleMuted,
 }) => {
-  const { t } = useTranslation('decision');
+  const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -53,17 +54,18 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     'tablet',
   ].includes(resizeMode);
 
+  // Show controls on shorter screens
+  const [uiOffset, setUiOffset] = useState<number | undefined>(undefined);
+
   useEffect(() => {
     async function markResponseAsViewed() {
       try {
         const payload = new newnewapi.MarkPostRequest({
-          postUuid: postId,
+          postUuid,
           markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
         });
 
         const res = await markPost(payload);
-
-        console.log(res);
 
         if (!res.error) {
           handleSetResponseViewed(true);
@@ -79,80 +81,133 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       handleSetResponseViewed(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postId, user.loggedIn, responseViewed]);
+  }, [openedTab, postUuid, user.loggedIn, responseViewed]);
+
+  // Adjust sound button if needed
+  useEffect(() => {
+    const handleScroll = () => {
+      const rect = document
+        .getElementById('sound-button')
+        ?.getBoundingClientRect();
+
+      let videoRect: DOMRect | undefined;
+      videoRect = document
+        .getElementById(`${postUuid}`)
+        ?.getBoundingClientRect();
+
+      if (!videoRect) {
+        videoRect = document
+          .getElementById(`video-${postUuid}`)
+          ?.getBoundingClientRect();
+      }
+
+      if (!videoRect) {
+        videoRect = document
+          .getElementById('responsesSlider')
+          ?.getBoundingClientRect();
+      }
+
+      if (rect && videoRect) {
+        const delta = window.innerHeight - videoRect.bottom;
+        if (delta < 0) {
+          setUiOffset(Math.abs(delta));
+        } else {
+          setUiOffset(undefined);
+        }
+      }
+    };
+
+    if (isBrowser() && !isMobileOrTablet) {
+      const rect = document
+        .getElementById('sound-button')
+        ?.getBoundingClientRect();
+
+      if (rect) {
+        const isInViewPort =
+          rect.bottom <=
+          (window.innerHeight || document.documentElement?.clientHeight);
+
+        if (!isInViewPort) {
+          const delta = window.innerHeight - rect.bottom;
+          setUiOffset(Math.abs(delta));
+        } else {
+          setUiOffset(undefined);
+        }
+      }
+
+      document?.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      setUiOffset(undefined);
+
+      if (isBrowser() && !isMobileOrTablet) {
+        document?.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [isMobileOrTablet, postUuid, openedTab]);
 
   return (
     <SVideoWrapper>
       {openedTab === 'response' && response ? (
         <>
-          <PostBitmovinPlayer
-            // key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
-            key={postId}
-            id={`video-${postId}`}
-            resources={response}
-            muted={isMuted}
-          />
-          <SSoundButton
-            iconOnly
-            view='transparent'
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
-            }}
-          >
-            <InlineSvg
-              svg={isMuted ? VolumeOff : VolumeOn}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-              fill='#FFFFFF'
+          {!additionalResponses || additionalResponses.length === 0 ? (
+            <PostVideojsPlayer
+              key={postUuid}
+              id={`video-${postUuid}`}
+              resources={response}
+              muted={isMuted}
+              showPlayButton
+              videoDurationWithTime
             />
-          </SSoundButton>
+          ) : (
+            <PostVideoResponsesSlider
+              isDeletingAdditionalResponse={false}
+              videos={[response, ...additionalResponses]}
+              isMuted={isMuted}
+              uiOffset={uiOffset}
+              videoDurationWithTime
+              autoscroll
+            />
+          )}
+          <PostVideoSoundButton
+            postUuid={postUuid}
+            isMuted={isMuted}
+            uiOffset={uiOffset}
+            handleToggleMuted={handleToggleMuted}
+          />
         </>
       ) : (
         <>
-          <PostBitmovinPlayer
-            id={postId}
+          <PostVideojsPlayer
+            id={postUuid}
             resources={announcement}
             muted={isMuted}
+            showPlayButton
+            videoDurationWithTime
           />
-          <SSoundButton
-            iconOnly
-            view='transparent'
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleMuted();
-              if (isSafari()) {
-                (
-                  document?.getElementById(
-                    `bitmovinplayer-video-${postId}`
-                  ) as HTMLVideoElement
-                )?.play();
-              }
-            }}
-          >
-            <InlineSvg
-              svg={isMuted ? VolumeOff : VolumeOn}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-              fill='#FFFFFF'
-            />
-          </SSoundButton>
+          <PostVideoSoundButton
+            postUuid={postUuid}
+            isMuted={isMuted}
+            uiOffset={uiOffset}
+            handleToggleMuted={handleToggleMuted}
+          />
         </>
       )}
       {!responseViewed && openedTab === 'announcement' && response ? (
         <SWatchResponseWrapper>
           <SWatchResponseBtn
             shouldView={!responseViewed}
+            onClickCapture={() => {
+              Mixpanel.track('Set Opened Tab Response', {
+                _stage: 'Post',
+                _postUuid: postUuid,
+                _component: 'PostVideoSuccess',
+              });
+            }}
             onClick={() => setOpenedTab('response')}
           >
-            {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+            {t('postVideoSuccess.tabs.watchResponseFirstTime')}
           </SWatchResponseBtn>
         </SWatchResponseWrapper>
       ) : null}
@@ -160,15 +215,29 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         <SToggleVideoWidget>
           <SChangeTabBtn
             shouldView={openedTab === 'announcement'}
+            onClickCapture={() => {
+              Mixpanel.track('Set Opened Tab Announcement', {
+                _stage: 'Post',
+                _postUuid: postUuid,
+                _component: 'PostVideoSuccess',
+              });
+            }}
             onClick={() => setOpenedTab('announcement')}
           >
-            {t('PostVideoSuccess.tabs.announcement')}
+            {t('postVideoSuccess.tabs.announcement')}
           </SChangeTabBtn>
           <SChangeTabBtn
             shouldView={openedTab === 'response'}
+            onClickCapture={() => {
+              Mixpanel.track('Set Opened Tab Response', {
+                _stage: 'Post',
+                _postUuid: postUuid,
+                _component: 'PostVideoSuccess',
+              });
+            }}
             onClick={() => setOpenedTab('response')}
           >
-            {t('PostVideoSuccess.tabs.response')}
+            {t('postVideoSuccess.tabs.response')}
           </SChangeTabBtn>
         </SToggleVideoWidget>
       ) : null}
@@ -207,6 +276,8 @@ const SVideoWrapper = styled.div`
     height: 506px;
     margin-left: initial;
 
+    flex-shrink: 0;
+
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     video {
@@ -218,31 +289,6 @@ const SVideoWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     width: 410px;
     height: 728px;
-  }
-`;
-
-const SSoundButton = styled(Button)`
-  position: absolute;
-  right: 16px;
-  bottom: 24px;
-
-  padding: 8px;
-  width: 36px;
-  height: 36px;
-
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 36px;
-    height: 36px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding: 12px;
-    width: 48px;
-    height: 48px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
 

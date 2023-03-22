@@ -22,25 +22,24 @@ variables:
   #
   # The 'docker' hostname is the alias of the service container as described at
   # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services.
-  BRANCH_ENV: "$CI_COMMIT_REF_NAME"
-  DOCKER_HOST: "tcp://docker:2375"
-  DOCKER_TLS_CERTDIR: ""
+  BRANCH_ENV: '$CI_COMMIT_REF_NAME'
+  DOCKER_HOST: 'tcp://docker:2375'
+  DOCKER_TLS_CERTDIR: ''
   # AWS_DEFAULT_REGION (and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY configured in the gitlab UI) are used by the AWS CLI which are used by `./bin/build-and-push-image-to-ecr`, `./bin/upload-assets-to-s3`, and `./bin/ecs`
-  AWS_DEFAULT_REGION: "us-east-2"
+  AWS_DEFAULT_REGION: 'us-east-2'
   # the below variables are used by `./bin/build-and-push-image-to-ecr`, `./bin/upload-assets-to-s3`, and `./bin/ecs`
-  CI_APPLICATION_REPOSITORY: "$ECR_HOST/web"
-  CI_APPLICATION_TAG: "$CI_PIPELINE_IID"
+  CI_APPLICATION_REPOSITORY: '$ECR_HOST/web'
+  CI_APPLICATION_TAG: '$CI_PIPELINE_IID'
   # the below variable is used by `./bin/upload-assets-to-s3`
-  CI_AWS_S3_BUCKET: "web-$CI_COMMIT_REF_NAME-aws-ecr-ecs-gitlab-ci-cd"
+  CI_AWS_S3_BUCKET: 'web-$CI_COMMIT_REF_NAME-aws-ecr-ecs-gitlab-ci-cd'
   # the below variables are used by `./bin/ecs`
-  CI_AWS_ECS_CLUSTER: "web"
-  CI_AWS_ECS_SERVICE: "web-$CI_COMMIT_REF_NAME"
-  CI_AWS_ECS_TASK_DEFINITION: "web-$CI_COMMIT_REF_NAME"
+  CI_AWS_ECS_CLUSTER: 'web'
+  CI_AWS_ECS_SERVICE: 'web-$CI_COMMIT_REF_NAME'
+  CI_AWS_ECS_TASK_DEFINITION: 'web-$CI_COMMIT_REF_NAME'
   # the below variable is used by `./bin/build-and-push-image-to-ecr`
-  NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
-  npm_config_cache: "$CI_PROJECT_DIR/.npm"
-  CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
-  NEXT_PUBLIC_BITMOVIN_PLAYER_KEY: "$BITMOVIN_PLAYER_KEY"
+  NEXT_JS_ASSET_URL: 'https://$CI_AWS_S3_BUCKET.s3.amazonaws.com'
+  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+  CYPRESS_CACHE_FOLDER: '$CI_PROJECT_DIR/cache/Cypress'
 
 stages:
   - test
@@ -56,7 +55,7 @@ cache:
     - node_modules
     - .next
 
-# Test using Cypress tests
+# Test using Cypress tests and Jest tests
 test:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
@@ -64,6 +63,7 @@ test:
   stage: test
   script:
     - npm ci --include=dev
+    - npm run test
     - npm run lint
     - npm run dev & npx wait-on http://localhost:4000
     - npm run test -- --record
@@ -78,18 +78,18 @@ build:
       when: manual
       allow_failure: true
       variables:
-        NEXT_PUBLIC_BASE_URL: "https://api-dev.newnew.co/v1"
-        NEXT_PUBLIC_SOCKET_URL: "https://api-dev.newnew.co"
+        NEXT_PUBLIC_BASE_URL: 'https://api-dev.newnew.co/v1'
+        NEXT_PUBLIC_SOCKET_URL: 'https://api-dev.newnew.co'
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
       variables:
-        NEXT_PUBLIC_BASE_URL: "https://api.newnew.co/v1"
-        NEXT_PUBLIC_SOCKET_URL: "https://api.newnew.co"
+        NEXT_PUBLIC_BASE_URL: 'https://api.newnew.co/v1'
+        NEXT_PUBLIC_SOCKET_URL: 'https://api.newnew.co'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
       variables:
-        NEXT_PUBLIC_BASE_URL: "https://api-staging.newnew.co/v1"
-        NEXT_PUBLIC_SOCKET_URL: "https://api-staging.newnew.co"
+        NEXT_PUBLIC_BASE_URL: 'https://api-staging.newnew.co/v1'
+        NEXT_PUBLIC_SOCKET_URL: 'https://api-staging.newnew.co'
   needs: []
   stage: build
   image: saltycrane/aws-cli-and-docker
@@ -110,7 +110,7 @@ deploy:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
-  needs: ["build"]
+  needs: ['build']
   stage: deploy
   image: saltycrane/aws-cli-and-docker
   services:

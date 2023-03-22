@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "About NewNew",
+    "description": "Learn more about creator economy company NewNew’s investors, press & media "
+  },
+  "intro": {
+    "title": "NewNew is where people come together to bid and vote on the world’s biggest decisions",
+    "text": "We empower people to take control and have more interactive experiences"
+  },
+  "press": {
+    "title": "Press",
+    "items": [
+      {
+        "title": "The app that lets you pay to control another person's life."
+      },
+      {
+        "title": "For Creators, Everything Is for Sale"
+      },
+      {
+        "title": "Monetizing the ‘creator economy,’ with NewNew."
+      },
+      {
+        "title": "20 creator economy startups to watch as the space heats up..."
+      },
+      {
+        "title": "Smart VCs Recognize That Black Female Founders May Lead..."
+      },
+      {
+        "title": "Quicktake “Take the Lead” (03/25/2020)"
+      },
+      {
+        "title": "How polling app NewNew represents the new class of..."
+      },
+      {
+        "title": "This tech 'outsider' CEO from Toronto went from Drake’s inner..."
+      },
+      {
+        "title": "Former Drake Executive Discusses Her Transition To Tech And... "
+      }
+    ]
+  },
+  "backers": {
+    "title": "Backers"
+  },
+  "investors": {
+    "title": "Individual Investors",
+    "participants": [
+      {
+        "name": "Michael Ovitz",
+        "description": "Founder, Creative Artists Agency (CAA)"
+      },
+      {
+        "name": "Stephen Pagliuca",
+        "description": "Co-Chairman, Bain Capital"
+      },
+      {
+        "name": "Kevin Mayer",
+        "description": "Chairman, DAZN Group (Former TikTok CEO  & Disney Chairman)"
+      },
+      {
+        "name": "Steven Galanis",
+        "description": "Founder, Cameo"
+      }
+    ]
+  }
+}

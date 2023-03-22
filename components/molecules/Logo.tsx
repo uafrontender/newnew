@@ -7,31 +7,36 @@ import Link from 'next/link';
 import Lottie from '../atoms/Lottie';
 import InlineSVG from '../atoms/InlineSVG';
 
-import { useAppSelector } from '../../redux-store/store';
-
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
 import logoText from '../../public/images/svg/logo_text.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
 
 export const Logo: React.FunctionComponent<{
   style?: React.CSSProperties;
-}> = ({ style }) => {
+  isShort?: boolean;
+}> = ({ style, isShort }) => {
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
   const handleClick = () => {
+    Mixpanel.track('Navigation Item Clicked', {
+      _button: 'Header Logo',
+    });
+
+    // This is used for smooth scrolling unlike the next/Link scrolling by hash
     if (router.pathname === '/') {
-      scroller.scrollTo('top-reload', {
+      scroller.scrollTo('generalContainer', {
         smooth: 'easeInOutQuart',
         duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
       });
     }
   };
@@ -46,37 +51,49 @@ export const Logo: React.FunctionComponent<{
     };
   });
 
-  return (
-    <Link href='/' passHref>
-      <SWrapper
-        {...{
-          ...(style
-            ? {
-                style,
-              }
-            : {}),
-        }}
-        onClick={handleClick}
-      >
-        <SAnimationWrapper>
-          <Lottie
-            width={isMobile ? 55 : 65}
-            height={isMobile ? 45 : 60}
-            options={{
-              loop: false,
-              autoplay: true,
-              animationData: logoAnimation,
-            }}
-            isStopped={!loading}
-          />
-        </SAnimationWrapper>
+  const Content = (
+    <SWrapper
+      {...{
+        ...(style
+          ? {
+              style,
+            }
+          : {}),
+      }}
+      isShort={isShort}
+      onClick={handleClick}
+    >
+      <SAnimationWrapper>
+        <Lottie
+          width={isMobile ? 55 : 65}
+          height={isMobile ? 45 : 55}
+          options={{
+            loop: false,
+            autoplay: true,
+            animationData: logoAnimation,
+          }}
+          isStopped={!loading}
+        />
+      </SAnimationWrapper>
+      {!isMobile && !isShort && (
         <SInlineSVG
           svg={logoText}
           fill={theme.colorsThemed.text.primary}
           width={isMobile ? '81px' : '94px'}
           height={isMobile ? '21px' : '21px'}
         />
-      </SWrapper>
+      )}
+    </SWrapper>
+  );
+
+  // Don`t add Link if it has no purpose
+  if (router.pathname === '/') {
+    return Content;
+  }
+
+  return (
+    <Link href='/' passHref>
+      {Content}
     </Link>
   );
 };
@@ -87,8 +104,10 @@ Logo.defaultProps = {
 
 export default Logo;
 
-const SWrapper = styled.a`
-  width: 127px;
+const SWrapper = styled.a<{
+  isShort?: boolean;
+}>`
+  width: ${({ isShort }) => (isShort ? '45px' : '127px')};
   height: 40px;
   cursor: pointer;
   display: flex;
@@ -97,7 +116,7 @@ const SWrapper = styled.a`
   justify-content: flex-end;
 
   ${(props) => props.theme.media.tablet} {
-    width: 152px;
+    width: ${({ isShort }) => (isShort ? '55px' : '152px')};
     height: 48px;
   }
 `;

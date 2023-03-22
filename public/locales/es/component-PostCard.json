@@ -1,0 +1,29 @@
+{
+  "button": {
+    "withActivity": {
+      "ac": "{{amount}} en ofertas",
+      "mc": "{{votes}} votos",
+      "mcSingular": "{{votes}} voto",
+      "cf": "{{backed}} de {{total}} patrocinadores"
+    },
+    "withoutActivity": {
+      "ac": "Ofertar ahora",
+      "mc": "¡Sé el primero en votar!",
+      "cf": "Patrocinar este Goal"
+    },
+    "seeResults": {
+      "ac": "Ver Bid",
+      "mc": "Ver Superpoll",
+      "cf": "Ver Goal"
+    }
+  },
+  "timer": {
+    "timeLeft": "Quedan {{time}}",
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Terminó el ",
+    "soon": "Próximamente"
+  }
+}

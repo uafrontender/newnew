@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-nested-ternary */
 // Temp disabled until backend is in place
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
@@ -19,7 +19,7 @@ import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
 
 // Reason for signing up type
-import { SignupReason } from '../../pages/sign-up';
+import { SignupReason } from '../../utils/signUpReasons';
 
 // Components
 import AnimatedPresence from '../atoms/AnimatedPresence';
@@ -44,6 +44,10 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
 import isSafari from '../../utils/isSafari';
+import { Mixpanel } from '../../utils/mixpanel';
+import { I18nNamespaces } from '../../@types/i18next';
+import { loadStateLS, removeStateLS } from '../../utils/localStorage';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ISignupMenu {
   goal?: string;
@@ -58,11 +62,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('sign-up');
+  const { t } = useTranslation('page-SignUp');
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -80,12 +84,26 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   // NB! We won't have 'already exists' errors, but will probably
   // need some case for banned users, etc.
-  const [submitError, setSubmitError] = useState<string>('');
+  const [submitError, setSubmitError] = useState<
+    keyof I18nNamespaces['page-SignUp']['error'] | ''
+  >('');
+
+  const [textWidth, setTextWidth] = useState<number | undefined>();
+
+  const handleTextWidthChange = useCallback((newTextWidth: number) => {
+    setTextWidth((curr) => Math.max(curr || 0, newTextWidth));
+  }, []);
 
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
     setSubmitError('');
     try {
+      const localHasSoldBundles = loadStateLS(
+        'creatorHasSoldBundles'
+      ) as boolean;
+      if (localHasSoldBundles) {
+        removeStateLS('creatorHasSoldBundles');
+      }
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
         useCase:
@@ -102,20 +120,33 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       dispatch(setSignupEmailInput(emailInput));
-      setIsSubmitLoading(false);
 
       authLayoutContext.setShouldHeroUnmount(true);
 
+      const parameters = {
+        to: goal,
+        reason,
+        redirectUrl: redirectURL,
+      };
+      const queryString = Object.entries(parameters)
+        .filter(([key, value]) => value)
+        .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
+        .join('&');
+
+      const verificationPath = `/verify-email${
+        queryString ? `?${queryString}` : ''
+      }`;
+
       if (!isSafari()) {
         setTimeout(() => {
-          router.push('/verify-email');
+          router.replace(verificationPath);
         }, 1000);
       } else {
-        router.push('/verify-email');
+        router.replace(verificationPath);
       }
     } catch (err: any) {
       setIsSubmitLoading(false);
-      setSubmitError(err?.message ?? 'generic_error');
+      setSubmitError(err?.message ?? 'genericError');
     }
   };
 
@@ -134,6 +165,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   const redirectUrlParam = redirectURL
     ? `?redirect_url=${encodeURIComponent(redirectURL)}`
+    : goal === 'create'
+    ? `?redirect_url=${process.env.NEXT_PUBLIC_APP_URL}/creator-onboarding`
     : '';
 
   return (
@@ -149,15 +182,22 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       <SMenuWrapper>
         <SSignInBackButton
           defer={isMobile ? 250 : undefined}
-          onClick={() => router.back()}
+          onClick={() => {
+            Mixpanel.track('Back Button Clicked', {
+              _stage: 'Sign Up',
+            });
+            router.back();
+          }}
         >
-          <span>{t('goBackBtn')}</span>
+          <span>{t('button.back')}</span>
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
-            ? `${t('heading.sign-in-to')} ${t(`heading.reasons.${reason}`)}`
-            : goal
-            ? t(`heading.${goal}`)
+            ? `${t('heading.sign-in-to')} ${t(
+                `heading.reason.${
+                  reason as keyof I18nNamespaces['page-SignUp']['heading']['reason']
+                }`
+              )}`
             : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
@@ -172,13 +212,18 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={GoogleIcon}
               hoverBgColor={theme.colorsThemed.social.google.hover}
               pressedBgColor={theme.colorsThemed.social.google.pressed}
-              onClick={() =>
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
+              onClick={() => {
+                Mixpanel.track('Sign In With Google Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/google${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
-              {t('signupOptions.google')}
+              {t('signUpOptions.google')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -188,13 +233,18 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() =>
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
+              onClick={() => {
+                Mixpanel.track('Sign In With Apple Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/apple${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
-              {t('signupOptions.apple')}
+              {t('signUpOptions.apple')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -204,11 +254,16 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() =>
-                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
-              }
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
+              onClick={() => {
+                Mixpanel.track('Sign In With Facebook Clicked', {
+                  _stage: 'Sign Up',
+                });
+                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`);
+              }}
             >
-              {t('signupOptions.facebook')}
+              {t('signUpOptions.facebook')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -217,13 +272,18 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() =>
+              textWidth={textWidth}
+              setTextWidth={handleTextWidthChange}
+              onClick={() => {
+                Mixpanel.track('Sign In With Twitter Clicked', {
+                  _stage: 'Sign Up',
+                });
                 handleSignupRedirect(
                   `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
-                )
-              }
+                );
+              }}
             >
-              {t('signupOptions.twitter')}
+              {t('signUpOptions.twitter')}
             </SignInButton>
           </motion.div>
           <motion.div variants={item}>
@@ -231,12 +291,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               lineColor={theme.colorsThemed.background.outlines1}
               innerSpan={
                 <SContinueWithSpan>
-                  {t('signupOptions.or_continue_with')}
+                  {t('signUpOptions.orContinueWith')}
                 </SContinueWithSpan>
               }
             />
           </motion.div>
           <SEmailSignInForm
+            id='authenticate-form'
             onSubmit={(e) => {
               e.preventDefault();
               if (
@@ -250,6 +311,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           >
             <motion.div variants={item}>
               <SignInTextInput
+                id='authenticate-input'
                 name='email'
                 type='email'
                 autoComplete='true'
@@ -260,15 +322,17 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   if (submitError) setSubmitError('');
                 }}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder={t('signupOptions.email')}
-                errorCaption={t('errors.email_invalid')}
+                placeholder={t('signUpOptions.email')}
+                errorCaption={t('error.emailInvalid')}
               />
             </motion.div>
             {submitError ? (
               <AnimatedPresence animateWhenInView={false} animation='t-09'>
                 <SErrorDiv>
-                  <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-                  {t(`errors.${submitError}`)}
+                  <>
+                    <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+                    {t(`error.${submitError}`)}
+                  </>
                 </SErrorDiv>
               </AnimatedPresence>
             ) : null}
@@ -278,13 +342,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 disabled={
                   !emailInputValid || isSubmitLoading || emailInput.length === 0
                 }
-                onClick={() => {}}
+                onClick={() => {
+                  Mixpanel.track('Sign In With Email Clicked', {
+                    _stage: 'Sign Up',
+                    _email: emailInput,
+                  });
+                }}
               >
-                <span>
-                  {goal !== 'log-in'
-                    ? t('signupOptions.signInBtn')
-                    : t('signupOptions.logInBtn')}
-                </span>
+                <span>{t('signUpOptions.signInButton')}</span>
               </EmailSignInButton>
             </motion.div>
           </SEmailSignInForm>
@@ -295,23 +360,46 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           delay={1.1}
         >
           <SLegalText>
-            {t('legalDisclaimer.main_text')}
+            {t('legalDisclaimer.mainText')}
             <br />
             <Link href='https://privacy.newnew.co'>
-              <a href='https://privacy.newnew.co' target='_blank'>
-                {t('legalDisclaimer.privacy_policy')}
+              <a
+                href='https://privacy.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Privacy Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
+                {t('legalDisclaimer.privacyPolicy')}
               </a>
             </Link>
-            {', '}
             <Link href='https://terms.newnew.co'>
-              <a href='https://terms.newnew.co' target='_blank'>
+              <a
+                href='https://terms.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Terms Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
                 {t('legalDisclaimer.terms')}
               </a>
             </Link>{' '}
             {t('legalDisclaimer.and')}{' '}
             <Link href='https://communityguidelines.newnew.co'>
-              <a href='https://communityguidelines.newnew.co' target='_blank'>
-                {t('legalDisclaimer.community_guidelines')}
+              <a
+                href='https://communityguidelines.newnew.co'
+                target='_blank'
+                onClickCapture={() =>
+                  Mixpanel.track('Community Guidelines Link Clicked', {
+                    _stage: 'Sign Up',
+                  })
+                }
+              >
+                {t('legalDisclaimer.communityGuidelines')}
               </a>
             </Link>
           </SLegalText>
@@ -343,7 +431,7 @@ const item: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
+      duration: 1,
     },
   },
 };
@@ -455,7 +543,8 @@ const SSignInBackButton = styled(GoBackButton)`
 
     width: fit-content;
 
-    margin-top: 142px;
+    margin-top: 62px;
+    margin-bottom: 80px;
     padding: 0;
 
     span {

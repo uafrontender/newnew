@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-unused-expressions */
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 
 import Col from '../atoms/Grid/Col';
@@ -9,7 +10,11 @@ import Banner from '../molecules/Banner';
 import Desktop from '../molecules/header/Desktop';
 import Container from '../atoms/Grid/Container';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import useHasMounted from '../../utils/hooks/useHasMounted';
+import { useAppState } from '../../contexts/appStateContext';
+import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
+import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 
 interface IHeader {
   visible: boolean;
@@ -17,7 +22,26 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
+
+  const dispatch = useAppDispatch();
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTabletOrSmallDesktop = ['tablet', 'laptop'].includes(resizeMode);
+  const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
+
+  const headerRef = useRef(null);
+
+  useOnClickOutside(headerRef, () => {
+    dispatch(setGlobalSearchActive(false));
+  });
+
+  const hasMounted = useHasMounted();
+
+  if (!hasMounted) return null;
 
   return (
     <SWrapper
@@ -25,19 +49,16 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       id='top-nav-header'
       visible={visible}
       withBanner={!!banner.show}
+      ref={headerRef}
     >
       <Banner />
-      <SContentWrapper>
-        <Container noMaxContent>
+      <SContentWrapper id='top-nav-header-wrapper'>
+        <Container wideContainer>
           <Row>
             <Col>
-              {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-                resizeMode
-              ) && <Mobile />}
-              {['tablet', 'laptop'].includes(resizeMode) && <Tablet />}
-              {['laptopM', 'laptopL', 'desktop'].includes(resizeMode) && (
-                <Desktop />
-              )}
+              {isMobile && <Mobile />}
+              {isTabletOrSmallDesktop && <Tablet />}
+              {isDesktop && <Desktop />}
             </Col>
           </Row>
         </Container>
@@ -59,7 +80,7 @@ const SWrapper = styled.header<ISWrapper>`
     props.visible ? `${props.withBanner ? 0 : '-40px'}` : '-96px'};
   left: 0;
   width: 100vw;
-  z-index: 10;
+  z-index: 11;
   position: fixed;
   transition: top ease 0.5s;
   background-color: ${(props) =>

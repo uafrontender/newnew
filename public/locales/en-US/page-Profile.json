@@ -1,0 +1,322 @@
+{
+  "Active": {
+    "meta": {
+      "title": "NewNew Profile Page",
+      "description": "Customize your NewNew profile with username, display name, bio and more"
+    },
+    "noContent": {
+      "description": "Posts you’re actively bidding on\nor voting on will be shown here"
+    }
+  },
+  "MyPosts": {
+    "meta": {
+      "title": "My NewNew Posts",
+      "description": "Re-watch all of the posts you created on NewNew for the audience"
+    },
+    "noContent": {
+      "description": "Posts you created will be shown here"
+    }
+  },
+  "Purchases": {
+    "meta": {
+      "title": "My NewNew Purchases",
+      "description": "See what you buy on NewNew"
+    },
+    "noContent": {
+      "description": "Any purchases you make\nwill be shown here"
+    }
+  },
+  "ViewingHistory": {
+    "meta": {
+      "title": "NewNew History",
+      "description": "History of all posts you have ever visited on NewNew"
+    },
+    "noContent": {
+      "description": "All posts you previewed\nwill be kept here in your history"
+    }
+  },
+  "Favorites": {
+    "meta": {
+      "title": "NewNew Favorites",
+      "description": "Browse through all of your saved favorite posts and creator"
+    },
+    "noContent": {
+      "description": "Posts that you 'favorite'\nwill be shown here"
+    }
+  },
+  "Profile": {
+    "meta": {
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description": "{{bio}} Bid and Vote on what people do next"
+    },
+    "user": {
+      "noContent": {
+        "description": "{{username}} has no activity yet.",
+        "suggestion": "Explore what's new",
+        "button": "Explore"
+      }
+    },
+    "creator": {
+      "noContent": {
+        "description": "Posts from the creator will be shown here"
+      }
+    }
+  },
+  "Activity": {
+    "meta": {
+      "title": "{{displayname}} (@{{username}}) | NewNew",
+      "description": "{{bio}} Bid and Vote on what people do next"
+    },
+    "noContent": {
+      "description": "Any creators activity will be shown here"
+    }
+  },
+  "tabs": {
+    "activelyBidding": "Active",
+    "purchases": "Purchases",
+    "viewHistory": "Viewing history",
+    "myposts": "My posts",
+    "favorites": "Favorites",
+    "userInitial": "Posts",
+    "activity": "Activity"
+  },
+  "accountPrivate": "{{username}}'s activity is private",
+  "modal": {
+    "blockUser": {
+      "title": "Block user",
+      "messageFirstPart": "Do you really want to block ",
+      "messageSecondPart": "?",
+      "button": {
+        "cancel": "Cancel",
+        "confirm": "Block user"
+      }
+    },
+    "deleteMyAccount": {
+      "title": "Delete my account",
+      "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
+      "button": {
+        "confirm": "Delete my account",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "profileLayout": {
+    "headerButtons": {
+      "edit": "Edit Profile",
+      "settings": "Settings"
+    },
+    "buttons": {
+      "favorites": "Favorites",
+      "enableSmsNotifications": "Notify me",
+      "disableSmsNotifications": "Notifications ON",
+      "buyBundles": "Buy Bundles",
+      "votesLeft": "{{amount}} votes left",
+      "sendMessage": "Send message",
+      "copied": "Link copied!"
+    }
+  },
+  "editProfileMenu": {
+    "button": {
+      "backToProfile": "Edit profile",
+      "backToImage": "Edit Profile Image",
+      "save": "Save changes",
+      "cancel": "Cancel"
+    },
+    "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
+    "inputs": {
+      "coverImage": {
+        "changeCoverImage": "Change cover image"
+      },
+      "nickname": {
+        "placeholder": "Display name",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Name is too long",
+          "tooShort": "Name is too short",
+          "invalidChar": "Name has invalid characters",
+          "inappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
+        }
+      },
+      "username": {
+        "placeholder": "@username",
+        "frequencyCaption": "{{domain}}{{username}}",
+        "cannotBeChangedCaption": "Username can be changed once a month.",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Username is too long",
+          "tooShort": "Username is too short",
+          "invalidChar": "Username has invalid characters",
+          "inappropriate": "Offensive words are forbidden",
+          "taken": "Username is taken",
+          "linksForbidden": "Links not allowed"
+        },
+        "points": {
+          "1": "2-25 characters length",
+          "2": "Lower case only",
+          "3": "No space and special characters"
+        }
+      },
+      "genderPronouns": {
+        "placeholder": "Gender",
+        "caption": "This can be changed or removed later"
+      },
+      "bio": {
+        "placeholder": "Bio",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Bio is too long",
+          "tooShort": "Bio is too short",
+          "inappropriate": "Offensive words are forbidden",
+          "linksForbidden": "No links allowed in bio"
+        }
+      }
+    }
+  },
+  "Settings": {
+    "meta": {
+      "title": "NewNew Settings",
+      "description": "Customize your NewNew profile and settings"
+    },
+    "heading": "Settings",
+    "button": {
+      "back": "Back"
+    },
+    "colorModeSwitch": {
+      "options": {
+        "light": "Light",
+        "dark": "Dark",
+        "auto": "Auto"
+      }
+    },
+    "sections": {
+      "wallet": {
+        "balance": "My balance",
+        "caption": "Add funds to vote and bid without any fees",
+        "button": {
+          "topUp": "Add funds"
+        },
+        "topUpWalletModal": {
+          "heading": "Add funds",
+          "button": {
+            "checkout": "Checkout",
+            "cancel": "Cancel"
+          }
+        }
+      },
+      "cards": {
+        "title": "My cards",
+        "myPaymentMethods": "My payment methods",
+        "hint": "You’ll need a card on file to participate in posts",
+        "adding": "Adding a new card...",
+        "ooops": "Ooops!",
+        "success": "Congratulations!",
+        "button": {
+          "addNewCard": "Add a new card",
+          "addCard": "Add card"
+        },
+        "primary": "Primary",
+        "ellipse": {
+          "makePrimary": "Make it primary",
+          "removeCard": "Remove card"
+        },
+        "status": {
+          "added": "Success! Your card has been saved",
+          "cannotBeAdded": "Failure! Your card cannot be saved",
+          "duplicate": "This card has been already saved in your profile",
+          "inProgress": "Saving your card. Please wait",
+          "requestFailed": "Something went wrong"
+        }
+      },
+      "personalInformation": {
+        "title": "Personal information",
+        "emailInput": {
+          "label": "Email address",
+          "placeholder": "email@email.com",
+          "errors": {
+            "invalidEmail": "Please enter a valid email address",
+            "emailTaken": "Email taken"
+          },
+          "whatsNew": "What’s your new email address?",
+          "confirmEmail": "Confirm new email",
+          "verifyNewEmail": "Confirm your new email",
+          "edit": "Edit"
+        },
+        "birthDateInput": {
+          "label": "Date of birth",
+          "errors": {
+            "tooYoung": "You must be 18 years or older."
+          },
+          "captions": {
+            "twoTimesOnly": "Birthday can be changed 2 times only",
+            "cannotChange": "You can only change this once"
+          }
+        },
+        "button": {
+          "save": "Save changes",
+          "cancel": "Cancel"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "email": "Email Notifications",
+        "push": "Push Notifications"
+      },
+      "transactions": {
+        "title": "Transactions",
+        "you": "You",
+        "type": {
+          "1": "bid",
+          "2": "superpoll",
+          "3": "goal"
+        },
+        "actions": {
+          "topup": "top-up your wallet.",
+          "decision": "post.",
+          "1": "bid on",
+          "2": "voted on",
+          "3": "backed on",
+          "5": "subscribed to",
+          "6": "purchased bundle from"
+        }
+      },
+      "privacy": {
+        "title": "Privacy",
+        "privacySubsections": {
+          "spending": {
+            "title": "Hide my spending from others",
+            "caption": "People will not be able to see how much you spent on Bids and Superpolls"
+          },
+          "private": {
+            "title": "Make my activity private",
+            "caption": "People will not be able to see any of your activity on Bids and Superpolls"
+          }
+        },
+        "blockedUsers": {
+          "title": "Blocked users",
+          "noBlockedUsers": "No blocked users",
+          "button": {
+            "unblock": "Unblock"
+          }
+        },
+        "closeAccount": {
+          "title": "Delete my account",
+          "caption": "Delete your account and account data.",
+          "button": {
+            "delete": "Delete"
+          }
+        }
+      }
+    },
+    "bottomDiv": {
+      "help": "Help",
+      "logout": "Log out"
+    }
+  },
+  "genderPronouns": {
+    "none": "None",
+    "feminine": "She/Her",
+    "masculine": "He/Him",
+    "neutral": "They/Them"
+  }
+}

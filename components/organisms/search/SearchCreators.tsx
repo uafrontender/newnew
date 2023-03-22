@@ -1,11 +1,12 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
-import { newnewapi } from 'newnew-api';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { searchCreators } from '../../../api/endpoints/search';
+
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import useSearchCreators from '../../../utils/hooks/useSearchCreators';
+import { useAppSelector } from '../../../redux-store/store';
+
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
@@ -17,104 +18,80 @@ interface IFunction {
 }
 
 export const SearchCreators: React.FC<IFunction> = ({ query }) => {
+  const { loggedIn } = useAppSelector((state) => state.user);
+  const { showErrorToastPredefined } = useErrorToasts();
+
+  const onLoadingCreatorsError = useCallback((err: any) => {
+    console.error(err);
+    showErrorToastPredefined(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
+    useSearchCreators(
+      {
+        loggedInUser: loggedIn,
+        query,
+      },
+      {
+        onError: onLoadingCreatorsError,
+      }
+    );
+
+  const creators = useMemo(
+    () => (data?.pages ? data?.pages.map((page) => page.creators).flat() : []),
+    [data]
+  );
+
+  const hasNoResults = useMemo(
+    () => !isLoading && creators?.length === 0,
+    [isLoading, creators?.length]
+  );
+
   // Loading state
   const { ref: loadingRef, inView } = useInView();
 
-  const [hasNoResults, setHasNoResults] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(false);
-  const [loadingCreators, setLoadingCreators] = useState(false);
-  const [creators, setCreators] = useState<newnewapi.IUser[]>([]);
-  const [creatorsNextPageToken, setCreatorsRoomsNextPageToken] =
-    useState<string | undefined | null>('');
-
-  const getSearchResult = useCallback(
-    async (pageToken?: string) => {
-      if (loadingCreators) return;
-      try {
-        setLoadingCreators(true);
-        const payload = new newnewapi.SearchCreatorsRequest({
-          query,
-          paging: {
-            limit: 10,
-            pageToken,
-          },
-        });
-        const res = await searchCreators(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (!initialLoad) setInitialLoad(true);
-
-        if (res.data.creators && res.data.creators.length > 0) {
-          if (hasNoResults) setHasNoResults(false);
-          if (!initialLoad) setInitialLoad(true);
-          setCreators((curr) => {
-            const arr = [...curr, ...(res.data?.creators as newnewapi.IUser[])];
-            return arr;
-          });
-          setCreatorsRoomsNextPageToken(res.data.paging?.nextPageToken);
-        } else {
-          setHasNoResults(true);
-        }
-
-        if (!res.data.paging?.nextPageToken && creatorsNextPageToken) {
-          setCreatorsRoomsNextPageToken(null);
-        }
-        setLoadingCreators(false);
-      } catch (err) {
-        setLoadingCreators(false);
-        console.error(err);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingCreators, query]
-  );
-
   useEffect(() => {
-    if (query.length > 0) {
-      setCreators([]);
-      getSearchResult();
+    if (inView) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [inView, fetchNextPage]);
 
-  useEffect(() => {
-    if (inView && !loadingCreators && creatorsNextPageToken) {
-      getSearchResult(creatorsNextPageToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loadingCreators, creatorsNextPageToken]);
+  if (hasNoResults) {
+    return (
+      <div>
+        <SNoResults>
+          <NoResults />
+        </SNoResults>
+      </div>
+    );
+  }
 
   return (
     <div>
-      {!hasNoResults ? (
+      {creators.length === 0 ? (
+        <SNoResults>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SNoResults>
+      ) : (
         <>
           <SCardsSection>
-            {initialLoad && (
-              <CreatorsList loading={loadingCreators} collection={creators} />
-            )}
-          </SCardsSection>
-          {creatorsNextPageToken && !loadingCreators && (
-            <SRef ref={loadingRef}>Loading...</SRef>
-          )}
-        </>
-      ) : (
-        <SNoResults>
-          {initialLoad ? (
-            <NoResults />
-          ) : (
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
+            <CreatorsList
+              loading={isLoading || isFetchingNextPage}
+              collection={creators}
+              withEllipseMenu
             />
-          )}
-        </SNoResults>
+          </SCardsSection>
+          {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
+        </>
       )}
     </div>
   );
@@ -128,8 +105,7 @@ const SCardsSection = styled.div`
 `;
 
 const SRef = styled.span`
-  text-indent: -9999px;
-  height: 0;
+  height: 10px;
   overflow: hidden;
 `;
 

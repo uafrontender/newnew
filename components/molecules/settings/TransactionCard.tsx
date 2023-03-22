@@ -1,91 +1,86 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
 import Link from 'next/link';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-
-import { TUserData } from '../../../redux-store/slices/userStateSlice';
+import { newnewapi } from 'newnew-api';
+import moment from 'moment';
+import { useRouter } from 'next/dist/client/router';
 
 import Text from '../../atoms/Text';
-import InlineSvg from '../../atoms/InlineSVG';
-import { TTransactionsSectionItem } from '../../organisms/settings/TransactionsSection';
-
 // Icons
-import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
+// import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
 import Caption from '../../atoms/Caption';
+import { useAppSelector } from '../../../redux-store/store';
+import { formatNumber } from '../../../utils/format';
 
 type ITransactionCard = {
-  cardInfo: TTransactionsSectionItem;
-  currentUser: TUserData;
+  transaction: newnewapi.ITransaction;
 };
 
 const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
-  cardInfo,
-  currentUser,
+  transaction,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
+  const { locale } = useRouter();
+  const user = useAppSelector((state) => state.user);
 
   return (
     <STransactionCard>
-      <SInlineSvg
-        svg={DownloadIcon}
-        fill={theme.colorsThemed.text.tertiary}
-        width='20px'
-        height='20px'
-      />
       <SAvatar>
-        <img alt={cardInfo.actor.username} src={cardInfo.actor.avatarUrl} />
+        <img alt={user.userData?.username} src={user.userData?.avatarUrl} />
       </SAvatar>
       <SActor variant={3} weight={600}>
-        {cardInfo.actor.username === currentUser.username
-          ? t('Settings.sections.Transactions.you')
-          : cardInfo.actor.username}
+        {t('Settings.sections.transactions.you')}
       </SActor>
-      <SAction variant={2}>
-        {cardInfo.action === 'topup' ? (
-          t('Settings.sections.Transactions.actions.topup')
-        ) : (
-          <>
-            <span>
-              {t(`Settings.sections.Transactions.actions.${cardInfo.action}`)}{' '}
-            </span>
-            <Link href={`/${cardInfo.recipient.username}`}>
-              <a href={`/${cardInfo.recipient.username}`}>
-                {cardInfo.recipient.username}
-                {"'s "}
-              </a>
-            </Link>
-            <span>{t('Settings.sections.Transactions.actions.decision')}</span>
-          </>
-        )}
-      </SAction>
-      <SAmount variant={3} weight={600} direction={cardInfo.direction}>
-        {cardInfo.direction === 'from' ? <span>- </span> : null}$
-        {cardInfo.amount.toFixed(2)}
-      </SAmount>
-      <SDate variant={2}>{getFormattedDate(cardInfo.date)}</SDate>
+      {transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.SUBSCRIPTION ||
+      transaction.transactionType ===
+        newnewapi.Transaction.TransactionType.BUNDLE ? (
+        <SAction variant={2}>
+          {`${t(
+            `Settings.sections.transactions.actions.${transaction.transactionType}`
+          )} `}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
+          </Link>
+        </SAction>
+      ) : (
+        <SAction variant={2}>
+          {`${t(
+            `Settings.sections.transactions.actions.${transaction.transactionType}` as any
+          )} `}
+          <Link href={`/${transaction.relatedCreator?.username}`}>
+            {`@${transaction.relatedCreator?.username}`}
+          </Link>
+          {`'s ${t(
+            `Settings.sections.transactions.type.${transaction.transactionType}` as any
+          )}`}
+        </SAction>
+      )}
+      {transaction?.amount?.usdCents && (
+        <SAmount variant={3} weight={600} direction='from'>
+          <span>-&nbsp;</span>
+          {`$${formatNumber(transaction?.amount.usdCents / 100 ?? 0, false)}`}
+        </SAmount>
+      )}
+      <SDate variant={2}>
+        {moment((transaction.createdAt?.seconds as number) * 1000)
+          .locale(locale || 'en-US')
+          .format('MMM DD YYYY')}
+      </SDate>
     </STransactionCard>
   );
 };
 
 export default TransactionCard;
 
-function getFormattedDate(date: Date): string {
-  return date
-    .toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-    .replaceAll(',', '');
-}
-
 const STransactionCard = styled.div`
   display: grid;
   grid-template-areas:
-    'download actor actor amount'
-    'download action action date';
-  grid-template-columns: 36px 4fr 4fr 2fr;
+    'actor actor amount'
+    'action action date';
+  grid-template-columns: 4fr 4fr 4fr;
   align-items: center;
 
   height: 38px;
@@ -101,18 +96,9 @@ const STransactionCard = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-      'avatar actor actor date amount download'
-      'avatar action action date amount download';
-    grid-template-columns: 52px 2fr 2fr 2fr 1fr 1fr;
-  }
-`;
-
-const SInlineSvg = styled(InlineSvg)`
-  grid-area: download;
-  justify-self: center;
-
-  ${({ theme }) => theme.media.tablet} {
-    justify-self: right;
+      'avatar actor actor date amount'
+      'avatar action action date amount';
+    grid-template-columns: 52px 2fr 2fr 2fr 2fr;
   }
 `;
 

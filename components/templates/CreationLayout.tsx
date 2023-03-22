@@ -1,26 +1,28 @@
 import React from 'react';
-import { AnimateSharedLayout } from 'framer-motion';
+import { LayoutGroup } from 'framer-motion';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
+import BaseLayout from './BaseLayout';
 
-interface ICreationLayout {}
+interface ICreationLayout {
+  children: React.ReactNode;
+}
 
 const CreationLayout: React.FC<ICreationLayout> = (props) => {
   const { children } = props;
 
   return (
-    <ErrorBoundary>
-      <AnimateSharedLayout>
+    <BaseLayout>
+      <LayoutGroup>
         <Container>
           <Row>
             <Col>{children}</Col>
           </Row>
         </Container>
-      </AnimateSharedLayout>
-    </ErrorBoundary>
+      </LayoutGroup>
+    </BaseLayout>
   );
 };
 

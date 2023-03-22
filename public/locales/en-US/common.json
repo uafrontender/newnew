@@ -1,105 +1,300 @@
 {
   "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
-  "mobile-bottom-navigation-add": "Create",
-  "mobile-bottom-navigation-home": "Home",
-  "mobile-bottom-navigation-more": "More",
-  "mobile-bottom-navigation-share": "Share",
-  "mobile-bottom-navigation-dashboard": "Dashboard",
-  "mobile-bottom-navigation-dms": "DMs",
-  "mobile-bottom-navigation": "Dashboard",
-  "mobile-bottom-navigation-notifications": "Notifications",
-  "mobile-top-navigation-notifications": "Notifications",
-  "mobile-top-navigation-direct-messages": "DMs",
-  "mobile-top-navigation-share": "Share",
-  "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
-  "mobile-top-navigation-my-balance-tablet": "${{value}}",
-  "mobile-top-navigation-my-balance-empty": "Wallet balance",
-  "mobile-top-navigation-profile": "Profile",
-  "my-link": "My link",
-  "my-link-copied": "Copied!",
-  "button-create-decision": "New post",
-  "button-create": "Create",
-  "button-login-in": "Log in",
-  "button-sign-up": "Sign up",
-  "button-dashboard": "Dashboard",
-  "button-create-on-newnew": "Create now",
-  "button-cancel": "Cancel",
-  "footer-top-title": "NewNew",
-  "footer-center-title": "Connect",
-  "footer-bottom-title": "Social",
-  "footer-about": "About",
-  "footer-press": "Press",
-  "footer-jobs": "Work @ NewNew",
-  "footer-help": "Help",
-  "footer-faq": "FAQs",
-  "footer-twitter": "Twitter",
-  "footer-how-it-works": "How it works",
-  "footer-guidelines": "Community Guidelines",
-  "footer-accessibility": "Accessibility",
-  "footer-suggest-a-feature": "Suggest a feature",
-  "footer-inc": "© NewNew Inc",
-  "footer-terms": "Terms",
-  "footer-privacy": "Privacy",
-  "dd-language-title-en-US": "English",
-  "dd-language-title-es-MX": "Español",
-  "dd-language-title-fr": "Français",
-  "dd-language-subTitle-en-US": "United states",
-  "dd-language-subTitle-es-MX": "México",
-  "dd-language-subTitle-fr": "France",
-  "selected-language-title-en-US": "English",
-  "selected-language-title-es-MX": "Español (MX)",
-  "selected-language-title-fr": "Français (FR)",
-  "dd-currency-title-usd": "United States dollar",
-  "dd-currency-title-eur": "Euro",
-  "dd-currency-subTitle-usd": "USD - $",
-  "dd-currency-subTitle-eur": "EUR - €",
-  "selected-currency-title-usd": "USD",
-  "selected-currency-title-eur": "EUR",
-  "cookie-text": "We use",
-  "cookie-link": "Learn more",
+  "topSectionTitle": "Top 10 in {{country}}",
+  "heroSection": {
+    "title": "Come together \nto shape reality",
+    "subTitle": "Bid and vote on what the world does next",
+    "signIn": "Sign in",
+    "explore": "Explore Now",
+    "exploreNow": "Explore now"
+  },
+  "shareTo": "Share to",
+  "ellipse": {
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied!",
+    "followDecision": "Favorite {{postType}}",
+    "followCreator": "Favorite creator",
+    "unFollowDecision": "Unfavorite {{postType}}",
+    "unFollowCreator": "Unfavorite creator",
+    "removeBid": "Remove bid",
+    "removeOption": "Remove option",
+    "view": "View profile",
+    "report": "Report",
+    "reportUser": "Report user",
+    "reportGroup": "Report group",
+    "reportBid": "Report bid",
+    "reportOption": "Report option",
+    "block": "Block",
+    "blockUser": "Block user",
+    "blockGroup": "Block group",
+    "unblock": "Unblock",
+    "unblockUser": "Unblock user",
+    "unblockGroup": "Unblock group",
+    "delete": "Delete",
+    "deleteDecision": "Delete {{postType}}",
+    "cancel": "Cancel"
+  },
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
+  "dragToReposition": "Drag to reposition image",
+  "mobileBottomNavigation": {
+    "add": "Create",
+    "home": "Home",
+    "more": "More",
+    "share": "Share",
+    "dashboard": "Dashboard",
+    "dms": "DMs",
+    "notifications": "Notifications",
+    "bundles": "Bundles"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "My Balance: ${{value}}",
+    "profile": "Profile"
+  },
+  "button": {
+    "bundles": "Bundles",
+    "createDecision": "New post",
+    "create": "Create",
+    "signIn": "Sign in",
+    "dashboard": "Dashboard",
+    "createOnNewnew": "Create now",
+    "cancel": "Cancel",
+    "takeMeHome": "Take me home"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "Connect",
+    "bottomTitle": "Social",
+    "about": "About",
+    "press": "Press",
+    "jobs": "Work @ NewNew",
+    "help": "Help",
+    "faq": "FAQs",
+    "twitter": "Twitter",
+    "howItWorks": "How it works",
+    "guidelines": "Community Guidelines",
+    "accessibility": "Accessibility",
+    "inc": "© NewNew Inc",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    }
+  },
+  "cookie": {
+    "text": "We use",
+    "link": "Learn more"
+  },
+  "reportBug": "Report a bug",
   "error": {
     "text": {
-      "min": "Text is too short, min {{value}} chars",
-      "max": "Text is too long, max {{value}} chars",
+      "min": "Text is too short, min {{value}} characters",
+      "max": "Text is too long, max {{value}} characters",
       "badWords": "Text contains swear words",
       "containsLinks": "Links not allowed"
     }
   },
   "modal": {
-    "report-user": {
+    "reportUser": {
       "title": "Report",
       "subtitle": "Help us understand so that we can investigate...",
       "options": {
         "spam": "Suspicious or spam",
         "abuse": "Abusive or harmful",
         "suicide": "Expresses intentions of self-harm or suicide",
-        "hate-speech": "Hate speech",
+        "hateSpeech": "Hate speech",
         "harassment": "Harassment or bullying",
         "copyright": "Copyright",
         "other": "Other"
       },
-      "additional-info": {
+      "additionalInfo": {
         "placeholder": "Please tell us a bit more..."
       },
-      "button-cancel": "Cancel",
-      "button-confirm": "Report user",
-      "button-confirm-group": "Report group"
+      "button": {
+        "cancel": "Cancel",
+        "report": "Report"
+      }
     },
-    "report-sent": {
+    "reportSent": {
       "title": "We’re on it!",
       "subtitle": "We appreciate you letting us know. We’ll take a look into this ASAP and take the appropriate steps to ensure everyone’s safety.",
       "button": "Got it"
+    },
+    "buyBundle": {
+      "title": "Buy a Superpoll bundle for:",
+      "votes": "<0>{{amount}}</0> votes",
+      "access": "plus get {{amount}} {{unit}} of:",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buy": "Buy for ${{amount}}",
+      "terms": "*votes in a bundle never expire",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      },
+      "payment": {
+        "header": "<0/> Superpoll Bundle",
+        "suffix": "'s"
+      },
+      "error": {
+        "requestFailed": "Request failed"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes": "<0>{{amount}}</0> votes unlocked",
+      "for": "for <0/>",
+      "access": "plus {{amount}} {{unit}} of:",
+      "customOptions": "adding custom Superpoll options",
+      "chat": "1-on-1 private chat",
+      "button": "Sounds good!",
+      "unit": {
+        "month": "month",
+        "months": "months"
+      }
+    },
+    "creatorsBundle": {
+      "accessExpired": "Your benefits have now expired. Buy another bundle for custom options and chat",
+      "votesLeft": "<0>{{amount}}</0> votes left",
+      "for": "for ",
+      "access": "<0/> left of:",
+      "unitPair": "{{amount}} {{unit}}",
+      "and": " and ",
+      "customOptions": "adding custom options to any Superpoll",
+      "chat": "1-on-1 private chat",
+      "buyButton": "Buy more votes",
+      "unit": {
+        "day": "day",
+        "days": "days",
+        "month": "month",
+        "months": "months",
+        "year": "year",
+        "years": "years"
+      }
     }
+  },
+  "myLink": {
+    "copy": "My link",
+    "copied": "Copied!"
   },
   "socials": {
     "copy": "Copy Link",
     "copied": "Link Copied!"
   },
   "search": {
-    "top-posts": "Top Posts",
-    "popular-creators": "Popular Creators"
+    "placeholder": "Search",
+    "placeholderLong": "Search creators and hashtags",
+    "topPosts": "Top Posts",
+    "popularCreators": "Popular Creators",
+    "creatorSubtitle": "See posts",
+    "popularTags": "Popular Tags",
+    "allResults": "All results",
+    "noResults": {
+      "title": "We didn’t find anything",
+      "description": "Try searching for something else or explore what’s new",
+      "action": "Explore"
+    }
   },
-  "creator-card": {
-    "subscription-cost": "${{amount}} Monthly"
-  }
+  "gotIt": "Got it",
+  "sortingOption": {
+    "sortingtype": "Order",
+    "sortingtype-all": "All",
+    "sortingtype-num_bids": "Participants",
+    "sortingtype-num_bids-ac": "Number of bids",
+    "sortingtype-num_bids-mc": "Number of votes",
+    "sortingtype-num_bids-cf": "Number of backers",
+    "sortingtype-newest": "Newest",
+    "bid": "Bid",
+    "bid-lowest": "Lowest",
+    "bid-highest": "Highest",
+    "time": "Time",
+    "time-ending-soon": "Ending soonest",
+    "time-newest": "Newest",
+    "time-oldest": "Oldest",
+    "numbers-of-bids": "Numbers of bids",
+    "numbers-of-bids-fewest": "Fewest",
+    "numbers-of-bids-most-first": "Most first"
+  },
+  "toastErrors": {
+    "generic": "An error occurred, please try again later",
+    "serverError": "A server-side error occurred, please try again later",
+    "recaptchaError": "Recaptcha failed, please try again later",
+    "usupportedImageFormatError": "Image format not supported, please try another image",
+    "processingLimitReachedError": "Please wait until you can upload more videos",
+    "invalidDateError": "Please check date and time"
+  },
+  "smsNotifications": {
+    "title": "What's your number?",
+    "success": "Success",
+    "description": "This way, we can send you new updates from <0>{{subject}}</0>!",
+    "confirmation": "Confirmation SMS was sent to {{phoneNumber}} number.",
+    "tos": "I accept NewNew’s <0>Terms</0> & <1>Privacy</1>. I opt-in and agree to receive updates from NewNew at the phone number provided. SMS and data rates may apply.",
+    "button": { "continue": "Continue", "close": "Cool!" },
+    "phoneError": {
+      "0": "Invalid phone number",
+      "1": "Invalid country code",
+      "2": "The phone number is too short",
+      "3": "The phone number is too long",
+      "4": "Invalid phone number"
+    },
+    "error": {
+      "requestFailed": "Request failed"
+    }
+  },
+  "creatorCard": {
+    "buyBundle": "Buy Bundle",
+    "purchasedVotes": "{{value}} votes"
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    }
+  },
+  "timer": {
+    "daysLeft": "d",
+    "hoursLeft": "h",
+    "minutesLeft": "m",
+    "secondsLeft": "s",
+    "endedOn": "Ended on "
+  },
+  "pushNotification": {
+    "alert": {
+      "safari": {
+        "title": "Turn on web notifications",
+        "subtitle": "Safari > Preferences > Notification."
+      },
+      "nonSafari": {
+        "title": "Turn on web notifications by clicking the lock"
+      },
+      "windows": {
+        "subtitle": "or go to Start > Settings > System > Notifications"
+      }
+    },
+    "requestModal": {
+      "title": "Turn on notifications",
+      "description": "Turn on web notifications and get alerts about new posts on NewNew.",
+      "button": "Turn on"
+    },
+    "successModal": {
+      "title": "Cheers!",
+      "description": "Thank you, we will keep you updated about new posts on NewNew.",
+      "button": "Cool!"
+    }
+  },
+  "oops": "Oops!",
+  "somethingWentWrong": "Something went wrong...",
+  "goHome": "Go home"
 }

@@ -1,0 +1,300 @@
+{
+  "welcome": "歡迎使用{{NEXT_PUBLIC_APP_NAME}}！",
+  "topSectionTitle": "{{country}}前十名",
+  "heroSection": {
+    "title": "共同重塑現實",
+    "subTitle": "出價並就世界的下一步行動投票",
+    "signIn": "登入",
+    "explore": "開始瀏覽",
+    "exploreNow": "開始瀏覽"
+  },
+  "shareTo": "分享到",
+  "ellipse": {
+    "copyLink": "複製連結",
+    "linkCopied": "連結已複製！",
+    "followDecision": "最喜歡的 {{postType}}",
+    "followCreator": "最喜歡的創作者",
+    "unFollowDecision": "不喜歡的{{postType}}",
+    "unFollowCreator": "不喜歡的創作者",
+    "removeBid": "移除投標",
+    "removeOption": "移除選項",
+    "view": "查看個人資料",
+    "report": "舉報",
+    "reportUser": "舉報用戶",
+    "reportGroup": "舉報該組",
+    "reportBid": "舉報出價",
+    "reportOption": "舉報選項",
+    "block": "屏蔽",
+    "blockUser": "屏蔽用戶",
+    "blockGroup": "屏蔽該組",
+    "unblock": "解除屏蔽",
+    "unblockUser": "解除屏蔽用戶",
+    "unblockGroup": "解除屏蔽該組",
+    "delete": "刪除",
+    "deleteDecision": "刪除{{postType}}",
+    "cancel": "取消"
+  },
+  "postType": {
+    "ac": "Bid",
+    "mc": "Superpoll",
+    "cf": "Goal"
+  },
+  "dragToReposition": "拖動以重新定位圖片",
+  "mobileBottomNavigation": {
+    "add": "創建",
+    "home": "主頁",
+    "more": "更多",
+    "share": "分享",
+    "dashboard": "儀錶板",
+    "dms": "私訊",
+    "notifications": "通知",
+    "bundles": "Bundles"
+  },
+  "mobileTopNavigation": {
+    "myBalance": "我的餘額${{value}}",
+    "profile": "個人資料"
+  },
+  "button": {
+    "bundles": "Bundles",
+    "createDecision": "新帖子",
+    "create": "創建",
+    "signIn": "登入",
+    "dashboard": "儀錶板",
+    "createOnNewnew": "開始創建",
+    "cancel": "取消",
+    "takeMeHome": "回到首頁"
+  },
+  "footer": {
+    "topTitle": "NewNew",
+    "centerTitle": "聯絡我們",
+    "bottomTitle": "社交",
+    "about": "關於",
+    "press": "新聞報道",
+    "jobs": "NewNew工作機會",
+    "help": "幫助",
+    "faq": "常見問題",
+    "twitter": "Twitter",
+    "howItWorks": "如何運作",
+    "guidelines": "社區指南",
+    "accessibility": "可訪問性",
+    "inc": "© NewNew Inc",
+    "terms": "條款",
+    "privacy": "隱私"
+  },
+  "language": {
+    "ddLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    },
+    "selectedLanguageTitle": {
+      "en-US": "English",
+      "es": "Español",
+      "zh": "漢語"
+    }
+  },
+  "cookie": {
+    "text": "我們使用",
+    "link": "瞭解更多"
+  },
+  "reportBug": "報告錯誤",
+  "error": {
+    "text": {
+      "min": "文本太短，最少{{value}}字元",
+      "max": "文本太長，最多{{value}}字元",
+      "badWords": "文本中有髒話",
+      "containsLinks": "不允許插入連結"
+    }
+  },
+  "modal": {
+    "reportUser": {
+      "title": "舉報",
+      "subtitle": "幫助我們瞭解，以便我們進行調查......",
+      "options": {
+        "spam": "可疑的或垃圾郵件",
+        "abuse": "辱駡或有害",
+        "suicide": "有自我傷害或自殺意圖",
+        "hateSpeech": "仇恨言論",
+        "harassment": "騷擾或霸淩",
+        "copyright": "版權",
+        "other": "其他"
+      },
+      "additionalInfo": {
+        "placeholder": "請再提供更多詳情......"
+      },
+      "button": {
+        "cancel": "取消",
+        "report": "舉報"
+      }
+    },
+    "reportSent": {
+      "title": "我們馬上處理！",
+      "subtitle": "感謝告知,我們會儘快調查此事，並採取適當的措施，確保每個人的安全。",
+      "button": "知道了"
+    },
+    "buyBundle": {
+      "title": "購買一個Superpoll bundle 的價格:",
+      "votes": "<0>{{amount}}</0>投票",
+      "access": "另可獲{{amount}}{{unit}}的：",
+      "customOptions": "在任何Superpoll中添加定制選項",
+      "chat": "一對一私聊",
+      "buy": "購買金額${{amount}}",
+      "terms": "*bundle中的投票不會過期",
+      "unit": {
+        "month": "月",
+        "months": "月"
+      },
+      "payment": {
+        "header": "<0/>的Superpoll Bundle",
+        "suffix": ""
+      },
+      "error": {
+        "requestFailed": "請求失敗"
+      }
+    },
+    "buyBundleSuccess": {
+      "votes": "已解鎖<0>{{amount}}</0>投票",
+      "for": "為  <0/>",
+      "access": "剩餘{{amount}} {{unit}}:",
+      "customOptions": "添加定制Superpoll選項",
+      "chat": "一對一私聊",
+      "button": "听起来不错!",
+      "unit": {
+        "month": "月",
+        "months": "月"
+      }
+    },
+    "creatorsBundle": {
+      "accessExpired": "您的福利現在已經過期。再購買一個bundle即可獲得自訂選項並聊天",
+      "votesLeft": "剩餘<0>{{amount}}</0> 票",
+      "for": "為 <0>{{creator}}</0>",
+      "access": "剩餘<0/>:",
+      "unitPair": "{{amount}}{{unit}}",
+      "and": "和",
+      "customOptions": "在任何Superpoll中添加定制選項",
+      "chat": "一對一私聊",
+      "buyButton": "購買更多投票",
+      "unit": {
+        "day": "天",
+        "days": "天",
+        "month": "月",
+        "months": "月",
+        "year": "年",
+        "years": "年"
+      }
+    }
+  },
+  "myLink": {
+    "copy": "我的連結",
+    "copied": "已複製！"
+  },
+  "socials": {
+    "copy": "複製連結",
+    "copied": "連結已複製！"
+  },
+  "search": {
+    "placeholder": "搜索",
+    "placeholderLong_NEED_TRANSLATION": "Search creators and hashtags",
+    "topPosts": "熱門帖子",
+    "popularCreators": "熱門創作者",
+    "creatorSubtitle": "查看帖子",
+    "popularTags": "熱門標籤",
+    "allResults": "所有結果",
+    "noResults": {
+      "title": "沒有找到任何內容",
+      "description": "嘗試搜索或瀏覽其他內容",
+      "action": "瀏覽"
+    }
+  },
+  "gotIt": "知道了",
+  "sortingOption": {
+    "sortingtype": "順序",
+    "sortingtype-all": "所有",
+    "sortingtype-num_bids": "參與者",
+    "sortingtype-num_bids-ac": "出價數量",
+    "sortingtype-num_bids-mc": "投票數量",
+    "sortingtype-num_bids-cf": "支持者人數",
+    "sortingtype-newest": "最新",
+    "bid": "Bid",
+    "bid-lowest": "最低",
+    "bid-highest": "最高",
+    "time": "時間",
+    "time-ending-soon": "最快結束",
+    "time-newest": "最新",
+    "time-oldest": "最舊",
+    "numbers-of-bids": "出價數量",
+    "numbers-of-bids-fewest": "最少",
+    "numbers-of-bids-most-first": "最先"
+  },
+  "toastErrors": {
+    "generic": "發生錯誤，請稍後再試",
+    "serverError": "發生伺服器端錯誤，請稍後再試",
+    "recaptchaError": "Recaptcha失敗，請稍後再試",
+    "usupportedImageFormatError": "圖片格式不支援，請嘗試其他圖片",
+    "processingLimitReachedError": "請等待，直到可以上傳更多的視頻",
+    "invalidDateError": "請檢查日期和時間"
+  },
+  "smsNotifications": {
+    "title": "你的號碼是多少？",
+    "success": "成功了",
+    "description": "這樣，我們就可以從<0>{{subject}}</0>向你發送更新！",
+    "confirmation": "確認短信已發送至號碼{{phoneNumber}}。",
+    "tos": "我接受NewNew <0>Terms</0> & <1>Privacy</1>. 我選擇加入，並同意使用提供的電話號碼接收來自NewNew的更新資訊。短信和資料流程量費可能適用。",
+    "button": { "continue": "繼續", "close": "酷！" },
+    "phoneError": {
+      "0": "無效的電話號碼",
+      "1": "無效的國家代碼",
+      "2": "電話號碼位數不足",
+      "3": "電話號碼位數過長",
+      "4": "無效的電話號碼"
+    },
+    "error": {
+      "requestFailed": "請求失敗"
+    }
+  },
+  "creatorCard": {
+    "buyBundle": "購買Bundle",
+    "purchasedVotes": "{{value}} 投票"
+  },
+  "colorModeSwitch": {
+    "options": {
+      "light": "淺色",
+      "dark": "深色",
+      "auto": "自動"
+    }
+  },
+  "timer": {
+    "daysLeft": "天",
+    "hoursLeft": "小時",
+    "minutesLeft": "分鐘",
+    "secondsLeft": "秒",
+    "endedOn": "結束於"
+  },
+  "pushNotification": {
+    "alert": {
+      "safari": {
+        "title": "開啟網頁通知",
+        "subtitle": " Safari > 首選項 > 通知。"
+      },
+      "nonSafari": {
+        "title": "點擊鎖可打開網路通知"
+      },
+      "windows": {
+        "subtitle": "或進入 開始 > 設置 > 系統 > 通知"
+      }
+    },
+    "requestModal": {
+      "title": "開啟通知",
+      "description": "開啟網頁通知以獲得有關NewNew上新帖子的提醒。",
+      "button": "開啟"
+    },
+    "successModal": {
+      "title": "好的！",
+      "description": "謝謝，我們將隨時向你通報NewNew上的新帖子。",
+      "button": "酷！"
+    }
+  },
+  "oops": "哎呀！",
+  "somethingWentWrong": "出錯了......",
+  "goHome": "返回首頁"
+}

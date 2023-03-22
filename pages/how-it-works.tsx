@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
 
 import { NextPageWithLayout } from './_app';
@@ -15,11 +15,13 @@ import Text from '../components/atoms/Text';
 import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
-import QuestionMarkVisual from '../components/organisms/how-it-works/QuestionMarkVisual';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { useAppState } from '../contexts/appStateContext';
 
 export const HowItWorks = () => {
-  const { t } = useTranslation('how-it-works');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { t } = useTranslation('page-HowItWorks');
+  const theme = useTheme();
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -30,6 +32,10 @@ export const HowItWorks = () => {
     <>
       <Head>
         <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
+        <meta property='og:title' content={t('meta.title')} />
+        <meta property='og:description' content={t('meta.description')} />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Container>
         <IntroSection>
@@ -39,13 +45,26 @@ export const HowItWorks = () => {
               {t('intro.text')}
             </IntroText>
           </IntroContent>
-          <QuestionMarkVisual alt='How it works' />
+          <QuestionMarkVisual muted autoPlay playsInline>
+            <source
+              src={
+                theme.name === 'light'
+                  ? assets.info.lightQuestionMarkVideo
+                  : assets.info.darkQuestionMarkVideo
+              }
+              type='video/mp4'
+            />
+          </QuestionMarkVisual>
         </IntroSection>
         <Content>
           <Section>
             <SectionImage
-              src={assets.creation.AcAnimated}
-              alt='events'
+              src={
+                theme.name === 'light'
+                  ? assets.common.ac.lightAcAnimated()
+                  : assets.common.ac.darkAcAnimated()
+              }
+              alt='bids'
               // Quick fix for animated image alignment
               style={
                 // eslint-disable-next-line no-nested-ternary
@@ -64,7 +83,11 @@ export const HowItWorks = () => {
 
           <Section>
             <SectionImage
-              src={assets.creation.McAnimated}
+              src={
+                theme.name === 'light'
+                  ? assets.common.mc.lightMcAnimated()
+                  : assets.common.mc.darkMcAnimated()
+              }
               alt='superpolls'
               // Quick fix for animated image alignment
               style={
@@ -82,9 +105,13 @@ export const HowItWorks = () => {
             </SectionContent>
           </Section>
 
-          <Section>
+          {/* <Section>
             <SectionImage
-              src={assets.creation.CfAnimated}
+              src={
+                theme.name === 'light'
+                  ? assets.creation.lightCfAnimated()
+                  : assets.creation.darkCfAnimated()
+              }
               alt='goals'
               // Quick fix for animated image alignment
               style={
@@ -100,7 +127,7 @@ export const HowItWorks = () => {
               <Headline variant={3}>{t('goals.title')}</Headline>
               <SectionText variant={5}>{t('goals.text')}</SectionText>
             </SectionContent>
-          </Section>
+            </Section> */}
 
           <ControlsContainer>
             <Link href='/'>
@@ -135,10 +162,16 @@ export const HowItWorks = () => {
 export default HowItWorks;
 
 export const getServerSideProps = async (context: NextPageContext) => {
-  const translationContext = await serverSideTranslations(context.locale!!, [
-    'common',
-    'how-it-works',
-  ]);
+  context.res?.setHeader(
+    'Cache-Control',
+    'public, s-maxage=30, stale-while-revalidate=35'
+  );
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-HowItWorks'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   return {
     props: {
@@ -152,7 +185,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 20px ${({ theme }) => theme.media.tablet} {
+  padding-top: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
     padding-top: 38px;
     padding-left: 20px;
     padding-right: 20px;
@@ -215,6 +250,13 @@ const IntroText = styled(Text)`
   ${({ theme }) => theme.media.laptop} {
     margin-top: 24px;
   }
+`;
+
+const QuestionMarkVisual = styled('video')`
+  position: relative;
+  display: flex;
+  width: 100%;
+  object-fit: contain;
 `;
 
 const Section = styled.div`

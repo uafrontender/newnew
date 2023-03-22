@@ -13,29 +13,73 @@ import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 import { NextPageWithLayout } from '../../_app';
 
+import assets from '../../../constants/assets';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import { I18nNamespaces } from '../../../@types/i18next';
+import { usePostCreationState } from '../../../contexts/postCreationContext';
+
 interface ICreationSecondStep {}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
-  const { t } = useTranslation('creation');
   const router = useRouter();
+  const { t } = useTranslation('page-Creation');
 
-  useLeavePageConfirm(true, t('secondStep.modal.leave.message'), [
-    '/creation',
-    '/creation/auction',
-    '/creation/multiple-choice',
-    '/creation/crowdfunding',
-    '/creation/auction/preview',
-    '/creation/multiple-choice/preview',
-    '/creation/crowdfunding/preview',
-    '/creation/auction/published',
-    '/creation/multiple-choice/published',
-    '/creation/crowdfunding/published',
-  ]);
+  const { clearCreation } = usePostCreationState();
+
+  useLeavePageConfirm(
+    true,
+    t('secondStep.modal.leave.message'),
+    [
+      '/creation/auction',
+      '/creation/multiple-choice',
+      '/creation/crowdfunding',
+      '/creation/auction/preview',
+      '/creation/multiple-choice/preview',
+      '/creation/crowdfunding/preview',
+      '/creation/auction/published',
+      '/creation/multiple-choice/published',
+      '/creation/crowdfunding/published',
+    ],
+    () => {
+      clearCreation();
+    }
+  );
 
   return (
     <SWrapper>
       <Head>
-        <title>{t(`secondStep.meta.title-${router?.query?.tab}`)}</title>
+        <title>
+          {t(
+            `secondStep.meta.${
+              `title-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
+        </title>
+        <meta
+          name='description'
+          content={t(
+            `secondStep.meta.${
+              `description-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
+        />
+        <meta
+          property='og:title'
+          content={t(
+            `secondStep.meta.${
+              `title-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
+        />
+        <meta
+          property='og:description'
+          content={t(
+            `secondStep.meta.${
+              `description-${router?.query?.tab}` as keyof I18nNamespaces['page-Creation']['secondStep']['meta']
+            }`
+          )}
+        />
+        <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <SecondStepContent {...props} />
     </SWrapper>
@@ -53,7 +97,9 @@ export async function getServerSideProps(
 ): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation']
+    ['common', 'page-Creation'],
+    null,
+    SUPPORTED_LANGUAGES
   );
 
   // @ts-ignore
@@ -62,6 +108,16 @@ export async function getServerSideProps(
       redirect: {
         permanent: false,
         destination: '/',
+      },
+    };
+  }
+
+  // TODO: remove when goals returned
+  if (context.req.url?.includes('crowdfunding')) {
+    return {
+      redirect: {
+        permanent: true,
+        destination: '/creation',
       },
     };
   }

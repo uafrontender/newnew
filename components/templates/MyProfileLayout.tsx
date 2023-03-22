@@ -1,6 +1,7 @@
 import React, {
   ReactElement,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -9,6 +10,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useUpdateEffect } from 'react-use';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -21,7 +23,6 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 
@@ -29,79 +30,52 @@ import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
+import BackButtonIcon from '../../public/images/svg/icons/filled/Back.svg';
+import mockProfileBg from '../../public/images/mock/profile-bg.png';
 
 import isBrowser from '../../utils/isBrowser';
 import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
-import BackButton from '../molecules/profile/BackButton';
+import getGenderPronouns, {
+  isGenderPronounsDefined,
+} from '../../utils/genderPronouns';
+import copyToClipboard from '../../utils/copyToClipboard';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
+import DisplayName from '../DisplayName';
+import { getMySpending } from '../../api/endpoints/payments';
+import { SocketContext } from '../../contexts/socketContext';
 
 type TPageType =
   | 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
-  | 'subscriptions'
   | 'myposts'
   | 'favorites';
 
 interface IMyProfileLayout {
   renderedPage: TPageType;
-  postsCachedActivelyBiddingOn?: newnewapi.Post[];
   postsCachedActivelyBiddingOnFilter?: newnewapi.Post.Filter;
-  postsCachedActivelyBiddingPageToken?: string | null | undefined;
-  postsCachedActivelyBiddingCount?: number;
-  postsCachedMyPurchases?: newnewapi.Post[];
   postsCachedMyPurchasesFilter?: newnewapi.Post.Filter;
-  postsCachedMyPurchasesPageToken?: string | null | undefined;
-  postsCachedMyPurchasesCount?: number;
-  postsCachedViewHistory?: newnewapi.Post[];
   postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
-  postsCachedViewHistoryPageToken?: string | null | undefined;
-  postsCachedViewHistoryCount?: number;
-  postsCachedSubscriptions?: newnewapi.Post[];
-  postsCachedSubscriptionsFilter?: newnewapi.Post.Filter;
-  postsCachedSubscriptionsPageToken?: string | null | undefined;
-  postsCachedSubscriptionsCount?: number;
-  postsCachedFavorites?: newnewapi.Post[];
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
-  postsCachedFavoritesPageToken?: string | null | undefined;
-  postsCachedFavoritesCount?: number;
-  postsCachedMyPosts?: newnewapi.Post[];
   postsCachedMyPostsFilter?: newnewapi.Post.Filter;
-  postsCachedMyPostsCount?: number;
-  postsCachedMyPostsPageToken?: string | null | undefined;
+  children: React.ReactNode;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   renderedPage,
-  postsCachedActivelyBiddingOn,
   postsCachedActivelyBiddingOnFilter,
-  postsCachedActivelyBiddingCount,
-  postsCachedMyPurchases,
   postsCachedMyPurchasesFilter,
-  postsCachedMyPurchasesCount,
-  postsCachedViewHistory,
   postsCachedViewHistoryFilter,
-  postsCachedViewHistoryCount,
-  postsCachedSubscriptions,
-  postsCachedSubscriptionsFilter,
-  postsCachedSubscriptionsCount,
-  postsCachedFavorites,
   postsCachedFavoritesFilter,
-  postsCachedFavoritesCount,
-  postsCachedMyPosts,
   postsCachedMyPostsFilter,
-  postsCachedMyPostsCount,
-  postsCachedActivelyBiddingPageToken,
-  postsCachedMyPurchasesPageToken,
-  postsCachedViewHistoryPageToken,
-  postsCachedSubscriptionsPageToken,
-  postsCachedFavoritesPageToken,
-  postsCachedMyPostsPageToken,
   children,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
+  const socketConnection = useContext(SocketContext);
   const router = useRouter();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
@@ -129,10 +103,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         url: '/profile/view-history',
       },
       {
-        nameToken: 'subscriptions',
-        url: '/profile/subscriptions',
-      },
-      {
         nameToken: 'favorites',
         url: '/profile/favorites',
       },
@@ -154,19 +124,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
   const handleCopyLink = useCallback(() => {
     if (window) {
       const url = `${window.location.origin}/${user.userData?.username}`;
 
-      copyPostUrlToClipboard(url)
+      copyToClipboard(url)
         .then(() => {
           setIsCopiedUrl(true);
           setTimeout(() => {
@@ -179,105 +141,25 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [user.userData?.username]);
 
-  // Cached posts
-  const [postsActivelyBiddingOn, setPostsActivelyBiddingOn] = useState(
-    postsCachedActivelyBiddingOn ?? []
-  );
+  // Filter
   const [postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter] =
     useState(postsCachedActivelyBiddingOnFilter ?? newnewapi.Post.Filter.ALL);
-  const [activelyBiddingPageToken, setActivelyBiddingPageToken] = useState(
-    postsCachedActivelyBiddingPageToken
-  );
-  const [activelyBiddingCount, setActivelyBiddingCount] = useState(
-    postsCachedActivelyBiddingCount
-  );
 
-  const [postsMyPurchases, setPostsMyPurchases] = useState(
-    postsCachedMyPurchases ?? []
-  );
   const [postsMyPurchasesFilter, setPostsMyPurchasesFilter] = useState(
     postsCachedMyPurchasesFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [myPurchasesPageToken, setMyPurchasesPageToken] = useState(
-    postsCachedMyPurchasesPageToken
-  );
-  const [myPurchasesCount, setMyPurchasesCount] = useState(
-    postsCachedMyPurchasesCount
-  );
 
-  const [postsViewHistory, setPostsViewHistory] = useState(
-    postsCachedViewHistory ?? []
-  );
   const [postsViewHistoryFilter, setPostsViewHistoryFilter] = useState(
     postsCachedViewHistoryFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [viewHistoryPageToken, setViewHistoryPageToken] = useState(
-    postsCachedViewHistoryPageToken
-  );
-  const [viewHistoryCount, setViewHistoryCount] = useState(
-    postsCachedViewHistoryCount
-  );
 
-  const [postsSubscriptions, setPostsSubscriptions] = useState(
-    postsCachedSubscriptions ?? []
-  );
-  const [postsSubscriptionsFilter, setPostsSubscriptionsFilter] = useState(
-    postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL
-  );
-  const [subscriptionsPageToken, setSubscriptionsPageToken] = useState(
-    postsCachedSubscriptionsPageToken
-  );
-  const [subscriptionsCount, setSubscriptionsCount] = useState(
-    postsCachedSubscriptionsCount
-  );
-
-  const [postsFavorites, setPostsFavorites] = useState(
-    postsCachedFavorites ?? []
-  );
   const [postsFavoritesFilter, setPostsFavoritesFilter] = useState(
     postsCachedFavoritesFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [favoritesPageToken, setFavoritesPageToken] = useState(
-    postsCachedFavoritesPageToken
-  );
-  const [postsFavoritesCount, setFavoritesCount] = useState(
-    postsCachedFavoritesCount
-  );
 
-  const [postsMyPosts, setPostsMyPosts] = useState(postsCachedMyPosts ?? []);
   const [postsMyPostsFilter, setPostsMyPostsFilter] = useState(
     postsCachedMyPostsFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [myPostsPageToken, setMyPostsPageToken] = useState(
-    postsCachedMyPostsPageToken
-  );
-  const [postsMyPostsCount, setMyPostsCount] = useState(
-    postsCachedMyPostsCount
-  );
-
-  // UpdateCachedPosts
-  const handleSetPostsActivelyBiddingOn: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsActivelyBiddingOn, [setPostsActivelyBiddingOn]);
-
-  const handleSetPostsMyPurchases: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsMyPurchases, [setPostsMyPurchases]);
-
-  const handleSetPostsViewHistory: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsViewHistory, [setPostsViewHistory]);
-  const handleSetPostsSubscriptions: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsSubscriptions, [setPostsSubscriptions]);
-
-  const handleSetPostsFavorites: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsFavorites, [setPostsFavorites]);
-
-  const handleSetPostsMyPosts: React.Dispatch<
-    React.SetStateAction<newnewapi.Post[]>
-  > = useCallback(setPostsMyPosts, [setPostsMyPosts]);
 
   const handleUpdateFilter = useCallback(
     (value: newnewapi.Post.Filter) => {
@@ -292,10 +174,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         }
         case 'viewHistory': {
           setPostsViewHistoryFilter(value);
-          break;
-        }
-        case 'subscriptions': {
-          setPostsSubscriptionsFilter(value);
           break;
         }
         case 'favorites': {
@@ -314,130 +192,28 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     [renderedPage]
   );
 
-  const handleUpdatePageToken = useCallback(
-    (value: string | null | undefined) => {
-      switch (renderedPage) {
-        case 'activelyBidding': {
-          setActivelyBiddingPageToken(value);
-          break;
-        }
-        case 'purchases': {
-          setMyPurchasesPageToken(value);
-          break;
-        }
-        case 'viewHistory': {
-          setViewHistoryPageToken(value);
-          break;
-        }
-        case 'subscriptions': {
-          setSubscriptionsPageToken(value);
-          break;
-        }
-        case 'favorites': {
-          setFavoritesPageToken(value);
-          break;
-        }
-        case 'myposts': {
-          setMyPostsPageToken(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
-  const handleUpdateCount = useCallback(
-    (value: number) => {
-      switch (renderedPage) {
-        case 'activelyBidding': {
-          setActivelyBiddingCount(value);
-          break;
-        }
-        case 'purchases': {
-          setMyPurchasesCount(value);
-          break;
-        }
-        case 'viewHistory': {
-          setViewHistoryCount(value);
-          break;
-        }
-        case 'subscriptions': {
-          setSubscriptionsCount(value);
-          break;
-        }
-        case 'favorites': {
-          setFavoritesCount(value);
-          break;
-        }
-        case 'myposts': {
-          setMyPostsCount(value);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [renderedPage]
-  );
-
   const renderChildren = () => {
-    let postsForPage = {};
     let postsForPageFilter;
-    let pageToken;
-    let handleSetPosts;
-    let totalCount;
 
     switch (renderedPage) {
       case 'activelyBidding': {
-        postsForPage = postsActivelyBiddingOn;
         postsForPageFilter = postsActivelyBiddingOnFilter;
-        pageToken = activelyBiddingPageToken;
-        totalCount = activelyBiddingCount;
-        handleSetPosts = handleSetPostsActivelyBiddingOn;
         break;
       }
       case 'purchases': {
-        postsForPage = postsMyPurchases;
         postsForPageFilter = postsMyPurchasesFilter;
-        pageToken = myPurchasesPageToken;
-        totalCount = myPurchasesCount;
-        handleSetPosts = handleSetPostsMyPurchases;
         break;
       }
       case 'viewHistory': {
-        postsForPage = postsViewHistory;
         postsForPageFilter = postsViewHistoryFilter;
-        pageToken = viewHistoryPageToken;
-        totalCount = viewHistoryCount;
-        handleSetPosts = handleSetPostsViewHistory;
-        break;
-      }
-      case 'subscriptions': {
-        postsForPage = postsSubscriptions;
-        postsForPageFilter = postsSubscriptionsFilter;
-        pageToken = subscriptionsPageToken;
-        totalCount = subscriptionsCount;
-        handleSetPosts = handleSetPostsSubscriptions;
         break;
       }
       case 'favorites': {
-        postsForPage = postsFavorites;
         postsForPageFilter = postsFavoritesFilter;
-        pageToken = favoritesPageToken;
-        totalCount = postsFavoritesCount;
-        handleSetPosts = handleSetPostsFavorites;
         break;
       }
       case 'myposts': {
-        postsForPage = postsMyPosts;
         postsForPageFilter = postsMyPostsFilter;
-        pageToken = myPostsPageToken;
-        totalCount = postsMyPostsCount;
-        handleSetPosts = handleSetPostsMyPosts;
         break;
       }
       default: {
@@ -446,13 +222,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
 
     return React.cloneElement(children as ReactElement, {
-      ...(postsForPage ? { posts: postsForPage } : {}),
       ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
-      pageToken,
-      totalCount,
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
       handleUpdateFilter,
     });
   };
@@ -496,7 +266,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleSetStageToEditingProfilePicture = () => {
     if (isBrowser()) {
-      syncedHistoryPushState(
+      syncedHistoryReplaceState(
         {
           stage: 'edit-profile-picture',
         },
@@ -525,38 +295,19 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
 
     // eslint-disable-next-line no-alert
-    const result = window.confirm(t('EditProfileMenu.confirmationWindow'));
+    const result = window.confirm(t('editProfileMenu.confirmationWindow'));
     if (result) {
       handleCloseEditProfileMenu();
     }
   }, [wasModified, handleCloseEditProfileMenu, t]);
 
   // Redirect to / if user is not logged in
-  useEffect(() => {
-    if (!user.loggedIn) {
+  useUpdateEffect(() => {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push('/');
     }
   }, [router, user]);
-
-  // useEffect(() => {
-  //   const start = (url: string) => {
-  //     console.log(url);
-  //     setRouteChangeLoading(true);
-  //   };
-  //   const end = (url: string) => {
-  //     console.log(url);
-  //     setRouteChangeLoading(false);
-  //   };
-  //   Router.events.on('routeChangeStart', start);
-  //   Router.events.on('routeChangeComplete', end);
-  //   Router.events.on('routeChangeError', end);
-  //   return () => {
-  //     Router.events.off('routeChangeStart', start);
-  //     Router.events.off('routeChangeComplete', end);
-  //     Router.events.off('routeChangeError', end);
-  //   };
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
 
   // Try to pre-fetch the content
   useEffect(() => {
@@ -564,140 +315,239 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Spending
+
+  const [mySpendingInCents, setMySpendingInCents] = useState<
+    number | undefined
+  >();
+
+  useEffect(() => {
+    if (user.userData?.options?.isWhiteListed) {
+      (async () => {
+        try {
+          const payload = new newnewapi.GetMySpendingRequest();
+
+          const res = await getMySpending(payload);
+
+          if (!res.data?.totalSpending?.usdCents || res.error) {
+            throw new Error(res.error?.message ?? 'Request failed');
+          }
+
+          setMySpendingInCents(res.data.totalSpending.usdCents);
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+  }, [user.userData?.options?.isWhiteListed]);
+
+  // Test WS events, had a bug with the event data coming from finalized transactions only
+  useEffect(() => {
+    const handleMySpendingChanged = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MySpendingChanged.decode(arr);
+      if (!decoded?.totalSpending?.usdCents) {
+        return;
+      }
+
+      setMySpendingInCents(decoded.totalSpending.usdCents);
+    };
+
+    if (socketConnection && user.loggedIn) {
+      socketConnection?.on('MySpendingChanged', handleMySpendingChanged);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+        socketConnection?.off('MySpendingChanged', handleMySpendingChanged);
+      }
+    };
+  }, [socketConnection, user.loggedIn]);
+
+  const mySpendingFormatted = useMemo(() => {
+    if (mySpendingInCents === undefined) {
+      return undefined;
+    }
+
+    const mySpendingInDollars = Math.floor(mySpendingInCents / 100);
+
+    if (mySpendingInDollars < 10000) {
+      return Math.floor(mySpendingInDollars / 1000);
+    }
+
+    return Math.floor(mySpendingInDollars / 10000) * 10;
+  }, [mySpendingInCents]);
+
   return (
-    <ErrorBoundary>
-      <SGeneral restrictMaxWidth>
-        <SMyProfileLayout>
-          <ProfileBackground
-            // Temp
-            pictureURL={
-              user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'
-            }
-          >
-            <Button
-              view='transparent'
-              withShrink
-              withDim
-              iconOnly={isMobileOrTablet}
-              onClick={() => handleOpenEditProfileMenu()}
-            >
-              <InlineSvg
-                svg={EditIcon}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-              {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
-            </Button>
-            <Button
-              view='transparent'
-              withDim
-              withShrink
-              iconOnly={isMobileOrTablet}
-              onClick={() => router.push('/profile/settings')}
-            >
-              <InlineSvg
-                svg={SettingsIcon}
-                width={isMobileOrTablet ? '16px' : '24px'}
-                height={isMobileOrTablet ? '16px' : '24px'}
-              />
-              {isMobileOrTablet
-                ? null
-                : t('ProfileLayout.headerButtons.settings')}
-            </Button>
-          </ProfileBackground>
-          <SBackButton
-            onClick={() => {
-              router.back();
-            }}
-          />
-          {/* NB! Temp */}
-          {user.userData?.avatarUrl && (
-            <ProfileImage src={user.userData?.avatarUrl} />
-          )}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+    <SGeneral restrictMaxWidth>
+      <SMyProfileLayout>
+        <ProfileBackground
+          // Temp
+          pictureURL={user?.userData?.coverUrl ?? mockProfileBg.src}
+        >
+          <SButton
+            view='transparent'
+            withShrink
+            withDim
+            iconOnly={isMobileOrTablet}
+            onClick={() => handleOpenEditProfileMenu()}
+            onClickCapture={() => {
+              Mixpanel.track('Click Edit Profile Button', {
+                _stage: 'MyProfile',
+                _component: 'MyProfileLayout',
+              });
             }}
           >
-            <SUsername variant={4}>{user.userData?.nickname}</SUsername>
-            <SShareDiv>
-              <SUsernameButton
-                view='tertiary'
-                iconOnly
-                style={{
-                  paddingTop: '8px',
-                  paddingBottom: '8px',
-                  paddingLeft: '16px',
-                  paddingRight: '16px',
-                }}
-                onClick={() => {}}
-              >
-                <SUsernameButtonText>
-                  @{/* Temp! */}
-                  {user.userData?.username &&
-                  user.userData?.username.length > 12
-                    ? `${user.userData?.username.substring(
-                        0,
-                        6
-                      )}...${user.userData?.username.substring(
-                        (user.userData?.username.length || 0) - 3
-                      )}`
-                    : user.userData?.username}
-                </SUsernameButtonText>
-              </SUsernameButton>
-              <SShareButton
-                view='tertiary'
-                iconOnly
-                withDim
-                withShrink
-                style={{
-                  padding: '8px',
-                }}
-                onClick={() => handleCopyLink()}
-              >
-                {isCopiedUrl ? (
-                  t('ProfileLayout.buttons.copied')
-                ) : (
-                  <InlineSvg
-                    svg={ShareIconFilled}
-                    fill={theme.colorsThemed.text.primary}
-                    width='20px'
-                    height='20px'
-                  />
+            <InlineSvg
+              svg={EditIcon}
+              width={isMobileOrTablet ? '16px' : '24px'}
+              height={isMobileOrTablet ? '16px' : '24px'}
+            />
+            {isMobileOrTablet ? null : t('profileLayout.headerButtons.edit')}
+          </SButton>
+          <SButton
+            id='settings-button'
+            view='transparent'
+            withDim
+            withShrink
+            iconOnly={isMobileOrTablet}
+            onClick={() => router.push('/profile/settings')}
+            onClickCapture={() => {
+              Mixpanel.track('Click Settings Button', {
+                _stage: 'MyProfile',
+                _component: 'MyProfileLayout',
+              });
+            }}
+          >
+            <InlineSvg
+              svg={SettingsIcon}
+              width={isMobileOrTablet ? '16px' : '24px'}
+              height={isMobileOrTablet ? '16px' : '24px'}
+            />
+            {isMobileOrTablet
+              ? null
+              : t('profileLayout.headerButtons.settings')}
+          </SButton>
+        </ProfileBackground>
+        <SButtonBack
+          view='transparent'
+          withDim
+          withShrink
+          iconOnly
+          onClick={() => {
+            router.back();
+          }}
+          onClickCapture={() => {
+            Mixpanel.track('Click Back Button', {
+              _stage: 'MyProfile',
+              _component: 'MyProfileLayout',
+            });
+          }}
+        >
+          <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
+        </SButtonBack>
+        {/* NB! Temp */}
+        {user.userData?.avatarUrl && (
+          <ProfileImage src={user.userData?.avatarUrl} />
+        )}
+        <SUserData>
+          <SUsernameWrapper>
+            <SUsername variant={4}>
+              <DisplayName user={user.userData} />
+            </SUsername>
+            {isGenderPronounsDefined(user.userData?.genderPronouns) && (
+              <SGenderPronouns variant={2}>
+                {t(
+                  `genderPronouns.${
+                    getGenderPronouns(user.userData?.genderPronouns!!).name
+                  }` as any
                 )}
-              </SShareButton>
-            </SShareDiv>
-            {user.userData?.bio ? (
-              <SBioText variant={3}>{user.userData?.bio}</SBioText>
-            ) : null}
-          </div>
-          <ProfileTabs pageType='myProfile' tabs={tabs} />
-          {/* Edit Profile modal menu */}
-          <Modal
-            show={isEditProfileMenuOpen}
-            overlayDim
-            transitionSpeed={isMobileOrTablet ? 0.15 : 0}
-            onClose={handleClosePreventDiscarding}
-          >
-            {isEditProfileMenuOpen ? (
-              <EditProfileMenu
-                stage={editingStage}
-                wasModified={wasModified}
-                handleClose={handleCloseEditProfileMenu}
-                handleSetWasModified={handleSetWasModified}
-                handleClosePreventDiscarding={handleClosePreventDiscarding}
-                handleSetStageToEditingProfilePicture={
-                  handleSetStageToEditingProfilePicture
-                }
-                handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
-              />
-            ) : null}
-          </Modal>
-        </SMyProfileLayout>
-        {renderChildren()}
-        {/* {!routeChangeLoading
+              </SGenderPronouns>
+            )}
+          </SUsernameWrapper>
+          <SShareDiv>
+            <SUsernameButton
+              view='tertiary'
+              iconOnly
+              style={{
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+              }}
+              onClick={() => {}}
+            >
+              <SUsernameButtonText>
+                @{/* Temp! */}
+                {user.userData?.username && user.userData?.username.length > 12
+                  ? `${user.userData?.username.substring(
+                      0,
+                      6
+                    )}...${user.userData?.username.substring(
+                      (user.userData?.username.length || 0) - 3
+                    )}`
+                  : user.userData?.username}
+              </SUsernameButtonText>
+            </SUsernameButton>
+            <SShareButton
+              view='tertiary'
+              iconOnly
+              withDim
+              withShrink
+              style={{
+                padding: '8px',
+              }}
+              onClick={() => handleCopyLink()}
+              onClickCapture={() => {
+                Mixpanel.track('Copy Own Link', {
+                  _stage: 'MyProfile',
+                  _component: 'MyProfileLayout',
+                });
+              }}
+            >
+              {isCopiedUrl ? (
+                t('profileLayout.buttons.copied')
+              ) : (
+                <InlineSvg
+                  svg={ShareIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width='20px'
+                  height='20px'
+                />
+              )}
+            </SShareButton>
+          </SShareDiv>
+          {user.userData?.bio ? (
+            <SBioText variant={3}>{user.userData?.bio}</SBioText>
+          ) : null}
+        </SUserData>
+        <ProfileTabs pageType='myProfile' tabs={tabs} />
+        {mySpendingFormatted !== undefined && (
+          <SSpending>{mySpendingFormatted}</SSpending>
+        )}
+        {/* Edit Profile modal menu */}
+        <Modal
+          show={isEditProfileMenuOpen}
+          transitionspeed={isMobileOrTablet ? 0.15 : 0}
+          onClose={handleClosePreventDiscarding}
+        >
+          {isEditProfileMenuOpen ? (
+            <EditProfileMenu
+              stage={editingStage}
+              wasModified={wasModified}
+              handleClose={handleCloseEditProfileMenu}
+              handleSetWasModified={handleSetWasModified}
+              handleClosePreventDiscarding={handleClosePreventDiscarding}
+              handleSetStageToEditingProfilePicture={
+                handleSetStageToEditingProfilePicture
+              }
+              handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
+            />
+          ) : null}
+        </Modal>
+      </SMyProfileLayout>
+      {renderChildren()}
+      {/* {!routeChangeLoading
           ? renderChildren() : (
             <CardSkeletonList
               count={8}
@@ -706,36 +556,16 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               }}
             />
           )} */}
-      </SGeneral>
-    </ErrorBoundary>
+    </SGeneral>
   );
 };
 
 MyProfileLayout.defaultProps = {
-  postsCachedActivelyBiddingOn: undefined,
   postsCachedActivelyBiddingOnFilter: undefined,
-  postsCachedActivelyBiddingCount: undefined,
-  postsCachedMyPurchases: undefined,
   postsCachedMyPurchasesFilter: undefined,
-  postsCachedMyPurchasesCount: undefined,
-  postsCachedViewHistory: undefined,
   postsCachedViewHistoryFilter: undefined,
-  postsCachedViewHistoryCount: undefined,
-  postsCachedSubscriptions: undefined,
-  postsCachedSubscriptionsFilter: undefined,
-  postsCachedSubscriptionsCount: undefined,
-  postsCachedFavorites: undefined,
   postsCachedFavoritesFilter: undefined,
-  postsCachedFavoritesCount: undefined,
-  postsCachedActivelyBiddingPageToken: undefined,
-  postsCachedMyPurchasesPageToken: undefined,
-  postsCachedViewHistoryPageToken: undefined,
-  postsCachedSubscriptionsPageToken: undefined,
-  postsCachedFavoritesPageToken: undefined,
-  postsCachedMyPosts: undefined,
   postsCachedMyPostsFilter: undefined,
-  postsCachedMyPostsCount: undefined,
-  postsCachedMyPostsPageToken: undefined,
 };
 
 export default MyProfileLayout;
@@ -749,20 +579,29 @@ const SGeneral = styled(General)`
 
   @media (max-width: 768px) {
     main {
-      div:first-child {
+      > div:first-child {
         padding-left: 0;
         padding-right: 0;
 
-        div:first-child {
-          margin-left: 0;
-          margin-right: 0;
+        > div:first-child {
+          padding-left: 0;
+          padding-right: 0;
+
+          > div:first-child {
+            padding-left: 0;
+            padding-right: 0;
+          }
         }
       }
     }
   }
 `;
 
-const SBackButton = styled(BackButton)`
+const SButton = styled(Button)`
+  background: rgba(11, 10, 19, 0.1);
+`;
+
+const SButtonBack = styled(SButton)`
   position: absolute;
   top: 16px;
   left: 16px;
@@ -773,10 +612,27 @@ const SBackButton = styled(BackButton)`
   }
 `;
 
-const SUsername = styled(Headline)`
-  text-align: center;
+const SUserData = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* alignitems: center; */
+`;
 
+const SUsernameWrapper = styled.div`
   margin-bottom: 12px;
+`;
+
+const SUsername = styled(Headline)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SGenderPronouns = styled(Text)`
+  text-align: center;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SShareDiv = styled.div`
@@ -819,12 +675,17 @@ const SShareButton = styled(Button)`
 const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  user-select: unset;
 
   padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 54px;
+  margin: 0 auto 54px;
 
   max-width: 480px;
+  width: 100%;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
@@ -846,5 +707,17 @@ const SMyProfileLayout = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
+  }
+`;
+
+const SSpending = styled.div`
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  color: transparent;
+  cursor: default;
+
+  :hover {
+    color: ${({ theme }) => (theme.name === 'light' ? '#B3BBCA' : '#323444')};
   }
 `;

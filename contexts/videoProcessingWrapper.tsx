@@ -4,13 +4,18 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 
 import { SocketContext } from './socketContext';
-import { usePostModalState } from './postModalContext';
+import useErrorToasts from '../utils/hooks/useErrorToasts';
 
-const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
+interface IVideoProcessingWrapper {
+  children: React.ReactNode;
+}
+
+const VideoProcessingWrapper: React.FunctionComponent<
+  IVideoProcessingWrapper
+> = ({ children }) => {
   const router = useRouter();
+  const { showErrorToastCustom } = useErrorToasts();
   const socketConnection = useContext(SocketContext);
-
-  const { postOverlayOpen } = usePostModalState();
 
   const handlerSocketUpdated = useCallback(
     (data: any) => {
@@ -35,19 +40,18 @@ const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
         ) {
           toast.success('Your video has been processed', {
             onClick: () => {
-              router.push(`/post/${decoded.postUuid}`);
+              router.push(`/profile/my-posts`);
             },
           });
         }
 
         if (
           decoded.videoType ===
-            newnewapi.VideoProcessingProgress.VideoType.RESPONSE &&
-          !postOverlayOpen
+          newnewapi.VideoProcessingProgress.VideoType.RESPONSE
         ) {
           toast.success('Your response has been processed', {
             onClick: () => {
-              router.push(`/post/${decoded.postUuid}`);
+              router.push(`/profile/my-posts`);
             },
           });
         }
@@ -58,24 +62,25 @@ const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
         decoded.postUuid &&
         decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
       ) {
-        toast.error('An error occured when processing your video', {
+        showErrorToastCustom('An error occurred when processing your video', {
           onClick: () => {
-            router.push(`/post/${decoded.postUuid}`);
+            router.push(`/profile/my-posts`);
           },
         });
       }
     },
-    [router, postOverlayOpen]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [router]
   );
 
   useEffect(() => {
     if (socketConnection) {
-      socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
+      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
     }
 
     return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('VideoProcessingProgress', handlerSocketUpdated);
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

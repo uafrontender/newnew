@@ -3,78 +3,84 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
-import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { usePostModalState } from '../../../contexts/postModalContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IList {
+  className?: string;
   collection: any;
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const PostList: React.FC<IList> = ({
+  className,
   collection,
   loading,
   skeletonsBgColor,
   skeletonsHighlightColor,
-  handlePostClicked,
 }) => {
-  const { postOverlayOpen } = usePostModalState();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      handlePostClicked(item);
-    };
+  const isTablet = ['tablet'].includes(resizeMode);
 
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
-      >
+  const isSmallDesktops = ['laptop', 'laptopM'].includes(resizeMode);
+
+  const skeletonNumber =
+    (isMobile && 1) || (isTablet && 3) || (isSmallDesktops && 4) || 5; // calculations how menu skeletons to display
+
+  const renderItem = (item: any, index: number) => (
+    <Link
+      href={`/p/${
+        switchPostType(item)[0].postShortId
+          ? switchPostType(item)[0].postShortId
+          : switchPostType(item)[0].postUuid
+      }`}
+      key={switchPostType(item)[0].postUuid}
+    >
+      <SItemWrapper>
         <PostCard
           item={item}
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
-          shouldStop={postOverlayOpen}
         />
       </SItemWrapper>
-    );
-  };
+    </Link>
+  );
 
   return (
-    <SListWrapper>
-      {collection?.map(renderItem)}
-      {collection.length > 0 &&
-        loading &&
-        Array(5)
-          .fill('_')
-          .map((_, i) => (
-            <CardSkeleton
-              key={i}
-              count={1}
-              cardWidth='100%'
-              cardHeight='100%'
-              bgColor={skeletonsBgColor}
-              highlightColor={skeletonsHighlightColor}
-            />
-          ))}
-      {collection.length === 0 && loading && (
+    <>
+      <SListWrapper className={className}>
+        {collection?.map(renderItem)}
+        {collection.length === 0 &&
+          loading &&
+          Array(skeletonNumber)
+            .fill('_')
+            .map((_, i) => (
+              <CardSkeleton
+                key={i}
+                count={1}
+                cardWidth='100%'
+                cardHeight='100%'
+                bgColor={skeletonsBgColor}
+                highlightColor={skeletonsHighlightColor}
+              />
+            ))}
+      </SListWrapper>
+      {collection.length > 0 && loading && (
         <SAnimationContainer
           onClick={(e) => {
             e.stopPropagation();
@@ -91,7 +97,7 @@ export const PostList: React.FC<IList> = ({
           />
         </SAnimationContainer>
       )}
-    </SListWrapper>
+    </>
   );
 };
 
@@ -104,27 +110,23 @@ export default PostList;
 
 const SListWrapper = styled.div`
   width: 100%;
-  cursor: grab;
   display: flex;
-  padding: 8px 0 0 0;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  // Needed for bump up animation
+  padding-top: 8px;
+  // Not sure these are needed on this level (should come from className)
+  padding-left: 16px;
+  padding-right: 16px;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(100% + 26px);
-    padding: 0;
+    margin: 0 -8px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
-  ${(props) => props.theme.media.laptop} {
-    width: calc(100% + 32px);
-    padding: 0 !important;
-    margin: 0 -16px;
-  }
-
-  ${(props) => props.theme.media.laptopL} {
+  ${(props) => props.theme.media.laptopM} {
     margin: 0 -16px;
   }
 
@@ -167,12 +169,16 @@ const SItemWrapper = styled.div`
   width: 100%;
   margin: 16px 0;
 
+  & > div {
+    max-width: 100%;
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: calc(33% - 16px);
     margin: 0 8px 24px 8px;
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     width: calc(25% - 32px);
     margin: 0 16px 32px 16px;
   }
@@ -188,7 +194,7 @@ const SItemWrapper = styled.div`
 
 const SAnimationContainer = styled.div`
   width: 100%;
-  height: 100%;
+  flex: 1;
 
   display: flex;
   justify-content: center;

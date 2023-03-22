@@ -1,0 +1,283 @@
+{
+  "back": "Back",
+  "at": " at ",
+  "first-step-title": "What will you post?",
+  "first-step-auction-title": "Bid",
+  "first-step-auction-sub-title": "People send bids for things they want you to do",
+  "first-step-multiple-choice-title": "Superpoll",
+  "first-step-multiple-choice-sub-title": "People pay to vote and you do the option with the most votes",
+  "first-step-crowdfunding-title": "Goal",
+  "first-step-crowdfunding-sub-title": "People pool money together to back your goal",
+  "second-step-auction-title": "Bid",
+  "second-step-multiple-choice-title": "Superpoll",
+  "second-step-crowdfunding-title": "Goal",
+  "videoBeingProcessedCaption": "Your video will be available once processed",
+  "tabs": {
+    "auction": "Bid",
+    "multiple-choice": "Superpoll",
+    "crowdfunding": "Goal"
+  },
+  "firstStep": {
+    "meta": {
+      "title": "Create a post on NewNew",
+      "description": "Create an Bid, a Superpoll or a Goal on NewNew in a few simple clicks and earn money"
+    }
+  },
+  "secondStep": {
+    "meta": {
+      "title-auction": "Post an Bid on NewNew",
+      "title-multiple-choice": "Post a Superpoll on NewNew",
+      "title-crowdfunding": "Post a Goal on NewNew",
+      "description-auction": "Fans bid on your auctions and you earn cash",
+      "description-multiple-choice": "Make a paid poll, earn money and cash out on NewNew",
+      "description-crowdfunding": "Use crowdfunding campaigns to fund your life goals and earn money"
+    },
+    "input": {
+      "label": "Title",
+      "placeholder": "ex. Where should I get my first tattoo \uD83D\uDE4A"
+    },
+    "fileUpload": {
+      "titleMobile": "Select a file ",
+      "titleDesktop": "Select a file or drag and drop here",
+      "description": "Video can be up to 10 GB",
+      "button": "Select file"
+    },
+    "block": {
+      "title": {
+        "file": "Upload video",
+        "decision": "Details",
+        "advanced": "Duration",
+        "floating": "Preview"
+      },
+      "subTitle": {
+        "votesInfo": "People will spend a minimum of $1 to vote",
+        "floating": "Upload your video to preview it here",
+        "floatingProcessing": "Preview will be available after processing"
+      }
+    },
+    "modal": {
+      "leave": {
+        "message": "Are you sure want to leave this page?"
+      },
+      "deleteFile": {
+        "title": "Delete video",
+        "description": "Are you sure you want to delete this video?"
+      }
+    },
+    "card": {
+      "left": "{{time}} left",
+      "soon": "Coming Soon"
+    },
+    "button": {
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "submit": "Publish",
+      "preview": "Review",
+      "schedule": "Schedule",
+      "delete": "Delete",
+      "card": {
+        "ac": "Place a bid",
+        "mc": "Place a bid",
+        "cf": "Place a bid"
+      }
+    },
+    "field": {
+      "minimalBid": {
+        "title": "Minimum bid",
+        "value": "${{value}}",
+        "label": "$",
+        "placeholder": "1",
+        "description": "the minimum bid a person can place"
+      },
+      "targetBackerCount": {
+        "title": "Minimum backers",
+        "value": "{{value}}",
+        "label": "",
+        "placeholder": "ex. 20",
+        "description": "${{value}} is the minimum a backer can contribute"
+      },
+      "expiresAt": {
+        "title": "Ends in",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "options": {
+          "2-minutes": "2 minutes",
+          "5-minutes": "5 minutes",
+          "10-minutes": "10 minutes",
+          "1-hour": "1 hour",
+          "3-hours": "3 hours",
+          "6-hours": "6 hours",
+          "12-hours": "12 hours",
+          "1-day": "1 day",
+          "3-days": "3 days",
+          "5-days": "5 days",
+          "7-days": "7 days"
+        }
+      },
+      "startsAt": {
+        "title": "Start date",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "modal": {
+          "title": "Start date",
+          "type": {
+            "schedule": "Schedule",
+            "right-away": "Right away"
+          },
+          "hoursFormat": {
+            "pm": "PM",
+            "am": "AM"
+          },
+          "days": {
+            "sunday": "S",
+            "monday": "M",
+            "tuesday": "T",
+            "wednesday": "W",
+            "thursday": "T",
+            "friday": "F",
+            "saturday": "S"
+          }
+        },
+        "tablet": {
+          "type": {
+            "schedule": "Schedule for a certain date",
+            "right-away": "Post right away once I publish it"
+          }
+        }
+      },
+      "comments": {
+        "title": "Allow comments from everyone"
+      },
+      "allowSuggestions": {
+        "title": "Allow suggestions from subscribers"
+      },
+      "choices": {
+        "add": "Add another option",
+        "option": {
+          "label": "Option {{value}}"
+        }
+      }
+    },
+    "video": {
+      "error": {
+        "minLength": "Video must be at least 10 seconds long",
+        "maxLength": "Video must be less than 10 minutes long",
+        "maxSize": "Video size too big, choose up to 10gb",
+        "title": "Ooops...",
+        "description": "There was an error and your file could not be uploaded. Would you like to try again."
+      },
+      "setThumbnail": "Set a thumbnail",
+      "thumbnailEllipseMenu": {
+        "uploadImageButton": "Upload an image"
+      },
+      "deleteFile": "Delete file",
+      "previewFull": "Preview",
+      "thumbnail": {
+        "info": "Learn more",
+        "title": "Set a thumbnail from the video",
+        "submit": "Save",
+        "description": "Select a snippet for your thumbnail. \nA good thumbnail gets viewers excited..."
+      },
+      "coverImage": {
+        "title": "Upload an image",
+        "submit": "Save",
+        "uploadCoverImage": {
+          "caption": "Select custom cover image",
+          "uploadBtn": "Select",
+          "deleteBtn": "Delete"
+        }
+      },
+      "full": {
+        "title": "Video preview"
+      },
+      "loading": {
+        "title": "Uploading video",
+        "description": "Your file is uploading. It won’t take long...",
+        "process": "{{progress}}% • {{time}} left"
+      },
+      "processing": {
+        "title": "Your file is processing. It won’t take long...",
+        "description": "Your video is processing",
+        "process": "{{progress}}% • {{time}} left"
+      }
+    }
+  },
+  "preview": {
+    "meta": {
+      "title-auction": "Creation | Bid | Preview",
+      "title-multiple-choice": "Creation | Superpoll | Preview",
+      "title-crowdfunding": "Creation | Goal | Preview"
+    },
+    "title-auction": "Review my Bid",
+    "title-multiple-choice": "Review my Superpoll",
+    "title-crowdfunding": "Review my Goal",
+    "button": {
+      "submit": "Publish",
+      "edit": "Edit"
+    },
+    "settings": {
+      "minimalBid": "Minimum bid",
+      "targetBackerCount": "Backers",
+      "expiresAt": "Ends on",
+      "startsAt": "Start date",
+      "comments": "Comments",
+      "allowSuggestions": "Suggestions"
+    },
+    "values": {
+      "minimalBid": "${{value}}",
+      "comments-allowed": "On",
+      "comments-forbidden": "Off",
+      "allowSuggestions-allowed": "On",
+      "allowSuggestions-forbidden": "Off"
+    }
+  },
+  "published": {
+    "meta": {
+      "title-auction-published": "Creation | Bid | Published",
+      "title-multiple-choice-published": "Creation | Superpoll | Published",
+      "title-crowdfunding-published": "Creation | Goal | Published",
+      "title-auction-scheduled": "Creation | Bid | Scheduled",
+      "title-multiple-choice-scheduled": "Creation | Superpoll | Scheduled",
+      "title-crowdfunding-scheduled": "Creation | Goal | Scheduled"
+    },
+    "button": {
+      "submit-published": "See my {{value}}",
+      "submit-scheduled": "See scheduled {{value}}"
+    },
+    "texts": {
+      "title-published": "It’s live...now share it!",
+      "title-scheduled": "It’s scheduled... share the info!"
+    },
+    "socials": {
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "copy": "Copy Link",
+      "copied": "Link Copied!"
+    }
+  },
+  "tutorials": {
+    "heroPopupCommon": {
+      "heroButtonText": "Let's go"
+    },
+    "heroPopupAC": {
+      "title": "Bids",
+      "line1": "1. Open to ideas? Post a video and have the\n audience send you bids on what you should do",
+      "line2": "2. People send bids with their ideas, and\n how much they’ll pay to see you do it",
+      "line3": "3. Choose your favorite bid, then\n upload a video of yourself doing it!"
+    },
+    "heroPopupMC": {
+      "title": "Superpolls",
+      "line1": "1. Post a video poll with a few options\n for the audience to choose from",
+      "line2": "2. People pay to vote on their favorite option",
+      "line3": "3. Upload a video response of you doing\n the option that gets the most votes!"
+    },
+    "heroPopupCF": {
+      "title": "Goals",
+      "line1": "1. Post a video goal and choose the number\n of backers you need to reach that goal",
+      "line2": "2. Every backer will contribute a custom\n dollar amount to your goal",
+      "line3": "3. Upload a video of you fulfilling your\n goal IRL when you get enough backers!"
+    }
+  }
+}

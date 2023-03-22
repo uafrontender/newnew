@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "title": "退訂NewNew"
+  },
+  "success": {
+    "heading": "你已成功退訂",
+    "subheading": "在設置頁面管理電子郵件通知。"
+  },
+  "fail": {
+    "heading": "我們無法取消你的訂閱",
+    "subheading": "你仍可在設置頁面管理電子郵件通知。"
+  },
+  "confirm": "好",
+  "error": {
+    "requestFailed": "請求失敗"
+  }
+}

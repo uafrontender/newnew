@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import InlineSVG from '../atoms/InlineSVG';
@@ -10,11 +10,13 @@ import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IBanner {}
 
 const Banner: React.FC<IBanner> = React.memo(() => {
-  const { banner, resizeMode } = useAppSelector((state) => state.ui);
+  const { banner } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
 
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -84,6 +86,13 @@ const SContainer = styled.div<ISContainer>`
   align-items: center;
   justify-content: center;
 
+  ${({ active }) =>
+    !active
+      ? css`
+          background: none;
+        `
+      : ''}
+
   &::after {
     top: 0;
     left: 0;
@@ -96,6 +105,13 @@ const SContainer = styled.div<ISContainer>`
     animation: shimmer 5s ease infinite;
     background: ${(props) => props.theme.gradients.bannerPink};
     content: '';
+
+    ${({ active }) =>
+      !active
+        ? css`
+            background: none;
+          `
+        : ''}
   }
 
   @keyframes shimmer {

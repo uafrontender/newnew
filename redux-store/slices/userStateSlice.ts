@@ -14,7 +14,6 @@ export type TUserData = Omit<
 
 interface ICreatorData {
   isLoaded: boolean;
-  hasCreatorTags: boolean;
   options: newnewapi.IGetMyOnboardingStateResponse;
 }
 
@@ -57,6 +56,8 @@ const defaultUIState: IUserStateInterface = {
     remainingAcCrCurrentStep: [newnewapi.AcCreationTutorialStep.AC_CR_HERO],
     remainingCfCrCurrentStep: [newnewapi.CfCreationTutorialStep.CF_CR_HERO],
     remainingMcCrCurrentStep: [newnewapi.McCreationTutorialStep.MC_CR_HERO],
+    remainingAcResponseCurrentStep: [newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE],
+    remainingMcResponseCurrentStep: [newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE],
   },
   userTutorialsProgressSynced: false,
 };
@@ -100,11 +101,11 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
         coverUrl: '',
         nickname: '',
         bio: '',
+        countryCode: '',
         options: {},
       };
       state.creatorData = {
         isLoaded: false,
-        hasCreatorTags: false,
         options: {
           creatorStatus: null,
           isCustomAvatar: null,
@@ -114,6 +115,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
           stripeConnectStatus: null,
         },
       };
+      state.userTutorialsProgress = defaultUIState.userTutorialsProgress;
+      state.userTutorialsProgressSynced =
+        defaultUIState.userTutorialsProgressSynced;
     },
   },
 });

@@ -33,7 +33,9 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
       try {
         setIsLoading(true);
 
-        if (!email_address || !token) throw new Error('No token');
+        if (!email_address || !token) {
+          throw new Error('No token on change email');
+        }
 
         const requestPayload = new newnewapi.SetMyEmailRequest({
           emailAddress: email_address,
@@ -43,7 +45,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
         const res = await setMyEmail(requestPayload);
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -106,7 +108,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
                 top: 'calc(50% + 48px)',
               }}
             >
-              An error occured
+              An error occurred
             </div>
           ) : null}
         </div>
@@ -117,7 +119,9 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 
 export default EmailUpdateRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  IEmailUpdateRedirectPage
+> = async (context) => {
   const { email_address, token } = context.query;
 
   if (

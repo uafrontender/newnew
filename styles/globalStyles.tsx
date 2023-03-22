@@ -9,6 +9,14 @@ const GlobalStyle = createGlobalStyle`
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+  }
+
+  /* Smooth theme transitions */
+  html.theming,
+  html.theming * {
+    // Do not assign all, breaks Lotti, use only color (theme) related props here
+    transition: color 0.3s linear, background 0.3s linear, background-color 0.3s linear !important;
   }
 
   *, *:before, *:after {
@@ -36,6 +44,13 @@ const GlobalStyle = createGlobalStyle`
   body {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background: ${({ theme }) => theme.colorsThemed.background.primary};
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   body.blurred {
@@ -46,6 +61,26 @@ const GlobalStyle = createGlobalStyle`
   a {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     text-decoration: none;
+  }
+
+  /* .iti__flag {background-image: url("../../flags.png");}
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .iti__flag {background-image: url("../../flags.png");}
+  } */
+
+  #nprogress .bar {
+    background: repeating-linear-gradient(to right, #1D6AFF 0%, rgba(29, 180, 255, 0.85) 50%, #1D6AFF 100%);
+    background-size: 200% auto;
+    background-position: 0 100%;
+    animation: gradient 2s infinite;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+  }
+
+  @keyframes gradient {
+    0%   { background-position: 0 0; }
+    100% { background-position: -200% 0; }
   }
 `;
 

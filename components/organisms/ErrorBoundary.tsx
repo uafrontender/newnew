@@ -1,25 +1,28 @@
 import React from 'react';
+import * as Sentry from '@sentry/react';
 
-export class ErrorBoundary extends React.Component {
-  state = { hasError: false };
+import ErrorPage from './ErrorPage';
+
+interface IErrorBoundary {
+  children: React.ReactNode;
+}
+
+export class ErrorBoundary extends React.Component<IErrorBoundary> {
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error(error, errorInfo);
+  }
 
   static getDerivedStateFromError() {
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
-    console.error(error, errorInfo);
-  }
-
   render() {
     const { children } = this.props;
-    const { hasError } = this.state;
-
-    if (hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return children;
+    return (
+      <Sentry.ErrorBoundary fallback={<ErrorPage />}>
+        {children}
+      </Sentry.ErrorBoundary>
+    );
   }
 }
 

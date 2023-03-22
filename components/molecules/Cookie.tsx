@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import Link from 'next/link';
 
 import InlineSVG from '../atoms/InlineSVG';
-import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
+import AnimatedPresence, {
+  TElementAnimations,
+} from '../atoms/AnimatedPresence';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
@@ -14,7 +16,7 @@ const Cookie = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();
-  const [animation, setAnimation] = useState('trans-06');
+  const [animation, setAnimation] = useState<TElementAnimations>('trans-06');
   const [animateCookie, setAnimateCookie] = useState(false);
 
   const handleClose = () => {
@@ -52,7 +54,7 @@ const Cookie = React.memo(() => {
   return (
     <AnimatedPresence
       start={animateCookie}
-      animation={animation as TAnimation}
+      animation={animation}
       onAnimationEnd={handleAnimationEnd}
       animateWhenInView={false}
     >
@@ -61,11 +63,15 @@ const Cookie = React.memo(() => {
           onMouseOver={handleMouseOver}
           onMouseLeave={handleMouseLeave}
         >
-          <SText>{t('cookie-text')}</SText>
+          <SText>{t('cookie.text')}</SText>
           <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
-          <Link href='/cookies'>
-            <a target='_blank'>
-              <STextLink>{t('cookie-link')}</STextLink>
+          <Link href='https://privacy.newnew.co'>
+            <a
+              href='https://privacy.newnew.co'
+              target='_blank'
+              rel='noreferrer'
+            >
+              <STextLink>{t('cookie.link')}</STextLink>
             </a>
           </Link>
           <InlineSVG
@@ -130,4 +136,9 @@ const STextLink = styled.div`
 const SInlineSVG = styled(InlineSVG)`
   top: -1px;
   position: relative;
+  margin-left: 4px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 8px;
+  }
 `;

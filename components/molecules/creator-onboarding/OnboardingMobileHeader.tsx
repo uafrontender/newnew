@@ -4,14 +4,13 @@ import React from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import GoBackButton from '../GoBackButton';
 import Logo from '../Logo';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const OnboardingMobileHeader: React.FunctionComponent = () => {
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -45,7 +44,7 @@ const SOnboardingProgressBarContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    padding-bottom: 80px;
+    padding-bottom: 0;
   }
 `;
 

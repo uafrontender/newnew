@@ -30,3 +30,15 @@ export const saveStateLS = (stateKey: string, stateValue: any): boolean => {
     return false;
   }
 };
+
+export const removeStateLS = (stateKey: string): boolean => {
+  try {
+    if (!isBrowser()) {
+      return false;
+    }
+    localStorage.removeItem(stateKey);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};

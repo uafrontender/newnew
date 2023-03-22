@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Superpoll Bundles",
+    "description": ""
+  },
+  "header": {
+    "title": "Superpoll Bundles"
+  },
+  "bundlesSection": {
+    "title": "Your current bundles",
+    "seeAll": "See all",
+    "noBundles": "You have no bundles. Try searching for creator or buy bundle",
+    "search": "Search"
+  },
+  "bundlesModal": {
+    "title": "Your current bundles"
+  },
+  "bundle": {
+    "accessExpired": "Your benefits have now expired. Buy another bundle for custom options and chat",
+    "votesLeft": "<0>{{amount}}</0> votes left",
+    "access": "plus <0/> of:",
+    "unitPair": "{{amount}} {{unit}}",
+    "and": " and ",
+    "customOptions": "adding custom Superpoll options",
+    "chat": "1-on-1 private chat",
+    "expiation": "votes never expire",
+    "unit": {
+      "day": "day",
+      "days": "days",
+      "month": "month",
+      "months": "months",
+      "year": "year",
+      "years": "years"
+    }
+  },
+  "search": {
+    "title": "Search creators offering Bundles",
+    "searchInputPlaceholder": "Search creators",
+    "topCreators": "Top Creators",
+    "resultsFor": "Results for"
+  },
+  "button": {
+    "back": "Back"
+  },
+  "error": {
+    "requestFailed": "Request failed"
+  }
+}

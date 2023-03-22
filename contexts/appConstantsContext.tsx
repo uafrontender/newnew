@@ -14,7 +14,13 @@ export const AppConstantsContext = createContext<{
   appConstants: {} as any,
 });
 
-const AppConstantsContextProvider: React.FC = ({ children }) => {
+interface IAppConstantsContextProvider {
+  children: React.ReactNode;
+}
+
+const AppConstantsContextProvider: React.FC<IAppConstantsContextProvider> = ({
+  children,
+}) => {
   const [appConstants, setAppConstants] = useState<
     Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>
   >({} as any);

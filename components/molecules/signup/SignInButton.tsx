@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -13,6 +19,8 @@ type TSignInButton = React.ComponentPropsWithoutRef<'button'> & {
   hoverBgColor?: string;
   hoverContentColor?: string;
   pressedBgColor: string;
+  textWidth?: number;
+  setTextWidth: (width: number) => void;
 };
 
 const SignInButton: React.FunctionComponent<TSignInButton> = ({
@@ -21,6 +29,8 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   hoverSvg,
   noRipple,
   children,
+  textWidth,
+  setTextWidth,
   onClick,
   disabled,
   ...rest
@@ -30,6 +40,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
 
   // Element ref
   const ref = useRef<HTMLButtonElement>();
+  const spanRef = useRef<HTMLSpanElement>();
 
   const [rippleOrigin, setRippleOrigin] = useState<{ x: string; y: string }>({
     x: '50%',
@@ -41,6 +52,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
     () => debounce(onClick!!, noRipple ? 300 : 900),
     [noRipple, onClick]
   );
+
   const handleRestoreRippling = useMemo(
     () =>
       debounce(() => {
@@ -51,7 +63,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   );
 
   const handleEnableHovered = useCallback(() => {
-    if (disabled) return;
+    if (disabled || window?.matchMedia('(hover: none)').matches) return;
     setHovered(true);
   }, [disabled, setHovered]);
 
@@ -61,7 +73,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   }, [disabled, focused, setHovered]);
 
   const handleFocusCapture = useCallback(() => {
-    if (disabled) return;
+    if (disabled || window?.matchMedia('(hover: none)').matches) return;
     setHovered(true);
     setFocused(true);
   }, [disabled, setFocused, setHovered]);
@@ -108,6 +120,12 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
     [disabled, setRippleOrigin, setIsRippling]
   );
 
+  useLayoutEffect(() => {
+    if (spanRef.current) {
+      setTextWidth(spanRef.current.getBoundingClientRect().width);
+    }
+  });
+
   return (
     <SSignInButton
       disabled={disabled}
@@ -115,6 +133,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
         ref.current = el!!;
       }}
       elementWidth={ref.current?.getBoundingClientRect().width ?? 800}
+      textWidth={textWidth}
       rippleOrigin={rippleOrigin}
       isRippling={noRipple ? false : isRippling}
       noRipple={noRipple ?? false}
@@ -137,7 +156,13 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
         height='20px'
         width='20px'
       />
-      <span>{title ?? children}</span>
+      <span
+        ref={(el) => {
+          spanRef.current = el!!;
+        }}
+      >
+        {title ?? children}
+      </span>
     </SSignInButton>
   );
 };
@@ -158,6 +183,7 @@ interface SISignInButton {
   hoverContentColor?: string;
   pressedBgColor: string;
   elementWidth: number;
+  textWidth?: number;
   isRippling: boolean;
   noRipple: boolean;
   rippleOrigin: {
@@ -179,7 +205,10 @@ const SSignInButton = styled.button<SISignInButton>`
 
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  padding: 16px 20px 16px 22%;
+  padding: ${({ elementWidth, textWidth }) =>
+    textWidth
+      ? `16px 20px 16px ${(elementWidth - textWidth - 36) / 2}px`
+      : '16px 20px 16px 22%'};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
@@ -236,35 +265,38 @@ const SSignInButton = styled.button<SISignInButton>`
   -ms-user-select: none;
   user-select: none;
 
-  &:hover:enabled,
-  &:focus:enabled {
-    background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
-      if (hoverBgColor && hoverContentColor) {
-        return theme.name === 'light' ? hoverBgColor : hoverContentColor;
-      }
-      return hoverBgColor;
-    }};
+  @media (hover: hover) {
+    &:hover:enabled,
+    &:focus:enabled {
+      background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
+        if (hoverBgColor && hoverContentColor) {
+          return theme.name === 'light' ? hoverBgColor : hoverContentColor;
+        }
+        return hoverBgColor;
+      }};
 
-    color: ${({ theme, hoverBgColor, hoverContentColor }) => {
-      if (hoverBgColor && hoverContentColor) {
-        return theme.name === 'light' ? hoverContentColor : hoverBgColor;
-      }
-      return 'white';
-    }};
-
-    & path {
-      fill: ${({ theme, hoverBgColor, hoverContentColor }) => {
+      color: ${({ theme, hoverBgColor, hoverContentColor }) => {
         if (hoverBgColor && hoverContentColor) {
           return theme.name === 'light' ? hoverContentColor : hoverBgColor;
         }
         return 'white';
       }};
-    }
 
-    transition: 0.15s linear;
+      & path {
+        fill: ${({ theme, hoverBgColor, hoverContentColor }) => {
+          if (hoverBgColor && hoverContentColor) {
+            return theme.name === 'light' ? hoverContentColor : hoverBgColor;
+          }
+          return 'white';
+        }};
+      }
+
+      transition: 0.15s linear;
+    }
   }
 
-  &:focus {
+  &:focus,
+  &:hover {
     outline: transparent;
   }
 
@@ -292,9 +324,16 @@ const SSignInButton = styled.button<SISignInButton>`
 
   &:enabled:active {
     transform: scale(0.9);
-    background: ${({ noRipple, pressedBgColor }) =>
-      noRipple ? pressedBgColor : 'initial'};
     transition: 0.2s linear;
+  }
+
+  @media (hover: hover) {
+    &:enabled:active {
+      transform: scale(0.9);
+      background: ${({ noRipple, pressedBgColor }) =>
+        noRipple ? pressedBgColor : 'initial'};
+      transition: 0.2s linear;
+    }
   }
 
   &:disabled {

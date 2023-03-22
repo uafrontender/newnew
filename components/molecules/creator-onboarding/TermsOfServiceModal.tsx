@@ -1,12 +1,12 @@
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppState } from '../../../contexts/appStateContext';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import Modal from '../../organisms/Modal';
-import mockToS from './mockToS';
+import TermsOfServiceHtml from './TermsOfServiceHtml';
 
 interface ITermsOfServiceModal {
   isOpen: boolean;
@@ -19,8 +19,8 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
   zIndex,
   onClose,
 }) => {
-  const { t } = useTranslation('creator-onboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -62,12 +62,12 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
   }, [isOpen]);
 
   return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex}>
+    <Modal show={isOpen} additionalz={zIndex}>
       <Container>
         <Content>
-          <SHeading variant={5}>{t('TosSection.heading')}</SHeading>
+          <SHeading variant={5}>{t('tosSection.heading')}</SHeading>
           <SSubheading variant={1} weight={600}>
-            {t('TosSection.subheading')}
+            {t('tosSection.subheading')}
           </SSubheading>
           <SContainer>
             {!isMobile && (
@@ -89,11 +89,11 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
                 containerRef.current = el!!;
               }}
               dangerouslySetInnerHTML={{
-                __html: mockToS,
+                __html: TermsOfServiceHtml,
               }}
             />
           </SContainer>
-          <SButton onClick={() => onClose()}>{t('TosSection.close')}</SButton>
+          <SButton onClick={() => onClose()}>{t('tosSection.close')}</SButton>
         </Content>
       </Container>
     </Modal>
@@ -112,7 +112,7 @@ const Container = styled.div`
 const Content = styled.div`
   max-width: 688px;
   max-height: 733px;
-  padding: 40px;
+  padding: 40px 0px;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -128,12 +128,15 @@ const SContainer = styled.div`
   overflow: hidden;
 `;
 
-const SHeading = styled(Headline)``;
+const SHeading = styled(Headline)`
+  padding: 0 40px;
+`;
 
 const SSubheading = styled(Caption)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-size: 14px;
 
+  padding: 0 40px;
   margin-top: 4px;
   margin-bottom: 24px;
 
@@ -183,8 +186,27 @@ const SShadowBottom = styled.div`
 `;
 
 const STosText = styled.div`
+  h1,
+  ul,
+  blockquote,
+  li,
   p {
     margin-bottom: 16px;
+  }
+
+  ol[type='a'] {
+    padding-left: 20px;
+  }
+  ol {
+    ol {
+      padding-left: 30px;
+    }
+  }
+  ul.list {
+    padding-left: 16px;
+  }
+  a {
+    text-decoration: underline;
   }
 
   display: flex;
@@ -193,13 +215,17 @@ const STosText = styled.div`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
+  padding: 0 40px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  ${({ theme }) => theme.media.laptop} {
-    // Remove scrollbar on laptop
-    margin-right: -18px;
-    padding-right: 18px;
+  ${({ theme }) => theme.media.tablet} {
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 `;
 

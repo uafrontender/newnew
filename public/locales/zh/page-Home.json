@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "title": "NewNew",
+    "description": "帖子人們接下來做什麼，與社區一起投票、出價投標和眾籌，觀看人們在NewNew上實際做的事情"
+  },
+  "cardsSection": {
+    "title": {
+      "biggest": "史上最棒",
+      "for-you": "為你而設",
+      "ac": "超大Bid",
+      "mc": "熱門Superpoll",
+      "cf": "熱門Goal",
+      "recent-activity": "最近活動"
+    },
+    "button": {
+      "showMore": "查看更多",
+      "showMoreCreator": "查看更多{{name}}的動態",
+      "creatorOnTheRise": "冉冉上升"
+    }
+  },
+  "section": {
+    "your": "你的帖子",
+    "explore": "探索"
+  },
+  "tutorial": {
+    "ac": {
+      "title": "出價",
+      "caption": "向創作者發送定制出價，看看他們是否會選擇你的出價。"
+    },
+    "mc": {
+      "title": "Superpolls",
+      "caption": "投票選擇讓創作者做什麼，然後觀看他們按得票最多的選項照做。"
+    },
+    "cf": {
+      "title": "Goals",
+      "caption": "與其他人集資，支持你喜歡的創作者的Goal。如果支持這個Goal的人足夠多，你就會看著創作者照做。"
+    },
+    "for-you": {
+      "title": "為你而設",
+      "caption": "向你推薦的帖子將顯示在此處。"
+    },
+    "biggest": {
+      "title": "史上最棒",
+      "caption": "最棒的帖子將顯示在此處。"
+    },
+    "recent-activity": {
+      "title": "最近活動",
+      "caption": "你参与的帖子将显示在這裏"
+    }
+  },
+  "faq": {
+    "title": "常見問題",
+    "learMore": "想了解更多？请访问<0>NewNew支持</0>",
+    "items": [
+      {
+        "question": "NewNew是什麽？",
+        "answer": "NewNew是一個互動市場，你在這裡對人們的生活結果進行投標和投票。人們讓別人參與自己的生活決定，以此來賺錢。"
+      },
+      {
+        "question": "我可以在NewNew上掙錢嗎？",
+        "answer": "當然可以! <0>註冊成為創作者</0>，讓人們付費為你的生活決定投票或出價！</0>"
+      },
+      {
+        "question": "出價是怎麽回事？",
+        "answer": "觀眾向你發出不同的出價，告訴你應該做什麼，以及他們願意付多少錢看你做這件事。由你選擇你最喜歡的出價，並上傳你做這件事的視頻 不要擔心......你不必選擇價格最高的出價（但如果你想的話，你可以選擇）！你可以選擇任何你覺得合適的出價，選擇任何你覺得舒服的出價。"
+      },
+      {
+        "question": "Superpoll是怎麽回事？",
+        "answer": "你可以發佈有不同選項的視頻投票，讓觀眾選擇。\n人們付費投票給他們最喜歡的選項，而你則上傳一段自己按照的票最多的選項的執行的視頻!"
+      },
+      {
+        "question": "什麽是Superpoll Bundles？",
+        "answer": "創作者可以為他們的Superpoll提供優惠的捆綁服務。購買Bundle產品是可選的，但如果你購買了Bundle產品，你可以享受的是：<2>票數上的巨大折扣+更多的投票，並可以在即將到來的Superpoll中使用</2> <2>可以在創作者的Superpoll中添加你的自訂選項</2> <2>與創作者進行1對1的交流</2>"
+      },
+      {
+        "question": "其他品牌可以使用NewNew嗎？",
+        "answer": "可以！創造者也可以是其他品牌。NewNew是與客戶進行超互動交流的好地方。品牌的客戶可以説明品牌做出重大決策，客戶在品牌今後的重大產品、發佈會等的過程會有參與感到，覺得他們的意見被傾聽。更何況，對你的品牌有投入的人還能獲得更多回饋。"
+      },
+      {
+        "question": "如果創作者不按照出價選出的選項執行怎麼辦？",
+        "answer": "如果有以下情況，不會向你收費。<1>創作者未向Superpoll或出價競標上傳回應視頻</1> <1>創作者沒有選擇你的出價</1>"
+      }
+    ]
+  },
+  "becomeCreator": {
+    "title": "準備好創作了嗎？"
+  },
+  "createFirstPost": {
+    "title": "貼出你的出Bid或是Superpoll",
+    "filter": {
+      "active": "進行中",
+      "ended": "已結束"
+    }
+  },
+  "ooops": "哎呀！",
+  "noPosts": "沒有找到帖子"
+}

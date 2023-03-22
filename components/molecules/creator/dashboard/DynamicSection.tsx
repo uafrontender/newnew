@@ -8,50 +8,82 @@ import React, {
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { isString } from 'lodash';
 import dynamic from 'next/dynamic';
+import { newnewapi } from 'newnew-api';
+import _ from 'lodash';
 
 import Button from '../../../atoms/Button';
 import { Tab } from '../../Tabs';
-import AnimatedPresence, { TAnimation } from '../../../atoms/AnimatedPresence';
+import AnimatedPresence, {
+  TElementAnimations,
+} from '../../../atoms/AnimatedPresence';
+
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
-import { setOverlay } from '../../../../redux-store/slices/uiStateSlice';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
-import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
+import { useOverlayMode } from '../../../../contexts/overlayModeContext';
+import { getRoom } from '../../../../api/endpoints/chat';
+import { Mixpanel } from '../../../../utils/mixpanel';
+import { useBundles } from '../../../../contexts/bundlesContext';
+import { useAppState } from '../../../../contexts/appStateContext';
+import Loader from '../../../atoms/Loader';
 
-const NewMessageModal = dynamic(() => import('./NewMessageModal'));
+const SearchInput = dynamic(() => import('./SearchInput'));
+const ChatContent = dynamic(
+  () => import('../../../organisms/direct-messages/ChatContent')
+);
+// TODO: Adjust New Message modal for dashboard to get only bundle owners
+const NewMessageModal = dynamic(
+  () => import('../../direct-messages/NewMessageModal')
+);
 const NotificationsList = dynamic(() => import('./NotificationsList'));
-const ChatList = dynamic(() => import('./ChatList'));
-const Chat = dynamic(() => import('./Chat'));
+const ChatList = dynamic(() => import('../../direct-messages/ChatList'));
+// const Chat = dynamic(() => import('./Chat'));
 const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 const Indicator = dynamic(() => import('../../../atoms/Indicator'));
 const Tabs = dynamic(() => import('../../Tabs'));
 
-export const DynamicSection = () => {
+interface IDynamicSection {
+  baseUrl: string;
+}
+
+export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const theme = useTheme();
-  const { t } = useTranslation('creator');
+  const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState('o-12');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const { unreadCountForCreator } = useGetChats();
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
+  const { resizeMode } = useAppState();
+  const {
+    unreadCountForCreator,
+    activeTab,
+    activeChatRoom,
+    setActiveChatRoom,
+    setActiveTab,
+  } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+  const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
+
+  const [chatRoomLoading, setChatRoomLoading] = useState(false);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isSmallDesktop = ['laptop', 'laptopM'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
+
+  const {
+    query: { tab = isDesktop ? 'notifications' : '' },
+  } = router;
 
   const [showNewMessageModal, setShowNewMessageModal] =
     useState<boolean>(false);
@@ -60,59 +92,87 @@ export const DynamicSection = () => {
     setShowNewMessageModal(false);
   };
 
-  const isDesktop = !isMobile && !isTablet;
-  const {
-    query: { tab = isDesktop ? 'notifications' : '' },
-  } = router;
-  const tabs: Tab[] = useMemo(
-    () => [
-      {
-        url: '/creator/dashboard?tab=notifications',
-        counter: unreadNotificationCount,
-        nameToken: 'notifications',
-      },
-      {
-        url: '/creator/dashboard?tab=chat',
-        counter: unreadCountForCreator,
-        nameToken: 'chat',
-      },
-    ],
-    [unreadCountForCreator, unreadNotificationCount]
-  );
+  const tabs: Tab[] = useMemo(() => {
+    if (directMessagesAvailable) {
+      return [
+        {
+          url: `${baseUrl}?tab=notifications`,
+          counter: unreadNotificationCount,
+          nameToken: 'notifications',
+        },
+        {
+          url: `${baseUrl}?tab=chat`,
+          counter: unreadCountForCreator,
+          nameToken: 'chat',
+        },
+      ];
+    }
 
-  const tabNotification: Tab[] = useMemo(
-    () => [
+    return [
       {
-        url: '/creator/dashboard?tab=notifications',
+        url: `${baseUrl}?tab=notifications`,
         counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
-    ],
-    [unreadNotificationCount]
-  );
+    ];
+  }, [
+    directMessagesAvailable,
+    baseUrl,
+    unreadCountForCreator,
+    unreadNotificationCount,
+  ]);
+
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
   const handleChatClick = useCallback(() => {
-    router.push('/creator/dashboard?tab=chat');
-  }, [router]);
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: `${baseUrl}?tab=chat`,
+      _button: 'DMs',
+      _component: 'DynamicSection',
+    });
+
+    router.push(`${baseUrl}?tab=chat`);
+  }, [baseUrl, router]);
+
   const handleNotificationsClick = useCallback(() => {
-    router.push('/creator/dashboard?tab=notifications');
-  }, [router]);
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: `${baseUrl}?tab=notifications`,
+      _button: 'Notifications',
+      _component: 'DynamicSection',
+    });
+    router.push(`${baseUrl}?tab=notifications`);
+  }, [baseUrl, router]);
+
   const handleMinimizeClick = useCallback(() => {
-    router.push('/creator/dashboard');
-  }, [router]);
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Dashboard',
+      _target: baseUrl,
+      _button: 'Minimize',
+      _component: 'DynamicSection',
+    });
+    router.push(baseUrl);
+  }, [baseUrl, router]);
+
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
+
   const handleMarkAllAsRead = useCallback(() => {
+    Mixpanel.track('Mark All As Read Button Clicked', {
+      _stage: 'Dashboard',
+      _target: baseUrl,
+      _button: 'Mark all as read',
+      _component: 'DynamicSection',
+    });
+
     setMarkReadNotifications(true);
     setTimeout(() => {
       setMarkReadNotifications(false);
     }, 1500);
-  }, []);
-  const handleSearchClick = useCallback(() => {
-    console.log('search');
-  }, []);
+  }, [baseUrl]);
+
   const handleBulkMessageClick = useCallback(() => {
     setShowNewMessageModal(true);
   }, []);
@@ -123,15 +183,66 @@ export const DynamicSection = () => {
     }
   });
   useOnClickOutside(containerRef, () => {
-    if (tab && !isDesktop) {
+    if (tab && !isDesktop && !showNewMessageModal) {
       handleMinimizeClick();
     }
   });
   useEffect(() => {
-    dispatch(setOverlay(isDesktop ? false : !!tab));
+    if (!isDesktop && tab) {
+      enableOverlayMode();
+    }
     setAnimate(true);
     setAnimation(tab ? 'o-12' : 'o-12-reverse');
-  }, [tab, dispatch, isDesktop]);
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
+
+  useEffect(() => {
+    if (
+      router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
+      !activeChatRoom
+    ) {
+      if (router.query.roomID) {
+        (async () => {
+          try {
+            setChatRoomLoading(true);
+            const payload = new newnewapi.GetRoomRequest({
+              roomId: _.toNumber(router.query.roomID),
+            });
+
+            const res = await getRoom(payload);
+            if (!res.data || res.error) {
+              throw new Error(res.error?.message ?? 'Request failed');
+            }
+            setActiveChatRoom(res.data);
+          } catch (err) {
+            router.push(`${baseUrl}?tab=chat`);
+            console.error(err);
+          } finally {
+            setChatRoomLoading(false);
+          }
+        })();
+      }
+    }
+  }, [baseUrl, router, activeChatRoom, setActiveChatRoom]);
+
+  useEffect(() => {
+    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
+      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    }
+  }, [activeTab, setActiveTab]);
+
+  useEffect(() => {
+    if (
+      isBundleDataLoaded &&
+      !directMessagesAvailable &&
+      (tab === 'chat' || tab === 'direct-messages')
+    ) {
+      router.replace(`${baseUrl}?tab=notifications`);
+    }
+  }, [isBundleDataLoaded, directMessagesAvailable, tab, baseUrl, router]);
 
   return (
     <STopButtons>
@@ -157,7 +268,7 @@ export const DynamicSection = () => {
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          {user.userData?.options?.isOfferingSubscription && (
+          {directMessagesAvailable && (
             <SButton view='secondary' onClick={handleChatClick}>
               <SIconHolder>
                 <SInlineSVG
@@ -176,49 +287,48 @@ export const DynamicSection = () => {
                   </SIndicatorContainer>
                 )}
               </SIconHolder>
-              {t('dashboard.button.dms')}
+              {t('dashboard.button.directMessages')}
             </SButton>
           )}
         </>
       )}
       <AnimatedPresence
         start={animate}
-        animation={animation as TAnimation}
+        animation={animation}
         onAnimationEnd={handleAnimationEnd}
         animateWhenInView={false}
+        delay={0}
+        duration={0.2}
       >
-        <SAnimatedContainer ref={containerRef}>
+        <SAnimatedContainer
+          ref={containerRef}
+          isDashboardMessages={tab === 'direct-messages'}
+        >
           {tab === 'direct-messages' ? (
-            <Chat
-              roomID={
-                router.query.roomID && isString(router.query.roomID)
-                  ? router.query.roomID
-                  : ''
-              }
-            />
+            <>
+              {activeChatRoom && !chatRoomLoading && (
+                <>
+                  <ChatContent chatRoom={activeChatRoom!!} />
+                  <ChatList hidden />
+                </>
+              )}
+              {!activeChatRoom && chatRoomLoading && (
+                <Loader size='md' isStatic />
+              )}
+            </>
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  {user.userData?.options?.isOfferingSubscription ? (
-                    <Tabs
-                      t={t}
-                      tabs={tabs}
-                      draggable={false}
-                      activeTabIndex={activeTabIndex}
-                    />
-                  ) : (
-                    <Tabs
-                      t={t}
-                      tabs={tabNotification}
-                      draggable={false}
-                      activeTabIndex={0}
-                    />
-                  )}
+                  <Tabs
+                    t={t}
+                    tabs={tabs}
+                    draggable={false}
+                    activeTabIndex={activeTabIndex}
+                  />
                 </STabsWrapper>
                 <SSectionTopLineButtons>
-                  {tab === 'notifications' ||
-                  !user.userData?.options?.isOfferingSubscription ? (
+                  {tab === 'notifications' ? (
                     <>
                       {unreadNotificationCount > 0 && (
                         <STopLineButton
@@ -239,14 +349,7 @@ export const DynamicSection = () => {
                     </>
                   ) : (
                     <>
-                      <SChatButton view='secondary' onClick={handleSearchClick}>
-                        <SChatInlineSVG
-                          svg={searchIcon}
-                          fill={theme.colorsThemed.text.primary}
-                          width='20px'
-                          height='20px'
-                        />
-                      </SChatButton>
+                      <SearchInput />
                       <SChatButton
                         view='secondary'
                         onClick={handleBulkMessageClick}
@@ -266,13 +369,15 @@ export const DynamicSection = () => {
                   )}
                 </SSectionTopLineButtons>
               </SSectionTopLine>
-              {tab === 'notifications' ? (
-                <NotificationsList
-                  markReadNotifications={markReadNotifications}
-                />
-              ) : (
-                <ChatList />
-              )}
+              <SSectionContent>
+                {tab === 'notifications' ? (
+                  <NotificationsList
+                    markReadNotifications={markReadNotifications}
+                  />
+                ) : (
+                  <ChatList />
+                )}
+              </SSectionContent>
             </>
           )}
         </SAnimatedContainer>
@@ -333,11 +438,14 @@ const SIndicator = styled(Indicator)`
         : props.theme.colorsThemed.button.background.secondary};
 `;
 
-const SAnimatedContainer = styled.div`
+interface ISAnimatedContainer {
+  isDashboardMessages?: boolean;
+}
+const SAnimatedContainer = styled.div<ISAnimatedContainer>`
   top: -20px;
 
   z-index: 5;
-  padding: 24px 0;
+  padding: ${(props) => (!props.isDashboardMessages ? '24px 0 0' : '0')};
   position: absolute;
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) =>
@@ -347,7 +455,8 @@ const SAnimatedContainer = styled.div`
   border-radius: 24px;
   width: 500px;
   right: -16px;
-  height: 800px;
+  height: 80vh;
+  max-height: 800px;
 
   ${(props) => props.theme.media.laptop} {
     left: unset;
@@ -377,6 +486,10 @@ const SSectionTopLine = styled.div<ISSectionTopLine>`
   padding: 0 24px ${(props) => (props.tab === 'transactions' ? 0 : '8px')} 24px;
   align-items: center;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.laptop} {
+    min-height: 52px;
+  }
 `;
 
 const SSectionTopLineButtons = styled.div`
@@ -397,4 +510,39 @@ const STopLineButton = styled(Button)`
 const SChatButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
+`;
+
+const SSectionContent = styled.div`
+  height: calc(100% - 52px);
+  padding: 0 24px;
+  display: flex;
+  position: relative;
+  overflow-y: auto;
+  flex-direction: column;
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  scrollbar-width: none;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+
+  &:hover {
+    scrollbar-width: thin;
+    &::-webkit-scrollbar-track {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    }
+  }
 `;

@@ -1,8 +1,7 @@
 import React, { useState, useRef, ReactElement, useEffect } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
-
-import { useAppSelector } from '../../../redux-store/store';
+import countries from 'i18n-iso-countries';
 
 // Utils
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
@@ -11,40 +10,38 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 // Icons
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 import InlineSvg from '../../atoms/InlineSVG';
+import { useAppState } from '../../../contexts/appStateContext';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
-export type TOnboardingCountrySelectItem<T> = {
-  name: string;
-  value: T;
-};
-
-interface IOnboardingCountrySelect<T> {
-  label: string;
-  selected?: T;
-  options: TOnboardingCountrySelectItem<T>[];
+interface IOnboardingCountrySelect {
+  selected: string;
+  options: string[];
+  locale: string | undefined;
   maxItems?: number;
   width?: string;
   disabled?: boolean;
   closeOnSelect?: boolean;
-  onSelect: (val: T) => void;
+  onSelect: (countryCode: string) => void;
 }
 
-const OnboardingCountrySelect = <T,>({
-  label,
+const OnboardingCountrySelect = ({
   selected,
   options,
   maxItems,
+  locale,
   width,
   disabled,
   closeOnSelect,
   onSelect,
-}: IOnboardingCountrySelect<T>): ReactElement => {
+}: IOnboardingCountrySelect): ReactElement => {
   const theme = useTheme();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>();
   const optionsContainerRef = useRef<HTMLDivElement>();
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -59,15 +56,36 @@ const OnboardingCountrySelect = <T,>({
 
   useEffect(() => {
     if (isOpen && selected) {
-      const itemTopPos =
-        optionsRefs.current[options.findIndex((o) => o.value === selected)]
-          .offsetTop;
+      const selectedItemIndex = options.findIndex((o) => o === selected);
+
+      // Do not scroll to the first item in the list
+      if (selectedItemIndex < 1) {
+        return;
+      }
+      const itemTopPos = optionsRefs.current[selectedItemIndex].offsetTop;
 
       if (optionsContainerRef.current) {
-        optionsContainerRef.current.scrollTop = itemTopPos;
+        // Leave a small gap above the selected item
+        const TOP_PADDING = 8;
+        optionsContainerRef.current.scrollTop = itemTopPos - TOP_PADDING;
       }
     }
   }, [selected, options, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      enableOverlayMode();
+    } else {
+      disableOverlayMode();
+    }
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [isOpen, enableOverlayMode, disableOverlayMode]);
+
+  // eslint-disable-next-line no-nested-ternary
+  const currentLocale = locale ? (locale === 'en-US' ? 'en' : locale) : 'en';
 
   return (
     <SFormItemContainer pushedUp={isMobile && isOpen}>
@@ -83,7 +101,7 @@ const OnboardingCountrySelect = <T,>({
             ...(width ? { width } : {}),
           }}
         >
-          <span>{label}</span>
+          <span> {countries.getName(selected, currentLocale)}</span>
           <SInlineSVG
             svg={ArrowDown}
             fill={theme.colorsThemed.text.quaternary}
@@ -112,17 +130,17 @@ const OnboardingCountrySelect = <T,>({
                 {options &&
                   options.map((o, i) => (
                     <SOption
-                      key={o.name}
+                      key={o}
                       ref={(el) => {
                         optionsRefs.current[i] = el!!;
                       }}
-                      selected={o.value === selected}
+                      selected={o === selected}
                       onClick={() => {
-                        onSelect(o.value);
+                        onSelect(o);
                         if (closeOnSelect) handleClose();
                       }}
                     >
-                      {o.name}
+                      {countries.getName(o, currentLocale)}
                     </SOption>
                   ))}
               </div>

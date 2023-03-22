@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Regístrate a NewNew",
+    "description": "Registrarse en NewNew es rápido y sencillo.",
+    "title-create": "Registrarse a NewNew",
+    "description-create": "Registrarse en NewNew es rápido y sencillo. Únete ahora y conviértete en un creador"
+  },
+  "heading": {
+    "sign-in": "Registrarse",
+    "sign-in-to": "Registrarse para",
+    "reason": {
+      "comment": "comentar",
+      "bid": "ofertar",
+      "pledge": "hacer una contribución",
+      "follow-decision": "marcar publicación como favorita",
+      "follow-creator": "seguir un creador",
+      "report": "hacer un reporte"
+    },
+    "subheading": "Iniciaremos sesión por ti o te crearemos una cuenta.",
+    "subheadingSessionExpired": "La sesión ha expirado, por favor, inicia sesión de nuevo"
+  },
+  "signUpOptions": {
+    "google": "Continuar con Google",
+    "apple": "Continuar con Apple ID",
+    "facebook": "Continuar con Facebook",
+    "twitter": "Continuar con Twitter",
+    "orContinueWith": "o continuar con",
+    "email": "Correo electrónico",
+    "signInButton": "Registrarse",
+    "logInButton": "Iniciar sesión"
+  },
+  "error": {
+    "emailInvalid": "Correo electrónico inválido",
+    "genericError": "Se ha producido un error",
+    "Failed to fetch": "No se ha podido enviar",
+    "An error occurred": "Se ha producido un error"
+  },
+  "legalDisclaimer": {
+    "mainText": "Al crear una cuenta, aceptas nuestra ",
+    "privacyPolicy": "Política de privacidad, ",
+    "terms": "Términos",
+    "and": "y",
+    "communityGuidelines": "Normas comunitarias"
+  },
+  "button": {
+    "back": "Regresar"
+  }
+}

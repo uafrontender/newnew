@@ -6,67 +6,62 @@ import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Logo from '../molecules/Logo';
 import Container from '../atoms/Grid/Container';
-import ErrorBoundary from '../organisms/ErrorBoundary';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import { useAppSelector } from '../../redux-store/store';
-import HeroVisual from './HeroVisual';
+import HeroVisual from './components/HeroVisual';
+import BaseLayout from './BaseLayout';
+import { useAppState } from '../../contexts/appStateContext';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
+  children: React.ReactNode;
 }
-
-const SCreatorStripeLayout = styled.div`
-  position: relative;
-
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-`;
 
 const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
   hideProgressBar,
   children,
 }) => {
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
   return (
-    <ErrorBoundary>
+    <SBaseLayout>
       <SkeletonTheme
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <SCreatorStripeLayout>
-          <HomeLogoButton />
-          {isTablet && hideProgressBar ? (
-            <SHomeLogoButton
-              style={{
-                display: 'block',
-              }}
-            >
-              <Row>
-                <Col>
-                  <SLogo />
-                </Col>
-              </Row>
-            </SHomeLogoButton>
-          ) : null}
-          <SContentContainer>{children}</SContentContainer>
-          {!isMobile && !isTablet && (
-            <HeroVisualContainer>
-              <HeroVisual />
-            </HeroVisualContainer>
-          )}
-        </SCreatorStripeLayout>
+        <HomeLogoButton />
+        {isTablet && hideProgressBar ? (
+          <SHomeLogoButton
+            style={{
+              display: 'block',
+            }}
+          >
+            <Row>
+              <Col>
+                <SLogo />
+              </Col>
+            </Row>
+          </SHomeLogoButton>
+        ) : null}
+        <SContentContainer>{children}</SContentContainer>
+        {!isMobile && !isTablet && (
+          <HeroVisualContainer>
+            <HeroVisual />
+          </HeroVisualContainer>
+        )}
       </SkeletonTheme>
-    </ErrorBoundary>
+    </SBaseLayout>
   );
+};
+
+CreatorStripeLayout.defaultProps = {
+  hideProgressBar: undefined,
 };
 
 export default CreatorStripeLayout;
@@ -80,6 +75,10 @@ const HomeLogoButton: React.FunctionComponent = () => (
     </Row>
   </SHomeLogoButton>
 );
+
+const SBaseLayout = styled(BaseLayout)`
+  overflow: hidden;
+`;
 
 const SHomeLogoButton = styled(Container)`
   display: none;

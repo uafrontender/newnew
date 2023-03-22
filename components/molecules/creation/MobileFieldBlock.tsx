@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -27,11 +33,18 @@ interface IMobileFieldBlock {
     min?: number;
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
+    max?: number;
+    customPlaceholder?: string;
   };
   formattedValue?: any;
   formattedDescription?: any;
 }
 
+// This component is overloaded and produces unnecessary hook instances
+// TODO: rework, separate 'input' | 'select' | 'date' into own components.
+// Provide type safety for all properties
+// TODO: this component sets Moment object to value.date, causing an error in the console
+// 'A non-serializable value was detected in the state'
 const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const {
     id,
@@ -43,34 +56,76 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     formattedDescription,
     onChange,
   } = props;
+
   const inputRef: any = useRef();
   const theme = useTheme();
-  const { t } = useTranslation('creation');
+  const { t } = useTranslation('page-Creation');
   const [focused, setFocused] = useState(false);
 
+  const isDaySame = useMemo(() => {
+    const selectedDate = moment(value?.date).startOf('D');
+    if (selectedDate) {
+      return selectedDate?.isSame(moment().startOf('day'));
+    }
+
+    return false;
+  }, [value?.date]);
+
+  const maxDate = useMemo(() => {
+    if (value?.type === 'right-away') {
+      return moment();
+    }
+
+    // If today is the last day of the month, max date is the last day of next month
+    if (moment().endOf('day').isSame(moment().endOf('month'))) {
+      return moment().add(1, 'M').endOf('month');
+    }
+
+    return moment().add(1, 'M');
+  }, [value?.type]);
+
+  const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
+    const currentTime = moment();
+    const h = currentTime.hour();
+    const ltd = h >= 12 ? 'pm' : 'am';
+
+    return {
+      isTimeOfTheDaySame: ltd === value?.['hours-format'],
+      localTimeOfTheDay: ltd,
+    };
+  }, [value]);
+
   const handleChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
   );
+
   const handleFocus = useCallback(() => {
     setFocused(true);
   }, []);
+
   const handleClick = useCallback(() => {
     handleFocus();
   }, [handleFocus]);
+
   const handleBlur = useCallback(() => {
     setFocused(false);
 
     if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
     }
+    if (inputProps?.type === 'number' && (inputProps?.max as number) < value) {
+      onChange(id, inputProps?.max as number);
+    }
   }, [inputProps, id, onChange, value]);
+
   const preventCLick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
+
   const renderItem = useCallback(
     (item: any) => {
       const handleItemClick = () => {
@@ -94,17 +149,18 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     },
     [id, onChange, handleBlur, value]
   );
+
   const getModal = useCallback(() => {
     if (type === 'select') {
       return (
-        <Modal show={focused} onClose={handleBlur}>
+        <SModal show={focused} onClose={handleBlur}>
           <SMobileListContainer focused={focused}>
             <SMobileList>{options?.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleBlur}>
               {t('secondStep.button.cancel')}
             </SCancelButton>
           </SMobileListContainer>
-        </Modal>
+        </SModal>
       );
     }
 
@@ -122,18 +178,20 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const formatOptions = [
         {
           id: 'am',
-          title: t('secondStep.field.startsAt.modal.hours-format.am'),
+          title: t('secondStep.field.startsAt.modal.hoursFormat.am'),
         },
         {
           id: 'pm',
-          title: t('secondStep.field.startsAt.modal.hours-format.pm'),
+          title: t('secondStep.field.startsAt.modal.hoursFormat.pm'),
         },
       ];
+
       const renderDay = (el: any) => (
         <SDay key={el.value} variant={1} weight={500}>
-          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+          {t(`secondStep.field.startsAt.modal.days.${el.value}` as any)}
         </SDay>
       );
+
       const handleScheduleChange = (selectedId: string) => {
         if (selectedId === 'right-away') {
           onChange(id, { date: new Date() });
@@ -143,21 +201,46 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           onChange(id, {
             'hours-format': moment().format('a'),
           });
+        } else {
+          onChange(id, {
+            time: moment().add(1, 'minute').format('hh:mm'),
+          });
         }
+
         onChange(id, { type: selectedId });
       };
-      const handleFormatChange = (selectedId: string) => {
+
+      const handleHoursFormatChange = (selectedId: string) => {
         onChange(id, { 'hours-format': selectedId });
       };
+
       const handleTimeChange = (e: any) => {
         onChange(id, { time: e.target.value });
       };
+
       const handleDateChange = (date: any) => {
         onChange(id, { date });
+
+        // Date here is a moment
+        const resultingDate = moment(
+          `${date.format('YYYY-MM-DD')}  ${value.time}:00 ${
+            value['hours-format']
+          }`
+        );
+
+        if (resultingDate.isBefore(moment())) {
+          onChange(id, {
+            time: moment().add(1, 'minute').format('hh:mm'),
+          });
+
+          onChange(id, {
+            'hours-format': moment().format('a'),
+          });
+        }
       };
 
       return (
-        <Modal show={focused} onClose={handleBlur}>
+        <SModal show={focused} onClose={handleBlur}>
           <SMobileDateContainer focused={focused}>
             <SMobileDateContent onClick={preventCLick}>
               <SModalTopLine>
@@ -187,11 +270,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 <SCalendarContent>
                   <CalendarScrollableVertically
                     minDate={moment()}
-                    maxDate={
-                      value?.type === 'right-away'
-                        ? moment()
-                        : moment().add(1, 'M')
-                    }
+                    maxDate={maxDate}
                     onSelect={handleDateChange}
                     selectedDate={moment(value?.date).startOf('D')}
                   />
@@ -204,14 +283,23 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   <TimePicker
                     disabled={value?.type === 'right-away'}
                     value={value?.time}
+                    hoursFormat={value['hours-format']}
+                    isDaySame={isDaySame}
+                    isTimeOfTheDaySame={isTimeOfTheDaySame}
+                    localTimeOfTheDay={localTimeOfTheDay as any}
                     onChange={handleTimeChange}
                   />
                 </STimePickerWrapper>
                 <CustomToggle
-                  disabled={value?.type === 'right-away'}
+                  disabled={
+                    value?.type === 'right-away' ||
+                    (isDaySame &&
+                      localTimeOfTheDay === 'pm' &&
+                      value?.['hours-format'] === 'pm')
+                  }
                   options={formatOptions}
                   selected={value?.['hours-format']}
-                  onChange={handleFormatChange}
+                  onChange={handleHoursFormatChange}
                 />
               </SModalToggleWrapper>
               <SScheduleButton view='primaryGrad' onClick={handleBlur}>
@@ -219,22 +307,26 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               </SScheduleButton>
             </SMobileDateContent>
           </SMobileDateContainer>
-        </Modal>
+        </SModal>
       );
     }
 
     return false;
   }, [
-    t,
-    id,
     type,
-    value,
     focused,
-    options,
-    onChange,
     handleBlur,
+    options,
     renderItem,
+    t,
     theme.colorsThemed.text.primary,
+    value,
+    isDaySame,
+    isTimeOfTheDaySame,
+    localTimeOfTheDay,
+    maxDate,
+    onChange,
+    id,
   ]);
 
   useEffect(() => {
@@ -242,14 +334,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       inputRef.current.focus();
     }
   }, [focused, inputRef]);
-  const inputLabel = t(`secondStep.field.${id}.label`);
+  const inputLabel = t(`secondStep.field.${id}.label` as any);
 
   return (
     <>
       {getModal()}
       <SContainer onClick={handleClick}>
         <STitle variant={2} weight={700}>
-          {t(`secondStep.field.${id}.title`)}
+          {t(`secondStep.field.${id}.title` as any)}
         </STitle>
         {type === 'input' ? (
           <SInputWrapper>
@@ -262,19 +354,22 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               onFocus={handleFocus}
               onChange={handleChange}
               withLabel={!!inputLabel}
-              placeholder={t(`secondStep.field.${id}.placeholder`)}
+              placeholder={
+                inputProps?.customPlaceholder ??
+                t(`secondStep.field.${id}.placeholder` as any)
+              }
               {...inputProps}
             />
           </SInputWrapper>
         ) : (
           <SValue variant={6}>
-            {t(`secondStep.field.${id}.value`, {
+            {t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
           </SValue>
         )}
         <SDescription variant={2} weight={700}>
-          {t(`secondStep.field.${id}.description`, {
+          {t(`secondStep.field.${id}.description` as any, {
             value: formattedDescription || value,
           })}
         </SDescription>
@@ -360,15 +455,18 @@ const SInput = styled.input<ISInput>`
   padding-left: ${(props) => (props.withLabel ? '10px' : '0')};
 
   -webkit-appearance: none;
-  -moz-appearance: none;
   -ms-appearance: none;
   -o-appearance: none;
   appearance: none;
 
+  /* Works for Chrome, Safari, Edge, Opera */
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
+
+  /* Works for Firefox */
+  -moz-appearance: textfield;
 
   font-size: 18px;
   font-weight: bold;
@@ -382,6 +480,12 @@ const SInput = styled.input<ISInput>`
   ${({ theme }) => theme.media.laptop} {
     font-size: 20px;
     line-height: 28px;
+  }
+`;
+
+const SModal = styled(Modal)`
+  & > div:first-child {
+    z-index: 2;
   }
 `;
 
@@ -423,6 +527,9 @@ const SMobileDateContent = styled.div`
     props.theme.colorsThemed.background.backgroundDD};
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
+  z-index: 3;
+
+  overflow-y: auto;
 `;
 
 const SMobileList = styled.div`
@@ -433,6 +540,10 @@ const SMobileList = styled.div`
   flex-direction: column;
   background-color: ${(props) =>
     props.theme.colorsThemed.background.backgroundDD};
+
+  z-index: 3;
+
+  overflow-y: auto;
 `;
 
 interface ISButton {
@@ -443,6 +554,8 @@ const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 16px;
 
+  flex-shrink: 0;
+
   ${(props) => props.theme.media.tablet} {
     min-width: 136px;
     justify-content: flex-start;
@@ -452,12 +565,16 @@ const SButton = styled(Button)<ISButton>`
 const SCancelButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 4px;
+
+  z-index: 3;
 `;
 
 const SScheduleButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 12px;
   margin-bottom: 8px;
+  height: 56px;
+  flex-shrink: 0;
 `;
 
 const SItemTitle = styled(Text)`
@@ -500,6 +617,8 @@ const SSeparator = styled.div`
   height: 1px;
   border-radius: 2px;
   background-color: ${(props) => props.theme.colorsThemed.background.outlines1};
+  // Otherwise blue color of selected number goes through
+  z-index: 2;
 `;
 
 const SCustomDays = styled.div`
@@ -535,6 +654,7 @@ const SCalendarTopGrad = styled.div`
   z-index: 1;
   position: absolute;
   background: ${(props) => props.theme.gradients.calendarTop};
+  pointer-events: none;
 `;
 
 const SCalendarBottomGrad = styled.div`
@@ -545,6 +665,7 @@ const SCalendarBottomGrad = styled.div`
   z-index: 1;
   position: absolute;
   background: ${(props) => props.theme.gradients.calendarBottom};
+  pointer-events: none;
 `;
 
 const STimePickerWrapper = styled.div`

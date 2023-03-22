@@ -1,15 +1,9 @@
-import React, {
-  // useMemo,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
-// import Image from 'next/image';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { scroller } from 'react-scroll';
-import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
@@ -18,15 +12,17 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import { SCROLL_EXPLORE } from '../../../constants/timings';
-
 import assets from '../../../constants/assets';
+import AnimationChain from '../../atoms/AnimationChain';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const HeroSection = React.memo(() => {
-  const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation('home');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { t } = useTranslation('common');
+  const { resizeMode } = useAppState();
+  const user = useAppSelector((state) => state.user);
+  const { locale } = useRouter();
 
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
@@ -35,27 +31,6 @@ export const HeroSection = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const handleSignInClick = () => {
-    router.push('/sign-up');
-  };
-  const handleExploreClick = () => {
-    if (document.getElementsByName('topSection').length > 0) {
-      scroller.scrollTo('topSection', {
-        offset: isMobile ? -20 : -100,
-        smooth: 'ease',
-        duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
-      });
-    } else {
-      console.log('hey');
-      scroller.scrollTo('ac', {
-        offset: isMobile ? -20 : -100,
-        smooth: 'ease',
-        duration: SCROLL_EXPLORE,
-        containerId: 'generalScrollContainer',
-      });
-    }
-  };
 
   const handleTitleAnimationEnd = useCallback(() => {
     setAnimateSubTitle(true);
@@ -70,121 +45,104 @@ export const HeroSection = React.memo(() => {
     }, 0);
   }, []);
 
-  // Try to pre-fetch the content
+  // reset animation on locale change
   useEffect(() => {
-    router.prefetch('/sign-up');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setAnimateSubTitle(false);
+    setAnimateButton(false);
+  }, [locale]);
 
   return (
     <SWrapper
-      layoutId='heroSection'
+      // I believe can be commented out now as there's no need for an animation
+      // layoutId='heroSection'
       transition={{
         ease: 'easeInOut',
         duration: 1,
       }}
     >
-      <STopWrapper>
-        <SHeadline>
-          <AnimatedPresence
-            start={animateTitle}
-            animation='t-08'
-            delay={0.4}
-            onAnimationEnd={handleTitleAnimationEnd}
-          >
-            {t('hero-block-title')}
-          </AnimatedPresence>
-        </SHeadline>
-        <SSubTitle weight={600}>
-          <AnimatedPresence
-            start={animateSubTitle}
-            animation='t-02'
-            onAnimationEnd={handleSubTitleAnimationEnd}
-          >
-            {t('hero-block-subTitle')}
-          </AnimatedPresence>
-        </SSubTitle>
-        <AnimatedPresence start={animateButton} animation='t-01'>
-          <SButtonsHolder>
-            {isMobile ? (
-              <>
-                <SButton
-                  withDim
-                  withShrink
-                  view='primaryGrad'
-                  onClick={handleSignInClick}
-                >
-                  {t('hero-block-sign-in')}
-                </SButton>
-                <SButton
-                  withDim
-                  withShrink
-                  view='secondary'
-                  onClick={handleExploreClick}
-                >
-                  {t('hero-block-explore')}
-                </SButton>
-              </>
-            ) : (
-              <SButton
-                withShrink
-                withShadow
-                view='primaryGrad'
-                onClick={handleExploreClick}
+      <SContentWrapper>
+        <STopWrapper>
+          <SHeadline>
+            <AnimatedPresence
+              start={animateTitle}
+              animation='t-08'
+              delay={0.4}
+              onAnimationEnd={handleTitleAnimationEnd}
+              key={locale}
+            >
+              {t('heroSection.title') as string}
+            </AnimatedPresence>
+          </SHeadline>
+          <SSubTitle weight={600}>
+            <AnimatedPresence
+              start={animateSubTitle}
+              animation='t-02'
+              onAnimationEnd={handleSubTitleAnimationEnd}
+              key={locale}
+            >
+              {t('heroSection.subTitle')}
+            </AnimatedPresence>
+          </SSubTitle>
+          <AnimatedPresence start={animateButton} animation='t-01' key={locale}>
+            <SButtonsHolder>
+              <Link
+                href={
+                  // eslint-disable-next-line no-nested-ternary
+                  user.loggedIn
+                    ? user.userData?.options?.isCreator
+                      ? '/creation'
+                      : '/creator-onboarding'
+                    : '/sign-up?to=create'
+                }
               >
-                {t('hero-block-explore-now')}
-              </SButton>
-            )}
-          </SButtonsHolder>
-        </AnimatedPresence>
-      </STopWrapper>
-      <SHeroImage>
+                <a>
+                  <SButton
+                    withShrink
+                    withShadow
+                    view='primary'
+                    onClick={() => {
+                      Mixpanel.track('Navigation Item Clicked', {
+                        _button: 'Create now',
+                      });
+                    }}
+                  >
+                    {user.userData?.options?.isCreator
+                      ? t('button.createDecision')
+                      : t('button.createOnNewnew')}
+                  </SButton>
+                </a>
+              </Link>
+            </SButtonsHolder>
+          </AnimatedPresence>
+        </STopWrapper>
         {isMobile ? (
-          <video
-            key='video-mobile'
-            loop
-            muted
-            autoPlay
-            playsInline
-            poster={
+          <SLargeAnimation
+            placeholderSrc={
               theme.name === 'light'
-                ? assets.home.lightMobileLandingStatic
-                : assets.home.darkMobileLandingStatic
+                ? assets.landing.lightMobileLandingStatic
+                : assets.landing.darkMobileLandingStatic
             }
-          >
-            <source
-              src={
-                theme.name === 'light'
-                  ? assets.home.lightMobileLandingAnimated
-                  : assets.home.darkMobileLandingAnimated
-              }
-              type='video/mp4'
-            />
-          </video>
+            videoSrcList={
+              theme.name === 'light'
+                ? assets.landing.lightMobileLandingVideo
+                : assets.landing.darkMobileLandingVideo
+            }
+          />
         ) : (
-          <video
-            key='video-desktop'
-            loop
-            muted
-            autoPlay
-            playsInline
-            poster={
+          <SLargeAnimation
+            placeholderSrc={
               theme.name === 'light'
-                ? assets.home.lightLandingStatic
-                : assets.home.darkLandingStatic
+                ? assets.landing.lightDesktopLandingStatic
+                : assets.landing.darkDesktopLandingStatic
             }
-          >
-            <source
-              src={
-                theme.name === 'light'
-                  ? assets.home.lightLandingAnimated
-                  : assets.home.darkLandingAnimated
-              }
-              type='video/mp4'
-            />
-          </video>
+            videoSrcList={
+              theme.name === 'light'
+                ? assets.landing.lightDesktopLandingVideo
+                : assets.landing.darkDesktopLandingVideo
+            }
+          />
         )}
-      </SHeroImage>
+      </SContentWrapper>
     </SWrapper>
   );
 });
@@ -192,59 +150,100 @@ export const HeroSection = React.memo(() => {
 export default HeroSection;
 
 const SWrapper = styled(motion.section)`
-  display: flex;
-  margin-bottom: 24px;
-  flex-direction: column;
+  position: relative;
+  width: 100%;
+  margin-top: -15px;
 
   ${(props) => props.theme.media.tablet} {
-    align-items: center;
-    flex-direction: row;
-
-    max-width: 702px;
-    margin: 0 auto;
+    margin-bottom: 10px;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    padding-bottom: 60px;
+    margin: -40px auto 0;
+  }
+
+  @media (min-width: 1441px) {
+    display: flex;
+    align-items: center;
+  }
+`;
+
+const SContentWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${(props) => props.theme.media.tablet} {
+    flex-direction: row;
+    justify-content: flex-end;
   }
 `;
 
 const STopWrapper = styled.div`
-  flex: 1;
+  align-self: center;
+  max-width: 320px;
   white-space: pre-line;
 
+  ${(props) => props.theme.media.tablet} {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-49%);
+    max-width: 300px;
+  }
+
   ${(props) => props.theme.media.laptop} {
-    max-width: 45%;
+    max-width: 360px;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 587px;
   }
 `;
 
 const SHeadline = styled(Headline)`
+  z-index: 2;
   text-align: center;
 
   /* Preserve line break */
   white-space: pre;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 320px;
     text-align: left;
   }
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 480px;
+    font-size: 40px;
+    line-height: 48px;
+  }
+
+  ${({ theme }) => theme.media.laptopM} {
+    font-size: 80px;
+    line-height: 88px;
   }
 `;
 
 const SSubTitle = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   margin-top: 16px;
 
   text-align: center;
+  font-size: 16px;
+  line-height: 24px;
 
   ${(props) => props.theme.media.tablet} {
     text-align: left;
   }
 
   ${(props) => props.theme.media.laptop} {
+    margin-top: 24px;
+
+    font-size: 24px;
+    line-height: 32px;
   }
 `;
 
@@ -254,94 +253,65 @@ const SButtonsHolder = styled.div`
   flex-direction: row;
   justify-content: center;
 
-  button {
-    margin-right: 16px;
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 24px;
+    justify-content: initial;
   }
 
-  ${(props) => props.theme.media.tablet} {
-    margin-top: 32px;
-    justify-content: initial;
+  ${(props) => props.theme.media.laptop} {
+    margin-top: 40px;
   }
 `;
 
-// const SNotificationsList = styled.div`
-//   flex: 1;
-//   display: flex;
-//   position: relative;
-//   margin-top: 44px;
-//   align-items: flex-end;
-//   flex-direction: column;
-// `;
-
-const SHeroImage = styled.div`
+const SLargeAnimation = styled(AnimationChain)`
+  right: 7px;
   order: -1;
 
   flex: 1;
 
-  width: 100%;
+  width: 90%;
   height: 300px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: center;
 
   z-index: 1;
 
-  video {
+  * {
     width: 100%;
     max-width: 360px;
     object-fit: contain;
-
-    position: relative;
-
-    top: -32px;
   }
 
   ${({ theme }) => theme.media.tablet} {
     order: unset;
-    height: 642px;
-    margin-top: 24px;
+    right: unset;
+    width: 405px;
+    max-width: 405px;
+    height: 374px;
 
-    video {
-      top: -10%;
-
+    * {
       max-width: unset;
     }
+  }
+
+  ${({ theme }) => theme.media.laptopM} {
+    margin-top: 0;
+    width: 736px;
+    max-width: 736px;
+    height: 658px;
+    order: unset;
+    z-index: -1;
   }
 `;
 
 const SButton = styled(Button)`
   padding: 12px 24px;
+  text-transform: capitalize;
 
   ${(props) => props.theme.media.tablet} {
     font-size: 16px;
   }
 `;
-
-// const GradientMask = styled.div`
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   z-index: 1;
-//   position: absolute;
-//   background: ${(props) => props.theme.gradients.heroNotifications};
-//   pointer-events: none;
-
-//   ${(props) => props.theme.media.tablet} {
-//     background: ${(props) => props.theme.gradients.heroNotificationsTablet};
-//   }
-// `;
-
-// const SNotificationItemHolder = styled.div`
-//   width: 100%;
-//   margin-top: 16px;
-
-//   ${(props) => props.theme.media.tablet} {
-//     max-width: 344px;
-//   }
-
-//   ${(props) => props.theme.media.laptop} {
-//     max-width: 608px;
-//   }
-// `;

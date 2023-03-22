@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import styled from 'styled-components';
 import CommentTextAreaAutoSize from 'react-textarea-autosize';
 
@@ -15,7 +15,7 @@ interface ICommentTextArea {
   maxlength?: number;
   onBlur?: (key: string, value: string) => void;
   onFocus?: (key: string) => void;
-  onChange: (key: string, value: string | boolean) => void;
+  onChange: (key: string, value: string) => void;
   placeholder: string;
 }
 
@@ -33,16 +33,18 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
   } = props;
 
   const handleChange = useCallback(
-    (e) => {
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
       onChange(id, e.target.value);
     },
     [id, onChange]
   );
+
   const handleFocus = useCallback(() => {
     onFocus(id);
   }, [id, onFocus]);
+
   const handleBlur = useCallback(
-    (e) => {
+    (e: FocusEvent<HTMLTextAreaElement>) => {
       onBlur(id, e.target.value);
     },
     [id, onBlur]
@@ -93,7 +95,6 @@ interface ISContent {
 }
 
 const SContent = styled.div<ISContent>`
-  padding: 9px 20px;
   position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
@@ -111,14 +112,16 @@ const SContent = styled.div<ISContent>`
 `;
 
 const SCommentTextArea = styled(CommentTextAreaAutoSize)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
+  padding: 9px 20px;
   width: 100%;
-  border: none;
+
   resize: none;
+
+  border: none;
   outline: none;
   background: transparent;
   font-weight: 500;
-
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-size: 14px;
   line-height: 20px;
   vertical-align: middle;

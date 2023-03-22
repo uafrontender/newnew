@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "title": "Sé un creador en NewNew",
+    "description": "Conviértete en un creador en la mejor empresa emergente de economía de creadores"
+  },
+  "tosSection": {
+    "heading": "Empieza a ganar dinero en NewNew",
+    "subheading": "Por favor, revisa nuestras condiciones...",
+    "close": "Hecho"
+  },
+  "detailsSection": {
+    "leaveMsg": "¿Estás seguro que quieres irte? Los cambios serán descartados",
+    "side": {
+      "heading": "Cuéntanos un poco sobre ti.",
+      "subheading": "Esta es la descripción que aparecerá en tu página de perfil."
+    },
+    "heading": "¿Estás listo para crear? Solo necesitamos algunos detalles...",
+    "form": {
+      "firstName": {
+        "placeholder": "Nombre",
+        "errors": {
+          "generic": "Por favor, comprueba lo que introdujiste",
+          "tooLong": "El nombre es demasiado largo",
+          "tooShort": "El nombre es demasiado corto",
+          "invalidChar": "El nombre contiene caracteres inválidios",
+          "inappropriate": "Las palabras ofensivas están prohibidas",
+          "linksForbidden": "Los enlaces no están permitidos"
+        }
+      },
+      "lastName": {
+        "placeholder": "Apellido",
+        "errors": {
+          "generic": "Por favor, comprueba lo que introdujiste",
+          "tooLong": "El nombre es demasiado largo",
+          "tooShort": "El nombre es demasiado corto",
+          "invalidChar": "El nombre contiene caracteres inválidios",
+          "inappropriate": "Las palabras ofensivas están prohibidas",
+          "linksForbidden": "Los enlaces no están permitidos"
+        }
+      },
+      "username": {
+        "placeholder": "Usuario",
+        "frequencyCaption": "El usuario puede ser cambiado una vez al mes.",
+        "errors": {
+          "generic": "Por favor, comprueba lo que introdujiste",
+          "tooLong": "El usuario es demasiado largo",
+          "tooShort": "El usuario es demasiado corto",
+          "invalidChar": "El usuario contiene caracteres inválidios",
+          "inappropriate": "Las palabras ofensivas están prohibidas",
+          "taken": "Este nombre de usuario ya está ocupado. Prueba con otro",
+          "linksForbidden": "Los enlaces no están permitidos"
+        },
+        "points": {
+          "1": "Longitud de 2 a 25 caracteres",
+          "2": "Solo minúsculas",
+          "3": "No espacios ni caracteres especiales"
+        }
+      },
+      "nickname": {
+        "placeholder": "Nombre para mostrar",
+        "errors": {
+          "generic": "Por favor, comprueba lo que introdujiste",
+          "tooLong": "El nombre es demasiado largo",
+          "tooShort": "El nombre es demasiado corto",
+          "invalidChar": "El nombre contiene caracteres inválidios",
+          "inappropriate": "Las palabras ofensivas están prohibidas",
+          "linksForbidden": "Los enlaces no están permitidos"
+        }
+      },
+      "email": {
+        "placeholder": "Correo electrónico",
+        "cantChangeInfoCaption_NEED_TRANSLATION": "You can edit your email in settings later",
+        "errors": {
+          "invalidEmail": "Por favor, introduce una dirección de correo electrónico válida",
+          "emailTaken": "Este correo electrónico ya está ocupado. Prueba con otro"
+        }
+      },
+      "dateOfBirth": {
+        "label": "Fecha de nacimiento",
+        "captions": {
+          "twoTimesOnly": "Tu fecha de nacimiento solo se puede cambiar 2 veces.",
+          "cannotChange": "No puedes cambiar tu fecha de nacimiento.",
+          "instruction": "Establece tu fecha de nacimiento"
+        },
+        "units": {
+          "day": "Día",
+          "month": "Mes",
+          "year": "Año"
+        },
+        "errors": {
+          "tooYoung": "Debes tener 18 años o más para ser un creador"
+        }
+      },
+      "profilePicture": {
+        "label": "Foto de perfil",
+        "captionMobile": "*resolución recomendada 200x200 px",
+        "captionDesktop": "Resolución recomendada 200x200 px",
+        "button": {
+          "upload": "Subir foto",
+          "uploadNew": "Subir nueva imagen"
+        }
+      }
+    },
+    "editProfileImageModal": {
+      "button": {
+        "back": "Editar imagen de perfil",
+        "save": "Guardar cambios",
+        "cancel": "Cancelar"
+      }
+    },
+    "button": {
+      "back": "Regresar",
+      "submit": "Hecho"
+    },
+    "agreedToTosCheckbox": "He leído y acepto los",
+    "linkText": "Términos de NewNew"
+  },
+  "aboutSection": {
+    "meta": {
+      "title": "Conviértete en un creador NewNew",
+      "description": "Conviértete en creador y gana dinero en NewNew"
+    },
+    "button": {
+      "submit": "Guardar cambios",
+      "back": "Cerrar"
+    },
+    "heading": "Esto es lo que ven tus fans",
+    "bio": {
+      "title": "Bio",
+      "placeholder": "Cuéntanos un poco sobre ti...",
+      "errors": {
+        "generic": "Por favor, comprueba lo que introdujiste",
+        "tooLong": "Tu biografía es muy larga",
+        "tooShort": "Tu biografía es muy corta",
+        "inappropriate": "Las palabras ofensivas están prohibidas",
+        "linksForbidden": "Los enlaces no están permitidos"
+      }
+    }
+  },
+  "stripeSection": {
+    "meta": {
+      "title": "Obtener tus pagos mediante",
+      "description": "Conecta una cuenta de Stripe para recibir tus pagos rápido."
+    },
+    "side": {
+      "heading": "Pagos fáciles con Stripe",
+      "subheading": "Conecta una cuenta de Stripe para recibir tus pagos rápido."
+    },
+    "titleSetUpStripe": "Establecer sistema de pago",
+    "bullets": {
+      "1": "Configurar una cuenta de Stripe es rápido y sencillo",
+      "2": "Retira tus ganancias de NewNew directamente a tu cuenta bancaria",
+      "3": "Stripe mantiene tu información privada y segura"
+    },
+
+    "button": {
+      "submit": "Hecho",
+      "requestSetupLink": "Conectar con Stripe",
+      "stripeConnectedLink": "¡Stripe conectado!",
+      "stripeConnecting": "Conectando...",
+      "requireInformation": "Stripe requiere información"
+    }
+  },
+  "subRateSection": {
+    "meta": {
+      "title": "Aumenta tus ingresos pasivos.",
+      "description": "Habilita las suscripciones para tu canal y recibe pagos mensuales."
+    },
+    "side": {
+      "heading": "Aumenta tus ingresos pasivos.",
+      "subheading": "Habilita las suscripciones para tu canal y recibe pagos mensuales."
+    },
+    "heading": "Establece tu tarifa de suscripción",
+    "selectInput": {
+      "perMonth": "/mes",
+      "select": "Seleccionar",
+      "featured": "Popular",
+      "noProduct": "Sin suscripción"
+    },
+    "button": {
+      "submit": "Guardar cambios",
+      "back": "Cerrar"
+    }
+  }
+}

@@ -3,7 +3,13 @@
 /* eslint-disable react/no-danger */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -40,6 +46,11 @@ import OnboardingCountrySelect from './OnboardingCountrySelect';
 import OnboardingSectionUsernameInput from './OnboardingUsernameInput';
 import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
+import resizeImage from '../../../utils/resizeImage';
+import useErrorToasts, {
+  ErrorToastPredefinedMessage,
+} from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -64,7 +75,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       break;
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
@@ -98,7 +109,7 @@ const errorSwitchUsername = (
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'innappropriate';
+      errorMsg = 'inappropriate';
       break;
     }
     case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
@@ -129,436 +140,126 @@ interface IOnboardingSectionDetails {
   availableCountries: newnewapi.Country[];
 }
 
-const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetails> =
-  ({ isAvatarCustom, availableCountries }) => {
-    const router = useRouter();
-    const { t } = useTranslation('creator-onboarding');
-    const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
-    const isTablet = ['tablet'].includes(resizeMode);
+const OnboardingSectionDetails: React.FunctionComponent<
+  IOnboardingSectionDetails
+> = ({ isAvatarCustom, availableCountries }) => {
+  const router = useRouter();
+  const { t } = useTranslation('page-CreatorOnboarding');
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet'].includes(resizeMode);
 
-    // Firstname
-    const [firstNameInEdit, setFirstnameInEdit] = useState('');
-    // TODO: improve firstName validation
-    const [firstNameError, setFirstnameError] = useState('');
-    const handleFirstnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (firstNameError) {
-        setFirstnameError('');
-      }
+  const { showErrorToastPredefined } = useErrorToasts();
+
+  const onlySpacesRegex = /^\s+$/;
+
+  // Firstname
+  const [firstNameInEdit, setFirstnameInEdit] = useState('');
+  // TODO: improve firstName validation
+  const [firstNameError, setFirstnameError] = useState('');
+  const handleFirstnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (firstNameError) {
+      setFirstnameError('');
+    }
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setFirstnameInEdit('');
+    } else {
       setFirstnameInEdit(e.target.value);
-    };
+    }
+  };
 
-    // Lastname
-    const [lastNameInEdit, setLastnameInEdit] = useState('');
-    // TODO: improve lastName validation
-    const [lastNameError, setLastnameError] = useState('');
-    const handleLastnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (lastNameError) {
-        setLastnameError('');
-      }
+  const [lastNameInEdit, setLastnameInEdit] = useState('');
+  // TODO: improve lastName validation
+  const [lastNameError, setLastnameError] = useState('');
+  const handleLastnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (lastNameError) {
+      setLastnameError('');
+    }
+
+    if (onlySpacesRegex.test(e.target.value)) {
+      setLastnameInEdit('');
+    } else {
       setLastnameInEdit(e.target.value);
-    };
+    }
+  };
 
-    // Username
-    const [usernameInEdit, setUsernameInEdit] = useState(
-      user.userData?.username ?? ''
-    );
-    const [usernameError, setUsernameError] = useState('');
-    const handleUpdateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value.replace('@', '');
-      setUsernameInEdit(newValue);
+  // Username
+  const [usernameInEdit, setUsernameInEdit] = useState(
+    user.userData?.username ?? ''
+  );
+  const [usernameError, setUsernameError] = useState('');
+  const handleUpdateUsername = (value: string) => {
+    const newValue = value.replace('@', '');
+    setUsernameInEdit(newValue);
 
-      validateUsernameViaAPIDebounced(newValue);
-    };
+    validateUsernameViaAPIDebounced(newValue);
+  };
 
-    // Nickname
-    const [nicknameInEdit, setNicknameInEdit] = useState(
-      user.userData?.nickname ?? ''
-    );
-    const [nicknameError, setNicknameError] = useState('');
-    const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Nickname
+  const [nicknameInEdit, setNicknameInEdit] = useState(
+    user.userData?.nickname ?? ''
+  );
+  const [nicknameError, setNicknameError] = useState('');
+  const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (onlySpacesRegex.test(e.target.value)) {
+      setNicknameInEdit('');
+    } else {
       setNicknameInEdit(e.target.value);
+    }
 
-      validateNicknameViaAPIDebounced(e.target.value);
-    };
+    validateNicknameViaAPIDebounced(e.target.value);
+  };
 
-    // API validations
-    const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-    const validateUsernameViaAPI = useCallback(
-      async (text: string) => {
-        setIsAPIValidateLoading(true);
-        try {
-          const payload = new newnewapi.ValidateUsernameRequest({
-            username: text,
-          });
+  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
 
-          const res = await validateUsernameTextField(payload);
-
-          if (!res.data?.status) throw new Error('An error occured');
-          if (
-            res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK
-          ) {
-            setUsernameError(errorSwitchUsername(res.data?.status!!));
-          } else {
-            setUsernameError('');
-          }
-
-          setIsAPIValidateLoading(false);
-        } catch (err) {
-          console.error(err);
-          setIsAPIValidateLoading(false);
-          if ((err as Error).message === 'No token') {
-            dispatch(logoutUserClearCookiesAndRedirect());
-          }
-          // Refresh token was present, session probably expired
-          // Redirect to sign up page
-          if ((err as Error).message === 'Refresh token invalid') {
-            dispatch(
-              logoutUserClearCookiesAndRedirect(
-                '/sign-up?reason=session_expired'
-              )
-            );
-          }
-        }
-      },
-      [setUsernameError, dispatch]
-    );
-
-    const validateUsernameViaAPIDebounced = useMemo(
-      () =>
-        debounce((text: string) => {
-          validateUsernameViaAPI(text);
-        }, 250),
-      [validateUsernameViaAPI]
-    );
-
-    const validateNicknameViaAPI = useCallback(
-      async (text: string) => {
-        setIsAPIValidateLoading(true);
-        try {
-          const payload = new newnewapi.ValidateTextRequest({
-            kind: newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-            text,
-          });
-
-          const res = await validateText(payload);
-
-          if (!res.data?.status) throw new Error('An error occured');
-
-          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setNicknameError(errorSwitch(res.data?.status!!));
-          } else {
-            setNicknameError('');
-          }
-
-          setIsAPIValidateLoading(false);
-        } catch (err) {
-          console.error(err);
-          setIsAPIValidateLoading(false);
-          if ((err as Error).message === 'No token') {
-            dispatch(logoutUserClearCookiesAndRedirect());
-          }
-          // Refresh token was present, session probably expired
-          // Redirect to sign up page
-          if ((err as Error).message === 'Refresh token invalid') {
-            dispatch(
-              logoutUserClearCookiesAndRedirect(
-                '/sign-up?reason=session_expired'
-              )
-            );
-          }
-        }
-      },
-      [setNicknameError, dispatch]
-    );
-
-    const validateNicknameViaAPIDebounced = useMemo(
-      () =>
-        debounce((text: string) => {
-          validateNicknameViaAPI(text);
-        }, 250),
-      [validateNicknameViaAPI]
-    );
-
-    // Email
-    const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
-    const [emailError, setEmailError] = useState('');
-    const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (emailError) setEmailError('');
-      setEmailInEdit(e.target.value);
-    };
-
-    // CoR
-    const countries = useMemo(
-      () =>
-        availableCountries.map((o, i) => ({
-          name: o.name,
-          value: o.code,
-        })),
-      [availableCountries]
-    );
-    const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
-
-    // Birthdate
-    const [dateInEdit, setDateInEdit] = useState<newnewapi.IDateComponents>(
-      user?.userData?.dateOfBirth
-        ? user?.userData?.dateOfBirth
-        : {
-            day: undefined,
-            month: undefined,
-            year: undefined,
-          }
-    );
-    const [dateError, setDateError] = useState('');
-
-    const handleDateInput = (value: newnewapi.IDateComponents) => {
-      setDateInEdit(value);
-    };
-
-    // Profile image
-    const [imageToSave, setImageToSave] = useState<File | null>(null);
-    const [cropMenuOpen, setCropMenuOpen] = useState(false);
-    const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
-    const [originalProfileImageWidth, setOriginalProfileImageWidth] =
-      useState(0);
-    // Determine whether or not the profile image is generic
-    const [imageInEdit, setImageInEdit] = useState(
-      user.userData?.avatarUrl && isAvatarCustom ? user.userData?.avatarUrl : ''
-    );
-
-    // Terms of service
-    const [agreedToTos, setAgreedToTos] = useState(false);
-    const [termsVisible, setTermsVisible] = useState(false);
-
-    // Save new data
-    const [fieldsToBeUpdated, setFieldsToBeUpdated] =
-      useState<TFieldsToBeUpdated>({
-        ...(!emailInEdit
-          ? // || (emailInEdit && !user.userData?.options?.isEmailVerified)
-            { email: true }
-          : {}),
-        countryOfResidence: true,
-        ...(!dateInEdit
-          ? {
-              dateOfBirth: true,
-            }
-          : {}),
-        ...(!imageInEdit
-          ? {
-              image: true,
-            }
-          : {}),
-      });
-
-    const [fieldsValid, setFieldsValid] = useState({
-      firstName: false,
-      lastName: false,
-      username: usernameInEdit.length > 0,
-      nickname: nicknameInEdit.length > 0,
-      email: validator.isEmail(emailInEdit),
-      countryOfResidence: true,
-      dateOfBirth:
-        Object.values(dateInEdit).length === 3
-          ? !Object.values(dateInEdit).some((v) => v === undefined)
-          : false,
-      image: imageInEdit ? true : false,
-      agreedToTos: true,
-    });
-    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-
-    const handleSetProfilePictureInEdit = (
-      e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-      const { files } = e.target;
-
-      if (files?.length === 1) {
-        const file = files[0];
-
-        if (!isImage(file.name)) return;
-        // if ((file.size / (1024 * 1024)) > 3) return;
-
-        // Read uploaded file as data URL
-        const reader = new FileReader();
-        const img = new Image();
-        reader.readAsDataURL(file);
-        reader.addEventListener('load', () => {
-          if (reader.result) {
-            setAvatarUrlInEdit(reader.result as string);
-
-            img.src = reader.result as string;
-
-            // eslint-disable-next-line func-names
-            img.addEventListener('load', function () {
-              // eslint-disable-next-line react/no-this-in-sfc
-              setOriginalProfileImageWidth(this.width);
-              setCropMenuOpen(true);
-              if (isBrowser()) {
-                window.history.pushState(
-                  {
-                    stage: 'edit-profile-picture',
-                  },
-                  ''
-                );
-              }
-            });
-          }
-        });
+  // API validations
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+  const validateUsernameAbortControllerRef = useRef<
+    AbortController | undefined
+  >();
+  const validateUsernameViaAPI = useCallback(
+    async (text: string) => {
+      setIsAPIValidateLoading(true);
+      if (validateUsernameAbortControllerRef.current) {
+        validateUsernameAbortControllerRef.current?.abort();
       }
-    };
-
-    const handleSaveChangesAndGoToDashboard = useCallback(async () => {
-      if (isAPIValidateLoading) return;
-      let newAvatarUrl;
+      validateUsernameAbortControllerRef.current = new AbortController();
       try {
-        setLoadingModalOpen(true);
+        // skip validation if username is equal to current username
+        if (text === user.userData?.username) {
+          setUsernameError('');
 
-        if (fieldsToBeUpdated.image) {
-          const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
-            filename: imageToSave?.name,
-          });
-
-          const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
-
-          if (!imgUploadRes.data || imgUploadRes.error)
-            throw new Error(imgUploadRes.error?.message ?? 'Upload error');
-
-          const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
-            method: 'PUT',
-            body: imageToSave,
-            headers: {
-              'Content-Type': 'image/png',
-            },
-          });
-
-          if (!uploadResponse.ok) throw new Error('Upload failed');
-
-          newAvatarUrl = imgUploadRes.data.publicUrl;
+          return;
         }
 
-        const updateMePayload = new newnewapi.UpdateMeRequest({
-          countryCode: selectedCountry,
-          ...(fieldsToBeUpdated.firstName
-            ? {
-                firstName: firstNameInEdit,
-              }
-            : {}),
-          ...(fieldsToBeUpdated.lastName
-            ? {
-                lastName: lastNameInEdit,
-              }
-            : {}),
-          ...(fieldsToBeUpdated.username
-            ? {
-                username: usernameInEdit,
-              }
-            : {}),
-          ...(fieldsToBeUpdated.nickname
-            ? {
-                nickname: nicknameInEdit,
-              }
-            : {}),
-          ...(fieldsToBeUpdated.dateOfBirth
-            ? {
-                dateOfBirth: dateInEdit,
-              }
-            : {}),
-          ...(newAvatarUrl
-            ? {
-                avatarUrl: newAvatarUrl,
-              }
-            : {}),
+        const payload = new newnewapi.ValidateUsernameRequest({
+          username: text,
         });
 
-        const updateMeRes = await updateMe(updateMePayload);
-
-        if (!updateMeRes.data || updateMeRes.error)
-          throw new Error(updateMeRes.error?.message ?? 'Request failed');
-
-        // Update Redux state
-        dispatch(
-          setUserData({
-            ...user.userData,
-            username: updateMeRes.data.me?.username,
-            nickname: updateMeRes.data.me?.nickname,
-            avatarUrl: updateMeRes.data.me?.avatarUrl,
-            countryCode: updateMeRes.data.me?.countryCode,
-            dateOfBirth: updateMeRes.data.me?.dateOfBirth,
-          })
+        const res = await validateUsernameTextField(
+          payload,
+          validateUsernameAbortControllerRef?.current?.signal
         );
 
-        if (fieldsToBeUpdated.email) {
-          const sendVerificationCodePayload =
-            new newnewapi.SendVerificationEmailRequest({
-              emailAddress: emailInEdit,
-              useCase:
-                newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
-            });
-
-          const res = await sendVerificationNewEmail(
-            sendVerificationCodePayload
-          );
-
-          if (
-            res.data?.status ===
-              newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-            !res.error
-          ) {
-            router.push(
-              `/verify-new-email?email=${emailInEdit}&redirect=dashboard`
-            );
-            return;
-            // eslint-disable-next-line no-else-return
-          }
-          throw new Error('Email taken');
-        } else {
-          const becomeCreatorPayload = new newnewapi.EmptyRequest({});
-
-          const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
-
-          if (!becomeCreatorRes.data || becomeCreatorRes.error)
-            throw new Error('Become creator failed');
-
-          dispatch(
-            setUserData({
-              options: {
-                isActivityPrivate:
-                  becomeCreatorRes.data.me?.options?.isActivityPrivate,
-                isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-                isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-                creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-              },
-            })
-          );
-
-          const acceptTermsPayload = new newnewapi.EmptyRequest({});
-
-          const res = await acceptCreatorTerms(acceptTermsPayload);
-
-          if (res.error) {
-            throw new Error('Request failed');
-          }
-          dispatch(
-            setCreatorData({
-              isLoaded: true,
-            })
-          );
-          router.push('/creator/dashboard');
+        if (!res.data?.status) {
+          throw new Error('An error occurred');
         }
+
+        if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
+          setUsernameError(errorSwitchUsername(res.data?.status));
+        } else {
+          setUsernameError('');
+        }
+
+        setIsAPIValidateLoading(false);
       } catch (err) {
         console.error(err);
-        setLoadingModalOpen(false);
-
-        if ((err as Error).message === 'Email taken') {
-          setEmailError('emailTaken');
-          // } else if ((err as Error).message === 'Too young') {
-        } else if ((err as Error).message) {
-          setDateError('tooYoung');
-        }
-
+        setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
         }
@@ -570,374 +271,729 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           );
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-      fieldsToBeUpdated,
-      dateInEdit,
-      selectedCountry,
-      emailInEdit,
-      user.userData,
-      imageToSave,
-      dispatch,
-      isAPIValidateLoading,
-      setLoadingModalOpen,
-    ]);
+    },
+    [setUsernameError, dispatch, user.userData?.username]
+  );
 
-    // Update image to be saved
-    useEffect(() => {
-      if (imageToSave) {
-        const imageUrl = URL.createObjectURL(imageToSave);
-        setImageInEdit(imageUrl);
-      }
-    }, [imageToSave]);
+  const validateUsernameViaAPIDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateUsernameViaAPI(text);
+      }, 250),
+    [validateUsernameViaAPI]
+  );
 
-    // Update what fields should be updated
-    // Firstname
-    useUpdateEffect(() => {
-      if (firstNameInEdit !== user.userData?.firstName) {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.firstName = true;
-          return working;
-        });
-      } else {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.firstName = false;
-          return working;
-        });
+  const validateTextAbortControllerRef = useRef<AbortController | undefined>();
+  const validateNicknameViaAPI = useCallback(
+    async (text: string) => {
+      if (validateTextAbortControllerRef.current) {
+        validateTextAbortControllerRef.current?.abort();
       }
-    }, [firstNameInEdit, setFieldsToBeUpdated]);
+      validateTextAbortControllerRef.current = new AbortController();
+      setIsAPIValidateLoading(true);
+      try {
+        const payload = new newnewapi.ValidateTextRequest({
+          kind: newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
+          text,
+        });
 
-    // Lastname
-    useUpdateEffect(() => {
-      if (lastNameInEdit !== user.userData?.lastName) {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.lastName = true;
-          return working;
-        });
-      } else {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.lastName = false;
-          return working;
-        });
-      }
-    }, [lastNameInEdit, setFieldsToBeUpdated]);
-
-    // Username
-    useUpdateEffect(() => {
-      if (usernameInEdit !== user.userData?.username) {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.username = true;
-          return working;
-        });
-      } else {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.username = false;
-          return working;
-        });
-      }
-    }, [usernameInEdit, setFieldsToBeUpdated]);
-    // Nickname
-    useUpdateEffect(() => {
-      if (nicknameInEdit !== user.userData?.nickname) {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.nickname = true;
-          return working;
-        });
-      } else {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.nickname = false;
-          return working;
-        });
-      }
-    }, [nicknameInEdit, setFieldsToBeUpdated]);
-    // Email
-    useUpdateEffect(() => {
-      if (emailInEdit !== user.userData?.email) {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.email = true;
-          return working;
-        });
-      } else {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.email = false;
-          return working;
-        });
-      }
-    }, [emailInEdit, setFieldsToBeUpdated]);
-    // Date of birth
-    useUpdateEffect(() => {
-      if (!isEqual(user.userData?.dateOfBirth, dateInEdit)) {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.dateOfBirth = true;
-          return working;
-        });
-      } else {
-        setFieldsToBeUpdated((curr) => {
-          const working = curr;
-          working.dateOfBirth = false;
-          return working;
-        });
-      }
-    }, [dateInEdit, setFieldsToBeUpdated]);
-    // Image
-    useUpdateEffect(() => {
-      if (imageInEdit !== user.userData?.avatarUrl) {
-        setFieldsToBeUpdated((curr) => {
-          const working = { ...curr };
-          working.image = true;
-          return working;
-        });
-      }
-    }, [imageInEdit, setFieldsToBeUpdated]);
-
-    // Validate fields
-    useEffect(() => {
-      setFieldsValid((curr) => {
-        const working = { ...curr };
-
-        working.firstName = firstNameInEdit.length > 1 && !firstNameError;
-        working.lastName = lastNameInEdit.length > 1 && !lastNameError;
-        working.username = usernameInEdit.length > 0 && !usernameError;
-        working.nickname = nicknameInEdit.length > 0 && !nicknameError;
-        working.email = validator.isEmail(emailInEdit) && !emailError;
-        working.dateOfBirth = !Object.values(dateInEdit).some(
-          (v) => v === undefined
+        const res = await validateText(
+          payload,
+          validateTextAbortControllerRef?.current?.signal
         );
-        working.image = imageInEdit !== '';
-        working.agreedToTos = agreedToTos;
+
+        if (!res.data?.status) throw new Error('An error occurred');
+
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setNicknameError(errorSwitch(res.data?.status));
+        } else {
+          setNicknameError('');
+        }
+
+        setIsAPIValidateLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsAPIValidateLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(
+            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+          );
+        }
+      }
+    },
+    [setNicknameError, dispatch]
+  );
+
+  const validateNicknameViaAPIDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateNicknameViaAPI(text);
+      }, 250),
+    [validateNicknameViaAPI]
+  );
+
+  // Email
+  const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
+  const [emailError, setEmailError] = useState('');
+  const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (emailError) setEmailError('');
+    setEmailInEdit(e.target.value);
+  };
+
+  // CoR
+  const countries = useMemo(
+    () => availableCountries.map((o) => o.code),
+    [availableCountries]
+  );
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+
+  // Birthdate
+  const [dateInEdit, setDateInEdit] = useState<newnewapi.IDateComponents>(
+    user?.userData?.dateOfBirth
+      ? user?.userData?.dateOfBirth
+      : {
+          day: undefined,
+          month: undefined,
+          year: undefined,
+        }
+  );
+  const [dateError, setDateError] = useState('');
+
+  const handleDateInput = (value: newnewapi.IDateComponents) => {
+    setDateInEdit(value);
+  };
+
+  // Profile image
+  const [imageToSave, setImageToSave] = useState<File | null>(null);
+  const [cropMenuOpen, setCropMenuOpen] = useState(false);
+  const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
+  const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
+  // Determine whether or not the profile image is generic
+  const [imageInEdit, setImageInEdit] = useState(
+    user.userData?.avatarUrl && isAvatarCustom ? user.userData?.avatarUrl : ''
+  );
+
+  // Terms of service
+  const [agreedToTos, setAgreedToTos] = useState(false);
+  const [termsVisible, setTermsVisible] = useState(false);
+
+  // Save new data
+  const [fieldsToBeUpdated, setFieldsToBeUpdated] =
+    useState<TFieldsToBeUpdated>({
+      ...(!emailInEdit
+        ? // || (emailInEdit && !user.userData?.options?.isEmailVerified)
+          { email: true }
+        : {}),
+      countryOfResidence: true,
+      ...(!dateInEdit
+        ? {
+            dateOfBirth: true,
+          }
+        : {}),
+      ...(!imageInEdit
+        ? {
+            image: true,
+          }
+        : {}),
+    });
+
+  const [fieldsValid, setFieldsValid] = useState({
+    firstName: false,
+    lastName: false,
+    username: usernameInEdit.length > 0,
+    nickname: nicknameInEdit.length > 0,
+    email: validator.isEmail(emailInEdit),
+    countryOfResidence: true,
+    dateOfBirth:
+      Object.values(dateInEdit).length === 3
+        ? !Object.values(dateInEdit).some((v) => v === undefined)
+        : false,
+    image: imageInEdit ? true : false,
+    agreedToTos: true,
+  });
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+  const handleSetProfilePictureInEdit = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { files } = e.target;
+
+    if (files?.length === 1) {
+      const file = files[0];
+
+      if (!isImage(file.name)) {
+        showErrorToastPredefined(
+          ErrorToastPredefinedMessage.UnsupportedImageFormatError
+        );
+        return;
+      }
+      // if ((file.size / (1024 * 1024)) > 3) return;
+
+      // Read uploaded file as data URL
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.addEventListener('load', async () => {
+        if (reader.result) {
+          const imageUrl = reader.result as string;
+
+          const properlySizedImage = await resizeImage(imageUrl, 1000);
+
+          // eslint-disable-next-line react/no-this-in-sfc
+          setOriginalProfileImageWidth(properlySizedImage.width);
+          const minZoom =
+            Math.max(properlySizedImage.height, properlySizedImage.width) /
+            Math.min(properlySizedImage.height, properlySizedImage.width);
+
+          setMinZoomProfileImage(minZoom);
+
+          setAvatarUrlInEdit(properlySizedImage.url as string);
+          setCropMenuOpen(true);
+        }
+      });
+    }
+  };
+
+  const handleSaveChangesAndGoToDashboard = useCallback(async () => {
+    if (isAPIValidateLoading) return;
+    let newAvatarUrl;
+    try {
+      setLoadingModalOpen(true);
+
+      if (fieldsToBeUpdated.image) {
+        const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+          filename: imageToSave?.name,
+        });
+
+        const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
+
+        if (!imgUploadRes.data || imgUploadRes.error)
+          throw new Error(imgUploadRes.error?.message ?? 'Upload error');
+
+        const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
+          method: 'PUT',
+          body: imageToSave,
+          headers: {
+            'Content-Type': 'image/png',
+          },
+        });
+
+        if (!uploadResponse.ok) throw new Error('Upload failed');
+
+        newAvatarUrl = imgUploadRes.data.publicUrl;
+      }
+
+      const updateMePayload = new newnewapi.UpdateMeRequest({
+        countryCode: selectedCountry,
+        ...(fieldsToBeUpdated.firstName
+          ? {
+              firstName: firstNameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.lastName
+          ? {
+              lastName: lastNameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.username
+          ? {
+              username: usernameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.nickname
+          ? {
+              nickname: nicknameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.dateOfBirth &&
+        !isEqual(user.userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
+          ? {
+              dateOfBirth: dateInEdit,
+            }
+          : {}),
+        ...(newAvatarUrl
+          ? {
+              avatarUrl: newAvatarUrl,
+            }
+          : {}),
+      });
+
+      const updateMeRes = await updateMe(updateMePayload);
+      if (!updateMeRes.data || updateMeRes.error)
+        throw new Error(updateMeRes.error?.message ?? 'Request failed');
+
+      // Update Redux state
+      dispatch(
+        setUserData({
+          ...user.userData,
+          username: updateMeRes.data.me?.username,
+          nickname: updateMeRes.data.me?.nickname,
+          avatarUrl: updateMeRes.data.me?.avatarUrl,
+          countryCode: updateMeRes.data.me?.countryCode,
+          dateOfBirth: updateMeRes.data.me?.dateOfBirth,
+        })
+      );
+
+      if (fieldsToBeUpdated.email) {
+        const sendVerificationCodePayload =
+          new newnewapi.SendVerificationEmailRequest({
+            emailAddress: emailInEdit,
+            useCase:
+              newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+          });
+
+        const res = await sendVerificationNewEmail(sendVerificationCodePayload);
+
+        if (
+          res.data?.status ===
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          !res.error
+        ) {
+          const newEmailValue = encodeURIComponent(emailInEdit);
+          router.push(
+            `/verify-new-email?email=${newEmailValue}&redirect=dashboard`
+          );
+          return;
+          // eslint-disable-next-line no-else-return
+        }
+        throw new Error('Email taken');
+      } else {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+        if (!becomeCreatorRes.data || becomeCreatorRes.error)
+          throw new Error('Become creator failed');
+
+        dispatch(
+          setUserData({
+            options: {
+              ...user.userData?.options,
+              isActivityPrivate:
+                becomeCreatorRes.data.me?.options?.isActivityPrivate,
+              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+            },
+          })
+        );
+
+        const acceptTermsPayload = new newnewapi.EmptyRequest({});
+
+        const res = await acceptCreatorTerms(acceptTermsPayload);
+
+        if (res.error) {
+          throw new Error('Request failed');
+        }
+        dispatch(
+          setCreatorData({
+            isLoaded: true,
+          })
+        );
+        router.push('/creator/dashboard?askPushNotificationPermission=true');
+      }
+    } catch (err) {
+      console.error(err);
+      setLoadingModalOpen(false);
+
+      if ((err as Error).message === 'Email taken') {
+        setEmailError('emailTaken');
+        // } else if ((err as Error).message === 'Too young') {
+        // TODO: fix error handling, not all other errors are DoB related
+      } else if ((err as Error).message === 'Request failed') {
+        showErrorToastPredefined(undefined);
+      } else if ((err as Error).message) {
+        setDateError('tooYoung');
+      }
+
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(
+          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
+        );
+      }
+    }
+    // We dont need router here?
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    fieldsToBeUpdated,
+    dateInEdit,
+    selectedCountry,
+    firstNameInEdit,
+    lastNameInEdit,
+    nicknameInEdit,
+    usernameInEdit,
+    emailInEdit,
+    user.userData,
+    imageToSave,
+    dispatch,
+    isAPIValidateLoading,
+    setLoadingModalOpen,
+  ]);
+
+  // Update image to be saved
+  useEffect(() => {
+    if (imageToSave) {
+      const imageUrl = URL.createObjectURL(imageToSave);
+      setImageInEdit(imageUrl);
+    }
+  }, [imageToSave]);
+
+  // Update what fields should be updated
+  // Firstname
+  useUpdateEffect(() => {
+    if (firstNameInEdit !== user.userData?.firstName) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.firstName = true;
         return working;
       });
-    }, [
-      firstNameInEdit,
-      firstNameError,
-      lastNameInEdit,
-      lastNameError,
-      usernameInEdit,
-      usernameError,
-      nicknameInEdit,
-      nicknameError,
-      emailInEdit,
-      emailError,
-      dateInEdit,
-      imageInEdit,
-      agreedToTos,
-      setFieldsValid,
-    ]);
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.firstName = false;
+        return working;
+      });
+    }
+  }, [firstNameInEdit, setFieldsToBeUpdated]);
 
-    return (
-      <>
-        <SContainer isMobile={isMobile}>
-          <SHeading variant={5}>{t('DetailsSection.heading')}</SHeading>
-          <STopContainer>
-            <SFieldPairContainer>
-              <OnboardingInput
-                id='settings_first_name_input'
-                type='text'
-                value={firstNameInEdit}
-                isValid={firstNameInEdit.length > 1 ? true : false}
-                placeholder={t('DetailsSection.form.firstName.placeholder')}
-                onChange={handleFirstnameInput}
-                errorCaption={t(
-                  'DetailsSection.form.firstName.errors.tooShort'
-                )}
-              />
-              <OnboardingInput
-                id='settings_last_name_input'
-                type='text'
-                value={lastNameInEdit}
-                isValid={lastNameInEdit.length > 1 ? true : false}
-                placeholder={t('DetailsSection.form.lastName.placeholder')}
-                onChange={handleLastnameInput}
-                errorCaption={t('DetailsSection.form.lastName.errors.tooShort')}
-              />
-            </SFieldPairContainer>
-            <SFieldPairContainer>
-              <OnboardingSectionUsernameInput
-                type='text'
-                value={usernameInEdit}
-                disabled={loadingModalOpen}
-                popupCaption={
-                  <UsernamePopupList
-                    points={[
-                      {
-                        text: t('DetailsSection.form.username.points.1'),
-                        isValid: usernameInEdit
-                          ? usernameInEdit.length >= 2 &&
-                            usernameInEdit.length <= 25
-                          : false,
-                      },
-                      {
-                        text: t('DetailsSection.form.username.points.2'),
-                        isValid: usernameInEdit
-                          ? validator.isLowercase(usernameInEdit)
-                          : false,
-                      },
-                      {
-                        text: t('DetailsSection.form.username.points.3'),
-                        isValid: usernameInEdit
-                          ? validator.isAlphanumeric(usernameInEdit)
-                          : false,
-                      },
-                    ]}
-                  />
-                }
-                frequencyCaption={t(
-                  'DetailsSection.form.username.frequencyCaption'
-                )}
-                errorCaption={t(
-                  `DetailsSection.form.username.errors.${usernameError}`
-                )}
-                placeholder={t('DetailsSection.form.username.placeholder')}
-                isValid={usernameError === ''}
-                onChange={handleUpdateUsername}
-              />
-              <OnboardingSectionNicknameInput
-                type='text'
-                value={nicknameInEdit}
-                disabled={loadingModalOpen}
-                placeholder={t('DetailsSection.form.nickname.placeholder')}
-                errorCaption={t(
-                  `DetailsSection.form.nickname.errors.${nicknameError}`
-                )}
-                isValid={nicknameError === ''}
-                onChange={handleUpdateNickname}
-              />
-            </SFieldPairContainer>
-            <SFieldPairContainer marginBottom={34}>
-              <OnboardingInput
-                id='settings_email_input'
-                type='email'
-                value={emailInEdit}
-                isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
-                isTaken={emailError === 'emailTaken'}
-                placeholder={t('DetailsSection.form.email.placeholder')}
-                cantChangeInfoCaption={t(
-                  'DetailsSection.form.email.cantChangeInfoCaption'
-                )}
-                errorCaption={
-                  emailError
-                    ? t('DetailsSection.form.email.errors.emailTaken')
-                    : t('DetailsSection.form.email.errors.invalidEmail')
-                }
-                onChange={handleEmailInput}
-              />
-              <OnboardingCountrySelect<string>
-                label={
-                  countries[
-                    countries.findIndex((o) => o.value === selectedCountry)
-                  ].name
-                }
-                width='100%'
-                selected={selectedCountry}
-                options={countries}
-                onSelect={(val) => setSelectedCountry(val)}
-                closeOnSelect
-              />
-            </SFieldPairContainer>
-            <OnboardingBirthDateInput
-              value={dateInEdit}
-              maxDate={maxDate}
+  // Lastname
+  useUpdateEffect(() => {
+    if (lastNameInEdit !== user.userData?.lastName) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.lastName = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.lastName = false;
+        return working;
+      });
+    }
+  }, [lastNameInEdit, setFieldsToBeUpdated]);
+
+  // Username
+  useUpdateEffect(() => {
+    if (usernameInEdit !== user.userData?.username) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.username = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.username = false;
+        return working;
+      });
+    }
+  }, [usernameInEdit, setFieldsToBeUpdated]);
+  // Nickname
+  useUpdateEffect(() => {
+    if (nicknameInEdit !== user.userData?.nickname) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.nickname = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.nickname = false;
+        return working;
+      });
+    }
+  }, [nicknameInEdit, setFieldsToBeUpdated]);
+  // Email
+  useUpdateEffect(() => {
+    if (emailInEdit !== user.userData?.email) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.email = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.email = false;
+        return working;
+      });
+    }
+  }, [emailInEdit, setFieldsToBeUpdated]);
+  // Date of birth
+  useUpdateEffect(() => {
+    if (!isEqual(user.userData?.dateOfBirth, dateInEdit)) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.dateOfBirth = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.dateOfBirth = false;
+        return working;
+      });
+    }
+  }, [dateInEdit, setFieldsToBeUpdated]);
+  // Image
+  useUpdateEffect(() => {
+    if (imageInEdit !== user.userData?.avatarUrl) {
+      setFieldsToBeUpdated((curr) => {
+        const working = { ...curr };
+        working.image = true;
+        return working;
+      });
+    }
+  }, [imageInEdit, setFieldsToBeUpdated]);
+
+  // Validate fields
+  useEffect(() => {
+    setFieldsValid((curr) => {
+      const working = { ...curr };
+
+      working.firstName = firstNameInEdit.trim().length > 1 && !firstNameError;
+      working.lastName = lastNameInEdit.trim().length > 1 && !lastNameError;
+      working.username = usernameInEdit.trim().length > 0 && !usernameError;
+      working.nickname = nicknameInEdit.trim().length > 0 && !nicknameError;
+      working.email = validator.isEmail(emailInEdit) && !emailError;
+      working.dateOfBirth = !Object.values(dateInEdit).some(
+        (v) => v === undefined
+      );
+      working.image = imageInEdit !== '';
+      working.agreedToTos = agreedToTos;
+      return working;
+    });
+  }, [
+    firstNameInEdit,
+    firstNameError,
+    lastNameInEdit,
+    lastNameError,
+    usernameInEdit,
+    usernameError,
+    nicknameInEdit,
+    nicknameError,
+    emailInEdit,
+    emailError,
+    dateInEdit,
+    imageInEdit,
+    agreedToTos,
+    setFieldsValid,
+  ]);
+
+  return (
+    <>
+      <SContainer isMobile={isMobile}>
+        <SHeading variant={5}>{t('detailsSection.heading')}</SHeading>
+        <STopContainer>
+          <SFieldPairContainer>
+            <OnboardingInput
+              id='settings_first_name_input'
+              type='text'
+              value={firstNameInEdit}
+              isValid={firstNameInEdit.length > 1 ? true : false}
+              placeholder={t('detailsSection.form.firstName.placeholder')}
+              onChange={handleFirstnameInput}
+              errorCaption={t('detailsSection.form.firstName.errors.tooShort')}
+            />
+            <OnboardingInput
+              id='settings_last_name_input'
+              type='text'
+              value={lastNameInEdit}
+              isValid={lastNameInEdit.length > 1 ? true : false}
+              placeholder={t('detailsSection.form.lastName.placeholder')}
+              onChange={handleLastnameInput}
+              errorCaption={t('detailsSection.form.lastName.errors.tooShort')}
+            />
+          </SFieldPairContainer>
+          <SFieldPairContainer>
+            <OnboardingSectionUsernameInput
+              type='text'
+              value={usernameInEdit}
+              disabled={loadingModalOpen}
+              popupCaption={
+                <UsernamePopupList
+                  points={[
+                    {
+                      text: t('detailsSection.form.username.points.1'),
+                      isValid: usernameInEdit
+                        ? usernameInEdit.length >= 2 &&
+                          usernameInEdit.length <= 25
+                        : false,
+                    },
+                    {
+                      text: t('detailsSection.form.username.points.2'),
+                      isValid: usernameInEdit
+                        ? validator.isLowercase(usernameInEdit)
+                        : false,
+                    },
+                    {
+                      text: t('detailsSection.form.username.points.3'),
+                      isValid: usernameInEdit
+                        ? validator.isAlphanumeric(usernameInEdit)
+                        : false,
+                    },
+                  ]}
+                />
+              }
+              frequencyCaption={t(
+                'detailsSection.form.username.frequencyCaption'
+              )}
+              errorCaption={t(
+                `detailsSection.form.username.errors.${usernameError}` as any
+              )}
+              placeholder={t('detailsSection.form.username.placeholder')}
+              isValid={usernameError === ''}
+              onChange={handleUpdateUsername}
+            />
+            <OnboardingSectionNicknameInput
+              type='text'
+              value={nicknameInEdit}
+              disabled={loadingModalOpen}
+              placeholder={t('detailsSection.form.nickname.placeholder')}
+              errorCaption={t(
+                `detailsSection.form.nickname.errors.${nicknameError}` as any
+              )}
+              isValid={nicknameError === ''}
+              onChange={handleUpdateNickname}
+            />
+          </SFieldPairContainer>
+          <SFieldPairContainer marginBottom={34}>
+            <OnboardingInput
+              id='settings_email_input'
+              type='email'
+              value={emailInEdit}
+              isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
+              isTaken={emailError === 'emailTaken'}
+              placeholder={t('detailsSection.form.email.placeholder')}
+              cantChangeInfoCaption={t(
+                'detailsSection.form.email.cantChangeInfoCaption'
+              )}
+              errorCaption={
+                emailError
+                  ? t('detailsSection.form.email.errors.emailTaken')
+                  : t('detailsSection.form.email.errors.invalidEmail')
+              }
+              onChange={handleEmailInput}
+              readOnly={!!user.userData?.email}
+            />
+            <OnboardingCountrySelect
+              width='100%'
+              selected={selectedCountry}
+              options={countries}
               locale={router.locale}
-              disabled={false}
-              isValid={dateError === ''}
-              labelCaption={t('DetailsSection.form.DoB.label')}
-              bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
-              errorCaption={t('DetailsSection.form.DoB.errors.tooYoung')}
-              onChange={handleDateInput}
-              handleResetIsValid={() => setDateError('')}
+              onSelect={(val) => setSelectedCountry(val)}
+              closeOnSelect
             />
-          </STopContainer>
-          {!isMobile && !isTablet && <SSeparator />}
-          <SPhotoContainer>
-            <OnboardingProfileImageInput
-              imageInEditUrl={imageInEdit}
-              handleChangeImageInEdit={handleSetProfilePictureInEdit}
-            />
-          </SPhotoContainer>
-          {(isMobile || isTablet) && (
+          </SFieldPairContainer>
+          <OnboardingBirthDateInput
+            value={dateInEdit}
+            maxDate={maxDate}
+            locale={router.locale}
+            disabled={
+              user?.userData?.dateOfBirth
+                ? Object.values(user?.userData?.dateOfBirth).every(
+                    (dateOfBirthEl) => !!dateOfBirthEl
+                  )
+                : false
+            }
+            isValid={dateError === ''}
+            onChange={handleDateInput}
+            handleResetIsValid={() => setDateError('')}
+          />
+        </STopContainer>
+        {!isMobile && !isTablet && <SSeparator />}
+        <SPhotoContainer>
+          <OnboardingProfileImageInput
+            id='avatar-input'
+            imageInEditUrl={imageInEdit}
+            handleChangeImageInEdit={handleSetProfilePictureInEdit}
+          />
+        </SPhotoContainer>
+        {(isMobile || isTablet) && (
+          <CheckboxWithALink
+            label={t('detailsSection.agreedToTosCheckbox')}
+            linkText={t('detailsSection.linkText')}
+            value={agreedToTos}
+            onLinkClicked={() => setTermsVisible(true)}
+            onToggled={() => setAgreedToTos(!agreedToTos)}
+          />
+        )}
+      </SContainer>
+      <SControlsDiv>
+        {!isMobile && (
+          <BackButtonSection>
+            <GoBackButton longArrow onClick={() => router.back()}>
+              {t('detailsSection.button.back')}
+            </GoBackButton>
+          </BackButtonSection>
+        )}
+        <ControlsSection>
+          {!isMobile && !isTablet && (
             <CheckboxWithALink
-              label={t('DetailsSection.agreedToTosCheckbox')}
-              linkText='NewNew’s terms'
+              id='tos-checkbox'
+              label={t('detailsSection.agreedToTosCheckbox')}
+              linkText={t('detailsSection.linkText')}
               value={agreedToTos}
               onLinkClicked={() => setTermsVisible(true)}
               onToggled={() => setAgreedToTos(!agreedToTos)}
             />
           )}
-        </SContainer>
-        <SControlsDiv>
-          {!isMobile && (
-            <BackButtonSection>
-              <GoBackButton longArrow onClick={() => router.back()}>
-                {t('DetailsSection.backButton')}
-              </GoBackButton>
-            </BackButtonSection>
-          )}
-          <ControlsSection>
-            {!isMobile && !isTablet && (
-              <CheckboxWithALink
-                label={t('DetailsSection.agreedToTosCheckbox')}
-                linkText={"NewNew's terms"}
-                value={agreedToTos}
-                onLinkClicked={() => setTermsVisible(true)}
-                onToggled={() => setAgreedToTos(!agreedToTos)}
-              />
-            )}
-            <SButton
-              view='primaryGrad'
-              disabled={Object.values(fieldsValid).some((v) => v === false)}
-              style={{
-                width: isMobile ? '100%' : 'initial',
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
-              onClick={() => handleSaveChangesAndGoToDashboard()}
-            >
-              {isMobile
-                ? t('DetailsSection.submitMobile')
-                : t('DetailsSection.submitDesktop')}
-            </SButton>
-          </ControlsSection>
-        </SControlsDiv>
-        {cropMenuOpen && (
-          <OnboardingEditProfileImageModal
-            isOpen={cropMenuOpen}
-            avatarUrlInEdit={avatarUrlInEdit}
-            originalProfileImageWidth={originalProfileImageWidth}
-            handleSetImageToSave={(val) => setImageToSave(val)}
-            setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
-            onClose={() => {
-              setCropMenuOpen(false);
-              // window.history.back();
-              if (isBrowser()) {
-                window.history.replaceState(null, '');
-              }
+          <SButton
+            id='submit-button'
+            view='primaryGrad'
+            disabled={Object.values(fieldsValid).some((v) => v === false)}
+            style={{
+              width: isMobile ? '100%' : 'initial',
+              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
             }}
-          />
-        )}
-        {/* Upload loading Modal */}
-        {loadingModalOpen && (
-          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-        )}
-        {termsVisible && (
-          <TermsOfServiceModal
-            isOpen={termsVisible}
-            zIndex={15}
-            onClose={() => setTermsVisible(false)}
-          />
-        )}
-      </>
-    );
-  };
+            onClick={() => handleSaveChangesAndGoToDashboard()}
+          >
+            {t('detailsSection.button.submit')}
+          </SButton>
+        </ControlsSection>
+      </SControlsDiv>
+      {cropMenuOpen && (
+        <OnboardingEditProfileImageModal
+          isOpen={cropMenuOpen}
+          avatarUrlInEdit={avatarUrlInEdit}
+          originalProfileImageWidth={originalProfileImageWidth}
+          minZoom={minZoomProfileImage}
+          handleSetImageToSave={(val) => setImageToSave(val)}
+          setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
+          onClose={() => {
+            setCropMenuOpen(false);
+            // window.history.back();
+            if (isBrowser()) {
+              window.history.replaceState(null, '');
+            }
+          }}
+        />
+      )}
+      {/* Upload loading Modal */}
+      {loadingModalOpen && (
+        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      )}
+      {termsVisible && (
+        <TermsOfServiceModal
+          isOpen={termsVisible}
+          zIndex={15}
+          onClose={() => setTermsVisible(false)}
+        />
+      )}
+    </>
+  );
+};
 
 export default OnboardingSectionDetails;
 
@@ -956,7 +1012,6 @@ const SContainer = styled.div<{
 
     padding-left: 152px;
     padding-right: 152px;
-
     margin-bottom: 44px;
   }
 
@@ -964,8 +1019,7 @@ const SContainer = styled.div<{
     height: fit-content;
 
     padding-left: 0;
-    padding-right: 104px;
-
+    padding-right: 0;
     margin-bottom: 130px;
   }
 `;
@@ -1018,7 +1072,7 @@ const SFieldPairContainer = styled.div<{ marginBottom?: number }>`
 const SSeparator = styled.div`
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-top: 20px;
+  margin-top: 32px;
   margin-bottom: 32px;
 `;
 
@@ -1060,7 +1114,6 @@ const SControlsDiv = styled.div`
     position: static;
 
     padding-left: 152px;
-    padding-right: 152px;
     padding-bottom: 24px;
 
     margin-left: 0;
@@ -1070,7 +1123,6 @@ const SControlsDiv = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     padding-left: 0;
-    padding-right: 104px;
   }
 `;
 

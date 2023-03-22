@@ -7,6 +7,7 @@ import { newnewapi } from 'newnew-api';
 import jsonwebtoken from 'jsonwebtoken';
 import getRawBody from 'raw-body';
 import qs from 'querystring';
+import { useUpdateEffect } from 'react-use';
 
 import Lottie from '../../components/atoms/Lottie';
 
@@ -23,6 +24,7 @@ import {
   setUserData,
   setUserLoggedIn,
 } from '../../redux-store/slices/userStateSlice';
+import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -45,14 +47,22 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { resumePushNotification } = usePushNotifications();
 
   useEffect(() => {
-    if (user.loggedIn) router.push('/');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    if (user.loggedIn) router?.push('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  useUpdateEffect(() => {
     async function handleAuth() {
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -102,7 +112,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         }
 
         if (!res!! || res!!.error || !res.data)
-          throw new Error(res!!.error?.message ?? 'An error occured');
+          throw new Error(res!!.error?.message ?? 'An error occurred');
 
         const { data } = res!!;
 
@@ -133,12 +143,13 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
           })
         );
         // Set credential cookies
-        setCookie('accessToken', data.credential?.accessToken, {
-          expires: new Date(
-            (data.credential?.expiresAt?.seconds as number)!! * 1000
-          ),
-          path: '/',
-        });
+        if (data.credential?.expiresAt?.seconds)
+          setCookie('accessToken', data.credential?.accessToken, {
+            expires: new Date(
+              (data.credential.expiresAt.seconds as number) * 1000
+            ),
+            path: '/',
+          });
         setCookie('refreshToken', data.credential?.refreshToken, {
           // Expire in 10 years
           maxAge: 10 * 365 * 24 * 60 * 60,
@@ -147,25 +158,27 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
         dispatch(setUserLoggedIn(true));
 
+        resumePushNotification();
+
         setIsLoading(false);
         if (data.redirectUrl) {
-          router.push(data.redirectUrl);
+          router?.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router.push('/creator/dashboard');
+          router?.push('/creator/dashboard');
         } else {
-          router.push('/');
+          router?.push('/');
         }
       } catch (err) {
         // NB! Might need an error toast
         console.error(err);
         setIsLoading(false);
-        router.push('/');
+        router?.push('/');
       }
     }
 
     handleAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mounted]);
 
   return (
     <div>
@@ -197,42 +210,60 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
 export default AuthRedirectPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { provider } = context.query;
+export const getServerSideProps: GetServerSideProps<IAuthRedirectPage> = async (
+  context
+) => {
+  try {
+    const { provider } = context.query;
 
-  const { req } = context;
+    const { req } = context;
 
-  let body: any;
-  let bodyStringified: string;
-  let bodyParsed: TAppleResponseBody;
-  let idTokenDecoded: any;
+    let body: any;
+    let bodyStringified: string;
+    let bodyParsed: TAppleResponseBody;
+    let idTokenDecoded: any;
 
-  if (req.method === 'POST' && provider && provider === 'apple') {
-    body = await getRawBody(req, {
-      encoding: 'utf-8',
-    });
+    if (req.method === 'POST' && provider && provider === 'apple') {
+      body = await getRawBody(req, {
+        encoding: 'utf-8',
+      });
 
-    if (body) {
-      body = qs.parse(body);
-      if (body.user) {
-        body.user = JSON.parse(body.user);
-      }
+      if (body) {
+        body = qs.parse(body);
+        if (body.user) {
+          body.user = JSON.parse(body.user);
+        }
 
-      bodyStringified = JSON.stringify(body);
-      bodyParsed = JSON.parse(bodyStringified);
-      idTokenDecoded = jsonwebtoken.decode(bodyParsed.id_token);
-      if (idTokenDecoded && idTokenDecoded.sub) {
-        bodyParsed.sub = idTokenDecoded.sub;
+        bodyStringified = JSON.stringify(body);
+        bodyParsed = JSON.parse(bodyStringified);
+        idTokenDecoded = jsonwebtoken.decode(bodyParsed.id_token);
+        if (idTokenDecoded && idTokenDecoded.sub) {
+          bodyParsed.sub = idTokenDecoded.sub;
+        }
       }
     }
-  }
 
-  if (
-    !provider ||
-    Array.isArray(provider) ||
-    SUPPORTED_AUTH_PROVIDERS.indexOf(provider as string) === -1 ||
-    (provider === 'apple' && (!bodyParsed!! || !bodyParsed.sub))
-  ) {
+    if (
+      !provider ||
+      Array.isArray(provider) ||
+      SUPPORTED_AUTH_PROVIDERS.indexOf(provider as string) === -1 ||
+      (provider === 'apple' && (!bodyParsed!! || !bodyParsed.sub))
+    ) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      props: {
+        provider,
+        ...(bodyParsed! ? { body: bodyParsed } : {}),
+      },
+    };
+  } catch (err) {
     return {
       redirect: {
         destination: '/',
@@ -240,11 +271,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-
-  return {
-    props: {
-      provider,
-      ...(bodyParsed! ? { body: bodyParsed } : {}),
-    },
-  };
 };
