@@ -202,12 +202,12 @@ export const Desktop: React.FC = React.memo(() => {
                 </SItemWithMargin>
               </>
             )}
-            {!user.userData?.options?.isCreator &&
-              canBecomeCreator(
-                user.userData?.dateOfBirth,
-                appConstants.minCreatorAgeYears
-              ) && (
-                <>
+            {!user.userData?.options?.isCreator && (
+              <>
+                {canBecomeCreator(
+                  user.userData?.dateOfBirth,
+                  appConstants.minCreatorAgeYears
+                ) && (
                   <SItemWithMargin>
                     <Link href='/creator-onboarding'>
                       <a>
@@ -228,23 +228,24 @@ export const Desktop: React.FC = React.memo(() => {
                       </a>
                     </Link>
                   </SItemWithMargin>
-                  <SItemWithMargin>
-                    <Link href='/profile'>
-                      <a id='profile-link'>
-                        <UserAvatar
-                          withClick
-                          avatarUrl={user.userData?.avatarUrl}
-                          onClick={() => {
-                            Mixpanel.track('My Avatar Clicked', {
-                              _target: '/profile',
-                            });
-                          }}
-                        />
-                      </a>
-                    </Link>
-                  </SItemWithMargin>
-                </>
-              )}
+                )}
+                <SItemWithMargin>
+                  <Link href='/profile'>
+                    <a id='profile-link'>
+                      <UserAvatar
+                        withClick
+                        avatarUrl={user.userData?.avatarUrl}
+                        onClick={() => {
+                          Mixpanel.track('My Avatar Clicked', {
+                            _target: '/profile',
+                          });
+                        }}
+                      />
+                    </a>
+                  </Link>
+                </SItemWithMargin>
+              </>
+            )}
           </>
         ) : (
           <>
