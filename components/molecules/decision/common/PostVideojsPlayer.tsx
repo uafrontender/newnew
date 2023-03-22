@@ -23,11 +23,11 @@ import InlineSvg from '../../../atoms/InlineSVG';
 
 import logoAnimation from '../../../../public/animations/mobile_logo.json';
 import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
-// import MaximizeIcon from '../../../../public/images/svg/icons/outlined/Maximize.svg';
-// import MinimizeIcon from '../../../../public/images/svg/icons/outlined/Minimize.svg';
+import MaximizeIcon from '../../../../public/images/svg/icons/outlined/Maximize.svg';
+import MinimizeIcon from '../../../../public/images/svg/icons/outlined/Minimize.svg';
 import PlayerScrubber from '../../../atoms/PlayerScrubber';
-// import { useAppState } from '../../../../contexts/appStateContext';
-// import Button from '../../../atoms/Button';
+import { useAppState } from '../../../../contexts/appStateContext';
+import Button from '../../../atoms/Button';
 import { setMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch } from '../../../../redux-store/store';
 
@@ -49,14 +49,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   onPlaybackFinished,
 }) => {
   const dispatch = useAppDispatch();
-  // const { resizeMode } = useAppState();
-  // const isMobileOrTablet = [
-  //   'mobile',
-  //   'mobileS',
-  //   'mobileM',
-  //   'mobileL',
-  //   'tablet',
-  // ].includes(resizeMode);
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const videoRef = useRef(null);
   const playerRef = useRef<videojs.Player>();
@@ -69,7 +69,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   }, []);
 
   // NB! Commented out for now
-  // const [isFulscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const qualityLevelsRef = useRef<QualityLevelList>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -208,14 +208,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           }
         });
 
-        // NB! Commented out for now
-        // Fulscreen
-        // p.on('fullscreenchange', (e) => {
-        //   console.log(p?.isFullscreen());
-        //   setIsFullscreen(p?.isFullscreen());
-        // });
+        // Fullscreen
+        p.on('fullscreenchange', (e) => {
+          console.log(p?.isFullscreen());
+          setIsFullscreen(p?.isFullscreen());
+        });
 
-        // NB! Commented out for now
         p.on('volumechange', (e) => {
           if (p?.volume() === 0 || p?.muted()) {
             dispatch(setMutedMode(true));
@@ -324,6 +322,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           }}
           ref={videoRef}
           videoOrientation={videoOrientation}
+          isFullScreen={isFullscreen}
         />
         {showPlayButton && isPaused && !isScrubberTimeChanging && (
           <SPlayPseudoButton
@@ -345,7 +344,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             />
           </SPlayPseudoButton>
         )}
-        {/* <SMaximizeButton
+        <SMaximizeButton
           id='maximize-button'
           iconOnly
           view='transparent'
@@ -360,7 +359,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             height={isMobileOrTablet ? '20px' : '24px'}
             fill='#FFFFFF'
           />
-        </SMaximizeButton> */}
+        </SMaximizeButton>
       </SVideoWrapper>
       {isLoading && (
         <SLoader>
@@ -384,7 +383,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
-      {/* {isFulscreen ? (
+      {isFullscreen ? (
         <SMinimizeButton
           id='minimize-button'
           iconOnly
@@ -401,7 +400,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             fill='#FFFFFF'
           />
         </SMinimizeButton>
-      ) : null} */}
+      ) : null}
     </SContent>
   );
 };
@@ -446,6 +445,7 @@ const SVideoWrapper = styled.div`
 
 const SWrapper = styled.div<{
   videoOrientation: 'vertical' | 'horizontal';
+  isFullScreen: boolean;
 }>`
   width: 100% !important;
   height: 100% !important;
@@ -463,8 +463,8 @@ const SWrapper = styled.div<{
     width: 100% !important;
     height: 100% !important;
 
-    object-fit: ${({ videoOrientation }) =>
-      videoOrientation === 'vertical' ? 'cover' : 'contain'};
+    object-fit: ${({ videoOrientation, isFullScreen }) =>
+      videoOrientation === 'vertical' && !isFullScreen ? 'cover' : 'contain'};
   }
 
   video::-webkit-media-controls-enclosure {
@@ -521,58 +521,58 @@ const SPlayPseudoButton = styled.button`
   }
 `;
 
-// const SMaximizeButton = styled(Button)`
-//   position: absolute;
-//   right: 16px;
-//   top: 16px;
+const SMaximizeButton = styled(Button)`
+  position: absolute;
+  right: 16px;
+  top: 16px;
 
-//   padding: 8px;
-//   width: 36px;
-//   height: 36px;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
 
-//   border-radius: ${({ theme }) => theme.borderRadius.small};
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 
-//   transition: unset;
+  transition: unset;
 
-//   ${({ theme }) => theme.media.tablet} {
-//     width: 36px;
-//     height: 36px;
-//   }
+  ${({ theme }) => theme.media.tablet} {
+    width: 36px;
+    height: 36px;
+  }
 
-//   ${({ theme }) => theme.media.laptop} {
-//     padding: 12px;
-//     width: 48px;
-//     height: 48px;
+  ${({ theme }) => theme.media.laptop} {
+    padding: 12px;
+    width: 48px;
+    height: 48px;
 
-//     border-radius: ${({ theme }) => theme.borderRadius.medium};
-//   }
-// `;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
 
-// const SMinimizeButton = styled(Button)`
-//   position: absolute;
-//   right: 16px;
-//   top: 16px;
+const SMinimizeButton = styled(Button)`
+  position: absolute;
+  right: 16px;
+  top: 16px;
 
-//   padding: 8px;
-//   width: 36px;
-//   height: 36px;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
 
-//   border-radius: ${({ theme }) => theme.borderRadius.small};
+  border-radius: ${({ theme }) => theme.borderRadius.small};
 
-//   transition: unset;
+  transition: unset;
 
-//   z-index: 2500000;
+  z-index: 2500000;
 
-//   ${({ theme }) => theme.media.tablet} {
-//     width: 36px;
-//     height: 36px;
-//   }
+  ${({ theme }) => theme.media.tablet} {
+    width: 36px;
+    height: 36px;
+  }
 
-//   ${({ theme }) => theme.media.laptop} {
-//     padding: 12px;
-//     width: 48px;
-//     height: 48px;
+  ${({ theme }) => theme.media.laptop} {
+    padding: 12px;
+    width: 48px;
+    height: 48px;
 
-//     border-radius: ${({ theme }) => theme.borderRadius.medium};
-//   }
-// `;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
