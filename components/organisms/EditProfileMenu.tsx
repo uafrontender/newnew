@@ -818,8 +818,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       return !validateInputText(value as string);
     });
 
-    console.log('');
-
     if (hasInvalidFields) {
       setIsDataValid(false);
       return;
@@ -850,17 +848,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         })),
     [t]
   );
-
-  console.log(
-    (!wasModified &&
-      ((!user.userData?.bio && dataInEdit.bio === '') ||
-        dataInEdit.bio === user.userData?.bio)) ||
-      !isDataValid ||
-      isLoading ||
-      !coverUrlInEdit
-  );
-  console.log('FIELDS');
-  console.log(isDataValid);
 
   return (
     <SEditProfileMenu

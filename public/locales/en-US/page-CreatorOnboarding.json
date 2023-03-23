@@ -88,7 +88,7 @@
           "year": "Year"
         },
         "errors": {
-          "tooYoung": "You must be 18 or older to become a creator"
+          "tooYoung": "You must be {{value}} or older to become a creator"
         }
       },
       "profilePicture": {
