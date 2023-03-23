@@ -68,7 +68,7 @@ export const Desktop: React.FC = React.memo(() => {
       <SRightBlock>
         {process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' && 'TEST'}
         {user.loggedIn && user.userData?.options?.isCreator && (
-          <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 12 }}>
+          <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 0 }}>
             <SNavText variant={3} weight={600} onClick={handlerCopy}>
               {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
             </SNavText>
@@ -303,8 +303,12 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 16px;
+  margin-left: 12px;
   position: relative;
+
+  ${({ theme }) => theme.media.laptopL} {
+    margin-left: 16px;
+  }
 `;
 
 const SNavText = styled(Text)`

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
@@ -21,6 +21,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { useBundles } from '../../../contexts/bundlesContext';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
+import { useAppState } from '../../../contexts/appStateContext';
 
 export const Tablet: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -28,6 +29,8 @@ export const Tablet: React.FC = React.memo(() => {
   const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppState();
+
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
 
@@ -35,9 +38,23 @@ export const Tablet: React.FC = React.memo(() => {
 
   const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
 
+  const isLaptop = ['laptop'].includes(resizeMode);
+
+  const searchInputWidth = useMemo(() => {
+    if (user.userData?.options?.isCreator && isLaptop) {
+      return '290px';
+    }
+
+    if (user.userData?.options?.isCreator) {
+      return '220px';
+    }
+
+    return undefined;
+  }, [isLaptop, user.userData?.options?.isCreator]);
+
   return (
     <SContainer>
-      <Logo isShort />
+      <Logo isShort style={{ flexShrink: 0 }} />
       <SRightBlock>
         {!user.loggedIn && <StaticSearchInput />}
         {user.loggedIn && (
@@ -65,15 +82,7 @@ export const Tablet: React.FC = React.memo(() => {
                 position: 'static',
               }}
             >
-              <StaticSearchInput
-                width={
-                  user.userData?.options?.isCreator &&
-                  bundles &&
-                  bundles.length > 0
-                    ? '200px'
-                    : undefined
-                }
-              />
+              <SStaticSearchInput width={searchInputWidth} />
             </SItemWithMargin>
             {bundles && bundles.length > 0 && (
               <SItemWithMargin>
@@ -294,3 +303,5 @@ const SDashboardButton = styled.button`
     outline: none;
   }
 `;
+
+const SStaticSearchInput = styled(StaticSearchInput)``;
