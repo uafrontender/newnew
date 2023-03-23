@@ -245,7 +245,7 @@
         "birthDateInput": {
           "label": "出生日期",
           "errors": {
-            "tooYoung": "必須年滿18歲或以上"
+            "tooYoung": "必須年滿{{value}}歲或以上"
           },
           "captions": {
             "twoTimesOnly": "生日只能更改2次",

@@ -22,6 +22,7 @@ import Modal from '../../organisms/Modal';
 import BirthDateMobileInput from '../BirthDateMobileInput';
 import getLocalizedDay from '../../../utils/getDay';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 const minDate = new Date(new Date().setFullYear(1900));
 
@@ -49,6 +50,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
   handleSetActive,
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
+  const { appConstants } = useGetAppConstants();
   const theme = useTheme();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -230,7 +232,9 @@ const OnboardingBirthDateInput: React.FunctionComponent<
             <SErrorDiv>
               <InlineSvg svg={AlertIcon} width='16px' height='16px' />
               {/* TODO: improve error messages */}
-              {t('detailsSection.form.dateOfBirth.errors.tooYoung')}
+              {t('detailsSection.form.dateOfBirth.errors.tooYoung', {
+                value: appConstants.minCreatorAgeYears,
+              })}
             </SErrorDiv>
           </AnimatedPresence>
         ) : null}

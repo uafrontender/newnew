@@ -30,6 +30,8 @@ import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
 import ChatContainer from '../organisms/direct-messages/ChatContainer';
 import { useAppState } from '../../contexts/appStateContext';
+import canBecomeCreator from '../../utils/canBecomeCreator';
+import { useGetAppConstants } from '../../contexts/appConstantsContext';
 
 interface IGeneral {
   className?: string;
@@ -51,6 +53,7 @@ export const General: React.FC<IGeneral> = (props) => {
   } = props;
   const user = useAppSelector((state) => state.user);
   const { banner, globalSearchActive } = useAppSelector((state) => state.ui);
+  const { appConstants } = useGetAppConstants();
   const { resizeMode } = useAppState();
   const theme = useTheme();
   const [cookies] = useCookies();
@@ -122,26 +125,36 @@ export const General: React.FC<IGeneral> = (props) => {
               url: '/notifications',
               counter: unreadNotificationCount,
             },
-            {
-              key: 'add',
-              url: '/creator-onboarding',
-            },
           ] as TBottomNavigationItem[]
-        ).concat(
-          bundles && bundles.length > 0
-            ? [
-                {
-                  key: 'bundles',
-                  url: '/bundles',
-                },
-                {
-                  key: 'dms',
-                  url: '/direct-messages',
-                  counter: unreadCount,
-                } as TBottomNavigationItem,
-              ]
-            : []
-        );
+        )
+          .concat(
+            canBecomeCreator(
+              user.userData?.dateOfBirth,
+              appConstants.minCreatorAgeYears
+            )
+              ? [
+                  {
+                    key: 'add',
+                    url: '/creator-onboarding',
+                  },
+                ]
+              : []
+          )
+          .concat(
+            bundles && bundles.length > 0
+              ? [
+                  {
+                    key: 'bundles',
+                    url: '/bundles',
+                  },
+                  {
+                    key: 'dms',
+                    url: '/direct-messages',
+                    counter: unreadCount,
+                  } as TBottomNavigationItem,
+                ]
+              : []
+          );
       }
     }
 
@@ -149,6 +162,8 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [
     user.loggedIn,
     unreadNotificationCount,
+    user.userData?.dateOfBirth,
+    appConstants.minCreatorAgeYears,
     user.userData?.options?.isCreator,
     unreadCount,
     bundles,
