@@ -245,7 +245,7 @@
         "birthDateInput": {
           "label": "Fecha de nacimiento",
           "errors": {
-            "tooYoung": "Debes tener 18 años o más."
+            "tooYoung": "Debes tener {{value}} años o más."
           },
           "captions": {
             "twoTimesOnly": "Tu fecha de nacimiento solo puede ser cambiada 2 veces",
