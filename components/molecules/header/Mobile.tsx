@@ -12,10 +12,13 @@ import Button from '../../atoms/Button';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 import SearchInput from '../../atoms/search/SearchInput';
 import { useAppState } from '../../../contexts/appStateContext';
+import canBecomeCreator from '../../../utils/canBecomeCreator';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation();
+  const { appConstants } = useGetAppConstants();
 
   const { resizeMode } = useAppState();
 
@@ -70,7 +73,7 @@ export const Mobile: React.FC = React.memo(() => {
         </SItemWithMargin>
         {user.loggedIn && (
           <>
-            {user.userData?.options?.isCreator ? (
+            {user.userData?.options?.isCreator && (
               <SItemWithMargin>
                 <Link href='/creation'>
                   <a>
@@ -91,28 +94,33 @@ export const Mobile: React.FC = React.memo(() => {
                   </a>
                 </Link>
               </SItemWithMargin>
-            ) : (
-              <SItemWithMargin>
-                <Link href='/creator-onboarding'>
-                  <a>
-                    <SButton
-                      view='primaryGrad'
-                      withDim
-                      withShrink
-                      withShadow
-                      onClick={() => {
-                        Mixpanel.track('Navigation Item Clicked', {
-                          _button: 'Create Now',
-                          _target: '/creator-onboarding',
-                        });
-                      }}
-                    >
-                      {t('button.createOnNewnew')}
-                    </SButton>
-                  </a>
-                </Link>
-              </SItemWithMargin>
             )}
+            {!user.userData?.options?.isCreator &&
+              canBecomeCreator(
+                user.userData?.dateOfBirth,
+                appConstants.minCreatorAgeYears
+              ) && (
+                <SItemWithMargin>
+                  <Link href='/creator-onboarding'>
+                    <a>
+                      <SButton
+                        view='primaryGrad'
+                        withDim
+                        withShrink
+                        withShadow
+                        onClick={() => {
+                          Mixpanel.track('Navigation Item Clicked', {
+                            _button: 'Create Now',
+                            _target: '/creator-onboarding',
+                          });
+                        }}
+                      >
+                        {t('button.createOnNewnew')}
+                      </SButton>
+                    </a>
+                  </Link>
+                </SItemWithMargin>
+              )}
           </>
         )}
       </SRightBlock>
