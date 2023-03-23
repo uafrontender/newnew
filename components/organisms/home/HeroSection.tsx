@@ -10,18 +10,16 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import assets from '../../../constants/assets';
 import AnimationChain from '../../atoms/AnimationChain';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 
+// Only visible for non logged in users
 export const HeroSection = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation('common');
   const { resizeMode } = useAppState();
-  const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
 
   const [animateTitle, setAnimateTitle] = useState(false);
@@ -85,16 +83,7 @@ export const HeroSection = React.memo(() => {
           </SSubTitle>
           <AnimatedPresence start={animateButton} animation='t-01' key={locale}>
             <SButtonsHolder>
-              <Link
-                href={
-                  // eslint-disable-next-line no-nested-ternary
-                  user.loggedIn
-                    ? user.userData?.options?.isCreator
-                      ? '/creation'
-                      : '/creator-onboarding'
-                    : '/sign-up?to=create'
-                }
-              >
+              <Link href='/sign-up?to=create'>
                 <a>
                   <SButton
                     withShrink
@@ -106,9 +95,7 @@ export const HeroSection = React.memo(() => {
                       });
                     }}
                   >
-                    {user.userData?.options?.isCreator
-                      ? t('button.createDecision')
-                      : t('button.createOnNewnew')}
+                    {t('button.createOnNewnew')}
                   </SButton>
                 </a>
               </Link>
@@ -250,6 +237,7 @@ const SSubTitle = styled(Text)`
 const SButtonsHolder = styled.div`
   display: flex;
   margin-top: 24px;
+  min-height: 48px;
   flex-direction: row;
   justify-content: center;
 

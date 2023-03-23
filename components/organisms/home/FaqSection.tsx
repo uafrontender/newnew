@@ -12,6 +12,8 @@ import assets from '../../../constants/assets';
 
 import CheckmarkIcon from '../../../public/images/svg/icons/outlined/Checkmark.svg';
 import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
+import canBecomeCreator from '../../../utils/canBecomeCreator';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 interface IEmbedLink {
   href: string;
@@ -49,42 +51,58 @@ const FaqSection = () => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
+  const { appConstants } = useGetAppConstants();
 
   return (
     <SContainer>
       <SHeadline variant={4}>{t('faq.title')}</SHeadline>
       <SList>
-        {new Array(7).fill('').map((_, i) => (
-          <SListItem key={t(`faq.items.${i}.question` as any)}>
-            <STitle variant={2} weight={600}>
-              {t(`faq.items.${i}.question` as any)}
-            </STitle>
-            <SText variant={3} weight={600}>
-              <Trans
-                key={`trans-${user.loggedIn}`}
-                i18nKey={`faq.items.${i}.answer` as any}
-                t={t}
-                components={[
-                  // @ts-ignore
-                  <EmbedLink
-                    href={
-                      // eslint-disable-next-line no-nested-ternary
-                      user.loggedIn
-                        ? user.userData?.options?.isCreator
-                          ? '/creator/dashboard'
-                          : '/creator-onboarding'
-                        : '/sign-up?to=create'
-                    }
-                  />,
-                  // @ts-ignore
-                  <Point variant={2} />,
-                  // @ts-ignore
-                  <Point variant={1} />,
-                ]}
-              />
-            </SText>
-          </SListItem>
-        ))}
+        {new Array(7).fill('').map((_, i) => {
+          // Skip section about becoming creator for users younger then 13
+          if (
+            i === 1 &&
+            user.loggedIn &&
+            !user.userData?.options?.isCreator &&
+            !canBecomeCreator(
+              user.userData?.dateOfBirth,
+              appConstants.minCreatorAgeYears
+            )
+          ) {
+            return null;
+          }
+
+          return (
+            <SListItem key={t(`faq.items.${i}.question` as any)}>
+              <STitle variant={2} weight={600}>
+                {t(`faq.items.${i}.question` as any)}
+              </STitle>
+              <SText variant={3} weight={600}>
+                <Trans
+                  key={`trans-${user.loggedIn}`}
+                  i18nKey={`faq.items.${i}.answer` as any}
+                  t={t}
+                  components={[
+                    // @ts-ignore
+                    <EmbedLink
+                      href={
+                        // eslint-disable-next-line no-nested-ternary
+                        user.loggedIn
+                          ? user.userData?.options?.isCreator
+                            ? '/creator/dashboard'
+                            : '/creator-onboarding'
+                          : '/sign-up?to=create'
+                      }
+                    />,
+                    // @ts-ignore
+                    <Point variant={2} />,
+                    // @ts-ignore
+                    <Point variant={1} />,
+                  ]}
+                />
+              </SText>
+            </SListItem>
+          );
+        })}
       </SList>
       <SHint variant={3} weight={600}>
         <Trans
