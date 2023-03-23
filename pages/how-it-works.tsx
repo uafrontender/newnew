@@ -17,10 +17,13 @@ import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { useAppState } from '../contexts/appStateContext';
+import canBecomeCreator from '../utils/canBecomeCreator';
+import { useGetAppConstants } from '../contexts/appConstantsContext';
 
 export const HowItWorks = () => {
   const { t } = useTranslation('page-HowItWorks');
   const theme = useTheme();
+  const { appConstants } = useGetAppConstants();
   const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -135,19 +138,31 @@ export const HowItWorks = () => {
                 <SButton view='primaryGrad'>{t('exploreButton')}</SButton>
               </a>
             </Link>
-            <Link
-              href={
-                !user.loggedIn
-                  ? 'sign-up'
-                  : !user.userData?.options?.isCreator
-                  ? '/creator-onboarding'
-                  : '/creation'
-              }
-            >
-              <a>
-                <SButton view='secondary'>{t('createButton')}</SButton>
-              </a>
-            </Link>
+            {!user.loggedIn && (
+              <Link href='/sign-up?to=create'>
+                <a>
+                  <SButton view='secondary'>{t('createButton')}</SButton>
+                </a>
+              </Link>
+            )}
+            {!user.userData?.options?.isCreator &&
+              canBecomeCreator(
+                user.userData?.dateOfBirth,
+                appConstants.minCreatorAgeYears
+              ) && (
+                <Link href='/creator-onboarding'>
+                  <a>
+                    <SButton view='secondary'>{t('createButton')}</SButton>
+                  </a>
+                </Link>
+              )}
+            {user.userData?.options?.isCreator && (
+              <Link href='/creation'>
+                <a>
+                  <SButton view='secondary'>{t('createButton')}</SButton>
+                </a>
+              </Link>
+            )}
           </ControlsContainer>
         </Content>
       </Container>

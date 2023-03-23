@@ -349,7 +349,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           iconOnly
           view='transparent'
           onClick={(e) => {
-            console.log('hey');
             playerRef?.current?.requestFullscreen();
           }}
         >
@@ -389,7 +388,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           iconOnly
           view='transparent'
           onClick={(e) => {
-            console.log('hey');
             playerRef?.current?.requestFullscreen();
           }}
         >
