@@ -64,8 +64,6 @@ export default async function getCroppedImg(
     Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
   );
 
-  // console.log(canvas.toDataURL('image/jpeg'));
-
   // Return as a file
   return new Promise((resolve) => {
     canvas.toBlob(
