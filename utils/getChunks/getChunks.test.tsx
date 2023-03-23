@@ -91,10 +91,10 @@ describe('parses hashtags', () => {
   });
 
   it('multiple', () => {
-    const input = '#hashtag #another_hashtag';
+    const input = '#hashtag #another_hashtag #one_more_hashtag';
     const chunks = getChunks(input);
 
-    expect(chunks.length).toBe(3);
+    expect(chunks.length).toBe(5);
 
     expect(chunks[0].type).toBe('hashtag');
     expect(chunks[0].text).toBe('hashtag');
@@ -104,6 +104,12 @@ describe('parses hashtags', () => {
 
     expect(chunks[2].type).toBe('hashtag');
     expect(chunks[2].text).toBe('another_hashtag');
+
+    expect(chunks[3].type).toBe('text');
+    expect(chunks[3].text).toBe(' ');
+
+    expect(chunks[4].type).toBe('hashtag');
+    expect(chunks[4].text).toBe('one_more_hashtag');
   });
 
   it('keeps spaces', () => {

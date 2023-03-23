@@ -28,9 +28,7 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
               <SHashtag
                 key={`text-chunk-${index}`}
                 onClick={() =>
-                  router.push(
-                    `/search?query=${chunk.text}&type=hashtags&tab=posts`
-                  )
+                  router.push(`/search?query=${chunk.text}&tab=posts`)
                 }
               >
                 #{chunk.text}
@@ -41,7 +39,7 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
           return (
             <Link
               key={`text-chunk-${index}`}
-              href={`/search?query=${chunk.text}&type=hashtags&tab=posts`}
+              href={`/search?query=${chunk.text}&tab=posts`}
               target={target}
             >
               <SHashtag>{`#${chunk.text}`}</SHashtag>
