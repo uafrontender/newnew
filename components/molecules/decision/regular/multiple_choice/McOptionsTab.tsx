@@ -57,7 +57,6 @@ import { OPTION_LENGTH_MAX } from '../../../../../constants/general';
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
 ) => {
-  console.log(status);
   switch (status) {
     // TODO: Cover CANNOT_CREATE_MULTIPLE_OPTIONS = 3;
     case newnewapi.CreateCustomMcOptionResponse.Status
