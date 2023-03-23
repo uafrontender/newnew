@@ -24,6 +24,8 @@ import { getMyPosts } from '../api/endpoints/user';
 import { TTokenCookie } from '../api/apiConfigs';
 import useMyPosts from '../utils/hooks/useMyPosts';
 import assets from '../constants/assets';
+import canBecomeCreator from '../utils/canBecomeCreator';
+import { useGetAppConstants } from '../contexts/appConstantsContext';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -60,6 +62,7 @@ const Home: NextPage<IHome> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  const { appConstants } = useGetAppConstants();
 
   useEffect(() => {
     if (sessionExpired) {
@@ -233,7 +236,11 @@ const Home: NextPage<IHome> = ({
 
       {(!user.loggedIn || !user.userData?.options?.isCreator) && <FaqSection />}
 
-      {!user.userData?.options?.isCreator && <BecomeCreatorSection />}
+      {!user.userData?.options?.isCreator &&
+        canBecomeCreator(
+          user.userData?.dateOfBirth,
+          appConstants.minCreatorAgeYears
+        ) && <BecomeCreatorSection />}
     </>
   );
 };
