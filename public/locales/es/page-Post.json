@@ -347,6 +347,7 @@
       "optionCard": {
         "by": "por",
         "bidders": "ofertantes",
+        "other": "otro",
         "others": "otros",
         "bid": "ofertar",
         "supportButton": "potenciar",
@@ -409,6 +410,7 @@
         "votes": "votos",
         "vote": "voto",
         "mySuggestion": "Mi sugerencia",
+        "other": "otro",
         "others": "otros",
         "voters": "votantes",
         "voted": "votaron",
@@ -608,6 +610,7 @@
     "heroText": "¡Velo suceder!",
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
+    "other": "otro",
     "others": "otros",
     "bid": "oferta",
     "bidChosen": "Oferta elegida",
@@ -620,6 +623,7 @@
     "heroText": "¡Velo suceder!",
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
+    "other": "otro",
     "others": "otros",
     "voted": "votaron",
     "votes": "votos",
@@ -653,13 +657,7 @@
       }
     },
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
-    "inTotalBids": "en ofertas totales",
-    "others": "otros",
-    "bid": "oferta",
-    "seeAll": "ver todas las ofertas",
-    "optionsTab": {
-      "backButton": "Regresar"
-    }
+    "inTotalBids": "en ofertas totales"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +675,7 @@
         "seconds_singular": "segundo"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
-    "inTotalVotes": "votos en total",
-    "others": "otros",
-    "voted": "votó",
-    "votes": "votos",
-    "vote": "voto",
-    "optionChosen": "La opción más votada",
-    "seeAll": "ver todas las opciones",
-    "optionsTab": {
-      "backButton": "Regresar"
-    }
+    "wantsToKnow": "{{creator}}<0/> quiere saber..."
   },
   "recommendationsSection": {
     "heading": "Más como esta publicación"

@@ -347,6 +347,7 @@
       "optionCard": {
         "by": "由",
         "bidders": "出價者",
+        "other": "其他",
         "others": "其他",
         "bid": "出價",
         "supportButton": "提高",
@@ -409,6 +410,7 @@
         "votes": "票",
         "vote": "票",
         "mySuggestion": "我的建議",
+        "other": "其他",
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
@@ -608,6 +610,7 @@
     "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalBids": "在總的出價中",
+    "other": "其他",
     "others": "其他",
     "bid": "出價",
     "bidChosen": "選擇的出價",
@@ -620,6 +623,7 @@
     "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalVotes": "總票數",
+    "other": "其他",
     "others": "其他",
     "voted": "已投票",
     "votes": "票",
@@ -653,13 +657,7 @@
       }
     },
     "wantsToKnow": "{{creator}}<0/>想知道......",
-    "inTotalBids": "在總的出價中",
-    "others": "其他",
-    "bid": "出價",
-    "seeAll": "查看所有出價",
-    "optionsTab": {
-      "backButton": "返回"
-    }
+    "inTotalBids": "在總的出價中"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +675,7 @@
         "seconds_singular": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}<0/>想知道......",
-    "inTotalVotes": "總票數",
-    "others": "其他",
-    "voted": "已投票",
-    "votes": "票",
-    "vote": "投票",
-    "optionChosen": "最高票數的選項",
-    "seeAll": "查看所有選項",
-    "optionsTab": {
-      "backButton": "返回"
-    }
+    "wantsToKnow": "{{creator}}<0/>想知道......"
   },
   "recommendationsSection": {
     "heading": "更多類似"
