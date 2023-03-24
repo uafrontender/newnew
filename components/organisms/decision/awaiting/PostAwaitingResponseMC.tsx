@@ -315,6 +315,14 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                         {winningOption.voteCount > 1
                           ? t('mcPostSuccess.votes')
                           : t('mcPostSuccess.vote')}
+                        {` `}
+                        {winningOption.totalAmount?.usdCents &&
+                        winningOption.totalAmount?.usdCents > 0
+                          ? `($${formatNumber(
+                              winningOption.totalAmount?.usdCents / 100 ?? 0,
+                              true
+                            )})`
+                          : ''}
                       </SWinningOptionAmount>
                       <SSeparator />
                       <SWinningOptionDetails>
