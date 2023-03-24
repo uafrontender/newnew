@@ -108,6 +108,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     handleGoBackInsidePost,
     resetSetupIntentClientSecret,
     refetchPost,
+    handleUpdatePostData,
   } = usePostInnerState();
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
@@ -238,8 +239,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === post.postUuid) {
-        await fetchPostLatestData();
+      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+        handleUpdatePostData(decoded.post);
       }
     };
 
