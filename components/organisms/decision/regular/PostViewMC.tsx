@@ -121,6 +121,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleGoBackInsidePost,
     resetSetupIntentClientSecret,
     refetchPost,
+    handleUpdatePostData,
   } = usePostInnerState();
   const post = useMemo(
     () => postParsed as newnewapi.MultipleChoice,
@@ -302,8 +303,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === post.postUuid) {
-        await fetchPostLatestData();
+      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+        handleUpdatePostData(decoded.post);
       }
     };
 
