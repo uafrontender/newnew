@@ -145,7 +145,7 @@ export const HowItWorks = () => {
                 </a>
               </Link>
             )}
-            {!user.userData?.options?.isCreator &&
+            {user.loggedIn && !user.userData?.options?.isCreator &&
               canBecomeCreator(
                 user.userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears
