@@ -37,8 +37,8 @@
       "placeholder": "ej. ¿Dónde debería hacerme mi primer tatuaje? \uD83D\uDE4A"
     },
     "fileUpload": {
-      "titleMobile_NEED_TRANSLATION": "Select a file ",
-      "titleDesktop_NEED_TRANSLATION": "Select a file or drag and drop here",
+      "titleMobile": "Selecciona un archivo",
+      "titleDesktop": "Selecciona un archivo o arrástralo y suéltalo aquí",
       "description": "El video puede ser de hasta 10 GB",
       "button": "Seleccionar archivo"
     },

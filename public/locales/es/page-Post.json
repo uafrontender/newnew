@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "{{postTitle}} | {{displayName}} en NewNew",
-    "deletedPost_NEED_TRANSLATION": "Deleted post",
+    "deletedPost": "Publicación eliminada",
     "description": {
       "ac": {
         "withContributions": "${{totalInBids}} en ofertas en NewNew",
@@ -148,8 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "¡Tu audiencia está esperando!",
-        "title_2_NEED_TRANSLATION": "Select a file",
-        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
+        "title_2": "Selecciona un archivo",
+        "title_2Long": "Selecciona un archivo o arrástralo y suéltalo aquí",
         "description": "El tamaño máximo del video es de 10 GB",
         "button": "Seleccionar archivo"
       },
