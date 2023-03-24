@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
+import ReactDOM from 'react-dom';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import hlsParser from 'hls-parser';
@@ -118,6 +119,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       responsive: false,
       playsinline: true,
       disablePictureInPicture: true,
+      fluid: false,
       sources: [
         {
           src: resources!!.hlsStreamUrl as string,
@@ -302,6 +304,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     }
   }, [muted]);
 
+  // vjs-big-play-centered video-js vjs-controls-disabled vjs-touch-enabled vjs-workinghover vjs-v7 vjs-has-started vjs_video_3-dimensions vjs-paused vjs-user-inactive vjs-fullscreen
+
   return (
     <SContent
       onMouseEnter={() => setIsHovered(true)}
@@ -349,7 +353,13 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           iconOnly
           view='transparent'
           onClick={(e) => {
-            playerRef?.current?.requestFullscreen();
+            // playerRef?.current?.requestFullscreen();
+            // playerRef?.current?.requestFullscreen();
+            // document
+            //   ?.querySelector('.vjs-tech')
+            //   ?.webkitSetPresentationMode('fullscreen');
+            // document?.querySelector('.vjs-tech')?.webkitEnterFullscreen();
+            // setIsFullscreen(true);
           }}
         >
           <InlineSvg
@@ -382,23 +392,27 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
-      {isFullscreen ? (
-        <SMinimizeButton
-          id='minimize-button'
-          iconOnly
-          view='transparent'
-          onClick={(e) => {
-            playerRef?.current?.requestFullscreen();
-          }}
-        >
-          <InlineSvg
-            svg={MinimizeIcon}
-            width={isMobileOrTablet ? '20px' : '24px'}
-            height={isMobileOrTablet ? '20px' : '24px'}
-            fill='#FFFFFF'
-          />
-        </SMinimizeButton>
-      ) : null}
+      {isFullscreen
+        ? ReactDOM.createPortal(
+            <SMinimizeButton
+              id='minimize-button'
+              iconOnly
+              view='transparent'
+              onClick={(e) => {
+                playerRef?.current?.exitFullscreen();
+                // document?.querySelector('.vjs-tech')?.webkitExitFullscreen();
+              }}
+            >
+              <InlineSvg
+                svg={MinimizeIcon}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
+                fill='#FFFFFF'
+              />
+            </SMinimizeButton>,
+            document.querySelector('.video-js') as HTMLElement
+          )
+        : null}
     </SContent>
   );
 };
