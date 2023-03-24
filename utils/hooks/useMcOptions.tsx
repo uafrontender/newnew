@@ -181,6 +181,8 @@ const useMcOptions = (
                   ...workingData.pages[k].mcOptions[optionIndex],
                   ...newOrUpdatedOption,
                 };
+
+                workingData.pages[k].mcOptions[optionIndex].isSupportedByMe = data.pages[k].mcOptions[optionIndex].isSupportedByMe;
                 optionExists = true;
                 break;
               }

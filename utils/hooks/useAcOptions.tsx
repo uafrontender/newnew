@@ -192,6 +192,8 @@ const useAcOptions = (
                   ...workingData.pages[k].acOptions[optionIndex],
                   ...newOrUpdatedOption,
                 };
+
+                workingData.pages[k].acOptions[optionIndex].isSupportedByMe = data.pages[k].acOptions[optionIndex].isSupportedByMe;
                 optionExists = true;
                 break;
               }
