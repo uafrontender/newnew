@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "該{{postType}}已被取消",
     "reason": {
-      "no-response": "{{creator}}沒有及時發佈回應視頻",
-      "ac-no-winner": "{{creator}}沒有及時選擇出價",
+      "no-response": "<0/>沒有及時發佈回應視頻",
+      "ac-no-winner": "<0/>沒有及時選擇出價",
       "ac": "時間在出價之前已經用完",
       "mc": "時間在進行投票之前已經用完",
       "cf": "時間在達到Goal之前已經用完"

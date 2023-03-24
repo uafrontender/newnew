@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "This {{postType}} is canceled",
     "reason": {
-      "no-response": "{{creator}} didn't post a response video in time",
-      "ac-no-winner": "{{creator}} didn't choose a bid in time",
+      "no-response": "<0/> didn't post a response video in time",
+      "ac-no-winner": "<0/> didn't choose a bid in time",
       "ac": "Time ran out before any bids were made",
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"

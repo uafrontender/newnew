@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "Este {{postType}} está cancelado",
     "reason": {
-      "no-response": "{{creator}} no publicó un video de respuesta a tiempo",
-      "ac-no-winner": "{{creator}} no eligió una oferta a tiempo",
+      "no-response": "<0/> no publicó un video de respuesta a tiempo",
+      "ac-no-winner": "<0/> no eligió una oferta a tiempo",
       "ac": "El tiempo se agotó antes de que se hiciera alguna oferta",
       "mc": "El tiempo se agotó antes de que se realizara alguna votación",
       "cf": "El tiempo se agotó antes de llegar al objetivo"
