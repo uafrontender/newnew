@@ -80,8 +80,13 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       'tablet',
     ].includes(resizeMode);
 
-    const { postParsed, postStatus, handleGoBackInsidePost, refetchPost } =
-      usePostInnerState();
+    const {
+      postParsed,
+      postStatus,
+      handleGoBackInsidePost,
+      refetchPost,
+      handleUpdatePostData,
+    } = usePostInnerState();
     const post = useMemo(
       () => postParsed as newnewapi.MultipleChoice,
       [postParsed]
@@ -257,8 +262,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
         if (!decoded) return;
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-        if (decodedParsed.postUuid === post.postUuid) {
-          await fetchPostLatestData();
+        if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+          handleUpdatePostData(decoded.post);
         }
       };
 
