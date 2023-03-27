@@ -11,8 +11,8 @@ import {
   SBottomActionText,
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
-import getDisplayname from '../../../utils/getDisplayname';
 import { Mixpanel } from '../../../utils/mixpanel';
+import DisplayName from '../../DisplayName';
 
 const BlockUserModal = dynamic(() => import('./BlockUserModal'));
 
@@ -45,7 +45,8 @@ const BlockedUser: React.FC<IBlockedUser> = ({
               <SBottomActionTitle>
                 {isAnnouncement
                   ? t('groupBlocked.title')
-                  : `${t('userBlocked.title')} ${getDisplayname(user.user)}`}
+                  : `${t('userBlocked.title')}`}
+                <DisplayName user={user.user} />
               </SBottomActionTitle>
               <SBottomActionMessage>
                 {isAnnouncement

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "NewNew上的{{postTitle}} | {{displayName}}",
-    "deletedPost_NEED_TRANSLATION": "Deleted post",
+    "deletedPost": "已刪除的帖子",
     "description": {
       "ac": {
         "withContributions": "NewNew上出價共有${{totalInBids}}",
@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "該{{postType}}已被取消",
     "reason": {
-      "no-response": "{{creator}}沒有及時發佈回應視頻",
-      "ac-no-winner": "{{creator}}沒有及時選擇出價",
+      "no-response": "<0/>沒有及時發佈回應視頻",
+      "ac-no-winner": "<0/>沒有及時選擇出價",
       "ac": "時間在出價之前已經用完",
       "mc": "時間在進行投票之前已經用完",
       "cf": "時間在達到Goal之前已經用完"
@@ -148,8 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "你的觀眾在等著呢！",
-        "title_2_NEED_TRANSLATION": "Select a file",
-        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
+        "title_2": "選擇一個文件",
+        "title_2Long": "選擇一個文件並拖放到這裡",
         "description": "視頻的最大尺寸為10GB",
         "button": "選擇檔案"
       },
@@ -347,6 +347,7 @@
       "optionCard": {
         "by": "由",
         "bidders": "出價者",
+        "other": "其他",
         "others": "其他",
         "bid": "出價",
         "supportButton": "提高",
@@ -409,6 +410,7 @@
         "votes": "票",
         "vote": "票",
         "mySuggestion": "我的建議",
+        "other": "其他",
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
@@ -608,6 +610,7 @@
     "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalBids": "在總的出價中",
+    "other": "其他",
     "others": "其他",
     "bid": "出價",
     "bidChosen": "選擇的出價",
@@ -620,6 +623,7 @@
     "heroText": "看它發生！",
     "wantsToKnow": "{{creator}}<0/>想知道......",
     "inTotalVotes": "總票數",
+    "other": "其他",
     "others": "其他",
     "voted": "已投票",
     "votes": "票",
@@ -653,13 +657,7 @@
       }
     },
     "wantsToKnow": "{{creator}}<0/>想知道......",
-    "inTotalBids": "在總的出價中",
-    "others": "其他",
-    "bid": "出價",
-    "seeAll": "查看所有出價",
-    "optionsTab": {
-      "backButton": "返回"
-    }
+    "inTotalBids": "在總的出價中"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +675,7 @@
         "seconds_singular": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}<0/>想知道......",
-    "inTotalVotes": "總票數",
-    "others": "其他",
-    "voted": "已投票",
-    "votes": "票",
-    "vote": "投票",
-    "optionChosen": "最高票數的選項",
-    "seeAll": "查看所有選項",
-    "optionsTab": {
-      "backButton": "返回"
-    }
+    "wantsToKnow": "{{creator}}<0/>想知道......"
   },
   "recommendationsSection": {
     "heading": "更多類似"

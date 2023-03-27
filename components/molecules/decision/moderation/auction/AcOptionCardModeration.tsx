@@ -151,7 +151,9 @@ const AcOptionCardModeration: React.FunctionComponent<
                   </SSpanBiddersRegular>
                   <SSpanBiddersHighlighted className='spanHighlighted'>
                     {formatNumber(option.supporterCount - 1, true)}{' '}
-                    {t('acPost.optionsTab.optionCard.others')}
+                    {option.supporterCount - 1 > 1
+                      ? t('acPost.optionsTab.optionCard.others')
+                      : t('acPost.optionsTab.optionCard.other')}
                   </SSpanBiddersHighlighted>
                 </>
               ) : null}{' '}
@@ -291,7 +293,9 @@ const AcOptionCardModeration: React.FunctionComponent<
                 </SSpanBiddersRegular>
                 <SSpanBiddersHighlighted className='spanHighlighted'>
                   {formatNumber(option.supporterCount - 1, true)}{' '}
-                  {t('acPost.optionsTab.optionCard.others')}
+                  {option.supporterCount - 1 > 1
+                    ? t('acPost.optionsTab.optionCard.others')
+                    : t('acPost.optionsTab.optionCard.other')}
                 </SSpanBiddersHighlighted>
               </>
             ) : null}{' '}

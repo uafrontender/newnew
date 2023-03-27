@@ -32,7 +32,7 @@
     "invalidFee": "出錯了。請重新載入此頁面並重試"
   },
   "errorCaptions": {
-    "emailRequired_NEED_TRANSLATION": "Email is required"
+    "emailRequired": "需提供電子郵件"
   },
   "processingFee": "處理費"
 }
