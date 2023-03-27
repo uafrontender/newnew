@@ -131,6 +131,7 @@ const PostPage: NextPage<IPostPage> = ({
     refetch: refetchPost,
     updatePostTitleMutation,
     updatePostStatusMutation,
+    updatePostMutation,
   } = usePost(
     {
       loggedInUser: user.loggedIn,
@@ -194,6 +195,13 @@ const PostPage: NextPage<IPostPage> = ({
       }
     },
     [postParsed?.postUuid, showErrorToastPredefined, updatePostTitleMutation]
+  );
+
+  const handleUpdatePostData = useCallback(
+    (updatedPost: newnewapi.IPost) => {
+      updatePostMutation.mutate(updatedPost);
+    },
+    [updatePostMutation]
   );
 
   const postStatus = useMemo<TPostStatusStringified>(() => {
@@ -738,6 +746,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
         handleUpdatePostTitle={handleUpdatePostTitle}
+        handleUpdatePostData={handleUpdatePostData}
         isUpdateTitleLoading={isUpdateTitleLoading}
         refetchPost={refetchPost}
       >
