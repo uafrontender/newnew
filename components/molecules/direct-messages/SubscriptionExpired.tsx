@@ -14,7 +14,7 @@ import {
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
 
-import getDisplayname from '../../../utils/getDisplayname';
+import DisplayName from '../../DisplayName';
 
 const BuyBundleModal = dynamic(() => import('../bundles/BuyBundleModal'));
 
@@ -38,7 +38,8 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
               </SBottomActionTitle>
               {myRole === 1 && user.options?.isOfferingBundles && (
                 <SBottomActionMessage>
-                  {t('subscriptionExpired.message')} {getDisplayname(user)}
+                  {t('subscriptionExpired.message')}
+                  <DisplayName user={user} />
                 </SBottomActionMessage>
               )}
             </SBottomActionText>

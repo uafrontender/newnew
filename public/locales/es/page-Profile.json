@@ -41,7 +41,7 @@
       "description": "Navega tus publicaciones y creadores favoritos guardados"
     },
     "noContent": {
-      "description_NEED_TRANSLATION": "Posts that you 'favorite'\nwill be shown here"
+      "description": "Las publicaciones que marques\n como favoritas aparecerán aquí"
     }
   },
   "Profile": {

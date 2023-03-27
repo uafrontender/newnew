@@ -5,7 +5,7 @@
   "mainContent": {
     "title": "結果",
     "tabs": {
-      "hashtags_NEED_TRANSLATION": "Hashtags",
+      "hashtags": "標籤",
       "creators": "創作者"
     }
   },

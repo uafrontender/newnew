@@ -48,15 +48,13 @@ import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import InlineSvg from '../../../atoms/InlineSVG';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../../utils/hooks/useErrorToasts';
-import getDisplayname from '../../../../utils/getDisplayname';
 import RichTextInput from '../../../atoms/creation/RichTextInput';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
+import DisplayName from '../../../DisplayName';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -1357,16 +1355,8 @@ export const CreationSecondStepContent: React.FC<
                         <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            {getDisplayname(user.userData)}
+                            <DisplayName user={user.userData} />
                           </SUserTitle>
-                          {user.userData?.options?.isVerified && (
-                            <SInlineSvg
-                              svg={VerificationCheckmark}
-                              width='20px'
-                              height='20px'
-                              fill='none'
-                            />
-                          )}
                         </SUserTitleContainer>
                         <SCaption variant={2} weight={700}>
                           {t('secondStep.card.left', {
@@ -1649,16 +1639,14 @@ const SUserTitleContainer = styled.div`
 `;
 
 const SUserTitle = styled(Text)`
+  display: flex;
+  flex-direction: row;
   padding-left: 12px;
   margin-right: 2px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-const SInlineSvg = styled(InlineSvg)`
-  flex-shrink: 0;
 `;
 
 const SBottomEnd = styled.div`
