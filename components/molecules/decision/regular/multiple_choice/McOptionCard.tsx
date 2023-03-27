@@ -1021,7 +1021,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
                 {formatNumber(supporterCountSubtracted, true)}{' '}
-                {t('mcPost.optionsTab.optionCard.others')}
+                {supporterCountSubtracted > 1
+                  ? t('mcPost.optionsTab.optionCard.others')
+                  : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
             <SSpanBiddersRegular className='spanRegular'>
@@ -1048,7 +1050,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
                 {formatNumber(supporterCountSubtracted, true)}{' '}
-                {t('mcPost.optionsTab.optionCard.others')}
+                {supporterCountSubtracted > 1
+                  ? t('mcPost.optionsTab.optionCard.others')
+                  : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
             <SSpanBiddersRegular className='spanRegular'>
@@ -1074,7 +1078,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubtracted, true)}{' '}
-              {t('mcPost.optionsTab.optionCard.others')}
+              {supporterCountSubtracted > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
@@ -1101,7 +1107,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubtracted - 1, true)}{' '}
-              {t('mcPost.optionsTab.optionCard.others')}
+              {supporterCountSubtracted - 1 > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
@@ -1126,7 +1134,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubtracted, true)}{' '}
-              {t('mcPost.optionsTab.optionCard.others')}
+              {supporterCountSubtracted > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}

@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "This {{postType}} is canceled",
     "reason": {
-      "no-response": "{{creator}} didn't post a response video in time",
-      "ac-no-winner": "{{creator}} didn't choose a bid in time",
+      "no-response": "<0/> didn't post a response video in time",
+      "ac-no-winner": "<0/> didn't choose a bid in time",
       "ac": "Time ran out before any bids were made",
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"
@@ -347,6 +347,7 @@
       "optionCard": {
         "by": "by",
         "bidders": "bidders",
+        "other": "other",
         "others": "others",
         "bid": "bid",
         "supportButton": "Boost",
@@ -409,6 +410,7 @@
         "votes": "votes",
         "vote": "vote",
         "mySuggestion": "My suggestion",
+        "other": "other",
         "others": "others",
         "voters": "voters",
         "voted": "voted",
@@ -608,6 +610,7 @@
     "heroText": "Watch it happen!",
     "wantsToKnow": "{{creator}}<0/> wants to know...",
     "inTotalBids": "in total bids",
+    "other": "other",
     "others": "others",
     "bid": "bid",
     "bidChosen": "Bid chosen",
@@ -620,6 +623,7 @@
     "heroText": "Watch it happen!",
     "wantsToKnow": "{{creator}}<0/> wants to know...",
     "inTotalVotes": "total votes",
+    "other": "other",
     "others": "others",
     "voted": "voted",
     "votes": "votes",
@@ -653,13 +657,7 @@
       }
     },
     "wantsToKnow": "{{creator}}<0/> wants to know...",
-    "inTotalBids": "in total bids",
-    "others": "others",
-    "bid": "bid",
-    "seeAll": "see all bids",
-    "optionsTab": {
-      "backButton": "Back"
-    }
+    "inTotalBids": "in total bids"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +675,7 @@
         "seconds_singular": "second"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> wants to know...",
-    "inTotalVotes": "total votes",
-    "others": "others",
-    "voted": "voted",
-    "votes": "votes",
-    "vote": "vote",
-    "optionChosen": "Highest voted option",
-    "seeAll": "see all options",
-    "optionsTab": {
-      "backButton": "Back"
-    }
+    "wantsToKnow": "{{creator}}<0/> wants to know..."
   },
   "recommendationsSection": {
     "heading": "More like this"

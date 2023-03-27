@@ -7,7 +7,7 @@ import PostFailIcon from '../../../../public/images/decision/post-failed-img.png
 
 interface IPostFailedBox {
   title: string;
-  body: string;
+  body: React.ReactNode;
   buttonCaption: string;
   imageSrc?: string;
   style?: React.CSSProperties;
@@ -75,6 +75,9 @@ const SHeadline = styled(Text)`
 
 const SBody = styled(Text)`
   grid-area: bodyArea;
+  display: flex;
+  flex-direction: row;
+  white-space: pre;
   align-self: center;
 
   color: #ffffff;

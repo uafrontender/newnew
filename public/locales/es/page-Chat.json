@@ -22,7 +22,7 @@
   },
   "subscriptionExpired": {
     "title": "La mensajería privada ha caducado",
-    "message": "Compra un nuevo bundle de Superpoll para enviar un mensaje",
+    "message": "Compra un nuevo bundle de Superpoll para enviar un mensaje ",
     "buttonText": "Comprar un bundle"
   },
   "messagingDisabled": {

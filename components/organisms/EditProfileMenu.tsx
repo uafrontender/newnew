@@ -1048,7 +1048,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             key='edit-picture'
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
-            exit={{ x: 300, opacity: 0 }}
+            exit={{ x: 300, opacity: 0, transition: { duration: 0 } }}
           >
             {isMobile ? (
               <SGoBackButtonMobile
@@ -1215,7 +1215,7 @@ const SEditProfileMenu = styled(motion.div)`
     top: max(min((100vh - 690px) / 2, 136px), 0px);
     left: calc(50% - 232px);
 
-    width: 464px;
+    width: 494px;
     height: 100%;
     max-height: 690px;
 
