@@ -22,7 +22,7 @@
   },
   "subscriptionExpired": {
     "title": "Private Messaging is expired",
-    "message": "Buy a new Superpoll bundle to message",
+    "message": "Buy a new Superpoll bundle to message ",
     "buttonText": "Buy a bundle"
   },
   "messagingDisabled": {

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "{{postTitle}} | {{displayName}} en NewNew",
-    "deletedPost_NEED_TRANSLATION": "Deleted post",
+    "deletedPost": "Publicación eliminada",
     "description": {
       "ac": {
         "withContributions": "${{totalInBids}} en ofertas en NewNew",
@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "Este {{postType}} está cancelado",
     "reason": {
-      "no-response": "{{creator}} no publicó un video de respuesta a tiempo",
-      "ac-no-winner": "{{creator}} no eligió una oferta a tiempo",
+      "no-response": "<0/> no publicó un video de respuesta a tiempo",
+      "ac-no-winner": "<0/> no eligió una oferta a tiempo",
       "ac": "El tiempo se agotó antes de que se hiciera alguna oferta",
       "mc": "El tiempo se agotó antes de que se realizara alguna votación",
       "cf": "El tiempo se agotó antes de llegar al objetivo"
@@ -148,8 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "¡Tu audiencia está esperando!",
-        "title_2_NEED_TRANSLATION": "Select a file",
-        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
+        "title_2": "Selecciona un archivo",
+        "title_2Long": "Selecciona un archivo o arrástralo y suéltalo aquí",
         "description": "El tamaño máximo del video es de 10 GB",
         "button": "Seleccionar archivo"
       },
@@ -347,6 +347,7 @@
       "optionCard": {
         "by": "por",
         "bidders": "ofertantes",
+        "other": "otro",
         "others": "otros",
         "bid": "ofertar",
         "supportButton": "potenciar",
@@ -409,6 +410,7 @@
         "votes": "votos",
         "vote": "voto",
         "mySuggestion": "Mi sugerencia",
+        "other": "otro",
         "others": "otros",
         "voters": "votantes",
         "voted": "votaron",
@@ -608,6 +610,7 @@
     "heroText": "¡Velo suceder!",
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
+    "other": "otro",
     "others": "otros",
     "bid": "oferta",
     "bidChosen": "Oferta elegida",
@@ -620,6 +623,7 @@
     "heroText": "¡Velo suceder!",
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
     "inTotalVotes": "votos en total",
+    "other": "otro",
     "others": "otros",
     "voted": "votaron",
     "votes": "votos",
@@ -653,13 +657,7 @@
       }
     },
     "wantsToKnow": "{{creator}}<0/> quiere saber...",
-    "inTotalBids": "en ofertas totales",
-    "others": "otros",
-    "bid": "oferta",
-    "seeAll": "ver todas las ofertas",
-    "optionsTab": {
-      "backButton": "Regresar"
-    }
+    "inTotalBids": "en ofertas totales"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +675,7 @@
         "seconds_singular": "segundo"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
-    "inTotalVotes": "votos en total",
-    "others": "otros",
-    "voted": "votó",
-    "votes": "votos",
-    "vote": "voto",
-    "optionChosen": "La opción más votada",
-    "seeAll": "ver todas las opciones",
-    "optionsTab": {
-      "backButton": "Regresar"
-    }
+    "wantsToKnow": "{{creator}}<0/> quiere saber..."
   },
   "recommendationsSection": {
     "heading": "Más como esta publicación"

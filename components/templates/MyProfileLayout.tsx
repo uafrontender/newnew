@@ -494,9 +494,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               iconOnly
               withDim
               withShrink
-              style={{
-                padding: '8px',
-              }}
+              active={isCopiedUrl}
               onClick={() => handleCopyLink()}
               onClickCapture={() => {
                 Mixpanel.track('Copy Own Link', {
@@ -663,12 +661,20 @@ const SUsernameButtonText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SShareButton = styled(Button)`
+const SShareButton = styled(Button)<{ active: boolean }>`
+  padding: 8px;
   span {
     font-weight: 500;
     font-size: 14px;
     line-height: 20px;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
+
+  &:focus:enabled {
+    background: ${(props) =>
+      props.active
+        ? undefined
+        : props.theme.colorsThemed.button.background.tertiary};
   }
 `;
 

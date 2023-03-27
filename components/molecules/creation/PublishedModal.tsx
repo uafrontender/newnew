@@ -10,7 +10,7 @@ import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
+import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -22,9 +22,8 @@ import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg'
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
 import { usePostCreationState } from '../../../contexts/postCreationContext';
+import DisplayName from '../../DisplayName';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -242,9 +241,6 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     </SItem>
   );
 
-  // TODO: Integrate DisplayName component instead
-  const displayName = getDisplayname(user.userData);
-
   return (
     <Modal show={open} onClose={handleClose}>
       <SMobileContainer onClick={preventClick}>
@@ -269,18 +265,8 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
             <SUserTitleContainer>
               <SUserTitle variant={3} weight={600}>
-                {displayName && displayName.length > 8
-                  ? `${displayName.substring(0, 8)}...`
-                  : displayName}
+                <DisplayName user={user.userData} />
               </SUserTitle>
-              {user.userData?.options?.isVerified && (
-                <InlineSvg
-                  svg={VerificationCheckmark}
-                  width='20px'
-                  height='20px'
-                  fill='none'
-                />
-              )}
             </SUserTitleContainer>
             <SCaption variant={2} weight={700}>
               {post.startsAt.type === 'right-away'
@@ -430,7 +416,7 @@ const SUserBlock = styled.div`
   align-items: center;
   flex-direction: row;
 
-  grid-template-columns: 36px 1fr 1fr;
+  grid-template-columns: 36px 1fr max-content;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -448,6 +434,9 @@ const SUserTitleContainer = styled.div`
 `;
 
 const SUserTitle = styled(Text)`
+  display: flex;
+  flex-direction: row;
+
   padding-left: 12px;
   margin-right: 2px;
 
