@@ -30,7 +30,8 @@
         "stripeButton": "Dirígeme a Stripe",
         "date": "se enviará automáticamente el {{date}}.",
         "submit": "Más información",
-        "noPayouts": "No tienes ningún pago pendiente"
+        "noPayouts": "No tienes ningún pago pendiente",
+        "nextPayout_NEED_TRANSLATION": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
       },
       "toDosIssue": {
         "text": "Añade una biografía y tus datos bancarios para retirar tus ganancias",

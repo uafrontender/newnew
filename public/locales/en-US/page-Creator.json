@@ -30,7 +30,8 @@
         "stripeButton": "Take me to Stripe",
         "date": "will automatically be sent on {{date}}.",
         "submit": "Learn More",
-        "noPayouts": "You don’t have any upcoming payouts"
+        "noPayouts": "You don’t have any upcoming payouts",
+        "nextPayout": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
       },
       "toDosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",

@@ -894,8 +894,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
     }
 
     if (!context.req.url?.startsWith('/_next')) {
-      // console.log('I am from direct link, making SSR request');
-
       const getPostPayload = new newnewapi.GetPostRequest({
         postUuid: post_uuid_or_short_id,
       });
@@ -1011,8 +1009,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         },
       };
     }
-
-    // console.log('I am from next router, no SSR needed');
 
     return {
       props: {
