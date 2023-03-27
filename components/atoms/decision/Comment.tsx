@@ -240,6 +240,7 @@ const Comment: React.FC<IComment> = ({
             </SActionsDiv>
           </SCommentHeader>
           {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
+          {/* TODO: SReply is not clickable element */}
           {!comment.parentId &&
             !comment.isDeleted &&
             (!isReplyFormOpen ? (
