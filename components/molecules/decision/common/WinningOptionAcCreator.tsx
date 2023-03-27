@@ -99,7 +99,9 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
               {` & `}
               {formatNumber(winningOption.supporterCount - 1, true)}
               &nbsp;
-              {t('acPostSuccess.others')}
+              {winningOption.supporterCount - 1 > 1
+                ? t('acPostSuccess.others')
+                : t('acPostSuccess.other')}
             </>
           ) : null}
           &nbsp;

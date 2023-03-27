@@ -105,7 +105,9 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
               <>
                 {` & `}
                 {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
-                {t('mcPostSuccess.others')}
+                {winningOption.supporterCount - 1 > 1
+                  ? t('mcPostSuccess.others')
+                  : t('mcPostSuccess.other')}
               </>
             ) : null}
             &nbsp;

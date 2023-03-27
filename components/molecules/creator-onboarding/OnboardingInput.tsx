@@ -202,6 +202,7 @@ const SErrorDiv = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  white-space: pre;
 
   position: absolute;
   bottom: -22px;

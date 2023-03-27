@@ -527,7 +527,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         : 1),
                     true
                   )}{' '}
-                  {t('acPost.optionsTab.optionCard.others')}
+                  {option.supporterCount -
+                    ((isSupportedByMe && !isMyBid) ||
+                    (isSupportedByMe && isMyBid && option.whitelistSupporter)
+                      ? 2
+                      : 1) >
+                  1
+                    ? t('acPost.optionsTab.optionCard.others')
+                    : t('acPost.optionsTab.optionCard.other')}
                 </SSpanBiddersHighlighted>
               </>
             ) : null}{' '}

@@ -300,20 +300,22 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       return <AccountDeleted />;
     }
 
-    if (isMessagingDisabled && chatRoom.visavis?.user)
+    if (isMessagingDisabled && chatRoom.visavis?.user) {
       return <MessagingDisabled user={chatRoom.visavis.user} />;
+    }
 
     if (
       !chatRoom.visavis?.isSubscriptionActive &&
       chatRoom.visavis?.user?.uuid &&
       chatRoom.myRole
-    )
+    ) {
       return (
         <SubscriptionExpired
           user={chatRoom.visavis.user}
           myRole={chatRoom.myRole}
         />
       );
+    }
     return null;
   }, [
     isMessagingDisabled,
