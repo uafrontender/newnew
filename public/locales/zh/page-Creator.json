@@ -30,7 +30,8 @@
         "stripeButton": "轉至Stripe",
         "date": "將於{{date}}自動發送,",
         "submit": "瞭解更多",
-        "noPayouts": "沒有任何即將支付的款項"
+        "noPayouts": "沒有任何即將支付的款項",
+        "nextPayout_NEED_TRANSLATION": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
       },
       "toDosIssue": {
         "text": "添加個人簡介和銀行資訊以支取你的收入",
