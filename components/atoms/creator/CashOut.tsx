@@ -50,8 +50,6 @@ const CashOut: React.FC<ICashOut> = ({
     [nextCashOutAmount]
   );
 
-  console.log(validateCash(), 'validateCash');
-
   useEffect(() => {
     async function getStripeLink() {
       try {
