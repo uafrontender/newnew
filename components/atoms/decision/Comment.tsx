@@ -46,11 +46,24 @@ interface IComment {
   isDeletingComment: boolean;
   canDeleteComment?: boolean;
   index?: number;
+  commentReply?: {
+    isOpen: boolean;
+    text: string;
+  };
   handleAddComment: (newMsg: string, id: number) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
   setCommentHeight?: (index: number, height: number) => void;
+  updateCommentReplies?: ({
+    id,
+    isOpen,
+    text,
+  }: {
+    id: number;
+    isOpen?: boolean;
+    text?: string;
+  }) => void;
 }
 
 const Comment = React.forwardRef<HTMLDivElement, IComment>(
@@ -61,11 +74,12 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       canDeleteComment,
       isDeletingComment,
       index,
+      commentReply,
       handleAddComment,
       handleDeleteComment,
       onFormFocus,
       onFormBlur,
-      setCommentHeight,
+      updateCommentReplies,
     },
     ref: any
   ) => {
@@ -84,7 +98,9 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const [confirmDeleteComment, setConfirmDeleteComment] =
       useState<boolean>(false);
 
-    const [isReplyFormOpen, setIsReplyFormOpen] = useState(false);
+    const [isReplyFormOpen, setIsReplyFormOpen] = useState(
+      commentReply?.isOpen || false
+    );
 
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -124,6 +140,16 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
 
     useEffect(() => {
       if (
+        isReplyFormOpen !== isReplyFormOpenRef.current &&
+        updateCommentReplies
+      ) {
+        updateCommentReplies({
+          id: comment.id as number,
+          isOpen: isReplyFormOpen,
+        });
+      }
+
+      if (
         isReplyFormOpen &&
         !isReplyFormOpenRef.current &&
         commentFormRef.current
@@ -139,7 +165,19 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       if (!isReplyFormOpen) {
         isReplyFormOpenRef.current = false;
       }
-    }, [isReplyFormOpen]);
+    }, [comment.id, isReplyFormOpen, updateCommentReplies]);
+
+    const handleReplyChange = useCallback(
+      (value: string) => {
+        if (updateCommentReplies) {
+          updateCommentReplies({
+            id: comment.id as number,
+            text: value,
+          });
+        }
+      },
+      [comment.id, updateCommentReplies]
+    );
 
     useEffect(() => {
       if (comment.isOpen) {
@@ -149,7 +187,9 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
 
     const moreButtonRef: any = useRef<HTMLButtonElement>();
 
-    if (comment.isDeleted || comment?.sender?.options?.isTombstone) return null;
+    if (comment.isDeleted || comment?.sender?.options?.isTombstone) {
+      return null;
+    }
 
     return (
       <>
@@ -275,6 +315,8 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
                     onBlur={onFormBlur ?? undefined}
                     onFocus={onFormFocus ?? undefined}
                     ref={commentFormRef}
+                    value={commentReply?.text}
+                    onChange={handleReplyChange}
                   />
                 </>
               ))}

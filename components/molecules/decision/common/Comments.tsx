@@ -187,6 +187,7 @@ const Comments: React.FunctionComponent<IComments> = ({
     'comments-scrolling-container'
   );
 
+  // Virtualization
   const commentsVirtualizer = useVirtualizer({
     count: hasNextPage && !isMobile ? comments.length + 1 : comments.length,
     getScrollElement: () => scrollRef.current,
@@ -208,6 +209,25 @@ const Comments: React.FunctionComponent<IComments> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasNextPage, fetchNextPage, comments.length, isLoading, commentItems]);
+
+  const [commentsReplies, setCommentsReplies] = useState<
+    Record<number, { isOpen: boolean; text: string }>
+  >({});
+
+  const updateCommentReplies = useCallback(
+    ({ id, isOpen, text }: { id: number; isOpen?: boolean; text?: string }) => {
+      setCommentsReplies((prevState) => ({
+        ...prevState,
+        [id]: {
+          ...(isOpen !== undefined
+            ? { isOpen }
+            : { isOpen: !!prevState[id]?.isOpen }),
+          ...(text !== undefined ? { text } : { text: prevState[id]?.text }),
+        },
+      }));
+    },
+    []
+  );
 
   return (
     <>
@@ -238,6 +258,12 @@ const Comments: React.FunctionComponent<IComments> = ({
                         ref={commentsVirtualizer.measureElement}
                         onFormBlur={onFormBlur ?? undefined}
                         onFormFocus={onFormFocus ?? undefined}
+                        updateCommentReplies={updateCommentReplies}
+                        commentReply={
+                          commentsReplies[
+                            comments[virtualItem.index].id as number
+                          ]
+                        }
                       />
                     )}
                   </div>
