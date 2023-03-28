@@ -108,7 +108,7 @@
   },
   "modal": {
     "reportUser": {
-      "title": "Report",
+      "title": "Report ",
       "subtitle": "Help us understand so that we can investigate...",
       "options": {
         "spam": "Suspicious or spam",

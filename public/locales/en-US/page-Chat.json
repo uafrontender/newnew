@@ -82,8 +82,8 @@
     "beforeName": "",
     "suffix": "'s",
     "afterName": "announcements",
-    "topMessageStart": "Only",
-    "topMessageEnd": "can send messages"
+    "topMessageStart": "Only ",
+    "topMessageEnd": " can send messages"
   },
   "userTypes": {
     "all": "All",

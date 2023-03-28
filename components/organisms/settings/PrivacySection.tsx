@@ -18,7 +18,7 @@ import { getUserByUsername } from '../../../api/endpoints/user';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;

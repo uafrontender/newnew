@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -53,6 +53,7 @@ import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBu
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import { OPTION_LENGTH_MAX } from '../../../../../constants/general';
+import DisplayName from '../../../../atoms/DisplayName';
 
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
@@ -72,8 +73,7 @@ const addOptionErrorMessage = (
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
   postStatus: TPostStatusStringified;
-  postCreatorName: string;
-  postDeadline: string;
+  postCreator: newnewapi.IUser | null | undefined;
   options: newnewapi.MultipleChoice.Option[];
   canAddCustomOption: boolean;
   bundle?: newnewapi.IBundle;
@@ -96,8 +96,7 @@ interface IMcOptionsTab {
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
   postStatus,
-  postCreatorName,
-  postDeadline,
+  postCreator,
   options,
   canAddCustomOption,
   bundle,
@@ -471,8 +470,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             <McOptionCard
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
-              creator={option.creator ?? post.creator!!}
-              postCreatorName={postCreatorName}
+              postCreator={postCreator}
               postText={post.title}
               postUuid={post.postUuid}
               postShortId={post.postShortId ?? ''}
@@ -680,10 +678,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           promptUserWithPushNotificationsPermissionModal();
         }}
       >
-        {t('paymentSuccessModal.mc', {
-          postCreator: postCreatorName,
-          postDeadline,
-        })}
+        <Trans
+          t={t}
+          i18nKey='paymentSuccessModal.mc'
+          // @ts-ignore
+          components={[<DisplayName user={postCreator} />]}
+        />
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile &&

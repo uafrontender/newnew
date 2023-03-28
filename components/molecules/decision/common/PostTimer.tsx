@@ -264,7 +264,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           {t(`postType.${postType}`)} {t('expires.ended_on')}{' '}
           {moment(timestampSeconds)
             .locale(locale || 'en-US')
-            .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
           <STutorialTooltipHolder>
             <TutorialTooltip
               isTooltipVisible={isTooltipVisible}

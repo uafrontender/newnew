@@ -54,7 +54,7 @@ import useErrorToasts, {
 import RichTextInput from '../../../atoms/creation/RichTextInput';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -885,7 +885,7 @@ export const CreationSecondStepContent: React.FC<
                   )}
                   formattedDescription={formatExpiresAt()
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD[${t('at')}]hh:mm A`)}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
@@ -899,7 +899,7 @@ export const CreationSecondStepContent: React.FC<
                   )}
                   formattedDescription={formatStartsAt()
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD[${t('at')}]hh:mm A`)}
                 />
               </SFieldWrapper>
             </SListWrapper>
@@ -920,7 +920,7 @@ export const CreationSecondStepContent: React.FC<
                 )}
                 formattedDescription={formatExpiresAt()
                   .locale(router.locale || 'en-US')
-                  .format(`DD MMM[${t('at')}]hh:mm A`)}
+                  .format(`MMM DD[${t('at')}]hh:mm A`)}
               />
             </SItemWrapper>
             <TabletStartDate

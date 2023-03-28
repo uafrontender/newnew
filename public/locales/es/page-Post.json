@@ -65,9 +65,9 @@
       "cf": "¡Estás patrocinando este Goal!"
     },
     "doneButton": "¡Suena bien!",
-    "ac": "{{postCreator}} elegirá su favorito una vez terminada la subasta.",
-    "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
-    "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
+    "ac": "<0/> elegirá su favorito una vez terminada la subasta.",
+    "mc": "<0/> hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
+    "cf": "<0/> hará el objetivo una vez que consiga suficientes patrocinadores."
   },
   "postFailedBoxModeration": {
     "title": "{{postType}} está cancelado",
@@ -316,11 +316,12 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "El Bid de {{creator}}",
+      "title": "El Bid de <0/>",
+      "suffix": "",
       "subtitle": "Tu oferta"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el <0/> elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -388,11 +389,12 @@
       "votes": "votos totales"
     },
     "paymentModalHeader": {
-      "title": "El Superpoll de {{creator}}",
+      "title": "El Superpoll de <0/>",
+      "suffix": "",
       "subtitle": "La opción que has elegido"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el <0/> elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -432,9 +434,10 @@
           "vote": "voto",
           "votes": "votos",
           "custom": "Votos personalizados",
-          "buySingleVote": "Compra un voto para votar en la Superpoll de {{creator}}",
-          "buyMultipleVotes": "Comprar {{amount}} votos para votar en la Superpoll de {{creator}}",
-          "buyAnyVotes": "Compra el número de votos que quieras para votar en la Superpoll de {{creator}}",
+          "buySingleVote": "Compra un voto para votar en la Superpoll de <0/>",
+          "buyMultipleVotes": "Comprar {{amount}} votos para votar en la Superpoll de <0/>",
+          "buyAnyVotes": "Compra el número de votos que quieras para votar en la Superpoll de <0/>",
+          "suffix": "",
           "optionCaption": "Opción de Superpoll",
           "voteButton": "Votar"
         }
@@ -501,10 +504,11 @@
       }
     },
     "paymentModalHeader": {
-      "title": "El Goal de {{creator}}"
+      "title": "El Goal de <0/>",
+      "suffix": ""
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el <0/> elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -608,7 +612,7 @@
   },
   "acPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
+    "wantsToKnow": "<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
     "other": "otro",
     "others": "otros",
@@ -621,7 +625,7 @@
   },
   "mcPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
+    "wantsToKnow": "<0/> quiere saber...",
     "inTotalVotes": "votos en total",
     "other": "otro",
     "others": "otros",
@@ -636,7 +640,7 @@
   },
   "cfPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "El Goal de {{creator}}<0/>",
+    "wantsToKnow": "El Goal de <0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"
@@ -656,7 +660,7 @@
         "seconds_singular": "segundo"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
+    "wantsToKnow": "<0/> quiere saber...",
     "inTotalBids": "en ofertas totales"
   },
   "mcPostAwaiting": {
@@ -675,7 +679,7 @@
         "seconds_singular": "segundo"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> quiere saber..."
+    "wantsToKnow": "<0/> quiere saber..."
   },
   "recommendationsSection": {
     "heading": "Más como esta publicación"
