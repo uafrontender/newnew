@@ -25,7 +25,7 @@ import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,

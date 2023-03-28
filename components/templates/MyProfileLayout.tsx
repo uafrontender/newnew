@@ -41,7 +41,7 @@ import getGenderPronouns, {
 import copyToClipboard from '../../utils/copyToClipboard';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
-import DisplayName from '../DisplayName';
+import DisplayName from '../atoms/DisplayName';
 import { getMySpending } from '../../api/endpoints/payments';
 import { SocketContext } from '../../contexts/socketContext';
 

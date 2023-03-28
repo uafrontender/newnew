@@ -15,7 +15,7 @@ import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface ICreatorsBundleModal {
   show: boolean;

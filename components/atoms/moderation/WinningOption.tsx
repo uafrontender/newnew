@@ -11,7 +11,7 @@ import GenericSkeleton from '../../molecules/GenericSkeleton';
 import { useAppSelector } from '../../../redux-store/store';
 import { TPostType } from '../../../utils/switchPostType';
 import { formatNumber } from '../../../utils/format';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../DisplayName';
 
 interface IWinningOption {
   postType: TPostType;
@@ -153,14 +153,6 @@ const SText = styled(Text)`
 const SSpan = styled.span`
   display: inline-flex;
   white-space: pre;
-
-  .creatorLinkAnchor {
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover {
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
 `;
 
 const SUserAvatar = styled.img`

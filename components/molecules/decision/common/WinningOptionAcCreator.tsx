@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { formatNumber } from '../../../../utils/format';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 
 interface IWinningOptionAcCreator {
   winningOption: newnewapi.Auction.IOption;

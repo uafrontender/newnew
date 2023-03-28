@@ -108,7 +108,7 @@
   },
   "modal": {
     "reportUser": {
-      "title": "Reportar",
+      "title": "Reportar ",
       "subtitle": "Ayúdanos a entender para que podamos investigar...",
       "options": {
         "spam": "Sospechoso o spam",

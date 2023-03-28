@@ -43,9 +43,8 @@ import getGenderPronouns, {
   isGenderPronounsDefined,
 } from '../../utils/genderPronouns';
 import { useBundles } from '../../contexts/bundlesContext';
-import getDisplayname from '../../utils/getDisplayname';
 import { Mixpanel } from '../../utils/mixpanel';
-import DisplayName from '../DisplayName';
+import DisplayName from '../atoms/DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
 import { useGetChats } from '../../contexts/chatContext';
@@ -465,7 +464,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={getDisplayname(user)}
+        reportedUser={user}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
