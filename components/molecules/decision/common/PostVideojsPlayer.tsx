@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { newnewapi } from 'newnew-api';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 // NB! We have to import these twice due to package issues
@@ -31,6 +31,9 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import Button from '../../../atoms/Button';
 import { setMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch } from '../../../../redux-store/store';
+import isSafari from '../../../../utils/isSafari';
+import isBrowser from '../../../../utils/isBrowser';
+import PostVideoFullscreenControls from './PostVideoFullscreenControls';
 
 interface IPostVideojsPlayer {
   id: string;
@@ -40,6 +43,13 @@ interface IPostVideojsPlayer {
   showPlayButton?: boolean;
   onPlaybackFinished?: () => void;
 }
+
+type TSafariHtmlPlayer = HTMLVideoElement & {
+  webkitDisplayingFullscreen: boolean;
+  volume: number;
+  webkitEnterFullscreen: () => void;
+  webkitExitFullscreen: () => void;
+};
 
 export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   id,
@@ -69,9 +79,18 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     setIsPaused(stateValue);
   }, []);
 
-  // NB! Commented out for now
+  // Fullscren
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mouseMoved, setMouseMoved] = useState(true);
+  const [videoWidthFulscreen, setVideoWidthFullscreen] = useState<{
+    width?: number;
+    height?: number;
+  }>({
+    width: undefined,
+    height: undefined,
+  });
 
+  // Video quality
   const qualityLevelsRef = useRef<QualityLevelList>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([]);
@@ -79,11 +98,21 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   const [videoOrientation, setVideoOrientation] = useState<
     'vertical' | 'horizontal'
   >('vertical');
+  const [largestResolutionDimensions, setLargestResolutionDimensions] =
+    useState<{
+      width?: number;
+      height?: number;
+    }>({
+      width: undefined,
+      height: undefined,
+    });
 
   const [isHovered, setIsHovered] = useState(false);
 
   const [playbackTime, setPlaybackTime] = useState(0);
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
+
+  const [currentVolume, setCurrentVolume] = useState(0);
 
   // NB! Commented out for now
   const [bufferedPercent, setBufferedPercent] = useState(0);
@@ -111,6 +140,20 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     },
     [handleSetIsPaused, isPaused]
   );
+
+  const handlePlayerVolumeChange = useCallback((percentAsDecimal: number) => {
+    playerRef?.current?.volume(percentAsDecimal);
+  }, []);
+
+  const handleToggleVideoPaused = useCallback(() => {
+    if (!playerRef.current?.paused()) {
+      playerRef.current?.pause();
+    } else {
+      playerRef.current?.play()?.catch(() => {
+        handleSetIsPaused(true);
+      });
+    }
+  }, [handleSetIsPaused]);
 
   const options: videojs.PlayerOptions = useMemo(
     () => ({
@@ -155,12 +198,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             promise
               .then(() => {
                 // Autoplay started!
-                // console.log('Autoplay started!');
               })
               .catch((error) => {
-                console.log(error);
+                console.error(error);
                 // Autoplay was prevented.
-                // console.log('Autoplay was prevented.');
                 // Try to mute and start over, catch with displaying pause button
                 dispatch(setMutedMode(true));
                 setTimeout(() => {
@@ -193,6 +234,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           setIsLoading(true);
         });
         p.on('canplay', (e) => {
+          setCurrentVolume(p?.volume());
           setIsLoading(false);
         });
 
@@ -212,17 +254,19 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
         // Fullscreen
         p.on('fullscreenchange', (e) => {
-          console.log(p?.isFullscreen());
           setIsFullscreen(p?.isFullscreen());
         });
 
-        p.on('volumechange', (e) => {
-          if (p?.volume() === 0 || p?.muted()) {
-            dispatch(setMutedMode(true));
-          } else {
-            dispatch(setMutedMode(false));
-          }
-        });
+        if (!isSafari()) {
+          p.on('volumechange', (e) => {
+            setCurrentVolume(p?.volume());
+            if (p?.volume() === 0 || p?.muted()) {
+              dispatch(setMutedMode(true));
+            } else {
+              dispatch(setMutedMode(false));
+            }
+          });
+        }
       } catch (err) {
         console.error(err);
       }
@@ -242,6 +286,15 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
         if (parsedManifest && parsedManifest.isMasterPlaylist) {
           const v1 = parsedManifest?.variants?.[0];
+
+          if (parsedManifest?.variants && parsedManifest?.variants?.length) {
+            const largestV = parsedManifest?.variants?.[0];
+
+            setLargestResolutionDimensions({
+              width: largestV.resolution?.width,
+              height: largestV.resolution?.height,
+            });
+          }
 
           if (
             v1 &&
@@ -304,15 +357,152 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     }
   }, [muted]);
 
-  // vjs-big-play-centered video-js vjs-controls-disabled vjs-touch-enabled vjs-workinghover vjs-v7 vjs-has-started vjs_video_3-dimensions vjs-paused vjs-user-inactive vjs-fullscreen
+  // Safari-specific handlers
+  useEffect(() => {
+    const handleFullscreenChangeSafari = () => {
+      setIsFullscreen(
+        (document?.querySelector('.vjs-tech') as TSafariHtmlPlayer)
+          ?.webkitDisplayingFullscreen
+      );
+    };
+
+    const handleVolumeChangeSafari: GlobalEventHandlers['onvolumechange'] = (
+      e
+    ) => {
+      setCurrentVolume((e.target as TSafariHtmlPlayer).volume);
+      if (
+        (e.target as TSafariHtmlPlayer).volume === 0 ||
+        (e.target as TSafariHtmlPlayer).muted
+      ) {
+        dispatch(setMutedMode(true));
+      } else {
+        dispatch(setMutedMode(false));
+      }
+    };
+
+    const vsjTech = document?.querySelector('.vjs-tech');
+
+    if (isBrowser() && !!vsjTech && isSafari()) {
+      (vsjTech as HTMLVideoElement).addEventListener(
+        'webkitfullscreenchange',
+        handleFullscreenChangeSafari
+      );
+
+      (vsjTech as HTMLVideoElement).addEventListener(
+        'volumechange',
+        handleVolumeChangeSafari
+      );
+    }
+
+    return () => {
+      (vsjTech as HTMLVideoElement).removeEventListener(
+        'webkitfullscreenchange',
+        handleFullscreenChangeSafari
+      );
+
+      (vsjTech as HTMLVideoElement).removeEventListener(
+        'volumechange',
+        handleVolumeChangeSafari
+      );
+    };
+    // Skipping `dispatch`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const handleSetVideoWidthFullscreen = () => {
+      if (
+        !largestResolutionDimensions.height ||
+        !largestResolutionDimensions.width
+      ) {
+        return;
+      }
+      const innerWidth = window?.innerWidth;
+      const innerHeight = window?.innerHeight;
+
+      const isVertical =
+        largestResolutionDimensions.height >= largestResolutionDimensions.width;
+      const ratio =
+        largestResolutionDimensions.height / largestResolutionDimensions.width;
+
+      if (isVertical) {
+        setVideoWidthFullscreen({
+          width: innerHeight / ratio,
+          height: innerHeight,
+        });
+      } else {
+        setVideoWidthFullscreen({
+          width: innerWidth,
+          height: innerWidth * ratio,
+        });
+      }
+    };
+
+    if (isBrowser()) {
+      handleSetVideoWidthFullscreen();
+      window.addEventListener('resize', handleSetVideoWidthFullscreen);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleSetVideoWidthFullscreen);
+    };
+  }, [
+    isFullscreen,
+    largestResolutionDimensions,
+    largestResolutionDimensions.height,
+    largestResolutionDimensions.width,
+  ]);
+
+  // Hide controls if mouse not moved in fullscreen
+  useEffect(() => {
+    let timeout: any = 0;
+
+    const handleTrackMouse = () => {
+      setMouseMoved(true);
+
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        setMouseMoved(false);
+      }, 5000);
+    };
+
+    if (isFullscreen && !isSafari()) {
+      window?.addEventListener('mousemove', handleTrackMouse);
+    } else {
+      window?.removeEventListener('mousemove', handleTrackMouse);
+      clearTimeout(timeout);
+    }
+
+    return () => {
+      window?.removeEventListener('mousemove', handleTrackMouse);
+      clearTimeout(timeout);
+    };
+  }, [isFullscreen]);
+
+  // Hide cursor if mouse not moved in fullscreen
+  useEffect(() => {
+    if (isBrowser() && isFullscreen && !mouseMoved) {
+      document.documentElement.style.cursor = 'none';
+    } else {
+      document.documentElement.style.cursor = '';
+    }
+
+    return () => {
+      document.documentElement.style.cursor = '';
+    };
+  }, [isFullscreen, mouseMoved]);
 
   return (
     <SContent
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
-      <SVideoWrapper data-vjs-player>
+      <SImageBG
+        src={resources?.thumbnailImageUrl ?? ''}
+        withBackDropFilter={!isFullscreen}
+      />
+      <SVideoWrapper data-vjs-player withBackDropFilter={!isFullscreen}>
         <SWrapper
           id={id}
           onClick={() => {
@@ -353,13 +543,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           iconOnly
           view='transparent'
           onClick={(e) => {
-            // playerRef?.current?.requestFullscreen();
-            // playerRef?.current?.requestFullscreen();
-            // document
-            //   ?.querySelector('.vjs-tech')
-            //   ?.webkitSetPresentationMode('fullscreen');
-            // document?.querySelector('.vjs-tech')?.webkitEnterFullscreen();
-            // setIsFullscreen(true);
+            if (!isSafari() && !isMobileOrTablet) {
+              playerRef?.current?.requestFullscreen();
+            } else if (document.querySelector('.vjs-tech')) {
+              (
+                document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
+              )?.webkitEnterFullscreen();
+              setIsFullscreen(true);
+            }
           }}
         >
           <InlineSvg
@@ -392,15 +583,32 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
-      {isFullscreen
+      {isFullscreen && mouseMoved && !isSafari()
         ? ReactDOM.createPortal(
             <SMinimizeButton
               id='minimize-button'
               iconOnly
               view='transparent'
+              style={{
+                ...(largestResolutionDimensions?.width
+                  ? {
+                      top: `calc(50% - ${
+                        videoWidthFulscreen.height! / 2
+                      }px + 16px)`,
+                      left: `calc(50% + ${
+                        videoWidthFulscreen.width! / 2
+                      }px - 16px - 48px)`,
+                    }
+                  : {}),
+              }}
               onClick={(e) => {
-                playerRef?.current?.exitFullscreen();
-                // document?.querySelector('.vjs-tech')?.webkitExitFullscreen();
+                if (!isSafari() && !isMobileOrTablet) {
+                  playerRef?.current?.exitFullscreen();
+                } else {
+                  (
+                    document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
+                  )?.webkitExitFullscreen();
+                }
               }}
             >
               <InlineSvg
@@ -410,6 +618,24 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
                 fill='#FFFFFF'
               />
             </SMinimizeButton>,
+            document.querySelector('.video-js') as HTMLElement
+          )
+        : null}
+      {isFullscreen && mouseMoved && !isSafari()
+        ? ReactDOM.createPortal(
+            <PostVideoFullscreenControls
+              isPaused={isPaused && !!showPlayButton}
+              handleToggleVideoPaused={handleToggleVideoPaused}
+              currentTime={playbackTime}
+              videoDuration={playerRef?.current?.duration() || 10}
+              handleChangeTime={handlePlayerScrubberChangeTime}
+              isMuted={!!muted}
+              handleToggleMuted={(newValue: boolean) =>
+                dispatch(setMutedMode(newValue))
+              }
+              currentVolume={currentVolume}
+              handleChangeVolume={handlePlayerVolumeChange}
+            />,
             document.querySelector('.video-js') as HTMLElement
           )
         : null}
@@ -436,7 +662,9 @@ const SContent = styled.div`
   }
 `;
 
-const SVideoWrapper = styled.div`
+const SVideoWrapper = styled.div<{
+  withBackDropFilter: boolean;
+}>`
   top: 0;
   left: 0;
   width: 100%;
@@ -447,8 +675,14 @@ const SVideoWrapper = styled.div`
   min-height: 100%;
   background: transparent;
 
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  ${({ withBackDropFilter }) =>
+    // Otherwise, Safari fullscreen breaks
+    withBackDropFilter
+      ? css`
+          backdrop-filter: blur(32px);
+          -webkit-backdrop-filter: blur(32px);
+        `
+      : null};
 
   ${({ theme }) => theme.media.tablet} {
     border-radius: 16px;
@@ -479,6 +713,11 @@ const SWrapper = styled.div<{
       videoOrientation === 'vertical' && !isFullScreen ? 'cover' : 'contain'};
   }
 
+  /* Mostly useless, added just in case */
+  video::-webkit-media-controls {
+    display: none !important;
+  }
+
   video::-webkit-media-controls-enclosure {
     display: none !important;
     pointer-events: none;
@@ -490,17 +729,39 @@ const SWrapper = styled.div<{
     display: none !important;
     opacity: 0 !important;
   }
+
+  .vjs-tech::-webkit-media-controls-enclosure {
+    display: none !important;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: -100;
+  }
+
+  .vjs-tech::-webkit-media-controls-panel {
+    display: none !important;
+    opacity: 0 !important;
+  }
 `;
 
-const SImageBG = styled.img`
+const SImageBG = styled.img<{
+  withBackDropFilter: boolean;
+}>`
   width: 100%;
   height: 100%;
   object-fit: cover;
   transform: scale(1.1);
 
-  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-    filter: blur(32px);
-  }
+  ${({ withBackDropFilter }) =>
+    // Otherwise, Safari fullscreen breaks
+    withBackDropFilter
+      ? css`
+          @supports not (
+            (-webkit-backdrop-filter: none) or (backdrop-filter: none)
+          ) {
+            filter: blur(32px);
+          }
+        `
+      : null};
 `;
 
 const SLoader = styled.div`
@@ -562,8 +823,6 @@ const SMaximizeButton = styled(Button)`
 
 const SMinimizeButton = styled(Button)`
   position: absolute;
-  right: 16px;
-  top: 16px;
 
   padding: 8px;
   width: 36px;
@@ -573,7 +832,7 @@ const SMinimizeButton = styled(Button)`
 
   transition: unset;
 
-  z-index: 2500000;
+  z-index: 2147483647;
 
   ${({ theme }) => theme.media.tablet} {
     width: 36px;
@@ -588,3 +847,5 @@ const SMinimizeButton = styled(Button)`
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
+
+// Fullscreen controls
