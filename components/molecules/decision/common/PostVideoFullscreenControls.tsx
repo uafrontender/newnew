@@ -18,6 +18,8 @@ import PauseIcon from '../../../../public/images/svg/icons/outlined/pause.svg';
 import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
 import isSafari from '../../../../utils/isSafari';
+import { useAppState } from '../../../../contexts/appStateContext';
+import useOnTouchStartOutside from '../../../../utils/hooks/useOnTouchStartOutside';
 
 interface IPostVideoFullscreenControls {
   // Play/Pause
@@ -45,6 +47,15 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
   currentVolume,
   handleChangeVolume,
 }) => {
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   // Time
   const timeSliderRef = useRef<HTMLInputElement>();
   const progress = useMemo(
@@ -128,6 +139,18 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
     }
   }, [volumeParsed]);
 
+  const soundControlsRef = useRef<HTMLDivElement>();
+  const handleSoundControlsClickOutsideMobile = () => {
+    if (isMobileOrTablet) {
+      setIsSoundControlsHovered(false);
+    }
+  };
+
+  useOnTouchStartOutside(
+    soundControlsRef,
+    handleSoundControlsClickOutsideMobile
+  );
+
   return (
     <SFullscreenControlsContainer>
       <SPlayPauseButton
@@ -156,7 +179,11 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
         onChange={handleTimeChange}
       />
       <SSoundControls
+        ref={(el) => {
+          soundControlsRef.current = el!!;
+        }}
         onMouseEnter={() => setIsSoundControlsHovered(true)}
+        onTouchStart={() => setIsSoundControlsHovered(true)}
         onMouseLeave={() => setIsSoundControlsHovered(false)}
       >
         <SSlider
