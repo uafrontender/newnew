@@ -44,8 +44,6 @@ const CommentsBottomSection: React.FunctionComponent<
   const user = useAppSelector((state) => state.user);
   const { showErrorToastPredefined } = useErrorToasts();
 
-  console.log('rerender');
-
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);

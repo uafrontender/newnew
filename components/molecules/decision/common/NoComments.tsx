@@ -43,32 +43,6 @@ NoComments.defaultProps = {
 
 export default NoComments;
 
-export const SScrollContainer = styled.div`
-  ${({ theme }) => theme.media.tablet} {
-    padding-right: 0;
-    max-height: 500px;
-    height: 100%;
-
-    overflow-y: auto;
-
-    // Scrollbar
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-    scrollbar-width: none;
-    &::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 4px;
-      transition: 0.2s linear;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: transparent;
-      border-radius: 4px;
-      transition: 0.2s linear;
-    }
-  }
-`;
-
 // No Comments yet
 const SNoCommentsYet = styled.div`
   display: flex;

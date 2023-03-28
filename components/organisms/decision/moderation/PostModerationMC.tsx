@@ -104,18 +104,18 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     // Announcement
     const announcement = useMemo(() => post.announcement, [post.announcement]);
 
-    const handleCommentFocus = () => {
+    const handleCommentFocus = useCallback(() => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
         document.getElementById('action-button-mobile')!!.style.display =
           'none';
       }
-    };
+    }, [isMobile]);
 
-    const handleCommentBlur = () => {
+    const handleCommentBlur = useCallback(() => {
       if (isMobile && !!document.getElementById('action-button-mobile')) {
         document.getElementById('action-button-mobile')!!.style.display = '';
       }
-    };
+    }, [isMobile]);
 
     // Tabs
     const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
