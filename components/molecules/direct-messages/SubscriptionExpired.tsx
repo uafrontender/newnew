@@ -14,7 +14,7 @@ import {
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
 
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 const BuyBundleModal = dynamic(() => import('../bundles/BuyBundleModal'));
 

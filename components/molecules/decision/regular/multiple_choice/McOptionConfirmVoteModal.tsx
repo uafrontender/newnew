@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -14,7 +14,7 @@ import assets from '../../../../../constants/assets';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import VotesAmountInputModal from '../../../../atoms/decision/VotesAmountInputModal';
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
-import getDisplayname from '../../../../../utils/getDisplayname';
+import DisplayName from '../../../../atoms/DisplayName';
 
 interface IMcConfirmVoteModal {
   show: boolean;
@@ -88,9 +88,19 @@ const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               {t('mcPost.optionsTab.optionCard.confirmVoteModal.custom')}
             </SHeadline>
             <SCreatorsText variant={2}>
-              {t('mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes', {
-                creator: getDisplayname(postCreator),
-              })}
+              <Trans
+                t={t}
+                i18nKey='mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes'
+                // @ts-ignore
+                components={[
+                  <DisplayName
+                    user={postCreator}
+                    suffix={t(
+                      'mcPost.optionsTab.optionCard.confirmVoteModal.suffix'
+                    )}
+                  />,
+                ]}
+              />
             </SCreatorsText>
             <SCaption variant={3}>
               {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
@@ -169,18 +179,38 @@ const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
           </SHeadline>
           <SCreatorsText variant={2}>
             {/** TODO: use DisplayName component, add it using Trans, change translations to use component */}
-            {parseInt(supportVotesAmount) === 1
-              ? t(
-                  'mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote',
-                  { creator: getDisplayname(postCreator) }
-                )
-              : t(
-                  'mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes',
+            {parseInt(supportVotesAmount) === 1 ? (
+              <Trans
+                t={t}
+                i18nKey='mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote'
+                // @ts-ignore
+                components={[
+                  <DisplayName
+                    user={postCreator}
+                    suffix={t(
+                      'mcPost.optionsTab.optionCard.confirmVoteModal.suffix'
+                    )}
+                  />,
+                ]}
+              />
+            ) : (
+              <Trans
+                t={t}
+                i18nKey='mcPost.optionsTab.optionCard.confirmVoteModal.buyMultipleVotes'
+                // @ts-ignore
+                components={[
+                  <DisplayName
+                    user={postCreator}
+                    suffix={t(
+                      'mcPost.optionsTab.optionCard.confirmVoteModal.suffix'
+                    )}
+                  />,
                   {
-                    creator: getDisplayname(postCreator),
                     amount: supportVotesAmount,
-                  }
-                )}
+                  },
+                ]}
+              />
+            )}
           </SCreatorsText>
           <SCaption variant={3}>
             {t('mcPost.optionsTab.optionCard.confirmVoteModal.optionCaption')}
