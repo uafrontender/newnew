@@ -27,8 +27,6 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import InlineSvg from '../../../atoms/InlineSVG';
 import McWaitingOptionsSection from '../../../molecules/decision/waiting/multiple_choice/McWaitingOptionsSection';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
@@ -36,6 +34,7 @@ import isBrowser from '../../../../utils/isBrowser';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useAppState } from '../../../../contexts/appStateContext';
 import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
+import DisplayName from '../../../atoms/DisplayName';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -277,17 +276,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                               t={t}
                               i18nKey='mcPostAwaiting.wantsToKnow'
                               // @ts-ignore
-                              components={[
-                                post.creator?.options?.isVerified ? (
-                                  <SInlineSVG
-                                    svg={VerificationCheckmark}
-                                    width='16px'
-                                    height='16px'
-                                    fill='none'
-                                  />
-                                ) : null,
-                                { creator: getDisplayname(post.creator) },
-                              ]}
+                              components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>
                         </a>
@@ -519,6 +508,7 @@ const SWantsToKnow = styled.span`
   position: relative;
   display: inline-flex;
   align-items: center;
+  white-space: pre;
   top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
@@ -531,10 +521,6 @@ const SWantsToKnow = styled.span`
     font-size: 16px;
     line-height: 24px;
   }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-right: 2px;
 `;
 
 const STotal = styled.div`

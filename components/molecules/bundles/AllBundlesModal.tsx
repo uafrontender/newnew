@@ -88,6 +88,7 @@ const SModalPaper = styled(ModalPaper)`
 
   ${({ theme }) => theme.media.tablet} {
     max-width: 550px;
+    max-height: 80vh;
   }
 
   ${({ theme }) => theme.media.laptop} {

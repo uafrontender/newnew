@@ -23,7 +23,7 @@ import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.sv
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { usePostCreationState } from '../../../contexts/postCreationContext';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,

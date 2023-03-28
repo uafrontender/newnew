@@ -37,7 +37,7 @@ import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')

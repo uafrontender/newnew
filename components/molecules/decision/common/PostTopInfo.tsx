@@ -43,7 +43,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { useAppState } from '../../../../contexts/appStateContext';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 /* import getGuestId from '../../../../utils/getGuestId';
  import {
   getGuestSmsNotificationsSubscriptionStatus,
@@ -843,20 +843,23 @@ const SCreatorCard = styled.div`
 
   padding-right: 8px;
 
+  * {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  }
+
   &:hover {
-    .username {
+    * {
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
 `;
 
 const SDisplayName = styled(DisplayName)`
-  display: inline;
   flex-shrink: 1;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
   transition: 0.2s linear;
 `;
 

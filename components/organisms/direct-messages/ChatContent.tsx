@@ -22,7 +22,6 @@ import { reportUser } from '../../../api/endpoints/report';
 import { sendMessage } from '../../../api/endpoints/chat';
 
 /* Utils */
-import getDisplayname from '../../../utils/getDisplayname';
 import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
@@ -398,7 +397,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       {chatRoom.visavis && (
         <ReportModal
           show={confirmReportUser}
-          reportedDisplayname={getDisplayname(chatRoom.visavis?.user!!)}
+          reportedUser={chatRoom.visavis?.user!!}
           onClose={() => setConfirmReportUser(false)}
           onSubmit={async ({ reasons, message }) => {
             if (chatRoom.visavis?.user?.uuid) {

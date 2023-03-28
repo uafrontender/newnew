@@ -184,7 +184,7 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
           show={reportPostOpen}
-          reportedDisplayname={getDisplayname(postParsed?.creator)}
+          reportedUser={postParsed?.creator}
           onSubmit={handleReportSubmit}
           onClose={handleReportClose}
         />
