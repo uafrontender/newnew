@@ -205,11 +205,11 @@ export default PostVideoFullscreenControls;
 
 const SFullscreenControlsContainer = styled.div`
   position: absolute;
-  left: calc(50% - 216px);
+  left: 5%;
   bottom: 0;
 
   height: 64px;
-  width: 432px;
+  width: 90%;
 
   z-index: 2147483647;
 
@@ -219,6 +219,11 @@ const SFullscreenControlsContainer = styled.div`
   justify-content: space-between;
   flex-wrap: nowrap;
   gap: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 432px;
+    left: calc(50% - 216px);
+  }
 `;
 
 const SPlayPauseButton = styled(Button)`

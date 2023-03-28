@@ -34,6 +34,7 @@ import { useAppDispatch } from '../../../../redux-store/store';
 import isSafari from '../../../../utils/isSafari';
 import isBrowser from '../../../../utils/isBrowser';
 import PostVideoFullscreenControls from './PostVideoFullscreenControls';
+import isIOS from '../../../../utils/isIOS';
 
 interface IPostVideojsPlayer {
   id: string;
@@ -81,7 +82,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   // Fullscren
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [mouseMoved, setMouseMoved] = useState(true);
+  const [fullscreenInteracted, setFullscreenInteracted] = useState(
+    !isMobileOrTablet
+  );
   const [videoWidthFulscreen, setVideoWidthFullscreen] = useState<{
     width?: number;
     height?: number;
@@ -457,32 +460,44 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   useEffect(() => {
     let timeout: any = 0;
 
-    const handleTrackMouse = () => {
-      setMouseMoved(true);
+    const handleTrackFullscreenInteracted = () => {
+      setFullscreenInteracted(true);
 
       clearTimeout(timeout);
 
       timeout = setTimeout(() => {
-        setMouseMoved(false);
+        setFullscreenInteracted(false);
       }, 5000);
     };
 
-    if (isFullscreen && !isSafari()) {
-      window?.addEventListener('mousemove', handleTrackMouse);
+    if (isFullscreen && !isSafari() && !isIOS()) {
+      window?.addEventListener('mousemove', handleTrackFullscreenInteracted);
+      window?.addEventListener('touchstart', handleTrackFullscreenInteracted);
+      window?.addEventListener('touchmove', handleTrackFullscreenInteracted);
     } else {
-      window?.removeEventListener('mousemove', handleTrackMouse);
+      window?.removeEventListener('mousemove', handleTrackFullscreenInteracted);
+      window?.removeEventListener(
+        'touchstart',
+        handleTrackFullscreenInteracted
+      );
+      window?.removeEventListener('touchmove', handleTrackFullscreenInteracted);
       clearTimeout(timeout);
     }
 
     return () => {
-      window?.removeEventListener('mousemove', handleTrackMouse);
+      window?.removeEventListener('mousemove', handleTrackFullscreenInteracted);
+      window?.removeEventListener(
+        'touchstart',
+        handleTrackFullscreenInteracted
+      );
+      window?.removeEventListener('touchmove', handleTrackFullscreenInteracted);
       clearTimeout(timeout);
     };
   }, [isFullscreen]);
 
   // Hide cursor if mouse not moved in fullscreen
   useEffect(() => {
-    if (isBrowser() && isFullscreen && !mouseMoved) {
+    if (isBrowser() && isFullscreen && !fullscreenInteracted) {
       document.documentElement.style.cursor = 'none';
     } else {
       document.documentElement.style.cursor = '';
@@ -491,7 +506,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     return () => {
       document.documentElement.style.cursor = '';
     };
-  }, [isFullscreen, mouseMoved]);
+  }, [isFullscreen, fullscreenInteracted]);
 
   return (
     <SContent
@@ -543,7 +558,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           iconOnly
           view='transparent'
           onClick={(e) => {
-            if (!isSafari() && !isMobileOrTablet) {
+            if (!isSafari() && !isIOS()) {
               playerRef?.current?.requestFullscreen();
             } else if (document.querySelector('.vjs-tech')) {
               (
@@ -583,14 +598,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
-      {isFullscreen && mouseMoved && !isSafari()
+      {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
         ? ReactDOM.createPortal(
             <SMinimizeButton
               id='minimize-button'
               iconOnly
               view='transparent'
               style={{
-                ...(largestResolutionDimensions?.width
+                ...(largestResolutionDimensions?.width && !isMobileOrTablet
                   ? {
                       top: `calc(50% - ${
                         videoWidthFulscreen.height! / 2
@@ -602,7 +617,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
                   : {}),
               }}
               onClick={(e) => {
-                if (!isSafari() && !isMobileOrTablet) {
+                if (!isSafari() && !isIOS()) {
                   playerRef?.current?.exitFullscreen();
                 } else {
                   (
@@ -621,7 +636,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             document.querySelector('.video-js') as HTMLElement
           )
         : null}
-      {isFullscreen && mouseMoved && !isSafari()
+      {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
         ? ReactDOM.createPortal(
             <PostVideoFullscreenControls
               isPaused={isPaused && !!showPlayButton}
@@ -823,6 +838,8 @@ const SMaximizeButton = styled(Button)`
 
 const SMinimizeButton = styled(Button)`
   position: absolute;
+  right: 16px;
+  top: 16px;
 
   padding: 8px;
   width: 36px;
