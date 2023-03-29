@@ -33,9 +33,6 @@ const HeroSection = dynamic(
 const CardsSection = dynamic(
   () => import('../components/organisms/home/CardsSection')
 );
-const TutorialCard = dynamic(
-  () => import('../components/molecules/TutorialCard')
-);
 
 interface IHome {
   top10posts?: newnewapi.NonPagedPostsResponse;
@@ -139,43 +136,17 @@ const Home: NextPage<IHome> = ({
         </>
       )}
 
-      {isUserLoggedIn && (
-        <>
-          {user.userData?.options?.isCreator && collectionRA?.length > 0 && (
-            <SHeading style={{ marginTop: '80px' }}>
-              <SHeadline>{t('section.explore')}</SHeadline>
-              {/* <SSubtitle variant='subtitle'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                fames nulla dignissim tellus purus. Faucibus ornare.
-              </SSubtitle> */}
-            </SHeading>
-          )}
-          {/* Recent activity */}
-          {collectionRA?.length > 0 ? (
-            <CardsSection
-              title={t('cardsSection.title.recent-activity')}
-              category='recent-activity'
-              collection={collectionRA}
-              tutorialCard={
-                isUserLoggedIn ? (
-                  <STutorialCard
-                    image={
-                      theme.name === 'dark'
-                        ? assets.common.darkLogoAnimated()
-                        : assets.common.lightLogoAnimated()
-                    }
-                    title={t('tutorial.recent-activity.title')}
-                    caption={t('tutorial.recent-activity.caption')}
-                  />
-                ) : undefined
-              }
-              padding={isUserLoggedIn ? 'small' : 'large'}
-              onReachEnd={loadMoreCollectionRA}
-              seeMoreLink='/profile/purchases'
-            />
-          ) : null}
-        </>
-      )}
+      {/* Recent activity */}
+      {collectionRA?.length > 0 ? (
+        <SCardsSection
+          title={t('section.explore')}
+          category='explore'
+          collection={collectionRA.slice(0, 10)}
+          padding={isUserLoggedIn ? 'small' : 'large'}
+          onReachEnd={loadMoreCollectionRA}
+          seeMoreLink='/profile/purchases'
+        />
+      ) : null}
 
       {/* MC posts example */}
       <PostTypeSection
@@ -251,27 +222,17 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-// const SCardsSection = styled(CardsSection)`
-//   ${({ theme }) => theme.media.laptop} {
-//     margin-top: 12px;
-//   }
+const SCardsSection = styled(CardsSection)`
+  &:first-child {
+    padding-top: 0;
+  }
 
-//   &:last-child {
-//     padding-bottom: 40px;
-//   }
-
-//   ${({ theme }) => theme.media.tablet} {
-//     &:last-child {
-//       padding-bottom: 60px;
-//     }
-//   }
-
-//   ${({ theme }) => theme.media.laptop} {
-//     &:last-child {
-//       padding-bottom: 80px;
-//     }
-//   }
-// `;
+  ${(props) => props.theme.media.tablet} {
+    &:first-child {
+      padding-top: 8px;
+    }
+  }
+`;
 
 const SHeading = styled.div`
   margin-bottom: 20px;
@@ -325,26 +286,6 @@ const SHeadline = styled(Headline)`
 //     line-height: 24px;
 //   }
 // `;
-
-const STutorialCard = styled(TutorialCard)`
-  & img {
-    width: 152px;
-    height: 114px;
-  }
-
-  & h4 {
-    font-size: 24px;
-    line-height: 32px;
-  }
-
-  &&& {
-    & div {
-      padding: 0;
-      font-size: 16px;
-      line-height: 24px;
-    }
-  }
-`;
 
 export default Home;
 

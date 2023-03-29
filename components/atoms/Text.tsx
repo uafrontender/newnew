@@ -121,6 +121,6 @@ const SText5 = styled(SText)`
 const STextSubtitle = styled(SText)`
   font-size: 12px;
   line-height: 16px;
-  font-weight: 600;
+  font-weight: ${(props) => props.weight || 600};
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;

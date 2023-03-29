@@ -111,6 +111,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     handleAddPostToState,
   }) => {
     const { t } = useTranslation('component-PostCard');
+    const { t: tCommon } = useTranslation('common');
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
@@ -514,6 +515,11 @@ export const PostCard: React.FC<ICard> = React.memo(
               </video>
               <SImageMask />
               <STopContent>
+                <STag>
+                  <Text variant='subtitle' weight={700}>
+                    {tCommon(`postType.${typeOfPost}`)}
+                  </Text>
+                </STag>
                 <SButtonIcon
                   iconOnly
                   id='showMore'
@@ -625,6 +631,11 @@ export const PostCard: React.FC<ICard> = React.memo(
               <source key={thumbnailUrl} src={thumbnailUrl} type='video/mp4' />
             </video>
             <STopContent>
+              <STag>
+                <Text variant='subtitle' weight={700}>
+                  {tCommon(`postType.${typeOfPost}`)}
+                </Text>
+              </STag>
               <SButtonIcon
                 iconOnly
                 id='showMore'
@@ -901,7 +912,7 @@ const SImageHolder = styled.div<ISWrapper>`
   width: 254px;
   height: 100%;
   display: flex;
-  padding: 16px;
+  padding: 8px;
   z-index: 2;
   overflow: hidden;
   position: absolute;
@@ -931,7 +942,6 @@ const SImageHolder = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     width: 212px;
-    padding: 12px;
 
     border: 1.5px solid;
     border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -1020,8 +1030,8 @@ const SImageMask = styled.div`
 const STopContent = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
   justify-content: flex-end;
-  padding-right: 8px;
 
   ${({ theme }) => theme.media.tablet} {
     padding-right: initial;
@@ -1048,6 +1058,7 @@ const SText = styled(Text)`
 
 const SWrapperOutside = styled.div<ISWrapper>`
   width: ${(props) => props.width};
+  min-width: 224px;
   cursor: pointer;
   display: flex;
   position: relative;
@@ -1080,7 +1091,7 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 224px;
+    max-width: ${(props) => props.width};
 
     :hover {
       #showMore {
@@ -1110,18 +1121,16 @@ const SImageHolderOutside = styled.div`
   width: 100%;
   height: 100%;
   z-index: 1;
-  padding: 16px;
   position: absolute;
   transition: all ease 0.5s;
 
   width: calc(100% - 20px);
   left: 10px;
-  padding: 10px;
+  padding: 8px;
   overflow: hidden;
   border-radius: 10px;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 12px;
     overflow: hidden;
     border-radius: 10px;
   }
@@ -1168,22 +1177,28 @@ const SBottomContentOutside = styled.div`
   word-break: break-word;
 `;
 
-const STextOutside = styled(Text)`
+export const STextOutside = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   display: -webkit-box;
   overflow: hidden;
   position: relative;
 
+  margin-bottom: 10px;
+  height: 48px;
+
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
 
-  margin-bottom: 10px;
+  ${(props) => props.theme.media.tablet} {
+    height: 40px;
 
-  height: 40px;
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;
 
 const SHashtag = styled.span`
@@ -1193,7 +1208,7 @@ const SHashtag = styled.span`
   color: ${(props) => props.theme.colorsThemed.accent.blue};
 `;
 
-const SBottomStart = styled.div<{
+export const SBottomStart = styled.div<{
   hasEnded: boolean;
 }>`
   display: flex;
@@ -1206,7 +1221,7 @@ const SBottomStart = styled.div<{
   overflow: hidden;
 `;
 
-const SUserAvatarOutside = styled(UserAvatar)`
+export const SUserAvatarOutside = styled(UserAvatar)`
   flex-shrink: 0;
   width: 24px;
   height: 24px;
@@ -1224,20 +1239,26 @@ const SUsernameContainer = styled.div`
   margin-right: 2px;
 `;
 
-const SUsername = styled(Text)`
+export const SUsername = styled(Text)`
   display: inline-flex;
   flex-shrink: 1;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  margin-left: 6px;
+  margin-left: 8px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: normal;
+
+  ${(props) => props.theme.media.tablet} {
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 16px;
+  }
 `;
 
 const SCardTimer = styled(CardTimer)`
@@ -1278,12 +1299,12 @@ interface ISButtonSpan {
   cardType: string;
 }
 
-const SButton = styled(Button)<ISButtonSpan>`
-  padding: 12px;
-  border-radius: 12px;
-
+export const SButton = styled(Button)<ISButtonSpan>`
+  padding: 8px 12px;
   width: 100%;
-  height: 36px;
+  height: 48px;
+
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   span {
     font-weight: 700;
@@ -1300,17 +1321,10 @@ const SButton = styled(Button)<ISButtonSpan>`
   }
 
   ${(props) => props.theme.media.tablet} {
+    height: 36px;
     padding: 8px 12px;
 
-    span {
-      font-size: 14px;
-    }
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    span {
-      font-size: 16px;
-    }
+    border-radius: ${({ theme }) => theme.borderRadius.smallLg};
   }
 
   &&& {
@@ -1369,11 +1383,40 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SButtonIcon = styled(Button)`
-  padding: 8px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 6px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.small};
+
+    div {
+      width: 16px;
+      height: 16px;
+    }
+  }
 
   ${(props) => props.theme.media.laptop} {
     opacity: 0;
     transition: all ease 0.5s;
+  }
+`;
+
+const STag = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: auto;
+  padding: 5px 16px;
+  z-index: 1;
+
+  border: ${({ theme }) => `1px solid ${theme.colors.white}`};
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.33);
+
+  div {
+    color: ${({ theme }) => theme.colors.white};
   }
 `;
