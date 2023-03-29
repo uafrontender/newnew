@@ -490,6 +490,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   // Prevent pausing video when trying to show fullscreen controls on non-iOS touch devices
   const handlePlayPauseWrapperOnTouchStart = useCallback(() => {
+    if (!isFullscreen) {
+      return;
+    }
     if (isMobileOrTablet && !isIOS() && !fullscreenInteracted && isFullscreen) {
       return;
     }
@@ -504,6 +507,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   }, [fullscreenInteracted, handleSetIsPaused, isFullscreen, isMobileOrTablet]);
 
   const handlePlayPauseWrapperOnMouseDown = useCallback(() => {
+    if (!isFullscreen) {
+      return;
+    }
     if (!window?.matchMedia('(pointer: coarse)')?.matches) {
       if (!playerRef.current?.paused()) {
         playerRef.current?.pause();
@@ -513,7 +519,20 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         });
       }
     }
-  }, [handleSetIsPaused]);
+  }, [handleSetIsPaused, isFullscreen]);
+
+  const handlePlayPauseWrapperOnClick = useCallback(() => {
+    if (isFullscreen) {
+      return;
+    }
+    if (!playerRef.current?.paused()) {
+      playerRef.current?.pause();
+    } else {
+      playerRef.current?.play()?.catch(() => {
+        handleSetIsPaused(true);
+      });
+    }
+  }, [handleSetIsPaused, isFullscreen]);
 
   // Hide controls if mouse not moved in fullscreen
   useEffect(() => {
@@ -581,6 +600,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           id={id}
           onTouchStart={handlePlayPauseWrapperOnTouchStart}
           onMouseDown={handlePlayPauseWrapperOnMouseDown}
+          onClick={handlePlayPauseWrapperOnClick}
           ref={videoRef}
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
