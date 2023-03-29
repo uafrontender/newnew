@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
@@ -47,6 +47,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import getDisplayname from '../../../../utils/getDisplayname';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
+import DisplayName from '../../../atoms/DisplayName';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -121,6 +122,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     handleGoBackInsidePost,
     resetSetupIntentClientSecret,
     refetchPost,
+    handleUpdatePostData,
   } = usePostInnerState();
   const post = useMemo(
     () => postParsed as newnewapi.MultipleChoice,
@@ -302,8 +304,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === post.postUuid) {
-        await fetchPostLatestData();
+      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+        handleUpdatePostData(decoded.post);
       }
     };
 
@@ -495,7 +497,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                   {t('expires.end_date')}{' '}
                   {moment((post.expiresAt?.seconds as number) * 1000)
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                 </SEndDate>
               </>
             ) : (
@@ -531,7 +533,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                   {t('expires.end_date')}{' '}
                   {moment((post.expiresAt?.seconds as number) * 1000)
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                 </SEndDate>
               </>
             ) : (
@@ -583,7 +585,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                         {t('expires.end_date')}{' '}
                         {moment((post.expiresAt?.seconds as number) * 1000)
                           .locale(router.locale || 'en-US')
-                          .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                          .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                       </SEndDate>
                     </>
                   ) : (
@@ -609,12 +611,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           <McOptionsTab
             post={post}
             postStatus={postStatus}
-            postCreatorName={getDisplayname(post.creator)}
-            postDeadline={moment(
-              (post.responseUploadDeadline?.seconds as number) * 1000
-            )
-              .subtract(3, 'days')
-              .calendar()}
+            postCreator={post.creator}
             options={options}
             canAddCustomOption={canAddCustomOption}
             bundle={creatorsBundle?.bundle ?? undefined}
@@ -640,14 +637,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               promptUserWithPushNotificationsPermissionModal();
             }}
           >
-            {t('paymentSuccessModal.mc', {
-              postCreator: getDisplayname(post.creator),
-              postDeadline: moment(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              )
-                .subtract(3, 'days')
-                .calendar(),
-            })}
+            <Trans
+              t={t}
+              i18nKey='paymentSuccessModal.mc'
+              // @ts-ignore
+              components={[<DisplayName user={postCreator} />]}
+            />
           </PaymentSuccessModal>
         )}
         {isPopupVisible && (

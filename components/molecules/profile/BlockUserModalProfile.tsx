@@ -7,7 +7,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import preventParentClick from '../../../utils/preventParentClick';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IBlockUserModalProfile {
   user: newnewapi.IUser;

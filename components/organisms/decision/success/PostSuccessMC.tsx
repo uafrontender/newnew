@@ -14,7 +14,6 @@ import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 
 // Utils
 import { formatNumber } from '../../../../utils/format';
-import getDisplayname from '../../../../utils/getDisplayname';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 
@@ -23,12 +22,11 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 
 import assets from '../../../../constants/assets';
-import InlineSvg from '../../../atoms/InlineSVG';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
 import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
+import DisplayName from '../../../atoms/DisplayName';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -221,17 +219,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                               t={t}
                               i18nKey='mcPostSuccess.wantsToKnow'
                               // @ts-ignore
-                              components={[
-                                post.creator?.options?.isVerified ? (
-                                  <SInlineSVG
-                                    svg={VerificationCheckmark}
-                                    width='16px'
-                                    height='16px'
-                                    fill='none'
-                                  />
-                                ) : null,
-                                { creator: getDisplayname(post.creator) },
-                              ]}
+                              components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>
                         </a>
@@ -259,6 +247,14 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                         {winningOption.voteCount > 1
                           ? t('mcPostSuccess.votes')
                           : t('mcPostSuccess.vote')}
+                        {` `}
+                        {winningOption.totalAmount?.usdCents &&
+                        winningOption.totalAmount?.usdCents > 0
+                          ? `($${formatNumber(
+                              winningOption.totalAmount?.usdCents / 100 ?? 0,
+                              true
+                            )})`
+                          : ''}
                       </SWinningOptionAmount>
                       <SSeparator />
                       <SWinningOptionDetails>
@@ -507,6 +503,7 @@ const SWantsToKnow = styled.span`
   position: relative;
   display: inline-flex;
   align-items: center;
+  white-space: pre;
   top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
@@ -519,10 +516,6 @@ const SWantsToKnow = styled.span`
     font-size: 16px;
     line-height: 24px;
   }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-right: 2px;
 `;
 
 const STotal = styled.div`

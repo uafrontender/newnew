@@ -8,7 +8,7 @@ import UserAvatar from '../UserAvatar';
 import formatTimeLeft from '../../../utils/formatTimeLeft';
 import BulletLine from './BulletLine';
 import { formatNumber } from '../../../utils/format';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IBundleCard {
   className?: string;

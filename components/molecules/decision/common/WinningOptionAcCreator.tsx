@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { formatNumber } from '../../../../utils/format';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 
 interface IWinningOptionAcCreator {
   winningOption: newnewapi.Auction.IOption;
@@ -99,7 +99,9 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
               {` & `}
               {formatNumber(winningOption.supporterCount - 1, true)}
               &nbsp;
-              {t('acPostSuccess.others')}
+              {winningOption.supporterCount - 1 > 1
+                ? t('acPostSuccess.others')
+                : t('acPostSuccess.other')}
             </>
           ) : null}
           &nbsp;
