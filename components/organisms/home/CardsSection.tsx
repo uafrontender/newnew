@@ -94,7 +94,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
     const collectionToRender = useMemo(() => {
       if (isMobile && collection?.length > 3) {
-        return collection.slice(0, 3);
+        return collection;
+        // TODO: temporary all posts are shown
+        // return collection.slice(0, 3);
       }
 
       return collection;
@@ -102,7 +104,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
     const renderShowMore = useMemo(() => {
       if (isMobile && collection?.length > 3) {
-        return true;
+        return false;
+
+        // TODO:temporary see more is hided
+        // return true;
       }
 
       return false;
@@ -478,7 +483,6 @@ const SWrapper = styled.section<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 52px 0 20px;
     margin: 0 -32px;
   }
 

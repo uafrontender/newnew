@@ -139,12 +139,12 @@ const Home: NextPage<IHome> = ({
       {/* Recent activity */}
       {collectionRA?.length > 0 ? (
         <SCardsSection
-          title={t('section.explore')}
-          category='explore'
+          title={t('section.popular')}
+          category='popular'
           collection={collectionRA.slice(0, 10)}
           padding={isUserLoggedIn ? 'small' : 'large'}
           onReachEnd={loadMoreCollectionRA}
-          seeMoreLink='/profile/purchases'
+          // seeMoreLink='/profile/purchases'
         />
       ) : null}
 

@@ -186,7 +186,7 @@ const SCardsSection = styled(CardsSection)`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 80px;
+    margin-bottom: 20px;
   }
 `;
 
@@ -197,17 +197,17 @@ const SCreateFirstContainer = styled.div`
   justify-content: center;
   border: 2px solid ${({ theme }) => theme.colorsThemed.accent.blue};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  height: 198px;
+  height: 216px;
   margin-bottom: 40px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 280px;
+    height: 292px;
 
     margin-bottom: 70px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: 484px;
+    height: 438px;
   }
 
   ${(props) => props.theme.media.laptopM} {
@@ -233,16 +233,15 @@ const SHeadline = styled(Headline)`
     margin-bottom: 24px;
     max-width: 320px;
 
-    font-size: 36px;
-    line-height: 44px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-bottom: 40px;
     max-width: 520px;
 
-    font-size: 64px;
-    line-height: 72px;
+    font-size: 40px;
+    line-height: 48px;
   }
 `;
 
