@@ -25,7 +25,6 @@ import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMe
 import McConfirmDeleteOptionModal from './McConfirmDeleteOptionModal';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
-import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
@@ -361,7 +360,7 @@ const McOptionCardModeration: React.FunctionComponent<
       {option.isCreatedBySubscriber && option.creator && (
         <ReportModal
           show={isReportModalOpen}
-          reportedDisplayname={getDisplayname(option.creator)}
+          reportedUser={option.creator}
           onSubmit={handleReportSubmit}
           onClose={handleReportClose}
         />

@@ -1,8 +1,12 @@
-/* eslint-disable no-plusplus */
 import Router from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useBeforeUnload } from 'react-use';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+
+function getPathFromUrl(url: string) {
+  const queryStartsAt = url.indexOf('?');
+  return url.slice(0, queryStartsAt !== -1 ? queryStartsAt : undefined);
+}
 
 export const useLeavePageConfirm = (
   isConfirm: boolean,
@@ -19,16 +23,13 @@ export const useLeavePageConfirm = (
     }
 
     return routes;
-  }, [allowedRoutes])
+  }, [allowedRoutes]);
 
   useBeforeUnload(isConfirm, message);
 
   useEffect(() => {
-    const handler = (route: string) => {
-      const routeTrimmed = route.slice(
-        0,
-        route.indexOf('?') !== -1 ? route.indexOf('?') : undefined
-      );
+    const beforeHistoryChangeHandler = (route: string) => {
+      const routeTrimmed = getPathFromUrl(route);
       if (!allowedRoutesWithLocales.includes(routeTrimmed) && isConfirm) {
         if (!window.confirm(message)) {
           // eslint-disable-next-line no-throw-literal
@@ -39,10 +40,10 @@ export const useLeavePageConfirm = (
       }
     };
 
-    Router.events.on('beforeHistoryChange', handler);
+    Router.events.on('beforeHistoryChange', beforeHistoryChangeHandler);
 
     return () => {
-      Router.events.off('beforeHistoryChange', handler);
+      Router.events.off('beforeHistoryChange', beforeHistoryChangeHandler);
     };
   }, [isConfirm, message, allowedRoutesWithLocales, callback]);
 };

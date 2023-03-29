@@ -226,7 +226,7 @@ const SEditPictureMenu = styled(motion.div)`
     top: max(min((100vh - 690px) / 2, 136px), 0px);
     left: calc(50% - 232px);
 
-    width: 464px;
+    width: 454px;
     height: 100%;
     max-height: 690px;
 

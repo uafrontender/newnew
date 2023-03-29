@@ -47,7 +47,7 @@
           "tooShort": "El usuario es demasiado corto",
           "invalidChar": "El usuario contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
-          "taken": "Este nombre de usuario ya está ocupado. Prueba con otro",
+          "taken": "Este nombre de usuario está tomado",
           "linksForbidden": "Los enlaces no están permitidos"
         },
         "points": {
@@ -69,10 +69,10 @@
       },
       "email": {
         "placeholder": "Correo electrónico",
-        "cantChangeInfoCaption_NEED_TRANSLATION": "You can edit your email in settings later",
+        "cantChangeInfoCaption": "Puedes editar tu correo electrónico en la configuración después",
         "errors": {
           "invalidEmail": "Por favor, introduce una dirección de correo electrónico válida",
-          "emailTaken": "Este correo electrónico ya está ocupado. Prueba con otro"
+          "emailTaken": "Este correo electrónico está tomado"
         }
       },
       "dateOfBirth": {

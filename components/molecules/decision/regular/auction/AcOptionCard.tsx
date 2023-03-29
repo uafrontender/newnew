@@ -3,7 +3,7 @@
 /* eslint-disable arrow-body-style */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
@@ -37,7 +37,6 @@ import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 // Utils
 import { formatNumber } from '../../../../../utils/format';
 import { Mixpanel } from '../../../../../utils/mixpanel';
-import getDisplayname from '../../../../../utils/getDisplayname';
 import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { reportEventOption } from '../../../../../api/endpoints/report';
@@ -58,6 +57,7 @@ import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png
 import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../../../contexts/appStateContext';
+import DisplayName from '../../../../atoms/DisplayName';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -85,8 +85,7 @@ interface IAcOptionCard {
   votingAllowed: boolean;
   postUuid: string;
   postShortId: string;
-  postCreatorName: string;
-  postDeadline: string;
+  postCreator: newnewapi.IUser | null | undefined;
   postText: string;
   index: number;
   optionBeingSupported?: string;
@@ -105,8 +104,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   votingAllowed,
   postUuid,
   postShortId,
-  postCreatorName,
-  postDeadline,
+  postCreator,
   postText,
   index,
   optionBeingSupported,
@@ -527,7 +525,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                         : 1),
                     true
                   )}{' '}
-                  {t('acPost.optionsTab.optionCard.others')}
+                  {option.supporterCount -
+                    ((isSupportedByMe && !isMyBid) ||
+                    (isSupportedByMe && isMyBid && option.whitelistSupporter)
+                      ? 2
+                      : 1) >
+                  1
+                    ? t('acPost.optionsTab.optionCard.others')
+                    : t('acPost.optionsTab.optionCard.other')}
                 </SSpanBiddersHighlighted>
               </>
             ) : null}{' '}
@@ -716,10 +721,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             (!appConstants.minHoldAmount?.usdCents ||
               paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
               <SPaymentSign variant='subtitle'>
-                {t('acPost.paymentModalFooter.body', {
-                  creator: postCreatorName,
-                })}
-                *
+                <Trans
+                  t={t}
+                  i18nKey='acPost.paymentModalFooter.body'
+                  // @ts-ignore
+                  components={[<DisplayName user={postCreator} />]}
+                />
+                {' *'}
                 <Link href='https://terms.newnew.co'>
                   <SPaymentTermsLink
                     href='https://terms.newnew.co'
@@ -745,9 +753,17 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('acPost.paymentModalHeader.title', {
-                  creator: postCreatorName,
-                })}
+                <Trans
+                  t={t}
+                  i18nKey='acPost.paymentModalHeader.title'
+                  // @ts-ignore
+                  components={[
+                    <DisplayName
+                      user={postCreator}
+                      suffix={t('acPost.paymentModalHeader.suffix')}
+                    />,
+                  ]}
+                />
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
@@ -773,10 +789,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           promptUserWithPushNotificationsPermissionModal();
         }}
       >
-        {t('paymentSuccessModal.ac', {
-          postCreator: postCreatorName,
-          postDeadline,
-        })}
+        <Trans
+          t={t}
+          i18nKey='paymentSuccessModal.ac'
+          // @ts-ignore
+          components={[<DisplayName user={postCreator} />]}
+        />
       </PaymentSuccessModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -817,7 +835,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       {option.creator && (
         <ReportModal
           show={isReportModalOpen}
-          reportedDisplayname={getDisplayname(option.creator)}
+          reportedUser={option.creator}
           onSubmit={handleReportSubmit}
           onClose={handleReportClose}
         />
@@ -1159,6 +1177,9 @@ const SPaymentModalHeadingPostSymbolImg = styled.img`
 `;
 
 const SPaymentModalHeadingPostCreator = styled(Text)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 600;
   font-size: 14px;

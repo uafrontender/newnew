@@ -12,7 +12,7 @@ import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useStripeSetupIntent from '../../../utils/hooks/useStripeSetupIntent';
 import { Mixpanel } from '../../../utils/mixpanel';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 import { ModalType } from '../../organisms/Modal';
 import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';

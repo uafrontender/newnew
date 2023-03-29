@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "NewNew上的{{postTitle}} | {{displayName}}",
-    "deletedPost_NEED_TRANSLATION": "Deleted post",
+    "deletedPost": "已刪除的帖子",
     "description": {
       "ac": {
         "withContributions": "NewNew上出價共有${{totalInBids}}",
@@ -65,9 +65,9 @@
       "cf": "你選擇支持這個Goal！"
     },
     "doneButton": "聽起來不錯！",
-    "ac": "{{postCreator}}將在競標結束後挑選他們最喜歡的一個。",
-    "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
-    "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
+    "ac": "<0/>將在競標結束後挑選他們最喜歡的一個。",
+    "mc": "<0/>將在Superpoll結束後完成得票數最多的選項。",
+    "cf": "<0/>在獲得足夠的支持者后，就會完成這個Goal。"
   },
   "postFailedBoxModeration": {
     "title": "{{postType}}被取消",
@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "該{{postType}}已被取消",
     "reason": {
-      "no-response": "{{creator}}沒有及時發佈回應視頻",
-      "ac-no-winner": "{{creator}}沒有及時選擇出價",
+      "no-response": "<0/>沒有及時發佈回應視頻",
+      "ac-no-winner": "<0/>沒有及時選擇出價",
       "ac": "時間在出價之前已經用完",
       "mc": "時間在進行投票之前已經用完",
       "cf": "時間在達到Goal之前已經用完"
@@ -148,8 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "你的觀眾在等著呢！",
-        "title_2_NEED_TRANSLATION": "Select a file",
-        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
+        "title_2": "選擇一個文件",
+        "title_2Long": "選擇一個文件並拖放到這裡",
         "description": "視頻的最大尺寸為10GB",
         "button": "選擇檔案"
       },
@@ -316,11 +316,12 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{creator}}的Bid",
+      "title": "<0/>的Bid",
+      "suffix": "",
       "subtitle": "你的出價"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有當<0/>選擇了你的出價時，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -347,6 +348,7 @@
       "optionCard": {
         "by": "由",
         "bidders": "出價者",
+        "other": "其他",
         "others": "其他",
         "bid": "出價",
         "supportButton": "提高",
@@ -387,7 +389,8 @@
       "votes": "票"
     },
     "paymentModalHeader": {
-      "title": "{{creator}}的Superpoll",
+      "title": "<0/>的Superpoll",
+      "suffix": "",
       "subtitle": "你選擇的選項"
     },
     "paymentModalFooter": {
@@ -409,6 +412,7 @@
         "votes": "票",
         "vote": "票",
         "mySuggestion": "我的建議",
+        "other": "其他",
         "others": "其他",
         "voters": "投票者",
         "voted": "投票",
@@ -430,9 +434,10 @@
           "vote": "票",
           "votes": "票",
           "custom": "自定義投票",
-          "buySingleVote": "購買1票，在{{creator}}的Superpoll中投票",
-          "buyMultipleVotes": "購買{{amount}}票，在{{creator}}的Superpoll中投票",
-          "buyAnyVotes": "購買任意數量的票數並在{{creator}}的Superpoll上投票",
+          "buySingleVote": "購買1票，在<0/>的Superpoll中投票",
+          "buyMultipleVotes": "購買{{amount}}票，在<0/>的Superpoll中投票",
+          "buyAnyVotes": "購買任意數量的票數並在<0/>的Superpoll上投票",
+          "suffix": "",
           "optionCaption": "Superpoll選項",
           "voteButton": "投票"
         }
@@ -499,10 +504,11 @@
       }
     },
     "paymentModalHeader": {
-      "title": "{{creator}}的Goal"
+      "title": "<0/>的Goal",
+      "suffix": ""
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。只有{{creator}}完成其Goal後，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有<0/>完成其Goal後，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -606,8 +612,9 @@
   },
   "acPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "wantsToKnow": "<0/>想知道......",
     "inTotalBids": "在總的出價中",
+    "other": "其他",
     "others": "其他",
     "bid": "出價",
     "bidChosen": "選擇的出價",
@@ -618,8 +625,9 @@
   },
   "mcPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "wantsToKnow": "<0/>想知道......",
     "inTotalVotes": "總票數",
+    "other": "其他",
     "others": "其他",
     "voted": "已投票",
     "votes": "票",
@@ -632,7 +640,7 @@
   },
   "cfPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}的<0/>Goal",
+    "wantsToKnow": "的<0/>Goal",
     "creatorsBackers": "{{creator}}的支持者",
     "ofTargetBackers": "共需 {{target_count}}支持者",
     "youBackedFor": "你支持的金額是"
@@ -652,14 +660,8 @@
         "seconds_singular": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}<0/>想知道......",
-    "inTotalBids": "在總的出價中",
-    "others": "其他",
-    "bid": "出價",
-    "seeAll": "查看所有出價",
-    "optionsTab": {
-      "backButton": "返回"
-    }
+    "wantsToKnow": "<0/>想知道......",
+    "inTotalBids": "在總的出價中"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +679,7 @@
         "seconds_singular": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}<0/>想知道......",
-    "inTotalVotes": "總票數",
-    "others": "其他",
-    "voted": "已投票",
-    "votes": "票",
-    "vote": "投票",
-    "optionChosen": "最高票數的選項",
-    "seeAll": "查看所有選項",
-    "optionsTab": {
-      "backButton": "返回"
-    }
+    "wantsToKnow": "<0/>想知道......"
   },
   "recommendationsSection": {
     "heading": "更多類似"
