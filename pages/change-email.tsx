@@ -44,15 +44,13 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 
         const res = await setMyEmail(requestPayload);
 
-        if (!res!! || res!!.error || !res.data)
+        if (!res || res.error || !res.data) {
           throw new Error(res!!.error?.message ?? 'An error occurred');
+        }
 
-        const { data } = res!!;
+        const { data } = res;
 
-        if (
-          !data ||
-          data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
-        )
+        if (data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS)
           throw new Error('Request failed');
 
         if (user.loggedIn) {

@@ -92,7 +92,6 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
         }}
       >
         <CodeVerificationMenu
-          expirationTime={60}
           allowLeave={!signupEmailInput}
           redirectUserTo={goal === 'create' ? '/creator-onboarding' : undefined}
           onBack={handleBack}

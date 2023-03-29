@@ -9,6 +9,7 @@ import { useCookies } from 'react-cookie';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
   setSignupEmailInput,
+  setSignupTimerValue,
   setUserData,
   setUserLoggedIn,
 } from '../../redux-store/slices/userStateSlice';
@@ -38,14 +39,12 @@ import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { useAppState } from '../../contexts/appStateContext';
 
 export interface ICodeVerificationMenu {
-  expirationTime: number;
   allowLeave: boolean;
   redirectUserTo?: string;
   onBack: () => void;
 }
 
 const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
-  expirationTime,
   allowLeave,
   redirectUserTo,
   onBack,
@@ -63,7 +62,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { signupEmailInput } = useAppSelector((state) => state.user);
+  const { signupEmailInput, signupTimerValue } = useAppSelector(
+    (state) => state.user
+  );
   const dispatch = useAppDispatch();
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -83,7 +84,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
   // Timer
-  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+  const [canResendAt, setCanResendAt] = useState<number>(
+    Date.now() + signupTimerValue * 1000
+  );
 
   useLeavePageConfirm(!isSuccess && !allowLeave, t('leaveAlert'), []);
 
@@ -105,9 +108,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         const { data, error } = await signInWithEmail(signInRequest);
 
         if (
+          error ||
           !data ||
-          data.status !== newnewapi.SignInResponse.Status.SUCCESS ||
-          error
+          data.status !== newnewapi.SignInResponse.Status.SUCCESS
         ) {
           throw new Error(error?.message ?? 'Request failed');
         }
@@ -150,6 +153,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         // Set logged in and
         dispatch(setUserLoggedIn(true));
         dispatch(setSignupEmailInput(''));
+        dispatch(setSignupTimerValue(0));
 
         setIsSuccess(true);
 
@@ -196,9 +200,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
   const handleResendCode = async () => {
+    if (isResendCodeLoading) {
+      return;
+    }
+
     setIsResendCodeLoading(true);
     setSubmitError('');
-    setTimerStartTime(Date.now());
+
     try {
       Mixpanel.track('Resend code', {
         _stage: 'Sign Up',
@@ -212,12 +220,24 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
       const { data, error } = await sendVerificationEmail(payload);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+      if (!data || error) {
+        throw new Error(error?.message ?? 'Request failed');
+      }
 
+      if (
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+      ) {
+        // TODO: add texts for individual error statuses
+        throw new Error('Request failed');
+      }
+
+      setCanResendAt(Date.now() + data.retryAfter * 1000);
       setIsResendCodeLoading(false);
       setCodeInitial(new Array(6).join('.').split('.'));
     } catch (err: any) {
-      setTimerStartTime(null);
       setIsResendCodeLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
     }
@@ -230,7 +250,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
   const onCodeComplete = useCallback(
     (args: any) => {
-      if (!signupEmailInput) return;
+      if (!signupEmailInput) {
+        return;
+      }
 
       signInWithRecaptchaProtection(args);
     },
@@ -291,14 +313,10 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           error={submitError ? true : undefined}
           onComplete={onCodeComplete}
         />
-        <SVerificationCodeResend
-          expirationTime={expirationTime}
+        <VerificationCodeResend
+          canResendAt={canResendAt}
+          show={!submitError && !isSignInWithEmailLoading && !isSuccess}
           onResendClick={handleResendCode}
-          onTimerEnd={() => {
-            setTimerStartTime(null);
-          }}
-          $invisible={!!submitError || !!isSignInWithEmailLoading}
-          startTime={timerStartTime}
         />
         {!isSignInWithEmailLoading &&
         !isResendCodeLoading &&
@@ -314,10 +332,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       </SCodeVerificationMenu>
     </>
   );
-};
-
-CodeVerificationMenu.defaultProps = {
-  expirationTime: 60,
 };
 
 export default CodeVerificationMenu;
@@ -476,11 +490,4 @@ const SErrorDiv = styled(Text)`
   ${({ theme }) => theme.media.laptopL} {
     line-height: 24px;
   }
-`;
-
-const SVerificationCodeResend = styled(VerificationCodeResend)<{
-  $invisible: boolean;
-}>`
-  visibility: ${({ $invisible }) => ($invisible ? 'hidden' : 'visible')};
-  height: 0;
 `;

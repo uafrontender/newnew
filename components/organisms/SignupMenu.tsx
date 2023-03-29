@@ -13,7 +13,10 @@ import isEmail from 'validator/lib/isEmail';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
-import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
+import {
+  setSignupEmailInput,
+  setSignupTimerValue,
+} from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
@@ -97,13 +100,16 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
     setSubmitError('');
+
     try {
       const localHasSoldBundles = loadStateLS(
         'creatorHasSoldBundles'
       ) as boolean;
+
       if (localHasSoldBundles) {
         removeStateLS('creatorHasSoldBundles');
       }
+
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
         useCase:
@@ -117,9 +123,22 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
       const { data, error } = await sendVerificationEmail(payload);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+      if (!data || error) {
+        throw new Error(error?.message ?? 'Request failed');
+      }
+
+      if (
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+      ) {
+        // TODO: add texts for individual error statuses
+        throw new Error('Request failed');
+      }
 
       dispatch(setSignupEmailInput(emailInput));
+      dispatch(setSignupTimerValue(data.retryAfter));
 
       authLayoutContext.setShouldHeroUnmount(true);
 
@@ -128,6 +147,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         reason,
         redirectUrl: redirectURL,
       };
+
       const queryString = Object.entries(parameters)
         .filter(([key, value]) => value)
         .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
@@ -319,7 +339,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 isValid={emailInputValid}
                 disabled={isSubmitLoading}
                 onFocus={() => {
-                  if (submitError) setSubmitError('');
+                  if (submitError) {
+                    setSubmitError('');
+                  }
                 }}
                 onChange={(e) => setEmailInput(e.target.value)}
                 placeholder={t('signUpOptions.email')}
