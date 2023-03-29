@@ -747,7 +747,8 @@ const SWrapper = styled.div<{
   }
 
   video {
-    width: 100% !important;
+    /* Fix background image flickering through */
+    width: calc(100% + 1px) !important;
     height: 100% !important;
 
     object-fit: ${({ videoOrientation, isFullScreen }) =>
