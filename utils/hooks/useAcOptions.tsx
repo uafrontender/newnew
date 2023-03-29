@@ -193,7 +193,11 @@ const useAcOptions = (
                   ...newOrUpdatedOption,
                 };
 
-                workingData.pages[k].acOptions[optionIndex].isSupportedByMe = data.pages[k].acOptions[optionIndex].isSupportedByMe;
+                // eslint-disable-next-line no-extra-boolean-cast
+                if (!!data.pages[k].acOptions[optionIndex].isSupportedByMe) {
+                  workingData.pages[k].acOptions[optionIndex].isSupportedByMe =
+                    data.pages[k].acOptions[optionIndex].isSupportedByMe;
+                }
                 optionExists = true;
                 break;
               }
