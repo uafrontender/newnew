@@ -9,7 +9,7 @@ import {
   SBottomActionText,
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IMessagingDisabled {
   user: newnewapi.IUser;

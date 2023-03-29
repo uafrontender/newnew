@@ -12,7 +12,7 @@ import {
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
 import { Mixpanel } from '../../../utils/mixpanel';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 const BlockUserModal = dynamic(() => import('./BlockUserModal'));
 

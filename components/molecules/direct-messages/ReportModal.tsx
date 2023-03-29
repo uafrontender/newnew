@@ -17,6 +17,7 @@ import Button from '../../atoms/Button';
 import CheckMark from '../CheckMark';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../atoms/DisplayName';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -25,14 +26,14 @@ export interface ReportData {
 
 interface IReportModal {
   show: boolean;
-  reportedDisplayname: string;
+  reportedUser: newnewapi.IUser;
   onSubmit: (reportData: ReportData) => Promise<void>;
   onClose: () => void;
 }
 
 // Accept user object, use JSX.element in ModalPaperTitle, use DisplayName component to add verification icon
 const ReportModal: React.FC<IReportModal> = React.memo(
-  ({ show, reportedDisplayname, onClose, onSubmit }) => {
+  ({ show, reportedUser, onClose, onSubmit }) => {
     const { t } = useTranslation('common');
     const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -170,7 +171,12 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       <>
         <Modal show={show} onClose={handleClose} additionalz={1000}>
           <ModalPaper
-            title={`${t('modal.reportUser.title')} ${reportedDisplayname}`}
+            title={
+              <SModalTitle>
+                {t('modal.reportUser.title')}
+                <DisplayName user={reportedUser} />
+              </SModalTitle>
+            }
             onClose={handleClose}
             isMobileFullScreen
             onClick={preventParentClick()}
@@ -252,6 +258,12 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 );
 
 export default ReportModal;
+
+const SModalTitle = styled.div`
+  display: flex;
+  flex-direction: row;
+  white-space: pre;
+`;
 
 const SModalMessage = styled.p`
   font-size: 14px;

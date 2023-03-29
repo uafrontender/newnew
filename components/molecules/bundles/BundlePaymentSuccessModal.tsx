@@ -13,7 +13,7 @@ import BulletLine from './BulletLine';
 import Button from '../../atoms/Button';
 import AnimatedBackground from '../../atoms/AnimationBackground';
 import getBundleOfferLevel from '../../../utils/getCurrentBundleLevel';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IBuyBundleModal {
   show: boolean;

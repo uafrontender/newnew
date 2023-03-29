@@ -11,11 +11,11 @@ const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
 interface IModalPaper {
   className?: string;
-  title?: string;
-  onClose: () => void;
+  title?: React.ReactNode;
   children: React.ReactNode;
   isMobileFullScreen?: boolean;
   isCloseButton?: boolean;
+  onClose: () => void;
   onClick?: (...params: any) => void;
 }
 
@@ -24,9 +24,9 @@ const ModalPaper: React.FC<IModalPaper> = React.memo(
     className,
     title,
     children,
-    onClose,
     isCloseButton,
     isMobileFullScreen,
+    onClose,
     ...otherProps
   }) => {
     const theme = useTheme();
@@ -130,12 +130,12 @@ const SModal = styled.div<{
 
 export const SContent = styled.div`
   overflow-y: scroll;
-  padding: 16px;
-  margin: -16px;
+  padding-bottom: 16px;
+  margin-bottom: -16px;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 24px;
-    margin: -24px;
+    padding-bottom: 24px;
+    margin-bottom: -24px;
   }
 
   /* Hide scrollbar */
@@ -154,9 +154,8 @@ const SFullScreenHeader = styled.div`
 `;
 
 const SHeader = styled.div`
-  display: block;
+  display: flex;
   height: auto;
-  margin: 0 0 24px;
 `;
 
 const SCloseButton = styled.div`

@@ -24,13 +24,12 @@ import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 import PostTitleContent from '../../../atoms/PostTitleContent';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import InlineSvg from '../../../atoms/InlineSVG';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../../utils/isBrowser';
 import { useAppState } from '../../../../contexts/appStateContext';
+import DisplayName from '../../../atoms/DisplayName';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -208,17 +207,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                         t={t}
                         i18nKey='acPostAwaiting.wantsToKnow'
                         // @ts-ignore
-                        components={[
-                          post.creator?.options?.isVerified ? (
-                            <SInlineSVG
-                              svg={VerificationCheckmark}
-                              width='16px'
-                              height='16px'
-                              fill='none'
-                            />
-                          ) : null,
-                          { creator: getDisplayname(post.creator) },
-                        ]}
+                        components={[<DisplayName user={post.creator} />]}
                       />
                     </SWantsToKnow>
                   </a>
@@ -357,6 +346,7 @@ const SWantsToKnow = styled.span`
   position: relative;
   display: inline-flex;
   align-items: center;
+  white-space: pre;
   top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
@@ -369,10 +359,6 @@ const SWantsToKnow = styled.span`
     font-size: 16px;
     line-height: 24px;
   }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-right: 2px;
 `;
 
 const STotal = styled.div`

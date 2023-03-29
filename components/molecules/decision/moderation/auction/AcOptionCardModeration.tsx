@@ -23,7 +23,6 @@ import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 import { formatNumber } from '../../../../../utils/format';
 import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import { reportEventOption } from '../../../../../api/endpoints/report';
-import getDisplayname from '../../../../../utils/getDisplayname';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 
@@ -339,7 +338,7 @@ const AcOptionCardModeration: React.FunctionComponent<
           {/* Report modal */}
           <ReportModal
             show={isReportModalOpen}
-            reportedDisplayname={getDisplayname(option.creator)}
+            reportedUser={option.creator}
             onSubmit={handleReportSubmit}
             onClose={handleReportClose}
           />

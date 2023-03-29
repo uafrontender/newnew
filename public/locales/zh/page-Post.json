@@ -65,9 +65,9 @@
       "cf": "你選擇支持這個Goal！"
     },
     "doneButton": "聽起來不錯！",
-    "ac": "{{postCreator}}將在競標結束後挑選他們最喜歡的一個。",
-    "mc": "{{postCreator}}將在Superpoll結束後完成得票數最多的選項。",
-    "cf": "{{postCreator}}在獲得足夠的支持者后，就會完成這個Goal。"
+    "ac": "<0/>將在競標結束後挑選他們最喜歡的一個。",
+    "mc": "<0/>將在Superpoll結束後完成得票數最多的選項。",
+    "cf": "<0/>在獲得足夠的支持者后，就會完成這個Goal。"
   },
   "postFailedBoxModeration": {
     "title": "{{postType}}被取消",
@@ -316,11 +316,12 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{creator}}的Bid",
+      "title": "<0/>的Bid",
+      "suffix": "",
       "subtitle": "你的出價"
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。只有當{{creator}}選擇了你的出價時，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有當<0/>選擇了你的出價時，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -388,7 +389,8 @@
       "votes": "票"
     },
     "paymentModalHeader": {
-      "title": "{{creator}}的Superpoll",
+      "title": "<0/>的Superpoll",
+      "suffix": "",
       "subtitle": "你選擇的選項"
     },
     "paymentModalFooter": {
@@ -432,9 +434,10 @@
           "vote": "票",
           "votes": "票",
           "custom": "自定義投票",
-          "buySingleVote": "購買1票，在{{creator}}的Superpoll中投票",
-          "buyMultipleVotes": "購買{{amount}}票，在{{creator}}的Superpoll中投票",
-          "buyAnyVotes": "購買任意數量的票數並在{{creator}}的Superpoll上投票",
+          "buySingleVote": "購買1票，在<0/>的Superpoll中投票",
+          "buyMultipleVotes": "購買{{amount}}票，在<0/>的Superpoll中投票",
+          "buyAnyVotes": "購買任意數量的票數並在<0/>的Superpoll上投票",
+          "suffix": "",
           "optionCaption": "Superpoll選項",
           "voteButton": "投票"
         }
@@ -501,10 +504,11 @@
       }
     },
     "paymentModalHeader": {
-      "title": "{{creator}}的Goal"
+      "title": "<0/>的Goal",
+      "suffix": ""
     },
     "paymentModalFooter": {
-      "body": "你的銀行卡信息將被暫時保留。只有{{creator}}完成其Goal後，你才會被扣款。",
+      "body": "你的銀行卡信息將被暫時保留。只有<0/>完成其Goal後，你才會被扣款。",
       "terms": "條款",
       "apply": "適用"
     },
@@ -608,7 +612,7 @@
   },
   "acPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "wantsToKnow": "<0/>想知道......",
     "inTotalBids": "在總的出價中",
     "other": "其他",
     "others": "其他",
@@ -621,7 +625,7 @@
   },
   "mcPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "wantsToKnow": "<0/>想知道......",
     "inTotalVotes": "總票數",
     "other": "其他",
     "others": "其他",
@@ -636,7 +640,7 @@
   },
   "cfPostSuccess": {
     "heroText": "看它發生！",
-    "wantsToKnow": "{{creator}}的<0/>Goal",
+    "wantsToKnow": "的<0/>Goal",
     "creatorsBackers": "{{creator}}的支持者",
     "ofTargetBackers": "共需 {{target_count}}支持者",
     "youBackedFor": "你支持的金額是"
@@ -656,7 +660,7 @@
         "seconds_singular": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}<0/>想知道......",
+    "wantsToKnow": "<0/>想知道......",
     "inTotalBids": "在總的出價中"
   },
   "mcPostAwaiting": {
@@ -675,7 +679,7 @@
         "seconds_singular": "秒"
       }
     },
-    "wantsToKnow": "{{creator}}<0/>想知道......"
+    "wantsToKnow": "<0/>想知道......"
   },
   "recommendationsSection": {
     "heading": "更多類似"

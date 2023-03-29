@@ -36,9 +36,8 @@ import { useAppState } from '../../../../../contexts/appStateContext';
 interface IAcOptionsTab {
   postUuid: string;
   postShortId: string;
-  postCreatorName: string;
+  postCreator: newnewapi.IUser | null | undefined;
   postText: string;
-  postDeadline: string;
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
@@ -61,9 +60,8 @@ interface IAcOptionsTab {
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postUuid,
   postShortId,
-  postCreatorName,
+  postCreator,
   postText,
-  postDeadline,
   postStatus,
   options,
   optionsLoading,
@@ -212,8 +210,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               option={option as TAcOptionWithHighestField}
               postUuid={postUuid}
               postShortId={postShortId}
-              postCreatorName={postCreatorName}
-              postDeadline={postDeadline}
+              postCreator={postCreator}
               postText={postText}
               index={i}
               minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}

@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 
 import { SChatItemInfo, SChatItemLine, SChatItemText } from './styles';
 import { useAppSelector } from '../../../redux-store/store';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../DisplayName';
 
 interface IChatName {
   chat: newnewapi.IChatRoom;
