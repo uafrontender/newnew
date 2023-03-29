@@ -70,6 +70,7 @@ const PostInnerContext = createContext<{
   handleUpdatePostCoverImage: (
     newImage: TUpdatePostCoverImageMutation
   ) => Promise<void>;
+  handleUpdatePostData: (updatedPost: newnewapi.IPost) => void;
   isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -119,6 +120,7 @@ const PostInnerContext = createContext<{
   handleSetIsConfirmToClosePost: (newState: boolean) => {},
   handleUpdatePostTitle: (() => {}) as () => Promise<void>,
   handleUpdatePostCoverImage: (() => {}) as () => Promise<void>,
+  handleUpdatePostData: (() => {}) as () => void,
   isUpdateTitleLoading: false,
   refetchPost: (() => {}) as any,
 });
@@ -160,6 +162,7 @@ interface IPostContextProvider {
   handleUpdatePostCoverImage: (
     newImage: TUpdatePostCoverImageMutation
   ) => Promise<void>;
+  handleUpdatePostData: (updatedPost: newnewapi.IPost) => void;
   isUpdateTitleLoading: boolean;
   refetchPost: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
@@ -198,6 +201,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   handleSetIsConfirmToClosePost,
   handleUpdatePostTitle,
   handleUpdatePostCoverImage,
+  handleUpdatePostData,
   isUpdateTitleLoading,
   refetchPost,
   children,
@@ -294,6 +298,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleSetIsConfirmToClosePost,
       handleUpdatePostTitle,
       handleUpdatePostCoverImage,
+      handleUpdatePostData,
       isUpdateTitleLoading,
       refetchPost,
     }),
@@ -338,6 +343,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       handleSetIsConfirmToClosePost,
       handleUpdatePostTitle,
       handleUpdatePostCoverImage,
+      handleUpdatePostData,
       isUpdateTitleLoading,
       refetchPost,
     ]

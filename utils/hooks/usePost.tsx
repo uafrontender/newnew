@@ -67,6 +67,38 @@ const usePost = (
     } as Omit<UseQueryOptions<newnewapi.IPost, any>, 'queryKey' | 'queryFn'>
   );
 
+  const updatePostMutation = useMutation({
+    mutationFn: (updatedPost: newnewapi.IPost) =>
+      new Promise((res) => {
+        res(updatedPost);
+      }),
+    onSuccess: (_, updatedPost) => {
+      queryClient.setQueryData(
+        [
+          params.loggedInUser ? 'private' : 'public',
+          'fetchPostByUUID',
+          params.postUuid,
+        ],
+        // @ts-ignore
+        (data: newnewapi.IPost | undefined) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            return { ...workingData, ...updatedPost };
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+    },
+  });
+
   const updatePostTitleMutation = useMutation({
     mutationFn: (newTitleParams: TUpdatePostTitleMutation) =>
       new Promise((res) => {
@@ -215,6 +247,7 @@ const usePost = (
     updatePostTitleMutation,
     updatePostStatusMutation,
     updatePostCoverImageMutation,
+    updatePostMutation,
   };
 };
 

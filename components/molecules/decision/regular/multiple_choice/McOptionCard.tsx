@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -26,7 +26,6 @@ import { setUserTutorialsProgress } from '../../../../../redux-store/slices/user
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
-import getDisplayname from '../../../../../utils/getDisplayname';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
@@ -54,6 +53,7 @@ import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
 import { useAppState } from '../../../../../contexts/appStateContext';
+import DisplayName from '../../../../atoms/DisplayName';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -84,10 +84,9 @@ const getPayWithCardErrorMessage = (
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
-  creator: newnewapi.IUser;
   postUuid: string;
   postShortId: string;
-  postCreatorName: string;
+  postCreator: newnewapi.IUser | null | undefined;
   postText: string;
   index: number;
   noAction: boolean;
@@ -104,10 +103,9 @@ interface IMcOptionCard {
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
-  creator,
   postUuid,
   postShortId,
-  postCreatorName,
+  postCreator,
   postText,
   index,
   noAction,
@@ -800,10 +798,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   customPaymentWithFeeInCents >
                     appConstants?.minHoldAmount?.usdCents)) && (
                 <SPaymentSign variant='subtitle'>
-                  {t('mcPost.paymentModalFooter.body', {
-                    creator: postCreatorName,
-                  })}
-                  *
+                  {t('mcPost.paymentModalFooter.body')}
+                  {' *'}
                   <Link href='https://terms.newnew.co'>
                     <SPaymentTermsLink
                       href='https://terms.newnew.co'
@@ -825,9 +821,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   />
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
-                  {t('mcPost.paymentModalHeader.title', {
-                    creator: postCreatorName,
-                  })}
+                  <Trans
+                    t={t}
+                    i18nKey='mcPost.paymentModalHeader.title'
+                    // @ts-ignore
+                    components={[
+                      <DisplayName
+                        user={postCreator}
+                        suffix={t('mcPost.paymentModalHeader.suffix')}
+                      />,
+                    ]}
+                  />
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalPostText variant={2}>
@@ -955,7 +959,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       {option.creator && (
         <ReportModal
           show={isReportModalOpen}
-          reportedDisplayname={getDisplayname(option.creator)}
+          reportedUser={option.creator}
           onSubmit={handleReportSubmit}
           onClose={handleReportClose}
         />
@@ -1021,7 +1025,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
                 {formatNumber(supporterCountSubtracted, true)}{' '}
-                {t('mcPost.optionsTab.optionCard.others')}
+                {supporterCountSubtracted > 1
+                  ? t('mcPost.optionsTab.optionCard.others')
+                  : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
             <SSpanBiddersRegular className='spanRegular'>
@@ -1048,7 +1054,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
             {supporterCountSubtracted > 0 ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>
                 {formatNumber(supporterCountSubtracted, true)}{' '}
-                {t('mcPost.optionsTab.optionCard.others')}
+                {supporterCountSubtracted > 1
+                  ? t('mcPost.optionsTab.optionCard.others')
+                  : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
             <SSpanBiddersRegular className='spanRegular'>
@@ -1074,7 +1082,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubtracted, true)}{' '}
-              {t('mcPost.optionsTab.optionCard.others')}
+              {supporterCountSubtracted > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
@@ -1101,7 +1111,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubtracted - 1, true)}{' '}
-              {t('mcPost.optionsTab.optionCard.others')}
+              {supporterCountSubtracted - 1 > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
@@ -1126,7 +1138,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
           <>
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubtracted, true)}{' '}
-              {t('mcPost.optionsTab.optionCard.others')}
+              {supporterCountSubtracted > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
@@ -1442,6 +1456,9 @@ const SPaymentModalHeadingPostSymbolImg = styled.img`
 `;
 
 const SPaymentModalHeadingPostCreator = styled(Text)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 600;
   font-size: 14px;

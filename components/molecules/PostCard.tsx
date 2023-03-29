@@ -52,7 +52,6 @@ import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
 import PostCardEllipseMenu from './PostCardEllipseMenu';
-import getDisplayname from '../../utils/getDisplayname';
 import ReportModal, { ReportData } from './direct-messages/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
@@ -60,7 +59,7 @@ import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 import getChunks from '../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
-import DisplayName from '../DisplayName';
+import DisplayName from '../atoms/DisplayName';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -575,7 +574,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           {postParsed?.creator && isReportModalOpen && (
             <ReportModal
               show={isReportModalOpen}
-              reportedDisplayname={getDisplayname(postParsed?.creator)}
+              reportedUser={postParsed?.creator}
               onSubmit={handleReportSubmit}
               onClose={handleReportClose}
             />
@@ -770,7 +769,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         {postParsed?.creator && isReportModalOpen && (
           <ReportModal
             show={isReportModalOpen}
-            reportedDisplayname={getDisplayname(postParsed?.creator)}
+            reportedUser={postParsed?.creator}
             onSubmit={handleReportSubmit}
             onClose={handleReportClose}
           />
