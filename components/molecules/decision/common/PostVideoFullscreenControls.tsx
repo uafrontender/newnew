@@ -1,4 +1,3 @@
-/* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useEffect,
@@ -10,6 +9,10 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 import 'moment-duration-format';
 
+import isSafari from '../../../../utils/isSafari';
+import { useAppState } from '../../../../contexts/appStateContext';
+import useOnTouchStartOutside from '../../../../utils/hooks/useOnTouchStartOutside';
+
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 
@@ -17,9 +20,6 @@ import PlayIcon from '../../../../public/images/svg/icons/outlined/play.svg';
 import PauseIcon from '../../../../public/images/svg/icons/outlined/pause.svg';
 import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
-import isSafari from '../../../../utils/isSafari';
-import { useAppState } from '../../../../contexts/appStateContext';
-import useOnTouchStartOutside from '../../../../utils/hooks/useOnTouchStartOutside';
 
 interface IPostVideoFullscreenControls {
   // Play/Pause
@@ -102,6 +102,7 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
   }, [progress]);
 
   // Volume
+  const soundControlsRef = useRef<HTMLDivElement>();
   const volumeSliderRef = useRef<HTMLInputElement>();
   const volumeParsed = useMemo(() => currentVolume * 100, [currentVolume]);
   const [isSoundControlsHovered, setIsSoundControlsHovered] = useState(false);
@@ -139,7 +140,6 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
     }
   }, [volumeParsed]);
 
-  const soundControlsRef = useRef<HTMLDivElement>();
   const handleSoundControlsClickOutsideMobile = () => {
     if (isMobileOrTablet) {
       setIsSoundControlsHovered(false);
@@ -233,7 +233,7 @@ export default PostVideoFullscreenControls;
 const SFullscreenControlsContainer = styled.div`
   position: absolute;
   left: 5%;
-  bottom: 0;
+  bottom: 12px;
 
   height: 64px;
   width: 90%;
@@ -248,6 +248,7 @@ const SFullscreenControlsContainer = styled.div`
   gap: 8px;
 
   ${({ theme }) => theme.media.tablet} {
+    bottom: 0;
     width: 432px;
     left: calc(50% - 216px);
   }

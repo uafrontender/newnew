@@ -1,5 +1,4 @@
 /* eslint-disable no-multi-assign */
-/* eslint-disable no-unused-expressions */
 import React, {
   useRef,
   useMemo,
@@ -82,9 +81,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   // Fullscren
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [fullscreenInteracted, setFullscreenInteracted] = useState(
-    !isMobileOrTablet
-  );
+  const [fullscreenInteracted, setFullscreenInteracted] = useState(false);
   const [videoWidthFulscreen, setVideoWidthFullscreen] = useState<{
     width?: number;
     height?: number;
@@ -278,6 +275,37 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     [handleSetIsPaused, onPlaybackFinished, resources]
   );
 
+  const handlePlayPseudoButtonClick = useCallback(() => {
+    if (!playerRef.current?.paused()) {
+      playerRef.current?.pause();
+    } else {
+      playerRef.current?.play()?.catch(() => {
+        handleSetIsPaused(true);
+      });
+    }
+  }, [handleSetIsPaused]);
+
+  const handleEnterFullscreen = useCallback(() => {
+    if (!isSafari() && !isIOS()) {
+      playerRef?.current?.requestFullscreen();
+    } else if (document.querySelector('.vjs-tech')) {
+      (
+        document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
+      )?.webkitEnterFullscreen();
+      setIsFullscreen(true);
+    }
+  }, []);
+
+  const handleExitFullscreen = useCallback(() => {
+    if (!isSafari() && !isIOS()) {
+      playerRef?.current?.exitFullscreen();
+    } else {
+      (
+        document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
+      )?.webkitExitFullscreen();
+    }
+  }, []);
+
   const fetchManifestDetermineOrientation = useCallback(async () => {
     try {
       // Load manifest and determine vertical/horizontal orientation
@@ -291,7 +319,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           const v1 = parsedManifest?.variants?.[0];
 
           if (parsedManifest?.variants && parsedManifest?.variants?.length) {
-            const largestV = parsedManifest?.variants?.[0];
+            const largestV =
+              parsedManifest?.variants?.[parsedManifest.variants.length - 1];
 
             setLargestResolutionDimensions({
               width: largestV.resolution?.width,
@@ -318,7 +347,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     }
   }, [resources]);
 
-  // Separate use effect for fetching manifest and determening horizontal/vertical orientation
+  // Separate use effect for fetching manifest and determining horizontal/vertical orientation
   useEffect(() => {
     fetchManifestDetermineOrientation();
   }, [fetchManifestDetermineOrientation]);
@@ -335,6 +364,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
       // @ts-ignore
       const player = (playerRef.current = videojs(videoElement, options, () => {
+        // eslint-disable-next-line no-unused-expressions
         handlePlayerReady && handlePlayerReady(player);
       }));
     }
@@ -360,7 +390,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     }
   }, [muted]);
 
-  // Safari-specific handlers
+  // Safari-specific fullscreen handlers
   useEffect(() => {
     const handleFullscreenChangeSafari = () => {
       setIsFullscreen(
@@ -412,6 +442,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFullscreen]);
 
+  // Set minimize button position in fullscreen
+  // Listenere mostly for devtools screen size change
   useEffect(() => {
     const handleSetVideoWidthFullscreen = () => {
       if (
@@ -455,6 +487,33 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     largestResolutionDimensions.height,
     largestResolutionDimensions.width,
   ]);
+
+  // Prevent pausing video when trying to show fullscreen controls on non-iOS touch devices
+  const handlePlayPauseWrapperOnTouchStart = useCallback(() => {
+    if (isMobileOrTablet && !isIOS() && !fullscreenInteracted && isFullscreen) {
+      return;
+    }
+
+    if (!playerRef.current?.paused()) {
+      playerRef.current?.pause();
+    } else {
+      playerRef.current?.play()?.catch(() => {
+        handleSetIsPaused(true);
+      });
+    }
+  }, [fullscreenInteracted, handleSetIsPaused, isFullscreen, isMobileOrTablet]);
+
+  const handlePlayPauseWrapperOnMouseDown = useCallback(() => {
+    if (!window?.matchMedia('(pointer: coarse)')?.matches) {
+      if (!playerRef.current?.paused()) {
+        playerRef.current?.pause();
+      } else {
+        playerRef.current?.play()?.catch(() => {
+          handleSetIsPaused(true);
+        });
+      }
+    }
+  }, [handleSetIsPaused]);
 
   // Hide controls if mouse not moved in fullscreen
   useEffect(() => {
@@ -520,31 +579,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       <SVideoWrapper data-vjs-player withBackDropFilter={!isFullscreen}>
         <SWrapper
           id={id}
-          onClick={() => {
-            if (!playerRef.current?.paused()) {
-              playerRef.current?.pause();
-            } else {
-              playerRef.current?.play()?.catch(() => {
-                handleSetIsPaused(true);
-              });
-            }
-          }}
+          onTouchStart={handlePlayPauseWrapperOnTouchStart}
+          onMouseDown={handlePlayPauseWrapperOnMouseDown}
           ref={videoRef}
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
         />
         {showPlayButton && isPaused && !isScrubberTimeChanging && (
-          <SPlayPseudoButton
-            onClick={() => {
-              if (!playerRef.current?.paused()) {
-                playerRef.current?.pause();
-              } else {
-                playerRef.current?.play()?.catch(() => {
-                  handleSetIsPaused(true);
-                });
-              }
-            }}
-          >
+          <SPlayPseudoButton onClick={handlePlayPseudoButtonClick}>
             <InlineSvg
               svg={PlayIcon}
               width='32px'
@@ -557,16 +599,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           id='maximize-button'
           iconOnly
           view='transparent'
-          onClick={(e) => {
-            if (!isSafari() && !isIOS()) {
-              playerRef?.current?.requestFullscreen();
-            } else if (document.querySelector('.vjs-tech')) {
-              (
-                document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
-              )?.webkitEnterFullscreen();
-              setIsFullscreen(true);
-            }
-          }}
+          onClick={handleEnterFullscreen}
         >
           <InlineSvg
             svg={MaximizeIcon}
@@ -598,6 +631,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         bufferedPercent={bufferedPercent || undefined}
         handleChangeTime={handlePlayerScrubberChangeTime}
       />
+      {/* Custom fullscreen controls */}
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
         ? ReactDOM.createPortal(
             <SMinimizeButton
@@ -616,15 +650,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
                     }
                   : {}),
               }}
-              onClick={(e) => {
-                if (!isSafari() && !isIOS()) {
-                  playerRef?.current?.exitFullscreen();
-                } else {
-                  (
-                    document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
-                  )?.webkitExitFullscreen();
-                }
-              }}
+              onClick={handleExitFullscreen}
             >
               <InlineSvg
                 svg={MinimizeIcon}
@@ -633,7 +659,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
                 fill='#FFFFFF'
               />
             </SMinimizeButton>,
-            document.querySelector('.video-js') as HTMLElement
+            document?.querySelector('.video-js') as HTMLElement
           )
         : null}
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
@@ -651,7 +677,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
               currentVolume={currentVolume}
               handleChangeVolume={handlePlayerVolumeChange}
             />,
-            document.querySelector('.video-js') as HTMLElement
+            document?.querySelector('.video-js') as HTMLElement
           )
         : null}
     </SContent>
