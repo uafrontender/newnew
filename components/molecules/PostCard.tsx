@@ -336,6 +336,8 @@ export const PostCard: React.FC<ICard> = React.memo(
           return;
         }
 
+        console.log(decoded);
+
         if (decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED) {
           if (
             decoded.videoTargetType ===
@@ -343,11 +345,13 @@ export const PostCard: React.FC<ICard> = React.memo(
             decoded.coverImageUrl
           ) {
             setAnnouncementCoverImage(decoded.coverImageUrl);
+            console.log(decoded);
           } else if (
             decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE &&
             decoded.coverImageUrl
           ) {
             setResponseCoverImage(decoded.coverImageUrl);
+            console.log(decoded);
           }
         } else if (
           decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
@@ -356,10 +360,12 @@ export const PostCard: React.FC<ICard> = React.memo(
             decoded.videoTargetType === newnewapi.VideoTargetType.ANNOUNCEMENT
           ) {
             setAnnouncementCoverImage(undefined);
+            console.log(decoded);
           } else if (
             decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE
           ) {
             setResponseCoverImage(undefined);
+            console.log(decoded);
           }
         }
       };
@@ -474,6 +480,18 @@ export const PostCard: React.FC<ICard> = React.memo(
         </>
       );
     }
+
+    useEffect(() => {
+      console.log(announcementCoverImage);
+    }, [announcementCoverImage]);
+
+    useEffect(() => {
+      console.log(responseCoverImage);
+    }, [responseCoverImage]);
+
+    useEffect(() => {
+      console.log(coverImageUrl);
+    }, [coverImageUrl]);
 
     if (type === 'inside') {
       return (
