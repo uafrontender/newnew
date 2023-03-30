@@ -102,7 +102,7 @@
   "postDeleted": {
     "title": "Este {{postType}} ha sido eliminado",
     "body": {
-      "byCreator": "{{creator}} eliminó este {{postType}}",
+      "byCreator": "<0/> eliminó este {{postType}}",
       "byAdmin": "Este {{postType}} infringía nuestras normas comunitarias"
     },
     "buttonText": "Ver nuevo {{postTypeMultiple}}"
@@ -459,7 +459,7 @@
         "suggestionPlaceholder": "Agregar tu propia opción",
         "suggestionPlaceholderDesktop": "Agregar opción...",
         "placeABidButton": "Agregar mi opción",
-        "offersBundles": "{{creator}} ofrece Bundles de Superpoll",
+        "offersBundles": "<0/> ofrece Bundles de Superpoll",
         "viewBundles": "Ver Bundles",
         "getMoreBundles": "Obtener otro bundle de Superpoll",
         "getBundles": "Obtenerlo"
@@ -648,7 +648,7 @@
   "acPostAwaiting": {
     "hero": {
       "title": "¡El tiempo se ha agotado!",
-      "body": "¡{{creator}} tiene {{time}} para seleccionar y realizar su oferta favorita!",
+      "body": "¡<0/> tiene {{time}} para seleccionar y realizar su oferta favorita!",
       "expires": {
         "days": "días",
         "days_singular": "día",
@@ -666,8 +666,8 @@
   "mcPostAwaiting": {
     "hero": {
       "title": "¡Los votos ya han sido conteados!",
-      "body": "{{creator}} tiene {{time}} para realizar esta opción. ¡Mantente atento!",
-      "bodyNoResponse": "{{creator}} tiene {{time}} para responder. ¡Permanece atento!",
+      "body": "<0/> tiene {{time}} para realizar esta opción. ¡Mantente atento!",
+      "bodyNoResponse": "<0/> tiene {{time}} para responder. ¡Permanece atento!",
       "expires": {
         "days": "días",
         "days_singular": "día",

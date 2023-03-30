@@ -27,7 +27,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   const dispatch = useAppDispatch();
 
   const router = useRouter();
-  const { email, redirect } = router.query;
+  const { email, retryAfter, redirect } = router.query;
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -106,7 +106,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       <CodeVerificationMenuNewEmail
         newEmail={email as string}
         redirect={redirect as 'settings' | 'dashboard'}
-        expirationTime={60}
+        canResendIn={parseInt(retryAfter as string)}
         allowLeave={!user.loggedIn && user._persist?.rehydrated}
       />
     </>

@@ -20,6 +20,7 @@ interface ICreatorData {
 export interface IUserStateInterface {
   loggedIn: boolean;
   signupEmailInput: string;
+  signupTimerValue: number;
   userData?: TUserData;
   userTutorialsProgress: newnewapi.IGetTutorialsStatusResponse;
   userTutorialsProgressSynced: boolean;
@@ -29,6 +30,7 @@ export interface IUserStateInterface {
 const defaultUIState: IUserStateInterface = {
   loggedIn: false,
   signupEmailInput: '',
+  signupTimerValue: 0,
   userTutorialsProgress: {
     // AC
     remainingAcSteps: [
@@ -56,8 +58,12 @@ const defaultUIState: IUserStateInterface = {
     remainingAcCrCurrentStep: [newnewapi.AcCreationTutorialStep.AC_CR_HERO],
     remainingCfCrCurrentStep: [newnewapi.CfCreationTutorialStep.CF_CR_HERO],
     remainingMcCrCurrentStep: [newnewapi.McCreationTutorialStep.MC_CR_HERO],
-    remainingAcResponseCurrentStep: [newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE],
-    remainingMcResponseCurrentStep: [newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE],
+    remainingAcResponseCurrentStep: [
+      newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
+    ],
+    remainingMcResponseCurrentStep: [
+      newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
+    ],
   },
   userTutorialsProgressSynced: false,
 };
@@ -71,6 +77,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     },
     setSignupEmailInput(state, { payload }: PayloadAction<string>) {
       state.signupEmailInput = payload;
+    },
+    setSignupTimerValue(state, { payload }: PayloadAction<number>) {
+      state.signupTimerValue = payload;
     },
     setUserData(state, { payload }: PayloadAction<TUserData>) {
       state.userData = { ...state.userData, ...payload };
@@ -125,6 +134,7 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
 export const {
   setUserLoggedIn,
   setSignupEmailInput,
+  setSignupTimerValue,
   setUserTutorialsProgressInner,
   setUserData,
   setCreatorData,
