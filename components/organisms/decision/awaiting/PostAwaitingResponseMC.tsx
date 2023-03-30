@@ -23,7 +23,6 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
 import { formatNumber } from '../../../../utils/format';
-import getDisplayname from '../../../../utils/getDisplayname';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
@@ -250,15 +249,19 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                 <WaitingForResponseBox
                   title={t('mcPostAwaiting.hero.title')}
                   body={
-                    winningOption
-                      ? t('mcPostAwaiting.hero.body', {
-                          creator: getDisplayname(post.creator),
-                          time: waitingTime,
-                        })
-                      : t('mcPostAwaiting.hero.bodyNoResponse', {
-                          creator: getDisplayname(post.creator),
-                          time: waitingTime,
-                        })
+                    <Trans
+                      t={t}
+                      i18nKey={
+                        winningOption
+                          ? 'mcPostAwaiting.hero.body'
+                          : 'mcPostAwaiting.hero.bodyNoResponse'
+                      }
+                      // @ts-ignore
+                      components={[
+                        <DisplayName user={post.creator} inverted />,
+                        { time: waitingTime },
+                      ]}
+                    />
                   }
                 />
                 <SMainSectionWrapper>

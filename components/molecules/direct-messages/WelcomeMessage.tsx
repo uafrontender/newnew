@@ -1,27 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IWelcomeMessage {
-  userAlias: string;
+  user: newnewapi.IUser | null | undefined;
 }
 
-const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(
-  ({ userAlias }) => {
-    const { t } = useTranslation('page-Chat');
+const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(({ user }) => {
+  const { t } = useTranslation('page-Chat');
 
-    return (
-      <SWelcomeMessage>
-        <SWelcomeMessageInner>
-          <SEmoji>🎉</SEmoji>
-          <p>
-            {t('chat.welcomeMessage')} {userAlias}
-          </p>
-        </SWelcomeMessageInner>
-      </SWelcomeMessage>
-    );
-  }
-);
+  return (
+    <SWelcomeMessage>
+      <SWelcomeMessageInner>
+        <SEmoji>🎉</SEmoji>
+        <p>
+          {t('chat.welcomeMessage')} <DisplayName user={user} />
+        </p>
+      </SWelcomeMessageInner>
+    </SWelcomeMessage>
+  );
+});
 
 const SWelcomeMessage = styled.div`
   position: absolute;
