@@ -71,7 +71,7 @@ export const HeroSection = React.memo(() => {
               {t('heroSection.title') as string}
             </AnimatedPresence>
           </SHeadline>
-          <SSubTitle weight={600}>
+          <SSubTitle weight={500}>
             <AnimatedPresence
               start={animateSubTitle}
               animation='t-02'
@@ -88,7 +88,7 @@ export const HeroSection = React.memo(() => {
                   <SButton
                     withShrink
                     withShadow
-                    view='primary'
+                    view='primaryGrad'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
                         _button: 'Create now',
@@ -210,7 +210,7 @@ const SHeadline = styled(Headline)`
 
   ${({ theme }) => theme.media.laptopM} {
     font-size: 80px;
-    line-height: 88px;
+    line-height: 92px;
   }
 `;
 
@@ -298,8 +298,13 @@ const SLargeAnimation = styled(AnimationChain)`
 const SButton = styled(Button)`
   padding: 12px 24px;
   text-transform: capitalize;
+  font-size: 14px;
+  line-height: 24px;
 
-  ${(props) => props.theme.media.tablet} {
+  ${(props) => props.theme.media.laptop} {
+    padding: 16px 32px;
+
+    border-radius: 20px;
     font-size: 16px;
   }
 `;
