@@ -15,7 +15,6 @@ import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 // Utils
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { formatNumber } from '../../../../utils/format';
-import getDisplayname from '../../../../utils/getDisplayname';
 
 import Headline from '../../../atoms/Headline';
 import DecisionEndedBox from '../../../molecules/decision/success/DecisionEndedBox';
@@ -23,12 +22,11 @@ import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSucce
 import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import assets from '../../../../constants/assets';
-import InlineSvg from '../../../atoms/InlineSVG';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import WinningOptionAcCreator from '../../../molecules/decision/common/WinningOptionAcCreator';
 import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
+import DisplayName from '../../../atoms/DisplayName';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -218,17 +216,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                               t={t}
                               i18nKey='acPostSuccess.wantsToKnow'
                               // @ts-ignore
-                              components={[
-                                post.creator?.options?.isVerified ? (
-                                  <SInlineSVG
-                                    svg={VerificationCheckmark}
-                                    fill='none'
-                                  />
-                                ) : null,
-                                {
-                                  creator: getDisplayname(post.creator),
-                                },
-                              ]}
+                              components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>
                         </a>
@@ -474,8 +462,8 @@ const SWantsToKnow = styled.span`
   position: relative;
   display: inline-flex;
   align-items: center;
-  top: -6px;
   white-space: pre;
+  top: -6px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
@@ -486,16 +474,6 @@ const SWantsToKnow = styled.span`
     font-weight: 700;
     font-size: 16px;
     line-height: 24px;
-  }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  height: 16px;
-  width: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    height: 24px;
-    width: 24px;
   }
 `;
 

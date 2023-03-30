@@ -25,7 +25,6 @@ import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMe
 import McConfirmDeleteOptionModal from './McConfirmDeleteOptionModal';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
-import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
@@ -37,10 +36,9 @@ import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
-  creator: newnewapi.IUser;
   index: number;
   canBeDeleted: boolean;
-  isCreatorsBid: boolean;
+  isCreatorsOption: boolean;
   isWinner?: boolean;
   handleRemoveOption?: () => void;
   handleSetScrollBlocked?: () => void;
@@ -51,10 +49,9 @@ const McOptionCardModeration: React.FunctionComponent<
   IMcOptionCardModeration
 > = ({
   option,
-  creator,
   index,
   canBeDeleted,
-  isCreatorsBid,
+  isCreatorsOption,
   isWinner,
   handleRemoveOption,
   handleSetScrollBlocked,
@@ -308,7 +305,7 @@ const McOptionCardModeration: React.FunctionComponent<
           {!isMobile && (
             <McOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
-              isBySubscriber={!isCreatorsBid}
+              isBySubscriber={!isCreatorsOption}
               canDeleteOptionInitial={canBeDeleted && !isWinner}
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
@@ -337,7 +334,7 @@ const McOptionCardModeration: React.FunctionComponent<
           isOpen={isEllipseMenuOpen}
           zIndex={16}
           onClose={handleCloseEllipseMenu}
-          isBySubscriber={!isCreatorsBid}
+          isBySubscriber={!isCreatorsOption}
           isUserBlocked={isUserBlocked}
           canDeleteOptionInitial={canBeDeleted && !isWinner}
           optionId={option.id as number}
@@ -350,7 +347,7 @@ const McOptionCardModeration: React.FunctionComponent<
         />
       )}
       {/* Confirm block user modal */}
-      {!isCreatorsBid && (
+      {!isCreatorsOption && (
         <BlockUserModalPost
           confirmBlockUser={isBlockModalOpen}
           user={option.creator!!}
@@ -358,10 +355,10 @@ const McOptionCardModeration: React.FunctionComponent<
         />
       )}
       {/* Report modal */}
-      {option.isCreatedBySubscriber && option.creator && (
+      {!isCreatorsOption && option.creator && (
         <ReportModal
           show={isReportModalOpen}
-          reportedDisplayname={getDisplayname(option.creator)}
+          reportedUser={option.creator}
           onSubmit={handleReportSubmit}
           onClose={handleReportClose}
         />

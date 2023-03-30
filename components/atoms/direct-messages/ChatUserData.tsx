@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { SUserAlias } from './styles';
 import { useAppSelector } from '../../../redux-store/store';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../DisplayName';
 
 interface IFunctionProps {
   isMyAnnouncement: boolean;

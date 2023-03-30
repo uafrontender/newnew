@@ -3,7 +3,7 @@
   "topSectionTitle": "Top 10 in {{country}}",
   "heroSection": {
     "title": "Come together \nto shape reality",
-    "subTitle": "Bid and vote on what the world does next",
+    "subTitle": "Bid and vote on what the world does next!",
     "signIn": "Sign in",
     "explore": "Explore Now",
     "exploreNow": "Explore now"
@@ -108,7 +108,7 @@
   },
   "modal": {
     "reportUser": {
-      "title": "Report",
+      "title": "Report ",
       "subtitle": "Help us understand so that we can investigate...",
       "options": {
         "spam": "Suspicious or spam",

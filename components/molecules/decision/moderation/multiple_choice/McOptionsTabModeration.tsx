@@ -111,10 +111,9 @@ const McOptionsTabModeration: React.FunctionComponent<
               index={i}
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
-              creator={option.creator ?? post.creator!!}
               canBeDeleted={options.length > 2}
               isWinner={winningOptionId?.toString() === option.id.toString()}
-              isCreatorsBid={
+              isCreatorsOption={
                 !option.creator || option.creator?.uuid === post.creator?.uuid
               }
               handleRemoveOption={() => handleRemoveOption(option)}

@@ -132,8 +132,8 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           elements,
           confirmParams: {
             return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `/${router.locale}` : ''
-            }/${redirectUrl}?save_card=${saveCard}`,
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }${redirectUrl}?save_card=${saveCard}`,
           },
           redirect: 'if_required',
         });
