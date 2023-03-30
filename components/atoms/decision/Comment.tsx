@@ -496,6 +496,13 @@ const SText = styled.div`
   overflow-wrap: break-word;
   word-break: break-word;
   user-select: text;
+
+  // Don't go under more button
+  margin-right: 24px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-right: 36px;
+  }
 `;
 
 const SReply = styled.div`
