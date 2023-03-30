@@ -55,7 +55,7 @@ const FaqSection = () => {
 
   return (
     <SContainer>
-      <SHeadline variant={4}>{t('faq.title')}</SHeadline>
+      <SHeadline variant={1}>{t('faq.title')}</SHeadline>
       <SList>
         {new Array(7).fill('').map((_, i) => {
           // Skip section about becoming creator for users younger then 13
@@ -187,7 +187,7 @@ const SContainer = styled.section`
   padding: 20px 0;
 
   ${(props) => props.theme.media.tablet} {
-    margin-top: 50px;
+    margin-top: 20px;
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -204,12 +204,15 @@ const SContainer = styled.section`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 24px;
-  font-size: 28px;
-  line-height: 36px;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     font-size: 32px;
     line-height: 40px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    font-size: 40px;
+    line-height: 48px;
   }
 `;
 
@@ -246,6 +249,7 @@ const SText = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     font-size: 14px;
     line-height: 20px;
+    font-weight: 500;
   }
 `;
 
@@ -255,13 +259,22 @@ const SHint = styled(Text)`
     theme.name === 'dark'
       ? theme.colorsThemed.background.outlines2
       : theme.colorsThemed.text.secondary};
+
+  ${({ theme }) => theme.media.tablet} {
+    line-height: 20px;
+    font-weight: 500;
+  }
 `;
 
 const SLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.accent.blue};
   text-decoration: underline;
   cursor: pointer;
-  font-weight: 700;
+  line-height: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-weight: 600;
+  }
 `;
 
 const SFloatingImage = styled.img`

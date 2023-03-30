@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -17,15 +17,12 @@ import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
-
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
-import { getMyPosts } from '../api/endpoints/user';
-import { TTokenCookie } from '../api/apiConfigs';
-import useMyPosts from '../utils/hooks/useMyPosts';
-import assets from '../constants/assets';
+import { useAppSelector } from '../redux-store/store';
+import { getPopularPosts } from '../api/endpoints/post';
 import canBecomeCreator from '../utils/canBecomeCreator';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
+
+import assets from '../constants/assets';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -33,21 +30,14 @@ const HeroSection = dynamic(
 const CardsSection = dynamic(
   () => import('../components/organisms/home/CardsSection')
 );
-const TutorialCard = dynamic(
-  () => import('../components/molecules/TutorialCard')
-);
 
 interface IHome {
   top10posts?: newnewapi.NonPagedPostsResponse;
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
-  initialPageRA?: {
-    posts: newnewapi.IPost[];
-    paging: newnewapi.PagingResponse | null | undefined;
-  };
   initialNextPageTokenRA?: string;
-  sessionExpired?: boolean;
+  popularPosts?: newnewapi.NonPagedPostsResponse;
 }
 
 // No sense to memorize
@@ -55,23 +45,12 @@ const Home: NextPage<IHome> = ({
   staticBids,
   staticSuperpolls,
   assumeLoggedIn,
-  initialPageRA,
-  sessionExpired,
+  popularPosts,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
   const { appConstants } = useGetAppConstants();
-
-  useEffect(() => {
-    if (sessionExpired) {
-      dispatch(
-        logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionExpired]);
 
   const isUserLoggedIn = useMemo(() => {
     if (user._persist?.rehydrated) {
@@ -80,44 +59,6 @@ const Home: NextPage<IHome> = ({
 
     return assumeLoggedIn;
   }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
-
-  // Resent activity
-  const {
-    data: collectionRAPages,
-    hasNextPage: hasNextPageRA,
-    fetchNextPage: fetchNextPageRA,
-  } = useMyPosts(
-    {
-      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-      limit: 6,
-    },
-    {
-      ...(initialPageRA
-        ? {
-            initialData: {
-              pages: [initialPageRA],
-              pageParams: [undefined],
-            },
-          }
-        : {}),
-      enabled: isUserLoggedIn,
-    }
-  );
-
-  const collectionRA = useMemo(
-    () =>
-      collectionRAPages
-        ? collectionRAPages.pages.map((page) => page?.posts || []).flat()
-        : [],
-
-    [collectionRAPages]
-  );
-
-  const loadMoreCollectionRA = useCallback(() => {
-    if (hasNextPageRA) {
-      fetchNextPageRA();
-    }
-  }, [fetchNextPageRA, hasNextPageRA]);
 
   return (
     <>
@@ -132,50 +73,24 @@ const Home: NextPage<IHome> = ({
 
       {user.userData?.options?.isCreator && (
         <>
-          <SHeading style={{ marginBottom: '48px' }}>
+          <SHeading>
             <SHeadline>{t('section.your')}</SHeadline>
           </SHeading>
           <YourPostsSection />
         </>
       )}
 
-      {isUserLoggedIn && (
-        <>
-          {user.userData?.options?.isCreator && collectionRA?.length > 0 && (
-            <SHeading style={{ marginTop: '80px' }}>
-              <SHeadline>{t('section.explore')}</SHeadline>
-              {/* <SSubtitle variant='subtitle'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                fames nulla dignissim tellus purus. Faucibus ornare.
-              </SSubtitle> */}
-            </SHeading>
-          )}
-          {/* Recent activity */}
-          {collectionRA?.length > 0 ? (
-            <CardsSection
-              title={t('cardsSection.title.recent-activity')}
-              category='recent-activity'
-              collection={collectionRA}
-              tutorialCard={
-                isUserLoggedIn ? (
-                  <STutorialCard
-                    image={
-                      theme.name === 'dark'
-                        ? assets.common.darkLogoAnimated()
-                        : assets.common.lightLogoAnimated()
-                    }
-                    title={t('tutorial.recent-activity.title')}
-                    caption={t('tutorial.recent-activity.caption')}
-                  />
-                ) : undefined
-              }
-              padding={isUserLoggedIn ? 'small' : 'large'}
-              onReachEnd={loadMoreCollectionRA}
-              seeMoreLink='/profile/purchases'
-            />
-          ) : null}
-        </>
-      )}
+      {/* Recent activity */}
+      {popularPosts && popularPosts.posts?.length > 0 ? (
+        <SCardsSection
+          title={t('section.popular')}
+          category='popular'
+          collection={popularPosts.posts}
+          padding={isUserLoggedIn ? 'small' : 'large'}
+          // onReachEnd={loadMoreCollectionRA}
+          // seeMoreLink='/profile/purchases'
+        />
+      ) : null}
 
       {/* MC posts example */}
       <PostTypeSection
@@ -189,7 +104,6 @@ const Home: NextPage<IHome> = ({
         }
         posts={staticSuperpolls}
         isStatic
-        // loading={collectionMCInitialLoading}
         padding={isUserLoggedIn ? 'small' : 'large'}
       />
 
@@ -205,34 +119,8 @@ const Home: NextPage<IHome> = ({
         }
         posts={staticBids}
         isStatic
-        // loading={collectionACInitialLoading}
         padding={isUserLoggedIn ? 'small' : 'large'}
       />
-
-      {/* Greatest of all time posts */}
-      {/* {!collectionBiggestError &&
-      (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
-        <SCardsSection
-          title={t('cardsSection.title.biggest')}
-          category='biggest'
-          collection={collectionBiggest}
-          loading={collectionBiggestInitialLoading}
-          tutorialCard={
-            user.loggedIn ? (
-              <STutorialCard
-                image={
-                  theme.name === 'dark'
-                    ? assets.common.darkAnimatedLogo
-                    : assets.common.lightAnimatedLogo
-                }
-                title={t('tutorial.biggest.title')}
-                caption={t('tutorial.biggest.caption')}
-              />
-            ) : undefined
-          }
-          padding={user.loggedIn ? 'small' : 'large'}
-        />
-      ) : null} */}
 
       {(!isUserLoggedIn || !user.userData?.options?.isCreator) && (
         <FaqSection />
@@ -251,34 +139,22 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-// const SCardsSection = styled(CardsSection)`
-//   ${({ theme }) => theme.media.laptop} {
-//     margin-top: 12px;
-//   }
-
-//   &:last-child {
-//     padding-bottom: 40px;
-//   }
-
-//   ${({ theme }) => theme.media.tablet} {
-//     &:last-child {
-//       padding-bottom: 60px;
-//     }
-//   }
-
-//   ${({ theme }) => theme.media.laptop} {
-//     &:last-child {
-//       padding-bottom: 80px;
-//     }
-//   }
-// `;
-
-const SHeading = styled.div`
-  margin-bottom: 20px;
+const SCardsSection = styled(CardsSection)`
+  &:first-child {
+    padding-top: 0;
+  }
 
   ${(props) => props.theme.media.tablet} {
-    margin-bottom: 48px;
+    &:first-child {
+      padding-top: 8px;
+    }
+  }
+`;
 
+const SHeading = styled.div`
+  margin-bottom: 24px;
+
+  ${(props) => props.theme.media.tablet} {
     & + section {
       padding-top: 0;
     }
@@ -289,60 +165,22 @@ const SHeading = styled.div`
     margin-left: auto;
     margin-right: auto;
     margin-top: 40px;
+    margin-bottom: 32px;
   }
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 16px;
-
-  font-size: 36px;
-  line-height: 44px;
+  font-size: 24px;
+  line-height: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 24px;
-
-    font-size: 40px;
-    line-height: 48px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-bottom: 24px;
-
-    font-size: 52px;
-    line-height: 40px;
-  }
-`;
-
-// const SSubtitle = styled(Text)`
-//   max-width: 570px;
-
-//   font-size: 14px;
-//   line-height: 24px;
-//   font-weight: 600;
-
-//   ${({ theme }) => theme.media.tablet} {
-//     font-size: 16px;
-//     line-height: 24px;
-//   }
-// `;
-
-const STutorialCard = styled(TutorialCard)`
-  & img {
-    width: 152px;
-    height: 114px;
-  }
-
-  & h4 {
-    font-size: 24px;
-    line-height: 32px;
-  }
-
-  &&& {
-    & div {
-      padding: 0;
-      font-size: 16px;
-      line-height: 24px;
-    }
+    font-size: 40px;
+    line-height: 48px;
   }
 `;
 
@@ -425,76 +263,33 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
     },
   ] as TStaticPost[];
 
-  // const top10payload = new newnewapi.EmptyRequest({});
+  try {
+    const popularPostsPayload = new newnewapi.EmptyRequest({});
 
-  // const resTop10 = await fetchCuratedPosts(top10payload);
+    const popularPosts = await getPopularPosts(popularPostsPayload);
 
-  if (assumeLoggedIn) {
-    try {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-        paging: {
-          limit: 6,
-        },
-      });
-      const res = await getMyPosts(
-        payload,
-        undefined,
-        {
-          accessToken: req.cookies?.accessToken,
-          refreshToken: req.cookies?.refreshToken,
-        },
-        (tokens: TTokenCookie[]) => {
-          const parsedTokens = tokens.map(
-            (t) =>
-              `${t.name}=${t.value}; ${
-                t.expires ? `expires=${t.expires}; ` : ''
-              } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
-          );
-          context.res.setHeader('set-cookie', parsedTokens);
-        }
-      );
-
-      if (res.data && res.data.toJSON().posts) {
-        return {
-          props: {
-            initialPageRA: {
-              posts: res.data.toJSON().posts,
-              paging: res.data.toJSON().paging || null,
-            },
-            assumeLoggedIn,
-            staticSuperpolls,
-            staticBids,
-            ...translationContext,
-          },
-        };
-      }
-    } catch (err) {
-      if ((err as Error).message === 'Refresh token invalid') {
-        return {
-          props: {
-            sessionExpired: true,
-            assumeLoggedIn,
-            staticSuperpolls,
-            staticBids,
-            ...translationContext,
-          },
-        };
-      }
-    }
+    return {
+      props: {
+        ...(popularPosts.data && popularPosts.data.toJSON().posts
+          ? {
+              popularPosts:
+                popularPosts.data.toJSON() as newnewapi.NonPagedPostsResponse,
+            }
+          : {}),
+        assumeLoggedIn,
+        staticSuperpolls,
+        staticBids,
+        ...translationContext,
+      },
+    };
+  } catch (err) {
+    return {
+      props: {
+        assumeLoggedIn,
+        staticSuperpolls,
+        staticBids,
+        ...translationContext,
+      },
+    };
   }
-
-  return {
-    props: {
-      // ...(resTop10.data
-      //   ? {
-      //       top10posts: resTop10.data.toJSON(),
-      //     }
-      //   : {}),
-      assumeLoggedIn,
-      staticSuperpolls,
-      staticBids,
-      ...translationContext,
-    },
-  };
 };
