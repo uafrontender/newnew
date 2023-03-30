@@ -16,6 +16,7 @@ import {
   setUserData,
   setUserLoggedIn,
   setSignupEmailInput,
+  setSignupTimerValue,
 } from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
@@ -111,6 +112,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         });
 
         dispatch(setSignupEmailInput(''));
+        dispatch(setSignupTimerValue(0));
         dispatch(setUserLoggedIn(true));
 
         resumePushNotification();
