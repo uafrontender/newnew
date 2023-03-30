@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -24,23 +24,22 @@ import VerificationCodeInput from '../atoms/VerificationCodeInput';
 import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 // Utils
-import secondsToString from '../../utils/secondsToHMS';
-import isBrowser from '../../utils/isBrowser';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { useAppState } from '../../contexts/appStateContext';
+import VerificationCodeResend from '../atoms/VerificationCodeResend';
 
 const AnimatedPresence = dynamic(() => import('../atoms/AnimatedPresence'));
 
 export interface ICodeVerificationMenuNewEmail {
-  expirationTime: number;
   newEmail: string;
+  canResendIn: number;
   redirect: 'settings' | 'dashboard';
   allowLeave: boolean;
 }
 
 const CodeVerificationMenuNewEmail: React.FunctionComponent<
   ICodeVerificationMenuNewEmail
-> = ({ expirationTime, newEmail, redirect, allowLeave }) => {
+> = ({ newEmail, canResendIn, redirect, allowLeave }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
   const user = useAppSelector((state) => state.user);
@@ -72,10 +71,10 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
   // Timer
-  const [timerSeconds, setTimerSeconds] = useState(expirationTime);
-  const [timerActive, setTimerActive] = useState(false);
   const [timerHidden, setTimerHidden] = useState(false);
-  const interval = useRef<number>();
+  const [canResendAt, setCanResendAt] = useState<number>(
+    Date.now() + canResendIn * 1000
+  );
 
   useLeavePageConfirm(!isSuccess && !allowLeave, t('leaveAlert'), []);
 
@@ -95,12 +94,11 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         const { data, error } = await setMyEmail(signInRequest);
 
         if (
-          data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS ||
-          error
+          error ||
+          !data ||
+          data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
         )
           throw new Error(error?.message ?? 'Request failed');
-
-        setTimerActive(false);
 
         if (redirect === 'settings') {
           dispatch(
@@ -144,14 +142,12 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
       } catch (err: any) {
         setIsSignInWithEmailLoading(false);
         setSubmitError(err?.message ?? 'generic_error');
-        setTimerActive(true);
         setTimerHidden(false);
       }
     },
     [
       setIsSignInWithEmailLoading,
       setSubmitError,
-      setTimerActive,
       user.userData?.options,
       newEmail,
       redirect,
@@ -172,16 +168,19 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
       const { data, error } = await sendVerificationNewEmail(payload);
 
       if (
-        data?.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS ||
-        error
-      )
+        error ||
+        !data ||
+        (data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+      ) {
         throw new Error(error?.message ?? 'Request failed');
+      }
 
       setIsResendCodeLoading(false);
       setCodeInitial(new Array(6).join('.').split('.'));
-      setTimerSeconds(expirationTime);
-      setTimerActive(true);
+      setCanResendAt(Date.now() + data.retryAfter * 1000);
     } catch (err: any) {
       setIsResendCodeLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -191,33 +190,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const handleTryAgain = () => {
     setSubmitError('');
     setCodeInitial(new Array(6).join('.').split('.'));
-    setTimerActive(true);
   };
-
-  useEffect(() => {
-    setTimerActive(true);
-  }, []);
-
-  useEffect(() => {
-    if (timerSeconds < 1) {
-      setTimerActive(false);
-      setSubmitError('');
-      setCodeInitial(new Array(6).join('.').split('.'));
-    }
-  }, [timerSeconds, setTimerActive, setSubmitError, setCodeInitial]);
-
-  useEffect(() => {
-    if (isBrowser()) {
-      if (timerActive) {
-        interval.current = window.setInterval(() => {
-          setTimerSeconds((seconds) => seconds - 1);
-        }, 1000);
-      } else if (!timerActive) {
-        clearInterval(interval.current);
-      }
-    }
-    return () => clearInterval(interval.current);
-  }, [timerActive, timerSeconds]);
 
   return (
     <>
@@ -253,34 +226,17 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         <VerificationCodeInput
           initialValue={codeInitial}
           length={6}
-          disabled={
-            isSignInWithEmailLoading || isResendCodeLoading || timerSeconds < 1
-          }
+          disabled={isSignInWithEmailLoading || isResendCodeLoading}
           error={submitError ? true : undefined}
           onComplete={onCodeComplete}
         />
-        {timerActive && !timerHidden && !submitError && !isSuccess ? (
-          <STimeoutDiv isAlertColor={timerSeconds < 11}>
-            {secondsToString(timerSeconds, 'm:s')}
-          </STimeoutDiv>
-        ) : (
-          !submitError &&
-          !isSignInWithEmailLoading &&
-          !isResendCodeLoading && (
-            <AnimatedPresence
-              animateWhenInView={false}
-              animation='t-01'
-              delay={0.3}
-            >
-              <STimeExpired>
-                {t('expired.noCodeReceived')}{' '}
-                <button type='button' onClick={() => handleResendCode()}>
-                  {t('expired.resendButtonText')}
-                </button>
-              </STimeExpired>
-            </AnimatedPresence>
-          )
-        )}
+        <VerificationCodeResend
+          canResendAt={canResendAt}
+          show={
+            !timerHidden && !submitError && !isResendCodeLoading && !isSuccess
+          }
+          onResendClick={handleResendCode}
+        />
         {!isSignInWithEmailLoading &&
         !isResendCodeLoading &&
         submitError &&
@@ -295,7 +251,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 };
 
 CodeVerificationMenuNewEmail.defaultProps = {
-  expirationTime: 60,
+  canResendIn: 0,
 };
 
 export default CodeVerificationMenuNewEmail;
@@ -434,60 +390,6 @@ const SSubheading = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
-  }
-`;
-
-interface ISTimeoutDiv {
-  isAlertColor: boolean;
-}
-
-const STimeoutDiv = styled.div<ISTimeoutDiv>`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  // NB! Temp
-  color: ${({ isAlertColor, theme }) => {
-    if (isAlertColor) return theme.colorsThemed.accent.error;
-    return theme.colorsThemed.text.tertiary;
-  }};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
-const STimeExpired = styled(Text)`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  button {
-    background-color: transparent;
-    border: transparent;
-
-    font-size: inherit;
-    font-weight: 500;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    cursor: pointer;
-
-    &:hover,
-    &:focus {
-      outline: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-      transition: 0.2s ease;
-    }
   }
 `;
 
