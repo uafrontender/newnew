@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -38,9 +38,9 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import AcAddNewOption from '../../../molecules/decision/regular/auction/AcAddNewOption';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
-import getDisplayname from '../../../../utils/getDisplayname';
 import useAcOptions from '../../../../utils/hooks/useAcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
+import DisplayName from '../../../atoms/DisplayName';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -108,6 +108,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     handleGoBackInsidePost,
     resetSetupIntentClientSecret,
     refetchPost,
+    handleUpdatePostData,
   } = usePostInnerState();
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
@@ -238,8 +239,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
       if (!decoded) return;
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === post.postUuid) {
-        await fetchPostLatestData();
+      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+        handleUpdatePostData(decoded.post);
       }
     };
 
@@ -427,7 +428,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   {t('expires.end_date')}{' '}
                   {moment((post.expiresAt?.seconds as number) * 1000)
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                 </SEndDate>
               </>
             ) : (
@@ -463,7 +464,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                   {t('expires.end_date')}{' '}
                   {moment((post.expiresAt?.seconds as number) * 1000)
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                 </SEndDate>
               </>
             ) : (
@@ -515,7 +516,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
                         {t('expires.end_date')}{' '}
                         {moment((post.expiresAt?.seconds as number) * 1000)
                           .locale(router.locale || 'en-US')
-                          .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                          .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                       </SEndDate>
                     </>
                   ) : (
@@ -547,12 +548,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             postShortId={post.postShortId ?? ''}
             postStatus={postStatus}
             postText={post.title}
-            postCreatorName={getDisplayname(post.creator)}
-            postDeadline={moment(
-              (post.responseUploadDeadline?.seconds as number) * 1000
-            )
-              .subtract(3, 'days')
-              .calendar()}
+            postCreator={post.creator}
             options={options}
             optionsLoading={isOptionsLoading}
             hasNextPage={!!hasNextOptionsPage}
@@ -568,12 +564,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               postShortId={post.postShortId ?? ''}
               postStatus={postStatus}
               postText={post.title}
-              postCreator={getDisplayname(post.creator)}
-              postDeadline={moment(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              )
-                .subtract(3, 'days')
-                .calendar()}
+              postCreator={post.creator}
               options={options}
               minAmount={
                 post.minimalBid?.usdCents
@@ -600,15 +591,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               promptUserWithPushNotificationsPermissionModal();
             }}
           >
-            {t('paymentSuccessModal.ac', {
-              postCreator: getDisplayname(post.creator),
-              postDeadline: moment(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              )
-                .locale(router.locale || 'en-US')
-                .subtract(3, 'days')
-                .calendar(),
-            })}
+            <Trans
+              t={t}
+              i18nKey='paymentSuccessModal.ac'
+              // @ts-ignore
+              components={[<DisplayName user={post.creator} />]}
+            />
           </PaymentSuccessModal>
         )}
         {isPopupVisible && (

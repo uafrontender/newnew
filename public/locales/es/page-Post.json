@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "{{postTitle}} | {{displayName}} en NewNew",
-    "deletedPost_NEED_TRANSLATION": "Deleted post",
+    "deletedPost": "Publicación eliminada",
     "description": {
       "ac": {
         "withContributions": "${{totalInBids}} en ofertas en NewNew",
@@ -65,9 +65,9 @@
       "cf": "¡Estás patrocinando este Goal!"
     },
     "doneButton": "¡Suena bien!",
-    "ac": "{{postCreator}} elegirá su favorito una vez terminada la subasta.",
-    "mc": "{{postCreator}} hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
-    "cf": "{{postCreator}} hará el objetivo una vez que consiga suficientes patrocinadores."
+    "ac": "<0/> elegirá su favorito una vez terminada la subasta.",
+    "mc": "<0/> hará la opción con la mayor cantidad de votos cuando termine la Superpoll.",
+    "cf": "<0/> hará el objetivo una vez que consiga suficientes patrocinadores."
   },
   "postFailedBoxModeration": {
     "title": "{{postType}} está cancelado",
@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "Este {{postType}} está cancelado",
     "reason": {
-      "no-response": "{{creator}} no publicó un video de respuesta a tiempo",
-      "ac-no-winner": "{{creator}} no eligió una oferta a tiempo",
+      "no-response": "<0/> no publicó un video de respuesta a tiempo",
+      "ac-no-winner": "<0/> no eligió una oferta a tiempo",
       "ac": "El tiempo se agotó antes de que se hiciera alguna oferta",
       "mc": "El tiempo se agotó antes de que se realizara alguna votación",
       "cf": "El tiempo se agotó antes de llegar al objetivo"
@@ -148,8 +148,8 @@
     "uploadResponseForm": {
       "fileUpload": {
         "title_1": "¡Tu audiencia está esperando!",
-        "title_2_NEED_TRANSLATION": "Select a file",
-        "title_2Long_NEED_TRANSLATION": "Select a file or drag and drop here",
+        "title_2": "Selecciona un archivo",
+        "title_2Long": "Selecciona un archivo o arrástralo y suéltalo aquí",
         "description": "El tamaño máximo del video es de 10 GB",
         "button": "Seleccionar archivo"
       },
@@ -316,11 +316,12 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "El Bid de {{creator}}",
+      "title": "El Bid de <0/>",
+      "suffix": "",
       "subtitle": "Tu oferta"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el <0/> elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -347,6 +348,7 @@
       "optionCard": {
         "by": "por",
         "bidders": "ofertantes",
+        "other": "otro",
         "others": "otros",
         "bid": "ofertar",
         "supportButton": "potenciar",
@@ -387,11 +389,12 @@
       "votes": "votos totales"
     },
     "paymentModalHeader": {
-      "title": "El Superpoll de {{creator}}",
+      "title": "El Superpoll de <0/>",
+      "suffix": "",
       "subtitle": "La opción que has elegido"
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el <0/> elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -409,6 +412,7 @@
         "votes": "votos",
         "vote": "voto",
         "mySuggestion": "Mi sugerencia",
+        "other": "otro",
         "others": "otros",
         "voters": "votantes",
         "voted": "votaron",
@@ -430,9 +434,10 @@
           "vote": "voto",
           "votes": "votos",
           "custom": "Votos personalizados",
-          "buySingleVote": "Compra un voto para votar en la Superpoll de {{creator}}",
-          "buyMultipleVotes": "Comprar {{amount}} votos para votar en la Superpoll de {{creator}}",
-          "buyAnyVotes": "Compra el número de votos que quieras para votar en la Superpoll de {{creator}}",
+          "buySingleVote": "Compra un voto para votar en la Superpoll de <0/>",
+          "buyMultipleVotes": "Comprar {{amount}} votos para votar en la Superpoll de <0/>",
+          "buyAnyVotes": "Compra el número de votos que quieras para votar en la Superpoll de <0/>",
+          "suffix": "",
           "optionCaption": "Opción de Superpoll",
           "voteButton": "Votar"
         }
@@ -499,10 +504,11 @@
       }
     },
     "paymentModalHeader": {
-      "title": "El Goal de {{creator}}"
+      "title": "El Goal de <0/>",
+      "suffix": ""
     },
     "paymentModalFooter": {
-      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el {{creator}} elige tu oferta.",
+      "body": "Se colocará una retención temporal en tu tarjeta. Solo se te cobrará si el <0/> elige tu oferta.",
       "terms": "Términos",
       "apply": "aplicar"
     },
@@ -606,8 +612,9 @@
   },
   "acPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
+    "wantsToKnow": "<0/> quiere saber...",
     "inTotalBids": "ofertas en total",
+    "other": "otro",
     "others": "otros",
     "bid": "oferta",
     "bidChosen": "Oferta elegida",
@@ -618,8 +625,9 @@
   },
   "mcPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
+    "wantsToKnow": "<0/> quiere saber...",
     "inTotalVotes": "votos en total",
+    "other": "otro",
     "others": "otros",
     "voted": "votaron",
     "votes": "votos",
@@ -632,7 +640,7 @@
   },
   "cfPostSuccess": {
     "heroText": "¡Velo suceder!",
-    "wantsToKnow": "El Goal de {{creator}}<0/>",
+    "wantsToKnow": "El Goal de <0/>",
     "creatorsBackers": "Los patrocinadores de {{creator}}",
     "ofTargetBackers": "de {{target_count}} patrocinadores",
     "youBackedFor": "Patrocinaste por"
@@ -652,14 +660,8 @@
         "seconds_singular": "segundo"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
-    "inTotalBids": "en ofertas totales",
-    "others": "otros",
-    "bid": "oferta",
-    "seeAll": "ver todas las ofertas",
-    "optionsTab": {
-      "backButton": "Regresar"
-    }
+    "wantsToKnow": "<0/> quiere saber...",
+    "inTotalBids": "en ofertas totales"
   },
   "mcPostAwaiting": {
     "hero": {
@@ -677,17 +679,7 @@
         "seconds_singular": "segundo"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> quiere saber...",
-    "inTotalVotes": "votos en total",
-    "others": "otros",
-    "voted": "votó",
-    "votes": "votos",
-    "vote": "voto",
-    "optionChosen": "La opción más votada",
-    "seeAll": "ver todas las opciones",
-    "optionsTab": {
-      "backButton": "Regresar"
-    }
+    "wantsToKnow": "<0/> quiere saber..."
   },
   "recommendationsSection": {
     "heading": "Más como esta publicación"

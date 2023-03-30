@@ -85,13 +85,12 @@ const McWaitingOptionsSection: React.FunctionComponent<
           <McOptionCard
             key={option.id.toString()}
             option={option as TMcOptionWithHighestField}
-            creator={option.creator ?? post.creator!!}
             postUuid={post.postUuid}
             postShortId={post.postShortId ?? ''}
             isCreatorsBid={
               !option.creator || option.creator?.uuid === post.creator?.uuid
             }
-            postCreatorName=''
+            postCreator={post.creator}
             postText=''
             index={i}
             noAction

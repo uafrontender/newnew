@@ -36,7 +36,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCodeLoading, setIsCodeLoading] = useState(false);
-  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+  const [canResendAt, setCanResendAt] = useState<number>(0);
 
   useEffect(() => {
     const setTimeoutId = setTimeout(() => {
@@ -51,6 +51,12 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const [isCodeSent, setIsCodeSent] = useState(false);
 
   const requestVerificationCode = useCallback(async () => {
+    if (isCodeLoading) {
+      return;
+    }
+
+    setIsCodeLoading(true);
+
     try {
       const sendVerificationCodePayload =
         new newnewapi.SendVerificationEmailRequest({
@@ -62,31 +68,34 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
       const { data, error } = await sendVerificationNewEmail(
         sendVerificationCodePayload
       );
+
       if (
-        data?.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS ||
-        error
+        error ||
+        !data ||
+        (data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
       ) {
         throw new Error(error?.message ?? 'Request failed');
       }
 
+      setCanResendAt(Date.now() + data.retryAfter * 1000);
+      setCode(new Array(6).join('.').split('.'));
       setIsCodeSent(true);
+      setIsCodeLoading(false);
     } catch (err: any) {
-      setTimerStartTime(null);
+      setIsCodeLoading(false);
       console.error(err);
     }
-  }, [user.userData?.email]);
+  }, [isCodeLoading, user.userData?.email]);
 
   const resendVerificationCode = async () => {
     Mixpanel.track('Resend Verification Code', {
       _stage: 'Settings',
     });
 
-    setIsCodeLoading(true);
-    setTimerStartTime(Date.now());
     await requestVerificationCode();
-    setIsCodeLoading(false);
-    setCode(new Array(6).join('.').split('.'));
   };
 
   useEffect(() => {
@@ -167,14 +176,10 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         isInputFocused={isInputFocused}
         key={`input-focused-${isInputFocused}`}
       />
-      <SVerificationCodeResend
-        expirationTime={60}
+      <VerificationCodeResend
+        canResendAt={canResendAt}
+        show={!errorMessage && !isSubmitting && isCodeSent}
         onResendClick={resendVerificationCode}
-        onTimerEnd={() => {
-          setTimerStartTime(null);
-        }}
-        $invisible={!!errorMessage || !!isSubmitting}
-        startTime={timerStartTime}
       />
       {errorMessage && (
         <AnimatedPresence animateWhenInView={false} animation='t-09'>
@@ -228,11 +233,4 @@ const SErrorDiv = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     line-height: 20px;
   }
-`;
-
-const SVerificationCodeResend = styled(VerificationCodeResend)<{
-  $invisible: boolean;
-}>`
-  visibility: ${({ $invisible }) => ($invisible ? 'hidden' : 'visible')};
-  height: 0;
 `;

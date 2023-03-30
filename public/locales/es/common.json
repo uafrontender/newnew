@@ -108,7 +108,7 @@
   },
   "modal": {
     "reportUser": {
-      "title": "Reportar",
+      "title": "Reportar ",
       "subtitle": "Ayúdanos a entender para que podamos investigar...",
       "options": {
         "spam": "Sospechoso o spam",
@@ -194,7 +194,7 @@
   },
   "search": {
     "placeholder": "Búsqueda",
-    "placeholderLong_NEED_TRANSLATION": "Search creators and hashtags",
+    "placeholderLong": "Buscar creadores y hashtags",
     "topPosts": "Publicaciones populares",
     "popularCreators": "Creadores populares",
     "creatorSubtitle": "Ver publicaciones",

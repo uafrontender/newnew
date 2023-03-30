@@ -17,11 +17,10 @@ import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import UserEllipseModal from '../profile/UserEllipseModal';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { useBundles } from '../../../contexts/bundlesContext';
 import { formatNumber } from '../../../utils/format';
-import getDisplayname from '../../../utils/getDisplayname';
 import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../atoms/DisplayName';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -132,15 +131,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SUserAvatar>
       </SUserAvatarContainer>
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
-        <SDisplayName>{getDisplayname(creator)}</SDisplayName>
-        {creator.options?.isVerified && (
-          <SInlineSVG
-            svg={VerificationCheckmark}
-            width='16px'
-            height='16px'
-            fill='none'
-          />
-        )}
+        <SDisplayName user={creator} />
       </SDisplayNameContainer>
       <SUserName>@{creator.username}</SUserName>
       {onBundleClicked && (
@@ -191,7 +182,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedDisplayname={getDisplayname(creator)}
+        reportedUser={creator}
         onSubmit={handleReportSubmit}
         onClose={handleReportClose}
       />
@@ -270,17 +261,11 @@ const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
   padding-left: ${({ isVerified }) => (isVerified ? '24px' : '0px')};
 `;
 
-const SDisplayName = styled.p`
-  text-align: center;
+const SDisplayName = styled(DisplayName)`
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  min-width: 24px;
-  min-height: 24px;
 `;
 
 const SUserName = styled.p`

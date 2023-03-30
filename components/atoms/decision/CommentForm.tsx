@@ -95,7 +95,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [commentText, setCommentText] = useState('');
     const [commentTextError, setCommentTextError] = useState('');
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-    const [commentToSend, setCommentToSend] = useState('');
 
     const validateTextAbortControllerRef = useRef<
       AbortController | undefined
@@ -162,72 +161,84 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const handleSubmit = useCallback(
       async (e: React.MouseEvent | React.KeyboardEvent) => {
         e.preventDefault();
-        // Redirect only after the persist data is pulled
-        if (!user.loggedIn && user._persist?.rehydrated) {
-          if (!isRoot) {
-            router.push(
-              `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                window.location.href
-              )}`
-            );
-          } else {
-            router.push(
-              `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                `${process.env.NEXT_PUBLIC_APP_URL}/${
-                  router.locale !== 'en-US' ? `${router.locale}/` : ''
-                }p/${postUuidOrShortId}?comment_content=${commentText}#comments`
-              )}`
-            );
-          }
-
+        if (isAPIValidateLoading) {
           return;
         }
+        setIsSubmitting(true);
+        try {
+          // Redirect only after the persist data is pulled
+          if (!user.loggedIn && user._persist?.rehydrated) {
+            if (!isRoot) {
+              router.push(
+                `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                  window.location.href
+                )}`
+              );
+            } else {
+              router.push(
+                `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                  `${process.env.NEXT_PUBLIC_APP_URL}/${
+                    router.locale !== 'en-US' ? `${router.locale}/` : ''
+                  }p/${postUuidOrShortId}?comment_content=${commentText}#comments`
+                )}`
+              );
+            }
 
-        setCommentToSend(commentText);
+            return;
+          }
+
+          await onSubmit(commentText);
+
+          setCommentText('');
+          setIsSubmitting(false);
+        } catch (err) {
+          console.error(err);
+          setIsSubmitting(false);
+        }
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [commentText, user.loggedIn, user._persist?.rehydrated, onSubmit, isRoot]
+      [
+        isAPIValidateLoading,
+        user.loggedIn,
+        user._persist?.rehydrated,
+        onSubmit,
+        commentText,
+        isRoot,
+        router,
+        postUuidOrShortId,
+      ]
     );
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLFormElement>) => {
+        if (isSubmitting || isAPIValidateLoading) {
+          return;
+        }
         if (!isMobileOrTablet) {
-          if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
+          if (
+            e.shiftKey &&
+            e.key === 'Enter' &&
+            commentText.trim().length > 0
+          ) {
             if (commentText.charCodeAt(commentText.length - 1) === 10) {
               setCommentText((curr) => curr.slice(0, -1));
             }
-          } else if (e.key === 'Enter') {
+          } else if (e.key === 'Enter' && commentText.trim().length > 0) {
             handleSubmit(e);
           }
-        } else if (e.key === 'Enter' && commentText.length > 0) {
+        } else if (e.key === 'Enter' && commentText.trim().length > 0) {
           if (commentText.charCodeAt(commentText.length - 1) === 10) {
             setCommentText((curr) => curr.slice(0, -1));
           }
         }
       },
-      [commentText, handleSubmit, isMobileOrTablet]
+      [
+        commentText,
+        handleSubmit,
+        isAPIValidateLoading,
+        isMobileOrTablet,
+        isSubmitting,
+      ]
     );
-
-    // TODO: Add loading state for mobile button on mobile
-    useEffect(() => {
-      if (!commentToSend || !!commentTextError) {
-        return;
-      }
-
-      if (isAPIValidateLoading) {
-        return;
-      }
-
-      const handleOnSubmit = async () => {
-        setIsSubmitting(true);
-        await onSubmit(commentToSend);
-        setIsSubmitting(false);
-        setCommentText('');
-        setCommentToSend('');
-      };
-
-      handleOnSubmit();
-    }, [commentToSend, commentTextError, isAPIValidateLoading, onSubmit]);
 
     const handleBlur = useCallback(() => {
       setFocusedInput(false);

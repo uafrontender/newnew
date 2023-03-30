@@ -131,6 +131,7 @@ const PostPage: NextPage<IPostPage> = ({
     refetch: refetchPost,
     updatePostTitleMutation,
     updatePostStatusMutation,
+    updatePostMutation,
   } = usePost(
     {
       loggedInUser: user.loggedIn,
@@ -194,6 +195,13 @@ const PostPage: NextPage<IPostPage> = ({
       }
     },
     [postParsed?.postUuid, showErrorToastPredefined, updatePostTitleMutation]
+  );
+
+  const handleUpdatePostData = useCallback(
+    (updatedPost: newnewapi.IPost) => {
+      updatePostMutation.mutate(updatedPost);
+    },
+    [updatePostMutation]
   );
 
   const postStatus = useMemo<TPostStatusStringified>(() => {
@@ -738,6 +746,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
         handleUpdatePostTitle={handleUpdatePostTitle}
+        handleUpdatePostData={handleUpdatePostData}
         isUpdateTitleLoading={isUpdateTitleLoading}
         refetchPost={refetchPost}
       >
@@ -885,8 +894,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
     }
 
     if (!context.req.url?.startsWith('/_next')) {
-      // console.log('I am from direct link, making SSR request');
-
       const getPostPayload = new newnewapi.GetPostRequest({
         postUuid: post_uuid_or_short_id,
       });
@@ -1002,8 +1009,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         },
       };
     }
-
-    // console.log('I am from next router, no SSR needed');
 
     return {
       props: {
