@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ICaption {
-  weight?: 600 | 700;
+  weight?: 500 | 600 | 700;
   variant?: 1 | 2 | 3;
   onClick?: () => void;
   innerRef?: () => void;
