@@ -201,12 +201,16 @@ export const PostCard: React.FC<ICard> = React.memo(
       return postParsed.announcement?.thumbnailUrl as string;
     });
 
-    const [coverImageUrl, setCoverImageUrl] = useState<
-      string | undefined | null
-    >(
-      (postParsed.response?.coverImageUrl ||
-        postParsed.announcement?.coverImageUrl) ??
-        undefined
+    // Cover image
+    const [announcementCoverImage, setAnnouncementCoverImage] = useState(
+      postParsed.announcement?.coverImageUrl || undefined
+    );
+    const [responseCoverImage, setResponseCoverImage] = useState(
+      postParsed.response?.coverImageUrl || undefined
+    );
+    const coverImageUrl = useMemo(
+      () => (responseCoverImage || announcementCoverImage) ?? undefined,
+      [announcementCoverImage, responseCoverImage]
     );
 
     const handleUserClick = (username: string) => {
@@ -328,33 +332,35 @@ export const PostCard: React.FC<ICard> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
 
-        if (decoded.postUuid !== postParsed.postUuid) return;
+        if (decoded.postUuid !== postParsed.postUuid) {
+          return;
+        }
 
         if (decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED) {
-          // Wait to make sure that cloudfare cache has been invalidated
-          setTimeout(() => {
-            fetch(decoded.coverImageUrl as string)
-              .then((res) => res.blob())
-              .then((blobFromFetch) => {
-                const url = URL.createObjectURL(blobFromFetch);
-
-                if (
-                  (postParsed?.response?.coverImageUrl &&
-                    decoded.videoTargetType ===
-                      newnewapi.VideoTargetType.RESPONSE) ||
-                  !postParsed?.response?.coverImageUrl
-                ) {
-                  setCoverImageUrl(url);
-                }
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          }, 5000);
+          if (
+            decoded.videoTargetType ===
+              newnewapi.VideoTargetType.ANNOUNCEMENT &&
+            decoded.coverImageUrl
+          ) {
+            setAnnouncementCoverImage(decoded.coverImageUrl);
+          } else if (
+            decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE &&
+            decoded.coverImageUrl
+          ) {
+            setResponseCoverImage(decoded.coverImageUrl);
+          }
         } else if (
           decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
         ) {
-          setCoverImageUrl(undefined);
+          if (
+            decoded.videoTargetType === newnewapi.VideoTargetType.ANNOUNCEMENT
+          ) {
+            setAnnouncementCoverImage(undefined);
+          } else if (
+            decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE
+          ) {
+            setResponseCoverImage(undefined);
+          }
         }
       };
 
