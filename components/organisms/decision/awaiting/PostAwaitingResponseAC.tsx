@@ -19,7 +19,6 @@ import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { formatNumber } from '../../../../utils/format';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
-import getDisplayname from '../../../../utils/getDisplayname';
 
 import Headline from '../../../atoms/Headline';
 import PostVideoSuccess from '../../../molecules/decision/success/PostVideoSuccess';
@@ -188,10 +187,17 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
           <SActivitiesContainer>
             <WaitingForResponseBox
               title={t('acPostAwaiting.hero.title')}
-              body={t('acPostAwaiting.hero.body', {
-                creator: getDisplayname(post.creator),
-                time: waitingTime,
-              })}
+              body={
+                <Trans
+                  t={t}
+                  i18nKey='acPostAwaiting.hero.body'
+                  // @ts-ignore
+                  components={[
+                    <DisplayName user={post.creator} inverted />,
+                    { time: waitingTime },
+                  ]}
+                />
+              }
             />
             <SCreatorInfoDiv>
               <SCreator>
