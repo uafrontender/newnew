@@ -208,7 +208,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
   }, [coverImageInEdit]);
 
   return (
-    <Modal show={open} onClose={handleClose}>
+    <Modal show={open} onClose={handleClose} additionalz={11}>
       <SContainer onClick={preventCLick}>
         <SModalTopContent>
           <SModalTopLine>
