@@ -14,6 +14,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 
 interface IEditEmailModal {
   show: boolean;
+  skipCurrentEmailVerificationStep: boolean;
   onClose: () => void;
 }
 
@@ -25,7 +26,11 @@ enum Steps {
   success = 3,
 }
 
-const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
+const EditEmailModal = ({
+  show,
+  skipCurrentEmailVerificationStep,
+  onClose,
+}: IEditEmailModal) => {
   const { resizeMode } = useAppState();
 
   const [newEmail, setNewEmail] = useState('');
@@ -39,13 +44,17 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
     'tablet',
   ].includes(resizeMode);
 
-  const [step, setStep] = useState<number | null>(Steps.verifyEmail);
+  const [step, setStep] = useState<number | null>(
+    skipCurrentEmailVerificationStep ? Steps.newEmail : Steps.verifyEmail
+  );
 
   useEffect(() => {
     if (show && !step) {
-      setStep(Steps.verifyEmail);
+      setStep(
+        skipCurrentEmailVerificationStep ? Steps.newEmail : Steps.verifyEmail
+      );
     }
-  }, [show, step]);
+  }, [show, step, skipCurrentEmailVerificationStep]);
 
   useEffect(() => {
     if (!show) {
@@ -89,24 +98,29 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
     >
       {show && (
         <SModalPaper isCloseButton onClose={onClose} isMobileFullScreen>
-          {(step === Steps.verifyEmail || step === Steps.newEmail) && (
-            <AnimationContent
-              initial={step === Steps.newEmail ? MInitialDisappear : false}
-              animate={step === Steps.newEmail ? MAnimationDisappear : false}
-            >
-              <AnimatePresence>
-                <SContent>
-                  <EditEmailStepOne onComplete={completeStepOne} />
-                </SContent>
-              </AnimatePresence>
-            </AnimationContent>
-          )}
+          {(step === Steps.verifyEmail || step === Steps.newEmail) &&
+            !skipCurrentEmailVerificationStep && (
+              <AnimationContent
+                initial={step === Steps.newEmail ? MInitialDisappear : false}
+                animate={step === Steps.newEmail ? MAnimationDisappear : false}
+              >
+                <AnimatePresence>
+                  <SContent>
+                    <EditEmailStepOne onComplete={completeStepOne} />
+                  </SContent>
+                </AnimatePresence>
+              </AnimationContent>
+            )}
 
           {(step === Steps.newEmail || step === Steps.verifyNewEmail) && (
             <AnimationContent
               initial={
                 // eslint-disable-next-line no-nested-ternary
-                step === Steps.newEmail ? MInitialAppear : MInitialDisappear
+                step === Steps.newEmail
+                  ? skipCurrentEmailVerificationStep
+                    ? false
+                    : MInitialAppear
+                  : MInitialDisappear
               }
               animate={
                 step === Steps.newEmail ? MAnimationAppear : MAnimationDisappear
