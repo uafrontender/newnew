@@ -20,7 +20,8 @@
   },
   "section": {
     "your": "你的帖子",
-    "explore": "探索"
+    "explore": "探索",
+    "popular_NEED_TRANSLATION": "Popular"
   },
   "tutorial": {
     "ac": {
@@ -29,7 +30,7 @@
     },
     "mc": {
       "title": "Superpolls",
-      "caption": "投票選擇讓創作者做什麼，然後觀看他們按得票最多的選項照做。"
+      "caption_NEED_TRANSLATION": "Vote on what creators do and watch them do it."
     },
     "cf": {
       "title": "Goals",
@@ -86,7 +87,7 @@
     "title": "準備好創作了嗎？"
   },
   "createFirstPost": {
-    "title": "貼出你的出Bid或是Superpoll",
+    "title": "貼出你的出Bid\n或是Superpoll",
     "filter": {
       "active": "進行中",
       "ended": "已結束"

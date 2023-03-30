@@ -25,7 +25,6 @@ import assets from '../../../../constants/assets';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
 import EditIconFilled from '../../../../public/images/svg/icons/filled/EditTransparent.svg';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 import PostEllipseModalModeration from './PostEllipseModalModeration';
 import PostEllipseMenuModeration from './PostEllipseMenuModeration';
@@ -39,6 +38,7 @@ import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { TPostType } from '../../../../utils/switchPostType';
 import { useAppState } from '../../../../contexts/appStateContext';
 import EditPostTitleModal from './EditPostTitleModal';
+import DisplayName from '../../../atoms/DisplayName';
 
 const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.common.ac.darkAcAnimated,
@@ -223,7 +223,7 @@ const PostTopInfoModeration: React.FunctionComponent<
                   : t('mcPost.postTopInfo.vote')}
               </SBidsAmount>
             ) : null}
-            <SCreatorCard>
+            <SCreatorInfo>
               <Link href='/profile/my-posts'>
                 <a
                   href='/profile/my-posts'
@@ -255,19 +255,11 @@ const PostTopInfoModeration: React.FunctionComponent<
                   }}
                 >
                   <SUsername className='username'>
-                    {t('me')}
-                    {creator.options?.isVerified && (
-                      <SInlineSVG
-                        svg={VerificationCheckmark}
-                        width='16px'
-                        height='16px'
-                        fill='none'
-                      />
-                    )}
+                    <DisplayName user={creator} altName={t('me')} />
                   </SUsername>
                 </a>
               </Link>
-            </SCreatorCard>
+            </SCreatorInfo>
           </>
         ) : null}
         <SActionsDiv>
@@ -631,7 +623,7 @@ const SText = styled(Text)`
 `;
 
 // Creator card
-const SCreatorCard = styled.div`
+const SCreatorInfo = styled.div`
   grid-area: userCard;
 
   display: grid;
@@ -645,12 +637,12 @@ const SCreatorCard = styled.div`
 
   padding-right: 8px;
 
-  .username {
-    transition: 0.2s linear;
+  * {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
   }
 
   &:hover {
-    .username {
+    * {
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
@@ -683,8 +675,8 @@ const SUsername = styled.div`
   align-items: center;
   font-weight: bold;
   font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  line-height: 20px;
+  transition: 0.2s linear;
 `;
 
 // Action buttons
@@ -727,8 +719,4 @@ const SMoreButton = styled(Button)`
     align-items: center;
     justify-content: center;
   }
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-left: 2px;
 `;

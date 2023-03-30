@@ -16,7 +16,6 @@ import AcOptionCard from '../../regular/auction/AcOptionCard';
 import Button from '../../../../atoms/Button';
 import GradientMask from '../../../../atoms/GradientMask';
 import { Mixpanel } from '../../../../../utils/mixpanel';
-import getDisplayname from '../../../../../utils/getDisplayname';
 
 import Lottie from '../../../../atoms/Lottie';
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
@@ -113,9 +112,8 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             option={option as TAcOptionWithHighestField}
             postUuid={post.postUuid}
             postShortId={post.postShortId ?? ''}
-            postCreatorName={getDisplayname(post.creator)}
+            postCreator={post.creator}
             postText=''
-            postDeadline=''
             index={i}
             minAmount={0}
             votingAllowed={false}

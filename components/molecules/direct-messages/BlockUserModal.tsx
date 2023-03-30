@@ -8,7 +8,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { Mixpanel } from '../../../utils/mixpanel';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IBlockUserModal {
   user: newnewapi.IVisavisUser;

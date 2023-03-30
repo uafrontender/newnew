@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -8,7 +7,7 @@ import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 import InlineSvg from '../InlineSVG';
 import { Mixpanel } from '../../../utils/mixpanel';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../DisplayName';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -110,12 +109,6 @@ const SUserAvatar = styled.div`
 
 const SDisplayName = styled(DisplayName)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  min-width: 24px;
-  min-height: 24px;
-  margin-right: 14px;
 `;
 
 const SLink = styled.span`
