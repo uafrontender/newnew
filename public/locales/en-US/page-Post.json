@@ -102,7 +102,7 @@
   "postDeleted": {
     "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "{{creator}} deleted this {{postType}}",
+      "byCreator": "<0/> deleted this {{postType}}",
       "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
     "buttonText": "See new {{postTypeMultiple}}"
@@ -459,7 +459,7 @@
         "suggestionPlaceholder": "Add your own option",
         "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option",
-        "offersBundles": "{{creator}} offers Superpoll Bundles",
+        "offersBundles": "<0/> offers Superpoll Bundles",
         "viewBundles": "View Bundles",
         "getMoreBundles": "Get another Superpoll Bundle",
         "getBundles": "Get it"
@@ -648,7 +648,7 @@
   "acPostAwaiting": {
     "hero": {
       "title": "Time's up!",
-      "body": "{{creator}} has {{time}} to select and do their favorite bid!",
+      "body": "<0/> has {{time}} to select and do their favorite bid!",
       "expires": {
         "days": "days",
         "days_singular": "day",
@@ -666,8 +666,8 @@
   "mcPostAwaiting": {
     "hero": {
       "title": "Votes are in!",
-      "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
-      "bodyNoResponse": "{{creator}} has {{time}} to do respond. Stay tuned!",
+      "body": "<0/> has {{time}} to do this option. Stay tuned!",
+      "bodyNoResponse": "<0/> has {{time}} to do respond. Stay tuned!",
       "expires": {
         "days": "days",
         "days_singular": "day",

@@ -7,7 +7,7 @@ import Headline from '../../../atoms/Headline';
 
 interface IWaitingForResponseBox {
   title: string;
-  body: string;
+  body: React.ReactNode;
 }
 
 const WaitingForResponseBox: React.FunctionComponent<

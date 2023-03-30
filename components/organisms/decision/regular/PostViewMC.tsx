@@ -44,7 +44,6 @@ import { usePushNotifications } from '../../../../contexts/pushNotificationsCont
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
-import getDisplayname from '../../../../utils/getDisplayname';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
@@ -661,11 +660,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             <STicketSet numberOFTickets={3} size={36} shift={11} />
           )}
           <SBundlesText>
-            {creatorsBundle?.bundle
-              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
-              : t('mcPost.optionsTab.actionSection.offersBundles', {
-                  creator: getDisplayname(post.creator),
-                })}
+            {creatorsBundle?.bundle ? (
+              t('mcPost.optionsTab.actionSection.getMoreBundles')
+            ) : (
+              <Trans
+                t={t}
+                i18nKey='mcPost.optionsTab.actionSection.offersBundles'
+                // @ts-ignore
+                components={[<DisplayName user={post.creator} />]}
+              />
+            )}
           </SBundlesText>
           <SHighlightedButton
             id='buy-bundle-button'
