@@ -42,13 +42,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const { postStatus, handleUpdatePostCoverImage } = usePostInnerState();
   const {
@@ -164,7 +160,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       }
     };
 
-    if (isBrowser() && !isMobileOrTablet) {
+    if (isBrowser() && !isMobile) {
       const rect =
         document.getElementById('sound-button')?.getBoundingClientRect() ||
         document.getElementById('toggle-video-widget')?.getBoundingClientRect();
@@ -188,11 +184,11 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     return () => {
       setUiOffset(undefined);
 
-      if (isBrowser() && !isMobileOrTablet) {
+      if (isBrowser() && !isMobile) {
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobileOrTablet, postUuid]);
+  }, [isMobile, postUuid]);
 
   return (
     <>
