@@ -475,6 +475,16 @@ export const PostCard: React.FC<ICard> = React.memo(
       );
     }
 
+    useEffect(() => {
+      setAnnouncementCoverImage(
+        postParsed.announcement?.coverImageUrl || undefined
+      );
+    }, [postParsed.announcement?.coverImageUrl]);
+
+    useEffect(() => {
+      setResponseCoverImage(postParsed.response?.coverImageUrl || undefined);
+    }, [postParsed.response?.coverImageUrl]);
+
     if (type === 'inside') {
       return (
         <SWrapper
