@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -17,15 +17,12 @@ import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
-
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
-import { getMyPosts } from '../api/endpoints/user';
-import { TTokenCookie } from '../api/apiConfigs';
-import useMyPosts from '../utils/hooks/useMyPosts';
-import assets from '../constants/assets';
+import { useAppSelector } from '../redux-store/store';
+import { getPopularPosts } from '../api/endpoints/post';
 import canBecomeCreator from '../utils/canBecomeCreator';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
+
+import assets from '../constants/assets';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -39,12 +36,8 @@ interface IHome {
   assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
-  initialPageRA?: {
-    posts: newnewapi.IPost[];
-    paging: newnewapi.PagingResponse | null | undefined;
-  };
   initialNextPageTokenRA?: string;
-  sessionExpired?: boolean;
+  popularPosts?: newnewapi.NonPagedPostsResponse;
 }
 
 // No sense to memorize
@@ -52,23 +45,12 @@ const Home: NextPage<IHome> = ({
   staticBids,
   staticSuperpolls,
   assumeLoggedIn,
-  initialPageRA,
-  sessionExpired,
+  popularPosts,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
   const { appConstants } = useGetAppConstants();
-
-  useEffect(() => {
-    if (sessionExpired) {
-      dispatch(
-        logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionExpired]);
 
   const isUserLoggedIn = useMemo(() => {
     if (user._persist?.rehydrated) {
@@ -77,44 +59,6 @@ const Home: NextPage<IHome> = ({
 
     return assumeLoggedIn;
   }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
-
-  // Resent activity
-  const {
-    data: collectionRAPages,
-    hasNextPage: hasNextPageRA,
-    fetchNextPage: fetchNextPageRA,
-  } = useMyPosts(
-    {
-      relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-      limit: 6,
-    },
-    {
-      ...(initialPageRA
-        ? {
-            initialData: {
-              pages: [initialPageRA],
-              pageParams: [undefined],
-            },
-          }
-        : {}),
-      enabled: isUserLoggedIn,
-    }
-  );
-
-  const collectionRA = useMemo(
-    () =>
-      collectionRAPages
-        ? collectionRAPages.pages.map((page) => page?.posts || []).flat()
-        : [],
-
-    [collectionRAPages]
-  );
-
-  const loadMoreCollectionRA = useCallback(() => {
-    if (hasNextPageRA) {
-      fetchNextPageRA();
-    }
-  }, [fetchNextPageRA, hasNextPageRA]);
 
   return (
     <>
@@ -137,13 +81,13 @@ const Home: NextPage<IHome> = ({
       )}
 
       {/* Recent activity */}
-      {collectionRA?.length > 0 ? (
+      {popularPosts && popularPosts.posts?.length > 0 ? (
         <SCardsSection
           title={t('section.popular')}
           category='popular'
-          collection={collectionRA.slice(0, 10)}
+          collection={popularPosts.posts}
           padding={isUserLoggedIn ? 'small' : 'large'}
-          onReachEnd={loadMoreCollectionRA}
+          // onReachEnd={loadMoreCollectionRA}
           // seeMoreLink='/profile/purchases'
         />
       ) : null}
@@ -319,76 +263,33 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
     },
   ] as TStaticPost[];
 
-  // const top10payload = new newnewapi.EmptyRequest({});
+  try {
+    const popularPostsPayload = new newnewapi.EmptyRequest({});
 
-  // const resTop10 = await fetchCuratedPosts(top10payload);
+    const popularPosts = await getPopularPosts(popularPostsPayload);
 
-  if (assumeLoggedIn) {
-    try {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_PURCHASES,
-        paging: {
-          limit: 6,
-        },
-      });
-      const res = await getMyPosts(
-        payload,
-        undefined,
-        {
-          accessToken: req.cookies?.accessToken,
-          refreshToken: req.cookies?.refreshToken,
-        },
-        (tokens: TTokenCookie[]) => {
-          const parsedTokens = tokens.map(
-            (t) =>
-              `${t.name}=${t.value}; ${
-                t.expires ? `expires=${t.expires}; ` : ''
-              } ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`
-          );
-          context.res.setHeader('set-cookie', parsedTokens);
-        }
-      );
-
-      if (res.data && res.data.toJSON().posts) {
-        return {
-          props: {
-            initialPageRA: {
-              posts: res.data.toJSON().posts,
-              paging: res.data.toJSON().paging || null,
-            },
-            assumeLoggedIn,
-            staticSuperpolls,
-            staticBids,
-            ...translationContext,
-          },
-        };
-      }
-    } catch (err) {
-      if ((err as Error).message === 'Refresh token invalid') {
-        return {
-          props: {
-            sessionExpired: true,
-            assumeLoggedIn,
-            staticSuperpolls,
-            staticBids,
-            ...translationContext,
-          },
-        };
-      }
-    }
+    return {
+      props: {
+        ...(popularPosts.data && popularPosts.data.toJSON().posts
+          ? {
+              popularPosts:
+                popularPosts.data.toJSON() as newnewapi.NonPagedPostsResponse,
+            }
+          : {}),
+        assumeLoggedIn,
+        staticSuperpolls,
+        staticBids,
+        ...translationContext,
+      },
+    };
+  } catch (err) {
+    return {
+      props: {
+        assumeLoggedIn,
+        staticSuperpolls,
+        staticBids,
+        ...translationContext,
+      },
+    };
   }
-
-  return {
-    props: {
-      // ...(resTop10.data
-      //   ? {
-      //       top10posts: resTop10.data.toJSON(),
-      //     }
-      //   : {}),
-      assumeLoggedIn,
-      staticSuperpolls,
-      staticBids,
-      ...translationContext,
-    },
-  };
 };

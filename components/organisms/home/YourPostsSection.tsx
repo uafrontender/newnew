@@ -190,6 +190,10 @@ const SCardsSection = styled(CardsSection)`
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 20px;
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 50px;
+  }
 `;
 
 const SCreateFirstContainer = styled.div`
@@ -208,6 +212,7 @@ const SCreateFirstContainer = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     height: 438px;
+    margin-bottom: 70px;
   }
 
   ${(props) => props.theme.media.laptopM} {
