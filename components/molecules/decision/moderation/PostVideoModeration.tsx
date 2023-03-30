@@ -75,12 +75,14 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
-    Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
+    Mixpanel.track('Edit Cover Image', { _stage: 'PostVideoModeration' });
     setCoverImageModalOpen(true);
   }, []);
 
   const handleCloseCoverImageEditClick = useCallback(() => {
-    Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
+    Mixpanel.track('Close Cover Image Edit Dialog', {
+      _stage: 'PostVideoModeration',
+    });
     setCoverImageModalOpen(false);
   }, []);
 
@@ -105,13 +107,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const [coverImageInitialResponseOpen, setCoverImageInitialResponseOpen] =
     useState(false);
   const handleOpenEditImageInitialResponse = useCallback(() => {
-    Mixpanel.track('Edit Initial Response Cover Image', { _stage: 'Creation' });
+    Mixpanel.track('Edit Initial Response Cover Image', {
+      _stage: 'PostVideoModeration',
+    });
     setCoverImageInitialResponseOpen(true);
   }, []);
 
   const handleCloseEditCoverImageInitialResponse = useCallback(() => {
     Mixpanel.track('Close Initial Response Cover Image Edit Dialog', {
-      _stage: 'Creation',
+      _stage: 'PostVideoModeration',
     });
     setCoverImageInitialResponseOpen(false);
   }, []);
