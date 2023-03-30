@@ -12,7 +12,7 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css, keyframes, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -1191,6 +1191,44 @@ const SLoaderContainer = styled.div`
   height: 100%;
 
   z-index: 10;
+`;
+
+const SLineAnimation = keyframes`
+  0% {
+    transform: scaleX(0);
+  }
+  70% {
+    transform: scaleX(.4);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const SLoadingLine = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    height: 2px;
+
+    animation: ${SLineAnimation} 1.5s infinite;
+    transform-origin: left;
+
+    background-color: ${({ theme }) => theme.colors.blue};
+  }
 `;
 
 const SBottomContentOutside = styled.div`
