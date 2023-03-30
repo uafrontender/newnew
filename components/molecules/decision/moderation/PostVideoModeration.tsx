@@ -45,6 +45,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
 
   const { postStatus, handleUpdatePostCoverImage } = usePostInnerState();
   const {
@@ -177,7 +178,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           setUiOffset(undefined);
         }
       }
-
+      handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
 
@@ -257,7 +258,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             wrapperCSS={{
               ...(uiOffset
                 ? {
-                    transform: `translateY(-${uiOffset + 8}px)`,
+                    transform: `translateY(-${
+                      uiOffset + (!isTablet ? 8 : 40)
+                    }px)`,
                   }
                 : {}),
             }}
