@@ -575,7 +575,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   // Hide cursor if mouse not moved in fullscreen
   useEffect(() => {
-    if (isBrowser() && isFullscreen && !fullscreenInteracted) {
+    if (isBrowser() && isFullscreen && !fullscreenInteracted && !isSafari()) {
       document.documentElement.style.cursor = 'none';
     } else {
       document.documentElement.style.cursor = '';
