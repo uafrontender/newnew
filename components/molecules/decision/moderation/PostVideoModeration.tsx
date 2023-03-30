@@ -361,7 +361,7 @@ const SReuploadButton = styled.button`
 
   ${({ theme }) => theme.media.tablet} {
     left: initial;
-    right: 16px;
+    right: 48px;
     top: 16px;
   }
 `;
