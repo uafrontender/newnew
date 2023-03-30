@@ -196,7 +196,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           setIsSubmitting(false);
         }
       },
-
       [
         isAPIValidateLoading,
         user.loggedIn,
@@ -211,21 +210,34 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLFormElement>) => {
+        if (isSubmitting || isAPIValidateLoading) {
+          return;
+        }
         if (!isMobileOrTablet) {
-          if (e.shiftKey && e.key === 'Enter' && commentText.length > 0) {
+          if (
+            e.shiftKey &&
+            e.key === 'Enter' &&
+            commentText.trim().length > 0
+          ) {
             if (commentText.charCodeAt(commentText.length - 1) === 10) {
               setCommentText((curr) => curr.slice(0, -1));
             }
-          } else if (e.key === 'Enter') {
+          } else if (e.key === 'Enter' && commentText.trim().length > 0) {
             handleSubmit(e);
           }
-        } else if (e.key === 'Enter' && commentText.length > 0) {
+        } else if (e.key === 'Enter' && commentText.trim().length > 0) {
           if (commentText.charCodeAt(commentText.length - 1) === 10) {
             setCommentText((curr) => curr.slice(0, -1));
           }
         }
       },
-      [commentText, handleSubmit, isMobileOrTablet]
+      [
+        commentText,
+        handleSubmit,
+        isAPIValidateLoading,
+        isMobileOrTablet,
+        isSubmitting,
+      ]
     );
 
     const handleBlur = useCallback(() => {
