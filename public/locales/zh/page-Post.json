@@ -102,7 +102,7 @@
   "postDeleted": {
     "title": "該{{postType}}已被刪除",
     "body": {
-      "byCreator": "{{creator}}刪除了這個{{postType}}",
+      "byCreator": "<0/>刪除了這個{{postType}}",
       "byAdmin": "該{{postType}}違反了我們的社區指南"
     },
     "buttonText": "查看新的{{postTypeMultiple}}"
@@ -459,7 +459,7 @@
         "suggestionPlaceholder": "添加你自己的選項",
         "suggestionPlaceholderDesktop": "添加選……",
         "placeABidButton": "添加我的選項",
-        "offersBundles": "{{creator}} 提供Superpoll Bundle",
+        "offersBundles": "<0/>提供Superpoll Bundle",
         "viewBundles": "查看Bundle",
         "getMoreBundles": "獲得另一個Superpoll Bundle",
         "getBundles": "獲取"
@@ -648,7 +648,7 @@
   "acPostAwaiting": {
     "hero": {
       "title": "時間到了！",
-      "body": "{{creator}}有{{time}} 進行選擇並完成他們最喜歡的投標！",
+      "body": "<0/>有{{time}} 進行選擇並完成他們最喜歡的投標！",
       "expires": {
         "days": "天",
         "days_singular": "天",
@@ -666,8 +666,8 @@
   "mcPostAwaiting": {
     "hero": {
       "title": "投票結果出來了！",
-      "body": "{{creator}}有{{time}}完成這個選項。請繼續關注！",
-      "bodyNoResponse": "{{creator}} 有 {{time}} 進行回應。敬請關注！",
+      "body": "<0/>有{{time}}完成這個選項。請繼續關注！",
+      "bodyNoResponse": "<0/>有{{time}}進行回應。敬請關注！",
       "expires": {
         "days": "天",
         "days_singular": "天",

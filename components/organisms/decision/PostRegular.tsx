@@ -1,12 +1,11 @@
 /* eslint-disable no-param-reassign */
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 
 import { usePostInnerState } from '../../../contexts/postInnerContext';
-import getDisplayname from '../../../utils/getDisplayname';
 
 import RegularView from './regular';
 import Headline from '../../atoms/Headline';
@@ -16,6 +15,7 @@ import assets from '../../../constants/assets';
 import GoBackButton from '../../molecules/GoBackButton';
 import isBrowser from '../../../utils/isBrowser';
 import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../atoms/DisplayName';
 
 const ListPostPage = dynamic(() => import('../see-more/ListPostPage'));
 const PostFailedBox = dynamic(
@@ -122,15 +122,21 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
                   postType: t(`postType.${typeOfPost}`),
                 })}
                 body={
-                  deletedByCreator
-                    ? t('postDeleted.body.byCreator', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
-                    : t('postDeleted.body.byAdmin', {
-                        creator: getDisplayname(postParsed.creator!!),
-                        postType: t(`postType.${typeOfPost}`),
-                      })
+                  deletedByCreator ? (
+                    <Trans
+                      t={t}
+                      i18nKey='postDeleted.body.byCreator'
+                      // @ts-ignore
+                      components={[
+                        <DisplayName user={postParsed.creator} />,
+                        { postType: t(`postType.${typeOfPost}`) },
+                      ]}
+                    />
+                  ) : (
+                    t('postDeleted.body.byAdmin', {
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  )
                 }
                 buttonCaption={tCommon('button.takeMeHome')}
                 imageSrc={
