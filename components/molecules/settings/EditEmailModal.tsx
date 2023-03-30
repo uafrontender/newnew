@@ -29,6 +29,7 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
   const { resizeMode } = useAppState();
 
   const [newEmail, setNewEmail] = useState('');
+  const [retryAfter, setRetryAfter] = useState(0);
 
   const isMobileOrTablet = [
     'mobile',
@@ -63,10 +64,14 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
     setStep(1);
   }, []);
 
-  const completeStepTwo = useCallback((email: string) => {
-    setNewEmail(email);
-    setStep(2);
-  }, []);
+  const completeStepTwo = useCallback(
+    (email: string, newRetryAfter: number) => {
+      setNewEmail(email);
+      setRetryAfter(newRetryAfter);
+      setStep(2);
+    },
+    []
+  );
 
   const completeStepThree = useCallback(() => {
     setStep(3);
@@ -133,6 +138,7 @@ const EditEmailModal = ({ show, onClose }: IEditEmailModal) => {
                   <EditEmailStepThree
                     onComplete={completeStepThree}
                     newEmail={newEmail}
+                    retryAfter={retryAfter}
                   />
                 </SContent>
               </AnimatePresence>

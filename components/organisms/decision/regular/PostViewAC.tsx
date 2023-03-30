@@ -595,7 +595,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               t={t}
               i18nKey='paymentSuccessModal.ac'
               // @ts-ignore
-              components={[<DisplayName user={postCreator} />]}
+              components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}

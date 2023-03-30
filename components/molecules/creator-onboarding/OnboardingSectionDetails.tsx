@@ -549,18 +549,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
         if (
-          res.data?.status ===
+          res.error ||
+          !res.data ||
+          (res.data.status !==
             newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-          !res.error
+            res.data.status !==
+              newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
         ) {
-          const newEmailValue = encodeURIComponent(emailInEdit);
-          router.push(
-            `/verify-new-email?email=${newEmailValue}&redirect=dashboard`
-          );
-          return;
-          // eslint-disable-next-line no-else-return
+          throw new Error('Email taken');
         }
-        throw new Error('Email taken');
+
+        const newEmailValue = encodeURIComponent(emailInEdit);
+        router.push(
+          `/verify-new-email?email=${newEmailValue}&retryAfter=${res.data.retryAfter}&redirect=dashboard`
+        );
       } else {
         const becomeCreatorPayload = new newnewapi.EmptyRequest({});
 
