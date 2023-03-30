@@ -553,7 +553,15 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         return;
       }
 
-      dispatch(setUserData(decoded.me));
+      // Needed for correct creatorStatus value
+      dispatch(
+        setUserData({
+          ...decoded.me,
+          options: {
+            ...decoded.me?.options,
+          },
+        })
+      );
     };
 
     if (socketConnection) {
