@@ -209,8 +209,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   );
 
   const handleAddOrUpdateOptionFromResponse = useCallback(
-    async (newOrUpdatedption: newnewapi.MultipleChoice.Option) => {
-      addOrUpdateMcOptionMutation?.mutate(newOrUpdatedption);
+    async (newOrUpdatedOption: newnewapi.MultipleChoice.Option) => {
+      addOrUpdateMcOptionMutation?.mutate(newOrUpdatedOption);
     },
     [addOrUpdateMcOptionMutation]
   );
