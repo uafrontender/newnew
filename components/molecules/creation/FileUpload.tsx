@@ -82,6 +82,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     setCreationFileUploadProgress,
     setCreationVideo,
     setCreationVideoProcessing,
+    unsetCustomCoverImageUrl,
   } = usePostCreationState();
   const { post, videoProcessing } = useMemo(
     () => postInCreation,
@@ -172,7 +173,8 @@ const FileUpload: React.FC<IFileUpload> = ({
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
-  }, [handleCloseDeleteVideoClick, id, onChange]);
+    unsetCustomCoverImageUrl();
+  }, [handleCloseDeleteVideoClick, id, onChange, unsetCustomCoverImageUrl]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,7 +218,8 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCancelUploadAndClearLocalFile = useCallback(() => {
     handleCancelVideoUpload();
     setLocalFile(null);
-  }, [handleCancelVideoUpload]);
+    unsetCustomCoverImageUrl();
+  }, [handleCancelVideoUpload, unsetCustomCoverImageUrl]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     Mixpanel.track('Cancel Video Processing', {
@@ -254,6 +257,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       setCreationFileProcessingError(false);
       setCreationFileProcessingLoading(false);
       setCreationFileProcessingProgress(0);
+      unsetCustomCoverImageUrl();
     } catch (err) {
       console.error(err);
       showErrorToastPredefined(undefined);
@@ -271,6 +275,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     setCreationVideo,
     setCreationVideoProcessing,
     showErrorToastPredefined,
+    unsetCustomCoverImageUrl,
     videoProcessing?.taskUuid,
   ]);
 
