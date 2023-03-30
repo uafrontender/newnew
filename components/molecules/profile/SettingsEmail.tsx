@@ -18,7 +18,10 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
     <SContainer>
       <SLabel htmlFor='settings_email_input'>{labelCaption}</SLabel>
       <SInputWrapper>
-        <SSettingsEmailInput>{value}</SSettingsEmailInput>
+        <SSettingsEmailInput isEmpty={!value}>
+          {value ||
+            t('Settings.sections.personalInformation.emailInput.placeholder')}
+        </SSettingsEmailInput>
         <SEditButton onClick={onEditButtonClick}>
           {t('Settings.sections.personalInformation.emailInput.edit')}
         </SEditButton>
@@ -54,6 +57,7 @@ const SLabel = styled.label`
 
 interface ISSettingsEmailInput {
   errorBordersShown?: boolean;
+  isEmpty?: boolean;
 }
 
 const SInputWrapper = styled.div`
@@ -83,7 +87,10 @@ const SSettingsEmailInput = styled.div<ISSettingsEmailInput>`
     return theme.colorsThemed.accent.error;
   }};
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  color: ${({ theme, isEmpty }) =>
+    isEmpty
+      ? theme.colorsThemed.text.quaternary
+      : theme.colorsThemed.text.primary};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   user-select: none;
 
