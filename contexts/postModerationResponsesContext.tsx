@@ -827,6 +827,10 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     }
   }, [additionalResponsesInitial]);
 
+  useEffect(() => {
+    setCoreResponse(() => coreResponseInitial);
+  }, [coreResponseInitial]);
+
   return (
     <>
       <PostModerationResponsesContext.Provider value={contextValue}>
