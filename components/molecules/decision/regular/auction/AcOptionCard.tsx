@@ -1180,6 +1180,8 @@ const SPaymentModalHeadingPostCreator = styled(Text)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  white-space: pre;
+
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 600;
   font-size: 14px;

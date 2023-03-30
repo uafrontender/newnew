@@ -16,7 +16,7 @@ import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailStepTwoModal {
-  onComplete: (email: string) => void;
+  onComplete: (email: string, retryAfter: number) => void;
 }
 
 const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
@@ -67,8 +67,12 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
           sendVerificationCodePayload
         );
 
+        if (error || !data) {
+          throw new Error(error?.message ?? 'Request failed');
+        }
+
         if (
-          data?.status ===
+          data.status ===
           newnewapi.SendVerificationEmailResponse.Status.EMAIL_TAKEN
         ) {
           setNewEmailError(tVerify('error.emailTaken'));
@@ -78,7 +82,7 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
         }
 
         if (
-          data?.status ===
+          data.status ===
           newnewapi.SendVerificationEmailResponse.Status
             .NOT_CONFIRMED_EXISTING_EMAIL
         ) {
@@ -89,14 +93,16 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
         }
 
         if (
-          data?.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
         ) {
           showErrorToastPredefined(undefined);
-          throw new Error(error?.message ?? 'Request failed');
+          throw new Error('Request failed');
         }
 
-        onComplete(newEmail);
+        onComplete(newEmail, data.retryAfter);
       } catch (err) {
         console.error(err);
       } finally {
