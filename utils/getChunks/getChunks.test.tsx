@@ -169,15 +169,20 @@ describe('dont parses hashtags', () => {
     expect(chunks[0].type).toBe('text');
     expect(chunks[0].text).toBe('#hello#world');
   });
+  // .,?:;—\-[\]{}()"…/\\|*^+~=%#$@
+  it('with forbidden characters', () => {
+    // prettier-ignore
+    const forbiddenCharacters = ['.', ',', '?', ':', ';', '—', '-','[',']', '{', '}','(',')','"','…','/','\\','|','*','^','+','~','=','%','#','$','@'];
 
-  it('with exclamation mark', () => {
-    const input = '#hello!there';
-    const chunks = getChunks(input);
+    forbiddenCharacters.forEach((forbiddenCharacter) => {
+      const input = `#hello${forbiddenCharacter}there`;
+      const chunks = getChunks(input);
 
-    expect(chunks.length).toBe(1);
+      expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type).toBe('text');
-    expect(chunks[0].text).toBe('#hello!there');
+      expect(chunks[0].text).toBe(input);
+      expect(chunks[0].type).toBe('text');
+    });
   });
 });
 
