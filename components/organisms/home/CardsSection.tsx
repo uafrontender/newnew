@@ -407,7 +407,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             {!loading ? (
               collectionToRender?.map(renderItem)
             ) : (
-              <SCardSkeletonSection count={!isMobile ? 5 : 1} />
+              <SCardSkeletonSection
+                count={!isMobile ? (isLaptop || isTablet ? 3 : 4) : 1}
+              />
             )}
             {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper
@@ -561,14 +563,21 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
 
   & > span > div {
     width: calc(100vw - 32px);
+    height: 665px;
 
     ${({ theme }) => theme.media.tablet} {
-      height: 410px;
       width: 224px;
+      height: 412px;
     }
 
     ${({ theme }) => theme.media.laptop} {
+      width: 256px;
       height: 454px;
+    }
+
+    ${({ theme }) => theme.media.laptopL} {
+      width: 288px;
+      height: 596px;
     }
   }
 `;
@@ -579,6 +588,10 @@ interface ISItemWrapper {
 
 const SItemWrapper = styled.div<ISItemWrapper>`
   margin: 16px 0;
+
+  & > div > div:first-child {
+    padding: 73.6% 0px;
+  }
 
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;

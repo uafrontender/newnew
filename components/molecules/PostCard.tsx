@@ -1335,12 +1335,11 @@ export const SButton = styled(Button)<ISButtonSpan>`
 `;
 
 export const SButtonFirst = styled(Button)`
-  padding: 12px;
-  border-radius: 12px;
-
+  padding: 8px 12px;
   width: 100%;
-  height: 36px;
+  height: 48px;
 
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) =>
     theme.name === 'light' ? '#F1F3F9' : '#FFFFFF'};
 
@@ -1353,7 +1352,10 @@ export const SButtonFirst = styled(Button)`
   }
 
   ${(props) => props.theme.media.tablet} {
+    height: 36px;
     padding: 8px 12px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 
     span {
       font-size: 14px;
