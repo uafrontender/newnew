@@ -19,6 +19,7 @@ import PostCard, {
   STextOutside,
   SUsername,
   SButton,
+  SButtonFirst,
 } from '../../molecules/PostCard';
 import Button from '../../atoms/Button';
 // import Caption from '../../atoms/Caption';
@@ -616,7 +617,7 @@ const SItemWrapper = styled.div<ISItemWrapper>`
       line-height: 20px;
     }
 
-    ${SButton} {
+    ${SButton}, ${SButtonFirst} {
       height: 48px;
 
       border-radius: ${({ theme }) => theme.borderRadius.medium};

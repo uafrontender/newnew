@@ -1334,7 +1334,7 @@ export const SButton = styled(Button)<ISButtonSpan>`
   }
 `;
 
-const SButtonFirst = styled(Button)`
+export const SButtonFirst = styled(Button)`
   padding: 12px;
   border-radius: 12px;
 

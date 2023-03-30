@@ -87,7 +87,7 @@
     "title": "Ready to create?"
   },
   "createFirstPost": {
-    "title": "Post your first Bid or Superpoll",
+    "title": "Post your first Bid\nor Superpoll",
     "filter": {
       "active": "Active",
       "ended": "Ended"

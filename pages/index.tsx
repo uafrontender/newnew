@@ -129,7 +129,7 @@ const Home: NextPage<IHome> = ({
 
       {user.userData?.options?.isCreator && (
         <>
-          <SHeading style={{ marginBottom: '48px' }}>
+          <SHeading>
             <SHeadline>{t('section.your')}</SHeadline>
           </SHeading>
           <YourPostsSection />
@@ -160,7 +160,6 @@ const Home: NextPage<IHome> = ({
         }
         posts={staticSuperpolls}
         isStatic
-        // loading={collectionMCInitialLoading}
         padding={isUserLoggedIn ? 'small' : 'large'}
       />
 
@@ -176,34 +175,8 @@ const Home: NextPage<IHome> = ({
         }
         posts={staticBids}
         isStatic
-        // loading={collectionACInitialLoading}
         padding={isUserLoggedIn ? 'small' : 'large'}
       />
-
-      {/* Greatest of all time posts */}
-      {/* {!collectionBiggestError &&
-      (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
-        <SCardsSection
-          title={t('cardsSection.title.biggest')}
-          category='biggest'
-          collection={collectionBiggest}
-          loading={collectionBiggestInitialLoading}
-          tutorialCard={
-            user.loggedIn ? (
-              <STutorialCard
-                image={
-                  theme.name === 'dark'
-                    ? assets.common.darkAnimatedLogo
-                    : assets.common.lightAnimatedLogo
-                }
-                title={t('tutorial.biggest.title')}
-                caption={t('tutorial.biggest.caption')}
-              />
-            ) : undefined
-          }
-          padding={user.loggedIn ? 'small' : 'large'}
-        />
-      ) : null} */}
 
       {(!isUserLoggedIn || !user.userData?.options?.isCreator) && (
         <FaqSection />
@@ -235,11 +208,9 @@ const SCardsSection = styled(CardsSection)`
 `;
 
 const SHeading = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   ${(props) => props.theme.media.tablet} {
-    margin-bottom: 48px;
-
     & + section {
       padding-top: 0;
     }
@@ -250,42 +221,24 @@ const SHeading = styled.div`
     margin-left: auto;
     margin-right: auto;
     margin-top: 40px;
+    margin-bottom: 32px;
   }
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 16px;
-
-  font-size: 36px;
-  line-height: 44px;
+  font-size: 24px;
+  line-height: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 24px;
-
-    font-size: 40px;
-    line-height: 48px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-bottom: 24px;
-
-    font-size: 52px;
-    line-height: 40px;
+    font-size: 40px;
+    line-height: 48px;
   }
 `;
-
-// const SSubtitle = styled(Text)`
-//   max-width: 570px;
-
-//   font-size: 14px;
-//   line-height: 24px;
-//   font-weight: 600;
-
-//   ${({ theme }) => theme.media.tablet} {
-//     font-size: 16px;
-//     line-height: 24px;
-//   }
-// `;
 
 export default Home;
 
