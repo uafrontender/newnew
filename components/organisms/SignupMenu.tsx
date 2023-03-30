@@ -133,7 +133,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         data.status !==
           newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
       ) {
-        // TODO: add texts for individual error statuses
+        // TODO: Add texts for individual error statuses
         throw new Error('Request failed');
       }
 

@@ -221,12 +221,6 @@ const McOptionCardModeration: React.FunctionComponent<
 
   const ellipseMenuButton: any = useRef();
 
-  console.log('----');
-  console.log(option);
-  console.log(option.isCreatedBySubscriber);
-  console.log(option.creator);
-  console.log(isReportModalOpen);
-
   return (
     <>
       <motion.div

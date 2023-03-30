@@ -251,7 +251,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 };
 
 CodeVerificationMenuNewEmail.defaultProps = {
-  canResendIn: 60,
+  canResendIn: 0,
 };
 
 export default CodeVerificationMenuNewEmail;

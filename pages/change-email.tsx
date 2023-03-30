@@ -50,8 +50,9 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 
         const { data } = res;
 
-        if (data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS)
+        if (data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS) {
           throw new Error('Request failed');
+        }
 
         if (user.loggedIn) {
           dispatch(
