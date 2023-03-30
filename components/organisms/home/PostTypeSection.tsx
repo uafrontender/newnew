@@ -78,7 +78,7 @@ const PostTypeSection = ({
           <img src={iconSrc} alt={title} draggable={false} />
         </SIconHolder>
         <SHeadline variant={2}>{title}</SHeadline>
-        <SCaption variant={2} weight={600}>
+        <SCaption variant={2} weight={500}>
           {caption}
         </SCaption>
       </SHeading>
@@ -105,7 +105,7 @@ const SContainer = styled.section<{
   padding: 20px 0;
 
   ${(props) => props.theme.media.laptop} {
-    padding: ${({ padding }) => (padding === 'small' ? '40px 0' : '60px 0')};
+    padding: ${({ padding }) => (padding === 'small' ? '45px 0' : '60px 0')};
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -134,7 +134,7 @@ const SHeading = styled.div`
   flex-direction: column;
   align-items: center;
   margin-bottom: 24px;
-  max-width: 365px;
+  max-width: 385px;
   align-self: center;
 
   ${({ theme }) => theme.media.tablet} {
@@ -168,7 +168,7 @@ const SIconHolder = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     img {
-      height: 220px;
+      height: 210px;
     }
   }
 `;
@@ -179,9 +179,10 @@ const SHeadline = styled(Headline)`
   line-height: 44px;
 
   ${({ theme }) => theme.media.laptopL} {
-    margin-bottom: 24px;
-    font-size: 80px;
-    line-height: 86px;
+    margin-bottom: 16px;
+
+    font-size: 64px;
+    line-height: 72px;
   }
 `;
 
@@ -190,8 +191,13 @@ const SCaption = styled(Text)`
   text-align: center;
 
   font-size: 14px;
-  line-height: 24px;
+  line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 
   ${({ theme }) => theme.media.laptopL} {
     padding: 0;
@@ -239,17 +245,21 @@ const SItemWrapper = styled.div<{ index: number }>`
 
   ${(props) => props.theme.media.laptopL} {
     transform: ${({ index }) => (index !== 1 ? `translateY(25%)` : 0)};
-    height: 390px;
+    height: 392px;
 
     & > div {
       min-width: 204px;
       max-width: 204px;
-      height: 390px;
+      height: 392px;
       background: ${({ theme }) => theme.colorsThemed.background.backgroundDD};
       border-color: ${({ theme }) =>
         theme.name === 'dark'
           ? theme.colorsThemed.background.backgroundDD
           : theme.colorsThemed.background.outlines1};
+    }
+
+    & > div > div:first-child {
+      padding: 67% 0px;
     }
   }
 `;

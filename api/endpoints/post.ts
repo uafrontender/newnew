@@ -8,7 +8,10 @@ import {
 
 const BASE_URL_POST = `${BASE_URL}/post`;
 
-export const createPost = (payload: newnewapi.CreatePostRequest, signal?: RequestInit['signal']) =>
+export const createPost = (
+  payload: newnewapi.CreatePostRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.CreatePostRequest,
     newnewapi.CreatePostResponse
@@ -18,10 +21,13 @@ export const createPost = (payload: newnewapi.CreatePostRequest, signal?: Reques
     `${BASE_URL_POST}/create_post`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest, signal?: RequestInit['signal']) =>
+export const setPostThumbnail = (
+  payload: newnewapi.SetPostThumbnailRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetPostThumbnailRequest,
     newnewapi.EmptyResponse
@@ -31,10 +37,13 @@ export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest, sig
     `${BASE_URL_POST}/set_post_thumbnail`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const setPostCoverImage = (payload: newnewapi.SetPostCoverImageRequest, signal?: RequestInit['signal']) =>
+export const setPostCoverImage = (
+  payload: newnewapi.SetPostCoverImageRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetPostCoverImageRequest,
     newnewapi.SetPostCoverImageResponse
@@ -44,10 +53,13 @@ export const setPostCoverImage = (payload: newnewapi.SetPostCoverImageRequest, s
     `${BASE_URL_POST}/set_post_cover_image`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const markPost = (payload: newnewapi.MarkPostRequest, signal?: RequestInit['signal']) =>
+export const markPost = (
+  payload: newnewapi.MarkPostRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.MarkPostRequest,
     newnewapi.EmptyResponse
@@ -57,10 +69,13 @@ export const markPost = (payload: newnewapi.MarkPostRequest, signal?: RequestIni
     `${BASE_URL_POST}/mark_post`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const setPostTitle = (payload: newnewapi.SetPostTitleRequest, signal?: RequestInit['signal']) =>
+export const setPostTitle = (
+  payload: newnewapi.SetPostTitleRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetPostTitleRequest,
     newnewapi.Post
@@ -70,10 +85,13 @@ export const setPostTitle = (payload: newnewapi.SetPostTitleRequest, signal?: Re
     `${BASE_URL_POST}/set_post_title`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const deleteMyPost = (payload: newnewapi.DeleteMyPostRequest, signal?: RequestInit['signal']) =>
+export const deleteMyPost = (
+  payload: newnewapi.DeleteMyPostRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.DeleteMyPostRequest,
     newnewapi.EmptyResponse
@@ -83,11 +101,12 @@ export const deleteMyPost = (payload: newnewapi.DeleteMyPostRequest, signal?: Re
     `${BASE_URL_POST}/delete_my_post`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const uploadPostResponse = (
-  payload: newnewapi.UploadPostResponseRequest, signal?: RequestInit['signal']
+  payload: newnewapi.UploadPostResponseRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.UploadPostResponseRequest,
@@ -98,11 +117,12 @@ export const uploadPostResponse = (
     `${BASE_URL_POST}/upload_post_response`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const uploadAdditionalPostResponse = (
-  payload: newnewapi.UploadAdditionalPostResponseRequest, signal?: RequestInit['signal']
+  payload: newnewapi.UploadAdditionalPostResponseRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.UploadAdditionalPostResponseRequest,
@@ -113,11 +133,12 @@ export const uploadAdditionalPostResponse = (
     `${BASE_URL_POST}/upload_additional_post_response`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const deleteAdditionalPostResponse = (
-  payload: newnewapi.DeleteAdditionalPostResponseRequest, signal?: RequestInit['signal']
+  payload: newnewapi.DeleteAdditionalPostResponseRequest,
+  signal?: RequestInit['signal']
 ) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.DeleteAdditionalPostResponseRequest,
@@ -128,13 +149,13 @@ export const deleteAdditionalPostResponse = (
     `${BASE_URL_POST}/delete_additional_post_response`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 export const fetchPostByUUID = (
   payload: newnewapi.GetPostRequest,
   signal?: RequestInit['signal'],
-  accessTokenFromSSRCookie?: string,
+  accessTokenFromSSRCookie?: string
 ) =>
   fetchProtobuf<newnewapi.GetPostRequest, newnewapi.Post>(
     newnewapi.GetPostRequest,
@@ -142,17 +163,21 @@ export const fetchPostByUUID = (
     `${BASE_URL_POST}/get_post`,
     'post',
     payload,
-    (cookiesInstance.get('accessToken') || accessTokenFromSSRCookie)
+    cookiesInstance.get('accessToken') || accessTokenFromSSRCookie
       ? {
-          'x-auth-token': cookiesInstance.get('accessToken') || accessTokenFromSSRCookie,
+          'x-auth-token':
+            cookiesInstance.get('accessToken') || accessTokenFromSSRCookie,
         }
       : {},
-      'cors',
-      'same-origin',
-      signal ?? undefined,
+    'cors',
+    'same-origin',
+    signal ?? undefined
   );
 
-export const fetchUsersPosts = (payload: newnewapi.GetUserPostsRequest, signal?: RequestInit['signal']) =>
+export const fetchUsersPosts = (
+  payload: newnewapi.GetUserPostsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<
     newnewapi.GetUserPostsRequest,
     newnewapi.PagedCountedPostsResponse
@@ -165,11 +190,14 @@ export const fetchUsersPosts = (payload: newnewapi.GetUserPostsRequest, signal?:
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
 // Fetch posts of different types (mainly, homepage)
-export const fetchCuratedPosts = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
+export const fetchCuratedPosts = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedPostsResponse>(
     newnewapi.EmptyRequest,
     newnewapi.NonPagedPostsResponse,
@@ -179,10 +207,13 @@ export const fetchCuratedPosts = (payload: newnewapi.EmptyRequest, signal?: Requ
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const fetchFeaturedCreatorPosts = (payload: newnewapi.EmptyRequest, signal?: RequestInit['signal']) =>
+export const fetchFeaturedCreatorPosts = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedPostsResponse>(
     newnewapi.EmptyRequest,
     newnewapi.NonPagedPostsResponse,
@@ -192,10 +223,13 @@ export const fetchFeaturedCreatorPosts = (payload: newnewapi.EmptyRequest, signa
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const fetchForYouPosts = (payload: newnewapi.PagedRequest, signal?: RequestInit['signal']) =>
+export const fetchForYouPosts = (
+  payload: newnewapi.PagedRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.PagedRequest,
     newnewapi.PagedPostsResponse
@@ -205,10 +239,13 @@ export const fetchForYouPosts = (payload: newnewapi.PagedRequest, signal?: Reque
     `${BASE_URL_POST}/get_for_you_posts`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const fetchBiggestPosts = (payload: newnewapi.PagedRequest, signal?: RequestInit['signal']) =>
+export const fetchBiggestPosts = (
+  payload: newnewapi.PagedRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
     newnewapi.PagedRequest,
     newnewapi.PagedPostsResponse,
@@ -218,10 +255,13 @@ export const fetchBiggestPosts = (payload: newnewapi.PagedRequest, signal?: Requ
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const fetchMoreLikePosts = (payload: newnewapi.GetSimilarPostsRequest, signal?: RequestInit['signal']) =>
+export const fetchMoreLikePosts = (
+  payload: newnewapi.GetSimilarPostsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<newnewapi.GetSimilarPostsRequest, newnewapi.PagedPostsResponse>(
     newnewapi.GetSimilarPostsRequest,
     newnewapi.PagedPostsResponse,
@@ -231,10 +271,13 @@ export const fetchMoreLikePosts = (payload: newnewapi.GetSimilarPostsRequest, si
     {},
     'cors',
     'same-origin',
-    signal ?? undefined,
+    signal ?? undefined
   );
 
-export const getMyUrgentPosts = (payload: newnewapi.PagedRequest, signal?: RequestInit['signal']) =>
+export const getMyUrgentPosts = (
+  payload: newnewapi.PagedRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.PagedRequest,
     newnewapi.PagedPostsResponse
@@ -244,5 +287,21 @@ export const getMyUrgentPosts = (payload: newnewapi.PagedRequest, signal?: Reque
     `${BASE_URL_POST}/get_my_urgent_posts`,
     'post',
     payload,
-    signal ?? undefined,
+    signal ?? undefined
+  );
+
+export const getPopularPosts = (
+  payload: newnewapi.EmptyRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedPostsResponse>(
+    newnewapi.EmptyRequest,
+    newnewapi.NonPagedPostsResponse,
+    `${BASE_URL_POST}/get_popular_posts`,
+    'post',
+    payload,
+    {},
+    'cors',
+    'same-origin',
+    signal ?? undefined
   );
