@@ -10,8 +10,6 @@ import Caption from '../../atoms/Caption';
 import InlineSVG from '../../atoms/InlineSVG';
 import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
-import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
-import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
 
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
@@ -103,7 +101,6 @@ const FileUpload: React.FC<IFileUpload> = ({
   const [showVideoDelete, setShowVideoDelete] = useState(false);
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
-  const [showEllipseMenu, setShowEllipseMenu] = useState(false);
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -129,20 +126,9 @@ const FileUpload: React.FC<IFileUpload> = ({
     });
   }, []);
 
-  const handleOpenEllipseMenu = useCallback(() => {
-    Mixpanel.track('Open Ellipse menu', { _stage: 'Creation' });
-    setShowEllipseMenu(true);
-  }, []);
-
-  const handleCloseEllipseMenu = useCallback(
-    () => setShowEllipseMenu(false),
-    []
-  );
-
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
     setCoverImageModalOpen(true);
-    setShowEllipseMenu(false);
     playerRef.current.pause();
   }, []);
 
@@ -485,8 +471,8 @@ const FileUpload: React.FC<IFileUpload> = ({
             <SButtonsContainerLeft>
               <SVideoButton
                 ref={ellipseButtonRef as any}
-                active={showEllipseMenu}
-                onClick={handleOpenEllipseMenu}
+                active={coverImageModalOpen}
+                onClick={() => handleOpenEditCoverImageMenu()}
               >
                 {t('secondStep.video.setThumbnail')}
               </SVideoButton>
@@ -533,11 +519,11 @@ const FileUpload: React.FC<IFileUpload> = ({
     customCoverImageUrl,
     value,
     showPlayButton,
-    showEllipseMenu,
-    handleOpenEllipseMenu,
+    coverImageModalOpen,
     handleDeleteVideoShow,
     isDesktop,
     handleFullPreview,
+    handleOpenEditCoverImageMenu,
   ]);
 
   return (
@@ -560,34 +546,6 @@ const FileUpload: React.FC<IFileUpload> = ({
         />
       )}
       {renderContent()}
-      {/* Ellipse menu */}
-      {!isMobile && (
-        <SEllipseMenu
-          isOpen={showEllipseMenu}
-          onClose={handleCloseEllipseMenu}
-          anchorElement={ellipseButtonRef.current}
-          anchorOrigin={{
-            horizontal: 'right',
-            vertical: 'center',
-          }}
-          offsetRight='180px'
-        >
-          <EllipseMenuButton onClick={() => handleOpenEditCoverImageMenu()}>
-            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
-          </EllipseMenuButton>
-        </SEllipseMenu>
-      )}
-      {isMobile && showEllipseMenu ? (
-        <EllipseModal
-          zIndex={10}
-          show={showEllipseMenu}
-          onClose={handleCloseEllipseMenu}
-        >
-          <EllipseModalButton onClick={() => handleOpenEditCoverImageMenu()}>
-            {t('secondStep.video.thumbnailEllipseMenu.uploadImageButton')}
-          </EllipseModalButton>
-        </EllipseModal>
-      ) : null}
     </SWrapper>
   );
 };
@@ -903,15 +861,4 @@ const SErrorBottomBlock = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
   }
-`;
-
-// Ellipse menu
-const SEllipseMenu = styled(EllipseMenu)`
-  max-width: 216px;
-  position: fixed !important;
-
-  background: ${({ theme }) =>
-    theme.name === 'light'
-      ? theme.colorsThemed.background.secondary
-      : theme.colorsThemed.background.primary} !important;
 `;
