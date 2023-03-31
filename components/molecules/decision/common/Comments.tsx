@@ -109,79 +109,6 @@ const Comments: React.FunctionComponent<IComments> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Scroll to comment
-  useEffect(() => {
-    async function findComment() {
-      const flat: TCommentWithReplies[] = [];
-      for (let i = 0; i < comments.length; i++) {
-        if (
-          comments[i].replies &&
-          Array.isArray(comments[i].replies) &&
-          comments[i].replies!!.length > 0
-        ) {
-          flat.push(...[comments[i], ...comments[i].replies!!]);
-        }
-        flat.push(comments[i]);
-      }
-
-      const idx = flat.findIndex(
-        (comment) => comment.id === parseInt(commentIdFromUrl as string)
-      );
-
-      if (idx === -1) {
-        scrollRef.current?.scrollIntoView();
-
-        if (isMobile && hasNextPage && !isLoading) {
-          await fetchNextPage();
-        } else {
-          scrollRef.current?.scrollBy({
-            top: scrollRef.current.scrollHeight,
-          });
-        }
-      } else {
-        if (!flat[idx].parentId || flat[idx].parentId === 0) {
-          document
-            ?.getElementById(`comment_id_${flat[idx].id}`)
-            ?.scrollIntoView({
-              block: 'end',
-              inline: 'nearest',
-            });
-          document
-            ?.getElementById(`comment_id_${flat[idx].id}`)
-            ?.classList.add('opened-flash');
-        } else if (flat[idx].parentId) {
-          const parentIdx = comments.findIndex(
-            (c) => c.id === flat[idx].parentId
-          );
-
-          if (parentIdx !== -1) {
-            openCommentProgrammatically(parentIdx);
-
-            setTimeout(() => {
-              document
-                ?.getElementById(`comment_id_${flat[idx].id}`)
-                ?.scrollIntoView({
-                  block: 'end',
-                  inline: 'nearest',
-                });
-              document
-                ?.getElementById(`comment_id_${flat[idx].id}`)
-                ?.classList.add('opened-flash');
-            }, 200);
-          }
-        }
-
-        handleResetCommentIdFromUrl?.();
-      }
-    }
-
-    if (commentIdFromUrl) {
-      findComment();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, comments, isMobile, isLoading]);
-
   useComponentScrollRestoration(
     scrollRef.current || undefined,
     'comments-scrolling-container'
@@ -228,6 +155,97 @@ const Comments: React.FunctionComponent<IComments> = ({
     },
     []
   );
+
+  const flashCommentOnScroll = useCallback(
+    (commentId: string, timeOffset?: number) => {
+      setTimeout(() => {
+        document?.getElementById(commentId)?.classList.add('opened-flash');
+      }, 100 + (timeOffset || 0));
+
+      setTimeout(() => {
+        document?.getElementById(commentId)?.classList.remove('opened-flash');
+      }, 1600 + (timeOffset || 0));
+    },
+    []
+  );
+
+  // Scroll to comment
+  useEffect(() => {
+    async function findComment() {
+      const flat: TCommentWithReplies[] = [];
+      for (let i = 0; i < comments.length; i++) {
+        if (
+          comments[i].replies &&
+          Array.isArray(comments[i].replies) &&
+          comments[i].replies!!.length > 0
+        ) {
+          flat.push(
+            ...[
+              { ...comments[i], index: i } as TCommentWithReplies,
+              ...comments[i].replies!!,
+            ]
+          );
+        }
+        flat.push({ ...comments[i], index: i } as TCommentWithReplies);
+      }
+
+      const idx = flat.findIndex(
+        (comment) => comment.id === parseInt(commentIdFromUrl as string)
+      );
+
+      if (idx === -1) {
+        scrollRef.current?.scrollIntoView();
+
+        if (isMobile && hasNextPage && !isLoading) {
+          await fetchNextPage();
+        } else {
+          scrollRef.current?.scrollBy({
+            top: scrollRef.current.scrollHeight,
+          });
+        }
+      } else {
+        if (!flat[idx].parentId || flat[idx].parentId === 0) {
+          commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
+            align: 'center',
+          });
+
+          flashCommentOnScroll(`comment_id_${flat[idx].id}`);
+        } else if (flat[idx].parentId) {
+          const parentIdx = comments.findIndex(
+            (c) => c.id === flat[idx].parentId
+          );
+
+          if (parentIdx !== -1) {
+            commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
+              align: 'center',
+            });
+
+            openCommentProgrammatically(parentIdx);
+
+            setTimeout(() => {
+              document
+                ?.getElementById(`comment_id_${flat[idx].id}`)
+                ?.scrollIntoView({
+                  block: 'end',
+                  inline: 'nearest',
+                });
+            }, 200);
+
+            flashCommentOnScroll(`comment_id_${flat[idx].id}`, 300);
+          }
+        }
+
+        handleResetCommentIdFromUrl?.();
+      }
+    }
+
+    if (commentIdFromUrl) {
+      findComment();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentIdFromUrl, comments, isMobile, isLoading]);
+
+  console.log(heightDelta, 'heightDelta');
 
   return (
     <>
@@ -325,17 +343,27 @@ Comments.defaultProps = {
 export default Comments;
 
 export const SScrollContainer = styled.div`
-  ${({ theme }) => theme.media.tablet} {
-    padding-right: 0;
-    max-height: 500px;
-    height: 100%;
+  max-height: 600px;
+  height: 100%;
 
-    overflow-y: auto;
+  overflow-y: auto;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    max-height: 500px;
 
     // Scrollbar
     &::-webkit-scrollbar {
       width: 4px;
+      display: initial;
     }
+    -ms-overflow-style: initial;
     scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
