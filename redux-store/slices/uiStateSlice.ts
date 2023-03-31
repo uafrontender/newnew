@@ -5,6 +5,7 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { cookiesInstance } from '../../api/apiConfigs';
 import isBrowser from '../../utils/isBrowser';
 import { AppThunk } from '../store';
+import getColorMode from '../../utils/getColorMode';
 
 // This slice will be responsible for major UI state data:
 // the app' color mode; are some global, app-wide components
@@ -77,7 +78,7 @@ export const {
 } = uiSlice.actions;
 
 export const setColorMode =
-  (payload: any): AppThunk =>
+  (payload: TColorMode): AppThunk =>
   (dispatch, getState) => {
     const currentColorMode = getState().ui.colorMode;
 
@@ -89,8 +90,10 @@ export const setColorMode =
       path: '/',
     });
 
+    const shouldAddTheming = getColorMode(currentColorMode) !== getColorMode(payload)
+
     // Smooth theming
-    if (isBrowser() && currentColorMode !== payload) {
+    if (isBrowser() && shouldAddTheming) {
       document?.documentElement?.classList?.add('theming');
       document?.documentElement?.addEventListener(
         'transitionend',
