@@ -78,7 +78,9 @@ export const {
 
 export const setColorMode =
   (payload: any): AppThunk =>
-  (dispatch) => {
+  (dispatch, getState) => {
+    const currentColorMode = getState().ui.colorMode;
+
     dispatch(_setColorMode(payload));
 
     cookiesInstance.set('colorMode', payload, {
@@ -88,7 +90,7 @@ export const setColorMode =
     });
 
     // Smooth theming
-    if (isBrowser()) {
+    if (isBrowser() && currentColorMode !== payload) {
       document?.documentElement?.classList?.add('theming');
       document?.documentElement?.addEventListener(
         'transitionend',
