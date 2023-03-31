@@ -19,7 +19,6 @@ import AcOptionCard from '../../regular/auction/AcOptionCard';
 import GradientMask from '../../../../atoms/GradientMask';
 
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
-import getDisplayname from '../../../../../utils/getDisplayname';
 import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcWaitingOptionsSection {
@@ -131,8 +130,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
             optionBeingSupported=''
             postUuid={post.postUuid}
             postShortId={post.postShortId ?? ''}
-            postCreatorName={getDisplayname(post.creator)}
-            postDeadline=''
+            postCreator={post.creator}
             postText=''
             index={i}
             minAmount={0}

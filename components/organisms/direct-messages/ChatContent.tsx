@@ -22,7 +22,6 @@ import { reportUser } from '../../../api/endpoints/report';
 import { sendMessage } from '../../../api/endpoints/chat';
 
 /* Utils */
-import getDisplayname from '../../../utils/getDisplayname';
 import validateInputText from '../../../utils/validateMessageText';
 
 /* Icons */
@@ -300,20 +299,22 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       return <AccountDeleted />;
     }
 
-    if (isMessagingDisabled && chatRoom.visavis?.user)
+    if (isMessagingDisabled && chatRoom.visavis?.user) {
       return <MessagingDisabled user={chatRoom.visavis.user} />;
+    }
 
     if (
       !chatRoom.visavis?.isSubscriptionActive &&
       chatRoom.visavis?.user?.uuid &&
       chatRoom.myRole
-    )
+    ) {
       return (
         <SubscriptionExpired
           user={chatRoom.visavis.user}
           myRole={chatRoom.myRole}
         />
       );
+    }
     return null;
   }, [
     isMessagingDisabled,
@@ -396,7 +397,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       {chatRoom.visavis && (
         <ReportModal
           show={confirmReportUser}
-          reportedDisplayname={getDisplayname(chatRoom.visavis?.user!!)}
+          reportedUser={chatRoom.visavis?.user!!}
           onClose={() => setConfirmReportUser(false)}
           onSubmit={async ({ reasons, message }) => {
             if (chatRoom.visavis?.user?.uuid) {

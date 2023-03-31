@@ -5,7 +5,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import { usePostInnerState } from '../../../contexts/postInnerContext';
-import getDisplayname from '../../../utils/getDisplayname';
 
 import SuccessView from './success';
 import WaitingForResponseView from './awaiting';
@@ -82,7 +81,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
       {postParsed?.creator && reportPostOpen && (
         <ReportModal
           show={reportPostOpen}
-          reportedDisplayname={getDisplayname(postParsed?.creator)}
+          reportedUser={postParsed?.creator}
           onSubmit={handleReportSubmit}
           onClose={handleReportClose}
         />

@@ -3,15 +3,19 @@ import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import Lottie from '../components/atoms/Lottie';
 
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { sendVerificationEmail } from '../api/endpoints/auth';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { setSignupEmailInput } from '../redux-store/slices/userStateSlice';
-
+import {
+  setSignupEmailInput,
+  setSignupTimerValue,
+} from '../redux-store/slices/userStateSlice';
 import logoAnimation from '../public/animations/logo-loading-blue.json';
+import { SUPPORTED_LANGUAGES } from '../constants/general';
 
 interface IEmailAuthRedirectPage {
   stripe_setup_intent_client_secret: string;
@@ -27,7 +31,6 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
-  const [signInError, setSignInError] = useState(false);
 
   useEffect(() => {
     if (user.loggedIn) {
@@ -58,33 +61,37 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           controller.signal
         );
 
-        if (!res!! || res!!.error || !res.data)
+        if (!res || res.error || !res.data) {
           throw new Error(res!!.error?.message ?? 'An error occurred');
+        }
 
-        const { data } = res!!;
+        const { data } = res;
 
         if (
-          !data ||
-          data.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS
-        )
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+        ) {
           throw new Error('No data');
+        }
 
         dispatch(setSignupEmailInput(data.emailAddress));
+        dispatch(setSignupTimerValue(data.retryAfter));
 
         setIsLoading(false);
         router.replace('/verify-email');
       } catch (err: any) {
         setIsLoading(false);
-        setSignInError(true);
-
-        console.log(err.message, 'error');
 
         // check if request wasn't aborted
-        if (err.message !== 'The user aborted a request.') {
-          showErrorToastPredefined(undefined);
+        if (err.message === 'The user aborted a request.') {
+          return;
         }
 
-        // router.push('/');
+        showErrorToastPredefined(undefined);
+        console.error(err.message, 'error');
+        router.back();
       }
     }
 
@@ -119,17 +126,6 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
             }}
             isStopped={!isLoading}
           />
-          {/* Temp */}
-          {signInError ? (
-            <div
-              style={{
-                position: 'absolute',
-                top: 'calc(50% + 48px)',
-              }}
-            >
-              An error occurred
-            </div>
-          ) : null}
         </div>
       </main>
     </div>
@@ -142,6 +138,13 @@ export const getServerSideProps: GetServerSideProps<
   IEmailAuthRedirectPage
 > = async (context) => {
   const { stripe_setup_intent_client_secret } = context.query;
+
+  const translationContext = await serverSideTranslations(
+    context.locale!!,
+    ['common', 'page-SignUp'],
+    null,
+    SUPPORTED_LANGUAGES
+  );
 
   if (
     !stripe_setup_intent_client_secret ||
@@ -158,6 +161,7 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       stripe_setup_intent_client_secret,
+      ...translationContext,
     },
   };
 };

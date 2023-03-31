@@ -13,14 +13,12 @@ import Text from '../../atoms/Text';
 // import Toggle from '../../atoms/Toggle';
 import Button from '../../atoms/Button';
 import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
-import InlineSvg from '../../atoms/InlineSVG';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
-import getDisplayname from '../../../utils/getDisplayname';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import { getUserByUsername } from '../../../api/endpoints/user';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
+import DisplayName from '../../atoms/DisplayName';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -142,15 +140,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
                 <img alt={user.username} src={user.avatarUrl} />
               </SAvatar>
               <SNickname variant={3}>
-                <SNicknameText>{getDisplayname(user)}</SNicknameText>
-                {user.options?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='16px'
-                    height='16px'
-                    fill='none'
-                  />
-                )}
+                <DisplayName user={user} />
               </SNickname>
               <Link href={`/${user.username}`}>
                 <SLink>
@@ -287,18 +277,6 @@ const SNickname = styled(Text)`
   align-items: center;
   grid-area: nickname;
   overflow: hidden;
-`;
-
-const SNicknameText = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  min-width: 24px;
-  min-height: 24px;
-  margin-left: 6px;
 `;
 
 const SLink = styled.a`

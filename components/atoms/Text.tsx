@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface IText {
+  className?: string;
   id?: string;
   weight?: 500 | 600 | 700;
   variant?: 1 | 2 | 3 | 4 | 5 | 'subtitle';
@@ -121,6 +122,6 @@ const SText5 = styled(SText)`
 const STextSubtitle = styled(SText)`
   font-size: 12px;
   line-height: 16px;
-  font-weight: 600;
+  font-weight: ${(props) => props.weight || 600};
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;

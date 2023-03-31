@@ -22,7 +22,7 @@
   },
   "subscriptionExpired": {
     "title": "Private Messaging is expired",
-    "message": "Buy a new Superpoll bundle to message",
+    "message": "Buy a new Superpoll bundle to message ",
     "buttonText": "Buy a bundle"
   },
   "messagingDisabled": {
@@ -82,8 +82,8 @@
     "beforeName": "",
     "suffix": "'s",
     "afterName": "announcements",
-    "topMessageStart": "Only",
-    "topMessageEnd": "can send messages"
+    "topMessageStart": "Only ",
+    "topMessageEnd": " can send messages"
   },
   "userTypes": {
     "all": "All",

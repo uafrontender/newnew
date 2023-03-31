@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { formatNumber } from '../../../../utils/format';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 
 interface IWinningMcOptionCreator {
   postCreator: newnewapi.IUser;
@@ -105,7 +105,9 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
               <>
                 {` & `}
                 {formatNumber(winningOption.supporterCount - 1, true)}&nbsp;
-                {t('mcPostSuccess.others')}
+                {winningOption.supporterCount - 1 > 1
+                  ? t('mcPostSuccess.others')
+                  : t('mcPostSuccess.other')}
               </>
             ) : null}
             &nbsp;

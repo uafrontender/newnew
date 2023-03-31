@@ -13,7 +13,14 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 
-import PostCard from '../../molecules/PostCard';
+import PostCard, {
+  SUserAvatarOutside,
+  SBottomStart,
+  STextOutside,
+  SUsername,
+  SButton,
+  SButtonFirst,
+} from '../../molecules/PostCard';
 import Button from '../../atoms/Button';
 // import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
@@ -32,7 +39,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 
 const SCROLL_STEP = {
   tablet: 3,
-  desktop: 5,
+  desktop: 4,
 };
 
 interface ICardSection {
@@ -83,12 +90,14 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       resizeMode
     );
     const isTablet = ['tablet'].includes(resizeMode);
-    // const isLaptop = ['laptop'].includes(resizeMode);
+    const isLaptop = ['laptop'].includes(resizeMode);
     // const isDesktop = ['laptopL'].includes(resizeMode);
 
     const collectionToRender = useMemo(() => {
       if (isMobile && collection?.length > 3) {
-        return collection.slice(0, 3);
+        return collection;
+        // TODO: temporary all posts are shown
+        // return collection.slice(0, 3);
       }
 
       return collection;
@@ -96,7 +105,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
 
     const renderShowMore = useMemo(() => {
       if (isMobile && collection?.length > 3) {
-        return true;
+        return false;
+
+        // TODO:temporary see more is hided
+        // return true;
       }
 
       return false;
@@ -212,8 +224,16 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                 <PostCard
                   item={item}
                   index={tutorialCard !== undefined ? index + 1 : index}
-                  width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
-                  height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+                  width={
+                    isMobile
+                      ? '100%'
+                      : isTablet
+                      ? '224px'
+                      : isLaptop
+                      ? '256px'
+                      : '288px'
+                  }
+                  height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
                   maxWidthTablet='224px'
                 />
               </SItemWrapper>
@@ -245,8 +265,16 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <PostCard
               item={item}
               index={tutorialCard !== undefined ? index + 1 : index}
-              width={isMobile ? '100%' : isTablet ? '224px' : '224px'}
-              height={isMobile ? '564px' : isTablet ? '270px' : '336px'}
+              width={
+                isMobile
+                  ? '100%'
+                  : isTablet
+                  ? '224px'
+                  : isLaptop
+                  ? '256px'
+                  : '288px'
+              }
+              height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
               maxWidthTablet='224px'
             />
           </SItemWrapper>
@@ -327,9 +355,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       <SWrapper name={category} {...restProps}>
         <STopWrapper>
           {type === 'default' ? (
-            <Headline variant={4} animation='t-01'>
+            <SDefaultHeadline variant={3} animation='t-01'>
               {title}
-            </Headline>
+            </SDefaultHeadline>
           ) : (
             <AnimatedPresence animation='t-01'>
               <SHeadline variant={4} animation='t-01'>
@@ -379,7 +407,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             {!loading ? (
               collectionToRender?.map(renderItem)
             ) : (
-              <SCardSkeletonSection count={!isMobile ? 5 : 1} />
+              <SCardSkeletonSection
+                count={!isMobile ? (isLaptop || isTablet ? 3 : 4) : 1}
+              />
             )}
             {(!loading && collection?.length === 0) || !collection ? (
               <SItemWrapper
@@ -456,7 +486,6 @@ const SWrapper = styled.section<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 52px 0 50px;
     margin: 0 -32px;
   }
 
@@ -534,14 +563,21 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
 
   & > span > div {
     width: calc(100vw - 32px);
+    height: 665px;
 
     ${({ theme }) => theme.media.tablet} {
-      height: 410px;
       width: 224px;
+      height: 412px;
     }
 
     ${({ theme }) => theme.media.laptop} {
+      width: 256px;
       height: 454px;
+    }
+
+    ${({ theme }) => theme.media.laptopL} {
+      width: 288px;
+      height: 596px;
     }
   }
 `;
@@ -553,19 +589,51 @@ interface ISItemWrapper {
 const SItemWrapper = styled.div<ISItemWrapper>`
   margin: 16px 0;
 
+  & > div > div:first-child {
+    padding: 73.6% 0px;
+  }
+
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;
 
     & > div > div:first-child {
-      padding: 60% 0px;
+      padding: 61% 0px;
     }
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopL} {
     margin: 0 8px;
 
     & > div > div:first-child {
-      padding: 70% 0px;
+      padding: 74% 0px;
+    }
+
+    ${SUserAvatarOutside} {
+      width: 30px;
+      height: 30px;
+    }
+
+    ${SBottomStart} {
+      height: 30px;
+    }
+
+    ${STextOutside} {
+      height: 48px;
+
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    ${SUsername} {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    ${SButton}, ${SButtonFirst} {
+      height: 48px;
+
+      border-radius: ${({ theme }) => theme.borderRadius.medium};
     }
   }
 
@@ -610,6 +678,18 @@ const STopWrapper = styled.div`
 //     color: ${(props) => props.theme.colorsThemed.text.primary};
 //   }
 // `;
+
+const SDefaultHeadline = styled(Headline)`
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 40px;
+    line-height: 48px;
+  }
+`;
 
 const SHeadline = styled(Headline)`
   display: flex;

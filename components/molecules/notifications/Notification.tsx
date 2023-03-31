@@ -14,12 +14,11 @@ import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
-import VerificationCheckmark from '../../../public/images/svg/icons/filled/Verification.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
-import getDisplayname from '../../../utils/getDisplayname';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import DisplayName from '../../atoms/DisplayName';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -144,14 +143,9 @@ const Notification: React.FC<INotification> = ({
     ) {
       return (
         <>
-          <STitleText>{getDisplayname(content.relatedUser)}</STitleText>
-          {content?.relatedUser?.isVerified && (
-            <SVerificationSvg
-              svg={VerificationCheckmark}
-              width='20px'
-              height='20px'
-            />
-          )}
+          <STitleText>
+            <DisplayName user={content.relatedUser} />
+          </STitleText>
         </>
       );
     }
@@ -311,7 +305,7 @@ const STitle = styled.div`
 `;
 
 const STitleText = styled.div`
-  display: block;
+  display: inline-block;
   overflow: hidden;
   white-space: pre;
   text-overflow: ellipsis;
@@ -392,11 +386,6 @@ const SIcon = styled.span`
     height: 40px;
     border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
   }
-`;
-
-const SVerificationSvg = styled(InlineSvg)`
-  min-width: 20px;
-  min-height: 20px;
 `;
 
 const SInlineSVG = styled(InlineSvg)`

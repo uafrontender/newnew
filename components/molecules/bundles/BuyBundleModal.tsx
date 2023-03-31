@@ -12,7 +12,7 @@ import BundleOfferCard from './BunldeOfferCard';
 import BundlePaymentModal from './BundlePaymentModal';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppState } from '../../../contexts/appStateContext';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../../atoms/DisplayName';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -69,11 +69,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
                 <SMobileTitle>{t('modal.buyBundle.title')}</SMobileTitle>
               )}
               <SUserAvatar avatarUrl={creator.avatarUrl ?? ''} />
-              <SUserData>
-                <SUsername>
-                  <DisplayName user={creator} />
-                </SUsername>
-              </SUserData>
+              <SDisplayName user={creator} />
               <SOfferedBundleList>
                 {appConstants.bundleOffers?.map((bundleOffer, index) => (
                   <SBundleOfferCard
@@ -156,20 +152,7 @@ const SUserAvatar = styled(UserAvatar)`
   }
 `;
 
-const SUserData = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 16px;
-  max-width: 100%;
-
-  ${({ theme }) => theme.media.laptop} {
-    margin-bottom: 24px;
-  }
-`;
-
-const SUsername = styled.h4`
-  display: inline-flex;
+const SDisplayName = styled(DisplayName)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: 700;
   font-size: 20px;
@@ -178,9 +161,13 @@ const SUsername = styled.h4`
   overflow: hidden;
   text-overflow: ellipsis;
 
+  margin-bottom: 16px;
+  max-width: 100%;
+
   ${({ theme }) => theme.media.laptop} {
     font-size: 24px;
     line-height: 32px;
+    margin-bottom: 24px;
   }
 `;
 

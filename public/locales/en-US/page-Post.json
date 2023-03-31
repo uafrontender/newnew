@@ -65,9 +65,9 @@
       "cf": "You’re backing this goal!"
     },
     "doneButton": "Sounds good!",
-    "ac": "{{postCreator}} will pick their favorite one once the Bid is over.",
-    "mc": "{{postCreator}} will do the option with the most amount of votes when the Superpoll is over.",
-    "cf": "{{postCreator}} will do the goal once it gets enough backers."
+    "ac": "<0/> will pick their favorite one once the Bid is over.",
+    "mc": "<0/> will do the option with the most amount of votes when the Superpoll is over.",
+    "cf": "<0/> will do the goal once it gets enough backers."
   },
   "postFailedBoxModeration": {
     "title": "{{postType}} is cancelled",
@@ -83,8 +83,8 @@
   "postFailedBox": {
     "title": "This {{postType}} is canceled",
     "reason": {
-      "no-response": "{{creator}} didn't post a response video in time",
-      "ac-no-winner": "{{creator}} didn't choose a bid in time",
+      "no-response": "<0/> didn't post a response video in time",
+      "ac-no-winner": "<0/> didn't choose a bid in time",
       "ac": "Time ran out before any bids were made",
       "mc": "Time ran out before any votes were made",
       "cf": "Time ran out before the goal was reached"
@@ -102,7 +102,7 @@
   "postDeleted": {
     "title": "This {{postType}} has been deleted",
     "body": {
-      "byCreator": "{{creator}} deleted this {{postType}}",
+      "byCreator": "<0/> deleted this {{postType}}",
       "byAdmin": "This {{postType}} was in violation of our Community Guidelines"
     },
     "buttonText": "See new {{postTypeMultiple}}"
@@ -316,11 +316,12 @@
   },
   "acPost": {
     "paymentModalHeader": {
-      "title": "{{creator}}'s Bid",
+      "title": "<0/> Bid",
+      "suffix": "'s",
       "subtitle": "Your bid"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} chooses your bid.",
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if <0/> chooses your bid.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -347,6 +348,7 @@
       "optionCard": {
         "by": "by",
         "bidders": "bidders",
+        "other": "other",
         "others": "others",
         "bid": "bid",
         "supportButton": "Boost",
@@ -387,7 +389,8 @@
       "votes": "total votes"
     },
     "paymentModalHeader": {
-      "title": "{{creator}}'s Superpoll",
+      "title": "<0/> Superpoll",
+      "suffix": "'s",
       "subtitle": "Option you chose"
     },
     "paymentModalFooter": {
@@ -409,6 +412,7 @@
         "votes": "votes",
         "vote": "vote",
         "mySuggestion": "My suggestion",
+        "other": "other",
         "others": "others",
         "voters": "voters",
         "voted": "voted",
@@ -430,9 +434,10 @@
           "vote": "vote",
           "votes": "votes",
           "custom": "Custom votes",
-          "buySingleVote": "Buy 1 vote to vote on {{creator}}'s Superpoll",
-          "buyMultipleVotes": "Buy {{amount}} votes to vote on {{creator}}'s Superpoll",
-          "buyAnyVotes": "Buy any number of votes you want to vote on {{creator}}'s Superpoll",
+          "buySingleVote": "Buy 1 vote to vote on <0/> Superpoll",
+          "buyMultipleVotes": "Buy {{amount}} votes to vote on <0/> Superpoll",
+          "buyAnyVotes": "Buy any number of votes you want to vote on <0/> Superpoll",
+          "suffix": "'s",
           "optionCaption": "Superpoll option",
           "voteButton": "Vote"
         }
@@ -454,7 +459,7 @@
         "suggestionPlaceholder": "Add your own option",
         "suggestionPlaceholderDesktop": "Add an option ...",
         "placeABidButton": "Add my option",
-        "offersBundles": "{{creator}} offers Superpoll Bundles",
+        "offersBundles": "<0/> offers Superpoll Bundles",
         "viewBundles": "View Bundles",
         "getMoreBundles": "Get another Superpoll Bundle",
         "getBundles": "Get it"
@@ -499,10 +504,11 @@
       }
     },
     "paymentModalHeader": {
-      "title": "{{creator}}'s Goal"
+      "title": "<0/> Goal",
+      "suffix": "'s"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. You’ll only get charged if {{creator}} reaches their goal.",
+      "body": "A temporary hold will be placed on your card. You’ll only get charged if <0/> reaches their goal.",
       "terms": "Terms",
       "apply": "apply"
     },
@@ -606,8 +612,9 @@
   },
   "acPostSuccess": {
     "heroText": "Watch it happen!",
-    "wantsToKnow": "{{creator}}<0/> wants to know...",
+    "wantsToKnow": "<0/> wants to know...",
     "inTotalBids": "in total bids",
+    "other": "other",
     "others": "others",
     "bid": "bid",
     "bidChosen": "Bid chosen",
@@ -618,8 +625,9 @@
   },
   "mcPostSuccess": {
     "heroText": "Watch it happen!",
-    "wantsToKnow": "{{creator}}<0/> wants to know...",
+    "wantsToKnow": "<0/> wants to know...",
     "inTotalVotes": "total votes",
+    "other": "other",
     "others": "others",
     "voted": "voted",
     "votes": "votes",
@@ -632,7 +640,7 @@
   },
   "cfPostSuccess": {
     "heroText": "Watch it happen!",
-    "wantsToKnow": "{{creator}}'s<0/> Goal",
+    "wantsToKnow": "<0/>'s Goal",
     "creatorsBackers": "{{creator}}'s backers",
     "ofTargetBackers": "of {{target_count}} backers",
     "youBackedFor": "You backed it for"
@@ -640,7 +648,7 @@
   "acPostAwaiting": {
     "hero": {
       "title": "Time's up!",
-      "body": "{{creator}} has {{time}} to select and do their favorite bid!",
+      "body": "<0/> has {{time}} to select and do their favorite bid!",
       "expires": {
         "days": "days",
         "days_singular": "day",
@@ -652,20 +660,14 @@
         "seconds_singular": "second"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> wants to know...",
-    "inTotalBids": "in total bids",
-    "others": "others",
-    "bid": "bid",
-    "seeAll": "see all bids",
-    "optionsTab": {
-      "backButton": "Back"
-    }
+    "wantsToKnow": "<0/> wants to know...",
+    "inTotalBids": "in total bids"
   },
   "mcPostAwaiting": {
     "hero": {
       "title": "Votes are in!",
-      "body": "{{creator}} has {{time}} to do this option. Stay tuned!",
-      "bodyNoResponse": "{{creator}} has {{time}} to do respond. Stay tuned!",
+      "body": "<0/> has {{time}} to do this option. Stay tuned!",
+      "bodyNoResponse": "<0/> has {{time}} to do respond. Stay tuned!",
       "expires": {
         "days": "days",
         "days_singular": "day",
@@ -677,17 +679,7 @@
         "seconds_singular": "second"
       }
     },
-    "wantsToKnow": "{{creator}}<0/> wants to know...",
-    "inTotalVotes": "total votes",
-    "others": "others",
-    "voted": "voted",
-    "votes": "votes",
-    "vote": "vote",
-    "optionChosen": "Highest voted option",
-    "seeAll": "see all options",
-    "optionsTab": {
-      "backButton": "Back"
-    }
+    "wantsToKnow": "<0/> wants to know..."
   },
   "recommendationsSection": {
     "heading": "More like this"

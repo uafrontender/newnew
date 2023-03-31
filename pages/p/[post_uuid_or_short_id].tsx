@@ -50,7 +50,9 @@ import GeneralLayout from '../../components/templates/General';
 import PostSkeleton from '../../components/organisms/decision/PostSkeleton';
 import Post from '../../components/organisms/decision';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
-import usePost from '../../utils/hooks/usePost';
+import usePost, {
+  TUpdatePostCoverImageMutation,
+} from '../../utils/hooks/usePost';
 import getDisplayname from '../../utils/getDisplayname';
 import { useAppState } from '../../contexts/appStateContext';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
@@ -130,6 +132,7 @@ const PostPage: NextPage<IPostPage> = ({
     isLoading: isPostLoading,
     refetch: refetchPost,
     updatePostTitleMutation,
+    updatePostCoverImageMutation,
     updatePostStatusMutation,
     updatePostMutation,
   } = usePost(
@@ -195,6 +198,13 @@ const PostPage: NextPage<IPostPage> = ({
       }
     },
     [postParsed?.postUuid, showErrorToastPredefined, updatePostTitleMutation]
+  );
+
+  const handleUpdatePostCoverImage = useCallback(
+    async (newCoverImage: TUpdatePostCoverImageMutation) => {
+      updatePostCoverImageMutation.mutate(newCoverImage);
+    },
+    [updatePostCoverImageMutation]
   );
 
   const handleUpdatePostData = useCallback(
@@ -746,6 +756,7 @@ const PostPage: NextPage<IPostPage> = ({
         handleCloseDeletePostModal={handleCloseDeletePostModal}
         handleSetIsConfirmToClosePost={handleSetIsConfirmToClosePost}
         handleUpdatePostTitle={handleUpdatePostTitle}
+        handleUpdatePostCoverImage={handleUpdatePostCoverImage}
         handleUpdatePostData={handleUpdatePostData}
         isUpdateTitleLoading={isUpdateTitleLoading}
         refetchPost={refetchPost}
@@ -894,8 +905,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
     }
 
     if (!context.req.url?.startsWith('/_next')) {
-      // console.log('I am from direct link, making SSR request');
-
       const getPostPayload = new newnewapi.GetPostRequest({
         postUuid: post_uuid_or_short_id,
       });
@@ -1011,8 +1020,6 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         },
       };
     }
-
-    // console.log('I am from next router, no SSR needed');
 
     return {
       props: {

@@ -5,7 +5,6 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
-import getDisplayname from '../../../utils/getDisplayname';
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
@@ -105,9 +104,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 
   return (
     <SContainer textareaFocused={textareaFocused}>
-      {hasWelcomeMessage && (
-        <WelcomeMessage userAlias={getDisplayname(chatRoom.visavis?.user)} />
-      )}
+      {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
       {hasNoMessagesYet && <NoMessagesYet />}
 
       {messages.map((item, index) => (

@@ -8,7 +8,7 @@ import Button from '../../../atoms/Button';
 import { useGetBlockedUsers } from '../../../../contexts/blockedUsersContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
-import DisplayName from '../../../DisplayName';
+import DisplayName from '../../../atoms/DisplayName';
 
 interface IBlockUserModalPost {
   user: newnewapi.IUser;

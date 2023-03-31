@@ -70,6 +70,7 @@ const YourPostsSection = () => {
         <Link href='/creation'>
           <a>
             <Button
+              view='primaryGrad'
               onClick={() => {
                 Mixpanel.track('Navigation Item Clicked', {
                   _stage: 'Homepage',
@@ -79,7 +80,7 @@ const YourPostsSection = () => {
                 });
               }}
             >
-              {tCommon('button.createDecision')}
+              {tCommon('button.createOnNewnew')}
             </Button>
           </a>
         </Link>
@@ -137,6 +138,7 @@ const YourPostsSection = () => {
               <Link href='/creation'>
                 <a>
                   <Button
+                    view='primaryGrad'
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
                         _stage: 'Homepage',
@@ -146,7 +148,7 @@ const YourPostsSection = () => {
                       });
                     }}
                   >
-                    {tCommon('button.createDecision')}
+                    {tCommon('button.createOnNewnew')}
                   </Button>
                 </a>
               </Link>
@@ -186,7 +188,11 @@ const SCardsSection = styled(CardsSection)`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 80px;
+    margin-bottom: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 50px;
   }
 `;
 
@@ -197,52 +203,43 @@ const SCreateFirstContainer = styled.div`
   justify-content: center;
   border: 2px solid ${({ theme }) => theme.colorsThemed.accent.blue};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  height: 198px;
-  margin-bottom: 40px;
+  height: 216px;
+  margin-bottom: 20px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 280px;
-
-    margin-bottom: 70px;
+    height: 292px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: 484px;
+    height: 438px;
+    margin-bottom: 70px;
   }
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
-    margin: 0 auto 80px;
+    margin: 0 auto 70px;
   }
 `;
 
 const SHeadline = styled(Headline)`
   margin-bottom: 16px;
-  max-width: 320px;
 
   text-align: center;
 
   font-size: 24px;
   line-height: 32px;
-
-  ${({ theme }) => theme.media.mobileL} {
-    max-width: 587px;
-  }
+  white-space: pre-line;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
-    max-width: 320px;
 
-    font-size: 36px;
-    line-height: 44px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-bottom: 40px;
-    max-width: 520px;
-
-    font-size: 64px;
-    line-height: 72px;
+    font-size: 40px;
+    line-height: 48px;
   }
 `;
 
@@ -298,7 +295,7 @@ const SHint = styled(Text)`
   line-height: 24px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
   }
 `;
 
