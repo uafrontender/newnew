@@ -3,7 +3,7 @@
   "topSectionTitle": "Top 10 en {{country}}",
   "heroSection": {
     "title": "¡Únete y moldea\n la realidad!",
-    "subTitle": "Haz ofertas y vota por lo que sucederá a continuación en el mundo",
+    "subTitle": "¡Haz ofertas y vota por lo que sucederá a continuación en el mundo!",
     "signIn": "Iniciar sesión",
     "explore": "Explorar Ahora",
     "exploreNow": "Explorar ahora"
@@ -108,7 +108,7 @@
   },
   "modal": {
     "reportUser": {
-      "title": "Reportar",
+      "title": "Reportar ",
       "subtitle": "Ayúdanos a entender para que podamos investigar...",
       "options": {
         "spam": "Sospechoso o spam",
@@ -194,7 +194,7 @@
   },
   "search": {
     "placeholder": "Búsqueda",
-    "placeholderLong_NEED_TRANSLATION": "Search creators and hashtags",
+    "placeholderLong": "Buscar creadores y hashtags",
     "topPosts": "Publicaciones populares",
     "popularCreators": "Creadores populares",
     "creatorSubtitle": "Ver publicaciones",

@@ -7,12 +7,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useTranslation } from 'next-i18next';
-import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from './socketContext';
 import {
+  getCoverImageUploadUrl,
   getVideoUploadUrl,
   removeUploadedFile,
   startVideoProcessing,
@@ -20,6 +19,7 @@ import {
 } from '../api/endpoints/upload';
 import {
   deleteAdditionalPostResponse,
+  setPostCoverImage,
   uploadAdditionalPostResponse,
   uploadPostResponse,
 } from '../api/endpoints/post';
@@ -28,6 +28,7 @@ import { usePostInnerState } from './postInnerContext';
 import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../utils/hooks/useErrorToasts';
+import urltoFile from '../utils/urlToFile';
 import { TVideoProcessingData } from './postCreationContext';
 
 interface IPostModerationResponsesContext {
@@ -38,7 +39,6 @@ interface IPostModerationResponsesContext {
   coreResponse: newnewapi.IVideoUrls | undefined;
   coreResponseUploading: boolean;
   handleUploadVideoProcessed: () => Promise<void>;
-  handleUploadVideoNotProcessed: () => Promise<void>;
   // Additional responses
   currentAdditionalResponseStep: 'regular' | 'editing';
   handleSetCurrentAdditionalResponseStep: (step: 'regular' | 'editing') => void;
@@ -69,6 +69,8 @@ interface IPostModerationResponsesContext {
   handleVideoDelete: () => Promise<void>;
   handleSetUploadingAdditionalResponse: (newValue: boolean) => void;
   handleSetReadyToUploadAdditionalResponse: (newValue: boolean) => void;
+  customCoverImageUrlResponse: string | undefined;
+  handleUpdateCustomCoverImageUrl: (newValue: string | undefined) => void;
 }
 
 const PostModerationResponsesContext =
@@ -80,7 +82,6 @@ const PostModerationResponsesContext =
     coreResponse: undefined,
     coreResponseUploading: false,
     handleUploadVideoProcessed: (() => {}) as () => Promise<void>,
-    handleUploadVideoNotProcessed: (() => {}) as () => Promise<void>,
     // Additional responses
     currentAdditionalResponseStep: 'regular',
     handleSetCurrentAdditionalResponseStep: (step: 'regular' | 'editing') => {},
@@ -113,6 +114,8 @@ const PostModerationResponsesContext =
     handleVideoDelete: (() => {}) as () => Promise<void>,
     handleSetUploadingAdditionalResponse: () => {},
     handleSetReadyToUploadAdditionalResponse: () => {},
+    customCoverImageUrlResponse: undefined,
+    handleUpdateCustomCoverImageUrl: (() => {}) as () => Promise<void>,
   });
 
 interface IPostModerationResponsesContextProvider {
@@ -132,7 +135,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   handleChangeTab,
   children,
 }) => {
-  const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
   const socketConnection = useContext(SocketContext);
@@ -148,6 +150,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const handleUpdateResponseVideo = useCallback(
     (newValue: newnewapi.IVideoUrls) => setCoreResponse(newValue),
+    []
+  );
+
+  // Cover image for response
+  const [customCoverImageUrlResponse, setCustomCoverImageUrlResponse] =
+    useState<string | undefined>(undefined);
+
+  const handleUpdateCustomCoverImageUrl = useCallback(
+    (newValue: string | undefined) => setCustomCoverImageUrlResponse(newValue),
     []
   );
 
@@ -424,9 +435,77 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     [handleVideoDelete, handleVideoUpload]
   );
 
+  const handleUploadCustomCoverImage = useCallback(async () => {
+    if (!customCoverImageUrlResponse) return false;
+    try {
+      const coverImageFile = await urltoFile(
+        customCoverImageUrlResponse,
+        'coverImage',
+        'image/jpeg'
+      );
+
+      const imageUrlPayload = new newnewapi.GetCoverImageUploadUrlRequest({
+        postUuid,
+        videoTargetType: newnewapi.VideoTargetType.RESPONSE,
+      });
+
+      const getCoverImageUploadUrlResponse = await getCoverImageUploadUrl(
+        imageUrlPayload
+      );
+
+      if (
+        !getCoverImageUploadUrlResponse.data ||
+        getCoverImageUploadUrlResponse.error
+      ) {
+        throw new Error(
+          getCoverImageUploadUrlResponse.error?.message ||
+            'Could not get cover image upload URL'
+        );
+      }
+
+      const uploadResponse = await fetch(
+        getCoverImageUploadUrlResponse.data.uploadUrl,
+        {
+          method: 'PUT',
+          body: coverImageFile,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        }
+      );
+
+      if (!uploadResponse.ok) {
+        throw new Error('Could not upload cover image to S3');
+      }
+
+      const updateCoverImagePayload = new newnewapi.SetPostCoverImageRequest({
+        postUuid,
+        videoTargetType: newnewapi.VideoTargetType.RESPONSE,
+        action: newnewapi.SetPostCoverImageRequest.Action.COVER_UPLOADED,
+      });
+
+      const updateCoverImageRes = await setPostCoverImage(
+        updateCoverImagePayload
+      );
+
+      if (updateCoverImageRes.error) {
+        throw new Error(
+          updateCoverImageRes.error?.message || 'Could not set cover image'
+        );
+      }
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }, [customCoverImageUrlResponse, postUuid]);
+
   const handleUploadVideoProcessed = useCallback(async () => {
     setCoreResponseUploading(true);
     try {
+      let hasCoverImage = false;
+
       const payload = new newnewapi.UploadPostResponseRequest({
         postUuid,
         responseVideoUrl: uploadedResponseVideoUrl,
@@ -435,6 +514,13 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       const res = await uploadPostResponse(payload);
 
       if (res.data) {
+        // If there's a cover image to be uploaded, try to do it
+        if (customCoverImageUrlResponse) {
+          hasCoverImage = await handleUploadCustomCoverImage();
+        }
+
+        console.log(hasCoverImage);
+
         // @ts-ignore
         let responseObj;
         if (res.data.auction) responseObj = res.data.auction.response;
@@ -469,40 +555,10 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   }, [
     postUuid,
     uploadedResponseVideoUrl,
+    customCoverImageUrlResponse,
     handleUpdateResponseVideo,
     refetchPost,
-    showErrorToastPredefined,
-  ]);
-
-  const handleUploadVideoNotProcessed = useCallback(async () => {
-    try {
-      const payload = new newnewapi.UploadPostResponseRequest({
-        postUuid,
-        responseVideoUrl: uploadedResponseVideoUrl,
-      });
-
-      const res = await uploadPostResponse(payload);
-
-      if (res.data) {
-        toast.success(t('postVideo.responseUploadedNonProcessed'));
-        refetchPost();
-        setUploadedResponseVideoUrl('');
-      }
-    } catch (err: any) {
-      if (err.message === 'Processing limit reached') {
-        showErrorToastPredefined(
-          ErrorToastPredefinedMessage.ProcessingLimitReachedError
-        );
-      } else {
-        console.error(err);
-        showErrorToastPredefined(undefined);
-      }
-    }
-  }, [
-    postUuid,
-    uploadedResponseVideoUrl,
-    t,
-    refetchPost,
+    handleUploadCustomCoverImage,
     showErrorToastPredefined,
   ]);
 
@@ -721,13 +777,14 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       responseFileProcessingError,
       handleItemChange,
       handleUploadVideoProcessed,
-      handleUploadVideoNotProcessed,
       handleUploadAdditionalVideoProcessed,
       handleResetVideoUploadAndProcessingState,
       handleCancelVideoUpload,
       handleVideoDelete,
       handleSetUploadingAdditionalResponse,
       handleSetReadyToUploadAdditionalResponse,
+      customCoverImageUrlResponse,
+      handleUpdateCustomCoverImageUrl,
     }),
     [
       openedTab,
@@ -754,12 +811,13 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       responseFileProcessingError,
       handleItemChange,
       handleUploadVideoProcessed,
-      handleUploadVideoNotProcessed,
       handleUploadAdditionalVideoProcessed,
       handleResetVideoUploadAndProcessingState,
       handleVideoDelete,
       handleSetUploadingAdditionalResponse,
       handleSetReadyToUploadAdditionalResponse,
+      customCoverImageUrlResponse,
+      handleUpdateCustomCoverImageUrl,
     ]
   );
 
@@ -768,6 +826,10 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       setAdditionalResponses(() => additionalResponsesInitial);
     }
   }, [additionalResponsesInitial]);
+
+  useEffect(() => {
+    setCoreResponse(() => coreResponseInitial);
+  }, [coreResponseInitial]);
 
   return (
     <>

@@ -164,6 +164,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
           />
           <EditEmailModal
             show={!!editEmail}
+            skipCurrentEmailVerificationStep={!currentEmail}
             onClose={() => {
               router.replace('/profile/settings');
             }}

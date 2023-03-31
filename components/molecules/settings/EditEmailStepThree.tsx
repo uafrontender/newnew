@@ -21,12 +21,14 @@ import { useAppDispatch } from '../../../redux-store/store';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailStepThreeModal {
-  onComplete: () => void;
   newEmail: string;
+  retryAfter: number;
+  onComplete: () => void;
 }
 
 const EditEmailStepThreeModal = ({
   onComplete,
+  retryAfter,
   newEmail,
 }: IEditEmailStepThreeModal) => {
   const { t } = useTranslation('page-Profile');
@@ -41,7 +43,10 @@ const EditEmailStepThreeModal = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCodeLoading, setIsCodeLoading] = useState(false);
-  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+
+  const [canResendAt, setCanResendAt] = useState<number>(
+    Date.now() + retryAfter * 1000
+  );
 
   useEffect(() => {
     const setTimeoutId = setTimeout(() => {
@@ -54,6 +59,10 @@ const EditEmailStepThreeModal = ({
   }, []);
 
   const resendVerificationCode = useCallback(async () => {
+    if (isCodeLoading) {
+      return;
+    }
+
     try {
       Mixpanel.track('Resend Verification Code For New Email', {
         _stage: 'Settings',
@@ -61,7 +70,6 @@ const EditEmailStepThreeModal = ({
       });
 
       setIsCodeLoading(true);
-      setTimerStartTime(Date.now());
       const sendVerificationCodePayload =
         new newnewapi.SendVerificationEmailRequest({
           emailAddress: newEmail,
@@ -73,21 +81,25 @@ const EditEmailStepThreeModal = ({
       );
 
       if (
-        data?.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS ||
-        error
+        error ||
+        !data ||
+        (data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
       ) {
         throw new Error(error?.message ?? 'Request failed');
       }
+
+      setCanResendAt(Date.now() + data.retryAfter * 1000);
 
       setIsCodeLoading(false);
       setCode(new Array(6).join('.').split('.'));
     } catch (err) {
       setIsCodeLoading(false);
-      setTimerStartTime(null);
       console.error(err);
     }
-  }, [newEmail]);
+  }, [isCodeLoading, newEmail]);
 
   const handleSetMyEmail = useCallback(
     async (verificationCode: string) => {
@@ -106,18 +118,19 @@ const EditEmailStepThreeModal = ({
 
         const { data, error } = await setMyEmail(setMyEmailPayload);
 
+        if (error || !data) {
+          throw new Error(error?.message ?? 'Request failed');
+        }
+
         if (
-          data?.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
+          data.status === newnewapi.ConfirmMyEmailResponse.Status.AUTH_FAILURE
         ) {
           setErrorMessage(tVerifyEmail('error.invalidCode'));
           throw new Error('Invalid code');
         }
 
-        if (
-          data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS ||
-          error
-        ) {
-          throw new Error(error?.message ?? 'Request failed');
+        if (data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS) {
+          throw new Error('Request failed');
         }
 
         dispatch(
@@ -169,14 +182,10 @@ const EditEmailStepThreeModal = ({
         isInputFocused={isInputFocused}
         key={`input-focused-${isInputFocused}`}
       />
-      <SVerificationCodeResend
-        expirationTime={60}
+      <VerificationCodeResend
+        canResendAt={canResendAt}
+        show={!errorMessage && !isSubmitting}
         onResendClick={resendVerificationCode}
-        onTimerEnd={() => {
-          setTimerStartTime(null);
-        }}
-        $invisible={!!errorMessage || !!isSubmitting}
-        startTime={timerStartTime}
       />
       {errorMessage && (
         <AnimatedPresence animateWhenInView={false} animation='t-09'>
@@ -226,11 +235,4 @@ const SErrorDiv = styled(Text)`
   ${({ theme }) => theme.media.tablet} {
     line-height: 20px;
   }
-`;
-
-const SVerificationCodeResend = styled(VerificationCodeResend)<{
-  $invisible: boolean;
-}>`
-  visibility: ${({ $invisible }) => ($invisible ? 'hidden' : 'visible')};
-  height: 0;
 `;

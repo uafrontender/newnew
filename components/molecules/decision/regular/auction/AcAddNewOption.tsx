@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
@@ -44,6 +44,7 @@ import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupInten
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../../../contexts/appStateContext';
+import DisplayName from '../../../../atoms/DisplayName';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -69,9 +70,8 @@ const getPayWithCardErrorMessage = (
 interface IAcAddNewOption {
   postUuid: string;
   postShortId: string;
-  postCreator: string;
+  postCreator: newnewapi.IUser | null | undefined;
   postText: string;
-  postDeadline: string;
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   minAmount: number;
@@ -85,7 +85,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   postShortId,
   postCreator,
   postText,
-  postDeadline,
   postStatus,
   options,
   minAmount,
@@ -336,7 +335,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           value={newBidText}
           placeholder={t(
             'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
-            { username: postCreator }
+            { username: postCreator?.username }
           )}
           onChange={handleUpdateNewOptionText}
         />
@@ -506,7 +505,13 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
             (!appConstants.minHoldAmount?.usdCents ||
               paymentWithFeeInCents > appConstants.minHoldAmount?.usdCents) && (
               <SPaymentSign variant='subtitle'>
-                {t('acPost.paymentModalFooter.body', { creator: postCreator })}*
+                <Trans
+                  t={t}
+                  i18nKey='acPost.paymentModalFooter.body'
+                  // @ts-ignore
+                  components={[<DisplayName user={postCreator} />]}
+                />
+                {' *'}
                 <Link href='https://terms.newnew.co'>
                   <SPaymentTermsLink
                     href='https://terms.newnew.co'
@@ -532,7 +537,17 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('acPost.paymentModalHeader.title', { creator: postCreator })}
+                <Trans
+                  t={t}
+                  i18nKey='acPost.paymentModalHeader.title'
+                  // @ts-ignore
+                  components={[
+                    <DisplayName
+                      user={postCreator}
+                      suffix={t('acPost.paymentModalHeader.suffix')}
+                    />,
+                  ]}
+                />
               </SPaymentModalHeadingPostCreator>
             </SPaymentModalHeading>
             <SPaymentModalPostText variant={2}>
@@ -560,10 +575,12 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           promptUserWithPushNotificationsPermissionModal();
         }}
       >
-        {t('paymentSuccessModal.ac', {
-          postCreator,
-          postDeadline,
-        })}
+        <Trans
+          t={t}
+          i18nKey='paymentSuccessModal.ac'
+          // @ts-ignore
+          components={[<DisplayName user={postCreator} />]}
+        />
       </PaymentSuccessModal>
     </>
   );
@@ -698,6 +715,11 @@ const SPaymentModalHeadingPostSymbolImg = styled.img`
 `;
 
 const SPaymentModalHeadingPostCreator = styled(Text)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: pre;
+
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 600;
   font-size: 14px;

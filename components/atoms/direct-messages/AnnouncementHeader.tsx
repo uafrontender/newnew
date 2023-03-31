@@ -3,7 +3,7 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import DisplayName from '../../DisplayName';
+import DisplayName from '../DisplayName';
 
 interface IAnnouncementHeader {
   user: newnewapi.IUser | null;
@@ -16,10 +16,8 @@ const AnnouncementHeader: React.FC<IAnnouncementHeader> = React.memo(
     return (
       <SAnnouncementHeader>
         <SAnnouncementText>
-          {t('announcement.topMessageStart')}{' '}
-          <SAnnouncementName>
-            <DisplayName user={user} />
-          </SAnnouncementName>{' '}
+          {t('announcement.topMessageStart')}
+          <SDisplayName user={user} />
           {t('announcement.topMessageEnd')}
         </SAnnouncementText>
       </SAnnouncementHeader>
@@ -51,10 +49,6 @@ const SAnnouncementText = styled.div`
       : props.theme.colorsThemed.background.tertiary};
 `;
 
-const SAnnouncementName = styled.div`
-  display: inline-flex;
-  text-align: center;
-  align-items: center;
-
+const SDisplayName = styled(DisplayName)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;

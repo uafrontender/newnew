@@ -3,7 +3,7 @@
   "topSectionTitle": "{{country}}前十名",
   "heroSection": {
     "title": "共同重塑現實",
-    "subTitle": "出價並就世界的下一步行動投票",
+    "subTitle": "出價並就世界的下一步行動投票！",
     "signIn": "登入",
     "explore": "開始瀏覽",
     "exploreNow": "開始瀏覽"
@@ -194,7 +194,7 @@
   },
   "search": {
     "placeholder": "搜索",
-    "placeholderLong_NEED_TRANSLATION": "Search creators and hashtags",
+    "placeholderLong": "搜索創作者和主題標籤",
     "topPosts": "熱門帖子",
     "popularCreators": "熱門創作者",
     "creatorSubtitle": "查看帖子",

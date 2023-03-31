@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -34,18 +34,16 @@ import PostEllipseModal from './PostEllipseModal';
 // import NotificationIconOutlined from '../../../../public/images/svg/icons/outlined/Notifications.svg';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../../public/images/svg/icons/filled/More.svg';
-import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 
 import { formatNumber } from '../../../../utils/format';
 import { markPost } from '../../../../api/endpoints/post';
-import getDisplayname from '../../../../utils/getDisplayname';
 import assets from '../../../../constants/assets';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
-import { I18nNamespaces } from '../../../../@types/i18next';
 import { useAppState } from '../../../../contexts/appStateContext';
+import DisplayName from '../../../atoms/DisplayName';
 /* import getGuestId from '../../../../utils/getGuestId';
  import {
   getGuestSmsNotificationsSubscriptionStatus,
@@ -609,17 +607,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               }}
             >
               <SUserInfo>
-                <SUsername className='username'>
-                  {getDisplayname(creator)}
-                </SUsername>
-                {creator.options?.isVerified && (
-                  <SInlineSVG
-                    svg={VerificationCheckmark}
-                    width='20px'
-                    height='20px'
-                    fill='none'
-                  />
-                )}
+                <SDisplayName user={creator} />
               </SUserInfo>
             </a>
           </Link>
@@ -749,14 +737,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           title={t('postFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(
-            `postFailedBox.reason.${
-              failureReason as keyof I18nNamespaces['page-Post']['postFailedBox']['reason']
-            }`,
-            {
-              creator: getDisplayname(creator),
-            }
-          )}
+          body={
+            <Trans
+              t={t}
+              i18nKey={`postFailedBox.reason.${failureReason}` as any}
+              // @ts-ignore
+              components={<DisplayName user={creator} />}
+            />
+          }
           buttonCaption={tCommon('button.takeMeHome')}
           imageSrc={
             postType
@@ -855,15 +843,24 @@ const SCreatorCard = styled.div`
 
   padding-right: 8px;
 
-  .username {
-    transition: 0.2s linear;
+  * {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
   }
 
   &:hover {
-    .username {
+    * {
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
+`;
+
+const SDisplayName = styled(DisplayName)`
+  flex-shrink: 1;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+
+  transition: 0.2s linear;
 `;
 
 const SAvatarArea = styled.div`
@@ -892,15 +889,6 @@ const SUserInfo = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-`;
-
-const SUsername = styled.div`
-  display: inline;
-  flex-shrink: 1;
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
 // Action buttons
@@ -1023,8 +1011,4 @@ const SHeadline = styled(Headline)`
 
 const SText = styled(Text)`
   color: #fff;
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  margin-left: 2px;
 `;

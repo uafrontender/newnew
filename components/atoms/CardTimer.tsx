@@ -97,7 +97,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
 
     if (!hasStarted) {
       return (
-        <SCaption variant={2} weight={600}>
+        <SCaption variant={2} weight={500}>
           {t('timer.soon')}
         </SCaption>
       );
@@ -105,7 +105,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
 
     if (hasEnded) {
       return (
-        <SCaptionEnded variant={2} weight={600}>
+        <SCaptionEnded variant={2} weight={500}>
           {/* Only en-US locale should be used due to requirements */}
           {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
         </SCaptionEnded>
@@ -113,7 +113,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     }
 
     return (
-      <SCaption variant={2} weight={600}>
+      <SCaption variant={2} weight={500}>
         {t('timer.timeLeft', { time: parsedString })}
       </SCaption>
     );
@@ -134,9 +134,14 @@ const SCaption = styled(Caption)`
   font-weight: 500;
 
   ${({ theme }) => theme.media.tablet} {
+    font-weight: 600;
     font-size: 12px;
     line-height: 16px;
-    font-weight: initial;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 14px;
+    line-height: 20px;
   }
 `;
 
@@ -148,5 +153,13 @@ const SCaptionEnded = styled(Caption)`
 
   letter-spacing: -0.5px;
 
+  font-size: 14px;
+  line-height: 20px;
   white-space: nowrap;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 16px;
+  }
 `;
