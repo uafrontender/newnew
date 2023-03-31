@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useScrollDirection = () => {
+export const useScrollDirection = (shouldListen: boolean) => {
   const [scrollDirection, setScrollDirection] = useState('');
 
   useEffect(() => {
@@ -28,12 +28,14 @@ export const useScrollDirection = () => {
       }
     };
 
-    document?.addEventListener('scroll', onScroll);
+    if (shouldListen) {
+      document?.addEventListener('scroll', onScroll);
+    }
 
     return () => {
       document?.removeEventListener('scroll', onScroll);
     };
-  }, [scrollDirection]);
+  }, [scrollDirection, shouldListen]);
 
   return {
     scrollDirection,
