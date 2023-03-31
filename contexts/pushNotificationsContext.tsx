@@ -538,9 +538,13 @@ const PushNotificationsContextProvider: React.FC<
       await subscription?.unsubscribe();
 
       setIsSubscribed(false);
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.message === 'No active subscription') {
+        setIsSubscribed(false);
+      } else {
+        showErrorToastPredefined();
+      }
       console.error(err);
-      showErrorToastPredefined();
     }
   }, [unregister, showErrorToastPredefined]);
 
@@ -755,6 +759,7 @@ const PushNotificationsContextProvider: React.FC<
       setIsPermissionRequestModalOpen(false);
       setIsLoading(false);
       setPublicKey('');
+      setIsSubscribed(false);
       pauseNotification();
     }
   }, [user.loggedIn, pauseNotification]);

@@ -11,62 +11,55 @@ import isBrowser from '../../utils/isBrowser';
 import AnimatedPresence from './AnimatedPresence';
 
 export interface IVerificationCodeResend {
-  expirationTime: number;
+  className?: string;
+  canResendAt: number;
+  show?: boolean;
   onResendClick: () => void;
-  onTimerEnd: () => void;
-  startTime: number | null;
+}
+
+function getSecondsLeft(to: number) {
+  return Math.ceil((to - Date.now()) / 1000);
 }
 
 const VerificationCodeResend: React.FunctionComponent<
   IVerificationCodeResend
-> = ({ expirationTime, onResendClick, onTimerEnd, startTime, ...rest }) => {
+> = ({ className, canResendAt, show = true, onResendClick }) => {
   const { t } = useTranslation('page-VerifyEmail');
 
   // Timer
-  const [timerSeconds, setTimerSeconds] = useState(expirationTime);
-  const [timerActive, setTimerActive] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(getSecondsLeft(canResendAt));
+  const [timerActive, setTimerActive] = useState(true);
   const interval = useRef<number>();
 
-  const handleResendCode = async () => {
-    setTimerSeconds(expirationTime);
-    await onResendClick();
-    setTimerActive(true);
-  };
+  useEffect(() => {
+    setTimerSeconds(getSecondsLeft(canResendAt));
+  }, [canResendAt]);
 
   useEffect(() => {
     if (timerSeconds < 1) {
       setTimerActive(false);
-      onTimerEnd();
+    } else {
+      setTimerActive(true);
     }
-  }, [timerSeconds, setTimerActive, onTimerEnd]);
+  }, [timerSeconds]);
 
   useEffect(() => {
-    if (isBrowser() && startTime) {
+    if (isBrowser()) {
       if (timerActive) {
         interval.current = window.setInterval(() => {
-          setTimerSeconds(
-            expirationTime - Math.floor((Date.now() - startTime) / 1000)
-          );
+          setTimerSeconds((curr) => curr - 1);
         }, 1000);
       } else if (!timerActive) {
         clearInterval(interval.current);
       }
     }
     return () => clearInterval(interval.current);
-  }, [timerActive, timerSeconds, startTime, expirationTime]);
-
-  useEffect(() => {
-    if (!startTime) {
-      setTimerActive(false);
-      onTimerEnd();
-      clearInterval(interval.current);
-    }
-  }, [startTime, onTimerEnd]);
+  }, [timerActive]);
 
   return (
     <>
       {timerActive && (
-        <STimeoutDiv isAlertColor={timerSeconds < 11} {...rest}>
+        <STimeoutDiv className={className} show={show}>
           {secondsToString(timerSeconds, 'm:s')}
         </STimeoutDiv>
       )}
@@ -77,9 +70,9 @@ const VerificationCodeResend: React.FunctionComponent<
           animation='t-01'
           delay={0.3}
         >
-          <STimeExpired {...rest}>
+          <STimeExpired className={className} show={show}>
             {t('expired.noCodeReceived')}{' '}
-            <button type='button' onClick={() => handleResendCode()}>
+            <button type='button' onClick={onResendClick}>
               {t('expired.resendButtonText')}
             </button>
           </STimeExpired>
@@ -89,34 +82,24 @@ const VerificationCodeResend: React.FunctionComponent<
   );
 };
 
-VerificationCodeResend.defaultProps = {
-  expirationTime: 60,
-};
-
 export default VerificationCodeResend;
 
-interface ISTimeoutDiv {
-  isAlertColor: boolean;
-}
-
-const STimeoutDiv = styled.div<ISTimeoutDiv>`
+const STimeoutDiv = styled.div<{ show: boolean }>`
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 
-  // NB! Temp
-  color: ${({ isAlertColor, theme }) => {
-    if (isAlertColor) return theme.colorsThemed.accent.error;
-    return theme.colorsThemed.text.tertiary;
-  }};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
   }
+
+  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
 `;
 
-const STimeExpired = styled(Text)`
+const STimeExpired = styled(Text)<{ show: boolean }>`
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -147,4 +130,6 @@ const STimeExpired = styled(Text)`
       transition: 0.2s ease;
     }
   }
+
+  visibility: ${({ show }) => (show ? 'visible' : 'hidden')};
 `;

@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
@@ -44,9 +44,9 @@ import { usePushNotifications } from '../../../../contexts/pushNotificationsCont
 import HighlightedButton from '../../../atoms/bundles/HighlightedButton';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
-import getDisplayname from '../../../../utils/getDisplayname';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
+import DisplayName from '../../../atoms/DisplayName';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -209,8 +209,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   );
 
   const handleAddOrUpdateOptionFromResponse = useCallback(
-    async (newOrUpdatedption: newnewapi.MultipleChoice.Option) => {
-      addOrUpdateMcOptionMutation?.mutate(newOrUpdatedption);
+    async (newOrUpdatedOption: newnewapi.MultipleChoice.Option) => {
+      addOrUpdateMcOptionMutation?.mutate(newOrUpdatedOption);
     },
     [addOrUpdateMcOptionMutation]
   );
@@ -496,7 +496,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                   {t('expires.end_date')}{' '}
                   {moment((post.expiresAt?.seconds as number) * 1000)
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                 </SEndDate>
               </>
             ) : (
@@ -532,7 +532,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                   {t('expires.end_date')}{' '}
                   {moment((post.expiresAt?.seconds as number) * 1000)
                     .locale(router.locale || 'en-US')
-                    .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                    .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                 </SEndDate>
               </>
             ) : (
@@ -584,7 +584,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
                         {t('expires.end_date')}{' '}
                         {moment((post.expiresAt?.seconds as number) * 1000)
                           .locale(router.locale || 'en-US')
-                          .format(`DD MMM YYYY[${t('at')}]hh:mm A`)}
+                          .format(`MMM DD YYYY[${t('at')}]hh:mm A`)}
                       </SEndDate>
                     </>
                   ) : (
@@ -610,12 +610,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           <McOptionsTab
             post={post}
             postStatus={postStatus}
-            postCreatorName={getDisplayname(post.creator)}
-            postDeadline={moment(
-              (post.responseUploadDeadline?.seconds as number) * 1000
-            )
-              .subtract(3, 'days')
-              .calendar()}
+            postCreator={post.creator}
             options={options}
             canAddCustomOption={canAddCustomOption}
             bundle={creatorsBundle?.bundle ?? undefined}
@@ -641,14 +636,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               promptUserWithPushNotificationsPermissionModal();
             }}
           >
-            {t('paymentSuccessModal.mc', {
-              postCreator: getDisplayname(post.creator),
-              postDeadline: moment(
-                (post.responseUploadDeadline?.seconds as number) * 1000
-              )
-                .subtract(3, 'days')
-                .calendar(),
-            })}
+            <Trans
+              t={t}
+              i18nKey='paymentSuccessModal.mc'
+              // @ts-ignore
+              components={[<DisplayName user={post.creator} />]}
+            />
           </PaymentSuccessModal>
         )}
         {isPopupVisible && (
@@ -667,11 +660,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             <STicketSet numberOFTickets={3} size={36} shift={11} />
           )}
           <SBundlesText>
-            {creatorsBundle?.bundle
-              ? t('mcPost.optionsTab.actionSection.getMoreBundles')
-              : t('mcPost.optionsTab.actionSection.offersBundles', {
-                  creator: getDisplayname(post.creator),
-                })}
+            {creatorsBundle?.bundle ? (
+              t('mcPost.optionsTab.actionSection.getMoreBundles')
+            ) : (
+              <Trans
+                t={t}
+                i18nKey='mcPost.optionsTab.actionSection.offersBundles'
+                // @ts-ignore
+                components={[<DisplayName user={post.creator} />]}
+              />
+            )}
           </SBundlesText>
           <SHighlightedButton
             id='buy-bundle-button'

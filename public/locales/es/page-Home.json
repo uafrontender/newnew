@@ -20,7 +20,8 @@
   },
   "section": {
     "your": "Tus publicaciones",
-    "explore": "Explorar"
+    "explore": "Explorar",
+    "popular_NEED_TRANSLATION": "Popular"
   },
   "tutorial": {
     "ac": {
@@ -29,7 +30,7 @@
     },
     "mc": {
       "title": "Superpolls",
-      "caption": "Participa y vota sobre lo que crees que debería hacer un creador y observa cómo realiza la opción con la mayor cantidad de votos."
+      "caption_NEED_TRANSLATION": "Vote on what creators do and watch them do it."
     },
     "cf": {
       "title": "Goals",
@@ -86,7 +87,7 @@
     "title": "¿Estás listo para crear algo emocionante?"
   },
   "createFirstPost": {
-    "title": "Publica tu primer Bid o Superpoll",
+    "title": "Publica tu primer Bid\no Superpoll",
     "filter": {
       "active": "Activo",
       "ended": "Concluido"

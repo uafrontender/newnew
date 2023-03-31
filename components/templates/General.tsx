@@ -169,8 +169,6 @@ export const General: React.FC<IGeneral> = (props) => {
     bundles,
   ]);
 
-  useScrollPosition();
-  const { scrollDirection } = useScrollDirection();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -182,6 +180,9 @@ export const General: React.FC<IGeneral> = (props) => {
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  useScrollPosition();
+  const { scrollDirection } = useScrollDirection(isMobile);
 
   const openChat = useCallback(() => {
     if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {

@@ -151,7 +151,7 @@ interface ISImageBG {
 
 const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  padding: 70% 0px;
+  padding: 73% 0px;
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
@@ -207,13 +207,28 @@ const SText = styled(Text)`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
 
   margin-bottom: 10px;
 
-  height: 40px;
+  height: 48px;
+
+  ${({ theme }) => theme.media.laptop} {
+    height: 40px;
+
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height: 32px;
+
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 16px;
+  }
 `;
 
 const SBottomStart = styled.div`
@@ -225,6 +240,10 @@ const SBottomStart = styled.div`
 
   margin-bottom: 4px;
   overflow: hidden;
+
+  ${(props) => props.theme.media.laptop} {
+    height: 16px;
+  }
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -233,6 +252,13 @@ const SUserAvatar = styled(UserAvatar)`
   height: 24px;
   min-width: 24px;
   min-height: 24px;
+
+  ${(props) => props.theme.media.laptop} {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+  }
 `;
 
 // Move all styles to here
@@ -247,16 +273,21 @@ const SUsernameContainer = styled.div`
 const SUsername = styled(Text)`
   display: inline-block;
   flex-shrink: 1;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  margin-left: 6px;
+  margin-left: 8px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 12px;
+    line-height: 16px;
+  }
 `;
 
 interface ISBottomEnd {
@@ -294,15 +325,15 @@ interface ISButtonSpan {
 
 const SButton = styled.div<ISButtonSpan>`
   padding: 12px;
-  border-radius: 12px;
   width: 100%;
-  height: 36px;
+  height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
 
   color: ${({ theme }) => theme.colorsThemed.button.color.primary};
   background: ${({ theme }) => theme.colorsThemed.button.background.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   font-weight: 700;
   font-size: 16px;
@@ -317,12 +348,16 @@ const SButton = styled.div<ISButtonSpan>`
       : ''}
 
   ${(props) => props.theme.media.tablet} {
+    height: 36px;
     padding: 8px 12px;
 
-    font-size: 14px;
+    border-radius: ${({ theme }) => theme.borderRadius.smallLg};
   }
 
   ${(props) => props.theme.media.laptop} {
+    height: 32px;
+
+    border-radius: 10px;
     font-size: 16px;
   }
 `;

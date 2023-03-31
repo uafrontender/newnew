@@ -107,6 +107,8 @@ const STextarea = styled.textarea`
   line-height: 24px;
   padding: 12.5px 20px;
   resize: none;
+  // Without it content scrolls even when empty
+  overflow: hidden;
   width: 100%;
 
   height: 48px;

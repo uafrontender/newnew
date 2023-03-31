@@ -22,10 +22,9 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
-import getDisplayname from '../../../utils/getDisplayname';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import DisplayName from '../../DisplayName';
+import DisplayName from '../DisplayName';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -375,7 +374,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
         {!comment.isDeleted && comment.sender && (
           <ReportModal
             show={confirmReportUser}
-            reportedDisplayname={getDisplayname(comment.sender)}
+            reportedUser={comment.sender}
             onClose={() => setConfirmReportUser(false)}
             onSubmit={async ({ reasons, message }) => {
               await reportMessage(comment.id, reasons, message);
@@ -493,6 +492,7 @@ const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
 
 const SCommentContent = styled.div`
   width: 100%;
+  overflow: hidden;
 `;
 
 const SCommentHeader = styled.div`
@@ -514,6 +514,7 @@ const SActionsDiv = styled.div`
 const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
+  flex-shrink: 0;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
@@ -541,6 +542,10 @@ const SBid = styled.span`
 `;
 
 const SDate = styled.span`
+  flex-shrink: 1;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 12px;
 `;
 
@@ -555,6 +560,13 @@ const SText = styled.div`
   overflow-wrap: break-word;
   word-break: break-word;
   user-select: text;
+
+  // Don't go under more button
+  margin-right: 24px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-right: 36px;
+  }
 `;
 
 const SReply = styled.div`

@@ -40,7 +40,27 @@ describe('parses hashtags', () => {
     expect(chunks[0].text).toBe('hashtag');
   });
 
-  it('with undescore', () => {
+  it('in Spanish', () => {
+    const input = '#configuración';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('configuración');
+  });
+
+  it('in Chinese', () => {
+    const input = '#件通知';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('件通知');
+  });
+
+  it('with underscore', () => {
     const input = '#another_hashtag';
     const chunks = getChunks(input);
 
@@ -88,6 +108,16 @@ describe('parses hashtags', () => {
 
     expect(chunks[0].type).toBe('hashtag');
     expect(chunks[0].text).toBe('1812');
+  });
+
+  it('with complex emoji', () => {
+    const input = '#🤷🏿‍♀️';
+    const chunks = getChunks(input);
+
+    expect(chunks.length).toBe(1);
+
+    expect(chunks[0].type).toBe('hashtag');
+    expect(chunks[0].text).toBe('🤷🏿‍♀️');
   });
 
   it('multiple', () => {
@@ -139,15 +169,20 @@ describe('dont parses hashtags', () => {
     expect(chunks[0].type).toBe('text');
     expect(chunks[0].text).toBe('#hello#world');
   });
+  // .,?:;—\-[\]{}()"…/\\|*^+~=%#$@
+  it('with forbidden characters', () => {
+    // prettier-ignore
+    const forbiddenCharacters = ['.', ',', '?', ':', ';', '—', '-','[',']', '{', '}','(',')','"','…','/','\\','|','*','^','+','~','=','%','#','$','@'];
 
-  it('with exclamation mark', () => {
-    const input = '#hello!there';
-    const chunks = getChunks(input);
+    forbiddenCharacters.forEach((forbiddenCharacter) => {
+      const input = `#hello${forbiddenCharacter}there`;
+      const chunks = getChunks(input);
 
-    expect(chunks.length).toBe(1);
+      expect(chunks.length).toBe(1);
 
-    expect(chunks[0].type).toBe('text');
-    expect(chunks[0].text).toBe('#hello!there');
+      expect(chunks[0].text).toBe(input);
+      expect(chunks[0].type).toBe('text');
+    });
   });
 });
 

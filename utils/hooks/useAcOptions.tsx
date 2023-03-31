@@ -188,10 +188,21 @@ const useAcOptions = (
               );
 
               if (optionIndex !== -1) {
+                // `isSupportedByMe` can be populated incorrectly (e.g. through the socket event)
+                // Assume that if true in an existing option, or in the `newOrUpdatedOption` object, set to true in the update
+                const isSupportedByMe =
+                  !!data.pages[k].acOptions[optionIndex].isSupportedByMe ||
+                  !!newOrUpdatedOption.isSupportedByMe;
+
                 workingData.pages[k].acOptions[optionIndex] = {
                   ...workingData.pages[k].acOptions[optionIndex],
                   ...newOrUpdatedOption,
                 };
+
+                if (isSupportedByMe) {
+                  workingData.pages[k].acOptions[optionIndex].isSupportedByMe =
+                    isSupportedByMe;
+                }
                 optionExists = true;
                 break;
               }
