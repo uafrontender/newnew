@@ -24,6 +24,7 @@
     "minutesLeft": "m",
     "secondsLeft": "s",
     "endedOn": "Terminó el ",
+    "ended": "Terminó",
     "soon": "Próximamente"
   }
 }

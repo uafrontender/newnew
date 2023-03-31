@@ -140,10 +140,7 @@ const SWrapper = styled(motion.section)`
   position: relative;
   width: 100%;
   margin-top: -15px;
-
-  ${(props) => props.theme.media.tablet} {
-    margin-bottom: 10px;
-  }
+  margin-bottom: 20px;
 
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;

@@ -77,7 +77,7 @@ const SBody = styled(Text)`
   grid-area: bodyArea;
   display: flex;
   flex-direction: row;
-  white-space: pre;
+  white-space: pre-wrap;
   align-self: center;
 
   color: #ffffff;
