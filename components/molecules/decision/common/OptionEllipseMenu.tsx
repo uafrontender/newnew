@@ -67,15 +67,18 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
           }
         }
 
+        setCanDeleteOption(canDelete);
+
+        // In this case, close without showing
         if (!canDelete && isMyOption) {
           handleClose();
+        } else {
+          setIsCanDeleteOptionLoading(false);
         }
-
-        setCanDeleteOption(canDelete);
       } catch (err) {
+        setIsCanDeleteOptionLoading(false);
         console.error(err);
       }
-      setIsCanDeleteOptionLoading(false);
     }
 
     if (isVisible && isMyOption) {
