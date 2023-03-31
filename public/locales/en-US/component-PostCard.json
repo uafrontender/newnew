@@ -24,6 +24,7 @@
     "minutesLeft": "m",
     "secondsLeft": "s",
     "endedOn": "Ended on ",
+    "ended": "Ended",
     "soon": "Coming Soon"
   }
 }

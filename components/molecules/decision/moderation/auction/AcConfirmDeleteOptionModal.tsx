@@ -28,7 +28,7 @@ const AcConfirmDeleteOptionModal: React.FC<IAcConfirmDeleteOptionModal> = ({
             {t('acPostModeration.deleteOptionModal.body')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton view='quaternary' onClick={closeModal}>
+            <SCancelButton view='modalSecondary' onClick={closeModal}>
               {t('acPostModeration.deleteOptionModal.button.cancel')}
             </SCancelButton>
             <SConfirmButton view='danger' onClick={handleConfirmDelete}>
