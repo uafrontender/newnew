@@ -615,7 +615,7 @@ context('Whitelisted Creator flow', () => {
     });
 
     it('can become a creator', () => {
-      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator-onboarding`);
+      // cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator-onboarding`);
       cy.url().should('include', '/creator-onboarding');
 
       cy.fixture('avatar.png', 'binary')
