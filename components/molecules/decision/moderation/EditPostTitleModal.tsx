@@ -215,7 +215,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
           />
           <SControlsDiv>
             <SCancelButton
-              view='quaternary'
+              view='modalSecondary'
               disabled={isUpdateTitleLoading}
               onClick={() => closeModal()}
             >
