@@ -26,6 +26,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const parsed = Math.ceil((endsAt - Date.now()) / 1000);
     const hasStarted = Date.now() > startsAt;
     const hasEnded = Date.now() >= endsAt;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const expirationDate = new Date(endsAt);
 
     const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
@@ -107,7 +108,9 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
       return (
         <SCaptionEnded variant={2} weight={500}>
           {/* Only en-US locale should be used due to requirements */}
-          {t('timer.endedOn')} {expirationDate.toLocaleDateString('en-US')}
+          {t('timer.endedOn')}
+          {/* Commented out as a hotfix */}
+          {/* {expirationDate.toLocaleDateString('en-US')} */}
         </SCaptionEnded>
       );
     }
