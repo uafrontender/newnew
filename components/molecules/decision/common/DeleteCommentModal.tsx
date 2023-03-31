@@ -31,7 +31,7 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
           <SModalMessage>{t('deleteCommentModal.body')}</SModalMessage>
           <SModalButtons>
             <SCancelButton
-              view='secondary'
+              view='modalSecondary'
               disabled={isDeletingComment}
               onClick={() => closeModal()}
             >
