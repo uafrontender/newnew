@@ -57,7 +57,7 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
           </SModalMessage>
           <SModalButtons>
             <SCancelButton
-              view='secondary'
+              view='modalSecondary'
               disabled={isDeletingPost}
               onClick={closeModalMixpanel}
             >

@@ -59,7 +59,7 @@ export const PostVideoResponsePreviewModal: React.FC<
         </SModalVideoWrapper>
         <SControlsContainer>
           {!isMobile && (
-            <SCancelButton view='secondary' onClick={handleClose}>
+            <SCancelButton view='modalSecondary' onClick={handleClose}>
               {t('postVideo.uploadResponseForm.video.full.cancelButton')}
             </SCancelButton>
           )}
