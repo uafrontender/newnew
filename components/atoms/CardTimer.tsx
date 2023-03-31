@@ -166,4 +166,9 @@ const SCaptionEnded = styled(Caption)`
     font-size: 12px;
     line-height: 16px;
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;
