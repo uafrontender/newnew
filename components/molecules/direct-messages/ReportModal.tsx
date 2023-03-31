@@ -220,7 +220,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             </STextAreaWrapper>
             <SModalButtons>
               {!isMobile && (
-                <SCancelButton view='secondary' onClick={handleClose}>
+                <SCancelButton view='modalSecondary' onClick={handleClose}>
                   {t('modal.reportUser.button.cancel')}
                 </SCancelButton>
               )}

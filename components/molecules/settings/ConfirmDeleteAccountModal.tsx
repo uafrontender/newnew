@@ -50,7 +50,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
           <SModalTitle>{t('modal.deleteMyAccount.title')}</SModalTitle>
           <SModalMessage>{t('modal.deleteMyAccount.body')}</SModalMessage>
           <SModalButtons>
-            <SCancelButton view='secondary' onClick={closeModal}>
+            <SCancelButton view='modalSecondary' onClick={closeModal}>
               {t('modal.deleteMyAccount.button.cancel')}
             </SCancelButton>
             <SConfirmButton view='danger' onClick={handleConfirmClick}>
