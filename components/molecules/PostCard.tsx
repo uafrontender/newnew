@@ -156,6 +156,10 @@ export const PostCard: React.FC<ICard> = React.memo(
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     const [postParsed, typeOfPost] = switchPostType(item);
+    const postStatus = useMemo(
+      () => switchPostStatus(typeOfPost, postParsed.status),
+      [postParsed.status, typeOfPost]
+    );
     // Live updates stored in local state
     const [totalAmount, setTotalAmount] = useState<number>(() =>
       typeOfPost === 'ac'
@@ -727,7 +731,10 @@ export const PostCard: React.FC<ICard> = React.memo(
                 />
               </SUsername>
             </SUsernameContainer>
-            <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
+            {postStatus !== 'deleted_by_admin' &&
+            postStatus !== 'deleted_by_creator' ? (
+              <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
+            ) : null}
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
             {getTitleContent(postParsed.title)}
@@ -785,7 +792,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
-                {switchPostStatus(typeOfPost, postParsed.status) === 'voting' &&
+                {postStatus === 'voting' &&
                 postParsed.creator?.uuid !== user.userData?.userUuid
                   ? t(`button.withoutActivity.${typeOfPost}`)
                   : t(`button.seeResults.${typeOfPost}`)}
