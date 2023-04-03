@@ -685,7 +685,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
         ? ReactDOM.createPortal(
             <PostVideoFullscreenControls
-              isPaused={isPaused && !!showPlayButton}
+              isPaused={isPaused && !!showPlayButton && !isScrubberTimeChanging}
               handleToggleVideoPaused={handleToggleVideoPaused}
               currentTime={playbackTime}
               videoDuration={playerRef?.current?.duration() || 10}
