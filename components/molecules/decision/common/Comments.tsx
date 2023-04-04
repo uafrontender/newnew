@@ -245,8 +245,6 @@ const Comments: React.FunctionComponent<IComments> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, comments, isMobile, isLoading]);
 
-  console.log(heightDelta, 'heightDelta');
-
   return (
     <>
       <SScrollContainer ref={scrollRef} id='comments-scrolling-container'>
