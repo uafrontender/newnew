@@ -7,8 +7,9 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-
-import isBrowser from '../../../../utils/isBrowser';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 import PostVideoStoryItem from './PostVideoStoryItem';
 import Button from '../../../atoms/Button';
@@ -64,29 +65,22 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   );
 
   const videosLength = useMemo(() => videos.length, [videos.length]);
-  const containerRef = useRef<HTMLDivElement>();
+
+  const sliderRef = useRef<Slider>();
   const [currentVideo, setCurrentVideo] = useState(0);
 
   const [hovered, setHovered] = useState(false);
 
   const scrollSliderTo = useCallback(
     (to: number) => {
-      const containerWidth =
-        containerRef.current?.getBoundingClientRect().width;
       let scrollTo = to;
-
       if (to < 0) {
         scrollTo = 0;
       } else if (scrollTo > (videosLength || 0) - 1) {
         scrollTo = (videosLength || 0) - 1;
       }
 
-      if (containerWidth) {
-        containerRef.current?.scrollTo({
-          left: containerWidth * scrollTo,
-          behavior: 'auto',
-        });
-      }
+      sliderRef?.current?.slickGoTo(scrollTo);
     },
     [videosLength]
   );
@@ -123,32 +117,31 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     scrollSliderTo(currentVideo + 1);
   }, [currentVideo, postParsed?.postUuid, scrollSliderTo]);
 
-  useEffect(() => {
-    const handleScroll = (e: Event) => {
-      const containerWidth =
-        containerRef.current?.getBoundingClientRect().width;
-      const containerScrollWidth = containerRef.current?.scrollWidth;
-      const currentScrollLeft = containerRef.current?.scrollLeft;
-
-      if (
-        containerWidth &&
-        containerScrollWidth &&
-        currentScrollLeft !== undefined
-      ) {
-        const currentIndex = Math.floor(currentScrollLeft / containerWidth);
-
-        setCurrentVideo(currentIndex);
-      }
-    };
-
-    if (isBrowser()) {
-      containerRef.current?.addEventListener('scroll', handleScroll);
-    }
-
-    return () => {
-      containerRef.current?.removeEventListener('scroll', handleScroll);
-    };
-  }, [videosLength]);
+  const handleMapVideoStoryItems = useCallback(
+    () =>
+      videos.map((video, i, arr) => (
+        <PostVideoStoryItem
+          key={video?.uuid ?? i}
+          video={video}
+          index={i}
+          isVisible={currentVideo === i}
+          isMuted={isMuted}
+          videoDurationWithTime={videoDurationWithTime}
+          onPlaybackFinished={
+            // If the last video in story mode, continue loop
+            autoscroll && i !== arr.length - 1 ? handleScrollRight : undefined
+          }
+        />
+      )),
+    [
+      autoscroll,
+      currentVideo,
+      handleScrollRight,
+      isMuted,
+      videoDurationWithTime,
+      videos,
+    ]
+  );
 
   useEffect(() => {
     if (uploadedFile?.hlsStreamUrl) {
@@ -159,30 +152,26 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
   return (
     <SWrapper
+      id='responsesSlider'
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <SContainer
-        id='responsesSlider'
+      <Slider
         ref={(el) => {
-          containerRef.current = el!!;
+          sliderRef.current = el!!;
         }}
+        className='sSlider'
+        speed={0}
+        initialSlide={0}
+        infinite={false}
+        afterChange={(current) => {
+          setCurrentVideo(current);
+        }}
+        arrows={false}
+        dots={false}
       >
-        {videos.map((video, i, arr) => (
-          <PostVideoStoryItem
-            key={video?.uuid ?? i}
-            video={video}
-            index={i}
-            isVisible={currentVideo === i}
-            isMuted={isMuted}
-            videoDurationWithTime={videoDurationWithTime}
-            onPlaybackFinished={
-              // If the last video in story mode, continue loop
-              autoscroll && i !== arr.length - 1 ? handleScrollRight : undefined
-            }
-          />
-        ))}
-      </SContainer>
+        {handleMapVideoStoryItems()}
+      </Slider>
       <SDotsContainer
         isEditingStories={isEditingStories}
         style={{
@@ -277,25 +266,24 @@ export default PostVideoResponsesSlider;
 const SWrapper = styled.div`
   width: 100%;
   height: 100%;
-`;
 
-const SContainer = styled.div`
-  width: 100%;
-  height: 100%;
-
-  overflow-x: auto;
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
+  .slick-track {
+    height: 100%;
   }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 
-  display: flex;
+  .sSlider {
+    width: 100%;
+    height: 100%;
+    display: flex;
 
-  position: relative;
+    .slick-slide {
+      height: 100%;
 
-  scroll-snap-type: x mandatory;
+      & > div {
+        height: 100%;
+      }
+    }
+  }
 `;
 
 const SScrollLeft = styled(Button)`
@@ -306,6 +294,8 @@ const SScrollLeft = styled(Button)`
 
   top: calc(50% - 100px);
   left: 0px;
+
+  z-index: 100;
 
   @media (max-width: 1024px) {
     &:disabled:after {
@@ -332,6 +322,8 @@ const SScrollRight = styled(Button)`
 
   top: calc(50% - 100px);
   right: 0px;
+
+  z-index: 100;
 
   @media (max-width: 1024px) {
     &:disabled:after {
