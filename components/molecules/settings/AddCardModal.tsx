@@ -153,7 +153,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
           >
             {t('Settings.sections.cards.button.addCard')}
           </SAddButton>
-          <SCancelButton view='modalSecondary' onClick={onCancel}>
+          <SCancelButton view='modalSecondarySelected' onClick={onCancel}>
             {tCommon('button.cancel')}
           </SCancelButton>
         </SModalButtons>
