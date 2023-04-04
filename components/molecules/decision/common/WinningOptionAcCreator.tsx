@@ -13,7 +13,6 @@ interface IWinningOptionAcCreator {
   winningOption: newnewapi.Auction.IOption;
 }
 
-// Refactor, fix links DisplayNam etc
 const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
   winningOption,
 }) => {
