@@ -52,7 +52,6 @@ import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBundleAfterStripeRedirect';
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../../contexts/appStateContext';
-import { OPTION_LENGTH_MAX } from '../../../../../constants/general';
 import DisplayName from '../../../../atoms/DisplayName';
 
 const addOptionErrorMessage = (
@@ -107,7 +106,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { t: tCommon } = useTranslation('common');
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -203,9 +201,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   // New option/bid
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
-  const [newOptionErrorText, setNewOptionErrorText] = useState<
-    string | undefined
-  >(undefined);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
   // Modal for new option
@@ -224,64 +219,40 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // Handlers
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
-  const validateTextViaAPI = useCallback(
-    async (text: string) => {
-      if (validateTextAbortControllerRef.current) {
-        validateTextAbortControllerRef.current?.abort();
+  const validateTextViaAPI = useCallback(async (text: string) => {
+    if (validateTextAbortControllerRef.current) {
+      validateTextAbortControllerRef.current?.abort();
+    }
+    validateTextAbortControllerRef.current = new AbortController();
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        // NB! temp
+        kind: newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+        validateTextAbortControllerRef?.current?.signal
+      );
+
+      if (!res.data?.status) throw new Error('An error occurred');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setNewOptionTextValid(false);
+      } else {
+        setNewOptionTextValid(true);
       }
-      validateTextAbortControllerRef.current = new AbortController();
-      setIsAPIValidateLoading(true);
-      try {
-        const payload = new newnewapi.ValidateTextRequest({
-          // NB! temp
-          kind: newnewapi.ValidateTextRequest.Kind.POST_OPTION,
-          text,
-        });
 
-        const res = await validateText(
-          payload,
-          validateTextAbortControllerRef?.current?.signal
-        );
+      setIsAPIValidateLoading(false);
 
-        if (!res.data?.status) throw new Error('An error occurred');
-
-        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-          // TODO: upgrade error messages and cover all errors
-          if (
-            res.data.status === newnewapi.ValidateTextResponse.Status.TOO_LONG
-          ) {
-            setNewOptionErrorText(
-              tCommon('error.text.max', { value: OPTION_LENGTH_MAX })
-            );
-          } else if (
-            res.data.status ===
-            newnewapi.ValidateTextResponse.Status.INAPPROPRIATE
-          ) {
-            setNewOptionErrorText(tCommon('error.text.badWords'));
-          } else if (
-            res.data.status ===
-            newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION
-          ) {
-            setNewOptionErrorText(tCommon('error.text.containsLinks'));
-          } else {
-            setNewOptionErrorText(undefined);
-          }
-          setNewOptionTextValid(false);
-        } else {
-          setNewOptionErrorText(undefined);
-          setNewOptionTextValid(true);
-        }
-
-        setIsAPIValidateLoading(false);
-
-        return res.data?.status === newnewapi.ValidateTextResponse.Status.OK;
-      } catch (err) {
-        console.error(err);
-        setIsAPIValidateLoading(false);
-      }
-    },
-    [tCommon]
-  );
+      return res.data?.status === newnewapi.ValidateTextResponse.Status.OK;
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+    }
+  }, []);
 
   const validateTextViaAPIDebounced = useMemo(
     () =>
@@ -592,7 +563,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
                 )}
-                error={newOptionErrorText}
+                isValid={newOptionTextValid}
                 onChange={handleUpdateNewOptionText}
               />
               <SAddOptionButton
@@ -637,7 +608,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholder'
                 )}
-                error={newOptionErrorText}
+                isValid={newOptionTextValid}
                 onChange={handleUpdateNewOptionText}
               />
               <SAddOptionButton
