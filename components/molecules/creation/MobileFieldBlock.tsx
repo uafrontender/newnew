@@ -553,7 +553,6 @@ interface ISButton {
 const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 16px;
-  margin-bottom: 14px;
 
   flex-shrink: 0;
 
@@ -565,7 +564,7 @@ const SButton = styled(Button)<ISButton>`
 
 const SCancelButton = styled(Button)`
   padding: 16px 32px;
-
+  margin-top: 4px;
   z-index: 3;
 `;
 

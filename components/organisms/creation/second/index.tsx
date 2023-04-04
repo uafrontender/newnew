@@ -678,36 +678,25 @@ export const CreationSecondStepContent: React.FC<
   );
   const expireOptions = useMemo(
     () => [
-      {
-        id: '5-days',
-        title: t('secondStep.field.expiresAt.options.5-days'),
-      },
-      {
-        id: '3-days',
-        title: t('secondStep.field.expiresAt.options.3-days'),
-      },
-      {
-        id: '1-day',
-        title: t('secondStep.field.expiresAt.options.1-day'),
-      },
-      {
-        id: '12-hours',
-        title: t('secondStep.field.expiresAt.options.12-hours'),
-      },
-      {
-        id: '6-hours',
-        title: t('secondStep.field.expiresAt.options.6-hours'),
-      },
-      {
-        id: '3-hours',
-        title: t('secondStep.field.expiresAt.options.3-hours'),
-      },
-      {
-        id: '1-hour',
-        title: t('secondStep.field.expiresAt.options.1-hour'),
-      },
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production' &&
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
+        ? [
+            {
+              id: '2-minutes',
+              title: t('secondStep.field.expiresAt.options.2-minutes'),
+            },
+            {
+              id: '5-minutes',
+              title: t('secondStep.field.expiresAt.options.5-minutes'),
+            },
+            {
+              id: '10-minutes',
+              title: t('secondStep.field.expiresAt.options.10-minutes'),
+            },
+          ]
+        : []),
       // Debatable, but reserve ability to make 10 minutes for staging, as well
-      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production'
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
         ? [
             {
               id: '10-minutes',
@@ -715,19 +704,34 @@ export const CreationSecondStepContent: React.FC<
             },
           ]
         : []),
-      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production' &&
-      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
-        ? [
-            {
-              id: '5-minutes',
-              title: t('secondStep.field.expiresAt.options.5-minutes'),
-            },
-            {
-              id: '2-minutes',
-              title: t('secondStep.field.expiresAt.options.2-minutes'),
-            },
-          ]
-        : []),
+      {
+        id: '1-hour',
+        title: t('secondStep.field.expiresAt.options.1-hour'),
+      },
+      {
+        id: '3-hours',
+        title: t('secondStep.field.expiresAt.options.3-hours'),
+      },
+      {
+        id: '6-hours',
+        title: t('secondStep.field.expiresAt.options.6-hours'),
+      },
+      {
+        id: '12-hours',
+        title: t('secondStep.field.expiresAt.options.12-hours'),
+      },
+      {
+        id: '1-day',
+        title: t('secondStep.field.expiresAt.options.1-day'),
+      },
+      {
+        id: '3-days',
+        title: t('secondStep.field.expiresAt.options.3-days'),
+      },
+      {
+        id: '5-days',
+        title: t('secondStep.field.expiresAt.options.5-days'),
+      },
     ],
     [t]
   );
