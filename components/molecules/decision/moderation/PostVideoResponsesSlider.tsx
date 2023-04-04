@@ -307,7 +307,7 @@ const SScrollLeft = styled(Button)`
     width: initial;
     height: initial;
     top: calc(50% - 24px);
-    left: 24px;
+    left: 16px;
     display: block;
     opacity: 0;
     transition: 0.3s linear;
@@ -335,7 +335,7 @@ const SScrollRight = styled(Button)`
     width: initial;
     height: initial;
     top: calc(50% - 24px);
-    right: 24px;
+    right: 16px;
     display: block;
     opacity: 0;
     transition: 0.3s linear;
