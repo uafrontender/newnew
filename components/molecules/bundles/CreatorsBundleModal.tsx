@@ -16,6 +16,7 @@ import { formatNumber } from '../../../utils/format';
 import HighlightedButton from '../../atoms/bundles/HighlightedButton';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import DisplayName from '../../atoms/DisplayName';
+import Text from '../../atoms/Text';
 
 interface ICreatorsBundleModal {
   show: boolean;
@@ -44,6 +45,14 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
         usersBlockedMe.includes(creator?.uuid ?? ''),
       [creator?.uuid, usersIBlocked, usersBlockedMe]
     );
+
+    const disabled = useMemo(() => {
+      if (!creatorBundle.creator?.options?.isOfferingBundles || isBlocked) {
+        return true;
+      }
+
+      return false;
+    }, [creatorBundle.creator?.options?.isOfferingBundles, isBlocked]);
 
     return (
       <>
@@ -128,12 +137,16 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                   </AccessDescription>
                 )}
               </SBundleInfo>
-              {creatorBundle.creator?.options?.isOfferingBundles &&
-                !isBlocked && (
-                  <BuyButton onClick={onBuyMore}>
-                    {t('modal.creatorsBundle.buyButton')}
-                  </BuyButton>
+              <SBuyButton disabled={disabled} onClick={onBuyMore}>
+                {t('modal.creatorsBundle.buyButton')}
+              </SBuyButton>
+              {creatorBundle.creator?.options &&
+                !creatorBundle.creator.options.isOfferingBundles && (
+                  <SNote variant='subtitle'>
+                    {t('modal.creatorsBundle.bundlesDisabled')}
+                  </SNote>
                 )}
+              {/* TODO: add text   */}
             </Content>
           </SModalPaper>
         </Modal>
@@ -245,10 +258,17 @@ const AccessDescription = styled.p`
   margin-bottom: 4px;
 `;
 
-const BuyButton = styled(HighlightedButton)`
+const SBuyButton = styled(HighlightedButton)`
   font-size: 14px;
 
   ${({ theme }) => theme.media.tablet} {
     width: auto;
   }
+`;
+
+const SNote = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  text-align: center;
+  white-space: pre-wrap;
+  margin-top: 8px;
 `;
