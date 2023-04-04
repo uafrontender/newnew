@@ -1,9 +1,10 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useMemo, Fragment } from 'react';
+import React, { useMemo, useCallback, Fragment } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal, { ModalType } from '../../organisms/Modal';
@@ -54,6 +55,12 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
       return false;
     }, [creatorBundle.creator?.options?.isOfferingBundles, isBlocked]);
 
+    const onUserLinkClicked = useCallback(() => {
+      if (router.asPath === `/${creatorBundle?.creator?.username}`) {
+        onClose();
+      }
+    }, [router, creatorBundle?.creator?.username, onClose]);
+
     return (
       <>
         <Modal show={show} modalType={modalType} onClose={onClose}>
@@ -81,21 +88,18 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                 />
               </SVotesAvailable>
               <SUserInfo>
-                <SUserAvatar
-                  avatarUrl={creatorBundle?.creator?.avatarUrl ?? ''}
-                />
+                <Link href={`/${creatorBundle?.creator?.username}`}>
+                  <SUserAvatar
+                    avatarUrl={creatorBundle?.creator?.avatarUrl ?? ''}
+                    onClick={onUserLinkClicked}
+                  />
+                </Link>
                 <SForLine>
                   <span>{t('modal.creatorsBundle.for')}</span>
                   <SDisplayName
                     user={creatorBundle?.creator}
                     href={`/${creatorBundle?.creator?.username}`}
-                    onClick={() => {
-                      if (
-                        router.asPath === `/${creatorBundle?.creator?.username}`
-                      ) {
-                        onClose();
-                      }
-                    }}
+                    onClick={onUserLinkClicked}
                   />
                 </SForLine>
               </SUserInfo>
@@ -215,6 +219,7 @@ const SUserAvatar = styled(UserAvatar)`
   min-height: 36px;
   border-radius: 50%;
   margin-right: 8px;
+  cursor: pointer;
 `;
 
 const SForLine = styled.div`
