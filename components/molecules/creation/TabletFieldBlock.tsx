@@ -99,6 +99,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
             options={getSelectOptions()}
             selected={value}
             maxItems={maxItems}
+            direction='top'
             onSelect={(newValue) => {
               onChange(id, newValue);
             }}
