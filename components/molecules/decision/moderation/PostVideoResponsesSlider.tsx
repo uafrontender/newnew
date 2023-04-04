@@ -153,6 +153,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   return (
     <SWrapper
       id='responsesSlider'
+      videosLength={videosLength}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -163,7 +164,15 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         className='sSlider'
         speed={0}
         initialSlide={0}
+        slidesPerRow={1}
+        draggable={false}
         infinite={false}
+        swipe={false}
+        useCSS={false}
+        accessibility={false}
+        touchMove={false}
+        easing='none'
+        fade={false}
         afterChange={(current) => {
           setCurrentVideo(current);
         }}
@@ -263,12 +272,16 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
 export default PostVideoResponsesSlider;
 
-const SWrapper = styled.div`
+const SWrapper = styled.div<{
+  videosLength: number;
+}>`
   width: 100%;
   height: 100%;
 
   .slick-track {
     height: 100%;
+    // Fixes desktop Safari fullscreen width bug
+    max-width: ${({ videosLength }) => `${videosLength * 768}px`} !important;
   }
 
   .sSlider {
@@ -278,6 +291,10 @@ const SWrapper = styled.div`
 
     .slick-slide {
       height: 100%;
+      // Fixes slider initialization problem
+      min-width: 200px !important;
+      // Fixes desktop Safari fullscreen width bug
+      max-width: 768px !important;
 
       & > div {
         height: 100%;
