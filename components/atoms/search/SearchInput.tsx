@@ -42,6 +42,7 @@ const SearchInput: React.FC = React.memo(() => {
 
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
+  const resultsContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
@@ -99,12 +100,13 @@ const SearchInput: React.FC = React.memo(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
   }, [dispatch, globalSearchActive]);
 
-  const handleSearchClose = () => {
+  const handleSearchClose = useCallback(() => {
     Mixpanel.track('Search Closed');
 
     setSearchValue('');
+    setIsResultsDropVisible(false);
     dispatch(setGlobalSearchActive(false));
-  };
+  }, [dispatch]);
 
   const handleInputChange = (e: any) => {
     // TODO: create util for spaces handle
@@ -141,11 +143,17 @@ const SearchInput: React.FC = React.memo(() => {
       handleSearchClose();
     }
   });
-  useOnClickOutside(inputContainerRef, () => {
-    if (globalSearchActive && !isMobileOrTablet) {
+
+  const handleClickOutside = useCallback(() => {
+    if (!isMobileOrTablet) {
       handleSearchClose();
     }
-  });
+  }, [isMobileOrTablet, handleSearchClose]);
+
+  useOnClickOutside(
+    [inputContainerRef, resultsContainerRef],
+    handleClickOutside
+  );
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -245,12 +253,12 @@ const SearchInput: React.FC = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchValue, isMobileOrTablet]);
 
-  function closeSearch() {
+  const closeSearch = useCallback(() => {
     handleSearchClose();
     setSearchValue('');
     setIsResultsDropVisible(false);
     resetResults();
-  }
+  }, [handleSearchClose]);
 
   useEffect(() => {
     if (isMobileOrTablet && isResultsDropVisible) {
@@ -315,7 +323,7 @@ const SearchInput: React.FC = React.memo(() => {
           />
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
-          <SResultsDrop>
+          <SResultsDrop ref={resultsContainerRef}>
             {resultsPosts.length === 0 &&
             resultsCreators.length === 0 &&
             resultsHashtags.length === 0 ? (
@@ -337,16 +345,18 @@ const SearchInput: React.FC = React.memo(() => {
                 </SBlock>
               )
             ) : (
-              <div
-                onClick={() => {
-                  closeSearch();
-                }}
-              >
+              <div>
                 {resultsCreators.length > 0 && (
-                  <PopularCreatorsResults creators={resultsCreators} />
+                  <PopularCreatorsResults
+                    creators={resultsCreators}
+                    onSelect={closeSearch}
+                  />
                 )}
                 {resultsHashtags.length > 0 && (
-                  <PopularTagsResults hashtags={resultsHashtags} />
+                  <PopularTagsResults
+                    hashtags={resultsHashtags}
+                    onSelect={closeSearch}
+                  />
                 )}
                 <SButton
                   onClick={() => {
@@ -366,7 +376,7 @@ const SearchInput: React.FC = React.memo(() => {
         )}
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
-        <SResultsDropMobile>
+        <SResultsDropMobile ref={resultsContainerRef}>
           {resultsPosts.length === 0 &&
           resultsCreators.length === 0 &&
           resultsHashtags.length === 0 ? (
@@ -388,12 +398,18 @@ const SearchInput: React.FC = React.memo(() => {
               </SBlock>
             )
           ) : (
-            <div onClick={() => closeSearch()}>
+            <div>
               {resultsCreators.length > 0 && (
-                <PopularCreatorsResults creators={resultsCreators} />
+                <PopularCreatorsResults
+                  creators={resultsCreators}
+                  onSelect={closeSearch}
+                />
               )}
               {resultsHashtags.length > 0 && (
-                <PopularTagsResults hashtags={resultsHashtags} />
+                <PopularTagsResults
+                  hashtags={resultsHashtags}
+                  onSelect={closeSearch}
+                />
               )}
               <SButton
                 onClick={() => {
