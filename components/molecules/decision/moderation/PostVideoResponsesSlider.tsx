@@ -81,6 +81,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       }
 
       sliderRef?.current?.slickGoTo(scrollTo);
+      setCurrentVideo(scrollTo);
     },
     [videosLength]
   );
@@ -124,20 +125,23 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           key={video?.uuid ?? i}
           video={video}
           index={i}
-          isVisible={currentVideo === i}
+          isCurrent={currentVideo === i}
+          shouldPrefetch
           isMuted={isMuted}
           videoDurationWithTime={videoDurationWithTime}
           onPlaybackFinished={
             // If the last video in story mode, continue loop
-            autoscroll && i !== arr.length - 1 ? handleScrollRight : undefined
+            autoscroll && i !== arr.length - 1
+              ? () => scrollSliderTo(i + 1)
+              : undefined
           }
         />
       )),
     [
       autoscroll,
       currentVideo,
-      handleScrollRight,
       isMuted,
+      scrollSliderTo,
       videoDurationWithTime,
       videos,
     ]
