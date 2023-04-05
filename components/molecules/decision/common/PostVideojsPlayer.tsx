@@ -664,8 +664,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     []
   );
 
+  const shouldShowPlayPseudoButton = useMemo(
+    () =>
+      !isInSlider
+        ? showPlayButton && isPaused && !isScrubberTimeChanging
+        : isCurrent && showPlayButton && isPaused && !isScrubberTimeChanging,
+    [isCurrent, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]
+  );
+
   return (
     <SContent
+      id={`sContent_${id}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -683,11 +692,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
         />
-        {(
-          !isInSlider
-            ? showPlayButton && isPaused && !isScrubberTimeChanging
-            : isCurrent && showPlayButton && isPaused && !isScrubberTimeChanging
-        ) ? (
+        {shouldShowPlayPseudoButton ? (
           <SPlayPseudoButton onClick={handlePlayPseudoButtonClick}>
             <InlineSvg
               svg={PlayIcon}
@@ -735,7 +740,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       />
       {/* Custom fullscreen controls */}
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
-        ? ReactDOM.createPortal(
+        ? ReactDOM?.createPortal(
             <SMinimizeButton
               id='minimize-button'
               iconOnly
@@ -761,11 +766,13 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
                 fill='#FFFFFF'
               />
             </SMinimizeButton>,
-            videoRef.current?.querySelector(`.video-js_${id}`) as HTMLElement
+            document
+              ?.getElementById(`sContent_${id}`)
+              ?.querySelector(`.video-js_${id}`) as HTMLElement
           )
         : null}
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
-        ? ReactDOM.createPortal(
+        ? ReactDOM?.createPortal(
             <PostVideoFullscreenControls
               isPaused={isPaused && !!showPlayButton && !isScrubberTimeChanging}
               handleToggleVideoPaused={handleToggleVideoPaused}
@@ -779,7 +786,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
               currentVolume={currentVolume}
               handleChangeVolume={handlePlayerVolumeChange}
             />,
-            videoRef.current?.querySelector(`video-js_${id}`) as HTMLElement
+            document
+              ?.getElementById(`sContent_${id}`)
+              ?.querySelector(`.video-js_${id}`) as HTMLElement
           )
         : null}
     </SContent>
