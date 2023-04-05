@@ -261,6 +261,16 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         if (onPlaybackFinished) {
           p.on('ended', () => {
             onPlaybackFinished();
+            if (
+              playerRef?.current?.isFullscreen() ||
+              (
+                videoRef.current?.querySelector(
+                  `.vjs-tech_${id}`
+                ) as TSafariHtmlPlayer
+              ).webkitDisplayingFullscreen
+            ) {
+              handleExitFullscreen();
+            }
           });
         }
 
