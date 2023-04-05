@@ -160,11 +160,13 @@ const SWinningBidCreatorText = styled.div`
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  height: 16px;
 
   ${({ theme }) => theme.media.laptop} {
     font-weight: 700;
     font-size: 16px;
     line-height: 24px;
+    height: 24px;
   }
 `;
 
