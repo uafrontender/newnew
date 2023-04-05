@@ -68,7 +68,6 @@ const DisplayName: React.FC<IDisplayName> = ({
 
     if (nameRef.current) {
       const spanSize = nameRef.current?.offsetHeight;
-      console.log(spanSize);
       setSize(spanSize);
     }
   }, [isVerified]);
