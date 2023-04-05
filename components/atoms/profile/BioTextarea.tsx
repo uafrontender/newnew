@@ -58,7 +58,11 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
           value={value}
           maxLength={maxChars}
           rows={2}
-          onChange={onChange}
+          onChange={(e) => {
+            if (onChange && e.target.value.length <= maxChars) {
+              onChange(e);
+            }
+          }}
           onChangeCapture={() => {
             if (textareaRef?.current) {
               textareaRef.current.style.height = '';
