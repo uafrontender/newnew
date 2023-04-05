@@ -57,7 +57,7 @@ export const SBottomActionTitle = styled.strong`
 export const SBottomActionMessage = styled.div`
   display: flex;
   flex-direction: row;
-  white-space: pre;
+  white-space: pre-wrap;
   font-size: 14px;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 `;
