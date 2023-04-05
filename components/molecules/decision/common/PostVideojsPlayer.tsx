@@ -683,7 +683,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
         />
-        {showPlayButton && isPaused && !isScrubberTimeChanging && (
+        {(
+          !isInSlider
+            ? showPlayButton && isPaused && !isScrubberTimeChanging
+            : isCurrent && showPlayButton && isPaused && !isScrubberTimeChanging
+        ) ? (
           <SPlayPseudoButton onClick={handlePlayPseudoButtonClick}>
             <InlineSvg
               svg={PlayIcon}
@@ -692,7 +696,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
               fill='#FFFFFF'
             />
           </SPlayPseudoButton>
-        )}
+        ) : null}
         <SMaximizeButton
           id='maximize-button'
           iconOnly
