@@ -144,8 +144,6 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
     }
   }, [closeModal, handleUpdatePostTitle, isAPIValidateLoading, titleInEdit]);
 
-  console.log('HERe');
-
   return (
     <Modal
       show={show}
