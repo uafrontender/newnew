@@ -363,6 +363,22 @@ const FileUpload: React.FC<IFileUpload> = ({
     );
 
     if (loadingUpload) {
+      const minutesLeft = Math.floor(etaUpload / 60);
+      const secondsLeft = Math.ceil(etaUpload % 60);
+
+      const minutesLeftString =
+        // eslint-disable-next-line no-nested-ternary
+        minutesLeft > 0
+          ? minutesLeft > 1
+            ? `${minutesLeft} ${t('secondStep.video.loading.minutes')} `
+            : `${minutesLeft} ${t('secondStep.video.loading.minute')} `
+          : '';
+      const secondsLeftString = `${secondsLeft} ${
+        secondsLeft === 1
+          ? t('secondStep.video.loading.second')
+          : t('secondStep.video.loading.seconds')
+      }`;
+
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
@@ -374,7 +390,8 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('secondStep.video.loading.process', {
-                time: `${etaUpload} seconds`,
+                seconds: secondsLeftString,
+                minutes: minutesLeftString,
                 progress: progressUpload,
               })}
             </SLoadingDescription>
