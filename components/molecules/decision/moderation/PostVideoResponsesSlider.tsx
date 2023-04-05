@@ -171,10 +171,8 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         slidesPerRow={1}
         draggable={false}
         infinite={false}
-        swipe={false}
         useCSS={false}
         accessibility={false}
-        touchMove={false}
         easing='none'
         fade={false}
         afterChange={(current) => {
@@ -310,10 +308,10 @@ const SWrapper = styled.div<{
 const SScrollLeft = styled(Button)`
   position: absolute;
 
-  width: 75px;
-  height: 200px;
+  width: 12px;
+  height: 240px;
 
-  top: calc(50% - 100px);
+  top: calc(50% - 120px);
   left: 0px;
 
   z-index: 100;
@@ -338,10 +336,10 @@ const SScrollLeft = styled(Button)`
 const SScrollRight = styled(Button)`
   position: absolute;
 
-  width: 75px;
-  height: 200px;
+  width: 12px;
+  height: 240px;
 
-  top: calc(50% - 100px);
+  top: calc(50% - 120px);
   right: 0px;
 
   z-index: 100;
