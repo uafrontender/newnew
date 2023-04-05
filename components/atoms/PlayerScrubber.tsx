@@ -56,6 +56,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.stopPropagation();
       handleChangeTime(
         (videoDuration / 100) * (parseFloat(e.target.value) as number)
       );
@@ -84,9 +85,18 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
         step={0.1}
         aria-labelledby='Video seek'
         bufferedPercent={bufferedPercent}
-        onTouchStart={() => setIsChanging(true)}
-        onTouchEnd={() => setIsChanging(false)}
-        onTouchCancel={() => setIsChanging(false)}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+          setIsChanging(true);
+        }}
+        onTouchEnd={(e) => {
+          e.stopPropagation();
+          setIsChanging(false);
+        }}
+        onTouchCancel={(e) => {
+          e.stopPropagation();
+          setIsChanging(false);
+        }}
         onMouseEnter={() => setIsChanging(true)}
         onMouseLeave={() => setIsChanging(false)}
         onBlur={() => setIsChanging(false)}
