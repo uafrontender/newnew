@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import Router from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useBeforeUnload } from 'react-use';
