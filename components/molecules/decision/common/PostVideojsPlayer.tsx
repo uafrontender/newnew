@@ -674,12 +674,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     []
   );
 
-  const shouldShowPlayPseudoButton = useMemo(() => {
-    if (!isInSlider) {
-      return showPlayButton && isPaused && !isScrubberTimeChanging;
-    }
-    return isActive && showPlayButton && isPaused && !isScrubberTimeChanging;
-  }, [isActive, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]);
+  const shouldShowPlayPseudoButton = useMemo(
+    () =>
+      (!isInSlider || isActive) &&
+      showPlayButton &&
+      isPaused &&
+      !isScrubberTimeChanging,
+    [isActive, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]
+  );
 
   return (
     <SContent
