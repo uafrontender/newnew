@@ -43,7 +43,7 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
 
     return cleanup;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cookies, fetchInitialized]);
+  }, [cookies?.accessToken, fetchInitialized]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

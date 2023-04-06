@@ -196,18 +196,19 @@
         "loading": {
           "title": "上傳視頻",
           "description": "我們正在上傳你的視頻回復......馬上就好！",
-          "process": "{{progress}}% • 還需{{time}}"
+          "process": "{{progress}}% • 還需{{minutes}}{{seconds}}",
+          "minute": "分",
+          "minutes": "分",
+          "second": "秒",
+          "seconds": "秒"
         },
         "processing": {
           "title": "處理視頻",
-          "description": "視頻正在處理中……稍等！",
-          "process": "{{progress}}% • 還需{{time}}",
-          "uploadNonProcessed": "發佈"
+          "description": "視頻正在處理中……稍等！"
         },
         "processingPublished": {
           "title": "處理視頻",
-          "description": "你的視頻處理完畢後即可以觀看",
-          "process": "{{progress}}% • 還需{{time}}"
+          "description": "你的視頻處理完畢後即可以觀看"
         }
       }
     }

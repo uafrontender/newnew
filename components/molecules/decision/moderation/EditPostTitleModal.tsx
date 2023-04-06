@@ -215,7 +215,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
           />
           <SControlsDiv>
             <SCancelButton
-              view='modalSecondary'
+              view='modalSecondarySelected'
               disabled={isUpdateTitleLoading}
               onClick={() => closeModal()}
             >
@@ -306,7 +306,7 @@ const SContainer = styled.div`
     width: 480px;
     box-shadow: ${({ theme }) => theme.shadows.lightBlue};
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) => theme.colorsThemed.background.primary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;

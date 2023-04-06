@@ -21,7 +21,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
-export const Desktop: React.FC = React.memo(() => {
+export const Desktop: React.FC = () => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
@@ -293,7 +293,7 @@ export const Desktop: React.FC = React.memo(() => {
       </SRightBlock>
     </SContainer>
   );
-});
+};
 
 export default Desktop;
 

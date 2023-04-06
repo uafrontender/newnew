@@ -271,6 +271,25 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     );
 
     if (responseFileUploadLoading) {
+      const minutesLeft = Math.floor(responseFileUploadETA / 60);
+      const secondsLeft = Math.ceil(responseFileUploadETA % 60);
+      const minutesLeftString =
+        // eslint-disable-next-line no-nested-ternary
+        minutesLeft > 0
+          ? minutesLeft > 1
+            ? `${minutesLeft} ${t(
+                'postVideo.uploadResponseForm.video.loading.minutes'
+              )} `
+            : `${minutesLeft} ${t(
+                'postVideo.uploadResponseForm.video.loading.minute'
+              )} `
+          : '';
+      const secondsLeftString = `${secondsLeft} ${
+        secondsLeft === 1
+          ? t('postVideo.uploadResponseForm.video.loading.second')
+          : t('postVideo.uploadResponseForm.video.loading.seconds')
+      }`;
+
       content = (
         <SLoadingBox>
           <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
@@ -282,7 +301,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('postVideo.uploadResponseForm.video.loading.process', {
-                time: `${responseFileUploadETA} seconds`,
+                seconds: secondsLeftString,
+                minutes: minutesLeftString,
                 progress: responseFileUploadProgress,
               })}
             </SLoadingDescription>
