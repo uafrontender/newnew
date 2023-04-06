@@ -125,7 +125,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           key={video?.uuid ?? i}
           video={video}
           index={i}
-          isCurrent={currentVideo === i}
+          isActive={currentVideo === i}
           shouldPrefetch
           isMuted={isMuted}
           videoDurationWithTime={videoDurationWithTime}

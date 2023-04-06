@@ -42,7 +42,7 @@ interface IPostVideojsPlayer {
   videoDurationWithTime?: boolean;
   showPlayButton?: boolean;
   isInSlider?: boolean;
-  isCurrent?: boolean;
+  isActive?: boolean;
   shouldPrefetch?: boolean;
   onPlaybackFinished?: () => void;
 }
@@ -61,7 +61,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   videoDurationWithTime,
   showPlayButton,
   isInSlider,
-  isCurrent,
+  isActive,
   shouldPrefetch,
   onPlaybackFinished,
 }) => {
@@ -209,7 +209,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         // Autoplay implementation by official video.js guide
         // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
         p.ready(() => {
-          if (!isInSlider || (isInSlider && isCurrent)) {
+          if (!isInSlider || (isInSlider && isActive)) {
             const promise = p.play();
 
             if (promise !== undefined) {
@@ -307,7 +307,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       resources,
       isInSlider,
       shouldPrefetch,
-      isCurrent,
+      isActive,
     ]
   );
 
@@ -636,7 +636,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   // Slider prefetching
   useEffect(() => {
     if (isInSlider) {
-      if (isCurrent) {
+      if (isActive) {
         const promise = playerRef?.current?.play();
 
         if (promise !== undefined) {
@@ -663,7 +663,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInSlider, isCurrent]);
+  }, [isInSlider, isActive]);
 
   // Try to pause the video when the component unmounts
   // to avoid attempts to play broken segments
@@ -674,13 +674,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     []
   );
 
-  const shouldShowPlayPseudoButton = useMemo(
-    () =>
-      !isInSlider
-        ? showPlayButton && isPaused && !isScrubberTimeChanging
-        : isCurrent && showPlayButton && isPaused && !isScrubberTimeChanging,
-    [isCurrent, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]
-  );
+  const shouldShowPlayPseudoButton = useMemo(() => {
+    if (!isInSlider) {
+      return showPlayButton && isPaused && !isScrubberTimeChanging;
+    }
+    return isActive && showPlayButton && isPaused && !isScrubberTimeChanging;
+  }, [isActive, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]);
 
   return (
     <SContent
