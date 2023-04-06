@@ -337,6 +337,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
             'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
             { username: postCreator?.username }
           )}
+          isValid={newBidTextValid}
           onChange={handleUpdateNewOptionText}
         />
         <BidAmountTextInput
@@ -453,6 +454,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
               placeholder={t(
                 'acPost.optionsTab.actionSection.suggestionPlaceholder'
               )}
+              isValid={newBidTextValid}
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput

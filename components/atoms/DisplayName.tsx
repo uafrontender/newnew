@@ -29,8 +29,9 @@ const DisplayName: React.FC<IDisplayName> = ({
   inverted,
   onClick,
 }) => {
-  const spanRef = useRef<HTMLSpanElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<number>(0);
+  const [iconVisible, setIconVisible] = useState(false);
 
   const isVerified: boolean = useMemo(() => {
     if (!user) {
@@ -49,6 +50,7 @@ const DisplayName: React.FC<IDisplayName> = ({
 
     return false;
   }, [user]);
+
   const shift = useMemo(() => -(size >= 20 ? 1 : 0), [size]);
   const padding = useMemo(() => Math.max(Math.floor(size / 10) - 1, 0), [size]);
   const gap = useMemo(() => Math.round(size / 10), [size]);
@@ -64,11 +66,18 @@ const DisplayName: React.FC<IDisplayName> = ({
       return;
     }
 
-    if (spanRef.current) {
-      const spanSize = spanRef.current?.offsetHeight;
+    if (nameRef.current) {
+      const spanSize = nameRef.current?.offsetHeight;
       setSize(spanSize);
     }
   }, [isVerified]);
+
+  // Delay showing verified icon, to avoid glitches dues to UI instability on first render
+  useEffect(() => {
+    if (size > 0) {
+      setIconVisible(true);
+    }
+  }, [size]);
 
   if (!user) {
     return null;
@@ -78,12 +87,12 @@ const DisplayName: React.FC<IDisplayName> = ({
     return (
       <Wrapper className={className}>
         <Link href={href}>
-          <SName ref={spanRef} onClick={onClick}>
+          <SName ref={nameRef} onClick={onClick}>
             {name}
             {suffix}
           </SName>
         </Link>
-        {isVerified && (
+        {isVerified && iconVisible && (
           // Need to make icon to be the same size as span. No better way found.
           <SInlineSvg
             shift={shift}
@@ -105,7 +114,7 @@ const DisplayName: React.FC<IDisplayName> = ({
 
   return (
     <Wrapper className={className}>
-      <SName ref={spanRef} onClick={onClick}>
+      <SName ref={nameRef} onClick={onClick}>
         {name}
         {suffix}
       </SName>
@@ -135,7 +144,7 @@ const Wrapper = styled.div`
   overflow: hidden;
 `;
 
-const SName = styled.span`
+const SName = styled.div`
   flex-shrink: 1;
   white-space: pre;
   overflow: hidden;

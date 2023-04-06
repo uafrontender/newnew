@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import Router from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useBeforeUnload } from 'react-use';
@@ -32,6 +33,8 @@ export const useLeavePageConfirm = (
       const routeTrimmed = getPathFromUrl(route);
       if (!allowedRoutesWithLocales.includes(routeTrimmed) && isConfirm) {
         if (!window.confirm(message)) {
+          Router.events.emit('routeChangeError');
+          Router.replace(Router, Router.asPath, { shallow: true });
           // eslint-disable-next-line no-throw-literal
           throw 'Route Canceled';
         } else {

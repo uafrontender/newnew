@@ -193,12 +193,15 @@
       "loading": {
         "title": "Uploading video",
         "description": "Your file is uploading. It won’t take long...",
-        "process": "{{progress}}% • {{time}} left"
+        "process": "{{progress}}% • {{minutes}} {{seconds}} left",
+        "minute": "minute",
+        "minutes": "minutes",
+        "second": "second",
+        "seconds": "seconds"
       },
       "processing": {
         "title": "Your file is processing. It won’t take long...",
-        "description": "Your video is processing",
-        "process": "{{progress}}% • {{time}} left"
+        "description": "Your video is processing"
       }
     }
   },

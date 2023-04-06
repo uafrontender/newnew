@@ -81,6 +81,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         | newnewapi.Auction
         | newnewapi.Crowdfunding
         | newnewapi.MultipleChoice;
+
       const handleShareClick = () => {
         if (window) {
           const url = `${window.location.origin}/p/${
@@ -101,24 +102,17 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
       const money = getAmountValue(data);
 
+      const imageUrl =
+        data.announcement?.coverImageUrl ??
+        data.announcement?.thumbnailImageUrl;
+
       return (
         <SListItemWrapper key={data.postUuid}>
           <SListItem>
             {isDesktop || isTablet ? (
               <>
                 <SListBodyItem width='calc(100% - 350px)' align='flex-start'>
-                  {!data.announcement?.thumbnailImageUrl ? (
-                    <SAvatar />
-                  ) : (
-                    <SImg
-                      src={
-                        data.announcement?.thumbnailImageUrl
-                          ? data.announcement?.thumbnailImageUrl
-                          : ''
-                      }
-                      alt=''
-                    />
-                  )}
+                  {imageUrl ? <SImg src={imageUrl} alt='' /> : <SAvatar />}
                   <SListItemTitleWrapper>
                     <SListItemTitle variant={3} weight={600}>
                       <PostTitleContent>{data.title}</PostTitleContent>

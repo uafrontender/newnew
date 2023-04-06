@@ -99,29 +99,35 @@ const MyProfileSettingsIndex = () => {
       Mixpanel.track('Logout', {
         _stage: 'Profile Settings',
       });
+
       setIsLogoutLoading(true);
+
       const payload = new newnewapi.EmptyRequest({});
       const res = await logout(payload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Log out failed');
+      }
+
+      dispatch(logoutUser(''));
 
       // Unset credential cookies
       removeCookie('accessToken', {
         path: '/',
       });
+
       removeCookie('refreshToken', {
         path: '/',
       });
-      setIsLogoutLoading(false);
 
-      dispatch(logoutUser(''));
+      setIsLogoutLoading(false);
     } catch (err) {
       console.error(err);
       setIsLogoutLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
       }
+
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {

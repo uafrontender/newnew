@@ -25,7 +25,7 @@ import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppState } from '../../../contexts/appStateContext';
 
-export const Tablet: React.FC = React.memo(() => {
+export const Tablet: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useGetChats();
@@ -261,7 +261,7 @@ export const Tablet: React.FC = React.memo(() => {
       </SRightBlock>
     </SContainer>
   );
-});
+};
 
 export default Tablet;
 
