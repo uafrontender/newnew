@@ -190,12 +190,15 @@
       "loading": {
         "title": "Subiendo video",
         "description": "Tu archivo se está cargando. No tardará mucho...",
-        "process": "{{progress}}% • Quedan {{time}}"
+        "process": "{{progress}}% • Quedan {{minutes}} {{seconds}}",
+        "minute": "minuto",
+        "minutes": "minutos",
+        "second": "segundo",
+        "seconds": "segundos"
       },
       "processing": {
         "title": "Tu archivo se está procesando. No tardará mucho...",
-        "description": "Tu video se está procesando",
-        "process": "{{progress}}% • Quedan {{time}}"
+        "description": "Tu video se está procesando"
       }
     }
   },
