@@ -44,7 +44,7 @@ export const SBottomActionText = styled.div`
 export const SBottomActionTitle = styled.strong`
   display: flex;
   flex-direction: row;
-  white-space: pre;
+  white-space: pre-wrap;
   font-size: 16px;
   margin-bottom: 4px;
   font-weight: 600;
@@ -57,7 +57,7 @@ export const SBottomActionTitle = styled.strong`
 export const SBottomActionMessage = styled.div`
   display: flex;
   flex-direction: row;
-  white-space: pre;
+  white-space: pre-wrap;
   font-size: 14px;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
 `;
