@@ -42,7 +42,7 @@ export const SBottomActionText = styled.div`
 `;
 
 export const SBottomActionTitle = styled.strong`
-  display: flex;
+  display: inline;
   flex-direction: row;
   white-space: pre-wrap;
   font-size: 16px;
@@ -55,7 +55,7 @@ export const SBottomActionTitle = styled.strong`
 `;
 
 export const SBottomActionMessage = styled.div`
-  display: flex;
+  display: inline;
   flex-direction: row;
   white-space: pre-wrap;
   font-size: 14px;
