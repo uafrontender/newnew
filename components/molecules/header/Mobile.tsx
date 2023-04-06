@@ -15,7 +15,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
-export const Mobile: React.FC = React.memo(() => {
+export const Mobile: React.FC = () => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation();
   const { appConstants } = useGetAppConstants();
@@ -126,7 +126,7 @@ export const Mobile: React.FC = React.memo(() => {
       </SRightBlock>
     </SContainer>
   );
-});
+};
 
 export default Mobile;
 
