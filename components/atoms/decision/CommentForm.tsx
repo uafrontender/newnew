@@ -24,6 +24,7 @@ import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { useAppState } from '../../../contexts/appStateContext';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -58,14 +59,26 @@ interface ICommentForm {
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
+  value?: string;
   onBlur?: () => void;
   onFocus?: () => void;
   onSubmit: (text: string) => void;
+  onChange?: (text: string) => void;
 }
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
   (
-    { postUuidOrShortId, position, zIndex, isRoot, onBlur, onFocus, onSubmit },
+    {
+      value: initialValue,
+      postUuidOrShortId,
+      position,
+      zIndex,
+      isRoot,
+      onBlur,
+      onFocus,
+      onSubmit,
+      onChange,
+    },
     ref
   ) => {
     const theme = useTheme();
@@ -92,9 +105,17 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
     const [focusedInput, setFocusedInput] = useState<boolean>(false);
 
-    const [commentText, setCommentText] = useState('');
+    const [commentText, setCommentText] = useState(initialValue || '');
     const [commentTextError, setCommentTextError] = useState('');
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
+    const debouncedCommentText = useDebouncedValue(commentText, 500);
+
+    useEffect(() => {
+      if (onChange) {
+        onChange(debouncedCommentText);
+      }
+    }, [debouncedCommentText, onChange]);
 
     const validateTextAbortControllerRef = useRef<
       AbortController | undefined

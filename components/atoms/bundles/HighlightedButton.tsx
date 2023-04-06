@@ -6,6 +6,7 @@ interface IHighlightedButton {
   id?: string;
   className?: string;
   size?: 'small' | 'normal';
+  disabled?: boolean;
   children: string;
   onClick?: () => void;
   onClickCapture?: () => void;
@@ -16,6 +17,7 @@ const HighlightedButton: React.FC<IHighlightedButton> = ({
   id,
   className,
   size = 'normal',
+  disabled,
   children,
   onClick,
   onClickCapture,
@@ -24,6 +26,7 @@ const HighlightedButton: React.FC<IHighlightedButton> = ({
     id={id}
     view='brandYellow'
     className={className}
+    disabled={disabled}
     $size={size}
     onClick={onClick}
     onClickCapture={onClickCapture}

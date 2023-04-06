@@ -517,7 +517,7 @@ const SSectionContent = styled.div`
   padding: 0 24px;
   display: flex;
   position: relative;
-  overflow-y: auto;
+  overflow-y: scroll;
   flex-direction: column;
   // Scrollbar
   &::-webkit-scrollbar {

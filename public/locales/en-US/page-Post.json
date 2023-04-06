@@ -196,18 +196,19 @@
         "loading": {
           "title": "Uploading video",
           "description": "We're uploading your video response... hang tight!",
-          "process": "{{progress}}% • {{time}} left"
+          "process": "{{progress}}% • {{minutes}} {{seconds}} left",
+          "minute": "minute",
+          "minutes": "minutes",
+          "second": "second",
+          "seconds": "seconds"
         },
         "processing": {
           "title": "Processing the video",
-          "description": "Your video is being processed... hang tight!",
-          "process": "{{progress}}% • {{time}} left",
-          "uploadNonProcessed": "Publish"
+          "description": "Your video is being processed... hang tight!"
         },
         "processingPublished": {
           "title": "Processing the video",
-          "description": "Your video will be available once it's processed",
-          "process": "{{progress}}% • {{time}} left"
+          "description": "Your video will be available once it's processed"
         }
       }
     }
