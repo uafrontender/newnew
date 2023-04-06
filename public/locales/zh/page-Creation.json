@@ -190,12 +190,15 @@
       "loading": {
         "title": "上傳視頻",
         "description": "文件正在上傳。不會花很長時間......",
-        "process": "{{progress}}% • 還需{{time}}"
+        "process": "{{progress}}% • 還需{{minutes}}{{seconds}}",
+        "minute": "分",
+        "minutes": "分",
+        "second": "秒",
+        "seconds": "秒"
       },
       "processing": {
         "title": "文檔正在處理中，不會需要很長時間......",
-        "description": "視頻處理中",
-        "process": "{{progress}}% • 還需{{time}}"
+        "description": "視頻處理中"
       }
     }
   },

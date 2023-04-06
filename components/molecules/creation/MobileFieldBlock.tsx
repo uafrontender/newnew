@@ -565,7 +565,6 @@ const SButton = styled(Button)<ISButton>`
 const SCancelButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 4px;
-
   z-index: 3;
 `;
 

@@ -3,6 +3,7 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import Headline from '../Headline';
 import Text from '../Text';
@@ -49,20 +50,33 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
           </SSpan>
           {winningOptionAc?.creator ? (
             <>
-              <SUserAvatar
-                draggable={false}
-                src={winningOptionAc?.creator?.avatarUrl!!}
-              />
+              {winningOptionAc.creator.options?.isVerified ? (
+                <Link href={`/${winningOptionAc.creator?.username}`}>
+                  <SUserAvatar
+                    draggable={false}
+                    src={winningOptionAc?.creator?.avatarUrl!!}
+                  />
+                </Link>
+              ) : (
+                <SUserAvatar
+                  draggable={false}
+                  src={winningOptionAc?.creator?.avatarUrl!!}
+                />
+              )}
               <SSpan>
                 <Trans
                   i18nKey='postResponseTabModeration.winner.ac.optionCreator'
                   t={t}
                   // @ts-ignore
                   components={[
-                    <DisplayName
+                    <SDisplayName
                       user={winningOptionAc.creator}
                       suffix={t('postResponseTabModeration.winner.ac.suffix')}
-                      href={`/${winningOptionAc.creator?.username}`}
+                      href={
+                        winningOptionAc.creator.options?.isVerified
+                          ? `/${winningOptionAc.creator?.username}`
+                          : undefined
+                      }
                     />,
                   ]}
                 />
@@ -97,20 +111,33 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
           {winningOptionMc.creator &&
           winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
             <>
-              <SUserAvatar
-                draggable={false}
-                src={winningOptionMc?.creator?.avatarUrl!!}
-              />
+              {winningOptionMc.creator.options?.isVerified ? (
+                <Link href={`/${winningOptionMc.creator?.username}`}>
+                  <SUserAvatar
+                    draggable={false}
+                    src={winningOptionMc?.creator?.avatarUrl!!}
+                  />
+                </Link>
+              ) : (
+                <SUserAvatar
+                  draggable={false}
+                  src={winningOptionMc?.creator?.avatarUrl!!}
+                />
+              )}
               <SSpan>
                 <Trans
                   i18nKey='postResponseTabModeration.winner.mc.optionCreator'
                   t={t}
                   // @ts-ignore
                   components={[
-                    <DisplayName
+                    <SDisplayName
                       user={winningOptionMc.creator}
                       suffix={t('postResponseTabModeration.winner.ac.suffix')}
-                      href={`/${winningOptionMc.creator?.username}`}
+                      href={
+                        winningOptionMc.creator.options?.isVerified
+                          ? `/${winningOptionMc.creator?.username}`
+                          : undefined
+                      }
                     />,
                   ]}
                 />
@@ -165,6 +192,15 @@ const SUserAvatar = styled.img`
 
   border-radius: 50%;
   object-fit: contain;
+`;
+
+const SDisplayName = styled(DisplayName)<{ href?: string }>`
+  cursor: ${({ href }) => (href ? 'pointer' : undefined)};
+
+  &:hover {
+    color: ${({ theme, href }) =>
+      href ? theme.colorsThemed.text.primary : undefined};
+  }
 `;
 
 const SHeadline = styled(Headline)`
