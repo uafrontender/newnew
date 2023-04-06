@@ -9,9 +9,13 @@ import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IHashtagsResults {
   hashtags: newnewapi.IHashtag[];
+  onSelect?: () => void;
 }
 
-const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
+const PopularTagsResults: React.FC<IHashtagsResults> = ({
+  hashtags,
+  onSelect,
+}) => {
   const { t } = useTranslation('common');
 
   return (
@@ -28,6 +32,7 @@ const PopularTagsResults: React.FC<IHashtagsResults> = ({ hashtags }) => {
                 Mixpanel.track('Search Result Tag Clicked', {
                   _tagText: hashtag.text,
                 });
+                onSelect?.();
               }}
             >
               <SHashtagIcon>

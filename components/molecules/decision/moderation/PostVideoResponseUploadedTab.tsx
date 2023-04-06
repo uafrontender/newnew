@@ -236,6 +236,24 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     let content;
 
     if (responseFileUploadLoading) {
+      const minutesLeft = Math.floor(responseFileUploadETA / 60);
+      const secondsLeft = Math.ceil(responseFileUploadETA % 60);
+      const minutesLeftString =
+        minutesLeft > 0
+          ? minutesLeft > 1
+            ? `${minutesLeft} ${t(
+                'postVideo.uploadResponseForm.video.loading.minutes'
+              )} `
+            : `${minutesLeft} ${t(
+                'postVideo.uploadResponseForm.video.loading.minute'
+              )} `
+          : '';
+      const secondsLeftString = `${secondsLeft} ${
+        secondsLeft === 1
+          ? t('postVideo.uploadResponseForm.video.loading.second')
+          : t('postVideo.uploadResponseForm.video.loading.seconds')
+      }`;
+
       content = (
         <SLoadingContainer>
           <SLoadingBox>
@@ -248,7 +266,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
             <SLoadingBottomBlock>
               <SLoadingDescription variant={2} weight={600}>
                 {t('postVideo.uploadResponseForm.video.loading.process', {
-                  time: `${responseFileUploadETA} seconds`,
+                  seconds: secondsLeftString,
+                  minutes: minutesLeftString,
                   progress: responseFileUploadProgress,
                 })}
               </SLoadingDescription>

@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import AnimatedPresence from '../AnimatedPresence';
-import InlineSvg from '../InlineSVG';
-import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 interface ISuggestionTextArea {
   id?: string;
@@ -10,7 +7,7 @@ interface ISuggestionTextArea {
   value: string;
   placeholder: string;
   disabled?: boolean;
-  error?: string;
+  isValid?: boolean;
   autofocus?: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
@@ -22,7 +19,7 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   placeholder,
   disabled,
   autofocus,
-  error,
+  isValid,
   onChange,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>();
@@ -58,6 +55,7 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
         value={value}
         disabled={disabled}
         placeholder={placeholder}
+        isValid={isValid}
         // (textareaRef.current.scrollHeight % 24) need to prevent input jump. 24 is text line-height
         onChangeCapture={() => {
           if (textareaRef?.current) {
@@ -75,14 +73,6 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
         }}
         onChange={onChange}
       />
-      {error ? (
-        <AnimatedPresence animation='t-09'>
-          <SErrorDiv>
-            <InlineSvg svg={alertIcon} width='16px' height='16px' />
-            {error}
-          </SErrorDiv>
-        </AnimatedPresence>
-      ) : null}
     </SWrapper>
   );
 };
@@ -101,7 +91,7 @@ const SWrapper = styled.div`
   width: 277px;
 `;
 
-const STextarea = styled.textarea`
+const STextarea = styled.textarea<{ isValid?: boolean }>`
   font-weight: 500;
   font-size: 16px;
   line-height: 24px;
@@ -116,7 +106,10 @@ const STextarea = styled.textarea`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border: 1.5px solid transparent;
+  border-width: 1.5px;
+  border-style: solid;
+  border-color: ${({ theme, isValid }) =>
+    isValid ? 'transparent' : theme.colorsThemed.accent.error};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   /* Hide scrollbar */
@@ -133,24 +126,5 @@ const STextarea = styled.textarea`
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
-  }
-`;
-
-const SErrorDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  margin-top: 6px;
-
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.accent.error};
-
-  & > div {
-    margin-right: 4px;
   }
 `;

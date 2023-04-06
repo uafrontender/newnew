@@ -1,8 +1,10 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import Modal, { ModalType } from '../../organisms/Modal';
 import ModalPaper, { SContent } from '../../organisms/ModalPaper';
@@ -28,6 +30,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
   ({ show, creator, bundleOffer, modalType, zIndex, onClose }) => {
     const { t } = useTranslation('common');
     const theme = useTheme();
+    const router = useRouter();
 
     const daysOfAccess = bundleOffer.accessDurationInSeconds! / 60 / 60 / 24;
     const monthsOfAccess = Math.floor(daysOfAccess / 30);
@@ -35,6 +38,12 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
     const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
     const bundleOfferLevel = getBundleOfferLevel(bundleOffer.votesAmount!);
+
+    const onUserLinkClicked = useCallback(() => {
+      if (router.asPath === `/${creator?.username}`) {
+        onClose();
+      }
+    }, [router, creator?.username, onClose]);
 
     return (
       <>
@@ -72,7 +81,12 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                 />
               </SVotesAvailable>
               <SUserInfo>
-                <SUserAvatar avatarUrl={creator?.avatarUrl ?? ''} />
+                <Link href={`/${creator?.username}`}>
+                  <SUserAvatar
+                    avatarUrl={creator?.avatarUrl ?? ''}
+                    onClick={onUserLinkClicked}
+                  />
+                </Link>
                 <SUsername>
                   <Trans
                     t={t}
@@ -82,6 +96,7 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                       <SDisplayName
                         user={creator}
                         href={`/${creator?.username}`}
+                        onClick={onUserLinkClicked}
                       />,
                     ]}
                   />
@@ -177,6 +192,7 @@ const SUserAvatar = styled(UserAvatar)`
   min-height: 36px;
   border-radius: 50%;
   margin-right: 8px;
+  cursor: pointer;
 `;
 
 const SUsername = styled.div`
