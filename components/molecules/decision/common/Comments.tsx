@@ -9,6 +9,7 @@ import React, {
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { newnewapi } from 'newnew-api';
 
 import GradientMask from '../../../atoms/GradientMask';
 import Comment from '../../../atoms/decision/Comment';
@@ -23,6 +24,7 @@ import useComponentScrollRestoration from '../../../../utils/hooks/useComponentS
 import { useAppState } from '../../../../contexts/appStateContext';
 import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
+import { APIResponse } from '../../../../api/apiConfigs';
 
 interface IComments {
   postUuid: string;
@@ -30,7 +32,10 @@ interface IComments {
   canDeleteComments?: boolean;
   isLoading: boolean;
   hasNextPage?: boolean;
-  addComment: (text: string, id: number) => void;
+  handleAddComment: (
+    text: string,
+    parentId: number
+  ) => Promise<APIResponse<newnewapi.IChatMessage>>;
   openCommentProgrammatically: (parentIdx: number) => void;
   fetchNextPage: () => void;
   onCommentDelete: (comment: TCommentWithReplies) => void;
@@ -44,7 +49,7 @@ const Comments: React.FunctionComponent<IComments> = ({
   canDeleteComments,
   isLoading,
   hasNextPage,
-  addComment,
+  handleAddComment,
   fetchNextPage,
   onCommentDelete,
   onFormFocus,
@@ -268,7 +273,7 @@ const Comments: React.FunctionComponent<IComments> = ({
                         lastChild={virtualItem.index === comments.length - 1}
                         comment={comments[virtualItem.index]}
                         isDeletingComment={isDeletingComment}
-                        handleAddComment={addComment}
+                        handleAddComment={handleAddComment}
                         handleDeleteComment={handleDeleteComment}
                         index={virtualItem.index}
                         ref={commentsVirtualizer.measureElement}
