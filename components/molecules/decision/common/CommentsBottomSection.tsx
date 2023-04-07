@@ -21,6 +21,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import usePostComments from '../../../../utils/hooks/usePostComments';
 import Comments, { SScrollContainer } from './Comments';
+import { APIResponse } from '../../../../api/apiConfigs';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -71,36 +72,42 @@ const CommentsBottomSection: React.FunctionComponent<
   );
 
   const handleAddComment = useCallback(
-    async (content: string, parentMsgId?: number) => {
-      try {
-        Mixpanel.track('Add Comment', {
-          _stage: 'Post',
-          _postUuid: postUuid,
-        });
-        const payload = new newnewapi.SendMessageRequest({
-          roomId: commentsRoomId,
-          content: {
-            text: content,
-          },
-          ...(parentMsgId
-            ? {
-                parentMessageId: parentMsgId,
-              }
-            : {}),
-        });
+    async (
+      content: string,
+      parentMsgId?: number
+    ): Promise<APIResponse<newnewapi.IChatMessage>> => {
+      Mixpanel.track('Add Comment', {
+        _stage: 'Post',
+        _postUuid: postUuid,
+      });
+      const payload = new newnewapi.SendMessageRequest({
+        roomId: commentsRoomId,
+        content: {
+          text: content,
+        },
+        ...(parentMsgId
+          ? {
+              parentMessageId: parentMsgId,
+            }
+          : {}),
+      });
 
-        const res = await sendMessage(payload);
+      const res = await sendMessage(payload);
 
-        if (res.data?.message) {
-          addCommentMutation?.mutate(res.data.message);
-        }
-      } catch (err) {
-        console.error(err);
-        showErrorToastPredefined(undefined);
+      if (res.data?.message) {
+        addCommentMutation?.mutate(res.data.message);
       }
+
+      if (res.data?.message && !res.error) {
+        return {
+          data: res.data.message,
+        };
+      }
+      return {
+        error: res?.error || new Error('Could not add comment'),
+      };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [commentsRoomId, postUuid]
+    [addCommentMutation, commentsRoomId, postUuid]
   );
 
   const handleDeleteComment = useCallback(
@@ -202,7 +209,7 @@ const CommentsBottomSection: React.FunctionComponent<
             }}
             position='sticky'
             zIndex={1}
-            onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+            onSubmit={handleAddComment}
             onBlur={onFormBlur ?? undefined}
             onFocus={onFormFocus ?? undefined}
           />
@@ -211,7 +218,7 @@ const CommentsBottomSection: React.FunctionComponent<
             postUuid={postUuid}
             onCommentDelete={handleDeleteComment}
             openCommentProgrammatically={handleOpenCommentProgrammatically}
-            addComment={handleAddComment}
+            handleAddComment={handleAddComment}
             isLoading={commentsLoading}
             fetchNextPage={fetchNextPage}
             hasNextPage={hasNextPage}
