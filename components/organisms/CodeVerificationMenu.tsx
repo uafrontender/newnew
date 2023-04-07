@@ -4,6 +4,7 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useCookies } from 'react-cookie';
+import { motion } from 'framer-motion';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -54,13 +55,10 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { resumePushNotification } = usePushNotifications();
 
   const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet'].includes(resizeMode);
 
   const { signupEmailInput, signupTimerValue } = useAppSelector(
     (state) => state.user
@@ -268,11 +266,15 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     [signInWithRecaptchaProtection, signupEmailInput]
   );
 
+  if (!signupEmailInputPersistent) {
+    return null;
+  }
+
   return (
     <>
-      {!isMobileOrTablet && (
+      {!isMobile && !isTablet && (
         <SBackButtonDesktop
-          longArrow={!isMobileOrTablet}
+          longArrow
           onClick={() => {
             Mixpanel.track('Go Back Clicked', {
               _stage: 'Sign Up',
@@ -280,61 +282,77 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
             onBack();
           }}
         >
-          {!isMobileOrTablet ? t('backButton') : ''}
+          {t('backButton')}
         </SBackButtonDesktop>
       )}
-      <SCodeVerificationMenu
-        onClick={() => {
-          if (submitError) {
-            handleTryAgain();
-          }
+      <motion.div
+        initial={{
+          x: isMobile ? 0 : 500,
+          y: 0,
+          opacity: 0,
+        }}
+        animate={{
+          x: 0,
+          y: 0,
+          opacity: 1,
+          transition: {
+            duration: isMobile ? 1.7 : 1,
+          },
         }}
       >
-        <SBackButton
-          defer={isMobileOrTablet ? 250 : undefined}
+        <SCodeVerificationMenu
           onClick={() => {
-            Mixpanel.track('Go Back Clicked', {
-              _stage: 'Sign Up',
-            });
-            onBack();
+            if (submitError) {
+              handleTryAgain();
+            }
           }}
-        />
-        <AnimatedLogoEmailVerification
-          isLoading={isSignInWithEmailLoading || isResendCodeLoading}
-        />
-        <SHeadline variant={3}>{t('heading.mainHeading')}</SHeadline>
-        <SSubheading variant={2} weight={600}>
-          {t('heading.subHeading')}
-          <br />
-          {signupEmailInputPersistent.toLowerCase()}
-        </SSubheading>
-        <VerificationCodeInput
-          id='verification-input'
-          initialValue={codeInitial}
-          length={6}
-          disabled={
-            isSignInWithEmailLoading || isResendCodeLoading || isSuccess
-          }
-          error={submitError ? true : undefined}
-          onComplete={onCodeComplete}
-        />
-        <VerificationCodeResend
-          canResendAt={canResendAt}
-          show={!submitError && !isSignInWithEmailLoading && !isSuccess}
-          onResendClick={handleResendCode}
-        />
-        {!isSignInWithEmailLoading &&
-        !isResendCodeLoading &&
-        submitError &&
-        !isSuccess ? (
-          <AnimatedPresence animateWhenInView={false} animation='t-09'>
-            <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
-          </AnimatedPresence>
-        ) : null}
-        {isRecaptchaV2Required && (
-          <ReCaptcha2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
-        )}
-      </SCodeVerificationMenu>
+        >
+          <SBackButton
+            defer={isMobile || isTablet ? 250 : undefined}
+            onClick={() => {
+              Mixpanel.track('Go Back Clicked', {
+                _stage: 'Sign Up',
+              });
+              onBack();
+            }}
+          />
+          <AnimatedLogoEmailVerification
+            isLoading={isSignInWithEmailLoading || isResendCodeLoading}
+          />
+          <SHeadline variant={3}>{t('heading.mainHeading')}</SHeadline>
+          <SSubheading variant={2} weight={600}>
+            {t('heading.subHeading')}
+            <br />
+            {signupEmailInputPersistent.toLowerCase()}
+          </SSubheading>
+          <VerificationCodeInput
+            id='verification-input'
+            initialValue={codeInitial}
+            length={6}
+            disabled={
+              isSignInWithEmailLoading || isResendCodeLoading || isSuccess
+            }
+            error={submitError ? true : undefined}
+            onComplete={onCodeComplete}
+          />
+          <VerificationCodeResend
+            canResendAt={canResendAt}
+            show={!submitError && !isSignInWithEmailLoading && !isSuccess}
+            onResendClick={handleResendCode}
+          />
+          {!isSignInWithEmailLoading &&
+          !isResendCodeLoading &&
+          submitError &&
+          !isSuccess ? (
+            <AnimatedPresence animateWhenInView={false} animation='t-09'>
+              <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
+            </AnimatedPresence>
+          ) : null}
+          {isRecaptchaV2Required && (
+            <ReCaptcha2 ref={recaptchaRef} onChange={onChangeRecaptchaV2} />
+          )}
+        </SCodeVerificationMenu>
+      </motion.div>
     </>
   );
 };
