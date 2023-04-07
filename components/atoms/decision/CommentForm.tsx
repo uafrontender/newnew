@@ -179,7 +179,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         setIsSubmitting(true);
         try {
           const isValid = await validateTextViaAPI(commentText);
-          console.log(isValid);
           if (isValid) {
             // Redirect only after the persist data is pulled
             if (!user.loggedIn && user._persist?.rehydrated) {
