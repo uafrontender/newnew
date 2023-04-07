@@ -88,6 +88,15 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     Date.now() + signupTimerValue * 1000
   );
 
+  const [signupEmailInputPersistent, setSignupEmailInputPersistent] =
+    useState(signupEmailInput);
+
+  useEffect(() => {
+    if (signupEmailInput) {
+      setSignupEmailInputPersistent(signupEmailInput);
+    }
+  }, [signupEmailInput]);
+
   useLeavePageConfirm(!isSuccess && !allowLeave, t('leaveAlert'), []);
 
   const handleSignIn = useCallback(
@@ -295,13 +304,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         />
         <SHeadline variant={3}>{t('heading.mainHeading')}</SHeadline>
         <SSubheading variant={2} weight={600}>
-          {signupEmailInput.length > 0 ? (
-            <>
-              {t('heading.subHeading')}
-              <br />
-              {signupEmailInput.toLowerCase()}
-            </>
-          ) : null}
+          {t('heading.subHeading')}
+          <br />
+          {signupEmailInputPersistent.toLowerCase()}
         </SSubheading>
         <VerificationCodeInput
           id='verification-input'
