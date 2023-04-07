@@ -95,6 +95,7 @@ interface ICard {
   width?: string;
   height?: string;
   maxWidthTablet?: string;
+  className?: string;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
 }
@@ -107,6 +108,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     width,
     height,
     maxWidthTablet,
+    className,
     handleRemovePostFromState,
     handleAddPostToState,
   }) => {
@@ -495,7 +497,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           ref={(el) => {
             wrapperRef.current = el!!;
           }}
-          className='postcard-identifier'
+          className={`postcard-identifier ${className || ''}`}
           onMouseEnter={() => handleSetHovered()}
           onTouchStart={() => handleSetHovered()}
           onMouseLeave={() => handleSetUnhovered()}
@@ -626,7 +628,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         ref={(el) => {
           wrapperRef.current = el!!;
         }}
-        className='postcard-identifier'
+        className={`postcard-identifier ${className || ''}`}
         onMouseEnter={() => handleSetHovered()}
         onTouchStart={() => handleSetHovered()}
         onMouseLeave={() => handleSetUnhovered()}
@@ -1096,7 +1098,7 @@ const SText = styled(Text)`
   word-break: break-word;
 `;
 
-const SWrapperOutside = styled.div<ISWrapper>`
+export const SWrapperOutside = styled.div<ISWrapper>`
   width: ${(props) => props.width};
   min-width: 224px;
   cursor: pointer;

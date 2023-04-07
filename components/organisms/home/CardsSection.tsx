@@ -563,11 +563,11 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
 
   & > span > div {
     width: calc(100vw - 32px);
-    height: 665px;
+    height: 584px;
 
     ${({ theme }) => theme.media.tablet} {
       width: 224px;
-      height: 412px;
+      height: 414px;
     }
 
     ${({ theme }) => theme.media.laptop} {
@@ -577,7 +577,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
 
     ${({ theme }) => theme.media.laptopL} {
       width: 288px;
-      height: 596px;
+      height: 592px;
     }
   }
 `;

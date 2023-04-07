@@ -28,7 +28,7 @@ const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
 );
 const CardsSection = dynamic(
-  () => import('../components/organisms/home/CardsSection')
+  () => import('../components/organisms/home/CuratedCardsSection')
 );
 
 interface IHome {
