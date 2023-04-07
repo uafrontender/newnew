@@ -12,6 +12,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
@@ -25,6 +26,7 @@ import { reportMessage } from '../../../api/endpoints/report';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import DisplayName from '../DisplayName';
+import { APIResponse } from '../../../api/apiConfigs';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -49,7 +51,10 @@ interface IComment {
     isOpen: boolean;
     text: string;
   };
-  handleAddComment: (newMsg: string, id: number) => void;
+  handleAddComment: (
+    text: string,
+    parentId: number
+  ) => Promise<APIResponse<newnewapi.IChatMessage>>;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
