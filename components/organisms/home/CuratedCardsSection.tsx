@@ -229,6 +229,7 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       margin: 16px 0;
       gap: 0;
       left: 0;
+      overflow: hidden;
 
       ${({ theme }) => theme.media.tablet} {
         margin: 0;
