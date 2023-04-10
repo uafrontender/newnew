@@ -735,7 +735,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           />
         </SMaximizeButton>
       </SVideoWrapper>
-      {isLoading && (
+      {isLoading && !shouldShowPlayPseudoButton && (
         <SLoader>
           <Lottie
             width={65}
