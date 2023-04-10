@@ -285,7 +285,6 @@ const SContentContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     padding: 32px;
-    padding-top: 16px;
   }
 `;
 
@@ -322,6 +321,7 @@ const SVoteButton = styled(Button)`
 
 const SCloseButton = styled(Button)`
   position: absolute;
+  top: 16px;
   right: 16px;
 
   background: transparent;
