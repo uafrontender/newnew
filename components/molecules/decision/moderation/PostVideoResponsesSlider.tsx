@@ -180,6 +180,9 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         }}
         arrows={false}
         dots={false}
+        touchMove={false}
+        swipeToSlide={false}
+        swipe={false}
       >
         {handleMapVideoStoryItems()}
       </Slider>
@@ -308,13 +311,11 @@ const SWrapper = styled.div<{
 const SScrollLeft = styled(Button)`
   position: absolute;
 
-  width: 12px;
-  height: 240px;
+  width: 35%;
+  height: 70%;
 
-  top: calc(50% - 120px);
+  top: 64px;
   left: 0px;
-
-  z-index: 100;
 
   @media (max-width: 1024px) {
     &:disabled:after {
@@ -336,13 +337,11 @@ const SScrollLeft = styled(Button)`
 const SScrollRight = styled(Button)`
   position: absolute;
 
-  width: 12px;
-  height: 240px;
+  width: 35%;
+  height: 70%;
 
-  top: calc(50% - 120px);
+  top: 64px;
   right: 0px;
-
-  z-index: 100;
 
   @media (max-width: 1024px) {
     &:disabled:after {
