@@ -20,6 +20,7 @@ import PlayIcon from '../../../../public/images/svg/icons/outlined/play.svg';
 import PauseIcon from '../../../../public/images/svg/icons/outlined/pause.svg';
 import VolumeOff from '../../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../../public/images/svg/icons/filled/VolumeON.svg';
+import isFirefox from '../../../../utils/isFirefox';
 
 interface IPostVideoFullscreenControls {
   // Play/Pause
@@ -177,6 +178,12 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
         step={0.1}
         aria-labelledby='Video seek'
         onChange={handleTimeChange}
+        onMouseUp={(e) => {
+          if (isFirefox()) {
+            e.preventDefault();
+            timeSliderRef.current?.blur();
+          }
+        }}
       />
       <SSoundControls
         ref={(el) => {
@@ -207,6 +214,12 @@ const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
           step={0.1}
           aria-labelledby='Volume input'
           onChange={handleVolumeChange}
+          onMouseUp={(e) => {
+            if (isFirefox()) {
+              e.preventDefault();
+              volumeSliderRef.current?.blur();
+            }
+          }}
         />
         <SSoundButton
           iconOnly

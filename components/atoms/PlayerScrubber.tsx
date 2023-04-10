@@ -8,6 +8,7 @@ import React, {
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import 'moment-duration-format';
+import isFirefox from '../../utils/isFirefox';
 
 interface IPlayerScrubber {
   isHovered: boolean;
@@ -99,6 +100,12 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
         }}
         onMouseEnter={() => setIsChanging(true)}
         onMouseLeave={() => setIsChanging(false)}
+        onMouseUp={(e) => {
+          if (isFirefox()) {
+            e.preventDefault();
+            sliderRef.current?.blur();
+          }
+        }}
         onBlur={() => setIsChanging(false)}
         onChange={handleChange}
       />
