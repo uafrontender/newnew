@@ -354,6 +354,7 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
       border-color: transparent;
       background: linear-gradient(#ffffff, #ffffff) 0 / var(--sx) 100% no-repeat,
         rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
     }
 
     &::-moz-range-thumb {
