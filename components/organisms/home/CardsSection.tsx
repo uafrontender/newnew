@@ -5,6 +5,8 @@ import React, {
   useEffect,
   ReactElement,
   useMemo,
+  useLayoutEffect,
+  useCallback,
 } from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
@@ -195,6 +197,54 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
     };
 
+    // eslint-disable-next-line arrow-body-style
+    const [cardWidth, setCardWidth] = useState(() => {
+      return isMobile
+        ? '100%'
+        : isTablet
+        ? '224px'
+        : isLaptop
+        ? '256px'
+        : '288px';
+    });
+
+    const getCardWidth = useCallback(() => {
+      const containerWidth = ref.current?.getBoundingClientRect().width;
+
+      const tabletItemWidth = (containerWidth - 64 - 16 * 2) / 3;
+
+      const laptopItemWidth = (containerWidth - 32 * 2) / 3;
+
+      const desktopItemWidth = (containerWidth - 32 * 3) / 4;
+
+      if (isMobile) {
+        return '100%';
+      }
+
+      if (isTablet) {
+        return `${tabletItemWidth}px`;
+      }
+
+      if (isLaptop) {
+        return `${laptopItemWidth}px`;
+      }
+
+      return `${desktopItemWidth}px`;
+    }, [isMobile, isTablet, isLaptop]);
+
+    useLayoutEffect(() => {
+      setCardWidth(getCardWidth());
+    }, [getCardWidth]);
+
+    useEffect(() => {
+      const resizeHandler = () => setCardWidth(getCardWidth());
+      window.addEventListener('resize', resizeHandler);
+
+      return () => {
+        window.removeEventListener('resize', resizeHandler);
+      };
+    }, [getCardWidth]);
+
     const renderItem = (item: any, index: number) => {
       if (tutorialCard !== undefined && index === 0) {
         return (
@@ -265,17 +315,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <PostCard
               item={item}
               index={tutorialCard !== undefined ? index + 1 : index}
-              width={
-                isMobile
-                  ? '100%'
-                  : isTablet
-                  ? '224px'
-                  : isLaptop
-                  ? '256px'
-                  : '288px'
-              }
+              width={cardWidth}
               height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
-              maxWidthTablet='224px'
+              maxWidthTablet={`${cardWidth}px`}
             />
           </SItemWrapper>
         </Link>
@@ -547,37 +589,49 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       margin: 16px 0;
       gap: 0;
       left: 0;
+      width: 100%;
+      overflow-x: hidden;
 
       ${({ theme }) => theme.media.tablet} {
         margin: 0;
         gap: 16px;
         left: 8px;
+        width: calc(100% - 16px);
       }
 
       ${({ theme }) => theme.media.laptop} {
         gap: 32px;
         left: 16px;
+        width: calc(100% + 16px);
+      }
+
+      ${({ theme }) => theme.media.laptopL} {
+        width: 100%;
       }
     }
   }
 
   & > span > div {
     width: calc(100vw - 32px);
-    height: 665px;
+    height: 584px;
 
     ${({ theme }) => theme.media.tablet} {
-      width: 224px;
-      height: 412px;
+      width: calc((100% - 16px * 3) / 3); //224px;
+      height: 428px;
     }
 
     ${({ theme }) => theme.media.laptop} {
-      width: 256px;
-      height: 454px;
+      width: calc((100% - 32px * 3) / 3);
+      height: 492px;
+    }
+
+    ${(props) => props.theme.media.laptopM} {
+      width: calc((100% - 32px * 4) / 4);
     }
 
     ${({ theme }) => theme.media.laptopL} {
-      width: 288px;
-      height: 596px;
+      width: calc((100% - 32px * 4) / 4);
+      height: 592px;
     }
   }
 `;
