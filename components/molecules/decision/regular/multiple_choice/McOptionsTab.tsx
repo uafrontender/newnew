@@ -589,7 +589,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             additionalz={12}
           >
             <SSuggestNewContainer>
-              <SCloseButton onClick={handleSuggestNewOptionModalClosed}>
+              <SCloseButton
+                iconOnly
+                view='transparent'
+                onClick={handleSuggestNewOptionModalClosed}
+              >
                 <InlineSvg
                   svg={CloseIcon}
                   fill={theme.colorsThemed.text.primary}
@@ -820,8 +824,8 @@ const SSuggestNewContainer = styled.div`
     left: calc(50% - 220px);
     width: 440px;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-    padding: 72px 40px 40px 40px;
+    background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+    padding: 32px 40px 40px 40px;
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
@@ -863,11 +867,12 @@ const SActionSection = styled.div`
   }
 `;
 
-const SCloseButton = styled.div`
+const SCloseButton = styled(Button)`
   position: absolute;
-  top: 24px;
-  right: 24px;
-  cursor: pointer;
+  top: 16px;
+  right: 16px;
+
+  background: transparent;
 `;
 
 const SAddOptionButtonDesktop = styled.button`

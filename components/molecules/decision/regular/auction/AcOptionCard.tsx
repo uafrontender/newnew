@@ -5,7 +5,13 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 
@@ -97,6 +103,7 @@ interface IAcOptionCard {
   handleRemoveOption?: () => void;
   handleSetScrollBlocked?: () => void;
   handleUnsetScrollBlocked?: () => void;
+  handleScrollIntoListView?: (element: HTMLElement) => void;
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
@@ -114,6 +121,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   handleRemoveOption,
   handleSetScrollBlocked,
   handleUnsetScrollBlocked,
+  handleScrollIntoListView,
 }) => {
   const router = useRouter();
   const theme = useTheme();
@@ -129,6 +137,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { showErrorToastPredefined } = useErrorToasts();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
+
+  const boostFormRef = useRef<HTMLDivElement>();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -220,6 +230,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
     handleSetSupportedBid(option.id.toString());
+
+    // Have to execute in a microtask to allow rendering take place first
+    setTimeout(() => {
+      if (handleScrollIntoListView && boostFormRef.current) {
+        handleScrollIntoListView(boostFormRef.current);
+      }
+    }, 0);
   };
 
   const handleCloseSupportForm = useCallback(() => {
@@ -610,6 +627,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           )}
       </SContainer>
       <SSupportBidForm
+        ref={(el) => {
+          if (el) {
+            boostFormRef.current = el;
+          }
+        }}
         // layout
         layout='size'
         transition={{
