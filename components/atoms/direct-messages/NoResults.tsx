@@ -25,11 +25,14 @@ const NoResults: React.FC<INoResults> = ({ text }) => {
 export default NoResults;
 
 const SEmptyInbox = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 100%;
   justify-content: center;
   line-height: 20px;
 `;
@@ -48,4 +51,6 @@ const SEmptyInboxText = styled.div`
   margin-right: 0 auto;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   max-width: 260px;
+
+  word-break: break-word;
 `;
