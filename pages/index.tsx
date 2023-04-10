@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo } from 'react';
+import React, { ReactElement, useContext, useMemo, useEffect } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -23,6 +23,8 @@ import canBecomeCreator from '../utils/canBecomeCreator';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
 
 import assets from '../constants/assets';
+import { SocketContext } from '../contexts/socketContext';
+import { ChannelsContext } from '../contexts/channelsContext';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -51,6 +53,48 @@ const Home: NextPage<IHome> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+  useEffect(() => {
+    addChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString(), {
+      curatedListUpdates: {
+        type: newnewapi.Channel.CuratedListType.Type.POPULAR,
+      },
+    });
+
+    return () => {
+      removeChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handlerSocketCuratedListUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CuratedListUpdated.decode(arr);
+
+      console.log(decoded, 'decoded');
+    };
+
+    if (socketConnection) {
+      socketConnection?.on(
+        'CuratedListUpdated',
+        handlerSocketCuratedListUpdated
+      );
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'CuratedListUpdated',
+          handlerSocketCuratedListUpdated
+        );
+      }
+    };
+  }, [socketConnection]);
 
   const isUserLoggedIn = useMemo(() => {
     if (user._persist?.rehydrated) {
