@@ -10,15 +10,21 @@ export const SBottomAction = styled.div`
       ? props.theme.colors.white
       : props.theme.colorsThemed.background.tertiary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
-  padding: 24px;
+  padding: 16px;
   width: 100%;
   box-sizing: border-box;
   align-items: center;
   flex-wrap: wrap;
+
   & + & {
     margin-top: 20px;
   }
-  ${(props) => props.theme.media.laptop} {
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 24px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
     flex-wrap: nowrap;
   }
 `;
@@ -29,16 +35,20 @@ export const SBottomActionLeft = styled.div`
 `;
 
 export const SBottomActionIcon = styled.span`
+  margin-right: 12px;
+
   font-size: 48px;
   line-height: 1;
-  margin-right: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-right: 24px;
+  }
 `;
 
 export const SBottomActionText = styled.div`
   display: flex;
   flex-direction: column;
   font-weight: 600;
-  margin-right: 12px;
 `;
 
 export const SBottomActionTitle = styled.strong`
@@ -65,12 +75,23 @@ export const SBottomActionMessage = styled.div`
 export const SBottomActionButton = styled(Button)`
   padding: 12px 24px;
   line-height: 24px;
-  margin-left: auto;
   flex-shrink: 0;
   width: 100%;
   margin-top: 24px;
+
   ${(props) => props.theme.media.tablet} {
     width: auto;
+    margin-top: 0;
+    margin-left: auto;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-left: 72px;
+    margin-top: 5px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    margin-left: auto;
     margin-top: 0;
   }
 `;
