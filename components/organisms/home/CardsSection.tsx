@@ -5,6 +5,8 @@ import React, {
   useEffect,
   ReactElement,
   useMemo,
+  useLayoutEffect,
+  useCallback,
 } from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
@@ -195,6 +197,54 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
     };
 
+    // eslint-disable-next-line arrow-body-style
+    const [cardWidth, setCardWidth] = useState(() => {
+      return isMobile
+        ? '100%'
+        : isTablet
+        ? '224px'
+        : isLaptop
+        ? '256px'
+        : '288px';
+    });
+
+    const getCardWidth = useCallback(() => {
+      const containerWidth = ref.current?.getBoundingClientRect().width;
+
+      const tabletItemWidth = (containerWidth - 64 - 16 * 2) / 3;
+
+      const laptopItemWidth = (containerWidth - 32 * 2) / 3;
+
+      const desktopItemWidth = (containerWidth - 32 * 3) / 4;
+
+      if (isMobile) {
+        return '100%';
+      }
+
+      if (isTablet) {
+        return `${tabletItemWidth}px`;
+      }
+
+      if (isLaptop) {
+        return `${laptopItemWidth}px`;
+      }
+
+      return `${desktopItemWidth}px`;
+    }, [isMobile, isTablet, isLaptop]);
+
+    useLayoutEffect(() => {
+      setCardWidth(getCardWidth());
+    }, [getCardWidth]);
+
+    useEffect(() => {
+      const resizeHandler = () => setCardWidth(getCardWidth());
+      window.addEventListener('resize', resizeHandler);
+
+      return () => {
+        window.removeEventListener('resize', resizeHandler);
+      };
+    }, [getCardWidth]);
+
     const renderItem = (item: any, index: number) => {
       if (tutorialCard !== undefined && index === 0) {
         return (
@@ -265,17 +315,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             <PostCard
               item={item}
               index={tutorialCard !== undefined ? index + 1 : index}
-              width={
-                isMobile
-                  ? '100%'
-                  : isTablet
-                  ? '224px'
-                  : isLaptop
-                  ? '256px'
-                  : '288px'
-              }
+              width={cardWidth}
               height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
-              maxWidthTablet='224px'
+              maxWidthTablet={`${cardWidth}px`}
             />
           </SItemWrapper>
         </Link>
