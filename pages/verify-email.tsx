@@ -3,7 +3,6 @@
 import React, { ReactElement, useCallback, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 
@@ -18,7 +17,6 @@ import assets from '../constants/assets';
 import { useAppSelector } from '../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { SignupReason, signupReasons } from '../utils/signUpReasons';
-import { useAppState } from '../contexts/appStateContext';
 
 interface IVerifyEmail {
   reason?: SignupReason;
@@ -30,11 +28,8 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
   const { t } = useTranslation('page-VerifyEmail');
   const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
-  const { resizeMode } = useAppState();
   const { signupEmailInput } = useAppSelector((state) => state.user);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+
   // Redirect if the user is logged in
   // useEffect(() => {
   //   if (loggedIn) router.replace('/');
@@ -76,27 +71,11 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      <motion.div
-        initial={{
-          x: isMobile ? 0 : 500,
-          y: 0,
-          opacity: 0,
-        }}
-        animate={{
-          x: 0,
-          y: 0,
-          opacity: 1,
-          transition: {
-            duration: isMobile ? 1.7 : 1,
-          },
-        }}
-      >
-        <CodeVerificationMenu
-          allowLeave={!signupEmailInput}
-          redirectUserTo={goal === 'create' ? '/creator-onboarding' : undefined}
-          onBack={handleBack}
-        />
-      </motion.div>
+      <CodeVerificationMenu
+        allowLeave={!signupEmailInput}
+        redirectUserTo={goal === 'create' ? '/creator-onboarding' : undefined}
+        onBack={handleBack}
+      />
     </>
   );
 };
