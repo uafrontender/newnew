@@ -15,7 +15,6 @@ export const SBottomAction = styled.div`
   box-sizing: border-box;
   align-items: center;
   flex-wrap: wrap;
-  justify-content: space-between;
 
   & + & {
     margin-top: 20px;
@@ -53,7 +52,7 @@ export const SBottomActionText = styled.div`
 `;
 
 export const SBottomActionTitle = styled.strong`
-  display: flex;
+  display: inline;
   flex-direction: row;
   white-space: pre-wrap;
   font-size: 16px;
@@ -66,23 +65,11 @@ export const SBottomActionTitle = styled.strong`
 `;
 
 export const SBottomActionMessage = styled.div`
-  display: flex;
-  flex-direction: column;
-  white-space: pre;
+  display: inline;
+  flex-direction: row;
+  white-space: pre-wrap;
   font-size: 14px;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    flex-direction: column;
-  }
-
-  ${({ theme }) => theme.media.laptopM} {
-    flex-direction: row;
-  }
 `;
 
 export const SBottomActionButton = styled(Button)`

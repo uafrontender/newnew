@@ -196,18 +196,19 @@
         "loading": {
           "title": "Subiendo video",
           "description": "Estamos subiendo tu respuesta en video... epera un momento.",
-          "process": "{{progress}}% • Quedan {{time}}"
+          "process": "{{progress}}% • Quedan {{minutes}} {{seconds}}",
+          "minute": "minuto",
+          "minutes": "minutos",
+          "second": "segundo",
+          "seconds": "segundos"
         },
         "processing": {
           "title": "Procesando el video",
-          "description": "Tu video está siendo procesado, ¡espera un momento!",
-          "process": "{{progress}}% • Quedan {{time}}",
-          "uploadNonProcessed": "Publicar"
+          "description": "Tu video está siendo procesado, ¡espera un momento!"
         },
         "processingPublished": {
           "title": "Procesando el video",
-          "description": "Tu video estará disponible una vez que haya sido procesado",
-          "process": "{{progress}}% • Quedan {{time}}"
+          "description": "Tu video estará disponible una vez que haya sido procesado"
         }
       }
     }

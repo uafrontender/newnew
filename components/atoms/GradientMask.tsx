@@ -44,7 +44,7 @@ const SGradientMask = styled.div<IGradientMask>`
   ${(props) => {
     if (props.positionTop) {
       return `top: ${
-        isNumber(props.positionTop) ? props.positionTop - 1 : -1
+        isNumber(props.positionTop) ? props.positionTop - 2 : -1
       }px`;
     }
     return `bottom: ${props.positionBottom ? props.positionBottom - 1 : -1}px`;

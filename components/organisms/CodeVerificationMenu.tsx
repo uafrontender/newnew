@@ -465,12 +465,14 @@ const SSubheading = styled(Text)`
 
   font-size: 14px;
   line-height: 20px;
+  height: 40px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
+    height: 48px;
   }
 `;
 

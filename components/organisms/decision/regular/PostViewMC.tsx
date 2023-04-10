@@ -816,7 +816,7 @@ const SBundlesContainer = styled.div<{ highlighted: boolean }>`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 16px;
+  padding: 24px 40px;
   border-radius: 16px;
   border-width: 1px;
   border-style: solid;

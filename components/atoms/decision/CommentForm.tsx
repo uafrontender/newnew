@@ -2,7 +2,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -10,7 +9,6 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -24,6 +22,9 @@ import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { useAppState } from '../../../contexts/appStateContext';
+import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
+import { APIResponse } from '../../../api/apiConfigs';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -58,14 +59,26 @@ interface ICommentForm {
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
+  value?: string;
   onBlur?: () => void;
   onFocus?: () => void;
-  onSubmit: (text: string) => void;
+  onSubmit: (text: string) => Promise<APIResponse<newnewapi.IChatMessage>>;
+  onChange?: (text: string) => void;
 }
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
   (
-    { postUuidOrShortId, position, zIndex, isRoot, onBlur, onFocus, onSubmit },
+    {
+      value: initialValue,
+      postUuidOrShortId,
+      position,
+      zIndex,
+      isRoot,
+      onBlur,
+      onFocus,
+      onSubmit,
+      onChange,
+    },
     ref
   ) => {
     const theme = useTheme();
@@ -73,6 +86,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const { t } = useTranslation('page-Post');
     const user = useAppSelector((state) => state.user);
     const { resizeMode } = useAppState();
+    const { showErrorToastPredefined } = useErrorToasts();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -92,143 +106,151 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
     const [focusedInput, setFocusedInput] = useState<boolean>(false);
 
-    const [commentText, setCommentText] = useState('');
+    const [commentText, setCommentText] = useState(initialValue || '');
     const [commentTextError, setCommentTextError] = useState('');
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
+    const debouncedCommentText = useDebouncedValue(commentText, 500);
+
+    useEffect(() => {
+      if (onChange) {
+        onChange(debouncedCommentText);
+      }
+    }, [debouncedCommentText, onChange]);
 
     const validateTextAbortControllerRef = useRef<
       AbortController | undefined
     >();
-    const validateTextViaAPI = useCallback(async (text: string) => {
-      if (validateTextAbortControllerRef.current) {
-        validateTextAbortControllerRef.current?.abort();
-      }
-      validateTextAbortControllerRef.current = new AbortController();
-      setIsAPIValidateLoading(true);
-      try {
-        const payload = new newnewapi.ValidateTextRequest({
-          kind: newnewapi.ValidateTextRequest.Kind.POST_COMMENT,
-          text,
-        });
-
-        const res = await validateText(
-          payload,
-          validateTextAbortControllerRef?.current?.signal
-        );
-
-        if (!res.data?.status) throw new Error('An error occurred');
-
-        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-          setCommentTextError(errorSwitch(res.data?.status));
-        } else {
-          setCommentTextError('');
+    const validateTextViaAPI = useCallback(
+      async (text: string): Promise<boolean> => {
+        if (validateTextAbortControllerRef.current) {
+          validateTextAbortControllerRef.current?.abort();
         }
-
-        if (text.length > 0) {
-          const isValidLocal = validateInputText(text);
-          if (!isValidLocal) {
-            setCommentTextError(
-              errorSwitch(newnewapi.ValidateTextResponse.Status.TOO_SHORT)
-            );
-            setIsAPIValidateLoading(false);
-            return;
+        validateTextAbortControllerRef.current = new AbortController();
+        setIsAPIValidateLoading(true);
+        try {
+          if (text.length > 0) {
+            const isValidLocal = validateInputText(text);
+            if (!isValidLocal) {
+              setCommentTextError(
+                errorSwitch(newnewapi.ValidateTextResponse.Status.TOO_SHORT)
+              );
+              setIsAPIValidateLoading(false);
+              return false;
+            }
           }
+
+          const payload = new newnewapi.ValidateTextRequest({
+            kind: newnewapi.ValidateTextRequest.Kind.POST_COMMENT,
+            text,
+          });
+
+          const res = await validateText(
+            payload,
+            validateTextAbortControllerRef?.current?.signal
+          );
+
+          if (!res.data?.status) throw new Error('An error occurred');
+
+          setIsAPIValidateLoading(false);
+          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+            setCommentTextError(errorSwitch(res.data?.status));
+            return false;
+          }
+          setCommentTextError('');
+          return true;
+        } catch (err) {
+          console.error(err);
+          setIsAPIValidateLoading(false);
+          return true;
         }
-
-        setIsAPIValidateLoading(false);
-      } catch (err) {
-        console.error(err);
-        setIsAPIValidateLoading(false);
-      }
-    }, []);
-
-    const validateTextViaAPIDebounced = useMemo(
-      () =>
-        debounce((text: string) => {
-          validateTextViaAPI(text);
-        }, 250),
-      [validateTextViaAPI]
-    );
-
-    const handleChange = useCallback(
-      (id: string, value: string) => {
-        setCommentText(value);
-        validateTextViaAPIDebounced(value);
       },
-      [validateTextViaAPIDebounced]
+      []
     );
+
+    const handleChange = useCallback((id: string, value: string) => {
+      setCommentTextError('');
+      setCommentText(value);
+    }, []);
 
     const handleSubmit = useCallback(
       async (e: React.MouseEvent | React.KeyboardEvent) => {
         e.preventDefault();
-        if (isAPIValidateLoading) {
-          return;
-        }
         setIsSubmitting(true);
         try {
-          // Redirect only after the persist data is pulled
-          if (!user.loggedIn && user._persist?.rehydrated) {
-            if (!isRoot) {
-              router.push(
-                `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                  window.location.href
-                )}`
-              );
-            } else {
-              router.push(
-                `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                  `${process.env.NEXT_PUBLIC_APP_URL}/${
-                    router.locale !== 'en-US' ? `${router.locale}/` : ''
-                  }p/${postUuidOrShortId}?comment_content=${commentText}#comments`
-                )}`
-              );
+          const isValid = await validateTextViaAPI(commentText);
+          if (isValid) {
+            // Redirect only after the persist data is pulled
+            if (!user.loggedIn && user._persist?.rehydrated) {
+              if (!isRoot) {
+                router.push(
+                  `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                    window.location.href
+                  )}`
+                );
+              } else {
+                router.push(
+                  `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                    `${process.env.NEXT_PUBLIC_APP_URL}/${
+                      router.locale !== 'en-US' ? `${router.locale}/` : ''
+                    }p/${postUuidOrShortId}?comment_content=${commentText}#comments`
+                  )}`
+                );
+              }
+
+              return;
             }
 
-            return;
+            const res = await onSubmit(commentText);
+
+            if (res.data && !res.error) {
+              setCommentText('');
+            } else {
+              throw new Error(res?.error?.message || 'Could not add comment');
+            }
           }
-
-          await onSubmit(commentText);
-
-          setCommentText('');
           setIsSubmitting(false);
         } catch (err) {
           console.error(err);
+          showErrorToastPredefined(undefined);
           setIsSubmitting(false);
         }
       },
       [
-        isAPIValidateLoading,
+        validateTextViaAPI,
+        commentText,
         user.loggedIn,
         user._persist?.rehydrated,
         onSubmit,
-        commentText,
         isRoot,
         router,
         postUuidOrShortId,
+        showErrorToastPredefined,
       ]
     );
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLFormElement>) => {
         if (isSubmitting || isAPIValidateLoading) {
+          e.preventDefault();
           return;
         }
-        if (!isMobileOrTablet) {
-          if (
-            e.shiftKey &&
-            e.key === 'Enter' &&
-            commentText.trim().length > 0
-          ) {
+        if (commentText.trim().length > 0) {
+          if (!isMobileOrTablet) {
+            if (e.shiftKey && e.key === 'Enter') {
+              if (commentText.charCodeAt(commentText.length - 1) === 10) {
+                setCommentText((curr) => curr.slice(0, -1));
+              }
+            } else if (e.key === 'Enter') {
+              handleSubmit(e);
+            }
+          } else if (e.key === 'Enter' && commentText.trim().length > 0) {
             if (commentText.charCodeAt(commentText.length - 1) === 10) {
               setCommentText((curr) => curr.slice(0, -1));
             }
-          } else if (e.key === 'Enter' && commentText.trim().length > 0) {
-            handleSubmit(e);
           }
-        } else if (e.key === 'Enter' && commentText.trim().length > 0) {
-          if (commentText.charCodeAt(commentText.length - 1) === 10) {
-            setCommentText((curr) => curr.slice(0, -1));
-          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
         }
       },
       [
