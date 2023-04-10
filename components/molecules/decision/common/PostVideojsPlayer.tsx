@@ -905,6 +905,20 @@ const SWrapper = styled.div<{
     display: none !important;
     opacity: 0 !important;
   }
+
+  /* Hide controls */
+  .vjs-control-bar {
+    display: none;
+  }
+  .vjs-modal-dialog {
+    display: none;
+  }
+  .vjs-loading-spinner {
+    display: none;
+  }
+  .vjs-big-play-button {
+    display: none;
+  }
 `;
 
 const SImageBG = styled.img<{
