@@ -164,7 +164,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   const options: videojs.PlayerOptions = useMemo(
     () => ({
-      loop: !onPlaybackFinished,
+      // Use manual loop due to Firefox issues
+      // loop: !onPlaybackFinished,
+      loop: false,
       controls: false,
       responsive: false,
       playsinline: true,
@@ -187,7 +189,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         },
       ],
     }),
-    [resources, onPlaybackFinished]
+    [resources]
   );
 
   // playerRef is set here, as well as all the listeners
@@ -271,6 +273,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             ) {
               handleExitFullscreen();
             }
+          });
+        } else {
+          p.on('ended', () => {
+            p?.play()?.catch(() => {
+              handleSetIsPaused(true);
+            });
           });
         }
 
