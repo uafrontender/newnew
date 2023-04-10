@@ -38,6 +38,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
+import Loader from '../../atoms/Loader';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -382,6 +383,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
             <GradientMask positionTop active={showTopGradient} />
             <GradientMask active={showBottomGradient} />
+            {loading && <Loader isStatic size='md' />}
           </SWrapper>
         </SModal>
       </SContainer>

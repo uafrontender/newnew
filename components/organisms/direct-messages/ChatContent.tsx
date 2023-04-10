@@ -448,10 +448,11 @@ const SBottomPart = styled.div`
   left: 0;
   right: 0;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
-  padding: 10px 24px 20px;
+  padding: 10px 16px 20px;
+
   ${(props) => props.theme.media.tablet} {
     position: absolute;
-    padding: 20px;
+    padding: 20px 24px;
     bottom: 0;
     left: 0;
     right: 0;
