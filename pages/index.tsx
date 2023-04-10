@@ -1,4 +1,10 @@
-import React, { ReactElement, useContext, useMemo, useEffect } from 'react';
+import React, {
+  ReactElement,
+  useContext,
+  useMemo,
+  useEffect,
+  useState,
+} from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -54,6 +60,8 @@ const Home: NextPage<IHome> = ({
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
 
+  const [popularPostsArr, setPopularPostsAdd] = useState(popularPosts?.posts);
+
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -76,7 +84,9 @@ const Home: NextPage<IHome> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CuratedListUpdated.decode(arr);
 
-      console.log(decoded, 'decoded');
+      if (decoded && decoded.posts) {
+        setPopularPostsAdd(decoded.posts);
+      }
     };
 
     if (socketConnection) {
@@ -125,11 +135,11 @@ const Home: NextPage<IHome> = ({
       )}
 
       {/* Recent activity */}
-      {popularPosts && popularPosts.posts?.length > 0 ? (
+      {popularPostsArr && popularPostsArr?.length > 0 ? (
         <SCardsSection
           title={t('section.popular')}
           category='popular'
-          collection={popularPosts.posts}
+          collection={popularPostsArr}
           padding={isUserLoggedIn ? 'small' : 'large'}
           // onReachEnd={loadMoreCollectionRA}
           // seeMoreLink='/profile/purchases'
