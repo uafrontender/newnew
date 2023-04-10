@@ -102,6 +102,19 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
                       },
                     ],
                   });
+                } else if (
+                  val ===
+                  newnewapi.Channel.CuratedListType.Type.POPULAR.toString()
+                ) {
+                  subscribeMsg = new newnewapi.SubscribeToChannels({
+                    channels: [
+                      {
+                        curatedListUpdates: {
+                          type: newnewapi.Channel.CuratedListType.Type.POPULAR,
+                        },
+                      },
+                    ],
+                  });
                 } else {
                   subscribeMsg = new newnewapi.SubscribeToChannels({
                     channels: [
@@ -113,6 +126,7 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
                     ],
                   });
                 }
+
                 const subscribeMsgEncoded =
                   newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
                 socketConnection?.emit(
@@ -129,7 +143,7 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
         });
       }
     }
-  }, [socketConnection, scheduledArr]);
+  }, [socketConnection, socketConnection?.connected, scheduledArr]);
 
   useEffect(() => {
     const shouldUnsubArray: newnewapi.IChannel[] = [];
@@ -144,13 +158,12 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
               chatRoomId: chatId,
             },
           } as newnewapi.IChannel);
-        } else {
-          if (Object.keys(channelsWithSubs)[i])
-            shouldUnsubArray.push({
-              postUpdates: {
-                postUuid: Object.keys(channelsWithSubs)[i],
-              },
-            } as newnewapi.IChannel);
+        } else if (Object.keys(channelsWithSubs)[i]) {
+          shouldUnsubArray.push({
+            postUpdates: {
+              postUuid: Object.keys(channelsWithSubs)[i],
+            },
+          } as newnewapi.IChannel);
         }
       }
     }
