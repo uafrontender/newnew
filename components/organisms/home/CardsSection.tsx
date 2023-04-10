@@ -589,16 +589,24 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
       margin: 16px 0;
       gap: 0;
       left: 0;
+      width: 100%;
+      overflow-x: hidden;
 
       ${({ theme }) => theme.media.tablet} {
         margin: 0;
         gap: 16px;
         left: 8px;
+        width: calc(100% - 16px);
       }
 
       ${({ theme }) => theme.media.laptop} {
         gap: 32px;
         left: 16px;
+        width: calc(100% + 16px);
+      }
+
+      ${({ theme }) => theme.media.laptopL} {
+        width: 100%;
       }
     }
   }
@@ -608,17 +616,21 @@ const SCardSkeletonSection = styled(CardSkeletonSection)`
     height: 584px;
 
     ${({ theme }) => theme.media.tablet} {
-      width: 224px;
-      height: 414px;
+      width: calc((100% - 16px * 3) / 3); //224px;
+      height: 428px;
     }
 
     ${({ theme }) => theme.media.laptop} {
-      width: 256px;
-      height: 454px;
+      width: calc((100% - 32px * 3) / 3);
+      height: 492px;
+    }
+
+    ${(props) => props.theme.media.laptopM} {
+      width: calc((100% - 32px * 4) / 4);
     }
 
     ${({ theme }) => theme.media.laptopL} {
-      width: 288px;
+      width: calc((100% - 32px * 4) / 4);
       height: 592px;
     }
   }
