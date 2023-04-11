@@ -8,6 +8,7 @@ import React, {
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import 'moment-duration-format';
+import isFirefox from '../../utils/isFirefox';
 
 interface IPlayerScrubber {
   isHovered: boolean;
@@ -56,6 +57,7 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.stopPropagation();
       handleChangeTime(
         (videoDuration / 100) * (parseFloat(e.target.value) as number)
       );
@@ -84,11 +86,26 @@ const PlayerScrubber: React.FC<IPlayerScrubber> = ({
         step={0.1}
         aria-labelledby='Video seek'
         bufferedPercent={bufferedPercent}
-        onTouchStart={() => setIsChanging(true)}
-        onTouchEnd={() => setIsChanging(false)}
-        onTouchCancel={() => setIsChanging(false)}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+          setIsChanging(true);
+        }}
+        onTouchEnd={(e) => {
+          e.stopPropagation();
+          setIsChanging(false);
+        }}
+        onTouchCancel={(e) => {
+          e.stopPropagation();
+          setIsChanging(false);
+        }}
         onMouseEnter={() => setIsChanging(true)}
         onMouseLeave={() => setIsChanging(false)}
+        onMouseUp={(e) => {
+          if (isFirefox()) {
+            e.preventDefault();
+            sliderRef.current?.blur();
+          }
+        }}
         onBlur={() => setIsChanging(false)}
         onChange={handleChange}
       />
@@ -110,6 +127,10 @@ const SContainer = styled.div<{
   position: absolute;
   bottom: 0px;
   left: 0;
+
+  @-moz-document url-prefix() {
+    bottom: -6px;
+  }
 
   width: 100%;
 
@@ -144,6 +165,10 @@ const SContainer = styled.div<{
     left: 12px;
 
     bottom: 6px;
+
+    @-moz-document url-prefix() {
+      bottom: 0px;
+    }
 
     &::before {
       width: calc(100% + 24px);
@@ -191,6 +216,7 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
     outline: none;
   }
 
+  /* Webkit */
   &::-webkit-slider-runnable-track {
     height: 4px;
     border-color: transparent;
@@ -219,25 +245,6 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
     transform: scale(1.1);
   }
 
-  &::-moz-range-thumb {
-    border: transparent;
-    background: transparent;
-    outline: none;
-    box-shadow: unset;
-
-    height: 48px;
-    width: 48px;
-    border-radius: 0px;
-    cursor: pointer;
-
-    margin-top: -16px;
-
-    transition: 0.1s ease-in-out;
-  }
-  &:hover::-moz-range-thumb {
-    transform: scale(1.1);
-  }
-
   &::-webkit-slider-runnable-track {
     background: linear-gradient(rgba(254, 44, 85, 1), rgba(254, 44, 85, 1)) 0 /
         var(--sx) 100% no-repeat,
@@ -254,6 +261,27 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
     background: linear-gradient(rgba(254, 44, 85, 1), rgba(254, 44, 85, 1)) 0 /
         var(--sx) 100% no-repeat,
       rgba(255, 255, 255, 0.2);
+  }
+
+  /* Firefox */
+  &::-moz-range-thumb {
+    border: transparent;
+    background: transparent;
+    outline: none;
+    box-shadow: unset;
+
+    height: 48px;
+    width: 48px;
+    border-radius: 0px;
+    cursor: pointer;
+
+    margin-top: -16px;
+
+    transition: 0.1s ease-in-out;
+  }
+
+  &:hover::-moz-range-thumb {
+    transform: scale(1.1);
   }
 
   &::-moz-range-track {
@@ -285,6 +313,7 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
       : null};
 
   ${({ theme }) => theme.media.tablet} {
+    /* Firefox */
     &:hover::-webkit-slider-runnable-track {
       height: 6px;
       transform: translateY(1px);
@@ -319,11 +348,13 @@ const SSlider = styled.input.attrs({ type: 'range' })<{
         rgba(255, 255, 255, 0.2);
     }
 
+    /* Firefox */
     &::-moz-range-track {
       height: 6px;
       border-color: transparent;
       background: linear-gradient(#ffffff, #ffffff) 0 / var(--sx) 100% no-repeat,
         rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
     }
 
     &::-moz-range-thumb {

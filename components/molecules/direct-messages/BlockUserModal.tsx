@@ -58,7 +58,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
             {t('modal.blockUser.messageSecondPart')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton view='modalSecondary' onClick={closeModal}>
+            <SCancelButton view='modalSecondarySelected' onClick={closeModal}>
               {t('modal.blockUser.button.cancel')}
             </SCancelButton>
             <SConfirmButton view='danger' onClick={handleConfirmClick}>

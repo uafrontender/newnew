@@ -1,31 +1,44 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
-import InlineSvg from '../InlineSVG';
 import { Mixpanel } from '../../../utils/mixpanel';
 import DisplayName from '../DisplayName';
+import { useAppSelector } from '../../../redux-store/store';
 
 interface IFunction {
   creators: newnewapi.IUser[];
+  onSelect?: () => void;
 }
 
-const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
+const PopularCreatorsResults: React.FC<IFunction> = ({
+  creators,
+  onSelect,
+}) => {
   const { t } = useTranslation('common');
+  const user = useAppSelector((state) => state.user);
+
   return (
     <SContainer>
       <SBlockTitle>{t('search.popularCreators')}</SBlockTitle>
       {creators.map((creator) => (
-        <Link href={`/${creator.username}`} key={creator.uuid}>
+        <Link
+          href={
+            creator.uuid === user.userData?.userUuid
+              ? '/profile'
+              : `/${creator.username}`
+          }
+          key={creator.uuid}
+        >
           <a>
             <SPost
               onClick={() => {
                 Mixpanel.track('Search Result Creator Clicked', {
                   _creatorUsername: creator.username,
                 });
+                onSelect?.();
               }}
             >
               <SLeftSide>

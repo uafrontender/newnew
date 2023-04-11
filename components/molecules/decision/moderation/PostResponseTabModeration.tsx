@@ -339,6 +339,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                 {t('postResponseTabModeration.winner.inResponseToYourPost')}
               </SSpan>
               <SEditTitleButton
+                id='edit-title'
                 view='transparent'
                 iconOnly
                 withDim
@@ -356,7 +357,7 @@ const PostResponseTabModeration: React.FunctionComponent<
                 />
               </SEditTitleButton>
             </STextTitle>
-            <SHeadline variant={5}>
+            <SHeadline id='post-title' variant={5}>
               <PostTitleContent>{postTitle}</PostTitleContent>
             </SHeadline>
           </STextContentWrapper>
@@ -429,6 +430,7 @@ const PostResponseTabModeration: React.FunctionComponent<
             {t('postResponseTabModeration.winner.inResponseToYourPost')}
           </SSpan>
           <SEditTitleButton
+            id='edit-title'
             view='transparent'
             iconOnly
             withDim
@@ -462,7 +464,7 @@ const PostResponseTabModeration: React.FunctionComponent<
             </STutorialTooltipHolder>
           ) : null}
         </STextTitle>
-        <SHeadline variant={5} undimmed={isTutorialVisible}>
+        <SHeadline id='post-title' variant={5} undimmed={isTutorialVisible}>
           <PostTitleContent>{postTitle}</PostTitleContent>
         </SHeadline>
       </STextContentWrapper>
@@ -586,8 +588,10 @@ const SHeadline = styled(Headline)<{
 }>`
   white-space: pre-wrap;
   word-break: break-word;
+  text-align: center;
 
   ${({ theme }) => theme.media.tablet} {
+    text-align: start;
     ${({ undimmed }) =>
       undimmed
         ? css`

@@ -41,6 +41,9 @@ interface IPostVideojsPlayer {
   resources?: newnewapi.IVideoUrls;
   videoDurationWithTime?: boolean;
   showPlayButton?: boolean;
+  isInSlider?: boolean;
+  isActive?: boolean;
+  shouldPrefetch?: boolean;
   onPlaybackFinished?: () => void;
 }
 
@@ -57,6 +60,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   resources,
   videoDurationWithTime,
   showPlayButton,
+  isInSlider,
+  isActive,
+  shouldPrefetch,
   onPlaybackFinished,
 }) => {
   const dispatch = useAppDispatch();
@@ -69,8 +75,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<videojs.Player>();
+  const [isReady, setIsReady] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -157,12 +164,24 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   const options: videojs.PlayerOptions = useMemo(
     () => ({
-      loop: !onPlaybackFinished,
+      // Use manual loop due to Firefox issues
+      // loop: !onPlaybackFinished,
+      loop: false,
       controls: false,
       responsive: false,
       playsinline: true,
       disablePictureInPicture: true,
       fluid: false,
+      html5: {
+        vhs: {
+          bandwidth: 41943040.0,
+          useBandwidthFromLocalStorage: true,
+          limitRenditionByPlayerDimensions: false,
+          overrideNative: !videojs.browser.IS_SAFARI,
+        },
+        nativeAudioTracks: videojs.browser.IS_SAFARI,
+        nativeVideoTracks: videojs.browser.IS_SAFARI,
+      },
       sources: [
         {
           src: resources!!.hlsStreamUrl as string,
@@ -170,7 +189,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         },
       ],
     }),
-    [resources, onPlaybackFinished]
+    [resources]
   );
 
   // playerRef is set here, as well as all the listeners
@@ -192,24 +211,26 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         // Autoplay implementation by official video.js guide
         // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
         p.ready(() => {
-          const promise = p.play();
+          if (!isInSlider || (isInSlider && isActive)) {
+            const promise = p.play();
 
-          if (promise !== undefined) {
-            promise
-              .then(() => {
-                // Autoplay started!
-              })
-              .catch((error) => {
-                console.error(error);
-                // Autoplay was prevented.
-                // Try to mute and start over, catch with displaying pause button
-                dispatch(setMutedMode(true));
-                setTimeout(() => {
-                  playerRef.current?.play()?.catch((e) => {
-                    handleSetIsPaused(true);
-                  });
-                }, 100);
-              });
+            if (promise !== undefined) {
+              promise
+                .then(() => {
+                  // Autoplay started!
+                })
+                .catch((error) => {
+                  console.error(error);
+                  // Autoplay was prevented.
+                  // Try to mute and start over, catch with displaying pause button
+                  dispatch(setMutedMode(true));
+                  setTimeout(() => {
+                    playerRef.current?.play()?.catch((e) => {
+                      handleSetIsPaused(true);
+                    });
+                  }, 100);
+                });
+            }
           }
         });
 
@@ -242,6 +263,22 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         if (onPlaybackFinished) {
           p.on('ended', () => {
             onPlaybackFinished();
+            if (
+              playerRef?.current?.isFullscreen() ||
+              (
+                videoRef.current?.querySelector(
+                  `.vjs-tech_${id}`
+                ) as TSafariHtmlPlayer
+              ).webkitDisplayingFullscreen
+            ) {
+              handleExitFullscreen();
+            }
+          });
+        } else {
+          p.on('ended', () => {
+            p?.play()?.catch(() => {
+              handleSetIsPaused(true);
+            });
           });
         }
 
@@ -272,7 +309,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused, onPlaybackFinished, resources]
+    [
+      handleSetIsPaused,
+      onPlaybackFinished,
+      resources,
+      isInSlider,
+      shouldPrefetch,
+      isActive,
+    ]
   );
 
   const handlePlayPseudoButtonClick = useCallback(() => {
@@ -288,23 +332,23 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   const handleEnterFullscreen = useCallback(() => {
     if (!isSafari() && !isIOS()) {
       playerRef?.current?.requestFullscreen();
-    } else if (document.querySelector('.vjs-tech')) {
+    } else if (videoRef.current?.querySelector(`.vjs-tech_${id}`)) {
       (
-        document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
+        videoRef.current?.querySelector(`.vjs-tech_${id}`) as TSafariHtmlPlayer
       )?.webkitEnterFullscreen();
       setIsFullscreen(true);
     }
-  }, []);
+  }, [id]);
 
   const handleExitFullscreen = useCallback(() => {
     if (!isSafari() && !isIOS()) {
       playerRef?.current?.exitFullscreen();
     } else {
       (
-        document?.querySelector('.vjs-tech') as TSafariHtmlPlayer
+        videoRef.current?.querySelector(`.vjs-tech_${id}`) as TSafariHtmlPlayer
       )?.webkitExitFullscreen();
     }
-  }, []);
+  }, [id]);
 
   const fetchManifestDetermineOrientation = useCallback(async () => {
     try {
@@ -359,6 +403,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       const videoElement = document.createElement('video-js');
 
       videoElement.classList.add('vjs-big-play-centered');
+      videoElement.classList.add(`video-js_${id}`);
       // @ts-ignore
       videoRef.current?.appendChild(videoElement);
 
@@ -366,9 +411,16 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       const player = (playerRef.current = videojs(videoElement, options, () => {
         // eslint-disable-next-line no-unused-expressions
         handlePlayerReady && handlePlayerReady(player);
+
+        // Add id to safari
+        const vjsTech = videoRef.current?.querySelector('.vjs-tech');
+        if (vjsTech) {
+          vjsTech.classList.add(`vjs-tech_${id}`);
+        }
+        setIsReady(true);
       }));
     }
-  }, [handlePlayerReady, options]);
+  }, [handlePlayerReady, id, options]);
 
   // Dispose the Video.js player when the functional component unmounts
   // NB! From official example
@@ -394,8 +446,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   useEffect(() => {
     const handleFullscreenChangeSafari = () => {
       setIsFullscreen(
-        (document?.querySelector('.vjs-tech') as TSafariHtmlPlayer)
-          ?.webkitDisplayingFullscreen
+        (
+          videoRef.current?.querySelector(
+            `.vjs-tech_${id}`
+          ) as TSafariHtmlPlayer
+        )?.webkitDisplayingFullscreen
       );
     };
 
@@ -413,34 +468,34 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       }
     };
 
-    const vsjTech = document?.querySelector('.vjs-tech');
+    const vjsTech = videoRef.current?.querySelector(`.vjs-tech_${id}`);
 
-    if (isBrowser() && !!vsjTech && isSafari()) {
-      (vsjTech as HTMLVideoElement).addEventListener(
+    if (isBrowser() && !!vjsTech && isSafari()) {
+      (vjsTech as HTMLVideoElement).addEventListener(
         'webkitfullscreenchange',
         handleFullscreenChangeSafari
       );
 
-      (vsjTech as HTMLVideoElement).addEventListener(
+      (vjsTech as HTMLVideoElement).addEventListener(
         'volumechange',
         handleVolumeChangeSafari
       );
     }
 
     return () => {
-      (vsjTech as HTMLVideoElement).removeEventListener(
+      (vjsTech as HTMLVideoElement)?.removeEventListener(
         'webkitfullscreenchange',
         handleFullscreenChangeSafari
       );
 
-      (vsjTech as HTMLVideoElement).removeEventListener(
+      (vjsTech as HTMLVideoElement)?.removeEventListener(
         'volumechange',
         handleVolumeChangeSafari
       );
     };
     // Skipping `dispatch`
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFullscreen]);
+  }, [isFullscreen, id, isReady]);
 
   // Set minimize button position in fullscreen
   // Listenere mostly for devtools screen size change
@@ -586,8 +641,62 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     };
   }, [isFullscreen, fullscreenInteracted]);
 
+  // Slider prefetching
+  useEffect(() => {
+    if (isInSlider) {
+      if (isActive) {
+        const promise = playerRef?.current?.play();
+
+        if (promise !== undefined) {
+          promise
+            .then(() => {
+              // Autoplay started!
+            })
+            .catch((error) => {
+              console.error(error);
+              // Autoplay was prevented.
+              // Try to mute and start over, catch with displaying pause button
+              dispatch(setMutedMode(true));
+              setTimeout(() => {
+                playerRef.current?.play()?.catch((e) => {
+                  handleSetIsPaused(true);
+                });
+              }, 100);
+            });
+        }
+      } else {
+        playerRef?.current?.pause();
+        // Required to avoid one frame flickering when changing items in the slider
+        setTimeout(() => {
+          setPlaybackTime(0);
+          playerRef.current?.currentTime(0);
+        }, 100);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInSlider, isActive]);
+
+  // Try to pause the video when the component unmounts
+  // to avoid attempts to play broken segments
+  useEffect(
+    () => () => {
+      playerRef?.current?.pause();
+    },
+    []
+  );
+
+  const shouldShowPlayPseudoButton = useMemo(
+    () =>
+      (!isInSlider || isActive) &&
+      showPlayButton &&
+      isPaused &&
+      !isScrubberTimeChanging,
+    [isActive, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]
+  );
+
   return (
     <SContent
+      id={`sContent_${id}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -605,7 +714,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
         />
-        {showPlayButton && isPaused && !isScrubberTimeChanging && (
+        {shouldShowPlayPseudoButton ? (
           <SPlayPseudoButton onClick={handlePlayPseudoButtonClick}>
             <InlineSvg
               svg={PlayIcon}
@@ -614,7 +723,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
               fill='#FFFFFF'
             />
           </SPlayPseudoButton>
-        )}
+        ) : null}
         <SMaximizeButton
           id='maximize-button'
           iconOnly
@@ -629,7 +738,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           />
         </SMaximizeButton>
       </SVideoWrapper>
-      {isLoading && (
+      {isLoading && !shouldShowPlayPseudoButton && (
         <SLoader>
           <Lottie
             width={65}
@@ -653,7 +762,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       />
       {/* Custom fullscreen controls */}
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
-        ? ReactDOM.createPortal(
+        ? ReactDOM?.createPortal(
             <SMinimizeButton
               id='minimize-button'
               iconOnly
@@ -679,13 +788,15 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
                 fill='#FFFFFF'
               />
             </SMinimizeButton>,
-            document?.querySelector('.video-js') as HTMLElement
+            document
+              ?.getElementById(`sContent_${id}`)
+              ?.querySelector(`.video-js_${id}`) as HTMLElement
           )
         : null}
       {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
-        ? ReactDOM.createPortal(
+        ? ReactDOM?.createPortal(
             <PostVideoFullscreenControls
-              isPaused={isPaused && !!showPlayButton}
+              isPaused={isPaused && !!showPlayButton && !isScrubberTimeChanging}
               handleToggleVideoPaused={handleToggleVideoPaused}
               currentTime={playbackTime}
               videoDuration={playerRef?.current?.duration() || 10}
@@ -697,7 +808,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
               currentVolume={currentVolume}
               handleChangeVolume={handlePlayerVolumeChange}
             />,
-            document?.querySelector('.video-js') as HTMLElement
+            document
+              ?.getElementById(`sContent_${id}`)
+              ?.querySelector(`.video-js_${id}`) as HTMLElement
           )
         : null}
     </SContent>
@@ -802,6 +915,20 @@ const SWrapper = styled.div<{
   .vjs-tech::-webkit-media-controls-panel {
     display: none !important;
     opacity: 0 !important;
+  }
+
+  /* Hide controls */
+  .vjs-control-bar {
+    display: none;
+  }
+  .vjs-modal-dialog {
+    display: none;
+  }
+  .vjs-loading-spinner {
+    display: none;
+  }
+  .vjs-big-play-button {
+    display: none;
   }
 `;
 
