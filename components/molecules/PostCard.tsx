@@ -1192,8 +1192,9 @@ const SImageHolderOutside = styled.div`
     top: 0;
     left: 0;
     object-fit: cover;
-    width: 100%;
-    height: 100%;
+    /* Increased bleeds */
+    width: 101%;
+    height: 101%;
     /* z-index: -1; */
   }
 `;
