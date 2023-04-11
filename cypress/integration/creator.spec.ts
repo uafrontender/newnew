@@ -1653,6 +1653,7 @@ context('Creator flow', () => {
   describe('User willing to add card first', () => {
     const USER_EMAIL = getNextUserEmail();
     const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_2_NUMBER = '6011111111111117';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1844,7 +1845,7 @@ context('Creator flow', () => {
         });
     });
 
-    it('can contribute to an event', () => {
+    it('can contribute to an event with another card', () => {
       const BID_OPTION_TEXT = getBidOptionText();
       const BID_OPTION_AMOUNT = 20;
 
@@ -1855,6 +1856,17 @@ context('Creator flow', () => {
 
       // Wait stripe elements
       cy.wait(1000);
+
+      cy.dGet('#new-card').click();
+
+      // Wait for stripe elements to load
+      cy.wait(2000);
+      enterCardInfo(
+        USER_CARD_2_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
       cy.dGet('#pay').click();
 
       cy.dGet('#paymentSuccess', {
@@ -1906,6 +1918,19 @@ context('Creator flow', () => {
       cy.url().should('include', '/creator/dashboard', {
         timeout: 15000,
       });
+    });
+
+    it('can change title of an active post', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post event ${testSeed} finishing`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
     });
 
     it('[system call - end posts]', () => {
@@ -2003,6 +2028,19 @@ context('Creator flow', () => {
         );
     });
 
+    it('can change title of a finished post', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post superpoll ${testSeed} finished`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
+    });
+
     it('can respond to a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
       cy.url().should('include', '/p/');
@@ -2041,6 +2079,19 @@ context('Creator flow', () => {
             calculateSuperpollEarnings(payedToSuperpoll)
           ).toString()
         );
+    });
+
+    it('can change title of a post with a response published', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post superpoll ${testSeed} published`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
     });
 
     /* it('can see correct earnings on dashboard', () => {

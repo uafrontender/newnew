@@ -14,6 +14,7 @@ const getDisplayname = (
     'isTombstone' in user.options &&
     user.options?.isTombstone
   ) {
+    // TODO: Add translation? Change it?
     return 'Private user';
   }
 
@@ -21,6 +22,7 @@ const getDisplayname = (
     return user?.nickname ?? `@${user?.username}`;
   }
 
+  // TODO: Add translation? Change it?
   return 'Private user';
 };
 

@@ -19,6 +19,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
 
   if (typeof user === 'string') {
     return (
+      // TODO: Should it have hover effect?
       <SHighlightedDisplayName
         user={typeof user === 'string' ? currentUser.userData : user}
         href={
@@ -38,6 +39,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
 
   if (user?.options?.isVerified) {
     return (
+      // TODO: Should it have hover effect?
       <SHighlightedDisplayName
         user={user}
         href={`/${user?.username}`}

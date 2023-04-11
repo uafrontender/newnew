@@ -48,7 +48,7 @@ const DeleteVideoModal: React.FC<IDeleteVideoModal> = ({
           <SModalMessage>{t('deleteVideoModal.body')}</SModalMessage>
           <SModalButtons>
             <SCancelButton
-              view='modalSecondary'
+              view='modalSecondarySelected'
               onClick={handleCloseModalMixpanel}
             >
               {t('deleteVideoModal.button.cancel')}

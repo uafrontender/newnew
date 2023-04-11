@@ -75,10 +75,8 @@ const SHeadline = styled(Text)`
 
 const SBody = styled(Text)`
   grid-area: bodyArea;
-  display: flex;
-  flex-direction: row;
+  display: inline;
   white-space: pre-wrap;
-  align-self: center;
 
   color: #ffffff;
   opacity: 0.8;

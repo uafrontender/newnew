@@ -37,7 +37,11 @@ export const CreatorsList: React.FC<IList> = ({
   const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
       if (creator) {
-        router.push(`/${creator.username}`);
+        if (creator.uuid === user.userData?.userUuid) {
+          router.push('/profile');
+        } else {
+          router.push(`/${creator.username}`);
+        }
       }
     };
 

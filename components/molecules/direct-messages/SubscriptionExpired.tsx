@@ -13,7 +13,6 @@ import {
   SBottomActionText,
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
-
 import DisplayName from '../../atoms/DisplayName';
 
 const BuyBundleModal = dynamic(() => import('../bundles/BuyBundleModal'));
@@ -27,6 +26,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
   ({ user, myRole }) => {
     const { t } = useTranslation('page-Chat');
     const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
+
     return (
       <>
         <SBottomActionContainer>
@@ -38,7 +38,9 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
               </SBottomActionTitle>
               {myRole === 1 && user.options?.isOfferingBundles && (
                 <SBottomActionMessage>
-                  {t('subscriptionExpired.message')}
+                  <SMessageWrap>
+                    {t('subscriptionExpired.message')}
+                  </SMessageWrap>
                   <DisplayName user={user} />
                 </SBottomActionMessage>
               )}
@@ -75,5 +77,13 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
 export default SubscriptionExpired;
 
 const SBottomActionContainer = styled(SBottomAction)`
-  margin-bottom: 16px;
+  /* margin-bottom: 16px; */
+`;
+
+const SMessageWrap = styled.span`
+  white-space: pre-wrap;
+
+  ${({ theme }) => theme.media.tablet} {
+    white-space: pre;
+  }
 `;

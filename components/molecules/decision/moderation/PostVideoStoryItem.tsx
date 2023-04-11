@@ -11,7 +11,8 @@ const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
 interface IPostVideoStoryItem {
   video: newnewapi.IVideoUrls;
   index: number;
-  isVisible: boolean;
+  isActive: boolean;
+  shouldPrefetch: boolean;
   isMuted?: boolean;
   videoDurationWithTime?: boolean;
   onPlaybackFinished?: () => void;
@@ -20,7 +21,8 @@ interface IPostVideoStoryItem {
 const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
   video,
   index,
-  isVisible,
+  isActive,
+  shouldPrefetch,
   isMuted,
   videoDurationWithTime,
   onPlaybackFinished,
@@ -30,9 +32,12 @@ const PostVideoStoryItem: React.FunctionComponent<IPostVideoStoryItem> = ({
       id={`storyItem_${index}`}
       key={`key_${video?.uuid}_${index}`}
     >
-      {isVisible ? (
+      {isActive || shouldPrefetch ? (
         <PostVideojsPlayer
           id={`id_${video?.uuid ?? index}`}
+          isInSlider
+          isActive={isActive}
+          shouldPrefetch={shouldPrefetch}
           resources={video}
           muted={isMuted}
           showPlayButton

@@ -220,7 +220,10 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             </STextAreaWrapper>
             <SModalButtons>
               {!isMobile && (
-                <SCancelButton view='modalSecondary' onClick={handleClose}>
+                <SCancelButton
+                  view='modalSecondarySelected'
+                  onClick={handleClose}
+                >
                   {t('modal.reportUser.button.cancel')}
                 </SCancelButton>
               )}
@@ -383,7 +386,7 @@ const STextArea = styled.textarea`
 
 const SConformationModal = styled(ModalPaper)`
   position: relative;
-  padding: 72px 40px 40px 40px;
+  padding: 32px 40px 40px 40px;
   margin: auto 16px;
   height: auto;
   max-width: 350px;

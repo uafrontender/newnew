@@ -2252,6 +2252,19 @@ context('Whitelisted Creator flow', () => {
       });
     });
 
+    it('can change title of an active post', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstEventShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post event ${testSeed} finishing`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
+    });
+
     it('[system call - end posts]', () => {
       // Wait for cookies
       cy.wait(2000);
@@ -2351,6 +2364,21 @@ context('Whitelisted Creator flow', () => {
         );
     });
 
+    it('can change title of a finished post', () => {
+      cy.visit(
+        `${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstSuperpollShortId}`
+      );
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post superpoll ${testSeed} finished`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
+    });
+
     it('can respond to a superpoll', () => {
       cy.visit(
         `${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstSuperpollShortId}`
@@ -2391,6 +2419,21 @@ context('Whitelisted Creator flow', () => {
             calculateSuperpollEarnings(payedToFirstSuperpoll)
           ).toString()
         );
+    });
+
+    it('can change title of a post with a response published', () => {
+      cy.visit(
+        `${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstSuperpollShortId}`
+      );
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post superpoll ${testSeed} published`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
     });
 
     /* it('can see correct earnings on dashboard', () => {
@@ -2438,6 +2481,19 @@ context('Whitelisted Creator flow', () => {
       cy.url().should('include', '/creator/dashboard', {
         timeout: 15000,
       });
+    });
+
+    it('can change title of an active post', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${secondEventShortId}`);
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post event ${testSeed} finishing`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
     });
 
     it('[system call - end posts]', () => {
@@ -2541,6 +2597,21 @@ context('Whitelisted Creator flow', () => {
         );
     });
 
+    it('can change title of a finished post', () => {
+      cy.visit(
+        `${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${secondSuperpollShortId}`
+      );
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post superpoll ${testSeed} finished`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
+    });
+
     it('can respond to a superpoll', () => {
       cy.visit(
         `${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${secondSuperpollShortId}`
@@ -2581,6 +2652,21 @@ context('Whitelisted Creator flow', () => {
             calculateSuperpollEarnings(payedToSecondSuperpoll)
           ).toString()
         );
+    });
+
+    it('can change title of a post with a response published', () => {
+      cy.visit(
+        `${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${secondSuperpollShortId}`
+      );
+      cy.url().should('include', '/p/');
+      cy.dGet('#edit-title').click();
+      const newTitle = `CI post superpoll ${testSeed} published`;
+      cy.dGet('#edit-title-input').clear().type(newTitle);
+      cy.dGet('#edit-title-submit')
+        .should('be.enabled')
+        .should('not.have.css', 'cursor', 'wait')
+        .click();
+      cy.dGet('#post-title').invoke('text').should('contain', newTitle);
     });
 
     /* it('can see correct earnings on dashboard', () => {

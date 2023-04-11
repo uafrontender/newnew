@@ -95,6 +95,7 @@ interface ICard {
   width?: string;
   height?: string;
   maxWidthTablet?: string;
+  className?: string;
   handleRemovePostFromState?: () => void;
   handleAddPostToState?: () => void;
 }
@@ -107,6 +108,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     width,
     height,
     maxWidthTablet,
+    className,
     handleRemovePostFromState,
     handleAddPostToState,
   }) => {
@@ -156,6 +158,10 @@ export const PostCard: React.FC<ICard> = React.memo(
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     const [postParsed, typeOfPost] = switchPostType(item);
+    const postStatus = useMemo(
+      () => switchPostStatus(typeOfPost, postParsed.status),
+      [postParsed.status, typeOfPost]
+    );
     // Live updates stored in local state
     const [totalAmount, setTotalAmount] = useState<number>(() =>
       typeOfPost === 'ac'
@@ -491,7 +497,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           ref={(el) => {
             wrapperRef.current = el!!;
           }}
-          className='postcard-identifier'
+          className={`postcard-identifier ${className || ''}`}
           onMouseEnter={() => handleSetHovered()}
           onTouchStart={() => handleSetHovered()}
           onMouseLeave={() => handleSetUnhovered()}
@@ -622,7 +628,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         ref={(el) => {
           wrapperRef.current = el!!;
         }}
-        className='postcard-identifier'
+        className={`postcard-identifier ${className || ''}`}
         onMouseEnter={() => handleSetHovered()}
         onTouchStart={() => handleSetHovered()}
         onMouseLeave={() => handleSetUnhovered()}
@@ -727,7 +733,10 @@ export const PostCard: React.FC<ICard> = React.memo(
                 />
               </SUsername>
             </SUsernameContainer>
-            <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
+            {postStatus !== 'deleted_by_admin' &&
+            postStatus !== 'deleted_by_creator' ? (
+              <SCardTimer startsAt={startsAtTime} endsAt={endsAtTime} />
+            ) : null}
           </SBottomStart>
           <STextOutside variant={3} weight={600}>
             {getTitleContent(postParsed.title)}
@@ -785,7 +794,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               )
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
-                {switchPostStatus(typeOfPost, postParsed.status) === 'voting' &&
+                {postStatus === 'voting' &&
                 postParsed.creator?.uuid !== user.userData?.userUuid
                   ? t(`button.withoutActivity.${typeOfPost}`)
                   : t(`button.seeResults.${typeOfPost}`)}
@@ -1089,7 +1098,7 @@ const SText = styled(Text)`
   word-break: break-word;
 `;
 
-const SWrapperOutside = styled.div<ISWrapper>`
+export const SWrapperOutside = styled.div<ISWrapper>`
   width: ${(props) => props.width};
   min-width: 224px;
   cursor: pointer;
@@ -1183,8 +1192,9 @@ const SImageHolderOutside = styled.div`
     top: 0;
     left: 0;
     object-fit: cover;
-    width: 100%;
-    height: 100%;
+    /* Increased bleeds */
+    width: 101%;
+    height: 101%;
     /* z-index: -1; */
   }
 `;

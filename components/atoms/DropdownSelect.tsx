@@ -21,6 +21,9 @@ export type TDropdownSelectItem<T> = {
   value: T;
 };
 
+const DROPDOWN_DIRECTIONS = ['top', 'bottom'] as const;
+type DropdownDirection = typeof DROPDOWN_DIRECTIONS[number];
+
 interface IDropdownSelect<T> {
   id?: string;
   label: string;
@@ -30,6 +33,7 @@ interface IDropdownSelect<T> {
   width?: string;
   disabled?: boolean;
   closeOnSelect?: boolean;
+  direction?: DropdownDirection;
   onSelect: (val: T) => void;
   className?: string;
 }
@@ -43,6 +47,7 @@ const DropdownSelect = <T,>({
   width,
   disabled,
   closeOnSelect,
+  direction = 'bottom',
   onSelect,
   className,
 }: IDropdownSelect<T>): ReactElement => {
@@ -125,6 +130,7 @@ const DropdownSelect = <T,>({
                 : 'inherit'
             }
             height={maxItems ? `${maxItems * 44 + 16}px` : undefined}
+            direction={direction}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -223,9 +229,11 @@ const SLabelButton = styled.button`
 const SOptionsContainer = styled(motion.div)<{
   width: string;
   height?: string;
+  direction: DropdownDirection;
 }>`
   position: absolute;
-  top: 54px;
+  top: ${({ direction }) => (direction === 'bottom' ? '54px' : undefined)};
+  bottom: ${({ direction }) => (direction === 'top' ? '54px' : undefined)};
 
   max-height: ${({ height }) => height ?? '300px'};
   width: ${({ width }) => width};
