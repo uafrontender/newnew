@@ -265,6 +265,7 @@ const PostTopInfoModeration: React.FunctionComponent<
         <SActionsDiv>
           {!hidden ? (
             <SEditTitleButton
+              id='edit-title'
               view='transparent'
               iconOnly
               withDim
@@ -358,7 +359,7 @@ const PostTopInfoModeration: React.FunctionComponent<
         </SActionsDiv>
         {!hidden ? (
           <>
-            <SPostTitle variant={5}>
+            <SPostTitle id='post-title' variant={5}>
               <PostTitleContent>{title}</PostTitleContent>
             </SPostTitle>
             {showWinnerOption ? (
@@ -512,7 +513,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: min-content 1fr 100px;
+    grid-template-columns: min-content 1fr 108px;
     align-items: center;
 
     margin-top: initial;
