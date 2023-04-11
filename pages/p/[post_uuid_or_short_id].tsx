@@ -585,7 +585,7 @@ const PostPage: NextPage<IPostPage> = ({
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
-    if (postParsed?.postUuid && socketConnection?.connected) {
+    if (postParsed?.postUuid) {
       addChannel(postParsed.postUuid, {
         postUpdates: {
           postUuid: postParsed.postUuid,
@@ -599,7 +599,7 @@ const PostPage: NextPage<IPostPage> = ({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postParsed?.postUuid, socketConnection?.connected]);
+  }, [postParsed?.postUuid]);
 
   // Listen for Post status updates
   useEffect(() => {

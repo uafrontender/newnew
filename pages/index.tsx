@@ -67,19 +67,17 @@ const Home: NextPage<IHome> = ({
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   useEffect(() => {
-    if (socketConnection?.connected) {
-      addChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString(), {
-        curatedListUpdates: {
-          type: newnewapi.Channel.CuratedListType.Type.POPULAR,
-        },
-      });
-    }
+    addChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString(), {
+      curatedListUpdates: {
+        type: newnewapi.Channel.CuratedListType.Type.POPULAR,
+      },
+    });
 
     return () => {
       removeChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection?.connected]);
+  }, []);
 
   useEffect(() => {
     const handlerSocketCuratedListUpdated = (data: any) => {

@@ -130,7 +130,7 @@ const CommentsBottomSection: React.FunctionComponent<
     [removeCommentMutation, showErrorToastPredefined]
   );
   useEffect(() => {
-    if (commentsRoomId && socketConnection?.connected) {
+    if (commentsRoomId) {
       addChannel(`comments_${commentsRoomId.toString()}`, {
         chatRoomUpdates: {
           chatRoomId: commentsRoomId,
@@ -138,7 +138,7 @@ const CommentsBottomSection: React.FunctionComponent<
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection?.connected, commentsRoomId]);
+  }, [commentsRoomId]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = async (data: any) => {
