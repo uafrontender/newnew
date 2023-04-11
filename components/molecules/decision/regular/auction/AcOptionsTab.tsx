@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -113,6 +113,30 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       );
     }
   };
+
+  // TODO: Standardize and turn into utility function
+  const handleScrollCardIntoListView = useCallback((element: HTMLElement) => {
+    if (containerRef.current) {
+      const listHeight = containerRef.current.offsetHeight;
+      const currentScrollPosition = containerRef.current.scrollTop;
+      const elementPosition = element.offsetTop;
+      const elementHeight = element.offsetHeight;
+      // Lower
+      if (
+        elementPosition + elementHeight >
+        listHeight + currentScrollPosition
+      ) {
+        containerRef.current.scrollTop = elementPosition + elementHeight;
+      }
+
+      // Higher
+      // TODO: Refactor
+      // 84 is a height of an option card itself + gap
+      if (elementPosition < currentScrollPosition + 100) {
+        containerRef.current.scrollTop = elementPosition - 100;
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (optionBeingSupported && containerRef.current && !isMobile) {
@@ -232,6 +256,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }}
               handleSetScrollBlocked={() => setIsScrollBlocked(true)}
               handleUnsetScrollBlocked={() => setIsScrollBlocked(false)}
+              handleScrollIntoListView={handleScrollCardIntoListView}
             />
           ))}
           {hasNextPage ? (

@@ -164,7 +164,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
 
   const options: videojs.PlayerOptions = useMemo(
     () => ({
-      loop: !onPlaybackFinished,
+      // Use manual loop due to Firefox issues
+      // loop: !onPlaybackFinished,
+      loop: false,
       controls: false,
       responsive: false,
       playsinline: true,
@@ -187,7 +189,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         },
       ],
     }),
-    [resources, onPlaybackFinished]
+    [resources]
   );
 
   // playerRef is set here, as well as all the listeners
@@ -271,6 +273,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             ) {
               handleExitFullscreen();
             }
+          });
+        } else {
+          p.on('ended', () => {
+            p?.play()?.catch(() => {
+              handleSetIsPaused(true);
+            });
           });
         }
 
@@ -657,9 +665,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             });
         }
       } else {
-        setPlaybackTime(0);
-        playerRef.current?.currentTime(0);
         playerRef?.current?.pause();
+        // Required to avoid one frame flickering when changing items in the slider
+        setTimeout(() => {
+          setPlaybackTime(0);
+          playerRef.current?.currentTime(0);
+        }, 100);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -727,7 +738,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
           />
         </SMaximizeButton>
       </SVideoWrapper>
-      {isLoading && (
+      {isLoading && !shouldShowPlayPseudoButton && (
         <SLoader>
           <Lottie
             width={65}
@@ -904,6 +915,20 @@ const SWrapper = styled.div<{
   .vjs-tech::-webkit-media-controls-panel {
     display: none !important;
     opacity: 0 !important;
+  }
+
+  /* Hide controls */
+  .vjs-control-bar {
+    display: none;
+  }
+  .vjs-modal-dialog {
+    display: none;
+  }
+  .vjs-loading-spinner {
+    display: none;
+  }
+  .vjs-big-play-button {
+    display: none;
   }
 `;
 

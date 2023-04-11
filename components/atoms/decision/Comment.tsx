@@ -382,7 +382,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
             reportedUser={comment.sender}
             onClose={() => setConfirmReportUser(false)}
             onSubmit={async ({ reasons, message }) => {
-              await reportMessage(comment.id, reasons, message);
+              await reportMessage(comment.id as number, reasons, message);
             }}
           />
         )}
