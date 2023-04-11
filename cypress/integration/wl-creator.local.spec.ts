@@ -247,8 +247,8 @@ context('Whitelisted Creator flow', () => {
 
     return { ...winningBid, bids: winningsBids.map((bid) => bid.amount) };
   }
-
-  function calculateEarnings(rawAmountInCents: number): number {
+  // Only needed for dashboard values
+  /* function calculateEarnings(rawAmountInCents: number): number {
     const feesInCents = Math.ceil(0.129 * rawAmountInCents) + 30;
     return rawAmountInCents - feesInCents;
   }
@@ -258,7 +258,7 @@ context('Whitelisted Creator flow', () => {
       calculateEarnings(contribution)
     );
     return earnings.reduce((acc, next) => acc + next);
-  }
+  } */
 
   function getDollarsFromCentsNumber(amountInCents: number): number {
     const amountInDollars = Math.ceil(amountInCents) / 100;
@@ -2455,9 +2455,7 @@ context('Whitelisted Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(
-            calculateTotalEarnings(firstWinningBid.bids)
-          ).toString()
+          getDollarsFromCentsNumber(firstWinningBid.totalAmount).toString()
         );
     });
 
@@ -2512,9 +2510,7 @@ context('Whitelisted Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(
-            calculateTotalEarnings(payedToFirstSuperpoll)
-          ).toString()
+          getDollarsFromCentsNumber(payedToSuperpollTotal).toString()
         );
     });
 
@@ -2691,9 +2687,7 @@ context('Whitelisted Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(
-            calculateTotalEarnings(secondWinningBid.bids)
-          ).toString()
+          getDollarsFromCentsNumber(secondWinningBid.totalAmount).toString()
         );
     });
 
@@ -2748,9 +2742,7 @@ context('Whitelisted Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(
-            calculateTotalEarnings(payedToSecondSuperpoll)
-          ).toString()
+          getDollarsFromCentsNumber(payedToSuperpollTotal).toString()
         );
     });
 

@@ -155,7 +155,8 @@ context('Creator flow', () => {
     return { ...winningBid, bids: winningsBids.map((bid) => bid.amount) };
   }
 
-  function calculateEarnings(rawAmountInCents: number): number {
+  // Only needed for dashboard values
+  /* function calculateEarnings(rawAmountInCents: number): number {
     const feesInCents = Math.ceil(0.129 * rawAmountInCents) + 30;
     return rawAmountInCents - feesInCents;
   }
@@ -165,7 +166,7 @@ context('Creator flow', () => {
       calculateEarnings(contribution)
     );
     return earnings.reduce((acc, next) => acc + next);
-  }
+  } */
 
   function getDollarsFromCentsNumber(amountInCents: number): number {
     const amountInDollars = Math.ceil(amountInCents) / 100;
@@ -2091,9 +2092,7 @@ context('Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(
-            calculateTotalEarnings(winningBid.bids)
-          ).toString()
+          getDollarsFromCentsNumber(winningBid.totalAmount).toString()
         );
     });
 
@@ -2144,9 +2143,7 @@ context('Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(
-            calculateTotalEarnings(payedToSuperpoll)
-          ).toString()
+          getDollarsFromCentsNumber(payedToSuperpollTotal).toString()
         );
     });
 
