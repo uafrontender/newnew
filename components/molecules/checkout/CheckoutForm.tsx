@@ -220,6 +220,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           />
           {!userData?.options?.isWhiteListed && (
             <OptionCard
+              id='new-card'
               handleClick={() =>
                 setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
               }
