@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-multi-assign */
 import React, {
   useRef,
@@ -591,43 +590,43 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   }, [handleSetIsPaused, isFullscreen]);
 
   // Hide controls if mouse not moved in fullscreen
-  // useEffect(() => {
-  //   let timeout: any = 0;
+  useEffect(() => {
+    let timeout: any = 0;
 
-  //   const handleTrackFullscreenInteracted = () => {
-  //     setFullscreenInteracted(true);
+    const handleTrackFullscreenInteracted = () => {
+      setFullscreenInteracted(true);
 
-  //     clearTimeout(timeout);
+      clearTimeout(timeout);
 
-  //     timeout = setTimeout(() => {
-  //       setFullscreenInteracted(false);
-  //     }, 5000);
-  //   };
+      timeout = setTimeout(() => {
+        setFullscreenInteracted(false);
+      }, 5000);
+    };
 
-  //   if (isFullscreen && !isSafari() && !isIOS()) {
-  //     window?.addEventListener('mousemove', handleTrackFullscreenInteracted);
-  //     window?.addEventListener('touchstart', handleTrackFullscreenInteracted);
-  //     window?.addEventListener('touchmove', handleTrackFullscreenInteracted);
-  //   } else {
-  //     window?.removeEventListener('mousemove', handleTrackFullscreenInteracted);
-  //     window?.removeEventListener(
-  //       'touchstart',
-  //       handleTrackFullscreenInteracted
-  //     );
-  //     window?.removeEventListener('touchmove', handleTrackFullscreenInteracted);
-  //     clearTimeout(timeout);
-  //   }
+    if (isFullscreen && !isSafari() && !isIOS()) {
+      window?.addEventListener('mousemove', handleTrackFullscreenInteracted);
+      window?.addEventListener('touchstart', handleTrackFullscreenInteracted);
+      window?.addEventListener('touchmove', handleTrackFullscreenInteracted);
+    } else {
+      window?.removeEventListener('mousemove', handleTrackFullscreenInteracted);
+      window?.removeEventListener(
+        'touchstart',
+        handleTrackFullscreenInteracted
+      );
+      window?.removeEventListener('touchmove', handleTrackFullscreenInteracted);
+      clearTimeout(timeout);
+    }
 
-  //   return () => {
-  //     window?.removeEventListener('mousemove', handleTrackFullscreenInteracted);
-  //     window?.removeEventListener(
-  //       'touchstart',
-  //       handleTrackFullscreenInteracted
-  //     );
-  //     window?.removeEventListener('touchmove', handleTrackFullscreenInteracted);
-  //     clearTimeout(timeout);
-  //   };
-  // }, [isFullscreen]);
+    return () => {
+      window?.removeEventListener('mousemove', handleTrackFullscreenInteracted);
+      window?.removeEventListener(
+        'touchstart',
+        handleTrackFullscreenInteracted
+      );
+      window?.removeEventListener('touchmove', handleTrackFullscreenInteracted);
+      clearTimeout(timeout);
+    };
+  }, [isFullscreen]);
 
   // Hide cursor if mouse not moved in fullscreen
   useEffect(() => {
@@ -708,9 +707,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       <SVideoWrapper data-vjs-player withBackDropFilter={!isFullscreen}>
         <SWrapper
           id={id}
-          // onTouchStart={handlePlayPauseWrapperOnTouchStart}
-          // onMouseDown={handlePlayPauseWrapperOnMouseDown}
-          // onClick={handlePlayPauseWrapperOnClick}
+          onTouchStart={handlePlayPauseWrapperOnTouchStart}
+          onMouseDown={handlePlayPauseWrapperOnMouseDown}
+          onClick={handlePlayPauseWrapperOnClick}
           ref={videoRef}
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
