@@ -21,10 +21,12 @@ context('Creator flow', () => {
   let payedToBid = [];
   // TODO: Calculate to check bundle earnings
   let payedForBundles = 0;
-  let winningBid: { text: string; amount: number } | undefined = undefined;
+  let eventBids: { text: string; amount: number }[] = [];
 
   const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25] as const;
   type SuperpollOption = typeof SUPERPOLL_OPTIONS[number];
+
+  const BID_TO_WIN_TEXT = 'Bid winning';
 
   let nextUserEmailId = 0;
   function getNextUserEmail() {
@@ -100,13 +102,57 @@ context('Creator flow', () => {
     return () => {
       const optionAmountInCents = optionAmount * 100;
       payedToBid.push(optionAmountInCents);
-      if (!winningBid || winningBid.amount < optionAmountInCents) {
+      eventBids.push({ text: optionText, amount: optionAmountInCents });
+    };
+  }
+
+  // Need both correct text and index
+  function boostEventBid(
+    optionIndex: number,
+    optionText: string,
+    optionAmount: number
+  ): () => void {
+    const buttonSelector = `#bid-${optionIndex}-support`;
+    cy.dGet(buttonSelector).click();
+    const inputSelector = `#bid-${optionIndex}-amount`;
+    cy.dGet(inputSelector).type(optionAmount.toString());
+    const submitSelector = `#bid-${optionIndex}-submit`;
+    cy.dGet(submitSelector)
+      .should('be.enabled')
+      .should('not.have.css', 'cursor', 'wait')
+      .click();
+
+    return () => {
+      const optionAmountInCents = optionAmount * 100;
+      payedToBid.push(optionAmountInCents);
+
+      eventBids.push({ text: optionText, amount: optionAmountInCents });
+    };
+  }
+
+  function getWinningBid() {
+    const bidsMap = new Map<string, number>();
+
+    eventBids.forEach((bid) => {
+      const existingBidValue = bidsMap.get(bid.text) ?? 0;
+      bidsMap.set(bid.text, existingBidValue + bid.amount);
+    });
+
+    let winningBid: { text: string; totalAmount: number };
+    bidsMap.forEach((amount, text) => {
+      if (!winningBid || winningBid.totalAmount < amount) {
         winningBid = {
-          text: optionText,
-          amount: optionAmountInCents,
+          text: text,
+          totalAmount: amount,
         };
       }
-    };
+    });
+
+    const winningsBids = eventBids.filter(
+      (bid) => bid.text === winningBid.text
+    );
+
+    return { ...winningBid, bids: winningsBids.map((bid) => bid.amount) };
   }
 
   function calculateEarnings(rawAmountInCents: number): number {
@@ -114,7 +160,7 @@ context('Creator flow', () => {
     return rawAmountInCents - feesInCents;
   }
 
-  function calculateSuperpollEarnings(contributions: number[]): number {
+  function calculateTotalEarnings(contributions: number[]): number {
     const earnings = contributions.map((contribution) =>
       calculateEarnings(contribution)
     );
@@ -382,13 +428,12 @@ context('Creator flow', () => {
     });
 
     it('can contribute to an event', () => {
-      const BID_OPTION_TEXT = getBidOptionText();
       const BID_OPTION_AMOUNT = 15;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
-      const onSuccess = bidOnEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
+      const onSuccess = bidOnEvent(BID_TO_WIN_TEXT, BID_OPTION_AMOUNT);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -402,7 +447,30 @@ context('Creator flow', () => {
           onSuccess();
         });
 
-      cy.contains(BID_OPTION_TEXT);
+      cy.contains(BID_TO_WIN_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can boost own bid', () => {
+      const BID_OPTION_AMOUNT = 15;
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+      const onSuccess = boostEventBid(0, BID_TO_WIN_TEXT, BID_OPTION_AMOUNT);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.contains(BID_TO_WIN_TEXT);
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
@@ -557,7 +625,7 @@ context('Creator flow', () => {
       storage.save();
     });
 
-    it('can contribute to an event without prior authentication', () => {
+    it('can boost a bid without prior authentication', () => {
       // Clear auth, use new email
       cy.setCookie('accessToken', '');
       cy.setCookie('refreshToken', '');
@@ -567,13 +635,12 @@ context('Creator flow', () => {
       cy.wait(2000);
 
       USER_EMAIL = getNextUserEmail();
-      const BID_OPTION_TEXT = getBidOptionText();
       const BID_OPTION_AMOUNT = 10;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
-      const onSuccess = bidOnEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
+      const onSuccess = boostEventBid(0, BID_TO_WIN_TEXT, BID_OPTION_AMOUNT);
 
       cy.dGet('#email-input').type(USER_EMAIL);
       enterCardInfo(
@@ -598,7 +665,7 @@ context('Creator flow', () => {
           onSuccess();
         });
 
-      cy.contains(BID_OPTION_TEXT);
+      cy.contains(BID_TO_WIN_TEXT);
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
@@ -1973,6 +2040,7 @@ context('Creator flow', () => {
     });
 
     it('can respond to an event', () => {
+      const winningBid = getWinningBid();
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
 
@@ -1990,18 +2058,19 @@ context('Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(winningBid.amount).toString()
+          getDollarsFromCentsNumber(winningBid.totalAmount).toString()
         );
       cy.dGet('#bid-details').invoke('text').should('contain', winningBid.text);
 
       cy.dGet('#confirm-winning-bid').click();
 
       cy.dGet('#post-tab-response').click();
+      // TODO: can fail due to video processing taking long. Separate stage of selecting winning bid out
       cy.dGet('#post-earnings')
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(winningBid.amount).toString()
+          getDollarsFromCentsNumber(winningBid.totalAmount).toString()
         );
 
       cy.dGet('#upload-response-button').should('be.enabled');
@@ -2023,7 +2092,7 @@ context('Creator flow', () => {
         .should(
           'contain',
           getDollarsFromCentsNumber(
-            calculateEarnings(winningBid.amount)
+            calculateTotalEarnings(winningBid.bids)
           ).toString()
         );
     });
@@ -2076,7 +2145,7 @@ context('Creator flow', () => {
         .should(
           'contain',
           getDollarsFromCentsNumber(
-            calculateSuperpollEarnings(payedToSuperpoll)
+            calculateTotalEarnings(payedToSuperpoll)
           ).toString()
         );
     });

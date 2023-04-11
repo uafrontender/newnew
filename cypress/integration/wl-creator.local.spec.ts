@@ -8,6 +8,7 @@ import getShortPostIdFromUrl from './utils/getShortPostIdFromUrl';
 
 const VERIFICATION_CODE = '111111';
 
+// TODO: Refactor duplicated functions, move to utils, applies to creator.spec.ts as well
 context('Whitelisted Creator flow', () => {
   const testSeed = Date.now();
 
@@ -25,12 +26,13 @@ context('Whitelisted Creator flow', () => {
   let payedToSecondBid = [];
   // TODO: Calculate to check bundle earnings
   let payedForBundles = 0;
-  let firstWinningBid: { text: string; amount: number } | undefined = undefined;
-  let secondWinningBid: { text: string; amount: number } | undefined =
-    undefined;
+  let firstEventBids: { text: string; amount: number }[] = [];
+  let secondEventBids: { text: string; amount: number }[] = [];
 
   const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25] as const;
   type SuperpollOption = typeof SUPERPOLL_OPTIONS[number];
+
+  const BID_TO_WIN_TEXT = 'Bid winning';
 
   let nextUserEmailId = 0;
   function getNextUserEmail() {
@@ -109,13 +111,57 @@ context('Whitelisted Creator flow', () => {
     return () => {
       const optionAmountInCents = optionAmount * 100;
       payedToFirstBid.push(optionAmountInCents);
-      if (!firstWinningBid || firstWinningBid.amount < optionAmountInCents) {
-        firstWinningBid = {
-          text: optionText,
-          amount: optionAmountInCents,
+      firstEventBids.push({ text: optionText, amount: optionAmountInCents });
+    };
+  }
+
+  // Need both correct text and index
+  function boostFirstEventBid(
+    optionIndex: number,
+    optionText: string,
+    optionAmount: number
+  ): () => void {
+    const buttonSelector = `#bid-${optionIndex}-support`;
+    cy.dGet(buttonSelector).click();
+    const inputSelector = `#bid-${optionIndex}-amount`;
+    cy.dGet(inputSelector).type(optionAmount.toString());
+    const submitSelector = `#bid-${optionIndex}-submit`;
+    cy.dGet(submitSelector)
+      .should('be.enabled')
+      .should('not.have.css', 'cursor', 'wait')
+      .click();
+
+    return () => {
+      const optionAmountInCents = optionAmount * 100;
+      payedToFirstBid.push(optionAmountInCents);
+
+      firstEventBids.push({ text: optionText, amount: optionAmountInCents });
+    };
+  }
+
+  function getFirstWinningBid() {
+    const bidsMap = new Map<string, number>();
+
+    firstEventBids.forEach((bid) => {
+      const existingBidValue = bidsMap.get(bid.text) ?? 0;
+      bidsMap.set(bid.text, existingBidValue + bid.amount);
+    });
+
+    let winningBid: { text: string; totalAmount: number };
+    bidsMap.forEach((amount, text) => {
+      if (!winningBid || winningBid.totalAmount < amount) {
+        winningBid = {
+          text: text,
+          totalAmount: amount,
         };
       }
-    };
+    });
+
+    const winningsBids = firstEventBids.filter(
+      (bid) => bid.text === winningBid.text
+    );
+
+    return { ...winningBid, bids: winningsBids.map((bid) => bid.amount) };
   }
 
   function voteSecondOnSuperpoll(
@@ -173,13 +219,33 @@ context('Whitelisted Creator flow', () => {
     return () => {
       const optionAmountInCents = optionAmount * 100;
       payedToSecondBid.push(optionAmountInCents);
-      if (!secondWinningBid || secondWinningBid.amount < optionAmountInCents) {
-        secondWinningBid = {
-          text: optionText,
-          amount: optionAmountInCents,
+      secondEventBids.push({ text: optionText, amount: optionAmountInCents });
+    };
+  }
+
+  function getSecondWinningBid() {
+    const bidsMap = new Map<string, number>();
+
+    secondEventBids.forEach((bid) => {
+      const existingBidValue = bidsMap.get(bid.text) ?? 0;
+      bidsMap.set(bid.text, existingBidValue + bid.amount);
+    });
+
+    let winningBid: { text: string; totalAmount: number };
+    bidsMap.forEach((amount, text) => {
+      if (!winningBid || winningBid.totalAmount < amount) {
+        winningBid = {
+          text: text,
+          totalAmount: amount,
         };
       }
-    };
+    });
+
+    const winningsBids = secondEventBids.filter(
+      (bid) => bid.text === winningBid.text
+    );
+
+    return { ...winningBid, bids: winningsBids.map((bid) => bid.amount) };
   }
 
   function calculateEarnings(rawAmountInCents: number): number {
@@ -187,7 +253,7 @@ context('Whitelisted Creator flow', () => {
     return rawAmountInCents - feesInCents;
   }
 
-  function calculateSuperpollEarnings(contributions: number[]): number {
+  function calculateTotalEarnings(contributions: number[]): number {
     const earnings = contributions.map((contribution) =>
       calculateEarnings(contribution)
     );
@@ -414,13 +480,12 @@ context('Whitelisted Creator flow', () => {
     });
 
     it('can contribute to an event', () => {
-      const BID_OPTION_TEXT = getBidOptionText();
       const BID_OPTION_AMOUNT = 25;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstEventShortId}`);
       cy.url().should('include', '/p/');
 
-      const onSuccess = bidOnFirstEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
+      const onSuccess = bidOnFirstEvent(BID_TO_WIN_TEXT, BID_OPTION_AMOUNT);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -434,7 +499,34 @@ context('Whitelisted Creator flow', () => {
           onSuccess();
         });
 
-      cy.contains(BID_OPTION_TEXT);
+      cy.contains(BID_TO_WIN_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can boost own bid', () => {
+      const BID_OPTION_AMOUNT = 15;
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstEventShortId}`);
+      cy.url().should('include', '/p/');
+      const onSuccess = boostFirstEventBid(
+        0,
+        BID_TO_WIN_TEXT,
+        BID_OPTION_AMOUNT
+      );
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.contains(BID_TO_WIN_TEXT);
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
@@ -809,7 +901,7 @@ context('Whitelisted Creator flow', () => {
       storage.save();
     });
 
-    it('can contribute to an event without prior authentication', () => {
+    it('can boost a bid without prior authentication', () => {
       // Clear auth, use new email
       cy.setCookie('accessToken', '');
       cy.setCookie('refreshToken', '');
@@ -819,13 +911,16 @@ context('Whitelisted Creator flow', () => {
       cy.wait(2000);
 
       USER_EMAIL = getNextUserEmail();
-      const BID_OPTION_TEXT = getBidOptionText();
       const BID_OPTION_AMOUNT = 10;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstEventShortId}`);
       cy.url().should('include', '/p/');
 
-      const onSuccess = bidOnFirstEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
+      const onSuccess = boostFirstEventBid(
+        0,
+        BID_TO_WIN_TEXT,
+        BID_OPTION_AMOUNT
+      );
 
       cy.dGet('#email-input').type(USER_EMAIL);
       enterCardInfo(
@@ -850,7 +945,7 @@ context('Whitelisted Creator flow', () => {
           onSuccess();
         });
 
-      cy.contains(BID_OPTION_TEXT);
+      cy.contains(BID_TO_WIN_TEXT);
       cy.contains(`${BID_OPTION_AMOUNT}`);
     });
 
@@ -2307,6 +2402,7 @@ context('Whitelisted Creator flow', () => {
     });
 
     it('can respond to an event', () => {
+      const firstWinningBid = getFirstWinningBid();
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${firstEventShortId}`);
       cy.url().should('include', '/p/');
 
@@ -2324,7 +2420,7 @@ context('Whitelisted Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(firstWinningBid.amount).toString()
+          getDollarsFromCentsNumber(firstWinningBid.totalAmount).toString()
         );
       cy.dGet('#bid-details')
         .invoke('text')
@@ -2333,11 +2429,12 @@ context('Whitelisted Creator flow', () => {
       cy.dGet('#confirm-winning-bid').click();
 
       cy.dGet('#post-tab-response').click();
+      // TODO: can fail due to video processing taking long. Separate stage of selecting winning bid out
       cy.dGet('#post-earnings')
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(firstWinningBid.amount).toString()
+          getDollarsFromCentsNumber(firstWinningBid.totalAmount).toString()
         );
 
       cy.dGet('#upload-response-button').should('be.enabled');
@@ -2359,7 +2456,7 @@ context('Whitelisted Creator flow', () => {
         .should(
           'contain',
           getDollarsFromCentsNumber(
-            calculateEarnings(firstWinningBid.amount)
+            calculateTotalEarnings(firstWinningBid.bids)
           ).toString()
         );
     });
@@ -2416,7 +2513,7 @@ context('Whitelisted Creator flow', () => {
         .should(
           'contain',
           getDollarsFromCentsNumber(
-            calculateSuperpollEarnings(payedToFirstSuperpoll)
+            calculateTotalEarnings(payedToFirstSuperpoll)
           ).toString()
         );
     });
@@ -2538,6 +2635,8 @@ context('Whitelisted Creator flow', () => {
     });
 
     it('can respond to an event', () => {
+      const secondWinningBid = getSecondWinningBid();
+
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${secondEventShortId}`);
       cy.url().should('include', '/p/');
 
@@ -2557,7 +2656,7 @@ context('Whitelisted Creator flow', () => {
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(secondWinningBid.amount).toString()
+          getDollarsFromCentsNumber(secondWinningBid.totalAmount).toString()
         );
       cy.dGet('#bid-details')
         .invoke('text')
@@ -2566,11 +2665,12 @@ context('Whitelisted Creator flow', () => {
       cy.dGet('#confirm-winning-bid').click();
 
       cy.dGet('#post-tab-response').click();
+      // TODO: can fail due to video processing taking long. Separate stage of selecting winning bid out
       cy.dGet('#post-earnings')
         .invoke('text')
         .should(
           'contain',
-          getDollarsFromCentsNumber(secondWinningBid.amount).toString()
+          getDollarsFromCentsNumber(secondWinningBid.totalAmount).toString()
         );
 
       cy.dGet('#upload-response-button').should('be.enabled');
@@ -2592,7 +2692,7 @@ context('Whitelisted Creator flow', () => {
         .should(
           'contain',
           getDollarsFromCentsNumber(
-            calculateEarnings(secondWinningBid.amount)
+            calculateTotalEarnings(secondWinningBid.bids)
           ).toString()
         );
     });
@@ -2649,7 +2749,7 @@ context('Whitelisted Creator flow', () => {
         .should(
           'contain',
           getDollarsFromCentsNumber(
-            calculateSuperpollEarnings(payedToSecondSuperpoll)
+            calculateTotalEarnings(payedToSecondSuperpoll)
           ).toString()
         );
     });
