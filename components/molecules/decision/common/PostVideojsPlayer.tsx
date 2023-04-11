@@ -665,9 +665,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             });
         }
       } else {
-        setPlaybackTime(0);
-        playerRef.current?.currentTime(0);
         playerRef?.current?.pause();
+        // Required to avoid one frame flickering when changing items in the slider
+        setTimeout(() => {
+          setPlaybackTime(0);
+          playerRef.current?.currentTime(0);
+        }, 100);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
