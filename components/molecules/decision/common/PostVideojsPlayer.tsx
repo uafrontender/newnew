@@ -708,9 +708,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       <SVideoWrapper data-vjs-player withBackDropFilter={!isFullscreen}>
         <SWrapper
           id={id}
-          onTouchStart={handlePlayPauseWrapperOnTouchStart}
-          onMouseDown={handlePlayPauseWrapperOnMouseDown}
-          onClick={handlePlayPauseWrapperOnClick}
+          // onTouchStart={handlePlayPauseWrapperOnTouchStart}
+          // onMouseDown={handlePlayPauseWrapperOnMouseDown}
+          // onClick={handlePlayPauseWrapperOnClick}
           ref={videoRef}
           videoOrientation={videoOrientation}
           isFullScreen={isFullscreen}
