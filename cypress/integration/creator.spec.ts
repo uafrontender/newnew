@@ -1653,6 +1653,7 @@ context('Creator flow', () => {
   describe('User willing to add card first', () => {
     const USER_EMAIL = getNextUserEmail();
     const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_2_NUMBER = '6011111111111117';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1844,7 +1845,7 @@ context('Creator flow', () => {
         });
     });
 
-    it('can contribute to an event', () => {
+    it('can contribute to an event with another card', () => {
       const BID_OPTION_TEXT = getBidOptionText();
       const BID_OPTION_AMOUNT = 20;
 
@@ -1855,6 +1856,17 @@ context('Creator flow', () => {
 
       // Wait stripe elements
       cy.wait(1000);
+
+      cy.dGet('#new-card').click();
+
+      // Wait for stripe elements to load
+      cy.wait(2000);
+      enterCardInfo(
+        USER_CARD_2_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
       cy.dGet('#pay').click();
 
       cy.dGet('#paymentSuccess', {

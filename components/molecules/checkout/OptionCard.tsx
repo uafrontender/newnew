@@ -9,12 +9,14 @@ import Text from '../../atoms/Text';
 import checkBoxAnim from '../../../public/animations/checkbox.json';
 
 interface IOptionCard {
+  id?: string;
   selected?: boolean;
   handleClick: () => void;
   label: string;
 }
 
 const OptionCard: React.FunctionComponent<IOptionCard> = ({
+  id,
   selected,
   handleClick,
   label,
@@ -40,6 +42,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
 
   return (
     <SOptionCard
+      id={id}
       selected={selected ?? false}
       onClick={handleClick}
       type='button'
