@@ -522,6 +522,7 @@ const SResultsDropMobile = styled.div`
   top: 56px;
   left: 0;
   overflow: auto;
+  padding: 16px;
 
   @supports (-webkit-touch-callout: none) {
     /* CSS specific to iOS devices */
