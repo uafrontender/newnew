@@ -328,7 +328,7 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
 
   return {
     ...appProps,
-    colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
+    colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
   };
 };

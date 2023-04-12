@@ -24,7 +24,7 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
   handleCloseOptionBidHistory,
 }) => {
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
 

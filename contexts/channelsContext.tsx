@@ -9,6 +9,7 @@ import React, {
   useMemo,
   useEffect,
   useContext,
+  useCallback,
 } from 'react';
 import { SocketContext } from './socketContext';
 
@@ -29,33 +30,36 @@ interface IChannelsContextProvider {
 const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
   children,
 }) => {
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const [channelsWithSubs, setChannelsWithSubs] = useState<IChannels>({});
   const [scheduledArr, setScheduledArr] = useState<string[]>([]);
 
-  const addChannel = (id: string, channel: newnewapi.IChannel) => {
-    setChannelsWithSubs((curr) => {
-      const workingObj = { ...curr };
-      const shouldSubscribe = !workingObj[id] || workingObj[id] === 0;
+  const addChannel = useCallback(
+    (id: string, channel: newnewapi.IChannel) => {
+      setChannelsWithSubs((curr) => {
+        const workingObj = { ...curr };
+        const shouldSubscribe = !workingObj[id] || workingObj[id] === 0;
 
-      if (!socketConnection?.connected) {
-        setScheduledArr((currentArr) => [...currentArr, id]);
-        return curr;
-      }
+        if (!isSocketConnected) {
+          setScheduledArr((currentArr) => [...currentArr, id]);
+          return curr;
+        }
 
-      if (shouldSubscribe && socketConnection && socketConnection?.connected) {
-        const subscribeMsg = new newnewapi.SubscribeToChannels({
-          channels: [channel],
-        });
+        if (shouldSubscribe && socketConnection && isSocketConnected) {
+          const subscribeMsg = new newnewapi.SubscribeToChannels({
+            channels: [channel],
+          });
 
-        const subscribeMsgEncoded =
-          newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-        socketConnection?.emit('SubscribeToChannels', subscribeMsgEncoded);
-      }
-      workingObj[id] = shouldSubscribe ? 1 : workingObj[id] + 1;
-      return workingObj;
-    });
-  };
+          const subscribeMsgEncoded =
+            newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+          socketConnection?.emit('SubscribeToChannels', subscribeMsgEncoded);
+        }
+        workingObj[id] = shouldSubscribe ? 1 : workingObj[id] + 1;
+        return workingObj;
+      });
+    },
+    [isSocketConnected, socketConnection]
+  );
 
   const removeChannel = (id: string) => {
     setChannelsWithSubs((curr) => {
@@ -73,77 +77,71 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
       addChannel,
       removeChannel,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [channelsWithSubs]
+    [channelsWithSubs, addChannel]
   );
 
   useEffect(() => {
-    if (socketConnection?.connected) {
-      if (scheduledArr.length > 0) {
-        setScheduledArr((currentArr) => {
-          currentArr.forEach((val) => {
-            setChannelsWithSubs((curr) => {
-              const workingObj = { ...curr };
-              const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
-              if (
-                shouldSubscribe &&
-                socketConnection &&
-                socketConnection?.connected
+    if (isSocketConnected && scheduledArr.length > 0) {
+      setScheduledArr((currentArr) => {
+        currentArr.forEach((val) => {
+          setChannelsWithSubs((curr) => {
+            const workingObj = { ...curr };
+            const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
+            if (shouldSubscribe && socketConnection && isSocketConnected) {
+              let subscribeMsg;
+              if (val.startsWith('chat_')) {
+                const chatId = parseInt(val.split('_')[1]);
+                subscribeMsg = new newnewapi.SubscribeToChannels({
+                  channels: [
+                    {
+                      chatRoomUpdates: {
+                        chatRoomId: chatId,
+                      },
+                    },
+                  ],
+                });
+              } else if (
+                val ===
+                newnewapi.Channel.CuratedListType.Type.POPULAR.toString()
               ) {
-                let subscribeMsg;
-                if (val.startsWith('chat_')) {
-                  const chatId = parseInt(val.split('_')[1]);
-                  subscribeMsg = new newnewapi.SubscribeToChannels({
-                    channels: [
-                      {
-                        chatRoomUpdates: {
-                          chatRoomId: chatId,
-                        },
+                subscribeMsg = new newnewapi.SubscribeToChannels({
+                  channels: [
+                    {
+                      curatedListUpdates: {
+                        type: newnewapi.Channel.CuratedListType.Type.POPULAR,
                       },
-                    ],
-                  });
-                } else if (
-                  val ===
-                  newnewapi.Channel.CuratedListType.Type.POPULAR.toString()
-                ) {
-                  subscribeMsg = new newnewapi.SubscribeToChannels({
-                    channels: [
-                      {
-                        curatedListUpdates: {
-                          type: newnewapi.Channel.CuratedListType.Type.POPULAR,
-                        },
+                    },
+                  ],
+                });
+              } else {
+                subscribeMsg = new newnewapi.SubscribeToChannels({
+                  channels: [
+                    {
+                      postUpdates: {
+                        postUuid: val,
                       },
-                    ],
-                  });
-                } else {
-                  subscribeMsg = new newnewapi.SubscribeToChannels({
-                    channels: [
-                      {
-                        postUpdates: {
-                          postUuid: val,
-                        },
-                      },
-                    ],
-                  });
-                }
-
-                const subscribeMsgEncoded =
-                  newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-                socketConnection?.emit(
-                  'SubscribeToChannels',
-                  subscribeMsgEncoded
-                );
+                    },
+                  ],
+                });
               }
-              workingObj[val] = shouldSubscribe ? 1 : workingObj[val] + 1;
 
-              return workingObj;
-            });
+              const subscribeMsgEncoded =
+                newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+
+              socketConnection?.emit(
+                'SubscribeToChannels',
+                subscribeMsgEncoded
+              );
+            }
+            workingObj[val] = shouldSubscribe ? 1 : workingObj[val] + 1;
+
+            return workingObj;
           });
-          return [];
         });
-      }
+        return [];
+      });
     }
-  }, [socketConnection, socketConnection?.connected, scheduledArr]);
+  }, [socketConnection, isSocketConnected, scheduledArr]);
 
   useEffect(() => {
     const shouldUnsubArray: newnewapi.IChannel[] = [];

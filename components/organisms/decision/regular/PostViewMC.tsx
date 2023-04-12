@@ -129,7 +129,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   );
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   // Bundle
   const { bundles } = useBundles();
