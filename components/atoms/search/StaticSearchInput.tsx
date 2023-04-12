@@ -154,8 +154,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
     }, [globalSearchActive, handleSearchClose]);
 
-    console.log(resultsContainerRef);
-
     useOnClickOutside(
       [inputContainerRef, resultsContainerRef],
       handleClickOutside
