@@ -242,13 +242,13 @@ export const PostCard: React.FC<ICard> = React.memo(
       setIsEllipseMenuOpen(true);
     };
 
-    const handleEllipseMenuClose = () => {
+    const handleEllipseMenuClose = useCallback(() => {
       Mixpanel.track('Closed Ellipse Menu Post Card', {
         _stage: 'Post Card',
         _postUuid: switchPostType(item)[0].postUuid,
       });
       setIsEllipseMenuOpen(false);
-    };
+    }, [item]);
 
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 

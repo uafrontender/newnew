@@ -230,6 +230,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         >
           {options.map((option, i) => (
             <AcOptionCard
+              id={`bid-${i}`}
               key={option.id.toString()}
               option={option as TAcOptionWithHighestField}
               postUuid={postUuid}

@@ -83,7 +83,19 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         }`}
         key={switchPostType(item)[0].postUuid}
       >
-        <SItemWrapper name={`cards-section-${category}-${index}`}>
+        <SItemWrapper
+          name={`cards-section-${category}-${index}`}
+          onClickCapture={() => {
+            Mixpanel.track('Open Post', {
+              _stage: 'Post Card',
+              _postUuid: switchPostType(item)[0].postUuid,
+              _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                switchPostType(item)[0].postShortId ||
+                switchPostType(item)[0].postUuid
+              }`,
+            });
+          }}
+        >
           <SPostCard
             item={item}
             index={index}

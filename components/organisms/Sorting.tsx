@@ -86,11 +86,13 @@ export const Sorting: React.FC<ISorting> = (props) => {
   }, []);
 
   useOnClickEsc(ref, handleCloseClick);
-  useOnClickOutside(ref, () => {
+  const handleClickOutside = useCallback(() => {
     if (!isMobile) {
       handleCloseClick();
     }
-  });
+  }, [isMobile, handleCloseClick]);
+
+  useOnClickOutside(ref, handleClickOutside);
 
   useEffect(() => {
     setTimeout(() => {
