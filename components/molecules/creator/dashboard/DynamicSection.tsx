@@ -182,11 +182,12 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       handleMinimizeClick();
     }
   });
-  useOnClickOutside(containerRef, () => {
+  const handleClickOutside = useCallback(() => {
     if (tab && !isDesktop && !showNewMessageModal) {
       handleMinimizeClick();
     }
-  });
+  }, [tab, isDesktop, showNewMessageModal, handleMinimizeClick]);
+  useOnClickOutside(containerRef, handleClickOutside);
   useEffect(() => {
     if (!isDesktop && tab) {
       enableOverlayMode();

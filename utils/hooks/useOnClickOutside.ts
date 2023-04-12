@@ -3,16 +3,10 @@ import { useEffect, useRef } from 'react';
 export const useOnClickOutside = (
   ref: any | any[],
   // Don't forget to wrap callback into usecallback
-  handler: (e: Event) => void,
-  debug?: boolean
+  handler: (e: Event) => void
 ) => {
   const refs = useRef(Array.isArray(ref) ? ref : [ref]);
-
   useEffect(() => {
-    if (debug) {
-      console.log('INITIALIZE');
-    }
-
     const listener = (event: Event) => {
       const noRefs = refs.current.every((r) => !r?.current);
 
@@ -29,9 +23,6 @@ export const useOnClickOutside = (
       });
 
       if (!inside) {
-        if (debug) {
-          console.log('HANDLER CALLED');
-        }
         handler(event);
       }
     };
