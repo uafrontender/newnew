@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -88,6 +88,11 @@ const Card: React.FunctionComponent<ICard> = ({
 
   const { setPrimaryCardMutation, removeCardMutation } = useCards();
 
+  const handleCloseCardEllipseMenu = useCallback(
+    () => setIsEllipseMenuOpen(false),
+    []
+  );
+
   const handelSetPrimaryCard = async () => {
     Mixpanel.track('Set Primary Card', {
       _stage: 'Settings',
@@ -135,7 +140,7 @@ const Card: React.FunctionComponent<ICard> = ({
           <CardEllipseMenu
             isVisible={isEllipseMenuOpen}
             isPrimary={isPrimary}
-            handleClose={() => setIsEllipseMenuOpen(false)}
+            handleClose={handleCloseCardEllipseMenu}
             anchorElement={moreButtonRef.current}
             onSetPrimaryCard={handelSetPrimaryCard}
             onDeleteCard={handleDeleteCard}

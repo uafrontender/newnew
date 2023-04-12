@@ -6,13 +6,12 @@ export const useOnClickOutside = (
   handler: (e: Event) => void
 ) => {
   const refs = useRef(Array.isArray(ref) ? ref : [ref]);
-
   useEffect(() => {
     const listener = (event: Event) => {
       const noRefs = refs.current.every((r) => !r?.current);
 
       if (noRefs) {
-        return
+        return;
       }
 
       const inside = refs.current.some((r) => {

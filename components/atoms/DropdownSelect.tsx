@@ -60,12 +60,10 @@ const DropdownSelect = <T,>({
   const selectedRef = useRef<T | undefined>(selected);
 
   const handleToggle = () => setIsOpen((curr) => !curr);
-  const handleClose = () => setIsOpen(false);
+  const handleClose = useCallback(() => setIsOpen(false), []);
 
   useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, () => {
-    handleClose();
-  });
+  useOnClickOutside(containerRef, handleClose);
 
   const getOptionId = useCallback((value: T): string | undefined => {
     if (typeof value === 'string') {
