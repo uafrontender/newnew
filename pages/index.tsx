@@ -63,21 +63,23 @@ const Home: NextPage<IHome> = ({
   const [popularPostsArr, setPopularPostsAdd] = useState(popularPosts?.posts);
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   useEffect(() => {
-    addChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString(), {
-      curatedListUpdates: {
-        type: newnewapi.Channel.CuratedListType.Type.POPULAR,
-      },
-    });
+    if (isSocketConnected) {
+      addChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString(), {
+        curatedListUpdates: {
+          type: newnewapi.Channel.CuratedListType.Type.POPULAR,
+        },
+      });
+    }
 
     return () => {
       removeChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isSocketConnected]);
 
   useEffect(() => {
     const handlerSocketCuratedListUpdated = (data: any) => {

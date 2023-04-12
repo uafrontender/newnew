@@ -9,6 +9,7 @@ import React, {
   useMemo,
   useEffect,
   useContext,
+  useCallback,
 } from 'react';
 import { SocketContext } from './socketContext';
 
@@ -29,55 +30,36 @@ interface IChannelsContextProvider {
 const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
   children,
 }) => {
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const [channelsWithSubs, setChannelsWithSubs] = useState<IChannels>({});
   const [scheduledArr, setScheduledArr] = useState<string[]>([]);
-  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
-  console.log(scheduledArr, 'scheduledArr');
+  const addChannel = useCallback(
+    (id: string, channel: newnewapi.IChannel) => {
+      setChannelsWithSubs((curr) => {
+        const workingObj = { ...curr };
+        const shouldSubscribe = !workingObj[id] || workingObj[id] === 0;
 
-  useEffect(() => {
-    const onSocketConnected = () => {
-      setIsSocketConnected(true);
-    };
+        if (!isSocketConnected) {
+          setScheduledArr((currentArr) => [...currentArr, id]);
+          return curr;
+        }
 
-    const onSocketDisconnected = () => {
-      setIsSocketConnected(false);
-    };
-    socketConnection?.on('connect', onSocketConnected);
+        if (shouldSubscribe && socketConnection && isSocketConnected) {
+          const subscribeMsg = new newnewapi.SubscribeToChannels({
+            channels: [channel],
+          });
 
-    socketConnection?.on('disconnect', onSocketDisconnected);
-
-    return () => {
-      socketConnection?.off('connect', onSocketConnected);
-
-      socketConnection?.off('disconnect', onSocketDisconnected);
-    };
-  }, [socketConnection]);
-
-  const addChannel = (id: string, channel: newnewapi.IChannel) => {
-    setChannelsWithSubs((curr) => {
-      const workingObj = { ...curr };
-      const shouldSubscribe = !workingObj[id] || workingObj[id] === 0;
-
-      if (!socketConnection?.connected) {
-        setScheduledArr((currentArr) => [...currentArr, id]);
-        return curr;
-      }
-
-      if (shouldSubscribe && socketConnection && socketConnection?.connected) {
-        const subscribeMsg = new newnewapi.SubscribeToChannels({
-          channels: [channel],
-        });
-
-        const subscribeMsgEncoded =
-          newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-        socketConnection?.emit('SubscribeToChannels', subscribeMsgEncoded);
-      }
-      workingObj[id] = shouldSubscribe ? 1 : workingObj[id] + 1;
-      return workingObj;
-    });
-  };
+          const subscribeMsgEncoded =
+            newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+          socketConnection?.emit('SubscribeToChannels', subscribeMsgEncoded);
+        }
+        workingObj[id] = shouldSubscribe ? 1 : workingObj[id] + 1;
+        return workingObj;
+      });
+    },
+    [isSocketConnected, socketConnection]
+  );
 
   const removeChannel = (id: string) => {
     setChannelsWithSubs((curr) => {
@@ -95,8 +77,7 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
       addChannel,
       removeChannel,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [channelsWithSubs]
+    [channelsWithSubs, addChannel]
   );
 
   useEffect(() => {
@@ -106,11 +87,7 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
           setChannelsWithSubs((curr) => {
             const workingObj = { ...curr };
             const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
-            if (
-              shouldSubscribe &&
-              socketConnection &&
-              socketConnection?.connected
-            ) {
+            if (shouldSubscribe && socketConnection && isSocketConnected) {
               let subscribeMsg;
               if (val.startsWith('chat_')) {
                 const chatId = parseInt(val.split('_')[1]);
@@ -150,6 +127,7 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
 
               const subscribeMsgEncoded =
                 newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+
               socketConnection?.emit(
                 'SubscribeToChannels',
                 subscribeMsgEncoded

@@ -46,7 +46,7 @@ const CommentsBottomSection: React.FunctionComponent<
   const { showErrorToastPredefined } = useErrorToasts();
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Submit form ref
@@ -130,7 +130,7 @@ const CommentsBottomSection: React.FunctionComponent<
     [removeCommentMutation, showErrorToastPredefined]
   );
   useEffect(() => {
-    if (commentsRoomId) {
+    if (commentsRoomId && isSocketConnected) {
       addChannel(`comments_${commentsRoomId.toString()}`, {
         chatRoomUpdates: {
           chatRoomId: commentsRoomId,
@@ -138,7 +138,7 @@ const CommentsBottomSection: React.FunctionComponent<
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentsRoomId]);
+  }, [commentsRoomId, isSocketConnected]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = async (data: any) => {
