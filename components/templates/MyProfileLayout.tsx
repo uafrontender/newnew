@@ -724,6 +724,7 @@ const SSpending = styled.div`
   cursor: default;
 
   :hover {
-    color: ${({ theme }) => (theme.name === 'light' ? '#B3BBCA' : '#323444')};
+    opacity: 0.7;
+    color: ${({ theme }) => (theme.name === 'light' ? '#D5DAE3;' : '#323444')};
   }
 `;
