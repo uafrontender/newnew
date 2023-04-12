@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -59,11 +59,13 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
   };
 
   useOnClickEsc(ref, handleCloseClick);
-  useOnClickOutside(ref, () => {
+
+  const handleClickOutside = useCallback(() => {
     if (!isMobile) {
       handleCloseClick();
     }
-  });
+  }, [isMobile]);
+  useOnClickOutside(ref, handleClickOutside);
 
   return (
     <SContainer ref={ref}>

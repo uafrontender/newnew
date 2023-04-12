@@ -216,6 +216,7 @@ const SText = styled(Text)`
   max-width: 250px;
   margin-top: 4px;
   text-align: center;
+  overflow-wrap: break-word;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-weight: 600;
 
