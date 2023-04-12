@@ -53,7 +53,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
   const { addCardMutation } = useCards();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const theme = useTheme();
 
   const [message, setMessage] = useState('');
