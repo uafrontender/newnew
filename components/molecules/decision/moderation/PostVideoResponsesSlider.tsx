@@ -345,7 +345,7 @@ const SDotsContainer = styled.div<{
   position: absolute;
 
   width: 100%;
-  bottom: ${({ isEditingStories }) => (isEditingStories ? '56px' : '86px')};
+  bottom: ${({ isEditingStories }) => (isEditingStories ? '56px' : '102px')};
 
   display: flex;
   justify-content: center;
