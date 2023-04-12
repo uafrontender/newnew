@@ -9,8 +9,14 @@ export const useOnClickOutside = (
 
   useEffect(() => {
     const listener = (event: Event) => {
-      const inside = refs.current.some((ref) => {
-        if (!ref.current || ref.current.contains(event.target)) {
+      const noRefs = refs.current.every((r) => !r?.current);
+
+      if (noRefs) {
+        return
+      }
+
+      const inside = refs.current.some((r) => {
+        if (r.current && r.current.contains(event.target)) {
           return true;
         }
 
