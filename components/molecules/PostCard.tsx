@@ -154,7 +154,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, [hovered]);
 
     // Socket
-    const socketConnection = useContext(SocketContext);
+    const { socketConnection, isSocketConnected } = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     const [postParsed, typeOfPost] = switchPostType(item);
@@ -295,17 +295,19 @@ export const PostCard: React.FC<ICard> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      addChannel(postParsed.postUuid, {
-        postUpdates: {
-          postUuid: postParsed.postUuid,
-        },
-      });
+      if (isSocketConnected) {
+        addChannel(postParsed.postUuid, {
+          postUpdates: {
+            postUuid: postParsed.postUuid,
+          },
+        });
+      }
 
       return () => {
         removeChannel(postParsed.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [isSocketConnected]);
 
     // Subscribe to post updates event
     useEffect(() => {

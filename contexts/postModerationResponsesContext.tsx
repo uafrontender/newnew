@@ -137,7 +137,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 }) => {
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const { postParsed, postStatus, refetchPost, handleSetIsConfirmToClosePost } =
     usePostInnerState();

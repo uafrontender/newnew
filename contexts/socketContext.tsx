@@ -1,11 +1,17 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useMemo } from 'react';
 import { useCookies } from 'react-cookie';
 import { Socket, io } from 'socket.io-client';
 import { fetchInitialized } from '../api/apiConfigs';
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_URL ?? '';
 
-export const SocketContext = createContext<Socket | undefined>(undefined);
+export const SocketContext = createContext<{
+  isSocketConnected: boolean;
+  socketConnection: Socket | undefined;
+}>({
+  isSocketConnected: false,
+  socketConnection: undefined,
+});
 
 interface ISocketContextProvider {
   children: React.ReactNode;
@@ -16,6 +22,29 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
 }) => {
   const [socket, setSocket] = useState<Socket | undefined>(undefined);
   const [cookies] = useCookies();
+
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
+
+  useEffect(() => {
+    const onSocketConnected = () => {
+      setIsSocketConnected(true);
+    };
+
+    const onSocketDisconnected = () => {
+      setIsSocketConnected(false);
+    };
+    if (socket) {
+      socket?.on('connect', onSocketConnected);
+
+      socket?.on('disconnect', onSocketDisconnected);
+    }
+
+    return () => {
+      socket?.off('connect', onSocketConnected);
+
+      socket?.off('disconnect', onSocketDisconnected);
+    };
+  }, [socket]);
 
   // Will use access token if it is available to connect to socket.io
   useEffect(() => {
@@ -34,7 +63,7 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
         // transports: ['websocket', 'polling'],
       });
 
-      setSocket(() => socketConnected);
+      setSocket(socketConnected);
     }
 
     function cleanup() {
@@ -45,8 +74,16 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cookies?.accessToken, fetchInitialized]);
 
+  const value = useMemo(
+    () => ({
+      isSocketConnected,
+      socketConnection: socket,
+    }),
+    [isSocketConnected, socket]
+  );
+
   return (
-    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
   );
 };
 

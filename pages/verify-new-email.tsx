@@ -30,7 +30,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   const { email, retryAfter, redirect } = router.query;
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   // Redirect if the user is not logged in
   useEffect(() => {
