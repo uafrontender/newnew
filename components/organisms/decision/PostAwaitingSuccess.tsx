@@ -2,7 +2,8 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { useInView } from 'react-intersection-observer';
 
 import { usePostInnerState } from '../../../contexts/postInnerContext';
 
@@ -11,6 +12,8 @@ import WaitingForResponseView from './awaiting';
 import GoBackButton from '../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../contexts/appStateContext';
+import Headline from '../../atoms/Headline';
+import ListPostPage from '../see-more/ListPostPage';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -21,6 +24,7 @@ interface IPostAwaitingSuccess {}
 const PostAwaitingSuccess: React.FunctionComponent<
   IPostAwaitingSuccess
 > = () => {
+  const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -37,7 +41,12 @@ const PostAwaitingSuccess: React.FunctionComponent<
     handleReportSubmit,
     handleReportClose,
     handleCloseAndGoBack,
+    handleOpenRecommendedPost,
+    loadingRef,
+    recommendedPostsLoading,
   } = usePostInnerState();
+
+  const { ref: recommendationsSectionRef } = useInView({});
 
   return (
     <>
@@ -76,6 +85,40 @@ const PostAwaitingSuccess: React.FunctionComponent<
               typeOfPost={typeOfPost}
             />
           ) : null}
+          <SRecommendationsSection
+            id='recommendations-section-heading'
+            ref={recommendationsSectionRef}
+            loaded={recommendedPosts && recommendedPosts.length > 0}
+          >
+            <Headline variant={4}>
+              {recommendedPosts.length > 0
+                ? t('recommendationsSection.heading')
+                : null}
+            </Headline>
+            {recommendedPosts && (
+              <ListPostPage
+                loading={recommendedPostsLoading}
+                collection={recommendedPosts}
+                skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                skeletonsHighlightColor={
+                  theme.colorsThemed.background.secondary
+                }
+                handlePostClicked={handleOpenRecommendedPost}
+              />
+            )}
+            <div
+              ref={loadingRef}
+              style={{
+                position: 'relative',
+                bottom: '10px',
+                ...(recommendedPostsLoading
+                  ? {
+                      display: 'none',
+                    }
+                  : {}),
+              }}
+            />
+          </SRecommendationsSection>
         </SPostContainer>
       ) : null}
       {postParsed?.creator && reportPostOpen && (
@@ -154,4 +197,16 @@ const SGoBackButtonContainer = styled.div`
 
 const SGoBackButton = styled(GoBackButton)`
   margin-right: auto;
+`;
+
+const SRecommendationsSection = styled.div<{
+  loaded: boolean;
+}>`
+  min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
+
+  margin-top: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 32px;
+  }
 `;
