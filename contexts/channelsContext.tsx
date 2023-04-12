@@ -32,6 +32,28 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
   const socketConnection = useContext(SocketContext);
   const [channelsWithSubs, setChannelsWithSubs] = useState<IChannels>({});
   const [scheduledArr, setScheduledArr] = useState<string[]>([]);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
+
+  console.log(scheduledArr, 'scheduledArr');
+
+  useEffect(() => {
+    const onSocketConnected = () => {
+      setIsSocketConnected(true);
+    };
+
+    const onSocketDisconnected = () => {
+      setIsSocketConnected(false);
+    };
+    socketConnection?.on('connect', onSocketConnected);
+
+    socketConnection?.on('disconnect', onSocketDisconnected);
+
+    return () => {
+      socketConnection?.off('connect', onSocketConnected);
+
+      socketConnection?.off('disconnect', onSocketDisconnected);
+    };
+  }, [socketConnection]);
 
   const addChannel = (id: string, channel: newnewapi.IChannel) => {
     setChannelsWithSubs((curr) => {
@@ -78,18 +100,17 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
   );
 
   useEffect(() => {
-    const handleSubscribeScheduledChannels = () => {
-      if (scheduledArr.length === 0) {
-        return;
-      }
-
+    if (isSocketConnected && scheduledArr.length > 0) {
       setScheduledArr((currentArr) => {
         currentArr.forEach((val) => {
           setChannelsWithSubs((curr) => {
             const workingObj = { ...curr };
             const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
-
-            if (shouldSubscribe) {
+            if (
+              shouldSubscribe &&
+              socketConnection &&
+              socketConnection?.connected
+            ) {
               let subscribeMsg;
               if (val.startsWith('chat_')) {
                 const chatId = parseInt(val.split('_')[1]);
@@ -141,14 +162,8 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
         });
         return [];
       });
-    };
-
-    socketConnection?.on('connect', handleSubscribeScheduledChannels);
-
-    return () => {
-      socketConnection?.off('connect', handleSubscribeScheduledChannels);
-    };
-  }, [socketConnection, scheduledArr]);
+    }
+  }, [socketConnection, isSocketConnected, scheduledArr]);
 
   useEffect(() => {
     const shouldUnsubArray: newnewapi.IChannel[] = [];
