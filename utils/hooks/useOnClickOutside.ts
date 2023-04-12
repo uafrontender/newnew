@@ -14,18 +14,13 @@ export const useOnClickOutside = (
     }
 
     const listener = (event: Event) => {
-      const noElements = refs.current.every((r) => !r.current);
+      const noRefs = refs.current.every((r) => !r?.current);
 
-      if (noElements) {
+      if (noRefs) {
         return;
       }
 
       const inside = refs.current.some((r) => {
-        if (debug) {
-          console.log('REF');
-          console.log(r.current);
-        }
-
         if (r.current && r.current.contains(event.target)) {
           return true;
         }
