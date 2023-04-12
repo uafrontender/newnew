@@ -1,4 +1,10 @@
-import React, { ReactElement, useEffect, useState, useRef } from 'react';
+import React, {
+  ReactElement,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from 'react';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../InlineSVG';
@@ -30,9 +36,9 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
 
   const containerRef = useRef(null);
 
-  const closePopup = () => {
+  const closePopup = useCallback(() => {
     setIsPopupVisible(false);
-  };
+  }, []);
 
   useOnClickOutside(containerRef, closePopup);
 

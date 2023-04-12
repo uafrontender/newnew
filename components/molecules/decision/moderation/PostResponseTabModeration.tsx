@@ -12,7 +12,6 @@ import WinningOption from '../../../atoms/moderation/WinningOption';
 import PostResponseTabModerationHeader from '../../../atoms/moderation/PostResponseModerationHeader';
 import PostResponseSuccessModal from './PostResponseSuccessModal';
 
-import { getMyEarningsByPosts } from '../../../../api/endpoints/payments';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 import { TPostType } from '../../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
@@ -150,18 +149,7 @@ const PostResponseTabModeration: React.FunctionComponent<
     setIsEditTitleMenuOpen(true);
   }, [setIsEditTitleMenuOpen, postUuid]);
 
-  // Earned amount
-  const [earnedAmount, setEarnedAmount] = useState<
-    newnewapi.MoneyAmount | undefined
-  >(undefined);
-  const [earnedAmountLoading, setEarnedAmountLoading] = useState(false);
-  const [isEarnedAmountFetched, setIsEarnedAmountFetched] = useState(false);
-
   const amountSwitch = useCallback(() => {
-    if (earnedAmount && !earnedAmountLoading) {
-      return formatNumber(earnedAmount.usdCents / 100 ?? 0, false);
-    }
-
     if (!winningOptionAc && (!options || !options.length) && !moneyBacked) {
       return undefined;
     }
@@ -187,14 +175,7 @@ const PostResponseTabModeration: React.FunctionComponent<
     }
 
     return '0';
-  }, [
-    earnedAmount,
-    earnedAmountLoading,
-    moneyBacked,
-    postType,
-    winningOptionAc,
-    options,
-  ]);
+  }, [moneyBacked, postType, winningOptionAc, options]);
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -239,36 +220,6 @@ const PostResponseTabModeration: React.FunctionComponent<
     });
     handleUploadAdditionalVideoProcessed();
   }, [handleUploadAdditionalVideoProcessed, postUuid]);
-
-  useEffect(() => {
-    async function loadEarnedAmount() {
-      setEarnedAmountLoading(true);
-      try {
-        const payload = new newnewapi.GetMyEarningsByPostsRequest({
-          postUuids: [postUuid],
-          ignoreTransactionStatus: true,
-        });
-
-        const res = await getMyEarningsByPosts(payload);
-
-        if (!res.data || !res.data?.earningsByPosts[0]?.earnings || res.error)
-          throw new Error('Request failed');
-
-        setEarnedAmount(
-          res.data.earningsByPosts[0].earnings as newnewapi.MoneyAmount
-        );
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setEarnedAmountLoading(false);
-        setIsEarnedAmountFetched(true);
-      }
-    }
-
-    if (postStatus === 'succeeded') {
-      loadEarnedAmount();
-    }
-  }, [postUuid, postStatus]);
 
   useEffect(() => {
     if (user.userTutorialsProgressSynced) {
@@ -326,8 +277,6 @@ const PostResponseTabModeration: React.FunctionComponent<
             <PostEarnings
               amount={amountSwitch()}
               label={t('postResponseTabModeration.succeeded.youMade')}
-              isEarnedAmountFetched={isEarnedAmountFetched}
-              loading={earnedAmountLoading || !isEarnedAmountFetched}
             />
             <WinningOption
               postType={postType}

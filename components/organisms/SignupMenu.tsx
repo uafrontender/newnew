@@ -1,7 +1,13 @@
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-nested-ternary */
 // Temp disabled until backend is in place
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
@@ -51,6 +57,7 @@ import { Mixpanel } from '../../utils/mixpanel';
 import { I18nNamespaces } from '../../@types/i18next';
 import { loadStateLS, removeStateLS } from '../../utils/localStorage';
 import { useAppState } from '../../contexts/appStateContext';
+import { useGetAppConstants } from '../../contexts/appConstantsContext';
 
 export interface ISignupMenu {
   goal?: string;
@@ -66,6 +73,36 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('page-SignUp');
+  const { appConstants } = useGetAppConstants();
+  const availableSocialProviders = useMemo<{
+    google: boolean;
+    fb: boolean;
+    twitter: boolean;
+    apple: boolean;
+  }>(() => {
+    if (!appConstants?.availableAuthProviders) {
+      return {
+        google: true,
+        fb: true,
+        twitter: true,
+        apple: true,
+      };
+    }
+    return {
+      google: appConstants?.availableAuthProviders.includes(
+        newnewapi.GetAppConstantsResponse.AuthProvider.GOOGLE
+      ),
+      fb: appConstants?.availableAuthProviders.includes(
+        newnewapi.GetAppConstantsResponse.AuthProvider.FB
+      ),
+      twitter: appConstants?.availableAuthProviders.includes(
+        newnewapi.GetAppConstantsResponse.AuthProvider.TWITTER
+      ),
+      apple: appConstants?.availableAuthProviders.includes(
+        newnewapi.GetAppConstantsResponse.AuthProvider.APPLE
+      ),
+    };
+  }, [appConstants?.availableAuthProviders]);
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
@@ -226,86 +263,102 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             : t('heading.subheadingSessionExpired')}
         </SSubheading>
         <MSContentWrapper variants={container} initial='hidden' animate='show'>
-          <motion.div variants={item}>
-            <SignInButton
-              noRipple
-              svg={GoogleIcon}
-              hoverBgColor={theme.colorsThemed.social.google.hover}
-              pressedBgColor={theme.colorsThemed.social.google.pressed}
-              textWidth={textWidth}
-              setTextWidth={handleTextWidthChange}
-              onClick={() => {
-                Mixpanel.track('Sign In With Google Clicked', {
-                  _stage: 'Sign Up',
-                });
-                handleSignupRedirect(
-                  `${BASE_URL_AUTH}/google${redirectUrlParam}`
-                );
-              }}
-            >
-              {t('signUpOptions.google')}
-            </SignInButton>
-          </motion.div>
-          <motion.div variants={item}>
-            <SignInButton
-              noRipple
-              svg={AppleIcon}
-              hoverBgColor='#000'
-              hoverContentColor='#FFF'
-              pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              textWidth={textWidth}
-              setTextWidth={handleTextWidthChange}
-              onClick={() => {
-                Mixpanel.track('Sign In With Apple Clicked', {
-                  _stage: 'Sign Up',
-                });
-                handleSignupRedirect(
-                  `${BASE_URL_AUTH}/apple${redirectUrlParam}`
-                );
-              }}
-            >
-              {t('signUpOptions.apple')}
-            </SignInButton>
-          </motion.div>
-          <motion.div variants={item}>
-            <SignInButton
-              noRipple
-              svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
-              hoverSvg={FacebookIconLight}
-              hoverBgColor={theme.colorsThemed.social.facebook.hover}
-              pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              textWidth={textWidth}
-              setTextWidth={handleTextWidthChange}
-              onClick={() => {
-                Mixpanel.track('Sign In With Facebook Clicked', {
-                  _stage: 'Sign Up',
-                });
-                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`);
-              }}
-            >
-              {t('signUpOptions.facebook')}
-            </SignInButton>
-          </motion.div>
-          <motion.div variants={item}>
-            <SignInButton
-              noRipple
-              svg={TwitterIcon}
-              hoverBgColor={theme.colorsThemed.social.twitter.hover}
-              pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              textWidth={textWidth}
-              setTextWidth={handleTextWidthChange}
-              onClick={() => {
-                Mixpanel.track('Sign In With Twitter Clicked', {
-                  _stage: 'Sign Up',
-                });
-                handleSignupRedirect(
-                  `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
-                );
-              }}
-            >
-              {t('signUpOptions.twitter')}
-            </SignInButton>
-          </motion.div>
+          {appConstants?.availableAuthProviders ? (
+            <>
+              {availableSocialProviders.google && (
+                <motion.div variants={item}>
+                  <SignInButton
+                    noRipple
+                    svg={GoogleIcon}
+                    hoverBgColor={theme.colorsThemed.social.google.hover}
+                    pressedBgColor={theme.colorsThemed.social.google.pressed}
+                    textWidth={textWidth}
+                    setTextWidth={handleTextWidthChange}
+                    onClick={() => {
+                      Mixpanel.track('Sign In With Google Clicked', {
+                        _stage: 'Sign Up',
+                      });
+                      handleSignupRedirect(
+                        `${BASE_URL_AUTH}/google${redirectUrlParam}`
+                      );
+                    }}
+                  >
+                    {t('signUpOptions.google')}
+                  </SignInButton>
+                </motion.div>
+              )}
+              {availableSocialProviders.apple && (
+                <motion.div variants={item}>
+                  <SignInButton
+                    noRipple
+                    svg={AppleIcon}
+                    hoverBgColor='#000'
+                    hoverContentColor='#FFF'
+                    pressedBgColor={theme.colorsThemed.social.apple.pressed}
+                    textWidth={textWidth}
+                    setTextWidth={handleTextWidthChange}
+                    onClick={() => {
+                      Mixpanel.track('Sign In With Apple Clicked', {
+                        _stage: 'Sign Up',
+                      });
+                      handleSignupRedirect(
+                        `${BASE_URL_AUTH}/apple${redirectUrlParam}`
+                      );
+                    }}
+                  >
+                    {t('signUpOptions.apple')}
+                  </SignInButton>
+                </motion.div>
+              )}
+              {availableSocialProviders.fb && (
+                <motion.div variants={item}>
+                  <SignInButton
+                    noRipple
+                    svg={
+                      theme.name === 'dark' ? FacebookIcon : FacebookIconLight
+                    }
+                    hoverSvg={FacebookIconLight}
+                    hoverBgColor={theme.colorsThemed.social.facebook.hover}
+                    pressedBgColor={theme.colorsThemed.social.facebook.pressed}
+                    textWidth={textWidth}
+                    setTextWidth={handleTextWidthChange}
+                    onClick={() => {
+                      Mixpanel.track('Sign In With Facebook Clicked', {
+                        _stage: 'Sign Up',
+                      });
+                      handleSignupRedirect(
+                        `${BASE_URL_AUTH}/fb${redirectUrlParam}`
+                      );
+                    }}
+                  >
+                    {t('signUpOptions.facebook')}
+                  </SignInButton>
+                </motion.div>
+              )}
+              {availableSocialProviders.twitter && (
+                <motion.div variants={item}>
+                  <SignInButton
+                    noRipple
+                    svg={TwitterIcon}
+                    hoverBgColor={theme.colorsThemed.social.twitter.hover}
+                    pressedBgColor={theme.colorsThemed.social.twitter.pressed}
+                    textWidth={textWidth}
+                    setTextWidth={handleTextWidthChange}
+                    onClick={() => {
+                      Mixpanel.track('Sign In With Twitter Clicked', {
+                        _stage: 'Sign Up',
+                      });
+                      handleSignupRedirect(
+                        `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
+                      );
+                    }}
+                  >
+                    {t('signUpOptions.twitter')}
+                  </SignInButton>
+                </motion.div>
+              )}
+            </>
+          ) : null}
           <motion.div variants={item}>
             <TextWithLine
               lineColor={theme.colorsThemed.background.outlines1}
