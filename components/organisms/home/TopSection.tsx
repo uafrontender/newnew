@@ -123,7 +123,7 @@ export const TopSection: React.FC<ITopSection> = React.memo(
               e.preventDefault();
               e.stopPropagation();
             } else {
-              Mixpanel.track('Go To Post from Post Card', {
+              Mixpanel.track('Open Post', {
                 _stage: 'Post Card',
                 _postUuid: switchPostType(item)[0].postUuid,
                 _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${

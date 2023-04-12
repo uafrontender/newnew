@@ -51,7 +51,7 @@ export const PostList: React.FC<IList> = ({
       }`}
       key={switchPostType(item)[0].postUuid}
       onClickCapture={() => {
-        Mixpanel.track('Go To Post from Post Card', {
+        Mixpanel.track('Open Post', {
           _stage: 'Post Card',
           _postUuid: switchPostType(item)[0].postUuid,
           _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
