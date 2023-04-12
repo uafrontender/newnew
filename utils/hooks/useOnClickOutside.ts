@@ -3,14 +3,30 @@ import { useEffect, useRef } from 'react';
 export const useOnClickOutside = (
   ref: any | any[],
   // Don't forget to wrap callback into usecallback
-  handler: (e: Event) => void
+  handler: (e: Event) => void,
+  debug?: boolean
 ) => {
   const refs = useRef(Array.isArray(ref) ? ref : [ref]);
 
   useEffect(() => {
+    if (debug) {
+      console.log('INITIALIZE');
+    }
+
     const listener = (event: Event) => {
-      const inside = refs.current.some((ref) => {
-        if (ref.current && ref.current.contains(event.target)) {
+      const noElements = refs.current.every((r) => !r.current);
+
+      if (noElements) {
+        return;
+      }
+
+      const inside = refs.current.some((r) => {
+        if (debug) {
+          console.log('REF');
+          console.log(r.current);
+        }
+
+        if (r.current && r.current.contains(event.target)) {
           return true;
         }
 
@@ -18,6 +34,9 @@ export const useOnClickOutside = (
       });
 
       if (!inside) {
+        if (debug) {
+          console.log('HANDLER CALLED');
+        }
         handler(event);
       }
     };
