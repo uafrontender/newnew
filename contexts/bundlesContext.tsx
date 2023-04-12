@@ -42,7 +42,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   children,
 }) => {
   const user = useAppSelector((state) => state.user);
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const [bundles, setBundles] = useState<

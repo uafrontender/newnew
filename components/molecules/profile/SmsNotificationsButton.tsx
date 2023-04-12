@@ -49,7 +49,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   const { t: tProfile } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
 

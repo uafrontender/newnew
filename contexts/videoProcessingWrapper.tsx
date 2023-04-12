@@ -15,7 +15,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
 > = ({ children }) => {
   const router = useRouter();
   const { showErrorToastCustom } = useErrorToasts();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const handlerSocketUpdated = useCallback(
     (data: any) => {

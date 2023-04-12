@@ -89,7 +89,7 @@ const PostPage: NextPage<IPostPage> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -585,7 +585,7 @@ const PostPage: NextPage<IPostPage> = ({
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
-    if (postParsed?.postUuid && socketConnection?.connected) {
+    if (postParsed?.postUuid && isSocketConnected) {
       addChannel(postParsed.postUuid, {
         postUpdates: {
           postUuid: postParsed.postUuid,
@@ -599,7 +599,7 @@ const PostPage: NextPage<IPostPage> = ({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postParsed?.postUuid, socketConnection?.connected]);
+  }, [postParsed?.postUuid, isSocketConnected]);
 
   // Listen for Post status updates
   useEffect(() => {
