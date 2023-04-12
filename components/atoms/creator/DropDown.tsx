@@ -48,9 +48,10 @@ export const DropDown: React.FC<IDropDown> = (props) => {
   const handleDropDownClick = () => {
     setFocused(!focused);
   };
-  const handleCloseClick = () => {
+  const handleCloseClick = useCallback(() => {
     setFocused(false);
-  };
+  }, []);
+
   const renderItem = useCallback(
     (item: TItem) => {
       const selected = value === item.id;
@@ -72,15 +73,16 @@ export const DropDown: React.FC<IDropDown> = (props) => {
         </SButton>
       );
     },
-    [value, handleChange]
+    [value, handleChange, handleCloseClick]
   );
 
   useOnClickEsc(ref, handleCloseClick);
-  useOnClickOutside(ref, () => {
+  const handleClickOutside = useCallback(() => {
     if (!isMobile) {
       handleCloseClick();
     }
-  });
+  }, [isMobile, handleCloseClick]);
+  useOnClickOutside(ref, handleClickOutside);
 
   const mobileViewRef = useRef(null);
 

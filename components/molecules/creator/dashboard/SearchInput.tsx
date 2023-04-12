@@ -41,11 +41,12 @@ const SearchInput: React.FC = React.memo(() => {
     [handleSearchClose, searchChatroom]
   );
 
-  // useOnClickOutside(inputContainerRef, () => {
+  // const handleClickOutside = useCallback(() => {
   //   if (isSearchActive) {
   //     handleSearchClose();
   //   }
-  // });
+  // }, []);
+  // useOnClickOutside(inputContainerRef, handleClickOutside;
 
   useEffect(() => {
     setTimeout(() => {
