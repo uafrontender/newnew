@@ -18,6 +18,7 @@ import { SCROLL_TOP_10 } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import GradientMaskHorizontal from '../../atoms/GradientMaskHorizontal';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -121,6 +122,15 @@ export const TopSection: React.FC<ITopSection> = React.memo(
             if (isDragging) {
               e.preventDefault();
               e.stopPropagation();
+            } else {
+              Mixpanel.track('Go To Post from Post Card', {
+                _stage: 'Post Card',
+                _postUuid: switchPostType(item)[0].postUuid,
+                _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                  switchPostType(item)[0].postShortId ||
+                  switchPostType(item)[0].postUuid
+                }`,
+              });
             }
           }}
         >

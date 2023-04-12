@@ -11,6 +11,7 @@ import PostCard from '../../molecules/PostCard';
 import switchPostType from '../../../utils/switchPostType';
 import CardSkeleton from '../../molecules/CardSkeleton';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IListPostPage {
   collection: any;
@@ -41,6 +42,16 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
             : switchPostType(item)[0].postUuid
         }`}
         key={switchPostType(item)[0].postUuid}
+        onClickCapture={() => {
+          Mixpanel.track('Go To Post from Post Card', {
+            _stage: 'Post Card',
+            _postUuid: switchPostType(item)[0].postUuid,
+            _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+              switchPostType(item)[0].postShortId ||
+              switchPostType(item)[0].postUuid
+            }`,
+          });
+        }}
       >
         <SItemWrapper>
           <PostCard

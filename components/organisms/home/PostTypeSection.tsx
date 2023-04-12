@@ -12,6 +12,7 @@ import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
 import switchPostType from '../../../utils/switchPostType';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IPostTypeSectionProps {
   posts: newnewapi.Post[] | TStaticPost[];
@@ -49,6 +50,16 @@ const PostTypeSection = ({
           : switchPostType(post)[0].postUuid
       }`}
       key={switchPostType(post)[0].postUuid}
+      onClickCapture={() => {
+        Mixpanel.track('Go To Post from Post Card', {
+          _stage: 'Post Card',
+          _postUuid: switchPostType(post)[0].postUuid,
+          _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+            switchPostType(post)[0].postShortId ||
+            switchPostType(post)[0].postUuid
+          }`,
+        });
+      }}
     >
       <SItemWrapper index={index}>
         <PostCard

@@ -13,6 +13,7 @@ import Lottie from '../../atoms/Lottie';
 import switchPostType from '../../../utils/switchPostType';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -48,6 +49,16 @@ export const PostList: React.FC<IList> = ({
           : switchPostType(item)[0].postUuid
       }`}
       key={switchPostType(item)[0].postUuid}
+      onClickCapture={() => {
+        Mixpanel.track('Go To Post from Post Card', {
+          _stage: 'Post Card',
+          _postUuid: switchPostType(item)[0].postUuid,
+          _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+            switchPostType(item)[0].postShortId ||
+            switchPostType(item)[0].postUuid
+          }`,
+        });
+      }}
     >
       <SItemWrapper id={`post-card-${switchPostType(item)[0].postShortId}`}>
         <PostCard
