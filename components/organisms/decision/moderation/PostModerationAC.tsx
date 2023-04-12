@@ -94,7 +94,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     );
 
     // Socket
-    const socketConnection = useContext(SocketContext);
+    const { socketConnection } = useContext(SocketContext);
 
     const winningOptionId = useMemo(
       () => post.winningOptionId ?? undefined,

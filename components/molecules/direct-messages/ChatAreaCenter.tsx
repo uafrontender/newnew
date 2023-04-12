@@ -29,7 +29,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 }) => {
   const { ref: loadingRef, inView } = useInView();
   const { activeChatRoom, justSentMessage } = useGetChats();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const {
     data,

@@ -102,7 +102,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     }
   }, [isMobileOrTablet]);
 
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const setData = useCallback((data: newnewapi.TotalUnreadMessageCounts) => {
     setUnreadCountForCreator(data.unreadCountForCreator);
