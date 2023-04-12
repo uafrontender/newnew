@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -73,11 +73,12 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = (props) => {
   };
 
   useOnClickEsc(ref, handleCloseClick);
-  useOnClickOutside(ref, () => {
+  const handleClickOutside = useCallback(() => {
     if (!isMobile) {
       handleCloseClick();
     }
-  });
+  }, [isMobile]);
+  useOnClickOutside(ref, handleClickOutside);
 
   if (options.length < 2) {
     return null;
