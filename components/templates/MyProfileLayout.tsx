@@ -75,7 +75,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const router = useRouter();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();

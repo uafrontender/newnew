@@ -28,7 +28,7 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const fetchNotificationCount = useCallback(async () => {
     if (!user.loggedIn) {

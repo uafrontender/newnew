@@ -99,7 +99,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     );
 
     // Socket
-    const socketConnection = useContext(SocketContext);
+    const { socketConnection } = useContext(SocketContext);
 
     // Announcement
     const announcement = useMemo(() => post.announcement, [post.announcement]);

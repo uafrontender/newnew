@@ -35,6 +35,7 @@ import ChatContentHeader from '../../molecules/direct-messages/ChatContentHeader
 import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import { SocketContext } from '../../../contexts/socketContext';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -63,6 +64,7 @@ interface IFuncProps {
 const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Chat');
+  const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const { resizeMode } = useAppState();
@@ -92,7 +94,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
 
   useEffect(() => {
-    if (chatRoom.id) {
+    if (chatRoom.id && isSocketConnected) {
       addChannel(`chat_${chatRoom.id.toString()}`, {
         chatRoomUpdates: {
           chatRoomId: chatRoom.id,
@@ -103,7 +105,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
       if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom]);
+  }, [chatRoom, isSocketConnected]);
 
   const prevChatRoomId = useRef(chatRoom.id);
 

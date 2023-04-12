@@ -113,7 +113,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const post = useMemo(() => postParsed as newnewapi.Auction, [postParsed]);
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(

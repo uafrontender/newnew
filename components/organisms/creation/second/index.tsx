@@ -163,7 +163,7 @@ export const CreationSecondStepContent: React.FC<
   const [tutorialType, setTutorialType] = useState<'AC' | 'MC' | 'CF'>('AC');
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const validateTextAPI = useCallback(
     async (text: string, kind: newnewapi.ValidateTextRequest.Kind) => {
