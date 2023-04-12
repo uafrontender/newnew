@@ -346,7 +346,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     const handleMySpendingChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.MySpendingChanged.decode(arr);
-      if (!decoded?.totalSpending?.usdCents) {
+      if (
+        decoded?.totalSpending?.usdCents === undefined ||
+        decoded.totalSpending.usdCents === null
+      ) {
         return;
       }
 
