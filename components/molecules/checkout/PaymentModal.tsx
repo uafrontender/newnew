@@ -79,12 +79,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   }, [setupIntent, setupIntent.setupIntentClientSecret, t]);
 
   return (
-    <Modal
-      show={isOpen}
-      modalType={modalType}
-      additionalz={zIndex}
-      onClose={onClose}
-    >
+    <Modal show={isOpen} modalType={modalType} additionalz={zIndex}>
       <SWrapper>
         <SContentContainer
           showTocApply={showTocApply ?? false}

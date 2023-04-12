@@ -108,6 +108,8 @@ const useStripeSetupIntent = ({
       };
     }
   );
+  const [isSetupIntentInitializing, setSetupIntentInitializing] =
+    useState(false);
 
   useEffect(() => {
     if (purpose) {
@@ -125,9 +127,11 @@ const useStripeSetupIntent = ({
 
   const init = useCallback(async () => {
     try {
-      if (!setupIntent) {
+      if (!setupIntent || isSetupIntentInitializing) {
         return {};
       }
+
+      setSetupIntentInitializing(true);
 
       const payload = new newnewapi.CreateStripeSetupIntentRequest({
         [setupIntent.purposeType!]: setupIntent.purpose,
@@ -155,12 +159,15 @@ const useStripeSetupIntent = ({
         setupIntentClientSecret: response?.data?.stripeSetupIntentClientSecret!,
       }));
 
+      setSetupIntentInitializing(false);
+
       return {};
     } catch (err: any) {
       console.error(err);
+      setSetupIntentInitializing(false);
       return { errorKey: 'errors.requestFailed' };
     }
-  }, [setupIntent]);
+  }, [setupIntent, isSetupIntentInitializing]);
 
   const update = useCallback(
     async ({
