@@ -42,7 +42,7 @@ import copyToClipboard from '../../utils/copyToClipboard';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../atoms/DisplayName';
-import { getMySpending } from '../../api/endpoints/payments';
+import { getMySpending as getMySpendingLimitLeft } from '../../api/endpoints/payments';
 import { SocketContext } from '../../contexts/socketContext';
 
 type TPageType =
@@ -315,9 +315,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Spending
+  // Spending limit
 
-  const [mySpendingInCents, setMySpendingInCents] = useState<
+  const [myLimitLeftInCents, setMyLimitLeftInCents] = useState<
     number | undefined
   >();
 
@@ -327,13 +327,13 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         try {
           const payload = new newnewapi.GetMySpendingRequest();
 
-          const res = await getMySpending(payload);
+          const res = await getMySpendingLimitLeft(payload);
 
           if (!res.data?.totalSpending?.usdCents || res.error) {
             throw new Error(res.error?.message ?? 'Request failed');
           }
 
-          setMySpendingInCents(res.data.totalSpending.usdCents);
+          setMyLimitLeftInCents(res.data.totalSpending.usdCents);
         } catch (err) {
           console.error(err);
         }
@@ -350,7 +350,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         return;
       }
 
-      setMySpendingInCents(decoded.totalSpending.usdCents);
+      setMyLimitLeftInCents(decoded.totalSpending.usdCents);
     };
 
     if (socketConnection && user.loggedIn) {
@@ -364,19 +364,23 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     };
   }, [socketConnection, user.loggedIn]);
 
-  const mySpendingFormatted = useMemo(() => {
-    if (mySpendingInCents === undefined) {
+  const myLimitLeftFormatted = useMemo(() => {
+    if (myLimitLeftInCents === undefined) {
       return undefined;
     }
 
-    const mySpendingInDollars = Math.floor(mySpendingInCents / 100);
-
-    if (mySpendingInDollars < 10000) {
-      return Math.floor(mySpendingInDollars / 1000);
+    if (myLimitLeftInCents < 0) {
+      return 0;
     }
 
-    return Math.floor(mySpendingInDollars / 10000) * 10;
-  }, [mySpendingInCents]);
+    const myLimitLeftInDollars = Math.floor(myLimitLeftInCents / 100);
+
+    if (myLimitLeftInDollars < 10000) {
+      return Math.floor(myLimitLeftInDollars / 1000);
+    }
+
+    return Math.floor(myLimitLeftInDollars / 10000) * 10;
+  }, [myLimitLeftInCents]);
 
   return (
     <SGeneral restrictMaxWidth>
@@ -520,8 +524,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           ) : null}
         </SUserData>
         <ProfileTabs pageType='myProfile' tabs={tabs} />
-        {mySpendingFormatted !== undefined && (
-          <SSpending>{mySpendingFormatted}</SSpending>
+        {myLimitLeftFormatted !== undefined && (
+          <SSpending>{myLimitLeftFormatted}</SSpending>
         )}
         {/* Edit Profile modal menu */}
         <Modal
