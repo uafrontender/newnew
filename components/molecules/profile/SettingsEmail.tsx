@@ -74,7 +74,10 @@ const SSettingsEmailInput = styled.div<ISSettingsEmailInput>`
   font-size: 14px;
   line-height: 20px;
 
-  padding: 12px 20px 12px 20px;
+  padding: 12px 50px 12px 20px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;

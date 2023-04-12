@@ -149,10 +149,10 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     });
 
     const handleClickOutside = useCallback(() => {
-      if (!isMobileOrTablet && globalSearchActive) {
+      if (globalSearchActive) {
         handleSearchClose();
       }
-    }, [isMobileOrTablet, globalSearchActive, handleSearchClose]);
+    }, [globalSearchActive, handleSearchClose]);
 
     useOnClickOutside(
       [inputContainerRef, resultsContainerRef],
@@ -358,7 +358,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           )}
         </SContainer>
         {isMobileOrTablet && isResultsDropVisible && (
-          <SResultsDropMobile ref={resultsContainerRef.current}>
+          <SResultsDropMobile ref={resultsContainerRef}>
             {resultsPosts.length === 0 &&
             resultsCreators.length === 0 &&
             resultsHashtags.length === 0 ? (

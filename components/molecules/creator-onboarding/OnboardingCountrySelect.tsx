@@ -1,4 +1,10 @@
-import React, { useState, useRef, ReactElement, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  ReactElement,
+  useEffect,
+  useCallback,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import countries from 'i18n-iso-countries';
@@ -47,12 +53,10 @@ const OnboardingCountrySelect = ({
   );
 
   const handleToggle = () => setIsOpen((curr) => !curr);
-  const handleClose = () => setIsOpen(false);
+  const handleClose = useCallback(() => setIsOpen(false), []);
 
   useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, () => {
-    handleClose();
-  });
+  useOnClickOutside(containerRef, handleClose);
 
   useEffect(() => {
     if (isOpen && selected) {

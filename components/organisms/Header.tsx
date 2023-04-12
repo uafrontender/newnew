@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 
@@ -10,11 +9,9 @@ import Banner from '../molecules/Banner';
 import Desktop from '../molecules/header/Desktop';
 import Container from '../atoms/Grid/Container';
 
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppSelector } from '../../redux-store/store';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useAppState } from '../../contexts/appStateContext';
-import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
-import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 
 interface IHeader {
   visible: boolean;
@@ -25,30 +22,14 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
   const { banner } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppState();
 
-  const dispatch = useAppDispatch();
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+
   const isTabletOrSmallDesktop = ['tablet', 'laptop'].includes(resizeMode);
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
 
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
-
   const headerRef = useRef(null);
-
-  useOnClickOutside(headerRef, () => {
-    if (globalSearchActive && isMobileOrTablet) {
-      dispatch(setGlobalSearchActive(false));
-    }
-  });
 
   const hasMounted = useHasMounted();
 
