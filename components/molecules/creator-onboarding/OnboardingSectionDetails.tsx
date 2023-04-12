@@ -51,6 +51,7 @@ import useErrorToasts, {
   ErrorToastPredefinedMessage,
 } from '../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -462,6 +463,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
     if (isAPIValidateLoading) return;
     let newAvatarUrl;
     try {
+      Mixpanel.track('Submit Onboarding Details', {
+        _stage: 'Onboarding',
+        _component: 'OnboardingSectionDetails',
+      });
+
       setLoadingModalOpen(true);
 
       if (fieldsToBeUpdated.image) {
