@@ -607,7 +607,9 @@ const PostPage: NextPage<IPostPage> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
       if (decoded.postUuid === postParsed?.postUuid) {
         if (decoded.auction) {
           const parsedStatus = switchPostStatus(

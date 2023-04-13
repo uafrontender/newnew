@@ -92,7 +92,9 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       const handlerStripeAccountChanged = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.StripeAccountChanged.decode(arr);
-        if (!decoded) return;
+        if (!decoded) {
+          return;
+        }
         if (decoded.isActive) {
           const payload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(payload);

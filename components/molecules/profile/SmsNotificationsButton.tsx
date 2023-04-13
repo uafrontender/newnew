@@ -279,7 +279,9 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.SmsNotificationsSubscribed.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (decoded.object?.creatorUuid === subscription.userId) {
         setSubscribedToSmsNotifications(true);
@@ -290,7 +292,9 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.SmsNotificationsUnsubscribed.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (decoded.object?.creatorUuid === subscription.userId) {
         setSubscribedToSmsNotifications(false);

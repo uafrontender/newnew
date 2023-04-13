@@ -145,7 +145,9 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatUnreadCountsChanged.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       setData(decoded.chatUnreadCounts as newnewapi.TotalUnreadMessageCounts);
     };
