@@ -509,7 +509,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.SmsNotificationsSubscribed.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded){
+        return;
+      }
 
       if (decoded.object?.postUuid === subscription.postUuid) {
         setSubscribedToSmsNotifications(true);
@@ -520,7 +522,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.SmsNotificationsUnsubscribed.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded){ 
+        return;
+      }
 
       if (decoded.object?.postUuid === subscription.postUuid) {
         setSubscribedToSmsNotifications(false);

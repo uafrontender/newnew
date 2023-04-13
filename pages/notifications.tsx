@@ -87,7 +87,7 @@ export const Notifications = () => {
   const handleMarkAllAsRead = useCallback(async () => {
     try {
       Mixpanel.track('Mark All As Read Clicked', {
-        stage: 'Notifications',
+        _stage: 'Notifications',
       });
 
       const lastNotification = notifications[0];
