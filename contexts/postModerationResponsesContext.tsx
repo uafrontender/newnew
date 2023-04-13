@@ -634,7 +634,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (
         decoded.taskUuid === videoProcessing?.taskUuid ||

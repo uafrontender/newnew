@@ -101,7 +101,9 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     const socketHandlerUserBlockStatusChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.BlockStatusChanged.decode(arr);
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
       console.log(decoded);
 
       decoded.isBlocked
