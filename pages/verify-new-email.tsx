@@ -46,7 +46,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.MeUpdated.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (redirect === 'dashboard') {
         const becomeCreatorPayload = new newnewapi.EmptyRequest({});

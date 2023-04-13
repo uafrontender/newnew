@@ -66,7 +66,10 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
     const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
+
       if (decoded.unreadCount !== undefined && decoded.unreadCount > 0) {
         setUnreadNotificationCount(decoded.unreadCount);
       } else {

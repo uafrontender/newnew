@@ -130,7 +130,9 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     const handleCardAdded = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CardStatusChanged.decode(arr);
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       setMessage(t(getCardStatusMessage(decoded.cardStatus)));
 
