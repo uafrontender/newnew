@@ -272,9 +272,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsSupportMenuOpen(true);
   };
 
-  const handleCloseSupportForm = () => {
+  const handleCloseSupportForm = useCallback(() => {
     setIsSupportMenuOpen(false);
-  };
+  }, []);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -285,6 +285,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const handleOpenPaymentModal = () => {
     setPaymentModalOpen(true);
   };
+
+  const handleCloseSelectVotesMenu = useCallback(() => {
+    handleCloseSupportForm();
+    setSelectVotesMenuTop(undefined);
+  }, [handleCloseSupportForm]);
 
   const handleOpenBundleVotesModal = () => {
     setBundleVotesModalOpen(true);
@@ -914,10 +919,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               ? (appConstants?.mcVoteOffers as newnewapi.McVoteOffer[])
               : []
           }
-          handleClose={() => {
-            handleCloseSupportForm();
-            setSelectVotesMenuTop(undefined);
-          }}
+          handleClose={handleCloseSelectVotesMenu}
           handleOpenBundleVotesModal={
             bundle?.votesLeft ? handleOpenBundleVotesModal : undefined
           }

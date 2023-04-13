@@ -7,9 +7,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 
 import PostVideoStoryItem from './PostVideoStoryItem';
 import Button from '../../../atoms/Button';
@@ -22,6 +19,7 @@ import { usePostModerationResponsesContext } from '../../../../contexts/postMode
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../contexts/appStateContext';
+import SimplifiedSlider from '../../../atoms/SimplifiedSlider';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
@@ -57,6 +55,8 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     'tablet',
   ].includes(resizeMode);
 
+  const wrapperRef = useRef<HTMLDivElement>();
+
   const { postParsed } = usePostInnerState();
   const { videoProcessing } = usePostModerationResponsesContext();
   const uploadedFile = useMemo(
@@ -66,7 +66,6 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
   const videosLength = useMemo(() => videos.length, [videos.length]);
 
-  const sliderRef = useRef<Slider>();
   const [currentVideo, setCurrentVideo] = useState(0);
 
   const [hovered, setHovered] = useState(false);
@@ -80,7 +79,6 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         scrollTo = (videosLength || 0) - 1;
       }
 
-      sliderRef?.current?.slickGoTo(scrollTo);
       setCurrentVideo(scrollTo);
     },
     [videosLength]
@@ -157,35 +155,16 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   return (
     <SWrapper
       id='responsesSlider'
+      ref={(el) => {
+        wrapperRef.current = el!!;
+      }}
       videosLength={videosLength}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <Slider
-        ref={(el) => {
-          sliderRef.current = el!!;
-        }}
-        className='sSlider'
-        speed={0}
-        initialSlide={0}
-        slidesPerRow={1}
-        draggable={false}
-        infinite={false}
-        useCSS={false}
-        accessibility={false}
-        easing='none'
-        fade={false}
-        afterChange={(current) => {
-          setCurrentVideo(current);
-        }}
-        arrows={false}
-        dots={false}
-        touchMove={false}
-        swipeToSlide={false}
-        swipe={false}
-      >
+      <SimplifiedSlider currentSlide={currentVideo} wrapperRef={wrapperRef}>
         {handleMapVideoStoryItems()}
-      </Slider>
+      </SimplifiedSlider>
       <SDotsContainer
         isEditingStories={isEditingStories}
         style={{
@@ -366,7 +345,7 @@ const SDotsContainer = styled.div<{
   position: absolute;
 
   width: 100%;
-  bottom: ${({ isEditingStories }) => (isEditingStories ? '56px' : '86px')};
+  bottom: ${({ isEditingStories }) => (isEditingStories ? '56px' : '102px')};
 
   display: flex;
   justify-content: center;

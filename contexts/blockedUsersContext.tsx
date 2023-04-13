@@ -39,7 +39,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const [usersBlockedLoaded, setUsersBlockedLoaded] = useState(false);
   const [isChangingUserBlockedStatus, setIsChangingUserBlockedStatus] =
     useState(false);
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const changeUserBlockedStatus = useCallback(
@@ -101,7 +101,9 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     const socketHandlerUserBlockStatusChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.BlockStatusChanged.decode(arr);
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
       console.log(decoded);
 
       decoded.isBlocked

@@ -384,6 +384,7 @@ const SSubheading = styled(Text)`
 
   font-size: 14px;
   line-height: 20px;
+  overflow-wrap: break-word;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 

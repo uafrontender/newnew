@@ -220,6 +220,7 @@ const SText = styled(Text)`
   text-align: center;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-weight: 600;
+  overflow-wrap: break-word;
 
   ${({ theme }) => theme.media.laptopL} {
     margin-top: 8px;

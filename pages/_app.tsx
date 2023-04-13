@@ -100,6 +100,11 @@ Router.events.on('routeChangeComplete', (url) => {
   if (!NO_LOADER_ROUTES.includes(url)) {
     NProgress.done();
   }
+
+  Mixpanel.track('Route Change Complete', {
+    _stage: 'Routing',
+    _url: url,
+  });
 });
 Router.events.on('routeChangeError', (err, url) => {
   if (!NO_LOADER_ROUTES.includes(url)) {
@@ -323,7 +328,7 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
 
   return {
     ...appProps,
-    colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
+    colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
   };
 };

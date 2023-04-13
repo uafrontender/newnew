@@ -28,7 +28,7 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const fetchNotificationCount = useCallback(async () => {
     if (!user.loggedIn) {
@@ -66,7 +66,10 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
     const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
+
       if (decoded.unreadCount !== undefined && decoded.unreadCount > 0) {
         setUnreadNotificationCount(decoded.unreadCount);
       } else {

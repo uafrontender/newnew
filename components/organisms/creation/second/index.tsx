@@ -163,7 +163,7 @@ export const CreationSecondStepContent: React.FC<
   const [tutorialType, setTutorialType] = useState<'AC' | 'MC' | 'CF'>('AC');
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const validateTextAPI = useCallback(
     async (text: string, kind: newnewapi.ValidateTextRequest.Kind) => {
@@ -963,7 +963,9 @@ export const CreationSecondStepContent: React.FC<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (
         decoded.taskUuid === videoProcessing?.taskUuid &&

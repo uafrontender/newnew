@@ -53,7 +53,7 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
   const { t } = useTranslation('page-Profile');
   const { t: tCommon } = useTranslation('common');
   const { addCardMutation } = useCards();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const theme = useTheme();
 
   const [message, setMessage] = useState('');
@@ -130,7 +130,9 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     const handleCardAdded = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CardStatusChanged.decode(arr);
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       setMessage(t(getCardStatusMessage(decoded.cardStatus)));
 

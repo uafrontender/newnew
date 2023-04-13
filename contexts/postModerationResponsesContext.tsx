@@ -137,7 +137,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 }) => {
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const { postParsed, postStatus, refetchPost, handleSetIsConfirmToClosePost } =
     usePostInnerState();
@@ -634,7 +634,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (
         decoded.taskUuid === videoProcessing?.taskUuid ||

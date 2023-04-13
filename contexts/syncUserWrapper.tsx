@@ -41,7 +41,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
   const userWasLoggedIn = useRef(false);
 
@@ -92,7 +92,9 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       const handlerStripeAccountChanged = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.StripeAccountChanged.decode(arr);
-        if (!decoded) return;
+        if (!decoded) {
+          return;
+        }
         if (decoded.isActive) {
           const payload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(payload);

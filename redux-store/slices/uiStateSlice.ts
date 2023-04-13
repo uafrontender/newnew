@@ -38,7 +38,7 @@ export const defaultUIState: UIStateInterface = {
     title:
       'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
   },
-  colorMode: 'auto',
+  colorMode: 'light',
   // colorMode: 'dark',
   mutedMode: true,
   globalSearchActive: false,
