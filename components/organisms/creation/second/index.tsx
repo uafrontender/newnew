@@ -963,7 +963,9 @@ export const CreationSecondStepContent: React.FC<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (
         decoded.taskUuid === videoProcessing?.taskUuid &&

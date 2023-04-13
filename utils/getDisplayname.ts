@@ -19,7 +19,7 @@ const getDisplayname = (
   }
 
   if (user?.nickname || user?.username) {
-    return user?.nickname ?? `@${user?.username}`;
+    return user?.nickname || `@${user?.username}`;
   }
 
   // TODO: Add translation? Change it?

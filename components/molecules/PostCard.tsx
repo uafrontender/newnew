@@ -315,7 +315,9 @@ export const PostCard: React.FC<ICard> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostUpdated.decode(arr);
 
-        if (!decoded) return;
+        if (!decoded) {
+          return;
+        }
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === postParsed.postUuid) {
           if (
