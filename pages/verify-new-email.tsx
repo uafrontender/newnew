@@ -30,7 +30,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   const { email, retryAfter, redirect } = router.query;
 
   // Socket
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   // Redirect if the user is not logged in
   useEffect(() => {
@@ -46,7 +46,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.MeUpdated.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (redirect === 'dashboard') {
         const becomeCreatorPayload = new newnewapi.EmptyRequest({});

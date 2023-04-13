@@ -87,6 +87,7 @@ const getPayWithCardErrorMessage = (
 };
 
 interface IAcOptionCard {
+  id?: string;
   option: TAcOptionWithHighestField;
   votingAllowed: boolean;
   postUuid: string;
@@ -107,6 +108,7 @@ interface IAcOptionCard {
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
+  id,
   option,
   votingAllowed,
   postUuid,
@@ -584,6 +586,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           </SSupportButton>
         ) : (
           <SSupportButtonDesktop
+            id={`${id}-support`}
             view='secondary'
             disabled={disabled}
             isBlue={isBlue}
@@ -643,6 +646,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         {!isMobile && isSupportFormOpen && (
           <>
             <SBidAmountTextInput
+              id={`${id}-amount`}
               value={supportBidAmount}
               inputAlign='left'
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
@@ -656,6 +660,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               }}
             />
             <Button
+              id={`${id}-submit`}
               view='primaryGrad'
               disabled={
                 !supportBidAmount

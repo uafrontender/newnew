@@ -241,6 +241,12 @@ const SRecommendationsSection = styled.div<{
   loaded: boolean;
 }>`
   min-height: ${({ loaded }) => (loaded ? '600px' : '0')};
+
+  margin-top: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 32px;
+  }
 `;
 
 const SGoBackButtonContainer = styled.div`

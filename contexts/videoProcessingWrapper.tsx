@@ -15,14 +15,16 @@ const VideoProcessingWrapper: React.FunctionComponent<
 > = ({ children }) => {
   const router = useRouter();
   const { showErrorToastCustom } = useErrorToasts();
-  const socketConnection = useContext(SocketContext);
+  const { socketConnection } = useContext(SocketContext);
 
   const handlerSocketUpdated = useCallback(
     (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-      if (!decoded) return;
+      if (!decoded) {
+        return;
+      }
 
       if (!decoded.postUuid) {
         console.log('Post has not been created yet. Returning');

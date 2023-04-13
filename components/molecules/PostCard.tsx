@@ -154,7 +154,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, [hovered]);
 
     // Socket
-    const socketConnection = useContext(SocketContext);
+    const { socketConnection, isSocketConnected } = useContext(SocketContext);
     const { addChannel, removeChannel } = useContext(ChannelsContext);
 
     const [postParsed, typeOfPost] = switchPostType(item);
@@ -242,13 +242,13 @@ export const PostCard: React.FC<ICard> = React.memo(
       setIsEllipseMenuOpen(true);
     };
 
-    const handleEllipseMenuClose = () => {
+    const handleEllipseMenuClose = useCallback(() => {
       Mixpanel.track('Closed Ellipse Menu Post Card', {
         _stage: 'Post Card',
         _postUuid: switchPostType(item)[0].postUuid,
       });
       setIsEllipseMenuOpen(false);
-    };
+    }, [item]);
 
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
@@ -295,17 +295,19 @@ export const PostCard: React.FC<ICard> = React.memo(
     // Increment channel subs after mounting
     // Decrement when unmounting
     useEffect(() => {
-      addChannel(postParsed.postUuid, {
-        postUpdates: {
-          postUuid: postParsed.postUuid,
-        },
-      });
+      if (isSocketConnected) {
+        addChannel(postParsed.postUuid, {
+          postUpdates: {
+            postUuid: postParsed.postUuid,
+          },
+        });
+      }
 
       return () => {
         removeChannel(postParsed.postUuid);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [isSocketConnected]);
 
     // Subscribe to post updates event
     useEffect(() => {
@@ -313,7 +315,9 @@ export const PostCard: React.FC<ICard> = React.memo(
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostUpdated.decode(arr);
 
-        if (!decoded) return;
+        if (!decoded) {
+          return;
+        }
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === postParsed.postUuid) {
           if (
