@@ -100,15 +100,24 @@ const ChannelsContextProvider: React.FC<IChannelsContextProvider> = ({
                     },
                   ],
                 });
+              } else if (val === newnewapi.CuratedListType.POPULAR.toString()) {
+                subscribeMsg = new newnewapi.SubscribeToChannels({
+                  channels: [
+                    {
+                      curatedListUpdates: {
+                        type: newnewapi.CuratedListType.POPULAR,
+                      },
+                    },
+                  ],
+                });
               } else if (
-                val ===
-                newnewapi.Channel.CuratedListType.Type.POPULAR.toString()
+                val === newnewapi.CuratedListType.MORE_LIKE_THIS.toString()
               ) {
                 subscribeMsg = new newnewapi.SubscribeToChannels({
                   channels: [
                     {
                       curatedListUpdates: {
-                        type: newnewapi.Channel.CuratedListType.Type.POPULAR,
+                        type: newnewapi.CuratedListType.MORE_LIKE_THIS,
                       },
                     },
                   ],
