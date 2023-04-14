@@ -49,7 +49,7 @@
     "moment": "2.29.1",
     "moment-duration-format": "2.3.2",
     "moment-timezone": "0.5.39",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#7fe88e5834096695ba5ececba472bd5774676b62",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#e39dc5a2e6ab4ff7303eaab11f63981e70f46caa",
     "next": "12.1.6",
     "next-i18next": "13.0.0",
     "next-redux-wrapper": "7.0.5",

@@ -98,6 +98,9 @@
         "button": {
           "upload": "Subir foto",
           "uploadNew": "Subir nueva imagen"
+        },
+        "errors_NEED_TRANSLATION": {
+          "inappropriate": "Uploaded image cannot be used"
         }
       }
     },

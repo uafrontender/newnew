@@ -83,6 +83,7 @@ interface EncDec<T = keyof NewnewapiType> {
  * @param response browser Fetch API response
  */
 const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
+  const clonedResponseObj = response.clone()
   const contentType = response.headers.get('content-type');
 
   return new Promise((resolve, reject) => {
@@ -99,7 +100,13 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
     if (response.status >= 401 && response.status < 404) {
       reject(new Error('Access token invalid'));
     }
-    reject(new Error('An error occurred'));
+
+    // Try to extract actual error message
+    clonedResponseObj.text().then((text) => {
+      reject(new Error(text || 'An error occurred'));
+    }).catch(() => {
+      reject(new Error('An error occurred'));
+    })
   });
 };
 
