@@ -18,6 +18,9 @@ import {
 import { reportPost } from '../api/endpoints/report';
 import { ReportData } from '../components/molecules/direct-messages/ReportModal';
 import { useAppSelector } from '../redux-store/store';
+import useCuratedList, {
+  useCuratedListSubscription,
+} from '../utils/hooks/useMoreLikeThis';
 import { TUpdatePostCoverImageMutation } from '../utils/hooks/usePost';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
@@ -40,11 +43,10 @@ const PostInnerContext = createContext<{
   stripeSetupIntentClientSecret: string | undefined;
   bundleStripeSetupIntentClientSecret: string | undefined;
   customOptionTextFromRedirect: string | undefined;
-  loadingRef: any;
+  // loadingRef: any;
   recommendedPostsLoading: boolean;
   reportPostOpen: boolean;
   handleSeeNewDeletedBox: () => void;
-  handleOpenRecommendedPost: (newPost: newnewapi.Post) => void;
   handleReportSubmit: ({ reasons, message }: ReportData) => Promise<void>;
   handleReportClose: () => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
@@ -89,11 +91,10 @@ const PostInnerContext = createContext<{
   stripeSetupIntentClientSecret: undefined,
   bundleStripeSetupIntentClientSecret: undefined,
   customOptionTextFromRedirect: undefined,
-  loadingRef: undefined,
+  // loadingRef: undefined,
   recommendedPostsLoading: false,
   reportPostOpen: false,
   handleSeeNewDeletedBox: () => {},
-  handleOpenRecommendedPost: (newPost: newnewapi.Post) => {},
   handleReportSubmit: (() => {}) as unknown as ({
     reasons,
     message,
@@ -142,10 +143,9 @@ interface IPostContextProvider {
   stripeSetupIntentClientSecret: string | undefined;
   bundleStripeSetupIntentClientSecret: string | undefined;
   customOptionText: string | undefined;
-  loadingRef: any;
+  // loadingRef: any;
   recommendedPostsLoading: boolean;
   handleSeeNewDeletedBox: () => void;
-  handleOpenRecommendedPost: (newPost: newnewapi.Post) => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
   resetSetupIntentClientSecret: () => void;
@@ -180,13 +180,12 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   deletedByCreator,
   recommendedPosts,
   recommendedPostsLoading,
-  handleOpenRecommendedPost,
   handleSeeNewDeletedBox,
   saveCard,
   stripeSetupIntentClientSecret,
   bundleStripeSetupIntentClientSecret,
   customOptionText: customOptionTextFromRedirect,
-  loadingRef,
+  // loadingRef,
   handleCloseAndGoBack,
   handleSetIsFollowingDecision,
   handleGoBackInsidePost,
@@ -264,15 +263,14 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       postStatus,
       isFollowingDecision,
       deletedByCreator,
-      hasRecommendations: recommendedPosts.length > 0,
+      hasRecommendations: recommendedPosts && recommendedPosts.length > 0,
       recommendedPosts,
       saveCard,
       stripeSetupIntentClientSecret,
       bundleStripeSetupIntentClientSecret,
       customOptionTextFromRedirect,
       handleSeeNewDeletedBox,
-      handleOpenRecommendedPost,
-      loadingRef,
+      // loadingRef,
       recommendedPostsLoading,
       reportPostOpen,
       handleReportSubmit,
@@ -316,8 +314,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       bundleStripeSetupIntentClientSecret,
       customOptionTextFromRedirect,
       handleSeeNewDeletedBox,
-      handleOpenRecommendedPost,
-      loadingRef,
+      // loadingRef,
       recommendedPostsLoading,
       reportPostOpen,
       handleReportSubmit,

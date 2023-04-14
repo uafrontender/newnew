@@ -24,7 +24,7 @@ import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { useAppSelector } from '../redux-store/store';
-import { getPopularPosts } from '../api/endpoints/post';
+import { getCuratedPosts } from '../api/endpoints/post';
 import canBecomeCreator from '../utils/canBecomeCreator';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
 
@@ -68,15 +68,15 @@ const Home: NextPage<IHome> = ({
 
   useEffect(() => {
     if (isSocketConnected) {
-      addChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString(), {
+      addChannel(newnewapi.CuratedListType.POPULAR.toString(), {
         curatedListUpdates: {
-          type: newnewapi.Channel.CuratedListType.Type.POPULAR,
+          type: newnewapi.CuratedListType.POPULAR,
         },
       });
     }
 
     return () => {
-      removeChannel(newnewapi.Channel.CuratedListType.Type.POPULAR.toString());
+      removeChannel(newnewapi.CuratedListType.POPULAR.toString());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSocketConnected]);
@@ -320,9 +320,13 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
   ] as TStaticPost[];
 
   try {
-    const popularPostsPayload = new newnewapi.EmptyRequest({});
+    const popularPostsPayload = new newnewapi.GetCuratedPostsRequest({
+      curatedListType: newnewapi.CuratedListType.POPULAR,
+    });
 
-    const popularPosts = await getPopularPosts(popularPostsPayload);
+    const popularPosts = await getCuratedPosts(popularPostsPayload);
+
+    console.log(popularPosts, 'popularPosts');
 
     return {
       props: {
