@@ -98,6 +98,9 @@
         "button": {
           "upload": "Subir foto",
           "uploadNew": "Subir nueva imagen"
+        },
+        "errors_NEED_TRANSLATION": {
+          "inappropriate": "Uploaded image cannot be used"
         }
       }
     },
@@ -159,27 +162,6 @@
       "stripeConnectedLink": "¡Stripe conectado!",
       "stripeConnecting": "Conectando...",
       "requireInformation": "Stripe requiere información"
-    }
-  },
-  "subRateSection": {
-    "meta": {
-      "title": "Aumenta tus ingresos pasivos.",
-      "description": "Habilita las suscripciones para tu canal y recibe pagos mensuales."
-    },
-    "side": {
-      "heading": "Aumenta tus ingresos pasivos.",
-      "subheading": "Habilita las suscripciones para tu canal y recibe pagos mensuales."
-    },
-    "heading": "Establece tu tarifa de suscripción",
-    "selectInput": {
-      "perMonth": "/mes",
-      "select": "Seleccionar",
-      "featured": "Popular",
-      "noProduct": "Sin suscripción"
-    },
-    "button": {
-      "submit": "Guardar cambios",
-      "back": "Cerrar"
     }
   }
 }

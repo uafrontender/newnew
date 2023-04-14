@@ -290,14 +290,17 @@ export const getMyUrgentPosts = (
     signal ?? undefined
   );
 
-export const getPopularPosts = (
-  payload: newnewapi.EmptyRequest,
+export const getCuratedPosts = (
+  payload: newnewapi.GetCuratedPostsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedPostsResponse>(
-    newnewapi.EmptyRequest,
+  fetchProtobuf<
+    newnewapi.GetCuratedPostsRequest,
+    newnewapi.NonPagedPostsResponse
+  >(
+    newnewapi.GetCuratedPostsRequest,
     newnewapi.NonPagedPostsResponse,
-    `${BASE_URL_POST}/get_popular_posts`,
+    `${BASE_URL_POST}/get_curated_posts`,
     'post',
     payload,
     {},
