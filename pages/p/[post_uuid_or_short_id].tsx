@@ -398,7 +398,7 @@ const PostPage: NextPage<IPostPage> = ({
   const { data: recommendedPosts, isLoading: recommendedPostsLoading } =
     useCuratedList(
       {
-        curatedListType: newnewapi.CuratedListType.POPULAR,
+        curatedListType: newnewapi.CuratedListType.MORE_LIKE_THIS,
         loggedInUser: false,
         postId: postParsed?.postUuid,
       },
@@ -408,7 +408,7 @@ const PostPage: NextPage<IPostPage> = ({
     );
 
   useCuratedListSubscription({
-    curatedListType: newnewapi.CuratedListType.POPULAR,
+    curatedListType: newnewapi.CuratedListType.MORE_LIKE_THIS,
     loggedInUser: false,
     postId: postParsed?.postUuid,
   });
