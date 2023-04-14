@@ -554,11 +554,11 @@
         "caption_1": "Sé el primero en mandar una oferta..."
       },
       "selectWinner": {
-        "title": "Confirmar oferta favorita",
+        "title": "Confirmar bid favorita",
         "body": "Si eliges esta oferta como favorita, ¡tendrás que subir un video tuyo haciéndola!",
         "button": {
           "cancel": "Cancelar",
-          "confirm": "Confirmar oferta favorita"
+          "confirm": "Confirmar bid favorita"
         }
       },
       "optionCard": {
