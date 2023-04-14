@@ -56,8 +56,7 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
     deletedByCreator,
     recommendedPosts,
     handleSeeNewDeletedBox,
-    handleOpenRecommendedPost,
-    loadingRef,
+    // loadingRef,
     recommendedPostsLoading,
     reportPostOpen,
     handleReportSubmit,
@@ -169,10 +168,9 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
                 skeletonsHighlightColor={
                   theme.colorsThemed.background.secondary
                 }
-                handlePostClicked={handleOpenRecommendedPost}
               />
             )}
-            <div
+            {/* <div
               ref={loadingRef}
               style={{
                 position: 'relative',
@@ -183,7 +181,7 @@ const PostRegular: React.FunctionComponent<IPostRegular> = () => {
                     }
                   : {}),
               }}
-            />
+            /> */}
           </SRecommendationsSection>
         </SPostContainer>
       ) : null}
