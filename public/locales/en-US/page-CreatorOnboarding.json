@@ -98,6 +98,9 @@
         "button": {
           "upload": "Upload photo",
           "uploadNew": "Upload new image"
+        },
+        "errors": {
+          "inappropriate": "Uploaded image cannot be used"
         }
       }
     },

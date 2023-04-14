@@ -1,9 +1,5 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 
 import PostCard from '../../molecules/PostCard';
@@ -18,17 +14,10 @@ interface IListPostPage {
   loading: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
-  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const ListPostPage: React.FC<IListPostPage> = React.memo(
-  ({
-    collection,
-    loading,
-    skeletonsBgColor,
-    skeletonsHighlightColor,
-    handlePostClicked,
-  }) => {
+  ({ collection, loading, skeletonsBgColor, skeletonsHighlightColor }) => {
     const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -54,7 +43,7 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
         }}
       >
         <SItemWrapper>
-          <PostCard
+          <SPostCard
             item={item}
             index={index + 1}
             width='100%'
@@ -75,6 +64,7 @@ export const ListPostPage: React.FC<IListPostPage> = React.memo(
             .fill('_')
             .map((_, i) => (
               <CardSkeleton
+                // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 count={1}
                 cardWidth='100%'
@@ -124,18 +114,16 @@ const SListPostPageWrapper = styled.div`
 
     ${(props) => props.theme.media.tablet} {
       height: 400px;
-      width: calc(33% - 16px);
+      width: calc((100% - 24px * 3) / 3);
       margin: 0 8px 24px 8px;
     }
 
-    ${(props) => props.theme.media.laptop} {
-      width: calc(25% - 32px);
-      margin: 0 16px 32px 16px;
+    ${(props) => props.theme.media.laptopM} {
+      width: calc((100% - 32px * 4) / 4);
     }
 
-    ${(props) => props.theme.media.laptopM} {
-      width: calc(20% - 32px);
-      margin: 0 16px 32px 16px;
+    ${(props) => props.theme.media.laptopL} {
+      width: calc((100% - 32px * 5) / 5);
     }
 
     div {
@@ -148,22 +136,27 @@ const SListPostPageWrapper = styled.div`
   }
 `;
 
+const SPostCard = styled(PostCard)`
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+`;
+
 const SItemWrapper = styled.div`
   width: 100%;
   margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(30%);
+    width: calc((100% - 24px * 3) / 3);
     margin: 0 8px 24px 8px;
   }
 
-  ${(props) => props.theme.media.laptop} {
-    width: calc(25% - 32px);
+  ${(props) => props.theme.media.laptopM} {
+    width: calc((100% - 32px * 4) / 4);
     margin: 0 16px 32px 16px;
   }
 
-  ${(props) => props.theme.media.laptopM} {
-    width: calc(20% - 32px);
-    margin: 0 16px 32px 16px;
+  ${(props) => props.theme.media.laptopL} {
+    width: calc((100% - 32px * 5) / 5);
   }
 `;

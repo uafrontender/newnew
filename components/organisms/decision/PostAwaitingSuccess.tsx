@@ -41,8 +41,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
     handleReportSubmit,
     handleReportClose,
     handleCloseAndGoBack,
-    handleOpenRecommendedPost,
-    loadingRef,
+    // loadingRef,
     recommendedPostsLoading,
   } = usePostInnerState();
 
@@ -103,10 +102,9 @@ const PostAwaitingSuccess: React.FunctionComponent<
                 skeletonsHighlightColor={
                   theme.colorsThemed.background.secondary
                 }
-                handlePostClicked={handleOpenRecommendedPost}
               />
             )}
-            <div
+            {/* <div
               ref={loadingRef}
               style={{
                 position: 'relative',
@@ -117,7 +115,7 @@ const PostAwaitingSuccess: React.FunctionComponent<
                     }
                   : {}),
               }}
-            />
+            /> */}
           </SRecommendationsSection>
         </SPostContainer>
       ) : null}

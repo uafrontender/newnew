@@ -554,11 +554,11 @@
         "caption_1": "成為第一個出價的人......"
       },
       "selectWinner": {
-        "title": "確認最喜歡的出價",
+        "title": "確認最喜歡的 bid",
         "body": "如果你選擇這個作為你最喜歡的投標，你需要上傳一段你自己的視頻！",
         "button": {
           "cancel": "取消",
-          "confirm": "確認最喜歡的出價"
+          "confirm": "確認最喜歡的 bid"
         }
       },
       "optionCard": {
