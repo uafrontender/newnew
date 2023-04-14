@@ -326,8 +326,6 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
 
     const popularPosts = await getCuratedPosts(popularPostsPayload);
 
-    console.log(popularPosts, 'popularPosts');
-
     return {
       props: {
         ...(popularPosts.data && popularPosts.data.toJSON().posts
