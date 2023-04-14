@@ -154,7 +154,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
   const onlySpacesRegex = /^\s+$/;
 
@@ -495,6 +495,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
       const updateMePayload = new newnewapi.UpdateMeRequest({
         countryCode: selectedCountry,
+        isForOnboarding: true,
         ...(fieldsToBeUpdated.firstName
           ? {
               firstName: firstNameInEdit.trim(),
@@ -529,8 +530,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
       });
 
       const updateMeRes = await updateMe(updateMePayload);
-      if (!updateMeRes.data || updateMeRes.error)
-        throw new Error(updateMeRes.error?.message ?? 'Request failed');
+      if (!updateMeRes.data || updateMeRes.error) {
+        throw new Error(updateMeRes.error?.message || 'Request failed');
+      }
 
       // Update Redux state
       dispatch(
@@ -574,8 +576,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        if (!becomeCreatorRes.data || becomeCreatorRes.error)
+        if (!becomeCreatorRes.data || becomeCreatorRes.error) {
           throw new Error('Become creator failed');
+        }
 
         dispatch(
           setUserData({
@@ -595,8 +598,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
         const res = await acceptCreatorTerms(acceptTermsPayload);
 
         if (res.error) {
-          throw new Error('Request failed');
+          throw new Error(res.error?.message || 'Request failed');
         }
+
         dispatch(
           setCreatorData({
             isLoaded: true,
@@ -608,14 +612,24 @@ const OnboardingSectionDetails: React.FunctionComponent<
       console.error(err);
       setLoadingModalOpen(false);
 
-      if ((err as Error).message === 'Email taken') {
+      if ((err as Error).message && (err as Error).message === 'Email taken') {
         setEmailError('emailTaken');
-        // } else if ((err as Error).message === 'Too young') {
-        // TODO: fix error handling, not all other errors are DoB related
-      } else if ((err as Error).message === 'Request failed') {
-        showErrorToastPredefined(undefined);
-      } else if ((err as Error).message) {
+      } else if (
+        (err as Error).message &&
+        (err as Error).message.includes('Uploaded image')
+      ) {
+        showErrorToastCustom(
+          t('detailsSection.form.profilePicture.errors.inappropriate')
+        );
+      } else if (
+        ((err as Error).message &&
+          (err as Error).message === 'Age is under allowed age') ||
+        ((err as Error).message &&
+          (err as Error).message?.toLowerCase().includes('age'))
+      ) {
         setDateError('tooYoung');
+      } else {
+        showErrorToastPredefined(undefined);
       }
 
       if ((err as Error).message === 'No token') {
