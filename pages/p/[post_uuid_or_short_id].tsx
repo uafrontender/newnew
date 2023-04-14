@@ -58,7 +58,7 @@ import { useAppState } from '../../contexts/appStateContext';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import useCuratedList, {
   useCuratedListSubscription,
-} from '../../utils/hooks/useMoreLikeThis';
+} from '../../utils/hooks/useCuratedList';
 
 interface IPostPage {
   postUuidOrShortId: string;

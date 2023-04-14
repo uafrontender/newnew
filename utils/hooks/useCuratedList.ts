@@ -44,8 +44,6 @@ const useCuratedList = (
     } as Omit<UseQueryOptions<newnewapi.IPost[], any>, 'queryKey' | 'queryFn'>
   );
 
-  console.log(query.data, 'query.data;');
-
   let posts: newnewapi.IPost[] | undefined = query.data;
 
   if (
