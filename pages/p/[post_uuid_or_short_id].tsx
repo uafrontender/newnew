@@ -19,12 +19,12 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+// import { useInView } from 'react-intersection-observer';
 import { validate as validateUuid } from 'uuid';
 
 import {
   deleteMyPost,
-  fetchMoreLikePosts,
+  // fetchMoreLikePosts,
   fetchPostByUUID,
   markPost,
   setPostTitle,
@@ -56,6 +56,9 @@ import usePost, {
 import getDisplayname from '../../utils/getDisplayname';
 import { useAppState } from '../../contexts/appStateContext';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
+import useCuratedList, {
+  useCuratedListSubscription,
+} from '../../utils/hooks/useCuratedList';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -382,15 +385,33 @@ const PostPage: NextPage<IPostPage> = ({
   const modalContainerRef = useRef<HTMLDivElement>();
 
   // Recommendations (with infinite scroll)
-  const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
-    []
-  );
-  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
-    ''
-  );
-  const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
-  const [triedLoading, setTriedLoading] = useState(false);
-  const { ref: loadingRef, inView } = useInView();
+  // const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
+  //   []
+  // );
+  // const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
+  //   ''
+  // );
+  // const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
+  // const [triedLoading, setTriedLoading] = useState(false);
+  // const { ref: loadingRef, inView } = useInView();
+
+  const { data: recommendedPosts, isLoading: recommendedPostsLoading } =
+    useCuratedList(
+      {
+        curatedListType: newnewapi.CuratedListType.MORE_LIKE_THIS,
+        loggedInUser: false,
+        postId: postParsed?.postUuid,
+      },
+      {
+        refetchOnWindowFocus: false,
+      }
+    );
+
+  useCuratedListSubscription({
+    curatedListType: newnewapi.CuratedListType.MORE_LIKE_THIS,
+    loggedInUser: false,
+    postId: postParsed?.postUuid,
+  });
 
   const handleCloseAndGoBack = useCallback(() => {
     if (
@@ -438,61 +459,61 @@ const PostPage: NextPage<IPostPage> = ({
     // }
   }, [router, handleCloseAndGoBack]);
 
-  const handleOpenRecommendedPost = useCallback(
-    (newPost: newnewapi.Post) => {
-      const newPostParsed = switchPostType(newPost)[0];
-      Mixpanel.track('Open Another Post', {
-        _stage: 'Post',
-        _postUuid: newPostParsed.postUuid,
-      });
-      router.push(
-        `/p/${
-          newPostParsed.postShortId
-            ? newPostParsed.postShortId
-            : newPostParsed.postUuid
-        }`
-      );
-    },
-    [router]
-  );
+  // const handleOpenRecommendedPost = useCallback(
+  //   (newPost: newnewapi.Post) => {
+  //     const newPostParsed = switchPostType(newPost)[0];
+  //     Mixpanel.track('Open Another Post', {
+  //       _stage: 'Post',
+  //       _postUuid: newPostParsed.postUuid,
+  //     });
+  //     router.push(
+  //       `/p/${
+  //         newPostParsed.postShortId
+  //           ? newPostParsed.postShortId
+  //           : newPostParsed.postUuid
+  //       }`
+  //     );
+  //   },
+  //   [router]
+  // );
 
-  const loadRecommendedPosts = useCallback(
-    async (pageToken?: string) => {
-      if (recommendedPostsLoading) return;
-      try {
-        setRecommendedPostsLoading(true);
-        setTriedLoading(true);
+  // const loadRecommendedPosts = useCallback(
+  //   async (pageToken?: string) => {
+  //     if (recommendedPostsLoading) return;
+  //     try {
+  //       setRecommendedPostsLoading(true);
+  //       setTriedLoading(true);
 
-        const fetchRecommenedPostsPayload =
-          new newnewapi.GetSimilarPostsRequest({
-            postUuid: postParsed?.postUuid,
-            ...(pageToken
-              ? {
-                  paging: {
-                    pageToken,
-                  },
-                }
-              : {}),
-          });
-        const postsResponse = await fetchMoreLikePosts(
-          fetchRecommenedPostsPayload
-        );
+  //       const fetchRecommenedPostsPayload =
+  //         new newnewapi.GetSimilarPostsRequest({
+  //           postUuid: postParsed?.postUuid,
+  //           ...(pageToken
+  //             ? {
+  //                 paging: {
+  //                   pageToken,
+  //                 },
+  //               }
+  //             : {}),
+  //         });
+  //       const postsResponse = await fetchMoreLikePosts(
+  //         fetchRecommenedPostsPayload
+  //       );
 
-        if (postsResponse.data && postsResponse.data.posts) {
-          setRecommendedPosts((curr) => [
-            ...curr,
-            ...(postsResponse.data?.posts as newnewapi.Post[]),
-          ]);
-          setNextPageToken(postsResponse.data.paging?.nextPageToken);
-        }
-        setRecommendedPostsLoading(false);
-      } catch (err) {
-        setRecommendedPostsLoading(false);
-        console.error(err);
-      }
-    },
-    [setRecommendedPosts, recommendedPostsLoading, postParsed]
-  );
+  //       if (postsResponse.data && postsResponse.data.posts) {
+  //         setRecommendedPosts((curr) => [
+  //           ...curr,
+  //           ...(postsResponse.data?.posts as newnewapi.Post[]),
+  //         ]);
+  //         setNextPageToken(postsResponse.data.paging?.nextPageToken);
+  //       }
+  //       setRecommendedPostsLoading(false);
+  //     } catch (err) {
+  //       setRecommendedPostsLoading(false);
+  //       console.error(err);
+  //     }
+  //   },
+  //   [setRecommendedPosts, recommendedPostsLoading, postParsed]
+  // );
 
   // Refetch Post if user authenticated
   useEffect(() => {
@@ -561,26 +582,26 @@ const PostPage: NextPage<IPostPage> = ({
   ]);
 
   // Infinite scroll
-  useEffect(() => {
-    if (inView && !recommendedPostsLoading) {
-      if (nextPageToken) {
-        loadRecommendedPosts(nextPageToken);
-      } else if (
-        !triedLoading &&
-        !nextPageToken &&
-        recommendedPosts?.length === 0
-      ) {
-        loadRecommendedPosts();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    inView,
-    nextPageToken,
-    recommendedPostsLoading,
-    recommendedPosts.length,
-    triedLoading,
-  ]);
+  // useEffect(() => {
+  //   if (inView && !recommendedPostsLoading) {
+  //     if (nextPageToken) {
+  //       loadRecommendedPosts(nextPageToken);
+  //     } else if (
+  //       !triedLoading &&
+  //       !nextPageToken &&
+  //       recommendedPosts?.length === 0
+  //     ) {
+  //       loadRecommendedPosts();
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [
+  //   inView,
+  //   nextPageToken,
+  //   recommendedPostsLoading,
+  //   recommendedPosts.length,
+  //   triedLoading,
+  // ]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -730,14 +751,13 @@ const PostPage: NextPage<IPostPage> = ({
         postParsed={postParsed}
         typeOfPost={typeOfPost}
         postStatus={postStatus}
-        loadingRef={loadingRef}
+        // loadingRef={loadingRef}
         modalContainerRef={modalContainerRef}
         isMyPost={isMyPost}
         deletedByCreator={deletedByCreator}
         handleSeeNewDeletedBox={handleSeeNewDeletedBox}
-        recommendedPosts={recommendedPosts}
+        recommendedPosts={recommendedPosts as newnewapi.Post[]}
         recommendedPostsLoading={recommendedPostsLoading}
-        handleOpenRecommendedPost={handleOpenRecommendedPost}
         saveCard={saveCard}
         stripeSetupIntentClientSecret={stripeSetupIntentClientSecret}
         resetSetupIntentClientSecret={resetSetupIntentClientSecret}
