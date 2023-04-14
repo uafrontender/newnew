@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import React, {
@@ -18,9 +16,6 @@ import {
 import { reportPost } from '../api/endpoints/report';
 import { ReportData } from '../components/molecules/direct-messages/ReportModal';
 import { useAppSelector } from '../redux-store/store';
-import useCuratedList, {
-  useCuratedListSubscription,
-} from '../utils/hooks/useCuratedList';
 import { TUpdatePostCoverImageMutation } from '../utils/hooks/usePost';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
