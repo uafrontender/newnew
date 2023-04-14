@@ -50,15 +50,12 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
       return '/profile';
     }
 
-    if (
-      userToRender?.options?.isVerified ||
-      userToRender?.uuid === winningOption.whitelistSupporter?.uuid
-    ) {
+    if (userToRender?.options?.isVerified) {
       return `/${userToRender?.username}`;
     }
 
     return undefined;
-  }, [userToRender, winningOption.whitelistSupporter?.uuid]);
+  }, [userToRender]);
 
   const avatarSrc: string = useMemo(() => {
     if (userToRender === 'me') {
