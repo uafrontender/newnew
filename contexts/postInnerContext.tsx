@@ -20,7 +20,7 @@ import { ReportData } from '../components/molecules/direct-messages/ReportModal'
 import { useAppSelector } from '../redux-store/store';
 import useCuratedList, {
   useCuratedListSubscription,
-} from '../utils/hooks/useMoreLikeThis';
+} from '../utils/hooks/useCuratedList';
 import { TUpdatePostCoverImageMutation } from '../utils/hooks/usePost';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
