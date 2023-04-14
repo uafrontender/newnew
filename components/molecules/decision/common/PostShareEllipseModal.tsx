@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
@@ -15,6 +15,7 @@ import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
+import Caption from '../../../atoms/Caption';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -36,37 +37,41 @@ const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
   React.memo(({ isOpen, zIndex, postUuid, postShortId, onClose }) => {
     const { t } = useTranslation('common');
 
-    // const socialButtons = useMemo(() => [
-    //   {
-    //     key: 'twitter',
-    //   },
-    //   {
-    //     key: 'facebook',
-    //   },
-    //   {
-    //     key: 'instagram',
-    //   },
-    //   {
-    //     key: 'tiktok',
-    //   },
-    //   {
-    //     key: 'copy',
-    //   },
-    // ], []);
-    // const renderItem = (item: any) => (
-    //   <SItem key={item.key}>
-    //     <SItemButton type={item.key}>
-    //       <InlineSVG
-    //         svg={SOCIAL_ICONS[item.key] as string}
-    //         width="50%"
-    //         height="50%"
-    //       />
-    //     </SItemButton>
-    //     <SItemTitle variant={3} weight={600}>
-    //       {t(`socials.${item.key}`)}
-    //     </SItemTitle>
-    //   </SItem>
-    // );
+    const socialButtons = useMemo(
+      () => [
+        {
+          key: 'twitter',
+        },
+        {
+          key: 'facebook',
+        },
+        {
+          key: 'instagram',
+        },
+        {
+          key: 'tiktok',
+        },
+        {
+          key: 'copy',
+        },
+      ],
+      []
+    );
+
+    const renderItem = (item: any) => (
+      <SItem key={item.key}>
+        <SItemButton type={item.key}>
+          <InlineSvg
+            svg={SOCIAL_ICONS[item.key] as string}
+            width='50%'
+            height='50%'
+          />
+        </SItemButton>
+        <SItemTitle variant={3} weight={600}>
+          {/* {t(`socials.${item.key}`)} */}
+        </SItemTitle>
+      </SItem>
+    );
 
     const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -103,6 +108,22 @@ const PostShareEllipseModal: React.FunctionComponent<IPostShareEllipseModal> =
       <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
         <ButtonsSection>
           <Headline variant={6}>{t('shareTo')}</Headline>
+          <SSocials>
+            {socialButtons.map((item: any) => (
+              <SItem key={item.key}>
+                <SItemButton type={item.key}>
+                  <InlineSvg
+                    svg={SOCIAL_ICONS[item.key] as string}
+                    width='50%'
+                    height='50%'
+                  />
+                </SItemButton>
+                <SItemTitle variant={3} weight={600}>
+                  {/* {t(`socials.${item.key}`)} */}
+                </SItemTitle>
+              </SItem>
+            ))}
+          </SSocials>
           <SSocialsSection>
             <SItem>
               <SItemButtonWide
@@ -164,4 +185,27 @@ const SItemButtonWide = styled.div<ISItemButton>`
 
   color: #ffffff;
   cursor: pointer;
+`;
+
+const SItemButton = styled.div<ISItemButton>`
+  width: 48px;
+  height: 48px;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  border-radius: 16px;
+  justify-content: center;
+  background: ${(props) => props.theme.colorsThemed.social[props.type].main};
+`;
+
+const SSocials = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const SItemTitle = styled(Caption)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  margin-top: 6px;
 `;
