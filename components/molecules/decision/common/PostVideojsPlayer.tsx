@@ -717,11 +717,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
             width={65}
             height={60}
             options={{
-              loop: false,
+              loop: true,
               autoplay: true,
               animationData: logoAnimation,
             }}
-            isStopped={!isLoading}
           />
         </SLoader>
       )}

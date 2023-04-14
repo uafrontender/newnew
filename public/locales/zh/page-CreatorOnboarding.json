@@ -160,26 +160,5 @@
       "stripeConnecting": "連接中......",
       "requireInformation": "Stripe需要資訊"
     }
-  },
-  "subRateSection": {
-    "meta": {
-      "title": "增加你的被動收入。",
-      "description": "為你的頻道啟用訂閱功能，按月獲得報酬。"
-    },
-    "side": {
-      "heading": "增加你的被動收入,",
-      "subheading": "為你的頻道啟用訂閱功能，按月獲得報酬。"
-    },
-    "heading": "設置訂閱費率",
-    "selectInput": {
-      "perMonth": "/月",
-      "select": "選擇",
-      "featured": "受歡迎",
-      "noProduct": "沒有訂閱"
-    },
-    "button": {
-      "submit": "保存更改",
-      "back": "關閉"
-    }
   }
 }
