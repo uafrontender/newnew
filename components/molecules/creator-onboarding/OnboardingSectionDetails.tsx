@@ -544,39 +544,66 @@ const OnboardingSectionDetails: React.FunctionComponent<
         })
       );
 
-      const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+      if (fieldsToBeUpdated.email) {
+        const sendVerificationCodePayload =
+          new newnewapi.SendVerificationEmailRequest({
+            emailAddress: emailInEdit,
+            useCase:
+              newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+          });
 
-      const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+        const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
-      if (!becomeCreatorRes.data || becomeCreatorRes.error)
-        throw new Error('Become creator failed');
+        if (
+          res.error ||
+          !res.data ||
+          (res.data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+            res.data.status !==
+              newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+        ) {
+          throw new Error('Email taken');
+        }
 
-      dispatch(
-        setUserData({
-          options: {
-            ...user.userData?.options,
-            isActivityPrivate:
-              becomeCreatorRes.data.me?.options?.isActivityPrivate,
-            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-          },
-        })
-      );
+        const newEmailValue = encodeURIComponent(emailInEdit);
+        router.push(
+          `/verify-new-email?email=${newEmailValue}&retryAfter=${res.data.retryAfter}&redirect=dashboard`
+        );
+      } else {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
 
-      const acceptTermsPayload = new newnewapi.EmptyRequest({});
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-      const res = await acceptCreatorTerms(acceptTermsPayload);
+        if (!becomeCreatorRes.data || becomeCreatorRes.error)
+          throw new Error('Become creator failed');
 
-      if (res.error) {
-        throw new Error('Request failed');
+        dispatch(
+          setUserData({
+            options: {
+              ...user.userData?.options,
+              isActivityPrivate:
+                becomeCreatorRes.data.me?.options?.isActivityPrivate,
+              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+            },
+          })
+        );
+
+        const acceptTermsPayload = new newnewapi.EmptyRequest({});
+
+        const res = await acceptCreatorTerms(acceptTermsPayload);
+
+        if (res.error) {
+          throw new Error('Request failed');
+        }
+        dispatch(
+          setCreatorData({
+            isLoaded: true,
+          })
+        );
+        router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
-      dispatch(
-        setCreatorData({
-          isLoaded: true,
-        })
-      );
-      router.push('/creator/dashboard?askPushNotificationPermission=true');
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
