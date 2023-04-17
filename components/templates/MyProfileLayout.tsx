@@ -266,7 +266,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleSetStageToEditingProfilePicture = () => {
     if (isBrowser()) {
-      syncedHistoryReplaceState(
+      syncedHistoryPushState(
         {
           stage: 'edit-profile-picture',
         },
@@ -295,8 +295,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
 
     // eslint-disable-next-line no-alert
-    const result = window.confirm(t('editProfileMenu.confirmationWindow'));
-    if (result) {
+    const confirmed = window.confirm(t('editProfileMenu.confirmationWindow'));
+    if (confirmed) {
       handleCloseEditProfileMenu();
     }
   }, [wasModified, handleCloseEditProfileMenu, t]);
