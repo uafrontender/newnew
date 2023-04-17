@@ -31,7 +31,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
   // QuickFix: Can happen on back button pressed on chat page
   useEffect(() => {
     if (isMobile && !activeChatRoom) {
-      setHiddenMessagesArea(true);
+      setHiddenMessagesArea(null);
     }
   }, [isMobile, activeChatRoom, setHiddenMessagesArea]);
 
