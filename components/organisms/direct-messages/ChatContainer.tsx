@@ -28,6 +28,13 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
     setHiddenMessagesArea,
   } = useGetChats();
 
+  // QuickFix: Can happen on back button pressed on chat page
+  useEffect(() => {
+    if (isMobile && !activeChatRoom) {
+      setHiddenMessagesArea(true);
+    }
+  }, [isMobile, activeChatRoom, setHiddenMessagesArea]);
+
   useEffect(() => {
     if (mobileChatOpened && !isMobile) {
       setMobileChatOpened(false);
@@ -48,7 +55,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
       {hiddenMessagesArea !== true && (
         <SContent>
           {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
-          {!activeChatRoom && !isLoading && <SelectChat />}
+          {!activeChatRoom && !isLoading && !isMobile && <SelectChat />}
           {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
         </SContent>
       )}
