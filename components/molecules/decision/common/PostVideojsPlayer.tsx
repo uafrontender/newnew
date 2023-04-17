@@ -649,9 +649,13 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   // Keyboard action handlers
   useEffect(() => {
     const handlePressSpacebar = (e: globalThis.KeyboardEvent) => {
+      const tagName = document?.activeElement?.tagName?.toLowerCase();
+
       const shouldPause =
         document?.hasFocus() &&
-        document?.activeElement?.tagName?.toLowerCase() === 'body';
+        tagName &&
+        tagName !== 'input' &&
+        tagName !== 'textarea';
 
       if (!shouldPause) {
         return;
