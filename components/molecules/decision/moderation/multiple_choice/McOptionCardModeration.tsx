@@ -224,7 +224,7 @@ const McOptionCardModeration: React.FunctionComponent<
   return (
     <>
       <motion.div
-        key={index}
+        key={option.id.toString()}
         layout='position'
         transition={{
           type: 'spring',
