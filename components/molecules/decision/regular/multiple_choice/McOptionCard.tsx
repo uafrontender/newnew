@@ -581,7 +581,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   return (
     <>
       <motion.div
-        key={index}
+        key={option.id.toString()}
         layout='position'
         transition={{
           type: 'spring',
