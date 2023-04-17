@@ -111,14 +111,28 @@ const AcOptionCardModeration: React.FunctionComponent<
   return (
     <>
       <motion.div
-        key={index}
+        key={option.id.toString()}
+        layout='position'
+        transition={{
+          type: 'spring',
+          damping: 20,
+          stiffness: 300,
+        }}
         style={{
           display: 'flex',
           flexDirection: 'column',
           marginBottom: '16px',
         }}
       >
-        <SContainer $isBlue={!!isWinner}>
+        <SContainer
+          layout='position'
+          transition={{
+            type: 'spring',
+            damping: 20,
+            stiffness: 300,
+          }}
+          $isBlue={!!isWinner}
+        >
           <SBidDetails isBlue={!!isWinner}>
             <SBidAmount isWhite={!!isWinner}>
               <OptionActionIcon
