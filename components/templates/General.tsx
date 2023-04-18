@@ -288,7 +288,7 @@ export const General: React.FC<IGeneral> = (props) => {
         {chatButtonVisible && (
           <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
-            zIndex={mobileChatOpened ? 100 : moreMenuMobileOpen ? 9 : 10}
+            zIndex={mobileChatOpened ? 11 : moreMenuMobileOpen ? 9 : 10}
           >
             {!mobileChatOpened ? (
               <FloatingMessages withCounter openChat={openChat} />
