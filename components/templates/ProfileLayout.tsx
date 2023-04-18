@@ -302,9 +302,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
-              handleClickBlock={() => {
+              handleClickBlock={async () => {
                 if (isUserBlocked) {
-                  changeUserBlockedStatus(user.uuid, false);
+                  await changeUserBlockedStatus(user.uuid, false);
                 } else {
                   setBlockUserModalOpen(true);
                 }
@@ -445,9 +445,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
-          handleClickBlock={() => {
+          handleClickBlock={async () => {
             if (isUserBlocked) {
-              changeUserBlockedStatus(user.uuid, false);
+              await changeUserBlockedStatus(user.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
