@@ -78,16 +78,23 @@ const DropdownSelect = <T,>({
   }, []);
 
   useEffect(() => {
-    if (isOpen && selected && selected !== selectedRef.current) {
-      const itemTopPos =
-        optionsRefs.current[options.findIndex((o) => o.value === selected)]
-          .offsetTop;
+    if (isOpen && selected) {
+      selectedRef.current = selected;
 
-      if (optionsContainerRef.current) {
-        optionsContainerRef.current.scrollTop = itemTopPos;
+      const selectedItemIndex = options.findIndex((o) => o.value === selected);
+
+      // Do not scroll to the first item in the list
+      if (selectedItemIndex < 1) {
+        return;
       }
 
-      selectedRef.current = selected;
+      const itemTopPos = optionsRefs.current[selectedItemIndex].offsetTop;
+
+      if (optionsContainerRef.current) {
+        // Leave a small gap above the selected item
+        const TOP_PADDING = 8;
+        optionsContainerRef.current.scrollTop = itemTopPos - TOP_PADDING;
+      }
     }
   }, [selected, options, isOpen]);
 
