@@ -302,8 +302,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     return () => window?.removeEventListener('resize', updateContainerWidth);
   }, []);
 
+  // Needs dependency to t object to react to text width changes
   useEffect(() => {
-    if (activeTabIndex === -1) return;
+    if (activeTabIndex === -1) {
+      return;
+    }
     const boundingRect =
       tabRefs.current[activeTabIndex].getBoundingClientRect();
 
@@ -326,6 +329,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     activeTabIndex,
     windowSize,
     isResizing,
+    t,
     setPrevLeft,
     setPosLeft,
     setActiveTabIndicator,
