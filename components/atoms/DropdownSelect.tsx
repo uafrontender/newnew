@@ -137,7 +137,11 @@ const DropdownSelect = <T,>({
             height={maxItems ? `${maxItems * 44 + 16}px` : undefined}
             direction={direction}
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{
+              opacity: 1,
+              // For some reason needs one more pixel to avoid jumping
+              height: maxItems ? maxItems * 44 + 16 + 1 : 'auto',
+            }}
             exit={{ opacity: 0, height: 0 }}
           >
             <div>
