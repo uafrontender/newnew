@@ -110,8 +110,10 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  max-width: 688px;
-  max-height: 733px;
+  width: 688px;
+  height: 733px;
+  max-width: 100%;
+  max-height: 95%;
   padding: 40px 0px;
   border-radius: 16px;
   overflow: hidden;

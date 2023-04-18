@@ -268,7 +268,7 @@ const MyProfileSettingsIndex = () => {
   useUpdateEffect(() => {
     // Redirect only after the persist data is pulled
     if (!loggedIn && _persist?.rehydrated) {
-      router.push('/');
+      router.replace('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, _persist?.rehydrated, router]);

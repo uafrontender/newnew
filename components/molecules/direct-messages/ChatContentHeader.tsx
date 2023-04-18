@@ -95,6 +95,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     return false;
   }, [router.asPath]);
 
+  // TODO: rework routing, pushing state on back button clicked is wrong
   const goBackHandler = useCallback(async () => {
     setHiddenMessagesArea(true);
     if (isDashboard) {
