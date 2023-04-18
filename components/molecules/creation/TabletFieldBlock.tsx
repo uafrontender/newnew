@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -51,11 +51,15 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
       onChange(id, inputProps?.max as number);
     }
   }, [inputProps, id, onChange, value]);
-  const getSelectOptions = () =>
-    options?.map((item: any) => ({
-      name: item.title,
-      value: item.id,
-    })) || [];
+
+  const selectOptions = useMemo(
+    () =>
+      options?.map((item: any) => ({
+        name: item.title,
+        value: item.id,
+      })) || [],
+    [options]
+  );
 
   const inputLabel = t(`secondStep.field.${id}.label` as any);
 
@@ -96,7 +100,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
             label={t(`secondStep.field.${id}.value` as any, {
               value: formattedValue || value,
             })}
-            options={getSelectOptions()}
+            options={selectOptions}
             selected={value}
             maxItems={maxItems}
             direction='top'

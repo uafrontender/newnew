@@ -28,6 +28,7 @@ interface IDropdownSelect<T> {
   id?: string;
   label: string;
   selected?: T;
+  // As an object needs to be wrapped into useMemo for stable scrolling
   options: TDropdownSelectItem<T>[];
   maxItems?: number;
   width?: string;
@@ -78,7 +79,7 @@ const DropdownSelect = <T,>({
   }, []);
 
   useEffect(() => {
-    if (isOpen && selected) {
+    if (isOpen && selected && selected !== selectedRef.current) {
       selectedRef.current = selected;
 
       const selectedItemIndex = options.findIndex((o) => o.value === selected);
