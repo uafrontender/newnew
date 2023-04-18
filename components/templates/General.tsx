@@ -1,6 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -32,6 +38,7 @@ import ChatContainer from '../organisms/direct-messages/ChatContainer';
 import { useAppState } from '../../contexts/appStateContext';
 import canBecomeCreator from '../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
+import isBrowser from '../../utils/isBrowser';
 
 interface IGeneral {
   className?: string;
@@ -188,9 +195,35 @@ export const General: React.FC<IGeneral> = (props) => {
     if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
       setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
     }
-    router.push(`/creator/dashboard?tab=chat`);
+
+    if (router.asPath.includes('/creator/bundles')) {
+      router.push(`/creator/bundles?tab=chat`);
+    } else {
+      router.push(`/creator/dashboard?tab=chat`);
+    }
     setMobileChatOpened(true);
   }, [activeTab, setActiveTab, setMobileChatOpened, router]);
+
+  useEffect(() => {
+    const checkUrl = () => {
+      if (!isBrowser()) {
+        return;
+      }
+
+      const newUrl = window.location.href;
+      if (
+        !newUrl.includes('tab=chat') &&
+        !newUrl.includes('tab=direct-messages')
+      ) {
+        setMobileChatOpened(false);
+      }
+    };
+
+    window.addEventListener('popstate', checkUrl);
+
+    return () => window.removeEventListener('popstate', checkUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const chatButtonVisible = useMemo(
     () => isMobile && withChat && directMessagesAvailable,
@@ -255,7 +288,7 @@ export const General: React.FC<IGeneral> = (props) => {
         {chatButtonVisible && (
           <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
-            zIndex={moreMenuMobileOpen ? 9 : 10}
+            zIndex={mobileChatOpened ? 100 : moreMenuMobileOpen ? 9 : 10}
           >
             {!mobileChatOpened ? (
               <FloatingMessages withCounter openChat={openChat} />
