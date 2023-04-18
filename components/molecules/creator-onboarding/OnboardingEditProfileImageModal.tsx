@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -15,7 +15,6 @@ import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
 import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import Button from '../../atoms/Button';
 import ProfileImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
-import isBrowser from '../../../utils/isBrowser';
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingEditProfileImageModal {
@@ -94,23 +93,6 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
       setLoading(false);
     }
   }, [avatarUrlInEdit, croppedAreaProfileImage, handleSetImageToSave, onClose]);
-
-  useEffect(() => {
-    const verify = () => {
-      if (!isBrowser()) return;
-
-      const { stage: currStage } = window.history.state;
-
-      if (!currStage) {
-        onClose();
-      }
-    };
-
-    window.addEventListener('popstate', verify);
-
-    return () => window.removeEventListener('popstate', verify);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <Modal show={isOpen} onClose={onClose}>

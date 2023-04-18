@@ -113,14 +113,18 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       );
 
       const [calendarOpen, setCalendarOpen] = useState(false);
-      const months: TDropdownSelectItem<number>[] = Array(12)
-        .fill('')
-        .map((_, i) => {
-          return {
-            name: getLocalizedMonth(i, locale),
-            value: i,
-          };
-        });
+      const months: TDropdownSelectItem<number>[] = useMemo(
+        () =>
+          Array(12)
+            .fill('')
+            .map((_, i) => {
+              return {
+                name: getLocalizedMonth(i, locale),
+                value: i,
+              };
+            }),
+        [locale]
+      );
       const years: TDropdownSelectItem<number>[] = useMemo(() => {
         const workingArr = [];
         for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {

@@ -36,7 +36,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   useEffect(() => {
     // Redirect only after the persist data is pulled
     if (!user.loggedIn && user._persist?.rehydrated) {
-      router.push('/');
+      router.replace('/');
     }
   }, [user.loggedIn, user._persist?.rehydrated, router]);
 
