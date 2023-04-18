@@ -5,21 +5,19 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useUpdateEffect } from 'react-use';
 import { useRouter } from 'next/router';
+import styled from 'styled-components';
 
 import Content from '../../components/organisms/creator/Dashboard';
 
 import { NextPageWithLayout } from '../_app';
 import assets from '../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
-import DashboardLayout from '../../components/templates/DashboardLayout';
-import ChatContainer from '../../components/organisms/direct-messages/ChatContainer';
-import { useGetChats } from '../../contexts/chatContext';
+import General from '../../components/templates/General';
 import { useAppSelector } from '../../redux-store/store';
 
 export const Dashboard = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Creator');
-  const { mobileChatOpened } = useGetChats();
   const { userData } = useAppSelector((state) => state.user);
 
   useUpdateEffect(() => {
@@ -41,13 +39,12 @@ export const Dashboard = () => {
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
       <Content />
-      {mobileChatOpened && <ChatContainer />}
     </>
   );
 };
 
 (Dashboard as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <DashboardLayout withChat>{page}</DashboardLayout>
+  <SGeneral withChat>{page}</SGeneral>
 );
 
 export default Dashboard;
@@ -79,3 +76,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
+
+const SGeneral = styled(General)`
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.secondary
+      : props.theme.colorsThemed.background.primary};
+
+  ${({ theme }) => theme.media.laptop} {
+    background: ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
+  }
+`;

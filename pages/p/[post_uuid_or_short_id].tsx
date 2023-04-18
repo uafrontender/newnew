@@ -258,6 +258,7 @@ const PostPage: NextPage<IPostPage> = ({
         _stage: 'Post',
         _postUuid: postParsed?.postUuid,
       });
+
       // Redirect only after the persist data is pulled
       if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
@@ -425,7 +426,7 @@ const PostPage: NextPage<IPostPage> = ({
     if (window.history.state && window.history.state.idx > 0) {
       router.back();
     } else {
-      router.push(`/${postParsed?.creator?.username}`);
+      router.replace(`/${postParsed?.creator?.username}`);
     }
   }, [isConfirmToClosePost, postParsed?.creator?.username, router, t]);
 
@@ -443,7 +444,7 @@ const PostPage: NextPage<IPostPage> = ({
     if (window.history.state && window.history.state.idx > 0) {
       router.back();
     } else {
-      router.push(`/${postParsed?.creator?.username}`);
+      router.replace(`/${postParsed?.creator?.username}`);
     }
   }, [isConfirmToClosePost, postParsed?.creator?.username, router, t]);
 
