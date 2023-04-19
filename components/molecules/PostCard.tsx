@@ -148,7 +148,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleVideoEnded = useCallback(() => {
       if (hovered) {
         videoRef?.current?.play().catch(() => {
-          console.error('Autoplay is not allowed');
+          console.warn('Autoplay is not allowed');
         });
       }
     }, [hovered]);
@@ -397,7 +397,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     useEffect(() => {
       if (hovered) {
         videoRef.current?.play().catch(() => {
-          console.error('Autoplay is not allowed');
+          console.warn('Autoplay is not allowed');
         });
       } else {
         videoRef.current?.pause();
