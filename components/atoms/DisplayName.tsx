@@ -1,13 +1,8 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useLayoutEffect,
-} from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import getDisplayname from '../../utils/getDisplayname';
 import InlineSvg from './InlineSVG';
@@ -62,8 +57,7 @@ const DisplayName: React.FC<IDisplayName> = ({
   const displayName = useMemo(() => getDisplayname(user), [user]);
   const name = useMemo(() => altName ?? displayName, [altName, displayName]);
 
-  // Causes warning about it doing nothing on SSR
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isVerified) {
       setSize(0);
       return;

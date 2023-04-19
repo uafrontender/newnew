@@ -33,7 +33,7 @@ interface IFunctionProps {
   chatRoom: newnewapi.IChatRoom;
   isVisavisBlocked: boolean;
   onUserReport: () => void;
-  onUserBlock: () => void;
+  onUserBlock: () => Promise<void>;
 }
 
 const ChatContentHeader: React.FC<IFunctionProps> = ({

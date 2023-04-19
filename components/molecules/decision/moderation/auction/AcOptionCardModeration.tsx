@@ -261,7 +261,7 @@ const AcOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
               handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-              handleUnblockUser={() =>
+              handleUnblockUser={async () =>
                 changeUserBlockedStatus(option.creator?.uuid, false)
               }
               anchorElement={ellipseButtonRef.current as HTMLElement}
@@ -336,7 +336,7 @@ const AcOptionCardModeration: React.FunctionComponent<
           handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
           handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
           handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-          handleUnblockUser={() =>
+          handleUnblockUser={async () =>
             changeUserBlockedStatus(option.creator?.uuid, false)
           }
         />
