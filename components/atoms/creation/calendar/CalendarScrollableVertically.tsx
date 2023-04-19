@@ -131,7 +131,7 @@ export const RenderMonthHeader = (props: any) => {
   const year = date.format('YYYY');
   return (
     <SMonthHeader variant={1} weight={600}>
-      {`${month}, ${year}`}
+      {`${month} ${year}`}
     </SMonthHeader>
   );
 };
