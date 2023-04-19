@@ -189,7 +189,9 @@ export default EllipseMenu;
 interface IEllipseMenuButton {
   id?: string;
   tone?: 'neutral' | 'error';
-  onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick?: (
+    e?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => Promise<void> | void;
   children: React.ReactNode;
   withoutTextWrapper?: boolean;
   variant?: 1 | 2 | 3 | 4 | 5;
@@ -205,26 +207,36 @@ export const EllipseMenuButton: React.FC<IEllipseMenuButton> = ({
   variant = 2,
   disabled,
   ...rest
-}) => (
-  <SButton
-    id={id}
-    onClick={(e) => {
+}) => {
+  const [busy, setBusy] = useState(false);
+  const handleClick = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (onClick) {
         e.stopPropagation();
-        onClick(e);
+        setBusy(true);
+        await onClick(e);
+        setBusy(false);
       }
-    }}
-    disabled={disabled}
-    {...rest}
-  >
-    {withoutTextWrapper && children}
-    {!withoutTextWrapper && (
-      <Text tone={tone} variant={variant}>
-        {children}
-      </Text>
-    )}
-  </SButton>
-);
+    },
+    [onClick]
+  );
+
+  return (
+    <SButton
+      id={id}
+      onClick={handleClick}
+      disabled={disabled || busy}
+      {...rest}
+    >
+      {withoutTextWrapper && children}
+      {!withoutTextWrapper && (
+        <Text tone={tone} variant={variant}>
+          {children}
+        </Text>
+      )}
+    </SButton>
+  );
+};
 
 const SContainer = styled(motion.div)<{
   top?: string;

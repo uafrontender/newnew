@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ interface IChatEllipseModal {
   zIndex: number;
   onClose: () => void;
   userBlocked?: boolean;
-  onUserBlock: () => void;
+  onUserBlock: () => Promise<void>;
   onUserReport: () => void;
   isAnnouncement?: boolean;
   visavis: newnewapi.IVisavisUser | null | undefined;
@@ -30,15 +30,15 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
 
-  const blockUserHandler = () => {
-    onUserBlock();
+  const blockUserHandler = useCallback(async () => {
+    await onUserBlock();
     onClose();
-  };
+  }, [onUserBlock, onClose]);
 
-  const reportUserHandler = () => {
+  const reportUserHandler = useCallback(() => {
     onUserReport();
     onClose();
-  };
+  }, [onUserReport, onClose]);
 
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>

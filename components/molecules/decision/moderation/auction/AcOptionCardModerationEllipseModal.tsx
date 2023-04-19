@@ -18,7 +18,7 @@ interface IAcOptionCardModerationEllipseModal {
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
   handleOpenRemoveOptionModal: () => void;
-  handleUnblockUser: () => void;
+  handleUnblockUser: () => Promise<void>;
 }
 
 const AcOptionCardModerationEllipseModal: React.FunctionComponent<
@@ -82,9 +82,9 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<
         {t('ellipse.reportBid')}
       </EllipseModalButton>
       <EllipseModalButton
-        onClick={() => {
+        onClick={async () => {
           if (isUserBlocked) {
-            handleUnblockUser();
+            await handleUnblockUser();
             return;
           }
           handleOpenBlockUserModal();

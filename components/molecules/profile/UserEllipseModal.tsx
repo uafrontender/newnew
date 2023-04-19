@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
@@ -10,7 +10,7 @@ interface IUserEllipseModal {
   loggedIn: boolean;
   onClose: () => void;
   handleClickReport: () => void;
-  handleClickBlock: () => void;
+  handleClickBlock: () => Promise<void>;
 }
 
 const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
@@ -24,15 +24,15 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
 }) => {
   const { t } = useTranslation('common');
 
-  const reportUserHandler = () => {
+  const blockHandler = useCallback(async () => {
+    await handleClickBlock();
+    onClose();
+  }, [handleClickBlock, onClose]);
+
+  const reportUserHandler = useCallback(() => {
     handleClickReport();
     onClose();
-  };
-
-  const blockHandler = () => {
-    handleClickBlock();
-    onClose();
-  };
+  }, [handleClickReport, onClose]);
 
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
