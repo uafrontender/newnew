@@ -447,7 +447,7 @@ export const PostCard: React.FC<ICard> = React.memo(
           }
           return;
         } catch (err) {
-          console.error(err);
+          console.warn(err);
         }
       }
 
