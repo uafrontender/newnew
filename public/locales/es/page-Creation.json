@@ -245,16 +245,10 @@
       "submit-scheduled": "Ver mi {{value}} programado"
     },
     "texts": {
-      "title-published": "Ahora está en vivo... ¡cómpartelo!",
-      "title-scheduled": "Ya está programado... ¡comparte la información!"
-    },
-    "socials": {
-      "twitter": "Twitter",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "copy": "Copiar enlace",
-      "copied": "¡Enlace copiado!"
+      "title-published": "Ahora está en vivo!",
+      "title-scheduled": "Ya está programado!",
+      "shareCaptionEvent_NEED_TRANSLATION": "Copy the link to share your Event on your social platforms.",
+      "shareCaptionSuperpoll_NEED_TRANSLATION": "Copy the link to share your Superpoll on your social platforms."
     }
   },
   "tutorials": {
