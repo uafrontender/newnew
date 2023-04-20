@@ -30,6 +30,7 @@ export const Logo: React.FunctionComponent<{
   const handleClick = () => {
     Mixpanel.track('Navigation Item Clicked', {
       _button: 'Header Logo',
+      _target: '/',
     });
 
     // This is used for smooth scrolling unlike the next/Link scrolling by hash

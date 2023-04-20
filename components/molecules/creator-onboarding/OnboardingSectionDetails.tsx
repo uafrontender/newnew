@@ -955,7 +955,17 @@ const OnboardingSectionDetails: React.FunctionComponent<
       <SControlsDiv>
         {!isMobile && (
           <BackButtonSection>
-            <GoBackButton longArrow onClick={() => router.back()}>
+            <GoBackButton
+              longArrow
+              onClick={() => {
+                Mixpanel.track('Navigation Item Clicked', {
+                  _stage: 'Onboarding',
+                  _button: 'Back button',
+                  _component: 'OnboardingSectionDetails',
+                });
+                router.back();
+              }}
+            >
               {t('detailsSection.button.back')}
             </GoBackButton>
           </BackButtonSection>
