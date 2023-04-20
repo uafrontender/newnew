@@ -24,8 +24,7 @@ context('Whitelisted Creator flow', () => {
   let payedToFirstBid = [];
   let payedToSecondSuperpoll = [];
   let payedToSecondBid = [];
-  // TODO: Calculate to check bundle earnings
-  let payedForBundles = 0;
+
   let firstEventBids: { text: string; amount: number }[] = [];
   let secondEventBids: { text: string; amount: number }[] = [];
 

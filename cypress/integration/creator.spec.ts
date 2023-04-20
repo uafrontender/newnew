@@ -17,16 +17,18 @@ context('Creator flow', () => {
   let creatorUsername = '';
   let eventShortId = '';
   let superpollShortId = '';
-  let payedToSuperpoll = [];
-  let payedToBid = [];
+  let payedToSuperpoll: number[] = [];
+  let payedToBid: number[] = [];
   // TODO: Calculate to check bundle earnings
-  let payedForBundles = 0;
+  let payedForBundles: number[] = [];
   let eventBids: { text: string; amount: number }[] = [];
 
   const SUPERPOLL_OPTIONS = [1, 2, 5, 10, 15, 25] as const;
   type SuperpollOption = typeof SUPERPOLL_OPTIONS[number];
 
   const BID_TO_WIN_TEXT = 'Bid winning';
+
+  const BUNDLE_OFFERS = [500, 2500, 5000, 7500];
 
   let nextUserEmailId = 0;
   function getNextUserEmail() {
@@ -155,8 +157,7 @@ context('Creator flow', () => {
     return { ...winningBid, bids: winningsBids.map((bid) => bid.amount) };
   }
 
-  // Only needed for dashboard values
-  /* function calculateEarnings(rawAmountInCents: number): number {
+  function calculateEarnings(rawAmountInCents: number): number {
     const feesInCents = Math.ceil(0.129 * rawAmountInCents) + 30;
     return rawAmountInCents - feesInCents;
   }
@@ -166,7 +167,7 @@ context('Creator flow', () => {
       calculateEarnings(contribution)
     );
     return earnings.reduce((acc, next) => acc + next);
-  } */
+  }
 
   function getDollarsFromCentsNumber(amountInCents: number): number {
     const amountInDollars = Math.ceil(amountInCents) / 100;
@@ -522,7 +523,7 @@ context('Creator flow', () => {
       // Wait for bundle offers to load
       cy.wait(4000);
       cy.dGet('#buy-bundle-button').click();
-      cy.dGet('#buy-bundle-1-button').click();
+      cy.dGet('#buy-bundle-0-button').click();
 
       // Wait stripe elements
       cy.wait(1000);
@@ -531,6 +532,7 @@ context('Creator flow', () => {
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
       }).click();
+      payedForBundles.push(BUNDLE_OFFERS[0]);
       cy.dGet('#bundles');
 
       cy.dGet('#support-button-supported').click();
@@ -789,6 +791,7 @@ context('Creator flow', () => {
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
       }).click();
+      payedForBundles.push(BUNDLE_OFFERS[1]);
 
       cy.dGet('#support-button-supported').should('be.visible');
     });
@@ -933,7 +936,7 @@ context('Creator flow', () => {
       cy.dGet('#add-option-input').type(CUSTOM_OPTION);
       cy.dGet('#add-option-submit').should('be.enabled').click();
 
-      cy.dGet('#buy-bundle-1-button').click();
+      cy.dGet('#buy-bundle-2-button').click();
 
       cy.dGet('#email-input').type(USER_EMAIL);
       enterCardInfo(
@@ -955,7 +958,7 @@ context('Creator flow', () => {
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
       }).click();
-
+      payedForBundles.push(BUNDLE_OFFERS[2]);
       // Could be great to show bundle purchased modal, but we don't know which offer was acquired
 
       cy.dGet('#bundles');
@@ -1102,7 +1105,7 @@ context('Creator flow', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
       cy.url().should('include', creatorUsername);
       cy.dGet('#buy-bundle-button').click();
-      cy.dGet('#buy-bundle-1-button').click();
+      cy.dGet('#buy-bundle-3-button').click();
 
       cy.dGet('#email-input').type(USER_EMAIL);
       enterCardInfo(
@@ -1124,6 +1127,7 @@ context('Creator flow', () => {
 
       // Could be great to show bundle purchased modal, but we don't know which offer was acquired
 
+      payedForBundles.push(BUNDLE_OFFERS[3]);
       cy.dGet('#bundles');
 
       cy.dGet('#see-bundle-button').should('be.visible');
@@ -1408,7 +1412,7 @@ context('Creator flow', () => {
       cy.wait(4000);
 
       cy.dGet('#buy-bundle-button').click();
-      cy.dGet('#buy-bundle-1-button').click();
+      cy.dGet('#buy-bundle-0-button').click();
 
       // Wait for stripe elements to load
       cy.wait(2000);
@@ -1426,6 +1430,7 @@ context('Creator flow', () => {
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
       }).click();
+      payedForBundles.push(BUNDLE_OFFERS[0]);
       cy.dGet('#bundles');
 
       cy.dGet('#support-button-0').click();
@@ -1606,6 +1611,7 @@ context('Creator flow', () => {
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
       }).click();
+      payedForBundles.push(BUNDLE_OFFERS[1]);
       cy.dGet('#bundles');
 
       cy.dGet('#see-bundle-button').should('be.visible');
@@ -1821,7 +1827,7 @@ context('Creator flow', () => {
       // Wait for bundle offers to load
       cy.wait(4000);
       cy.dGet('#buy-bundle-button').click();
-      cy.dGet('#buy-bundle-1-button').click();
+      cy.dGet('#buy-bundle-2-button').click();
 
       // Wait stripe elements
       cy.wait(1000);
@@ -1830,6 +1836,7 @@ context('Creator flow', () => {
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
       }).click();
+      payedForBundles.push(BUNDLE_OFFERS[2]);
       cy.dGet('#bundles');
 
       cy.dGet('#support-button-supported').click();
@@ -2160,12 +2167,86 @@ context('Creator flow', () => {
       cy.dGet('#post-title').invoke('text').should('contain', newTitle);
     });
 
-    /* it('can see correct earnings on dashboard', () => {
-      // TODO: Add it later
-      // TODO: Ether need to add bank on Stripe (complicated)
-      // or make test creator account have a flag set
-      // Check earnings
-      // Check bundle earnings
-    }); */
+    it('can access dashboard and add bio and see correct earnings on dashboard', () => {
+      const CREATOR_BIO = 'I am test creator!';
+
+      cy.dGet('#dashboard').click();
+      cy.url().should('include', '/creator/dashboard');
+      cy.dGet('#add-bio').click();
+      cy.url().should('include', '/creator-onboarding-about');
+      cy.dGet('#bio-input').type(CREATOR_BIO);
+      cy.dGet('#submit').click();
+      cy.url().should('include', '/creator-onboarding-stripe');
+    });
+
+    it('can see correct earnings on dashboard page', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/dashboard`);
+
+      // Let data load
+      cy.wait(2000);
+
+      const winningBid = getWinningBid();
+      const acEarnings = calculateTotalEarnings(winningBid.bids);
+      cy.dGet('#ac-earnings')
+        .invoke('text')
+        .should('contain', getDollarsFromCentsNumber(acEarnings).toString());
+
+      const mcEarnings = calculateTotalEarnings(payedToSuperpoll);
+      cy.dGet('#mc-earnings')
+        .invoke('text')
+        .should('contain', getDollarsFromCentsNumber(mcEarnings).toString());
+
+      const bundleEarnings = calculateTotalEarnings(payedForBundles);
+      cy.dGet('#bundles-earnings')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(bundleEarnings).toString()
+        );
+
+      const totalEarnings = acEarnings + mcEarnings + bundleEarnings;
+      cy.dGet('#total-earnings')
+        .invoke('text')
+        .should('contain', getDollarsFromCentsNumber(totalEarnings).toString());
+      // Let video capture the data
+      cy.wait(2000);
+    });
+
+    it('can see correct earnings on bundles page', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/bundles`);
+
+      // Let data load
+      cy.wait(2000);
+
+      const bundleEarnings = calculateTotalEarnings(payedForBundles);
+      cy.dGet('#total-bundle-earnings')
+        .invoke('text')
+        .should(
+          'contain',
+          getDollarsFromCentsNumber(bundleEarnings).toString()
+        );
+
+      BUNDLE_OFFERS.forEach((offer) => {
+        const bundlesSold = payedForBundles.filter((x) => x === offer);
+        const bundleEarnings = calculateTotalEarnings(bundlesSold);
+
+        const bundleEarningsSelector = `#${offer}-bundle-earnings`;
+        cy.dGet(bundleEarningsSelector)
+          .invoke('text')
+          .should(
+            'contain',
+            getDollarsFromCentsNumber(bundleEarnings).toString()
+          );
+
+        // Bundles sold number is broken
+        // const bundleSoldSelector = `#${offer}-bundle-sold`;
+        // cy.dGet(bundleSoldSelector)
+        //   .invoke('text')
+        //   .should('contain', bundlesSold.length.toString());
+      });
+
+      // Let video capture the data
+      cy.wait(2000);
+    });
   });
 });

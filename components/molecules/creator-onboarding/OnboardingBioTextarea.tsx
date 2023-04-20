@@ -40,6 +40,7 @@ const OnboardingBioTextarea: React.FunctionComponent<
       </SLabelDiv>
       <SOnboardingBioTextareaDiv>
         <textarea
+          id='bio-input'
           value={value}
           maxLength={maxChars}
           onChange={(e) => {
