@@ -245,16 +245,10 @@
       "submit-scheduled": "看到已計畫的{{value}}"
     },
     "texts": {
-      "title-published": "已上線......馬上分享吧！",
-      "title-scheduled": "已經安排好了......分享資訊！"
-    },
-    "socials": {
-      "twitter": "Twitter",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "copy": "複製連結",
-      "copied": "連結已複製！"
+      "title-published": "已上線！",
+      "title-scheduled": "已經安排好了！",
+      "shareCaptionEvent_NEED_TRANSLATION": "Copy the link to share your Event on your social platforms.",
+      "shareCaptionSuperpoll_NEED_TRANSLATION": "Copy the link to share your Superpoll on your social platforms."
     }
   },
   "tutorials": {

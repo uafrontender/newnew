@@ -48,15 +48,6 @@
     "seconds": "s",
     "leftToRespond": "left to respond"
   },
-  "socials": {
-    "share-to": "Share to",
-    "twitter": "Twitter",
-    "facebook": "Facebook",
-    "instagram": "Instagram",
-    "tiktok": "TikTok",
-    "copy": "Copy Link",
-    "copied": "Link copied!"
-  },
   "paymentSuccessModal": {
     "title": {
       "ac": "Bid is in!",
