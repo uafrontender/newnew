@@ -48,15 +48,6 @@
     "seconds": "秒",
     "leftToRespond": "後回應時間截止"
   },
-  "socials": {
-    "share-to": "分享到",
-    "twitter": "Twitter",
-    "facebook": "Facebook",
-    "instagram": "Instagram",
-    "tiktok": "TikTok",
-    "copy": "複製連結",
-    "copied": "連結已複製！"
-  },
   "paymentSuccessModal": {
     "title": {
       "ac": "出價成功！",
