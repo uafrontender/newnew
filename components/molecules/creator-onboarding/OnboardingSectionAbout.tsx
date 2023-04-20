@@ -265,6 +265,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
             </GoBackButton>
           )}
           <Button
+            id='submit'
             view='primaryGrad'
             disabled={!isFormValid}
             style={{
