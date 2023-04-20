@@ -255,7 +255,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
               onClick={() => {
                 Mixpanel.track('Navigation Item Clicked', {
                   _stage: 'Onboarding',
-                  _button: 'Close',
+                  _button: 'Back button',
                   _component: 'OnboardingSectionAbout',
                 });
                 router.back();
