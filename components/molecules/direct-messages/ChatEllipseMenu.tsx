@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -12,7 +12,7 @@ interface IChatEllipseMenu {
   user: newnewapi.IVisavisUser;
   isVisible: boolean;
   handleClose: () => void;
-  onUserBlock: () => void;
+  onUserBlock: () => Promise<void>;
   onUserReport: () => void;
   userBlocked?: boolean;
   isAnnouncement?: boolean;
@@ -34,7 +34,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   const { t } = useTranslation('common');
   const router = useRouter();
 
-  const blockUserHandler = () => {
+  const blockUserHandler = useCallback(async () => {
     Mixpanel.track(
       userBlocked ? 'Unblock User Button Clicked' : 'Block User Button Clicked',
       {
@@ -43,9 +43,9 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
         _userUuid: user.user?.uuid,
       }
     );
-    onUserBlock();
+    await onUserBlock();
     handleClose();
-  };
+  }, [user.user?.uuid, userBlocked, onUserBlock, handleClose]);
 
   const reportUserHandler = () => {
     Mixpanel.track('Report Button Clicked', {

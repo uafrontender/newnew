@@ -48,15 +48,6 @@
     "seconds": "s",
     "leftToRespond": "para responder"
   },
-  "socials": {
-    "share-to": "Compartir a",
-    "twitter": "Twitter",
-    "facebook": "Facebook",
-    "instagram": "Instagram",
-    "tiktok": "TikTok",
-    "copy": "Copiar enlace",
-    "copied": "¡Enlace copiado!"
-  },
   "paymentSuccessModal": {
     "title": {
       "ac": "¡Tu oferta está dentro!",

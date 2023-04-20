@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { isArray } from 'lodash';
@@ -67,7 +67,9 @@ export default EllipseModal;
 interface IEllipseModalButton {
   tone?: 'neutral' | 'error';
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (
+    e?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => Promise<void> | void;
   children: string | React.ReactNode;
 }
 
@@ -76,13 +78,27 @@ export const EllipseModalButton: React.FC<IEllipseModalButton> = ({
   disabled,
   onClick,
   children,
-}) => (
-  <SButton onClick={onClick} disabled={disabled}>
-    <Text variant={3} tone={tone}>
-      {children}
-    </Text>
-  </SButton>
-);
+}) => {
+  const [busy, setBusy] = useState(false);
+  const handleClick = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      if (onClick) {
+        setBusy(true);
+        await onClick(e);
+        setBusy(false);
+      }
+    },
+    [onClick]
+  );
+
+  return (
+    <SButton onClick={handleClick} disabled={disabled || busy}>
+      <Text variant={3} tone={tone}>
+        {children}
+      </Text>
+    </SButton>
+  );
+};
 
 const SWrapper = styled.div`
   width: 100%;

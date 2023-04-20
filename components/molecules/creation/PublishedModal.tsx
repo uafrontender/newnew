@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
@@ -10,28 +10,15 @@ import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
-import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
-import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
-import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
-import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { usePostCreationState } from '../../../contexts/postCreationContext';
 import DisplayName from '../../atoms/DisplayName';
-
-const SOCIAL_ICONS: any = {
-  copy: copyIcon,
-  tiktok: tiktokIcon,
-  twitter: twitterIcon,
-  facebook: facebookIcon,
-  instagram: instagramIcon,
-};
+import SharePanel from '../../atoms/SharePanel';
 
 const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -53,33 +40,10 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     [postInCreation]
   );
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
-
   const preventClick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
-  const socialButtons = useMemo(
-    () => [
-      // {
-      //   key: 'twitter',
-      // },
-      // {
-      //   key: 'facebook',
-      // },
-      // {
-      //   key: 'instagram',
-      // },
-      // {
-      //   key: 'tiktok',
-      // },
-      {
-        key: 'copy',
-      },
-    ],
-    []
-  );
 
   // No need in translation as these are reserved words
   const postTypeText = useCallback(() => {
@@ -95,59 +59,6 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
 
     return 'Bid';
   }, [postData]);
-
-  async function copyPostUrlToClipboard(url: string) {
-    Mixpanel.track('Copy Post Url to Clipboard', {
-      _stage: 'Creation',
-      _url: url,
-    });
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
-  const socialBtnClickHandler = useCallback(
-    (buttonType: string) => {
-      const val = buttonType;
-      if (val === 'copy' && postData) {
-        let url;
-        if (window) {
-          url = `${window.location.origin}/p/`;
-          if (url) {
-            if (postData.auction) {
-              url += postData.auction.postShortId
-                ? postData.auction.postShortId
-                : postData.auction.postUuid;
-            }
-            if (postData.crowdfunding) {
-              url += postData.crowdfunding.postShortId
-                ? postData.crowdfunding.postShortId
-                : postData.crowdfunding.postUuid;
-            }
-            if (postData.multipleChoice) {
-              url += postData.multipleChoice.postShortId
-                ? postData.multipleChoice.postShortId
-                : postData.multipleChoice.postUuid;
-            }
-
-            copyPostUrlToClipboard(url)
-              .then(() => {
-                setIsCopiedUrl(true);
-                setTimeout(() => {
-                  setIsCopiedUrl(false);
-                }, 1500);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          }
-        }
-      }
-    },
-    [postData]
-  );
 
   const handleViewMyPost = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -213,33 +124,27 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     return dateValue;
   }, [post.expiresAt]);
 
-  const renderItem = (item: any) => (
-    <SItem key={item.key} type={item.key}>
-      <SItemButton
-        buttonType={item.key}
-        onClick={() => socialBtnClickHandler(item.key)}
-      >
-        <InlineSVG
-          svg={SOCIAL_ICONS[item.key] as string}
-          width='25px'
-          height='25px'
-          onClick={() => {
-            socialBtnClickHandler(item.key);
-          }}
-        />
-      </SItemButton>
-      <SItemTitle
-        variant={3}
-        weight={600}
-        type={item.key}
-        onClick={socialBtnClickHandler as any}
-      >
-        {item.key === 'copy' && isCopiedUrl
-          ? t(`published.socials.copied`)
-          : t(`published.socials.${item.key}` as any)}
-      </SItemTitle>
-    </SItem>
-  );
+  const linkToShare = useMemo(() => {
+    let url = `${window.location.origin}/p/`;
+    if (url && postData) {
+      if (postData.auction) {
+        url += postData.auction.postShortId
+          ? postData.auction.postShortId
+          : postData.auction.postUuid;
+      }
+      if (postData.crowdfunding) {
+        url += postData.crowdfunding.postShortId
+          ? postData.crowdfunding.postShortId
+          : postData.crowdfunding.postUuid;
+      }
+      if (postData.multipleChoice) {
+        url += postData.multipleChoice.postShortId
+          ? postData.multipleChoice.postShortId
+          : postData.multipleChoice.postUuid;
+      }
+    }
+    return url;
+  }, [postData]);
 
   return (
     <Modal show={open} onClose={handleClose}>
@@ -287,7 +192,12 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
               }`
             )}
           </STitle>
-          <SSocials>{socialButtons.map(renderItem)}</SSocials>
+          <SCaptionItsLive variant={2}>
+            {postData?.auction
+              ? t('published.texts.shareCaptionEvent')
+              : t('published.texts.shareCaptionSuperpoll')}
+          </SCaptionItsLive>
+          <SSharePanel linkToShare={linkToShare} />
           <SButtonWrapper id='see-post' onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
@@ -343,62 +253,16 @@ const STitle = styled(Headline)`
   text-align: center;
 `;
 
-const SSocials = styled.div`
-  /* gap: 24px; */
-  width: 100%;
-  display: flex;
-  margin-top: 16px;
-  /* align-items: center; */
-  flex-direction: row;
-  justify-content: center;
-`;
+const SCaptionItsLive = styled(Caption)`
+  text-align: center;
 
-const SItem = styled.div<{
-  type: string;
-}>`
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-`;
-
-interface ISItemButton {
-  buttonType: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
-}
-
-const SItemButton = styled.button<ISItemButton>`
-  cursor: pointer;
-  width: 224px;
-  height: 48px;
-  display: flex;
-  overflow: hidden;
-  align-items: center;
-  border-radius: 16px;
-  justify-content: center;
-  background: ${(props) =>
-    props.theme.colorsThemed.social[props.buttonType].main};
-
-  border: transparent;
-  cursor: pointer;
-
-  &:hover:enabled,
-  &:focus:enabled {
-    outline: none;
-  }
-`;
-
-const SItemTitle = styled(Caption)<{
-  type: string;
-}>`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-top: 6px;
-  cursor: pointer;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SButtonWrapper = styled.div`
   cursor: pointer;
   display: flex;
   padding: 16px 0;
-  margin-top: 24px;
   align-items: center;
   justify-content: center;
 `;
@@ -464,4 +328,16 @@ const SCaption = styled(Caption)`
   justify-self: flex-end;
   line-break: strict;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SSharePanel = styled(SharePanel)`
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 24px;
+  display: flex;
+  margin-top: 16px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
 `;

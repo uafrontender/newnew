@@ -2,5 +2,8 @@
   "header": "Congrats!",
   "youMade": "You made",
   "makeNewPostButton": "Make another post",
-  "subtitle": ""
+  "subtitle": "",
+  "itsLiveTitle": "It's live!",
+  "shareCaptionEvent": "Copy the link to share your Event on your social platforms.",
+  "shareCaptionSuperpoll": "Copy the link to share your Superpoll on your social platforms."
 }

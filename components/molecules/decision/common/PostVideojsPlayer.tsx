@@ -212,7 +212,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
         p.ready(() => {
           if (!isInSlider || (isInSlider && isActive)) {
-            const promise = p.play();
+            const promise = p.play()?.catch(() => {
+              console.warn('Autoplay is not allowed');
+            });
 
             if (promise !== undefined) {
               promise
@@ -615,7 +617,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   useEffect(() => {
     if (isInSlider) {
       if (isActive) {
-        const promise = playerRef?.current?.play();
+        const promise = playerRef?.current?.play()?.catch(() => {
+          console.warn('Autoplay is not allowed');
+        });
 
         if (promise !== undefined) {
           promise
