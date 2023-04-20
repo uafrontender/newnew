@@ -74,6 +74,7 @@ export const YourToDos = () => {
           <Link href='/creator-onboarding-about'>
             <a>
               <SBottomActionButton
+                id='add-bio'
                 withDim
                 withShrink
                 withShadow
