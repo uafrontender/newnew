@@ -2,5 +2,8 @@
   "header": "恭喜！",
   "youMade": "你做了",
   "makeNewPostButton": "再發一個帖子",
-  "subtitle": ""
+  "subtitle": "",
+  "itsLiveTitle": "已上線！",
+  "shareCaptionEvent_NEED_TRANSALTION": "Copy the link to share your Event on your social platforms.",
+  "shareCaptionSuperpoll_NEED_TRANSALTION": "Copy the link to share your Superpoll on your social platforms."
 }
