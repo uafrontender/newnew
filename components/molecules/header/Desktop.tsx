@@ -121,6 +121,7 @@ export const Desktop: React.FC = () => {
                 <Link href='/creator/dashboard'>
                   <a>
                     <Button
+                      id='dashboard'
                       view='quaternary'
                       onClick={() => {
                         Mixpanel.track('Navigation Item Clicked', {

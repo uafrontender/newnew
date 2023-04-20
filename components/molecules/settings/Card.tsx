@@ -93,7 +93,7 @@ const Card: React.FunctionComponent<ICard> = ({
     []
   );
 
-  const handelSetPrimaryCard = async () => {
+  const handelSetPrimaryCard = () => {
     Mixpanel.track('Set Primary Card', {
       _stage: 'Settings',
       _cardUuid: cardId,
@@ -101,7 +101,7 @@ const Card: React.FunctionComponent<ICard> = ({
     setPrimaryCardMutation?.mutate(cardId);
   };
 
-  const handleDeleteCard = async () => {
+  const handleDeleteCard = () => {
     try {
       Mixpanel.track('Delete Card', {
         _stage: 'Settings',

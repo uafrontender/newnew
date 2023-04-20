@@ -120,6 +120,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
     [disabled, setRippleOrigin, setIsRippling]
   );
 
+  // TODO: probably needs useIsomorphicLayoutEffect
   useLayoutEffect(() => {
     if (spanRef.current) {
       setTextWidth(spanRef.current.getBoundingClientRect().width);

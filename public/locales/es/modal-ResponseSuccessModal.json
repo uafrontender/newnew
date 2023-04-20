@@ -2,5 +2,8 @@
   "header": "¡Felicidades!",
   "youMade": "Ganaste",
   "makeNewPostButton": "Hacer otra publicación",
-  "subtitle": ""
+  "subtitle": "",
+  "itsLiveTitle": "Ahora está en vivo!",
+  "shareCaptionEvent_NEED_TRANSALTION": "Copy the link to share your Event on your social platforms.",
+  "shareCaptionSuperpoll_NEED_TRANSALTION": "Copy the link to share your Superpoll on your social platforms."
 }

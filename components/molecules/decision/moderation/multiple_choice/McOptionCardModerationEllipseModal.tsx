@@ -20,7 +20,7 @@ interface IMcOptionCardModerationEllipseModal {
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
   handleOpenRemoveOptionModal: () => void;
-  handleUnblockUser: () => void;
+  handleUnblockUser: () => Promise<void>;
 }
 
 const McOptionCardModerationEllipseModal: React.FunctionComponent<
@@ -88,9 +88,9 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<
       )}
       {isBySubscriber && (
         <EllipseModalButton
-          onClick={() => {
+          onClick={async () => {
             if (isUserBlocked) {
-              handleUnblockUser();
+              await handleUnblockUser();
               return;
             }
             handleOpenBlockUserModal();
