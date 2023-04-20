@@ -185,7 +185,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
     [chatRoom.visavis?.user?.uuid, usersBlockedMe]
   );
 
-  const onUserBlock = useCallback(() => {
+  const onUserBlock = useCallback(async () => {
     if (!isVisavisBlocked) {
       if (!confirmBlockUser) {
         Mixpanel.track('Block User Modal Opened', {
@@ -195,7 +195,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
         setConfirmBlockUser(true);
       }
     } else {
-      changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
+      await changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
     }
   }, [
     isVisavisBlocked,

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -11,29 +11,15 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
-import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
 
-import { I18nNamespaces } from '../../../../@types/i18next';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
-import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
-import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
-import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
-import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
 import DisplayName from '../../../atoms/DisplayName';
-
-const SOCIAL_ICONS: any = {
-  copy: copyIcon,
-  tiktok: tiktokIcon,
-  twitter: twitterIcon,
-  facebook: facebookIcon,
-  instagram: instagramIcon,
-};
+import SharePanel from '../../../atoms/SharePanel';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -56,16 +42,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     resizeMode
   );
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
-
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
   // No need in translation as these are reserved words
   const postTypeText = useCallback(() => {
     if (postData) {
@@ -82,46 +58,27 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     return 'Bid';
   }, [postData]);
 
-  const socialBtnClickHandler = useCallback(
-    (buttonType: string) => {
-      const val = buttonType;
-      if (val === 'copy' && postData) {
-        let url;
-        if (window) {
-          url = `${window.location.origin}/p/`;
-          if (url) {
-            if (postData.auction) {
-              url += postData.auction.postShortId
-                ? postData.auction.postShortId
-                : postData.auction.postUuid;
-            }
-            if (postData.crowdfunding) {
-              url += postData.crowdfunding.postShortId
-                ? postData.crowdfunding.postShortId
-                : postData.crowdfunding.postUuid;
-            }
-            if (postData.multipleChoice) {
-              url += postData.multipleChoice.postShortId
-                ? postData.multipleChoice.postShortId
-                : postData.multipleChoice.postUuid;
-            }
-
-            copyPostUrlToClipboard(url)
-              .then(() => {
-                setIsCopiedUrl(true);
-                setTimeout(() => {
-                  setIsCopiedUrl(false);
-                }, 1500);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          }
-        }
+  const linkToShare = useMemo(() => {
+    let url = `${window.location.origin}/p/`;
+    if (url && postData) {
+      if (postData.auction) {
+        url += postData.auction.postShortId
+          ? postData.auction.postShortId
+          : postData.auction.postUuid;
       }
-    },
-    [postData]
-  );
+      if (postData.crowdfunding) {
+        url += postData.crowdfunding.postShortId
+          ? postData.crowdfunding.postShortId
+          : postData.crowdfunding.postUuid;
+      }
+      if (postData.multipleChoice) {
+        url += postData.multipleChoice.postShortId
+          ? postData.multipleChoice.postShortId
+          : postData.multipleChoice.postUuid;
+      }
+    }
+    return url;
+  }, [postData]);
 
   const handleViewMyPost = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -156,27 +113,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     [postData, router, clearCreation]
   );
 
-  const socialButtons = useMemo(
-    () => [
-      // {
-      //   key: 'twitter',
-      // },
-      // {
-      //   key: 'facebook',
-      // },
-      // {
-      //   key: 'instagram',
-      // },
-      // {
-      //   key: 'tiktok',
-      // },
-      {
-        key: 'copy',
-      },
-    ],
-    []
-  );
-
   const formatExpiresAtNoStartsAt = useCallback(() => {
     const dateValue = moment();
 
@@ -206,38 +142,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
 
     return dateValue;
   }, [post.expiresAt]);
-
-  const renderItem = (item: any) => (
-    <SItem key={item.key} type={item.key}>
-      <SItemButton
-        buttonType={item.key}
-        onClick={() => socialBtnClickHandler(item.key)}
-      >
-        <InlineSVG
-          svg={SOCIAL_ICONS[item.key] as string}
-          width='25px'
-          height='25px'
-          onClick={() => {
-            socialBtnClickHandler(item.key);
-          }}
-        />
-      </SItemButton>
-      <SItemTitle
-        variant={3}
-        weight={600}
-        type={item.key}
-        onClick={socialBtnClickHandler as any}
-      >
-        {item.key === 'copy' && isCopiedUrl
-          ? t(`published.socials.copied`)
-          : t(
-              `published.socials.${
-                item.key as keyof I18nNamespaces['page-Creation']['published']['socials']
-              }`
-            )}
-      </SItemTitle>
-    </SItem>
-  );
 
   // Redirect if post state is empty
   useEffect(() => {
@@ -294,7 +198,12 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
             }`
           )}
         </STitle>
-        <SSocials>{socialButtons.map(renderItem)}</SSocials>
+        <SCaptionItsLive variant={2}>
+          {postData?.auction
+            ? t('published.texts.shareCaptionEvent')
+            : t('published.texts.shareCaptionSuperpoll')}
+        </SCaptionItsLive>
+        <SSharePanel linkToShare={linkToShare} />
       </SContent>
       {isMobile && (
         <SButtonWrapper>
@@ -379,6 +288,12 @@ const STitle = styled(Headline)`
   text-align: center;
 `;
 
+const SCaptionItsLive = styled(Caption)`
+  text-align: center;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
 const SUserBlock = styled.div`
   width: 224px;
   margin: 16px auto 16px auto;
@@ -415,58 +330,6 @@ const SUserTitle = styled(Text)`
   text-overflow: ellipsis;
 `;
 
-const SSocials = styled.div`
-  /* gap: 24px; */
-  width: 100%;
-  display: flex;
-  margin-top: 16px;
-  /* align-items: center; */
-  flex-direction: row;
-  justify-content: center;
-`;
-
-const SItem = styled.div<{
-  type: string;
-}>`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-`;
-
-interface ISItemButton {
-  buttonType: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
-}
-
-const SItemButton = styled.div<ISItemButton>`
-  cursor: pointer;
-  width: 224px;
-  height: 48px;
-  display: flex;
-  overflow: hidden;
-  align-items: center;
-  border-radius: 16px;
-  justify-content: center;
-  background: ${(props) =>
-    props.theme.colorsThemed.social[props.buttonType].main};
-
-  border: transparent;
-  cursor: pointer;
-
-  &:hover:enabled,
-  &:focus:enabled {
-    outline: none;
-  }
-`;
-
-const SItemTitle = styled(Caption)<{
-  type: string;
-}>`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-top: 6px;
-  cursor: pointer;
-`;
-
 const SText = styled(Text)`
   margin-top: 45%;
 
@@ -487,4 +350,16 @@ const SCaption = styled(Caption)`
   justify-self: flex-end;
   line-break: strict;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SSharePanel = styled(SharePanel)`
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 24px;
+  display: flex;
+  margin-top: 16px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
 `;

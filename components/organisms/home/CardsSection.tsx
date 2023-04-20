@@ -232,6 +232,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       return `${desktopItemWidth}px`;
     }, [isMobile, isTablet, isLaptop]);
 
+    // TODO: probably needs useIsomorphicLayoutEffect
     useLayoutEffect(() => {
       setCardWidth(getCardWidth());
     }, [getCardWidth]);
