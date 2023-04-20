@@ -28,6 +28,7 @@ import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import BundleCreatorsList from '../../molecules/bundles/BundleCreatorsList';
 import { useAppState } from '../../../contexts/appStateContext';
 import MobileBundleCreatorsList from '../../molecules/bundles/MobileBundleCreatorsList';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 export const Bundles: React.FC = React.memo(() => {
   const router = useRouter();
@@ -134,9 +135,28 @@ export const Bundles: React.FC = React.memo(() => {
           />
           <SubNavigation>
             {isMobile ? (
-              <SBackButton onClick={() => router.back()} />
+              <SBackButton
+                onClick={() => {
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _stage: 'Bundles',
+                    _button: 'Back button',
+                    _component: 'Bundles',
+                  });
+                  router.back();
+                }}
+              />
             ) : (
-              <GoBackButton longArrow onClick={() => router.back()}>
+              <GoBackButton
+                longArrow
+                onClick={() => {
+                  router.back();
+                  Mixpanel.track('Navigation Item Clicked', {
+                    _stage: 'Bundles',
+                    _button: 'Back button',
+                    _component: 'Bundles',
+                  });
+                }}
+              >
                 {t('button.back')}
               </GoBackButton>
             )}

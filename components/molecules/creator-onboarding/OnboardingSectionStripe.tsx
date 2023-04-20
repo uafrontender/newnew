@@ -175,6 +175,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
                   Mixpanel.track('Navigation Item Clicked', {
                     _stage: 'Onboarding',
                     _component: 'OnboardingSectionStripe',
+                    _button: 'back button',
                     _target: '/creator/dashboard',
                   });
                 }}
