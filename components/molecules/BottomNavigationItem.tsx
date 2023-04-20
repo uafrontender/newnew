@@ -82,6 +82,7 @@ const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
       Mixpanel.track('Navigation Item Clicked', {
         _stage: 'Creation',
         _button: 'New Post',
+        _target: item.url,
       });
     } else {
       Mixpanel.track('Navigation Item Clicked', {
