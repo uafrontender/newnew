@@ -191,7 +191,10 @@
   },
   "socials": {
     "copy": "Copiar enlace",
-    "copied": "¡Enlace copiado!"
+    "copied": "¡Enlace copiado!",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "instagram": "Instagram"
   },
   "search": {
     "placeholder": "Búsqueda",

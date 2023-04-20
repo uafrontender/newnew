@@ -248,16 +248,10 @@
       "submit-scheduled": "See scheduled {{value}}"
     },
     "texts": {
-      "title-published": "It’s live...now share it!",
-      "title-scheduled": "It’s scheduled... share the info!"
-    },
-    "socials": {
-      "twitter": "Twitter",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "copy": "Copy Link",
-      "copied": "Link Copied!"
+      "title-published": "It’s live!",
+      "title-scheduled": "It’s scheduled!",
+      "shareCaptionEvent": "Copy the link to share your Event on your social platforms.",
+      "shareCaptionSuperpoll": "Copy the link to share your Superpoll on your social platforms."
     }
   },
   "tutorials": {

@@ -65,7 +65,10 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
           : 0;
 
         return (
-          <SBundle key={`superpoll-bundle-${price}`}>
+          <SBundle
+            id={`${price}-bundle-earnings`}
+            key={`superpoll-bundle-${price}`}
+          >
             <div>
               <SBundleTitle>
                 $
@@ -73,7 +76,7 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
                   'myBundles.earnings.unitName'
                 )}`}
               </SBundleTitle>
-              <SText variant={3}>
+              <SText id={`${price}-bundle-sold`} variant={3}>
                 {`${quantitySold} ${t('myBundles.earnings.sold')}`}
               </SText>
             </div>
@@ -101,7 +104,10 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
         ) : (
           <>
             <STotal>
-              <STotalEarned isBundlesEnabled={isBundlesEnabled}>
+              <STotalEarned
+                id='total-bundle-earnings'
+                isBundlesEnabled={isBundlesEnabled}
+              >
                 ${formatNumber(totalEarned / 100 ?? 0, false)}
               </STotalEarned>
               <STotalEarnedText>

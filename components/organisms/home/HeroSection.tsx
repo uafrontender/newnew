@@ -92,6 +92,7 @@ export const HeroSection = React.memo(() => {
                     onClick={() => {
                       Mixpanel.track('Navigation Item Clicked', {
                         _button: 'Create now',
+                        _target: '/sign-up?to=create',
                       });
                     }}
                   >

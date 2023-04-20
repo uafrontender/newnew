@@ -12,7 +12,7 @@ interface IUserEllipseMenu {
   right?: string;
   handleClose: () => void;
   handleClickReport: () => void;
-  handleClickBlock: () => void;
+  handleClickBlock: () => Promise<void>;
   anchorElement?: HTMLElement;
   offsetTop?: string;
 }
@@ -47,8 +47,8 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
       </EllipseMenuButton>
       {loggedIn && (
         <EllipseMenuButton
-          onClick={() => {
-            handleClickBlock();
+          onClick={async () => {
+            await handleClickBlock();
             handleClose();
           }}
         >
