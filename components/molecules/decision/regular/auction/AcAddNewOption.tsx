@@ -447,7 +447,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       {isMobile && postStatus === 'voting' ? (
         <OptionActionMobileModal
           show={suggestNewMobileOpen}
-          modalType={paymentModalOpen !== undefined ? 'covered' : 'initial'}
+          modalType={paymentModalOpen ? 'covered' : 'initial'}
           onClose={() => setSuggestNewMobileOpen(false)}
           zIndex={12}
         >
