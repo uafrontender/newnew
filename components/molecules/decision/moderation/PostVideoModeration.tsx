@@ -339,7 +339,7 @@ const SVideoWrapper = styled.div`
 const SReuploadButton = styled.button`
   position: absolute;
   left: 16px;
-  top: 32px;
+  top: 16px;
 
   color: ${({ theme }) => theme.colors.dark};
   background: #ffffff;

@@ -7,7 +7,7 @@ interface ISuggestionTextArea {
   value: string;
   placeholder: string;
   disabled?: boolean;
-  isValid?: boolean;
+  invalid?: boolean;
   autofocus?: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
@@ -19,7 +19,7 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   placeholder,
   disabled,
   autofocus,
-  isValid,
+  invalid,
   onChange,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>();
@@ -55,7 +55,7 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
         value={value}
         disabled={disabled}
         placeholder={placeholder}
-        isValid={isValid}
+        invalid={invalid}
         // (textareaRef.current.scrollHeight % 24) need to prevent input jump. 24 is text line-height
         onChangeCapture={() => {
           if (textareaRef?.current) {
@@ -91,7 +91,7 @@ const SWrapper = styled.div`
   width: 277px;
 `;
 
-const STextarea = styled.textarea<{ isValid?: boolean }>`
+const STextarea = styled.textarea<{ invalid?: boolean }>`
   font-weight: 500;
   font-size: 16px;
   line-height: 24px;
@@ -108,8 +108,8 @@ const STextarea = styled.textarea<{ isValid?: boolean }>`
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border-width: 1.5px;
   border-style: solid;
-  border-color: ${({ theme, isValid }) =>
-    isValid ? 'transparent' : theme.colorsThemed.accent.error};
+  border-color: ${({ theme, invalid }) =>
+    invalid ? theme.colorsThemed.accent.error : 'transparent'};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   /* Hide scrollbar */

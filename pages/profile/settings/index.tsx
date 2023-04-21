@@ -248,7 +248,6 @@ const MyProfileSettingsIndex = () => {
           handleSetActive={() => {}}
         />
       ),
-      hidden: myTransactionsTotal === 0,
     },
     {
       id: 'privacy',

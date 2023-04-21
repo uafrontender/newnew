@@ -101,7 +101,7 @@ const PostResponseSuccessModal: React.FunctionComponent<
           <STitle variant={6}>{t('itsLiveTitle')}</STitle>
           <SCaptionItsLive variant={2}>
             {typeOfPost === 'ac'
-              ? t('shareCaptionEvent')
+              ? t('shareCaptionBid')
               : t('shareCaptionSuperpoll')}
           </SCaptionItsLive>
           <SSharePanel
