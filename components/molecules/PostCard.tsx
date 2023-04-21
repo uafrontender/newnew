@@ -162,6 +162,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       () => switchPostStatus(typeOfPost, postParsed.status),
       [postParsed.status, typeOfPost]
     );
+
     // Live updates stored in local state
     const [totalAmount, setTotalAmount] = useState<number>(() =>
       typeOfPost === 'ac'
@@ -393,6 +394,34 @@ export const PostCard: React.FC<ICard> = React.memo(
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection, postParsed]);
+
+    useEffect(() => {
+      const [parsedItem] = switchPostType(item);
+
+      if (
+        typeOfPost === 'ac' &&
+        'totalAmount' in parsedItem &&
+        parsedItem.totalAmount?.usdCents
+      ) {
+        setTotalAmount(parsedItem.totalAmount.usdCents);
+      }
+
+      if (typeOfPost === 'cf' && 'currentBackerCount' in parsedItem) {
+        setCurrentBackerCount(parsedItem.currentBackerCount);
+      }
+
+      if (typeOfPost === 'mc' && 'totalVotes' in parsedItem) {
+        setTotalVotes(parsedItem.totalVotes);
+      }
+
+      if (parsedItem.announcement?.coverImageUrl) {
+        setAnnouncementCoverImage(parsedItem.announcement.coverImageUrl);
+      }
+
+      if (parsedItem.response?.coverImageUrl) {
+        setResponseCoverImage(parsedItem.response.coverImageUrl);
+      }
+    }, [item, typeOfPost]);
 
     useEffect(() => {
       if (hovered) {
