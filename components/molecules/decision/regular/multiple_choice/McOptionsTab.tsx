@@ -201,6 +201,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   // New option/bid
   const [newOptionText, setNewOptionText] = useState('');
   const [newOptionTextValid, setNewOptionTextValid] = useState(true);
+  const [lastValidatedNewOptionText, setLastValidatedNewOptionText] =
+    useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
   // Modal for new option
@@ -237,7 +239,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         validateTextAbortControllerRef?.current?.signal
       );
 
-      if (!res.data?.status) throw new Error('An error occurred');
+      if (!res.data?.status) {
+        throw new Error('An error occurred');
+      }
+
+      setLastValidatedNewOptionText(text);
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setNewOptionTextValid(false);
@@ -563,7 +569,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholderDesktop'
                 )}
-                isValid={newOptionTextValid}
+                invalid={
+                  !newOptionTextValid &&
+                  lastValidatedNewOptionText === newOptionText
+                }
                 onChange={handleUpdateNewOptionText}
               />
               <SAddOptionButton
@@ -612,7 +621,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 placeholder={t(
                   'mcPost.optionsTab.actionSection.suggestionPlaceholder'
                 )}
-                isValid={newOptionTextValid}
+                invalid={
+                  !newOptionTextValid &&
+                  lastValidatedNewOptionText === newOptionText
+                }
                 onChange={handleUpdateNewOptionText}
               />
               <SAddOptionButton
