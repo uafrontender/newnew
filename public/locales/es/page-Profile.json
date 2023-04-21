@@ -265,6 +265,7 @@
       "transactions": {
         "title": "Transacciones",
         "you": "Tú",
+        "empty_NEED_TRANSLATION": "There are no transaction yet",
         "type": {
           "1": "bid",
           "2": "superpoll",
