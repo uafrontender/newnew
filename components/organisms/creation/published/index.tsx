@@ -200,7 +200,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
         </STitle>
         <SCaptionItsLive variant={2}>
           {postData?.auction
-            ? t('published.texts.shareCaptionEvent')
+            ? t('published.texts.shareCaptionBid')
             : t('published.texts.shareCaptionSuperpoll')}
         </SCaptionItsLive>
         <SSharePanel linkToShare={linkToShare} />
