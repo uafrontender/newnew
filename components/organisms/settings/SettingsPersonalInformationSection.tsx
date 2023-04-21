@@ -166,7 +166,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             show={!!editEmail}
             skipCurrentEmailVerificationStep={!currentEmail}
             onClose={() => {
-              router.replace('/profile/settings');
+              router.back();
             }}
           />
           <SettingsBirthDateInput
