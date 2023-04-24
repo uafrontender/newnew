@@ -191,7 +191,11 @@
   },
   "socials": {
     "copy": "複製連結",
-    "copied": "連結已複製！"
+    "copied": "連結已複製！",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
   },
   "search": {
     "placeholder": "搜索",

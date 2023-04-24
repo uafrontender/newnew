@@ -134,22 +134,29 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
             _activeChatRoom: chatRoom,
           }),
     });
+
     if (!isDashboard) {
       router.push(chatRoute);
-    } else if (router.asPath.includes('/creator/bundles')) {
+      return;
+    }
+
+    if (router.asPath.includes('/creator/bundles')) {
       router.push(
         `/creator/bundles?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
       );
-    } else {
+    }
+
+    if (router.asPath.includes('/creator/dashboard')) {
       router.push(
         `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
       );
-      setActiveChatRoom(chatRoom);
-      if (isMobileOrTablet) {
-        setHiddenMessagesArea(false);
-      }
-      setSearchChatroom('');
     }
+
+    setActiveChatRoom(chatRoom);
+    if (isMobileOrTablet) {
+      setHiddenMessagesArea(false);
+    }
+    setSearchChatroom('');
   }, [
     chatRoom,
     chatRoute,

@@ -255,7 +255,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
               onClick={() => {
                 Mixpanel.track('Navigation Item Clicked', {
                   _stage: 'Onboarding',
-                  _button: 'Close',
+                  _button: 'Back button',
                   _component: 'OnboardingSectionAbout',
                 });
                 router.back();
@@ -265,6 +265,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
             </GoBackButton>
           )}
           <Button
+            id='submit'
             view='primaryGrad'
             disabled={!isFormValid}
             style={{

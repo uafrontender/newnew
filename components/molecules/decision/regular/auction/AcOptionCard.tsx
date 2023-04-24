@@ -442,8 +442,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   }, [isSupportFormOpen]);
 
   return (
-    <div
-      key={index}
+    <motion.div
+      key={option.id.toString()}
+      layout='position'
+      transition={{
+        type: 'spring',
+        damping: 20,
+        stiffness: 300,
+      }}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -456,6 +462,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }}
     >
       <SContainer
+        layout='position'
+        transition={{
+          type: 'spring',
+          damping: 20,
+          stiffness: 300,
+        }}
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => handleClickOptionBodyOpenEllipseMenu(e)}
@@ -873,7 +885,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         closeModal={handleRemoveClose}
         handleConfirmDelete={handleRemoveSubmit}
       />
-    </div>
+    </motion.div>
   );
 };
 

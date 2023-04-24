@@ -18,7 +18,7 @@ const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
   usersIBlocked: [] as string[],
   usersBlockedLoaded: false,
-  changeUserBlockedStatus: (
+  changeUserBlockedStatus: async (
     uuid: string | null | undefined,
     block: boolean
   ) => {},

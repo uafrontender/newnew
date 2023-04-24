@@ -1,11 +1,14 @@
 import { newnewapi } from 'newnew-api';
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import { useTranslation } from 'react-i18next';
+
 import { getMyTransactions } from '../../../api/endpoints/payments';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import TransactionCard from '../../molecules/settings/TransactionCard';
 import ChevronDown from '../../../public/images/svg/icons/outlined/ChevronDown.svg';
+import Text from '../../atoms/Text';
 
 type TTransactionsSection = {
   transactions: newnewapi.ITransaction[];
@@ -21,6 +24,8 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
   transactionsLimit,
   handleSetActive,
 }) => {
+  const { t } = useTranslation('page-Profile');
+
   const [prevPage, setPrevPage] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [lastPage, setLastPage] = useState<number | undefined>();
@@ -58,6 +63,7 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
     }
   }, [transactionsTotal, transactionsLimit, lastPage]);
 
+  // What is that? A way to set an initial value?
   useEffect(() => {
     if (!myTransactions || myTransactions.length < 1) {
       setMyTransactions(transactions);
@@ -86,6 +92,9 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
       style={{ minHeight }}
       onMouseEnter={() => handleSetActive()}
     >
+      {myTransactions.length === 0 && (
+        <SText variant={2}> {t('Settings.sections.transactions.empty')}</SText>
+      )}
       {myTransactions.map((transaction) => (
         <TransactionCard
           key={transaction.id?.toString()}
@@ -135,9 +144,16 @@ const SWrapper = styled.div`
   gap: 18px;
   padding-bottom: 25px;
 `;
+
+const SText = styled(Text)`
+  width: 100%;
+  text-align: center;
+`;
+
 interface ISButton {
   invisible?: boolean;
 }
+
 const SButton = styled(Button)<ISButton>`
   width: 20px;
   height: 20px;
@@ -168,9 +184,11 @@ const SNav = styled.div`
   justify-content: center;
   margin-top: auto;
 `;
+
 interface ISInlineSVG {
   type?: string;
 }
+
 const SInlineSVG = styled(InlineSVG)<ISInlineSVG>`
   min-width: 16px;
   min-height: 16px;

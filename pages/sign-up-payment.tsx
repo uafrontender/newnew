@@ -34,7 +34,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
   useEffect(() => {
     if (user.loggedIn) {
-      router.push('/');
+      router.replace('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
