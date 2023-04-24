@@ -66,7 +66,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   // Redirect if onboarded or underaged
   useEffect(() => {
     if (user.userData?.options?.isCreator) {
-      router.push('/creator/dashboard');
+      router.replace('/creator/dashboard');
     }
 
     if (
@@ -75,7 +75,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
         appConstants.minCreatorAgeYears
       )
     ) {
-      router.push('/');
+      router.replace('/');
     }
   }, [
     user.userData?.options?.isCreator,

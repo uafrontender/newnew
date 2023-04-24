@@ -451,7 +451,7 @@ const SContainer = styled.div`
 
 const SUploadVideoButton = styled.button`
   position: absolute;
-  top: 24px;
+  top: 16px;
   left: calc(50% - 60px);
 
   width: 120px;

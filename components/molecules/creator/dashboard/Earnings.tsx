@@ -177,7 +177,10 @@ export const Earnings: React.FC<IFunctionProps> = ({
 
   const renderListItem = useCallback(
     (item: { id: string }) => (
-      <SListItem key={`list-item-earnings-${item.id}`}>
+      <SListItem
+        id={`${item.id}-earnings`}
+        key={`list-item-earnings-${item.id}`}
+      >
         <SListItemTitle variant={2} weight={700}>
           {t(`dashboard.earnings.list.${item.id}` as any)}
         </SListItemTitle>
@@ -222,7 +225,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
       </SHeaderLine>
       <STotalLine>
         <STotalTextWrapper>
-          <STotal variant={4}>
+          <STotal id='total-earnings' variant={4}>
             {totalEarnings
               ? `$${formatNumber(totalEarnings / 100 ?? 0, false)}`
               : '$0.00'}

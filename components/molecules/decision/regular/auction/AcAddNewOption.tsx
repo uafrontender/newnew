@@ -109,6 +109,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
   const [newBidTextValid, setNewBidTextValid] = useState(true);
+  const [lastValidatedNewBidText, setLastValidatedNewBidText] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [newBidAmount, setNewBidAmount] = useState('');
   // Mobile modal for new option
@@ -165,7 +166,11 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         validateTextAbortControllerRef?.current?.signal
       );
 
-      if (!res.data?.status) throw new Error('An error occurred');
+      if (!res.data?.status) {
+        throw new Error('An error occurred');
+      }
+
+      setLastValidatedNewBidText(text);
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setNewBidTextValid(false);
@@ -337,7 +342,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
             'acPost.optionsTab.actionSection.suggestionPlaceholderDesktop',
             { username: postCreator?.username }
           )}
-          isValid={newBidTextValid}
+          invalid={!newBidTextValid && lastValidatedNewBidText === newBidText}
           onChange={handleUpdateNewOptionText}
         />
         <BidAmountTextInput
@@ -442,7 +447,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
       {isMobile && postStatus === 'voting' ? (
         <OptionActionMobileModal
           show={suggestNewMobileOpen}
-          modalType={paymentModalOpen !== undefined ? 'covered' : 'initial'}
+          modalType={paymentModalOpen ? 'covered' : 'initial'}
           onClose={() => setSuggestNewMobileOpen(false)}
           zIndex={12}
         >
@@ -454,7 +459,9 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
               placeholder={t(
                 'acPost.optionsTab.actionSection.suggestionPlaceholder'
               )}
-              isValid={newBidTextValid}
+              invalid={
+                !newBidTextValid && lastValidatedNewBidText === newBidText
+              }
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput

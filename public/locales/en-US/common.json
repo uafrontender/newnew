@@ -191,7 +191,11 @@
   },
   "socials": {
     "copy": "Copy Link",
-    "copied": "Link Copied!"
+    "copied": "Link Copied!",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
   },
   "search": {
     "placeholder": "Search",

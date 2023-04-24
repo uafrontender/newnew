@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import getDisplayname from '../../utils/getDisplayname';
 import InlineSvg from './InlineSVG';
@@ -31,7 +32,6 @@ const DisplayName: React.FC<IDisplayName> = ({
 }) => {
   const nameRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<number>(0);
-  const [iconVisible, setIconVisible] = useState(false);
 
   const isVerified: boolean = useMemo(() => {
     if (!user) {
@@ -57,27 +57,34 @@ const DisplayName: React.FC<IDisplayName> = ({
   const displayName = useMemo(() => getDisplayname(user), [user]);
   const name = useMemo(() => altName ?? displayName, [altName, displayName]);
 
-  // Might not re-calculate size on parent size changed
-  // useEffect => verified icon delayed
-  // useLayoutEffect => warning about it doing nothing on ssr
-  // useLayoutEffect + Component delayed => same as just useEffect
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isVerified) {
+      setSize(0);
       return;
     }
 
     if (nameRef.current) {
-      const spanSize = nameRef.current?.offsetHeight;
+      const spanSize = nameRef.current.offsetHeight;
       setSize(spanSize);
     }
   }, [isVerified]);
 
-  // Delay showing verified icon, to avoid glitches dues to UI instability on first render
   useEffect(() => {
-    if (size > 0) {
-      setIconVisible(true);
+    const resizeObserver = new ResizeObserver(() => {
+      if (nameRef.current) {
+        const spanSize = nameRef.current?.offsetHeight;
+        setSize(spanSize);
+      }
+    });
+
+    if (nameRef.current) {
+      resizeObserver.observe(nameRef.current);
     }
-  }, [size]);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   if (!user) {
     return null;
@@ -92,7 +99,7 @@ const DisplayName: React.FC<IDisplayName> = ({
             {suffix}
           </SName>
         </Link>
-        {isVerified && iconVisible && (
+        {isVerified && size > 0 && (
           // Need to make icon to be the same size as span. No better way found.
           <SInlineSvg
             shift={shift}

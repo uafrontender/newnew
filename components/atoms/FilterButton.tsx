@@ -40,6 +40,8 @@ const SButton = styled(Button)<ISButton>`
   cursor: pointer;
   margin-right: 16px;
   border-radius: 12px !important;
+  transition: background 0s linear;
+
   ${(props) => {
     if (props.active) {
       return css`

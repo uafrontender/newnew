@@ -224,7 +224,7 @@ const McOptionCardModeration: React.FunctionComponent<
   return (
     <>
       <motion.div
-        key={index}
+        key={option.id.toString()}
         layout='position'
         transition={{
           type: 'spring',
@@ -313,7 +313,7 @@ const McOptionCardModeration: React.FunctionComponent<
               handleOpenReportOptionModal={handleReportOpen}
               handleOpenBlockUserModal={handleOpenBlockModal}
               handleOpenRemoveOptionModal={handleOpenDeleteModal}
-              handleUnblockUser={() =>
+              handleUnblockUser={async () =>
                 changeUserBlockedStatus(option.creator?.uuid, false)
               }
               anchorElement={ellipseMenuButton.current}
@@ -341,7 +341,7 @@ const McOptionCardModeration: React.FunctionComponent<
           handleOpenReportOptionModal={handleReportOpen}
           handleOpenBlockUserModal={handleOpenBlockModal}
           handleOpenRemoveOptionModal={handleOpenDeleteModal}
-          handleUnblockUser={() =>
+          handleUnblockUser={async () =>
             changeUserBlockedStatus(option.creator?.uuid, false)
           }
         />

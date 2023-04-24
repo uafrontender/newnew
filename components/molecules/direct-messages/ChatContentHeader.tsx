@@ -18,6 +18,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const GoBackButton = dynamic(
   () => import('../../atoms/direct-messages/GoBackButton')
@@ -33,7 +34,7 @@ interface IFunctionProps {
   chatRoom: newnewapi.IChatRoom;
   isVisavisBlocked: boolean;
   onUserReport: () => void;
-  onUserBlock: () => void;
+  onUserBlock: () => Promise<void>;
 }
 
 const ChatContentHeader: React.FC<IFunctionProps> = ({
@@ -95,17 +96,38 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     return false;
   }, [router.asPath]);
 
+  // TODO: rework routing, pushing state on back button clicked is wrong
   const goBackHandler = useCallback(async () => {
     setHiddenMessagesArea(true);
     if (isDashboard) {
       if (router.asPath.includes('/creator/bundles')) {
+        Mixpanel.track('Navigation Item Clicked', {
+          _stage: 'Chat',
+          _button: 'Back button',
+          _component: 'ChatContentHeader',
+          _target: '/creator/bundles?tab=chat',
+        });
+
         await router.push(`/creator/bundles?tab=chat`);
       } else {
+        Mixpanel.track('Navigation Item Clicked', {
+          _stage: 'Chat',
+          _button: 'Back button',
+          _component: 'ChatContentHeader',
+          _target: '/creator/dashboard?tab=chat',
+        });
         await router.push(`/creator/dashboard?tab=chat`);
       }
 
       setActiveChatRoom(null);
     } else if (isMobileOrTablet) {
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Chat',
+        _button: 'Back button',
+        _component: 'ChatContentHeader',
+        _target: '/direct-messages',
+      });
+
       router.push(`/direct-messages`);
     }
   }, [

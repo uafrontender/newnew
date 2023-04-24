@@ -9,7 +9,7 @@ interface IPostEllipseMenu {
   postType: TPostType;
   isVisible: boolean;
   isFollowingDecision: boolean;
-  handleFollowDecision: () => void;
+  handleFollowDecision: () => Promise<void>;
   handleReportOpen: () => void;
   onClose: () => void;
   anchorElement?: HTMLElement;

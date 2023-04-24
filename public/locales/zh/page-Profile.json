@@ -265,6 +265,7 @@
       "transactions": {
         "title": "交易",
         "you": "你",
+        "empty_NEED_TRANSLATION": "There are no transaction yet",
         "type": {
           "1": "bid",
           "2": "superpoll",

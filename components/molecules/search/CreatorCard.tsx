@@ -114,9 +114,9 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           top='48px'
           right='0px'
           handleClose={() => setEllipseMenuOpen(false)}
-          handleClickBlock={() => {
+          handleClickBlock={async () => {
             if (isUserBlocked) {
-              changeUserBlockedStatus(creator.uuid, false);
+              await changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }
@@ -163,9 +163,9 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setEllipseMenuOpen(false)}
-          handleClickBlock={() => {
+          handleClickBlock={async () => {
             if (isUserBlocked) {
-              changeUserBlockedStatus(creator.uuid, false);
+              await changeUserBlockedStatus(creator.uuid, false);
             } else {
               setBlockUserModalOpen(true);
             }

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
   useEffect,
@@ -743,11 +741,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleSetStageToEditingGeneral,
     dispatch,
   ]);
-  const scrollPosition = useRef(0);
 
   useEffect(() => {
     const verify = () => {
-      if (!isBrowser()) return;
+      if (!isBrowser()) {
+        return;
+      }
 
       const { stage: currStage } = window.history.state;
 
@@ -999,7 +998,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               {!isMobile ? (
                 <Button
                   view='secondary'
-                  onClick={() => handleClose()}
+                  onClick={() => handleClosePreventDiscarding()}
                   onClickCapture={() => {
                     Mixpanel.track('Click Cancel Editing Profile Button', {
                       _stage: 'MyProfile',

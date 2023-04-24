@@ -20,6 +20,8 @@ if (SENTRY_DSN) {
     tracesSampleRate: 1.0,
     environment: NEXT_PUBLIC_ENVIRONMENT,
     maxBreadcrumbs: 50,
+    // Partially matches the messages
+    ignoreErrors: ['Abort', 'abort'],
     // ...
     // Note: if you want to override the automatic release value, do not set a
     // `release` value here - use the environment variable `SENTRY_RELEASE`, so

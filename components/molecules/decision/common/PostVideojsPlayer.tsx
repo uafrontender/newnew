@@ -212,7 +212,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
         // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
         p.ready(() => {
           if (!isInSlider || (isInSlider && isActive)) {
-            const promise = p.play();
+            const promise = p.play()?.catch(() => {
+              console.warn('Autoplay is not allowed');
+            });
 
             if (promise !== undefined) {
               promise
@@ -615,7 +617,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   useEffect(() => {
     if (isInSlider) {
       if (isActive) {
-        const promise = playerRef?.current?.play();
+        const promise = playerRef?.current?.play()?.catch(() => {
+          console.warn('Autoplay is not allowed');
+        });
 
         if (promise !== undefined) {
           promise
@@ -645,6 +649,44 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInSlider, isActive]);
+
+  // Keyboard action handlers
+  useEffect(() => {
+    const handlePressSpacebar = (e: globalThis.KeyboardEvent) => {
+      const tagName = document?.activeElement?.tagName?.toLowerCase();
+
+      const shouldPause =
+        document?.hasFocus() &&
+        tagName &&
+        tagName !== 'input' &&
+        tagName !== 'textarea';
+
+      if (!shouldPause) {
+        return;
+      }
+
+      e.preventDefault();
+      if (e.code === 'Space') {
+        if (!playerRef.current?.paused()) {
+          playerRef.current?.pause();
+        } else {
+          playerRef.current?.play()?.catch(() => {
+            handleSetIsPaused(true);
+          });
+        }
+      }
+    };
+
+    if (!isInSlider || isActive) {
+      window.addEventListener('keydown', handlePressSpacebar);
+    } else {
+      window.removeEventListener('keydown', handlePressSpacebar);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handlePressSpacebar);
+    };
+  }, [handleSetIsPaused, isActive, isInSlider]);
 
   // Try to pause the video when the component unmounts
   // to avoid attempts to play broken segments
