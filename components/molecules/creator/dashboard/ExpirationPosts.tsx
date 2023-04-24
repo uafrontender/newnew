@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -42,6 +42,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
   const [isCopiedUrlIndex, setIsCopiedUrlIndex] = useState<number | null>(null);
+  const linkCopiedTimerRef = useRef<NodeJS.Timeout| undefined>()
 
   useEffect(() => {
     if (expirationPosts) {
@@ -87,12 +88,19 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
           const url = `${window.location.origin}/p/${
             data.postShortId ? data.postShortId : data.postUuid
           }`;
+
           copyPostUrlToClipboard(url)
             .then(() => {
               setIsCopiedUrlIndex(index);
-              setTimeout(() => {
+
+              if (linkCopiedTimerRef.current) {
+                clearTimeout(linkCopiedTimerRef.current);
+              }
+
+              linkCopiedTimerRef.current = setTimeout(() => {
                 setIsCopiedUrlIndex(null);
               }, 1000);
+
             })
             .catch((err) => {
               console.log(err);
