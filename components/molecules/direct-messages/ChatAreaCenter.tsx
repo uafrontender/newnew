@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useContext, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -9,6 +8,7 @@ import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
 import { SocketContext } from '../../../contexts/socketContext';
+import Loader from '../../atoms/Loader';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -48,6 +48,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [data]
   );
 
+  // TODO: remove refetch, use mutation instead
   useEffect(() => {
     if (activeChatRoom && justSentMessage) {
       refetch();
@@ -78,6 +79,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       // eslint-disable-next-line eqeqeq
       if (decoded.roomId == activeChatRoom?.id) {
+        // TODO: remove refetch, use mutation instead
         refetch();
       }
     };
@@ -116,6 +118,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
           prevElement={messages[index - 1]}
         />
       ))}
+      {messages.length === 0 && isLoading && <Loader isStatic size='md' />}
       {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
     </SContainer>
   );

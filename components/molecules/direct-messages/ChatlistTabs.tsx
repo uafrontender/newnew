@@ -9,7 +9,7 @@ interface IFunctionProps {
   changeActiveTab: (arg: newnewapi.ChatRoom.MyRole) => void;
 }
 
-const ChatlistTabs: React.FC<IFunctionProps> = ({
+const ChatListTabs: React.FC<IFunctionProps> = ({
   activeTab,
   changeActiveTab,
 }) => {
@@ -40,7 +40,7 @@ const ChatlistTabs: React.FC<IFunctionProps> = ({
   );
 };
 
-export default ChatlistTabs;
+export default ChatListTabs;
 
 const STabs = styled.div`
   display: flex;

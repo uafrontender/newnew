@@ -9,12 +9,11 @@ import {
   SChatItemContent,
   SChatItemContentWrapper,
   SChatItemLastMessage,
-  SChatItemRight,
+  SUnreadCountWrapper,
   SChatItemTime,
   SUserAvatar,
   SUnreadCount,
 } from '../../atoms/direct-messages/styles';
-import UserAvatar from '../UserAvatar';
 import textTrim from '../../../utils/textTrim';
 import ChatName from '../../atoms/direct-messages/ChatName';
 import { useAppSelector } from '../../../redux-store/store';
@@ -53,10 +52,11 @@ const ChatListItem: React.FC<IFunctionProps> = ({
     // setActiveChatRoom,
     activeTab,
     setSearchChatroom,
-    setHiddenMessagesArea,
   } = useGetChats();
 
   const user = useAppSelector((state) => state.user);
+
+  // TODO: maybe move to parent
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) => {
       if (
@@ -82,6 +82,7 @@ const ChatListItem: React.FC<IFunctionProps> = ({
     return false;
   }, [router.asPath]);
 
+  // TODO: Pass room kind props instead of using activeTab
   const chatRoute = useMemo(() => {
     let route = `${
       chatRoom.visavis?.user?.username || user.userData?.username
@@ -109,6 +110,7 @@ const ChatListItem: React.FC<IFunctionProps> = ({
     }
   }, [chatRoom]);
 
+  // TODO: move markAsRead to chat content
   useEffect(() => {
     if (
       chatRoom.unreadMessageCount &&
@@ -154,31 +156,15 @@ const ChatListItem: React.FC<IFunctionProps> = ({
       undefined,
       { shallow: true }
     );
-
-    if (isMobileOrTablet) {
-      setHiddenMessagesArea(false);
-    }
     setSearchChatroom('');
   }, [
     chatRoom,
     chatRoute,
     isDashboard,
     router,
-    isMobileOrTablet,
     onChatRoomSelect,
     setSearchChatroom,
-    setHiddenMessagesArea,
   ]);
-
-  let avatar = (
-    <SUserAvatar>
-      <UserAvatar avatarUrl={chatRoom.visavis?.user?.avatarUrl ?? ''} />
-    </SUserAvatar>
-  );
-
-  if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
-    avatar = <MyAvatarMassupdate />;
-  }
 
   let lastMsg = chatRoom.lastMessage?.content?.text;
 
@@ -192,7 +178,12 @@ const ChatListItem: React.FC<IFunctionProps> = ({
 
   return (
     <SChatItem onClick={handleItemClick} isActiveChat={isActiveChat(chatRoom)}>
-      {avatar}
+      {chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE ? (
+        <MyAvatarMassupdate />
+      ) : (
+        <SUserAvatar avatarUrl={chatRoom.visavis?.user?.avatarUrl ?? ''} />
+      )}
+
       <SChatItemContent>
         <SChatItemContentWrapper>
           <ChatName chat={chatRoom} />
@@ -206,12 +197,12 @@ const ChatListItem: React.FC<IFunctionProps> = ({
           <SChatItemLastMessage variant={3} weight={600}>
             {textTrim(lastMsg, 28)}
           </SChatItemLastMessage>
-          <SChatItemRight>
+          <SUnreadCountWrapper>
             {(chatRoom.unreadMessageCount as number) > 0 &&
               activeChatRoom?.id !== chatRoom.id && (
                 <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
               )}
-          </SChatItemRight>
+          </SUnreadCountWrapper>
         </SChatItemContentWrapper>
       </SChatItemContent>
     </SChatItem>

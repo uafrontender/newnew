@@ -1,7 +1,10 @@
 import styled, { css } from 'styled-components';
+
 import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 import Text from '../Text';
+
+import { UserAvatar } from '../../molecules/UserAvatar';
 
 export const SBottomAction = styled.div`
   display: flex;
@@ -198,7 +201,7 @@ export const SChatItemLastMessage = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
-export const SChatItemRight = styled.div`
+export const SUnreadCountWrapper = styled.div`
   display: flex;
   padding: 2px 0 0;
   margin-bottom: -2px;
@@ -228,18 +231,10 @@ export const SUserAlias = styled.span`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
-export const SUserAvatar = styled.div`
+export const SUserAvatar = styled(UserAvatar)`
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  & > * {
-    width: 100%;
-    height: 100%;
-    min-width: 100%;
-    min-height: 100%;
-  }
 `;
 
 export const SUnreadCount = styled.span`

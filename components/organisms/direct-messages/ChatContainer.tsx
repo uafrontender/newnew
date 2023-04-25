@@ -55,13 +55,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({
     }
   }, [username]);
 
-  const {
-    activeChatRoom,
-    hiddenMessagesArea,
-    mobileChatOpened,
-    setMobileChatOpened,
-    setHiddenMessagesArea,
-  } = useGetChats();
+  const { mobileChatOpened, setMobileChatOpened } = useGetChats();
 
   // const [isChatSidebarVisible, setIsChatSidebarVisible] = useState(true);
 
@@ -71,26 +65,11 @@ export const ChatContainer: React.FC<IChatContainer> = ({
     }
   }, [mobileChatOpened, isMobile, setMobileChatOpened]);
 
-  // QuickFix: Can happen on back button pressed on chat page
-  useEffect(() => {
-    if (isMobile && !activeChatRoom) {
-      setHiddenMessagesArea(true);
-    }
-  }, [isMobile, activeChatRoom, setHiddenMessagesArea]);
-
-  useEffect(() => {
-    // Reset hiddenMessagesArea to null for desktop, to prevent issue with white chat area after setting hiddenMessagesArea in DynamicSection
-    // TODO: consider removing hiddenMessagesArea from context
-    if (hiddenMessagesArea && !isMobile && !isTablet) {
-      setHiddenMessagesArea(null);
-    }
-  }, [setHiddenMessagesArea, isTablet, isMobile, hiddenMessagesArea]);
-
   // TODO: think how to implement local chat context instead of passing props down to children onChatRoomSelect={handleSetActiveChat}
   // For this /direct-messages/ can be replaced with something like /direct-messages/empty to work only with [username] and be able to do shallow routing
   return (
     <SContainer mobileChatOpened={mobileChatOpened}>
-      {isMobileOrTablet && !activeChat && (
+      {(!isMobileOrTablet || !activeChat) && (
         <ChatSidebar onChatRoomSelect={handleSetActiveChat} />
       )}
       {(!isMobileOrTablet || activeChat) && (

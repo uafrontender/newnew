@@ -6,7 +6,7 @@ import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
 
 const ChatListTabs = dynamic(
-  () => import('../../molecules/direct-messages/ChatlistTabs')
+  () => import('../../molecules/direct-messages/ChatListTabs')
 );
 const ChatList = dynamic(
   () => import('../../molecules/direct-messages/ChatList')
