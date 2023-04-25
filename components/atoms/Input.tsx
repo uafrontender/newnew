@@ -14,6 +14,7 @@ const Input: React.FunctionComponent<TInput> = ({
   value,
   isValid,
   errorCaption,
+  className,
   onChange,
   onFocus,
   ...rest
@@ -31,7 +32,7 @@ const Input: React.FunctionComponent<TInput> = ({
   }, [focused, isValid, errorCaption]);
 
   return (
-    <SWrapper>
+    <SWrapper className={className}>
       <SInput
         value={value}
         errorBordersShown={errorBordersShown}
