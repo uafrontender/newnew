@@ -18,6 +18,9 @@ import CheckMark from '../CheckMark';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
+import InlineSvg from '../../atoms/InlineSVG';
+import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -31,6 +34,9 @@ interface IReportModal {
   onClose: () => void;
 }
 
+const MIN_REPORT_MESSAGE_LENGTH = 15;
+const MAX_REPORT_MESSAGE_LENGTH = 150;
+
 // Accept user object, use JSX.element in ModalPaperTitle, use DisplayName component to add verification icon
 const ReportModal: React.FC<IReportModal> = React.memo(
   ({ show, reportedUser, onClose, onSubmit }) => {
@@ -41,6 +47,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     );
 
     const [message, setMessage] = useState('');
+    const [messageErrorVisible, setMessageErrorVisible] = useState(false);
     const [reportSent, setReportSent] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -77,10 +84,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       Reducer<Map<newnewapi.ReportingReason, boolean>, ReportAction>
     >(reasonsReducer, new Map());
 
-    const disabled =
-      Array.from(reasons.entries()).filter(([key, value]) => value).length ===
-        0 || message.length < 15;
-
     const reportTypes = useMemo(
       () => [
         {
@@ -115,8 +118,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       [t]
     );
 
-    const reportMaxLength = 150;
-
     const submitReport = async () => {
       const reasonsList = Array.from(reasons.entries())
         .filter(([key, value]) => value)
@@ -129,7 +130,10 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         _message: message,
       });
 
-      if (reasonsList.length > 0 && message.length >= 15) {
+      if (
+        reasonsList.length > 0 &&
+        message.length >= MIN_REPORT_MESSAGE_LENGTH
+      ) {
         setIsSubmitting(true);
         await onSubmit({
           reasons: reasonsList,
@@ -159,13 +163,29 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         if (onlySpacesRegex.test(e.target.value)) {
           setMessage('');
         } else {
-          setMessage(
-            e.target.value.replaceAll('  ', ' ').replaceAll(/\n\n/g, '\n')
-          );
+          const newMessage = e.target.value
+            .replaceAll('  ', ' ')
+            .replaceAll(/\n\n/g, '\n');
+          if (newMessage.length <= MAX_REPORT_MESSAGE_LENGTH) {
+            setMessage(newMessage);
+          }
         }
       },
       []
     );
+
+    const validateMessage = useCallback((newMessage: string) => {
+      if (
+        newMessage.length > 0 &&
+        newMessage.length < MIN_REPORT_MESSAGE_LENGTH
+      ) {
+        setMessageErrorVisible(true);
+      }
+    }, []);
+
+    const disabled =
+      Array.from(reasons.entries()).filter(([key, value]) => value).length ===
+        0 || message.length < 15;
 
     return (
       <>
@@ -205,18 +225,28 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             <STextAreaWrapper>
               <STextAreaTitle>
                 <span>
-                  {message ? message.length : 0}/{reportMaxLength}
+                  {message ? message.length : 0}/{MAX_REPORT_MESSAGE_LENGTH}
                 </span>
               </STextAreaTitle>
               <STextArea
                 id='report-additional-info'
-                maxLength={reportMaxLength}
+                maxLength={MAX_REPORT_MESSAGE_LENGTH}
                 value={message}
                 onChange={handleMessageChange}
+                onBlur={() => validateMessage(message)}
+                onFocus={() => setMessageErrorVisible(false)}
                 placeholder={`${t(
                   'modal.reportUser.additionalInfo.placeholder'
                 )}`}
               />
+              {messageErrorVisible ? (
+                <AnimatedPresence animation='t-09'>
+                  <SErrorDiv>
+                    <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+                    {t('modal.reportUser.additionalInfo.tooShort')}
+                  </SErrorDiv>
+                </AnimatedPresence>
+              ) : null}
             </STextAreaWrapper>
             <SModalButtons>
               {!isMobile && (
@@ -333,10 +363,30 @@ const SCheckBoxWrapper = styled.div`
   padding: 5px;
   margin-bottom: 10px;
   overflow: hidden;
+  cursor: pointer;
 `;
 
 const SCheckMark = styled(CheckMark)`
   pointer-events: none;
+`;
+
+const SErrorDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
 `;
 
 const STextAreaWrapper = styled.div`

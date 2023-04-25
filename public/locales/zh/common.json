@@ -120,7 +120,8 @@
         "other": "其他"
       },
       "additionalInfo": {
-        "placeholder": "請再提供更多詳情......"
+        "placeholder": "請再提供更多詳情......",
+        "tooShort_NEED_TRANSLATION": "Report is too short"
       },
       "button": {
         "cancel": "取消",
