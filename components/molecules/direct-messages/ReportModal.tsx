@@ -185,7 +185,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const disabled =
       Array.from(reasons.entries()).filter(([key, value]) => value).length ===
-        0 || message.length < 15;
+        0 || message.length < MIN_REPORT_MESSAGE_LENGTH;
 
     return (
       <>
