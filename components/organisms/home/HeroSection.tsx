@@ -207,6 +207,11 @@ const SHeadline = styled(Headline)`
   }
 
   ${({ theme }) => theme.media.laptopM} {
+    font-size: 64px;
+    line-height: 68px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
     font-size: 80px;
     line-height: 92px;
   }
@@ -285,11 +290,19 @@ const SLargeAnimation = styled(AnimationChain)`
 
   ${({ theme }) => theme.media.laptopM} {
     margin-top: 0;
+    width: 50vw;
+    max-width: 50vw;
+    height: 520px;
+    order: unset;
+    z-index: -1;
+    right: -20px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
     width: 736px;
     max-width: 736px;
     height: 658px;
-    order: unset;
-    z-index: -1;
+    right: -44px;
   }
 `;
 
