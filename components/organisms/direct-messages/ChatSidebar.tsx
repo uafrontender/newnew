@@ -15,7 +15,11 @@ const ChatToolbar = dynamic(
   () => import('../../molecules/direct-messages/ChatToolbar')
 );
 
-const ChatSidebar: React.FC = () => {
+interface IChatSidebar {
+  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom | null) => void;
+}
+
+const ChatSidebar: React.FC<IChatSidebar> = ({ onChatRoomSelect }) => {
   const { searchChatroom, activeTab, setActiveTab, mobileChatOpened } =
     useGetChats();
 
@@ -59,7 +63,7 @@ const ChatSidebar: React.FC = () => {
             changeActiveTab={changeActiveTab}
           />
         )}
-      <ChatList />
+      <ChatList onChatRoomSelect={onChatRoomSelect} />
     </SSidebar>
   );
 };

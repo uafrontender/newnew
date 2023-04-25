@@ -18,13 +18,14 @@ const NoResults = dynamic(
   () => import('../../atoms/direct-messages/NoResults')
 );
 
-const ChatlistItem = dynamic(() => import('./ChatListItem'));
+const ChatListItem = dynamic(() => import('./ChatListItem'));
 
 interface IChatList {
   hidden?: boolean;
+  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
-const ChatList: React.FC<IChatList> = ({ hidden }) => {
+const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
   const { ref: scrollRef, inView } = useInView();
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -103,11 +104,11 @@ const ChatList: React.FC<IChatList> = ({ hidden }) => {
         {hasNextPage && index === chatrooms.length - 1 && (
           <SRef ref={scrollRef}>Loading...</SRef>
         )}
-        <ChatlistItem chatRoom={chatroom} />
+        <ChatListItem chatRoom={chatroom} onChatRoomSelect={onChatRoomSelect} />
         {index < chatrooms.length - 1 && <SChatSeparator />}
       </React.Fragment>
     ),
-    [chatrooms, hasNextPage, scrollRef]
+    [chatrooms, hasNextPage, scrollRef, onChatRoomSelect]
   );
 
   return (

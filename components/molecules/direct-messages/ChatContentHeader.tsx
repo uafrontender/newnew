@@ -100,24 +100,14 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const goBackHandler = useCallback(async () => {
     setHiddenMessagesArea(true);
     if (isDashboard) {
-      if (router.asPath.includes('/creator/bundles')) {
-        Mixpanel.track('Navigation Item Clicked', {
-          _stage: 'Chat',
-          _button: 'Back button',
-          _component: 'ChatContentHeader',
-          _target: '/creator/bundles?tab=chat',
-        });
+      Mixpanel.track('Navigation Item Clicked', {
+        _stage: 'Chat',
+        _button: 'Back button',
+        _component: 'ChatContentHeader',
+        _target: `${router.pathname}?tab=chat`,
+      });
 
-        await router.push(`/creator/bundles?tab=chat`);
-      } else {
-        Mixpanel.track('Navigation Item Clicked', {
-          _stage: 'Chat',
-          _button: 'Back button',
-          _component: 'ChatContentHeader',
-          _target: '/creator/dashboard?tab=chat',
-        });
-        await router.push(`/creator/dashboard?tab=chat`);
-      }
+      await router.push(`${router.pathname}?tab=chat`);
 
       setActiveChatRoom(null);
     } else if (isMobileOrTablet) {
@@ -128,7 +118,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
         _target: '/direct-messages',
       });
 
-      router.push(`/direct-messages`);
+      router.push('/direct-messages', undefined, { shallow: true });
     }
   }, [
     setActiveChatRoom,

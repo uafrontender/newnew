@@ -29,12 +29,17 @@ const MyAvatarMassupdate = dynamic(
 
 interface IFunctionProps {
   chatRoom: newnewapi.IChatRoom;
+  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
-const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
+const ChatListItem: React.FC<IFunctionProps> = ({
+  chatRoom,
+  onChatRoomSelect,
+}) => {
   const { t } = useTranslation('page-Chat');
   const { resizeMode } = useAppState();
   const router = useRouter();
+
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -45,7 +50,7 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
 
   const {
     activeChatRoom,
-    setActiveChatRoom,
+    // setActiveChatRoom,
     activeTab,
     setSearchChatroom,
     setHiddenMessagesArea,
@@ -78,7 +83,7 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   }, [router.asPath]);
 
   const chatRoute = useMemo(() => {
-    let route = `/direct-messages/${
+    let route = `${
       chatRoom.visavis?.user?.username || user.userData?.username
     }`;
     if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
@@ -119,40 +124,37 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
       _stage: 'Direct Messages',
       _component: 'ChatListItem',
       _isDashboard: isDashboard,
-      // eslint-disable-next-line no-nested-ternary
       ...(!isDashboard
         ? {
             _target: chatRoute,
           }
-        : router.asPath.includes('/creator/bundles')
-        ? {
-            _target: `/creator/bundles?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
-            _activeChatRoom: chatRoom,
-          }
         : {
-            _target: `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
+            _target: `${
+              router.pathname
+            }?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
             _activeChatRoom: chatRoom,
           }),
     });
 
+    onChatRoomSelect(chatRoom);
+
     if (!isDashboard) {
-      router.push(chatRoute);
+      router.push(chatRoute, undefined, { shallow: true });
       return;
     }
 
-    if (router.asPath.includes('/creator/bundles')) {
-      router.push(
-        `/creator/bundles?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
-      );
-    }
+    router.push(
+      {
+        query: {
+          ...router.query,
+          tab: 'direct-messages',
+          roomID: chatRoom.id?.toString(),
+        },
+      },
+      undefined,
+      { shallow: true }
+    );
 
-    if (router.asPath.includes('/creator/dashboard')) {
-      router.push(
-        `/creator/dashboard?tab=direct-messages&roomID=${chatRoom.id?.toString()}`
-      );
-    }
-
-    setActiveChatRoom(chatRoom);
     if (isMobileOrTablet) {
       setHiddenMessagesArea(false);
     }
@@ -163,7 +165,7 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
     isDashboard,
     router,
     isMobileOrTablet,
-    setActiveChatRoom,
+    onChatRoomSelect,
     setSearchChatroom,
     setHiddenMessagesArea,
   ]);
@@ -216,4 +218,4 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
   );
 };
 
-export default ChatlistItem;
+export default ChatListItem;

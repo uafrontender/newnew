@@ -1,5 +1,7 @@
+import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useGetChats } from '../../../contexts/chatContext';
@@ -10,15 +12,48 @@ import ChatContent from './ChatContent';
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 
 interface IChatContainer {
+  chatRoom?: newnewapi.IChatRoom | null;
   isLoading?: boolean;
 }
 
-export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
+export const ChatContainer: React.FC<IChatContainer> = ({
+  chatRoom,
+  isLoading,
+}) => {
+  const router = useRouter();
+
+  const { username } = router.query;
+
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
+
+  const isMobileOrTablet = isMobile || isTablet;
+
+  const [activeChat, setActiveChat] = useState<
+    newnewapi.IChatRoom | undefined | null
+  >(chatRoom);
+
+  const handleSetActiveChat = useCallback(
+    (newChatRoom: newnewapi.IChatRoom | null) => {
+      setActiveChat(newChatRoom);
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!activeChat) {
+      setActiveChat(chatRoom);
+    }
+  }, [chatRoom, activeChat]);
+
+  useEffect(() => {
+    if (username === 'empty') {
+      setActiveChat(null);
+    }
+  }, [username]);
 
   const {
     activeChatRoom,
@@ -27,6 +62,8 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
     setMobileChatOpened,
     setHiddenMessagesArea,
   } = useGetChats();
+
+  // const [isChatSidebarVisible, setIsChatSidebarVisible] = useState(true);
 
   useEffect(() => {
     if (mobileChatOpened && !isMobile) {
@@ -49,14 +86,18 @@ export const ChatContainer: React.FC<IChatContainer> = ({ isLoading }) => {
     }
   }, [setHiddenMessagesArea, isTablet, isMobile, hiddenMessagesArea]);
 
+  // TODO: think how to implement local chat context instead of passing props down to children onChatRoomSelect={handleSetActiveChat}
+  // For this /direct-messages/ can be replaced with something like /direct-messages/empty to work only with [username] and be able to do shallow routing
   return (
     <SContainer mobileChatOpened={mobileChatOpened}>
-      {hiddenMessagesArea !== false && <ChatSidebar />}
-      {hiddenMessagesArea !== true && (
+      {isMobileOrTablet && !activeChat && (
+        <ChatSidebar onChatRoomSelect={handleSetActiveChat} />
+      )}
+      {(!isMobileOrTablet || activeChat) && (
         <SContent>
-          {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
-          {!activeChatRoom && !isLoading && !isMobile && <SelectChat />}
-          {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
+          {activeChat && <ChatContent chatRoom={activeChat} />}
+          {!activeChat && !isLoading && !isMobile && <SelectChat />}
+          {!activeChat && isLoading && <Loader size='md' isStatic />}
         </SContent>
       )}
     </SContainer>

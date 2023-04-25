@@ -2,9 +2,11 @@ import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import NewMessage from './NewMessage';
+
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppState } from '../../../contexts/appStateContext';
 
@@ -14,6 +16,8 @@ const GoBackButton = dynamic(
 
 const ChatToolbar: React.FC = () => {
   const { resizeMode } = useAppState();
+  const router = useRouter();
+
   const { t } = useTranslation('page-Chat');
   const { setSearchChatroom, mobileChatOpened, setMobileChatOpened } =
     useGetChats();
@@ -35,19 +39,12 @@ const ChatToolbar: React.FC = () => {
     if (mobileChatOpened) {
       setMobileChatOpened(false);
     }
-  }, [mobileChatOpened, setMobileChatOpened]);
+    router.push('/');
+  }, [mobileChatOpened, router, setMobileChatOpened]);
+
   return (
     <SToolbar isMobile={isMobileOrTablet}>
-      {isMobileOrTablet &&
-        (!mobileChatOpened ? (
-          <Link href='/'>
-            <a>
-              <GoBackButton onClick={goBackHandler} />
-            </a>
-          </Link>
-        ) : (
-          <GoBackButton onClick={goBackHandler} />
-        ))}
+      {isMobileOrTablet && <GoBackButton onClick={goBackHandler} />}
       <SearchInput
         placeholderText={t('toolbar.searchPlaceholder')}
         style={{ marginRight: '16px', fontSize: '16px' }}

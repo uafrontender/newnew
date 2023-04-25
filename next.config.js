@@ -53,6 +53,10 @@ const moduleExports = {
         // use "api-eu.mixpanel.com" if you need to use EU servers
         destination: 'https://api.mixpanel.com/:slug',
       },
+      {
+        source: '/direct-messages',
+        destination: '/direct-messages/empty',
+      },
     ];
   },
   async redirects() {
@@ -60,9 +64,9 @@ const moduleExports = {
       {
         source: '/post/:path*',
         destination: '/p/:path*',
-        permanent: true
+        permanent: true,
       },
-    ]
+    ];
   },
   experimental: {
     scrollRestoration: true,
