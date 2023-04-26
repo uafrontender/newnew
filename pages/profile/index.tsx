@@ -124,6 +124,15 @@ export async function getServerSideProps(
     SUPPORTED_LANGUAGES
   );
 
+  if (!context?.req?.cookies?.accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
+
   return {
     props: {
       ...translationContext,
