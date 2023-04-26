@@ -207,11 +207,11 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
             comment.sender?.options?.isVerified ||
             comment.sender?.uuid === user.userData?.userUuid ? (
               <Link
-                href={`/${
+                href={
                   comment.sender?.uuid === user.userData?.userUuid
                     ? '/profile'
-                    : comment.sender?.username
-                }`}
+                    : `/${comment.sender?.username}`
+                }
               >
                 <a>
                   <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
@@ -239,11 +239,11 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
                           ? t('comments.me')
                           : undefined
                       }
-                      href={`/${
+                      href={
                         comment.sender?.uuid === user.userData?.userUuid
                           ? '/profile'
-                          : comment.sender?.username
-                      }`}
+                          : `/${comment.sender?.username}`
+                      }
                     />
                   ) : (
                     <SDisplayName

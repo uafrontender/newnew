@@ -120,7 +120,8 @@
         "other": "Otro"
       },
       "additionalInfo": {
-        "placeholder": "Por favor, cuéntanos un poco más..."
+        "placeholder": "Por favor, cuéntanos un poco más...",
+        "tooShort_NEED_TRANSLATION": "Report is too short"
       },
       "button": {
         "cancel": "Cancelar",
