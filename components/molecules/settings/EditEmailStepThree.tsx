@@ -167,9 +167,9 @@ const EditEmailStepThreeModal = ({
         width='60px'
         height='40px'
       />
-      <Headline variant={4}>
+      <SHeadline variant={4}>
         {t('Settings.sections.personalInformation.emailInput.verifyNewEmail')}
-      </Headline>
+      </SHeadline>
       <SText variant={2}>
         {`${tVerifyEmail('heading.subHeading')} ${newEmail}`}
       </SText>
@@ -214,8 +214,12 @@ const SLogo = styled(InlineSvg)`
   margin-bottom: 35px;
 `;
 
+const SHeadline = styled(Headline)`
+  text-align: center;
+`;
+
 const SText = styled(Text)`
-  max-width: 250px;
+  max-width: 320px;
   margin-top: 4px;
   text-align: center;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};

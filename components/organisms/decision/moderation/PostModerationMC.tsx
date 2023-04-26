@@ -126,6 +126,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         : 'announcement'
     );
 
+    useEffect(() => {
+      if (
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response'
+      ) {
+        setOpenedTab('response');
+      }
+    }, [postStatus]);
+
     const handleChangeTab = useCallback(
       (newValue: 'announcement' | 'response') => setOpenedTab(newValue),
       []
