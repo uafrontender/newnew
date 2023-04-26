@@ -44,7 +44,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
-import { ChatsProvider } from '../contexts/chatContext';
+import { ChatsUnreadMessagesProvider } from '../contexts/chatsUnreadMessagesContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
 import LanguageWrapper from '../contexts/languageWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
@@ -243,7 +243,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                   <BlockedUsersProvider>
                                     <FollowingsContextProvider>
                                       <BundlesContextProvider>
-                                        <ChatsProvider>
+                                        <ChatsUnreadMessagesProvider>
                                           <OverlayModeProvider>
                                             <MultipleBeforePopStateContextProvider>
                                               <PostCreationContextProvider>
@@ -274,7 +274,7 @@ const MyApp = (props: IMyApp): ReactElement => {
                                               </PostCreationContextProvider>
                                             </MultipleBeforePopStateContextProvider>
                                           </OverlayModeProvider>
-                                        </ChatsProvider>
+                                        </ChatsUnreadMessagesProvider>
                                       </BundlesContextProvider>
                                     </FollowingsContextProvider>
                                   </BlockedUsersProvider>

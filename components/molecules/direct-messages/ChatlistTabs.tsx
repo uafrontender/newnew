@@ -2,7 +2,7 @@ import React from 'react';
 import { newnewapi } from 'newnew-api';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useGetChats } from '../../../contexts/chatContext';
+import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 
 interface IFunctionProps {
   activeTab: newnewapi.ChatRoom.MyRole;
@@ -14,7 +14,8 @@ const ChatListTabs: React.FC<IFunctionProps> = ({
   changeActiveTab,
 }) => {
   const { t } = useTranslation('page-Chat');
-  const { unreadCountForCreator, unreadCountForUser } = useGetChats();
+  const { unreadCountForCreator, unreadCountForUser } =
+    useChatsUnreadMessages();
 
   return (
     <STabs>

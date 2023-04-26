@@ -32,6 +32,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import Loader from '../../../atoms/Loader';
+import { useChatsUnreadMessages } from '../../../../contexts/chatsUnreadMessagesContext';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -60,13 +61,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const { resizeMode } = useAppState();
-  const {
-    unreadCountForCreator,
-    activeTab,
-    activeChatRoom,
-    setActiveChatRoom,
-    setActiveTab,
-  } = useGetChats();
+  const { unreadCountForCreator } = useChatsUnreadMessages();
+  const { activeChatRoom, setActiveChatRoom } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
@@ -229,11 +225,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     }
   }, [baseUrl, router, activeChatRoom, setActiveChatRoom]);
 
-  useEffect(() => {
-    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
-      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
-    }
-  }, [activeTab, setActiveTab]);
+  // useEffect(() => {
+  //   if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
+  //     setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+  //   }
+  // }, [activeTab, setActiveTab]);
 
   useEffect(() => {
     if (
@@ -310,7 +306,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
               {activeChatRoom && !chatRoomLoading && (
                 <>
                   <ChatContent chatRoom={activeChatRoom!!} />
-                  <ChatList hidden />
+                  <ChatList hidden myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
                 </>
               )}
               {!activeChatRoom && chatRoomLoading && (
@@ -376,7 +372,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
                     markReadNotifications={markReadNotifications}
                   />
                 ) : (
-                  <ChatList />
+                  <ChatList myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
                 )}
               </SSectionContent>
             </>

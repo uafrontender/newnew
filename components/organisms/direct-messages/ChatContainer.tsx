@@ -1,8 +1,9 @@
+import React, { useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useRouter } from 'next/router';
+
 import { useAppState } from '../../../contexts/appStateContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import SelectChat from '../../atoms/direct-messages/SelectChat';
@@ -12,18 +13,14 @@ import ChatContent from './ChatContent';
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 
 interface IChatContainer {
-  chatRoom?: newnewapi.IChatRoom | null;
   isLoading?: boolean;
+  initialTab: newnewapi.ChatRoom.MyRole | undefined;
 }
 
 export const ChatContainer: React.FC<IChatContainer> = ({
-  chatRoom,
   isLoading,
+  initialTab,
 }) => {
-  const router = useRouter();
-
-  const { username } = router.query;
-
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -32,32 +29,13 @@ export const ChatContainer: React.FC<IChatContainer> = ({
 
   const isMobileOrTablet = isMobile || isTablet;
 
-  const [activeChat, setActiveChat] = useState<
-    newnewapi.IChatRoom | undefined | null
-  >(chatRoom);
+  const router = useRouter();
+  const { username } = router.query;
 
-  const handleSetActiveChat = useCallback(
-    (newChatRoom: newnewapi.IChatRoom | null) => {
-      setActiveChat(newChatRoom);
-    },
-    []
-  );
+  const isActiveChatRoom = username !== 'empty';
 
-  useEffect(() => {
-    if (!activeChat) {
-      setActiveChat(chatRoom);
-    }
-  }, [chatRoom, activeChat]);
-
-  useEffect(() => {
-    if (username === 'empty') {
-      setActiveChat(null);
-    }
-  }, [username]);
-
-  const { mobileChatOpened, setMobileChatOpened } = useGetChats();
-
-  // const [isChatSidebarVisible, setIsChatSidebarVisible] = useState(true);
+  const { activeChatRoom, mobileChatOpened, setMobileChatOpened } =
+    useGetChats();
 
   useEffect(() => {
     if (mobileChatOpened && !isMobile) {
@@ -65,20 +43,18 @@ export const ChatContainer: React.FC<IChatContainer> = ({
     }
   }, [mobileChatOpened, isMobile, setMobileChatOpened]);
 
-  // TODO: think how to implement local chat context instead of passing props down to children onChatRoomSelect={handleSetActiveChat}
-  // For this /direct-messages/ can be replaced with something like /direct-messages/empty to work only with [username] and be able to do shallow routing
   return (
     <SContainer mobileChatOpened={mobileChatOpened}>
-      {(!isMobileOrTablet || !activeChat) && (
-        <ChatSidebar onChatRoomSelect={handleSetActiveChat} />
-      )}
-      {(!isMobileOrTablet || activeChat) && (
-        <SContent>
-          {activeChat && <ChatContent chatRoom={activeChat} />}
-          {!activeChat && !isLoading && !isMobile && <SelectChat />}
-          {!activeChat && isLoading && <Loader size='md' isStatic />}
-        </SContent>
-      )}
+      <ChatSidebar
+        initialTab={initialTab}
+        hidden={isMobileOrTablet && isActiveChatRoom}
+      />
+
+      <SContent hidden={isMobileOrTablet && !isActiveChatRoom}>
+        {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
+        {!activeChatRoom && !isLoading && !isMobile && <SelectChat />}
+        {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
+      </SContent>
     </SContainer>
   );
 };
@@ -119,7 +95,9 @@ const SContainer = styled.div<ISContainer>`
   }
 `;
 
-const SContent = styled.div`
+const SContent = styled.div<{
+  hidden: boolean;
+}>`
   position: relative;
   height: 100%;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
@@ -131,4 +109,13 @@ const SContent = styled.div`
     margin: 0 0 0 auto;
     border-radius: ${(props) => props.theme.borderRadius.large};
   }
+
+  ${({ hidden }) => {
+    if (hidden) {
+      return css`
+        display: none;
+      `;
+    }
+    return css``;
+  }}
 `;

@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useMemo } from 'react';
+import React, { ReactElement, useEffect, useMemo, useRef } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -11,16 +11,10 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import ChatLayout from '../../../components/templates/ChatLayout';
 import ChatContainer from '../../../components/organisms/direct-messages/ChatContainer';
-import { useGetChats } from '../../../contexts/chatContext';
+import { ChatsProvider, useGetChats } from '../../../contexts/chatContext';
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
-import { useAppState } from '../../../contexts/appStateContext';
+import { ChatTypes } from '../../../constants/chat';
 
-// eslint-disable-next-line no-shadow
-enum ChatTypes {
-  default = 'default',
-  announcement = 'announcement',
-  bundle = 'bundle',
-}
 interface IChat {
   username: string;
 }
@@ -29,14 +23,8 @@ const Chat: NextPage<IChat> = ({ username }) => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+
+  const isInitialChatSet = useRef(false);
 
   useUpdateEffect(() => {
     // Redirect only after the persist data is pulled
@@ -45,12 +33,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [router, user.loggedIn, user._persist?.rehydrated]);
 
-  const {
-    setActiveChatRoom,
-    setActiveTab,
-    setHiddenMessagesArea,
-    activeChatRoom: activeChatRoomFromContext,
-  } = useGetChats();
+  const { setActiveChatRoom } = useGetChats();
 
   useEffect(() => {
     // prevent user from opening chat with himself
@@ -63,16 +46,20 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [router, username, user.userData?.username]);
 
+  const chatType = useMemo<ChatTypes>(
+    () =>
+      username && username.includes('-')
+        ? (username.toString().split('-')[1] as ChatTypes)
+        : ChatTypes.default,
+    [username]
+  );
+
   // Parse roomKind, username, myRole from ulr parameter [username]
   // [username] possible forms: username, username-bundle, username-announcement
   const chatRoomParams = useMemo(() => {
     if (!username) {
       return null;
     }
-
-    const chatType: ChatTypes = username.includes('-')
-      ? (username.split('-')[1] as ChatTypes)
-      : ChatTypes.default;
 
     const visavisUsername = username.includes('-')
       ? username.split('-')[0]
@@ -114,15 +101,15 @@ const Chat: NextPage<IChat> = ({ username }) => {
         return null;
       }
     }
-  }, [user.userData?.username, username]);
+  }, [chatType, user.userData?.username, username]);
 
-  const { data, isFetched, isFetching } = useMyChatRooms(
+  const { data, isFetching } = useMyChatRooms(
     {
       ...chatRoomParams,
       searchQuery: chatRoomParams?.username,
     },
     {
-      enabled: !!chatRoomParams,
+      enabled: !!chatRoomParams && !isInitialChatSet.current,
     },
     'getRoom'
   );
@@ -185,56 +172,36 @@ const Chat: NextPage<IChat> = ({ username }) => {
   }, [chatRoomParams, chatRooms]);
 
   useEffect(() => {
-    if (isFetched && !isFetching) {
+    if (activeChatRoom && !isInitialChatSet.current) {
       setActiveChatRoom(activeChatRoom);
-
-      // Set activeTab
-      if (
-        activeChatRoom &&
-        activeChatRoom.id !== activeChatRoomFromContext?.id
-      ) {
-        setActiveTab(
-          activeChatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
-            ? newnewapi.ChatRoom.MyRole.CREATOR
-            : newnewapi.ChatRoom.MyRole.SUBSCRIBER
-        );
-
-        if (isMobileOrTablet) {
-          setHiddenMessagesArea(false);
-        }
-      }
+      isInitialChatSet.current = true;
     }
-  }, [
-    activeChatRoom,
-    isFetched,
-    isFetching,
-    isMobileOrTablet,
-    setActiveChatRoom,
-    setActiveTab,
-    setHiddenMessagesArea,
-    activeChatRoomFromContext?.id,
-  ]);
+  }, [activeChatRoom, setActiveChatRoom]);
 
-  // Reset activeChatRoom on unmount
-  useEffect(
-    () => () => {
-      setActiveChatRoom(null);
-    },
-    [setActiveChatRoom]
-  );
+  const initialTab = useMemo(() => {
+    if (username === 'empty') {
+      return undefined;
+    }
+
+    return chatType === ChatTypes.default
+      ? newnewapi.ChatRoom.MyRole.SUBSCRIBER
+      : newnewapi.ChatRoom.MyRole.CREATOR;
+  }, [username, chatType]);
 
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <ChatContainer chatRoom={activeChatRoom} isLoading={isFetching} />
+      <ChatContainer isLoading={isFetching} initialTab={initialTab} />
     </>
   );
 };
 
 (Chat as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <ChatLayout>{page}</ChatLayout>
+  <ChatsProvider>
+    <ChatLayout>{page}</ChatLayout>
+  </ChatsProvider>
 );
 
 export default Chat;

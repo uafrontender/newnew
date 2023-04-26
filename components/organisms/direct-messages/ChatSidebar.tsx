@@ -1,11 +1,16 @@
-import React, { useCallback, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppSelector } from '../../../redux-store/store';
 
 const ChatListTabs = dynamic(
+  // eslint-disable-next-line import/no-unresolved
   () => import('../../molecules/direct-messages/ChatListTabs')
 );
 const ChatList = dynamic(
@@ -16,14 +21,27 @@ const ChatToolbar = dynamic(
 );
 
 interface IChatSidebar {
-  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom | null) => void;
+  initialTab: newnewapi.ChatRoom.MyRole | undefined;
+  hidden: boolean;
 }
 
-const ChatSidebar: React.FC<IChatSidebar> = ({ onChatRoomSelect }) => {
-  const { searchChatroom, activeTab, setActiveTab, mobileChatOpened } =
-    useGetChats();
+const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
+  const user = useAppSelector((state) => state.user);
+  const router = useRouter();
+
+  const {
+    searchChatroom,
+    mobileChatOpened,
+    activeChatRoom,
+    setActiveChatRoom,
+    setSearchChatroom,
+  } = useGetChats();
 
   const { bundles, isSellingBundles, hasSoldBundles } = useBundles();
+
+  const [activeTab, setActiveTab] = useState<
+    newnewapi.ChatRoom.MyRole | undefined
+  >(initialTab);
 
   useEffect(() => {
     if (!activeTab && searchChatroom === '') {
@@ -40,6 +58,7 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ onChatRoomSelect }) => {
     isSellingBundles,
     hasSoldBundles,
     setActiveTab,
+    activeChatRoom,
   ]);
 
   const changeActiveTab = useCallback(
@@ -49,11 +68,36 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ onChatRoomSelect }) => {
     [setActiveTab]
   );
 
+  const handleSelectChatRoom = useCallback(
+    (chatRoom: newnewapi.IChatRoom) => {
+      Mixpanel.track('Chat Item Clicked', {
+        _stage: 'Direct Messages',
+        _component: 'ChatListItem',
+        _target: '/direct-messages',
+      });
+
+      setActiveChatRoom(chatRoom);
+      setSearchChatroom('');
+
+      let route = `${
+        chatRoom.visavis?.user?.username || user.userData?.username
+      }`;
+
+      if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
+        route += '-announcement';
+      } else if (chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
+        route += '-bundle';
+      }
+
+      router.push(route, undefined, { shallow: true });
+    },
+    [router, setActiveChatRoom, setSearchChatroom, user.userData?.username]
+  );
+
   return (
-    <SSidebar>
+    <SSidebar hidden={hidden}>
       <ChatToolbar />
-      {activeTab &&
-        searchChatroom === '' &&
+      {searchChatroom === '' &&
         !mobileChatOpened &&
         bundles &&
         bundles?.length > 0 &&
@@ -63,14 +107,16 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ onChatRoomSelect }) => {
             changeActiveTab={changeActiveTab}
           />
         )}
-      <ChatList onChatRoomSelect={onChatRoomSelect} />
+      <ChatList onChatRoomSelect={handleSelectChatRoom} myRole={activeTab} />
     </SSidebar>
   );
 };
 
 export default ChatSidebar;
 
-const SSidebar = styled.div`
+const SSidebar = styled.div<{
+  hidden: boolean;
+}>`
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -81,4 +127,13 @@ const SSidebar = styled.div`
     width: 352px;
     z-index: 0;
   }
+
+  ${({ hidden }) => {
+    if (hidden) {
+      return css`
+        display: none;
+      `;
+    }
+    return css``;
+  }}
 `;

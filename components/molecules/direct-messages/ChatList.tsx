@@ -1,5 +1,4 @@
-/* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -13,6 +12,7 @@ import { useGetChats } from '../../../contexts/chatContext';
 import Loader from '../../atoms/Loader';
 import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 
 const NoResults = dynamic(
   () => import('../../atoms/direct-messages/NoResults')
@@ -22,10 +22,15 @@ const ChatListItem = dynamic(() => import('./ChatListItem'));
 
 interface IChatList {
   hidden?: boolean;
+  myRole: newnewapi.ChatRoom.MyRole | undefined;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
-const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
+const ChatList: React.FC<IChatList> = ({
+  myRole,
+  hidden,
+  onChatRoomSelect,
+}) => {
   const { ref: scrollRef, inView } = useInView();
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -46,18 +51,15 @@ const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
     }
     return false;
   }, [router.asPath]);
-  const {
-    unreadCountForCreator,
-    unreadCountForUser,
-    searchChatroom,
-    activeTab,
-    activeChatRoom,
-    justSentMessage,
-  } = useGetChats();
+
+  const { unreadCountForCreator, unreadCountForUser } =
+    useChatsUnreadMessages();
+
+  const { searchChatroom, activeChatRoom, justSentMessage } = useGetChats();
 
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
-      myRole: searchChatroom ? undefined : activeTab,
+      myRole: searchChatroom ? undefined : myRole,
       searchQuery: searchChatroom,
     });
 
@@ -73,18 +75,18 @@ const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
   }, [inView, isLoading, hasNextPage, fetchNextPage]);
 
   useEffect(() => {
-    if (activeTab === newnewapi.ChatRoom.MyRole.CREATOR) {
+    if (myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
       refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unreadCountForCreator, refetch, activeTab]);
+  }, [unreadCountForCreator, refetch, myRole]);
 
   useEffect(() => {
-    if (activeTab === newnewapi.ChatRoom.MyRole.SUBSCRIBER) {
+    if (myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER) {
       refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, unreadCountForUser, refetch]);
+  }, [myRole, unreadCountForUser, refetch]);
 
   // to update last message and position in chatlist
   useEffect(() => {
@@ -98,21 +100,10 @@ const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
     }
   }, [activeChatRoom, justSentMessage, isDashboard, isMobileOrTablet, refetch]);
 
-  const renderChatItem = useCallback(
-    (chatroom: newnewapi.IChatRoom, index: number) => (
-      <React.Fragment key={chatroom.id as number}>
-        {hasNextPage && index === chatrooms.length - 1 && (
-          <SRef ref={scrollRef}>Loading...</SRef>
-        )}
-        <ChatListItem chatRoom={chatroom} onChatRoomSelect={onChatRoomSelect} />
-        {index < chatrooms.length - 1 && <SChatSeparator />}
-      </React.Fragment>
-    ),
-    [chatrooms, hasNextPage, scrollRef, onChatRoomSelect]
-  );
+  console.log(activeChatRoom, 'activeChatRoom');
 
   return (
-    <SChatlist
+    <SChatList
       style={
         hidden
           ? {
@@ -124,11 +115,30 @@ const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
       {/* Loading state */}
       {isLoading && <Loader size='md' isStatic />}
 
+      {/* Chats */}
       {!isLoading && (
         <>
           {chatrooms.length > 0 && (
             <>
-              {chatrooms.map(renderChatItem)}
+              {chatrooms.map((chatroom, index) => (
+                <React.Fragment key={chatroom.id as number}>
+                  {hasNextPage && index === chatrooms.length - 1 && (
+                    <SRef ref={scrollRef}>Loading...</SRef>
+                  )}
+                  <ChatListItem
+                    chatRoom={chatroom}
+                    onChatRoomSelect={onChatRoomSelect}
+                    isActive={
+                      !!(
+                        activeChatRoom &&
+                        activeChatRoom.id &&
+                        chatroom.id === activeChatRoom.id
+                      )
+                    }
+                  />
+                  {index < chatrooms.length - 1 && <SChatSeparator />}
+                </React.Fragment>
+              ))}
               {/* TODO: Remove this for dynamic section */}
               {isMobileOrTablet && (
                 <>
@@ -148,13 +158,13 @@ const ChatList: React.FC<IChatList> = ({ hidden, onChatRoomSelect }) => {
           )}
         </>
       )}
-    </SChatlist>
+    </SChatList>
   );
 };
 
 export default ChatList;
 
-const SChatlist = styled.div`
+const SChatList = styled.div`
   display: flex;
   position: relative;
   overflow-y: auto;

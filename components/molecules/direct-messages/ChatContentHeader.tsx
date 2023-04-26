@@ -61,8 +61,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const router = useRouter();
 
-  const { setActiveChatRoom, setHiddenMessagesArea, mobileChatOpened } =
-    useGetChats();
+  const { setActiveChatRoom, mobileChatOpened } = useGetChats();
 
   useEffect(() => {
     if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
@@ -98,7 +97,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
 
   // TODO: rework routing, pushing state on back button clicked is wrong
   const goBackHandler = useCallback(async () => {
-    setHiddenMessagesArea(true);
     if (isDashboard) {
       Mixpanel.track('Navigation Item Clicked', {
         _stage: 'Chat',
@@ -108,8 +106,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
       });
 
       await router.push(`${router.pathname}?tab=chat`);
-
-      setActiveChatRoom(null);
     } else if (isMobileOrTablet) {
       Mixpanel.track('Navigation Item Clicked', {
         _stage: 'Chat',
@@ -118,15 +114,11 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
         _target: '/direct-messages',
       });
 
-      router.push('/direct-messages', undefined, { shallow: true });
+      await router.push('/direct-messages', undefined, { shallow: true });
     }
-  }, [
-    setActiveChatRoom,
-    setHiddenMessagesArea,
-    isDashboard,
-    router,
-    isMobileOrTablet,
-  ]);
+
+    setActiveChatRoom(null);
+  }, [setActiveChatRoom, isDashboard, router, isMobileOrTablet]);
 
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.user?.username) {

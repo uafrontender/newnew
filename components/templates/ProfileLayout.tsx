@@ -47,7 +47,6 @@ import { Mixpanel } from '../../utils/mixpanel';
 import DisplayName from '../atoms/DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
-import { useGetChats } from '../../contexts/chatContext';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -71,16 +70,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isDesktop = ['laptop', 'laptopM', 'laptopL', 'desktop'].includes(
     resizeMode
   );
-
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
-
-  const { setHiddenMessagesArea } = useGetChats();
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
   const { bundles } = useBundles();
@@ -156,7 +145,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           nameToken: 'userInitial',
           url: `/${user.username}`,
         },
-        
+
          {
           nameToken: 'activity',
           url: `/${user.username}/activity`,
@@ -229,11 +218,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     user.uuid,
   ]);
 
-  const handleSendMessageClick = useCallback(() => {
-    if (isMobileOrTablet) {
-      setHiddenMessagesArea(false);
-    }
-  }, [isMobileOrTablet, setHiddenMessagesArea]);
+  // const handleSendMessageClick = useCallback(() => {
+  //   if (isMobileOrTablet) {
+  //     setHiddenMessagesArea(false);
+  //   }
+  // }, [isMobileOrTablet, setHiddenMessagesArea]);
 
   const moreButtonRef = useRef() as any;
 
@@ -396,7 +385,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                           _component: 'ProfileLayout',
                         });
                       }}
-                      onClick={handleSendMessageClick}
+                      // onClick={handleSendMessageClick}
                     >
                       {t('profileLayout.buttons.sendMessage')}
                     </SSendButton>

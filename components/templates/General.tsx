@@ -11,7 +11,6 @@ import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
-import { newnewapi } from 'newnew-api';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -39,6 +38,7 @@ import { useAppState } from '../../contexts/appStateContext';
 import canBecomeCreator from '../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
 import isBrowser from '../../utils/isBrowser';
+import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContext';
 
 interface IGeneral {
   className?: string;
@@ -67,13 +67,9 @@ export const General: React.FC<IGeneral> = (props) => {
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
-  const {
-    unreadCount,
-    setMobileChatOpened,
-    mobileChatOpened,
-    activeTab,
-    setActiveTab,
-  } = useGetChats();
+  const { unreadCount } = useChatsUnreadMessages();
+
+  const { setMobileChatOpened, mobileChatOpened } = useGetChats();
 
   const hasMounted = useHasMounted();
 
@@ -192,9 +188,9 @@ export const General: React.FC<IGeneral> = (props) => {
   const { scrollDirection } = useScrollDirection(isMobile);
 
   const openChat = useCallback(() => {
-    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
-      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
-    }
+    // if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
+    //   setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    // }
 
     if (router.asPath.includes('/creator/bundles')) {
       router.push(`/creator/bundles?tab=chat`);
@@ -202,7 +198,7 @@ export const General: React.FC<IGeneral> = (props) => {
       router.push(`/creator/dashboard?tab=chat`);
     }
     setMobileChatOpened(true);
-  }, [activeTab, setActiveTab, setMobileChatOpened, router]);
+  }, [setMobileChatOpened, router]);
 
   useEffect(() => {
     const checkUrl = () => {

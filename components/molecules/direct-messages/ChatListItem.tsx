@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -16,10 +16,9 @@ import {
 } from '../../atoms/direct-messages/styles';
 import textTrim from '../../../utils/textTrim';
 import ChatName from '../../atoms/direct-messages/ChatName';
-import { useAppSelector } from '../../../redux-store/store';
 import { useGetChats } from '../../../contexts/chatContext';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
-import { Mixpanel } from '../../../utils/mixpanel';
+// import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 
 const MyAvatarMassupdate = dynamic(
@@ -28,11 +27,13 @@ const MyAvatarMassupdate = dynamic(
 
 interface IFunctionProps {
   chatRoom: newnewapi.IChatRoom;
+  isActive: boolean;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
 const ChatListItem: React.FC<IFunctionProps> = ({
   chatRoom,
+  isActive,
   onChatRoomSelect,
 }) => {
   const { t } = useTranslation('page-Chat');
@@ -47,55 +48,17 @@ const ChatListItem: React.FC<IFunctionProps> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const {
-    activeChatRoom,
-    // setActiveChatRoom,
-    activeTab,
-    setSearchChatroom,
-  } = useGetChats();
+  const { activeChatRoom } = useGetChats();
 
-  const user = useAppSelector((state) => state.user);
-
-  // TODO: maybe move to parent
-  const isActiveChat = useCallback(
-    (chat: newnewapi.IChatRoom) => {
-      if (
-        !isMobileOrTablet &&
-        activeChatRoom &&
-        activeChatRoom.id &&
-        chat.id === activeChatRoom.id
-      ) {
-        return true;
-      }
-      return false;
-    },
-    [activeChatRoom, isMobileOrTablet]
-  );
-
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard?tab=chat') ||
-      router.asPath.includes('/creator/bundles?tab=chat')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
-
-  // TODO: Pass room kind props instead of using activeTab
-  const chatRoute = useMemo(() => {
-    let route = `${
-      chatRoom.visavis?.user?.username || user.userData?.username
-    }`;
-    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
-      route += '-announcement';
-      return route;
-    }
-    if (activeTab && chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
-      route += '-bundle';
-    }
-    return route;
-  }, [chatRoom, activeTab, user.userData?.username]);
+  // const isDashboard = useMemo(() => {
+  //   if (
+  //     router.asPath.includes('/creator/dashboard?tab=chat') ||
+  //     router.asPath.includes('/creator/bundles?tab=chat')
+  //   ) {
+  //     return true;
+  //   }
+  //   return false;
+  // }, [router.asPath]);
 
   const markAsRead = useCallback(async () => {
     try {
@@ -122,49 +85,43 @@ const ChatListItem: React.FC<IFunctionProps> = ({
   }, [chatRoom, activeChatRoom, markAsRead]);
 
   const handleItemClick = useCallback(async () => {
-    Mixpanel.track('Chat Item Clicked', {
-      _stage: 'Direct Messages',
-      _component: 'ChatListItem',
-      _isDashboard: isDashboard,
-      ...(!isDashboard
-        ? {
-            _target: chatRoute,
-          }
-        : {
-            _target: `${
-              router.pathname
-            }?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
-            _activeChatRoom: chatRoom,
-          }),
-    });
-
     onChatRoomSelect(chatRoom);
 
-    if (!isDashboard) {
-      router.push(chatRoute, undefined, { shallow: true });
-      return;
-    }
+    // Mixpanel.track('Chat Item Clicked', {
+    //   _stage: 'Direct Messages',
+    //   _component: 'ChatListItem',
+    //   _isDashboard: isDashboard,
+    //   ...(!isDashboard
+    //     ? {
+    //         _target: chatRoute,
+    //       }
+    //     : {
+    //         _target: `${
+    //           router.pathname
+    //         }?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
+    //         _activeChatRoom: chatRoom,
+    //       }),
+    // });
 
-    router.push(
-      {
-        query: {
-          ...router.query,
-          tab: 'direct-messages',
-          roomID: chatRoom.id?.toString(),
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
-    setSearchChatroom('');
-  }, [
-    chatRoom,
-    chatRoute,
-    isDashboard,
-    router,
-    onChatRoomSelect,
-    setSearchChatroom,
-  ]);
+    // onChatRoomSelect(chatRoom);
+
+    // if (!isDashboard) {
+    //   return;
+    // }
+
+    // router.push(
+    //   {
+    //     query: {
+    //       ...router.query,
+    //       tab: 'direct-messages',
+    //       roomID: chatRoom.id?.toString(),
+    //     },
+    //   },
+    //   undefined,
+    //   { shallow: true }
+    // );
+    // setSearchChatroom('');
+  }, [chatRoom, onChatRoomSelect]);
 
   let lastMsg = chatRoom.lastMessage?.content?.text;
 
@@ -177,7 +134,10 @@ const ChatListItem: React.FC<IFunctionProps> = ({
   }
 
   return (
-    <SChatItem onClick={handleItemClick} isActiveChat={isActiveChat(chatRoom)}>
+    <SChatItem
+      onClick={handleItemClick}
+      isActiveChat={isActive && !isMobileOrTablet}
+    >
       {chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE ? (
         <MyAvatarMassupdate />
       ) : (

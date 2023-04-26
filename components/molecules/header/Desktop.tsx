@@ -10,7 +10,7 @@ import UserAvatar from '../UserAvatar';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { useGetChats } from '../../../contexts/chatContext';
+import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useBundles } from '../../../contexts/bundlesContext';
@@ -30,7 +30,7 @@ export const Desktop: React.FC = () => {
 
   const isDesktopL = ['laptopL', 'desktop'].includes(resizeMode);
 
-  const { unreadCount } = useGetChats();
+  const { unreadCount } = useChatsUnreadMessages();
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
 

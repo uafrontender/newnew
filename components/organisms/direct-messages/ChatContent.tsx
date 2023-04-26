@@ -1,6 +1,4 @@
 /* eslint-disable consistent-return */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useState,
   useEffect,
@@ -223,6 +221,8 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
             },
           });
           const res = await sendMessage(payload);
+
+          console.log(res, 'res');
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');
 

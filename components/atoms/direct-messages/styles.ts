@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 import Button from '../Button';
 import InlineSvg from '../InlineSVG';
 import Text from '../Text';
-
 import { UserAvatar } from '../../molecules/UserAvatar';
 
 export const SBottomAction = styled.div`
