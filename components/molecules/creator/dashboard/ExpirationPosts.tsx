@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -40,14 +40,8 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   const isDesktop = !isMobile && !isTablet;
   const router = useRouter();
 
-  const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
   const [isCopiedUrlIndex, setIsCopiedUrlIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (expirationPosts) {
-      setPosts(expirationPosts);
-    }
-  }, [expirationPosts]);
+  const linkCopiedTimerRef = useRef<NodeJS.Timeout | undefined>();
 
   const getAmountValue = (
     data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
@@ -87,10 +81,16 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
           const url = `${window.location.origin}/p/${
             data.postShortId ? data.postShortId : data.postUuid
           }`;
+
           copyPostUrlToClipboard(url)
             .then(() => {
               setIsCopiedUrlIndex(index);
-              setTimeout(() => {
+
+              if (linkCopiedTimerRef.current) {
+                clearTimeout(linkCopiedTimerRef.current);
+              }
+
+              linkCopiedTimerRef.current = setTimeout(() => {
                 setIsCopiedUrlIndex(null);
               }, 1000);
             })
@@ -222,7 +222,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
               </>
             )}
           </SListItem>
-          {index !== posts.length - 1 && <SListItemSeparator />}
+          {index !== expirationPosts.length - 1 && <SListItemSeparator />}
         </SListItemWrapper>
       );
     },
@@ -231,7 +231,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       t,
       isMobile,
       isDesktop,
-      posts.length,
+      expirationPosts.length,
       theme.colorsThemed.text.primary,
       router,
       isCopiedUrlIndex,
@@ -283,7 +283,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
             <SListItemSeparator />
           </>
         )}
-        {posts.map(renderItem)}
+        {expirationPosts.map(renderItem)}
       </SListWrapper>
     </SContainer>
   );
