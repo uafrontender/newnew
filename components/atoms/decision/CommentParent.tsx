@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
   useRef,
+  useContext,
 } from 'react';
 import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -23,10 +24,16 @@ import { useAppSelector } from '../../../redux-store/store';
 import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
+import { APIResponse } from '../../../api/apiConfigs';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import DisplayName from '../DisplayName';
-import { APIResponse } from '../../../api/apiConfigs';
+import CommentChild from './CommentChild';
+import usePostComments from '../../../utils/hooks/usePostComments';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { deleteComment, sendComment } from '../../../api/endpoints/comments';
+import { SocketContext } from '../../../contexts/socketContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -41,7 +48,8 @@ const DeleteCommentModal = dynamic(
   () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
-interface IComment {
+interface ICommentParent {
+  postUuid: string;
   lastChild?: boolean;
   comment: TCommentWithReplies;
   isDeletingComment: boolean;
@@ -59,31 +67,33 @@ interface IComment {
   onFormFocus?: () => void;
   onFormBlur?: () => void;
   setCommentHeight?: (index: number, height: number) => void;
-  updateCommentReplies?: ({
+  updateCommentReplies: ({
     id,
     isOpen,
     text,
   }: {
     id: number;
-    isOpen?: boolean;
-    text?: string;
+    isOpen?: boolean | undefined;
+    text?: string | undefined;
   }) => void;
+  handleToggleReplies: (idToOpen: number, newState: boolean) => void;
 }
 
-const Comment = React.forwardRef<HTMLDivElement, IComment>(
+const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
   (
     {
+      postUuid,
       comment,
       lastChild,
       canDeleteComment,
       isDeletingComment,
       index,
       commentReply,
-      handleAddComment,
       handleDeleteComment,
       onFormFocus,
       onFormBlur,
       updateCommentReplies,
+      handleToggleReplies,
     },
     ref: any
   ) => {
@@ -96,15 +106,17 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       resizeMode
     );
 
+    const { socketConnection } = useContext(SocketContext);
+
+    const { showErrorToastPredefined } = useErrorToasts();
+
     const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
     const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
     const [confirmDeleteComment, setConfirmDeleteComment] =
       useState<boolean>(false);
 
-    const [isReplyFormOpen, setIsReplyFormOpen] = useState(
-      commentReply?.isOpen || false
-    );
+    const isReplyFormOpen = useMemo(() => comment?.isOpen, [comment?.isOpen]);
 
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -114,7 +126,79 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       [user.loggedIn, user.userData?.userUuid, comment.sender?.uuid]
     );
 
-    const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
+    const {
+      processedComments: replies,
+      addCommentMutation,
+      removeCommentMutation,
+      fetchNextPage,
+      isLoading,
+      isFetchingNextPage,
+      hasNextPage,
+    } = usePostComments(
+      {
+        loggedInUser: user.loggedIn,
+        postUuid,
+        parentCommentId: comment.id as number,
+      },
+      {
+        enabled: comment?.isOpen,
+      }
+    );
+
+    const handleAddComment = useCallback(
+      async (
+        content: string,
+        parentMsgId?: number
+      ): Promise<APIResponse<newnewapi.ICommentMessage>> => {
+        Mixpanel.track('Add Comment', {
+          _stage: 'Post',
+          _postUuid: postUuid,
+        });
+        const payload = new newnewapi.SendCommentRequest({
+          postUuid,
+          content: {
+            text: content,
+          },
+          parentCommentId: comment.id,
+        });
+
+        const res = await sendComment(payload);
+
+        if (res.data?.comment) {
+          addCommentMutation?.mutate(res.data.comment);
+        }
+
+        if (res.data?.comment && !res.error) {
+          return {
+            data: res.data.comment,
+          };
+        }
+        return {
+          error: res?.error || new Error('Could not add comment'),
+        };
+      },
+      [addCommentMutation, comment.id, postUuid]
+    );
+
+    const handleDeleteChildComment = useCallback(
+      async (commentToDelete: TCommentWithReplies) => {
+        try {
+          const payload = new newnewapi.DeleteCommentRequest({
+            commentId: commentToDelete.id,
+          });
+
+          const res = await deleteComment(payload);
+
+          if (!res.error) {
+            removeCommentMutation?.mutate(commentToDelete);
+          }
+        } catch (err) {
+          console.error(err);
+          showErrorToastPredefined(undefined);
+        }
+      },
+      [removeCommentMutation, showErrorToastPredefined]
+    );
 
     const onUserReport = useCallback(() => {
       // Redirect only after the persist data is pulled
@@ -136,9 +220,9 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
 
     const commentFormRef = useRef<HTMLFormElement | null>(null);
 
-    const replyHandler = () => {
-      setIsReplyFormOpen((prevState) => !prevState);
-    };
+    const replyHandler = useCallback(() => {
+      handleToggleReplies(comment.id as number, !comment?.isOpen);
+    }, [comment.id, comment?.isOpen, handleToggleReplies]);
 
     const isReplyFormOpenRef = useRef(isReplyFormOpen);
 
@@ -184,10 +268,56 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     );
 
     useEffect(() => {
-      if (comment.isOpen) {
-        setIsReplyFormOpen(true);
+      const socketHandlerMessageCreated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.CommentMessageCreated.decode(arr);
+        if (
+          decoded?.newComment &&
+          decoded.newComment!!.sender?.uuid !== user.userData?.userUuid &&
+          decoded.newComment?.parentCommentId &&
+          decoded.newComment.parentCommentId === comment.id
+        ) {
+          addCommentMutation?.mutate(decoded.newComment);
+        }
+      };
+
+      const socketHandlerMessageDeleted = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.CommentMessageDeleted.decode(arr);
+        if (
+          decoded.deletedComment &&
+          decoded.deletedComment?.parentCommentId &&
+          decoded.deletedComment.parentCommentId === comment.id
+        ) {
+          removeCommentMutation?.mutate(decoded.deletedComment);
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on(
+          'CommentMessageCreated',
+          socketHandlerMessageCreated
+        );
+        socketConnection?.on(
+          'CommentMessageDeleted',
+          socketHandlerMessageDeleted
+        );
       }
-    }, [comment.isOpen]);
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'CommentMessageCreated',
+            socketHandlerMessageCreated
+          );
+          socketConnection?.off(
+            'CommentMessageDeleted',
+            socketHandlerMessageDeleted
+          );
+        }
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection, comment?.id, user.userData?.userUuid]);
 
     const moreButtonRef: any = useRef<HTMLButtonElement>();
 
@@ -351,18 +481,22 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
             {isReplyFormOpen &&
               replies &&
               replies.map((item, i) => (
-                <Comment
+                <CommentChild
                   key={item.id.toString()}
                   isDeletingComment={isDeletingComment}
                   canDeleteComment={canDeleteComment}
                   lastChild={i === replies.length - 1}
                   comment={item}
-                  handleAddComment={(newMsg: string) =>
-                    handleAddComment(newMsg, item.id as number)
-                  }
-                  handleDeleteComment={handleDeleteComment}
+                  handleDeleteComment={handleDeleteChildComment}
                 />
               ))}
+            {/* TEMP */}
+            {isReplyFormOpen &&
+              hasNextPage &&
+              !isFetchingNextPage &&
+              !isLoading && (
+                <SReply onClick={() => fetchNextPage()}>Load replies</SReply>
+              )}
           </SCommentContent>
           <DeleteCommentModal
             isVisible={confirmDeleteComment}
@@ -401,9 +535,9 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
   }
 );
 
-export default Comment;
+export default CommentParent;
 
-Comment.defaultProps = {
+CommentParent.defaultProps = {
   lastChild: false,
   canDeleteComment: false,
   onFormFocus: () => {},

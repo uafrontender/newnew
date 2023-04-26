@@ -571,7 +571,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               postShortId={post.postShortId ?? ''}
-              commentsRoomId={post.commentsRoomId as number}
               canDeleteComments
               onFormBlur={handleCommentBlur}
               onFormFocus={handleCommentFocus}

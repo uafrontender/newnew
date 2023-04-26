@@ -12,7 +12,6 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { newnewapi } from 'newnew-api';
 
 import GradientMask from '../../../atoms/GradientMask';
-import Comment from '../../../atoms/decision/Comment';
 
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
@@ -25,6 +24,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
 import { APIResponse } from '../../../../api/apiConfigs';
+import CommentParent from '../../../atoms/decision/CommentParent';
 
 interface IComments {
   postUuid: string;
@@ -41,6 +41,7 @@ interface IComments {
   onCommentDelete: (comment: TCommentWithReplies) => void;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
+  handleToggleCommentRepliesById: (idToOpen: number, newState: boolean) => void;
 }
 
 const Comments: React.FunctionComponent<IComments> = ({
@@ -55,6 +56,7 @@ const Comments: React.FunctionComponent<IComments> = ({
   onFormFocus,
   onFormBlur,
   openCommentProgrammatically,
+  handleToggleCommentRepliesById,
 }) => {
   const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppState();
@@ -268,7 +270,8 @@ const Comments: React.FunctionComponent<IComments> = ({
                         <Loader size='sm' isStatic />
                       </SLoaderDiv>
                     ) : (
-                      <Comment
+                      <CommentParent
+                        postUuid={postUuid}
                         canDeleteComment={canDeleteComments}
                         lastChild={virtualItem.index === comments.length - 1}
                         comment={comments[virtualItem.index]}
@@ -279,12 +282,13 @@ const Comments: React.FunctionComponent<IComments> = ({
                         ref={commentsVirtualizer.measureElement}
                         onFormBlur={onFormBlur ?? undefined}
                         onFormFocus={onFormFocus ?? undefined}
-                        updateCommentReplies={updateCommentReplies}
                         commentReply={
                           commentsReplies[
                             comments[virtualItem.index].id as number
                           ]
                         }
+                        updateCommentReplies={updateCommentReplies}
+                        handleToggleReplies={handleToggleCommentRepliesById}
                       />
                     )}
                   </div>

@@ -10,50 +10,24 @@ import {
 } from 'react-query';
 import { cloneDeep, uniqBy } from 'lodash';
 
-import { getMessages } from '../../api/endpoints/chat';
+import { getComments } from '../../api/endpoints/comments';
 import { TCommentWithReplies } from '../../components/interfaces/tcomment';
 import useErrorToasts from './useErrorToasts';
 
 interface IUsePostComments {
   loggedInUser: boolean;
-  commentsRoomId: number;
+  postUuid: string;
+  parentCommentId?: number;
 }
 
 const processComments = (
   commentsRaw: Array<newnewapi.IChatMessage | TCommentWithReplies>
 ): TCommentWithReplies[] => {
-  let lastParentIdx;
-  const goalArr: TCommentWithReplies[] = [];
-
   const workingArr = uniqBy(commentsRaw, 'id');
 
   const workingArrFiltered = workingArr.filter((c) => !c.isDeleted);
 
-  workingArrFiltered.forEach((rawItem, i) => {
-    const workingItem = { ...rawItem };
-
-    if (!rawItem.parentId || rawItem.parentId === 0) {
-      lastParentIdx = undefined;
-
-      workingItem.parentId = undefined;
-      goalArr.push(workingItem as TCommentWithReplies);
-    } else {
-      lastParentIdx = goalArr.findIndex((o) => o.id === workingItem.parentId);
-
-      if (lastParentIdx !== -1) {
-        if (!goalArr[lastParentIdx].replies) {
-          goalArr[lastParentIdx].replies = [];
-        }
-
-        // @ts-ignore
-        const workingSubarr = [...goalArr[lastParentIdx].replies];
-
-        goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
-      }
-    }
-  });
-
-  return goalArr;
+  return workingArrFiltered as TCommentWithReplies[];
 };
 
 const usePostComments = (
@@ -72,21 +46,26 @@ const usePostComments = (
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
     async ({ pageParam, signal }) => {
-      const payload = new newnewapi.GetMessagesRequest({
-        roomId: params.commentsRoomId,
+      const payload = new newnewapi.GetCommentsRequest({
+        postUuid: params.postUuid,
+        ...(params?.parentCommentId
+          ? {
+              parentCommentId: params.parentCommentId,
+            }
+          : {}),
         paging: {
           pageToken: pageParam,
         },
       });
 
-      const postsResponse = await getMessages(payload, signal);
+      const postsResponse = await getComments(payload, signal);
 
       if (!postsResponse.data || postsResponse.error) {
         throw new Error('Request failed');
       }
 
       return {
-        comments: postsResponse?.data?.messages || [],
+        comments: postsResponse?.data?.comments || [],
         paging: postsResponse?.data?.paging,
       };
     },
@@ -116,13 +95,25 @@ const usePostComments = (
     flatComments ? processComments(flatComments) : []
   );
 
-  const handleOpenCommentProgrammatically = useCallback((idxToOpen: number) => {
+  const handleOpenCommentByIdx = useCallback((idxToOpen: number) => {
     setProcessedComments((curr) => {
       const working = [...curr];
       working[idxToOpen].isOpen = true;
       return working;
     });
   }, []);
+
+  const handleToggleCommentRepliesById = useCallback(
+    (idToOpen: number, newState: boolean) => {
+      setProcessedComments((curr) => {
+        const working = [...curr];
+        const idxToOpen = working.findIndex((c) => c.id === idToOpen);
+        working[idxToOpen].isOpen = newState;
+        return working;
+      });
+    },
+    []
+  );
 
   const addCommentMutation = useMutation({
     mutationFn: (card: newnewapi.IChatMessage) =>
@@ -143,32 +134,13 @@ const usePostComments = (
         ) => {
           if (data) {
             const workingData = cloneDeep(data);
-            if (!newComment?.parentId) {
-              workingData.pages = workingData.pages.map((page, i: number) => {
-                if (i === 0) {
-                  // eslint-disable-next-line no-param-reassign
-                  page.comments = [newComment, ...page.comments];
-                }
-                return page;
-              });
-
-              return workingData;
-            }
-
-            for (let k = 0; k < workingData.pages.length; k++) {
-              const parentMsgIndex = workingData.pages[k].comments.findIndex(
-                (c) => c.id === newComment?.parentId
-              );
-
-              if (parentMsgIndex !== -1) {
-                workingData.pages[k].comments = [
-                  ...workingData.pages[k].comments.slice(0, parentMsgIndex + 1),
-                  newComment,
-                  ...workingData.pages[k].comments.slice(parentMsgIndex + 1),
-                ];
-                break;
+            workingData.pages = workingData.pages.map((page, i: number) => {
+              if (i === 0) {
+                // eslint-disable-next-line no-param-reassign
+                page.comments = [newComment, ...page.comments];
               }
-            }
+              return page;
+            });
 
             return workingData;
           }
@@ -241,7 +213,8 @@ const usePostComments = (
 
   return {
     processedComments,
-    handleOpenCommentProgrammatically,
+    handleOpenCommentByIdx,
+    handleToggleCommentRepliesById,
     addCommentMutation,
     removeCommentMutation,
     ...query,
