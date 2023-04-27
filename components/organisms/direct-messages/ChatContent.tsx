@@ -11,6 +11,8 @@ import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { useQueryClient } from 'react-query';
+
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
@@ -81,6 +83,8 @@ const ChatContent: React.FC<IFuncProps> = ({
   const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
+  const queryClient = useQueryClient();
+
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
@@ -94,7 +98,6 @@ const ChatContent: React.FC<IFuncProps> = ({
     useGetBlockedUsers();
   const {
     chatsDraft,
-    setJustSentMessage,
     addInputValueIntoChatsDraft,
     removeInputValueFromChatsDraft,
   } = useGetChats();
@@ -238,10 +241,20 @@ const ChatContent: React.FC<IFuncProps> = ({
           });
           const res = await sendMessage(payload);
 
-          if (!res.data || res.error)
+          if (!res.data || res.error) {
             throw new Error(res.error?.message ?? 'Request failed');
+          }
 
-          setJustSentMessage(true);
+          // TODO: don't like this, need to think
+          // Update Chat List
+          queryClient.invalidateQueries({
+            queryKey: ['private', 'getMyRooms'],
+          });
+
+          // Update Chat
+          queryClient.invalidateQueries({
+            queryKey: ['private', 'getMyRooms'],
+          });
           setSendingMessage(false);
 
           if (chatRoom.id) {
@@ -258,7 +271,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     chatRoom,
     messageTextValid,
     messageText,
-    setJustSentMessage,
+    queryClient,
     removeInputValueFromChatsDraft,
   ]);
 

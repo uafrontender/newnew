@@ -42,7 +42,7 @@ const ChatList: React.FC<IChatList> = ({
   const { unreadCountForCreator, unreadCountForUser } =
     useChatsUnreadMessages();
 
-  const { searchChatroom, activeChatRoom, justSentMessage } = useGetChats();
+  const { searchChatroom, activeChatRoom } = useGetChats();
 
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
@@ -73,17 +73,7 @@ const ChatList: React.FC<IChatList> = ({
     }
   }, [myRole, unreadCountForUser, refetch]);
 
-  // to update last message and position in chatlist
-  useEffect(() => {
-    if (
-      !isMobileOrTablet &&
-      // !isDashboard &&
-      activeChatRoom &&
-      justSentMessage
-    ) {
-      refetch();
-    }
-  }, [activeChatRoom, justSentMessage, isMobileOrTablet, refetch]);
+  console.log(activeChatRoom, 'activeChatRoom');
 
   return (
     <SChatList

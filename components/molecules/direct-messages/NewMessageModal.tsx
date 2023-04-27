@@ -1,14 +1,10 @@
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-} from 'react';
+import React, { useCallback, useState, useRef, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { useQuery } from 'react-query';
+
 import {
   SChatItemContainer,
   SChatItemCenter,
@@ -74,36 +70,30 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
   const [searchValue, setSearchValue] = useState('');
 
-  const [loading, setLoading] = useState(false);
-  const [chatRooms, setChatRooms] = useState<newnewapi.IVisavisListItem[]>([]);
+  const { data, isLoading } = useQuery<newnewapi.IVisavisListItem[]>(
+    ['private', 'fetchVisavisList'],
+    async ({ signal }) => {
+      const payload = new newnewapi.EmptyRequest();
+
+      const res = await getVisavisList(payload, signal);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+
+      return res.data.visavis;
+    },
+    {
+      onError: (error) => {
+        console.error(error);
+      },
+    }
+  );
+
+  const chatRooms = useMemo(() => data || [], [data]);
 
   const passInputValue = (str: string) => {
     setSearchValue(str);
   };
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (loading) return;
-      try {
-        setLoading(true);
-        const payload = new newnewapi.EmptyRequest();
-
-        const res = await getVisavisList(payload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        setChatRooms(res.data.visavis);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    };
-    if (!loading && !chatRooms.length) {
-      loadData();
-    }
-  }, [loading, chatRooms.length]);
 
   const filteredChatRooms = useMemo(
     () =>
@@ -242,7 +232,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             passInputValue={passInputValue}
           />
           <SWrapper>
-            {!loading && (
+            {!isLoading && (
               <SSectionContent ref={scrollRef}>
                 {user.userData?.options?.isOfferingBundles && !searchValue && (
                   <NewAnnouncement handleClick={openMyAnnouncement} />
@@ -263,7 +253,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
             <GradientMask positionTop active={showTopGradient} />
             <GradientMask active={showBottomGradient} />
-            {loading && <Loader isStatic size='md' />}
+            {isLoading && <Loader isStatic size='md' />}
           </SWrapper>
         </SModal>
       </SContainer>

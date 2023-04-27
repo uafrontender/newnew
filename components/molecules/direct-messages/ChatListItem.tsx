@@ -53,7 +53,6 @@ const ChatListItem: React.FC<IFunctionProps> = ({
       _page: router.pathname,
     });
     onChatRoomSelect(chatRoom);
-    // setSearchChatroom('');
   }, [chatRoom, onChatRoomSelect, router.pathname]);
 
   let lastMsg = chatRoom.lastMessage?.content?.text;
@@ -91,7 +90,7 @@ const ChatListItem: React.FC<IFunctionProps> = ({
             {textTrim(lastMsg, 28)}
           </SChatItemLastMessage>
           <SUnreadCountWrapper>
-            {(chatRoom.unreadMessageCount as number) > 0 && (
+            {(chatRoom.unreadMessageCount as number) > 0 && !isActive && (
               <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
             )}
           </SUnreadCountWrapper>

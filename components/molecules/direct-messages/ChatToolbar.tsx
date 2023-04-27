@@ -18,6 +18,15 @@ const GoBackButton = dynamic(
 
 const ChatToolbar: React.FC = () => {
   const { resizeMode } = useAppState();
+
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -28,13 +37,7 @@ const ChatToolbar: React.FC = () => {
     setMobileChatOpened,
     setActiveChatRoom,
   } = useGetChats();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+
   const passInputValue = useCallback(
     (str: string) => {
       setSearchChatroom(str);

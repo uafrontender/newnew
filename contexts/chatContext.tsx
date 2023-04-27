@@ -15,34 +15,26 @@ interface IChatsContext {
   mobileChatOpened: boolean;
   activeChatRoom: newnewapi.IChatRoom | null;
   searchChatroom: string;
-  justSentMessage: boolean;
   chatsDraft: { roomId: number | Long; text: string }[];
-  isActiveChatRoomLoading: boolean;
-  setJustSentMessage: (value: boolean) => void;
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => void;
   setSearchChatroom: (str: string) => void;
   setMobileChatOpened: (mobileChatOpened: boolean) => void;
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => void;
   removeInputValueFromChatsDraft: (roomId: number | Long) => void;
   restDraft: () => void;
-  setIsActiveChatRoomLoading: (isActiveChatRoomLoading: boolean) => void;
 }
 
 const ChatsContext = createContext<IChatsContext>({
   mobileChatOpened: false,
   activeChatRoom: null,
   searchChatroom: '',
-  justSentMessage: false,
   chatsDraft: [],
-  isActiveChatRoomLoading: false,
-  setJustSentMessage: (value: boolean) => {},
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => {},
   setSearchChatroom: (str: string) => {},
   setMobileChatOpened: (mobileChatOpened: boolean) => {},
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => {},
   removeInputValueFromChatsDraft: (roomId: number | Long) => {},
   restDraft: () => {},
-  setIsActiveChatRoomLoading: (isActiveChatRoomLoading: boolean) => {},
 });
 
 interface IChatsProvider {
@@ -55,32 +47,14 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   // TODO: Should be here??
   const [mobileChatOpened, setMobileChatOpened] = useState<boolean>(false);
 
-  const [isActiveChatRoomLoading, setIsActiveChatRoomLoading] =
-    useState<boolean>(false);
+  // TODO: make it as initial data for use query ????
   const [activeChatRoom, setActiveChatRoom] =
     useState<newnewapi.IChatRoom | null>(null);
   const [searchChatroom, setSearchChatroom] = useState<string>('');
 
-  const [justSentMessage, setJustSentMessage] = useState<boolean>(false);
   const [chatsDraft, setChatsDraft] = useState<
     { roomId: number | Long; text: string }[]
   >([]);
-
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-
-    if (justSentMessage) {
-      timer = setTimeout(() => {
-        setJustSentMessage(false);
-      }, 500);
-    }
-
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [justSentMessage]);
 
   const removeInputValueFromChatsDraft = useCallback(
     (roomId: number | Long) => {
@@ -119,7 +93,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     setMobileChatOpened(false);
     setActiveChatRoom(null);
     setSearchChatroom('');
-    setJustSentMessage(false);
     setChatsDraft([]);
   }, []);
 
@@ -142,33 +115,25 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       mobileChatOpened,
       activeChatRoom,
       searchChatroom: searchChatroomDebounced,
-      justSentMessage,
       chatsDraft,
-      isActiveChatRoomLoading,
-      setJustSentMessage,
       setActiveChatRoom,
       setMobileChatOpened,
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,
       restDraft,
-      setIsActiveChatRoomLoading,
     }),
     [
       activeChatRoom,
       mobileChatOpened,
       searchChatroomDebounced,
-      justSentMessage,
       chatsDraft,
-      isActiveChatRoomLoading,
-      setJustSentMessage,
       setActiveChatRoom,
       setMobileChatOpened,
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,
       restDraft,
-      setIsActiveChatRoomLoading,
     ]
   );
 

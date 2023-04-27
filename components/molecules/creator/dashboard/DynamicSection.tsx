@@ -44,7 +44,6 @@ const NewMessageModal = dynamic(
 );
 const NotificationsList = dynamic(() => import('./NotificationsList'));
 const ChatList = dynamic(() => import('../../direct-messages/ChatList'));
-// const Chat = dynamic(() => import('./Chat'));
 const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 const Indicator = dynamic(() => import('../../../atoms/Indicator'));
 const Tabs = dynamic(() => import('../../Tabs'));
@@ -53,6 +52,7 @@ interface IDynamicSection {
   baseUrl: string;
 }
 
+// TODO: Refactoring
 export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creator');
@@ -183,7 +183,9 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       handleMinimizeClick();
     }
   }, [tab, isDesktop, showNewMessageModal, handleMinimizeClick]);
+
   useOnClickOutside(containerRef, handleClickOutside);
+
   useEffect(() => {
     if (!isDesktop && tab) {
       enableOverlayMode();
@@ -196,36 +198,43 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     };
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
-  useEffect(() => {
-    if (router.query.roomID && !activeChatRoom) {
-      (async () => {
-        try {
-          setChatRoomLoading(true);
-          const payload = new newnewapi.GetRoomRequest({
-            roomId: _.toNumber(router.query.roomID),
-          });
+  const initialRoomId = useRef(router.query.roomID);
 
-          const res = await getRoom(payload);
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
-          }
-          setActiveChatRoom(res.data);
-        } catch (err) {
-          router.push(`${baseUrl}?tab=chat`);
-          console.error(err);
-        } finally {
-          setChatRoomLoading(false);
+  useEffect(() => {
+    const getChatRoom = async () => {
+      try {
+        setChatRoomLoading(true);
+        const payload = new newnewapi.GetRoomRequest({
+          roomId: _.toNumber(initialRoomId.current),
+        });
+
+        const res = await getRoom(payload);
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
         }
-      })();
+        setActiveChatRoom(res.data);
+      } catch (err) {
+        router.push(`${baseUrl}?tab=chat`);
+        console.error(err);
+      } finally {
+        setChatRoomLoading(false);
+      }
+    };
+    if (initialRoomId.current && !activeChatRoom) {
+      getChatRoom();
     }
   }, [baseUrl, router, activeChatRoom, setActiveChatRoom]);
 
   const handleChatRoomSelect = useCallback(
-    (chatRoom: newnewapi.IChatRoom) => {
+    async (chatRoom: newnewapi.IChatRoom) => {
       setActiveChatRoom(chatRoom);
-      router.push(`?tab=direct-messages&roomID=${chatRoom.id}`, undefined, {
-        shallow: true,
-      });
+      await router.push(
+        `?tab=direct-messages&roomID=${chatRoom.id}`,
+        undefined,
+        {
+          shallow: true,
+        }
+      );
     },
     [setActiveChatRoom, router]
   );

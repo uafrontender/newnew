@@ -4,6 +4,8 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
+import { useQueryClient } from 'react-query';
+
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
@@ -33,8 +35,10 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   variant,
 }) => {
   const { ref: loadingRef, inView } = useInView();
-  const { activeChatRoom, justSentMessage } = useGetChats();
+  const { activeChatRoom } = useGetChats();
   const { socketConnection } = useContext(SocketContext);
+
+  const queryClient = useQueryClient();
 
   const {
     data,
@@ -54,25 +58,24 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [data]
   );
 
-  // TODO: remove refetch, use mutation instead
-  useEffect(() => {
-    if (activeChatRoom && justSentMessage) {
-      refetch();
-    }
-  }, [activeChatRoom, justSentMessage, refetch]);
-
   const markAsRead = useCallback(async () => {
     try {
       const payload = new newnewapi.MarkRoomAsReadRequest({
         roomId: chatRoom.id as number,
       });
       const res = await markRoomAsRead(payload);
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      // Update chat list
+      queryClient.invalidateQueries({
+        queryKey: ['private', 'getMyRooms'],
+      });
     } catch (err) {
       console.error(err);
     }
-  }, [chatRoom]);
+  }, [chatRoom, queryClient]);
 
   useEffect(() => {
     if (

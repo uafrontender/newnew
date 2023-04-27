@@ -32,14 +32,14 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   const router = useRouter();
   const { username } = router.query;
 
-  const isActiveChatRoom = username !== 'empty';
-
   const {
     activeChatRoom,
     mobileChatOpened,
     setMobileChatOpened,
     setActiveChatRoom,
   } = useGetChats();
+
+  const isActiveChatRoom = username !== 'empty' || !!activeChatRoom;
 
   useEffect(() => {
     if (mobileChatOpened && !isMobile) {

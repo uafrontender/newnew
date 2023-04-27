@@ -7,6 +7,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
+import useDebounce from '../../../../utils/hooks/useDebounce';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -14,32 +15,37 @@ const SearchInput: React.FC = React.memo(() => {
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const { searchChatroom, setSearchChatroom } = useGetChats();
+
+  const [searchText, setSearchText] = useState('');
+  const { setSearchChatroom } = useGetChats();
+
+  const searchTextDebounced = useDebounce(searchText, 300);
 
   const handleSearchClick = useCallback(() => {
     setIsSearchActive((prevState) => !prevState);
   }, []);
 
   const handleSearchClose = useCallback(() => {
-    setSearchChatroom('');
+    setSearchText('');
     setIsSearchActive(false);
-  }, [setSearchChatroom]);
+  }, []);
 
-  const handleInputChange = useCallback(
-    (e: any) => {
-      setSearchChatroom(e.target.value);
-    },
-    [setSearchChatroom]
-  );
+  const handleInputChange = useCallback((e: any) => {
+    setSearchText(e.target.value);
+  }, []);
 
   const handleKeyDown = useCallback(
     (e: any) => {
-      if (e.keyCode === 13 && searchChatroom) {
+      if (e.keyCode === 13 && searchText) {
         handleSearchClose();
       }
     },
-    [handleSearchClose, searchChatroom]
+    [handleSearchClose, searchText]
   );
+
+  useEffect(() => {
+    setSearchChatroom(searchTextDebounced);
+  }, [searchTextDebounced, setSearchChatroom]);
 
   // const handleClickOutside = useCallback(() => {
   //   if (isSearchActive) {
@@ -73,7 +79,7 @@ const SearchInput: React.FC = React.memo(() => {
         />
         <SInput
           ref={inputRef}
-          value={searchChatroom}
+          value={searchText}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder={t('search.placeholder')}

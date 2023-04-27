@@ -57,7 +57,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
   // Parse roomKind, username, myRole from ulr parameter [username]
   // [username] possible forms: username, username-bundle, username-announcement
   const chatRoomParams = useMemo(() => {
-    if (!username) {
+    if (!username || username === 'empty') {
       return null;
     }
 
@@ -131,7 +131,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
 
     return chatRooms[0];
 
-    // TODO: check if this logic is required
+    // TODO: looks like this logic is not required
     // Announcements, creator role
     // if (
     //   chatRoomParams.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
