@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -16,8 +16,6 @@ import {
 } from '../../atoms/direct-messages/styles';
 import textTrim from '../../../utils/textTrim';
 import ChatName from '../../atoms/direct-messages/ChatName';
-import { useGetChats } from '../../../contexts/chatContext';
-import { markRoomAsRead } from '../../../api/endpoints/chat';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -47,32 +45,6 @@ const ChatListItem: React.FC<IFunctionProps> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-
-  const { activeChatRoom } = useGetChats();
-
-  const markAsRead = useCallback(async () => {
-    try {
-      const payload = new newnewapi.MarkRoomAsReadRequest({
-        roomId: chatRoom.id as number,
-      });
-      const res = await markRoomAsRead(payload);
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-    } catch (err) {
-      console.error(err);
-    }
-  }, [chatRoom]);
-
-  // TODO: move markAsRead to chat content
-  useEffect(() => {
-    if (
-      chatRoom.unreadMessageCount &&
-      chatRoom.unreadMessageCount > 0 &&
-      activeChatRoom?.id === chatRoom.id
-    ) {
-      markAsRead();
-    }
-  }, [chatRoom, activeChatRoom, markAsRead]);
 
   const handleItemClick = useCallback(async () => {
     Mixpanel.track('Chat Item Clicked', {
@@ -119,10 +91,9 @@ const ChatListItem: React.FC<IFunctionProps> = ({
             {textTrim(lastMsg, 28)}
           </SChatItemLastMessage>
           <SUnreadCountWrapper>
-            {(chatRoom.unreadMessageCount as number) > 0 &&
-              activeChatRoom?.id !== chatRoom.id && (
-                <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
-              )}
+            {(chatRoom.unreadMessageCount as number) > 0 && (
+              <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
+            )}
           </SUnreadCountWrapper>
         </SChatItemContentWrapper>
       </SChatItemContent>

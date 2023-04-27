@@ -87,6 +87,7 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
     [router, setActiveChatRoom, setSearchChatroom, user.userData?.username]
   );
 
+  // TODO: move hidden to parent, just pass className here
   return (
     <SSidebar hidden={hidden}>
       <ChatToolbar />

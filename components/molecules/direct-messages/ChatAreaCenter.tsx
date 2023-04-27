@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import isIOS from '../../../utils/isIOS';
 import { useGetChats } from '../../../contexts/chatContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import Loader from '../../atoms/Loader';
+import { markRoomAsRead } from '../../../api/endpoints/chat';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -42,6 +43,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     fetchNextPage,
     refetch,
     isFetchingNextPage,
+    isFetched,
   } = useChatRoomMessages({
     limit: isIOS() ? 8 : 20,
     roomId: chatRoom?.id,
@@ -58,6 +60,29 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       refetch();
     }
   }, [activeChatRoom, justSentMessage, refetch]);
+
+  const markAsRead = useCallback(async () => {
+    try {
+      const payload = new newnewapi.MarkRoomAsReadRequest({
+        roomId: chatRoom.id as number,
+      });
+      const res = await markRoomAsRead(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+    } catch (err) {
+      console.error(err);
+    }
+  }, [chatRoom]);
+
+  useEffect(() => {
+    if (
+      chatRoom.unreadMessageCount &&
+      chatRoom.unreadMessageCount > 0 &&
+      isFetched
+    ) {
+      markAsRead();
+    }
+  }, [chatRoom, isFetched, markAsRead]);
 
   const hasWelcomeMessage = useMemo(
     () =>

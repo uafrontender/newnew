@@ -16,7 +16,6 @@ import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesCon
 const NoResults = dynamic(
   () => import('../../atoms/direct-messages/NoResults')
 );
-
 const ChatListItem = dynamic(() => import('./ChatListItem'));
 
 interface IChatList {
@@ -66,14 +65,12 @@ const ChatList: React.FC<IChatList> = ({
     if (myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
       refetch();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unreadCountForCreator, refetch, myRole]);
 
   useEffect(() => {
     if (myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER) {
       refetch();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myRole, unreadCountForUser, refetch]);
 
   // to update last message and position in chatlist

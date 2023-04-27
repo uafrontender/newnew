@@ -362,7 +362,7 @@ const ChatContent: React.FC<IFuncProps> = ({
         isAnnouncement={isAnnouncement}
         textareaFocused={textareaFocused}
         isChatMessageAvatar={isChatMessageAvatar}
-        variant={variant || 'primary'}
+        variant={variant}
       />
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis && (
@@ -389,7 +389,7 @@ const ChatContent: React.FC<IFuncProps> = ({
                 placeholder={t('chat.placeholder')}
                 gotMaxLength={handleSubmit}
                 setTextareaFocused={handleTextareaFocused}
-                variant={variant || 'primary'}
+                variant={variant}
               />
             </STextArea>
             <SButton
