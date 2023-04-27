@@ -13,7 +13,7 @@ const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => {
     <SProfileImage>
       <SGenericSkeleton
         visible={!loaded}
-        bgColor={theme.colorsThemed.background.secondary}
+        bgColor={theme.colorsThemed.background.tertiary}
         highlightColor={theme.colorsThemed.background.quaternary}
       />
       <SImg
@@ -23,7 +23,7 @@ const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => {
         width='100%'
         height='100%'
         draggable={false}
-        onLoad={(e) => {
+        onLoad={() => {
           setLoaded(true);
         }}
       />
