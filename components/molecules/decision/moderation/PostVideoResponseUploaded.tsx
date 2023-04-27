@@ -84,6 +84,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
           handleDeleteUnuploadedAdditonalResponse={
             handleDeleteUnuploadedAdditonalResponse
           }
+          autoscroll
         />
       ) : (
         <PostVideojsPlayer
