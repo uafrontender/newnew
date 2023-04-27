@@ -32,7 +32,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
   const { resizeMode } = useAppState();
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
