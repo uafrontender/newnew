@@ -14,6 +14,7 @@ import assets from '../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import General from '../../components/templates/General';
 import { useAppSelector } from '../../redux-store/store';
+import { ChatsProvider } from '../../contexts/chatContext';
 
 export const Dashboard = () => {
   const router = useRouter();
@@ -38,7 +39,9 @@ export const Dashboard = () => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      <Content />
+      <ChatsProvider>
+        <Content />
+      </ChatsProvider>
     </>
   );
 };

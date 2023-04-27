@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
@@ -34,14 +34,23 @@ export const ChatContainer: React.FC<IChatContainer> = ({
 
   const isActiveChatRoom = username !== 'empty';
 
-  const { activeChatRoom, mobileChatOpened, setMobileChatOpened } =
-    useGetChats();
+  const {
+    activeChatRoom,
+    mobileChatOpened,
+    setMobileChatOpened,
+    setActiveChatRoom,
+  } = useGetChats();
 
   useEffect(() => {
     if (mobileChatOpened && !isMobile) {
       setMobileChatOpened(false);
     }
   }, [mobileChatOpened, isMobile, setMobileChatOpened]);
+
+  const handleCloseChatRoom = useCallback(() => {
+    setActiveChatRoom(null);
+    router.replace('/direct-messages', undefined, { shallow: true });
+  }, [router, setActiveChatRoom]);
 
   return (
     <SContainer mobileChatOpened={mobileChatOpened}>
@@ -51,7 +60,15 @@ export const ChatContainer: React.FC<IChatContainer> = ({
       />
 
       <SContent hidden={isMobileOrTablet && !isActiveChatRoom}>
-        {activeChatRoom && <ChatContent chatRoom={activeChatRoom} />}
+        {activeChatRoom && (
+          <ChatContent
+            chatRoom={activeChatRoom}
+            isBackButton={isMobileOrTablet}
+            onBackButtonClick={handleCloseChatRoom}
+            isMoreButton
+            isChatMessageAvatar
+          />
+        )}
         {!activeChatRoom && !isLoading && !isMobile && <SelectChat />}
         {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
       </SContent>

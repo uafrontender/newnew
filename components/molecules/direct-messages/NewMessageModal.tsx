@@ -9,7 +9,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import {
   SChatItemContainer,
   SChatItemCenter,
@@ -27,11 +26,13 @@ import InlineSVG from '../../atoms/InlineSVG';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import Modal from '../../organisms/Modal';
 
-import { getVisavisList } from '../../../api/endpoints/chat';
+import {
+  getMyRooms,
+  getRoom,
+  getVisavisList,
+} from '../../../api/endpoints/chat';
 
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
-import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
@@ -50,6 +51,7 @@ const NewAnnouncement = dynamic(
 interface INewMessageModal {
   showModal: boolean;
   closeModal: () => void;
+  onNewMessageSelect: (newChatRoom: newnewapi.IChatRoom) => void;
 }
 interface IChatroomsSorted {
   letter: string;
@@ -59,6 +61,7 @@ interface IChatroomsSorted {
 const NewMessageModal: React.FC<INewMessageModal> = ({
   showModal,
   closeModal,
+  onNewMessageSelect,
 }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
@@ -67,16 +70,6 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
-  );
-
-  const router = useRouter();
-
-  const { setActiveChatRoom } = useGetChats();
-  const { data } = useMyChatRooms({});
-
-  const targetChatRooms = useMemo(
-    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
-    [data]
   );
 
   const [searchValue, setSearchValue] = useState('');
@@ -141,74 +134,33 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     return arr;
   }, [filteredChatRooms]);
 
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard') ||
-      router.asPath.includes('/creator/bundles')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
-
-  useEffect(() => {
-    // TODO: visavilist should include only creators on dashboard
-    if (showModal && isDashboard && targetChatRooms.length === 1) {
-      setActiveChatRoom(targetChatRooms[0]);
-      if (router.asPath.includes('/creator/bundles')) {
-        router.push(
-          `/creator/bundles?tab=direct-messages&roomID=${targetChatRooms[0].id?.toString()}`
-        );
-      } else {
-        router.push(
-          `/creator/dashboard?tab=direct-messages&roomID=${targetChatRooms[0].id?.toString()}`
-        );
-      }
-      closeModal();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showModal, targetChatRooms]);
-
   const openMyAnnouncement = useCallback(async () => {
     Mixpanel.track('My Announcement Clicked', {
       _stage: 'Direct Messages',
       _component: 'NewMessageModal',
-      _isDashboard: isDashboard,
-      ...(!isDashboard
-        ? {
-            _target: `/direct-messages/${user.userData?.username}-announcement`,
-          }
-        : {
-            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
-            _username: user.userData?.username,
-          }),
     });
 
-    // TODO: replace with request because of pagination
-    const targetChatRoom =
-      targetChatRooms.find(
-        (targetChat: newnewapi.IChatRoom) =>
-          targetChat.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
-          targetChat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
-      ) || null;
-
-    setActiveChatRoom(targetChatRoom);
-
-    if (!isDashboard) {
-      await router.push(`${user.userData?.username}-announcement`, undefined, {
-        shallow: true,
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+        roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
       });
 
+      const targetChatRoomResponse = await getMyRooms(payload);
+
+      if (!targetChatRoomResponse.data || targetChatRoomResponse.error) {
+        throw new Error('Request failed');
+      }
+
+      const targetChatRoom = targetChatRoomResponse.data.rooms[0] || null;
+
+      await onNewMessageSelect(targetChatRoom);
+
       closeModal();
+    } catch (err) {
+      console.error(err);
     }
-  }, [
-    isDashboard,
-    user.userData?.username,
-    targetChatRooms,
-    setActiveChatRoom,
-    router,
-    closeModal,
-  ]);
+  }, [onNewMessageSelect, closeModal]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
@@ -216,38 +168,24 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         Mixpanel.track('Chat Item Clicked', {
           _stage: 'Direct Messages',
           _component: 'NewMessageModal',
-          _isDashboard: isDashboard,
-          ...(!isDashboard
-            ? {
-                _target: `/direct-messages/${chat.user?.username}`,
-                _visavis: chat.user?.username,
-              }
-            : {
-                _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-                _visavis: chat.user?.username,
-              }),
         });
 
-        if (!isDashboard) {
-          // TODO: replace with request because of pagination
-          const targetChatRoom =
-            targetChatRooms.find(
-              (targetChat: newnewapi.IChatRoom) =>
-                targetChat.id === chat.chatroomId
-            ) || null;
-
-          const chatPrefix =
-            targetChatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR
-              ? '-bundle'
-              : '';
-
-          setActiveChatRoom(targetChatRoom);
-
-          await router.push(`${chat.user?.username}${chatPrefix}`, undefined, {
-            shallow: true,
+        try {
+          const payload = new newnewapi.GetRoomRequest({
+            roomId: chat.chatroomId,
           });
 
+          const res = await getRoom(payload);
+
+          if (!res.data || res.error) {
+            throw new Error(res.error?.message ?? 'Request failed');
+          }
+
+          await onNewMessageSelect(res.data);
+
           closeModal();
+        } catch (err) {
+          console.error(err);
         }
       };
 
@@ -272,15 +210,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         </SChatItemContainer>
       );
     },
-    [
-      filteredChatRooms.length,
-      chatRooms,
-      isDashboard,
-      router,
-      setActiveChatRoom,
-      targetChatRooms,
-      closeModal,
-    ]
+    [filteredChatRooms.length, chatRooms, onNewMessageSelect, closeModal]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);

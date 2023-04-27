@@ -20,12 +20,16 @@ interface IChatAreaCenter {
   chatRoom: newnewapi.IChatRoom;
   isAnnouncement?: boolean;
   textareaFocused: boolean;
+  isChatMessageAvatar?: boolean;
+  variant?: 'primary' | 'secondary';
 }
 
 const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   chatRoom,
   isAnnouncement,
+  isChatMessageAvatar,
   textareaFocused,
+  variant,
 }) => {
   const { ref: loadingRef, inView } = useInView();
   const { activeChatRoom, justSentMessage } = useGetChats();
@@ -116,6 +120,8 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
           item={item}
           nextElement={messages[index + 1]}
           prevElement={messages[index - 1]}
+          isAvatar={isChatMessageAvatar}
+          variant={variant}
         />
       ))}
       {messages.length === 0 && isLoading && <Loader isStatic size='md' />}

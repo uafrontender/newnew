@@ -57,9 +57,25 @@ const SubscriptionExpired = dynamic(
 
 interface IFuncProps {
   chatRoom: newnewapi.IChatRoom;
+  isBackButton?: boolean;
+  isMoreButton?: boolean;
+  isChatMessageAvatar?: boolean;
+  isAvatar?: boolean;
+  className?: string;
+  variant?: 'primary' | 'secondary';
+  onBackButtonClick?: () => void;
 }
 
-const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
+const ChatContent: React.FC<IFuncProps> = ({
+  chatRoom,
+  isBackButton,
+  isMoreButton,
+  isChatMessageAvatar,
+  isAvatar,
+  className,
+  variant,
+  onBackButtonClick,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Chat');
   const { isSocketConnected } = useContext(SocketContext);
@@ -222,7 +238,6 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
           });
           const res = await sendMessage(payload);
 
-          console.log(res, 'res');
           if (!res.data || res.error)
             throw new Error(res.error?.message ?? 'Request failed');
 
@@ -330,18 +345,24 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
   }, []);
 
   return (
-    <SContainer isTextareaHidden={isTextareaHidden}>
+    <SContainer isTextareaHidden={isTextareaHidden} className={className}>
       <ChatContentHeader
         chatRoom={chatRoom}
         isVisavisBlocked={isVisavisBlocked}
         onUserReport={onUserReport}
         onUserBlock={onUserBlock}
+        onBackButtonClick={onBackButtonClick}
+        isBackButton={isBackButton}
+        isMoreButton={isMoreButton}
+        isAvatar={isAvatar}
       />
 
       <ChatAreaCenter
         chatRoom={chatRoom}
         isAnnouncement={isAnnouncement}
         textareaFocused={textareaFocused}
+        isChatMessageAvatar={isChatMessageAvatar}
+        variant={variant || 'primary'}
       />
       <SBottomPart>
         {(isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis && (
@@ -368,6 +389,7 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
                 placeholder={t('chat.placeholder')}
                 gotMaxLength={handleSubmit}
                 setTextareaFocused={handleTextareaFocused}
+                variant={variant || 'primary'}
               />
             </STextArea>
             <SButton

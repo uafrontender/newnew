@@ -3,12 +3,14 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import NewMessage from './NewMessage';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useAppSelector } from '../../../redux-store/store';
 
 const GoBackButton = dynamic(
   () => import('../../atoms/direct-messages/GoBackButton')
@@ -17,10 +19,15 @@ const GoBackButton = dynamic(
 const ChatToolbar: React.FC = () => {
   const { resizeMode } = useAppState();
   const router = useRouter();
+  const user = useAppSelector((state) => state.user);
 
   const { t } = useTranslation('page-Chat');
-  const { setSearchChatroom, mobileChatOpened, setMobileChatOpened } =
-    useGetChats();
+  const {
+    setSearchChatroom,
+    mobileChatOpened,
+    setMobileChatOpened,
+    setActiveChatRoom,
+  } = useGetChats();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -39,8 +46,28 @@ const ChatToolbar: React.FC = () => {
     if (mobileChatOpened) {
       setMobileChatOpened(false);
     }
-    router.push('/');
+    router.back();
   }, [mobileChatOpened, router, setMobileChatOpened]);
+
+  const handleChatRoomSelect = useCallback(
+    (chatRoom: newnewapi.IChatRoom) => {
+      setActiveChatRoom(chatRoom);
+
+      if (
+        chatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
+        chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
+      ) {
+        router.push(`${user.userData?.username}-announcement`, undefined, {
+          shallow: true,
+        });
+      } else if (chatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
+        router.push(`${chatRoom.visavis?.user?.username}-bundle`, undefined, {
+          shallow: true,
+        });
+      }
+    },
+    [setActiveChatRoom, router, user.userData?.username]
+  );
 
   return (
     <SToolbar isMobile={isMobileOrTablet}>
@@ -50,7 +77,7 @@ const ChatToolbar: React.FC = () => {
         style={{ marginRight: '16px', fontSize: '16px' }}
         passInputValue={passInputValue}
       />
-      <NewMessage />
+      <NewMessage onNewMessageSelect={handleChatRoomSelect} />
     </SToolbar>
   );
 };

@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
-import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppSelector } from '../../../redux-store/store';
 
 const ChatListTabs = dynamic(
@@ -70,12 +69,6 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
 
   const handleSelectChatRoom = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
-      Mixpanel.track('Chat Item Clicked', {
-        _stage: 'Direct Messages',
-        _component: 'ChatListItem',
-        _target: '/direct-messages',
-      });
-
       setActiveChatRoom(chatRoom);
       setSearchChatroom('');
 

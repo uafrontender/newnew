@@ -18,8 +18,8 @@ import textTrim from '../../../utils/textTrim';
 import ChatName from '../../atoms/direct-messages/ChatName';
 import { useGetChats } from '../../../contexts/chatContext';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
-// import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import { Mixpanel } from '../../../utils/mixpanel';
 
 const MyAvatarMassupdate = dynamic(
   () => import('../../atoms/direct-messages/MyAvatarMassupdate')
@@ -50,16 +50,6 @@ const ChatListItem: React.FC<IFunctionProps> = ({
 
   const { activeChatRoom } = useGetChats();
 
-  // const isDashboard = useMemo(() => {
-  //   if (
-  //     router.asPath.includes('/creator/dashboard?tab=chat') ||
-  //     router.asPath.includes('/creator/bundles?tab=chat')
-  //   ) {
-  //     return true;
-  //   }
-  //   return false;
-  // }, [router.asPath]);
-
   const markAsRead = useCallback(async () => {
     try {
       const payload = new newnewapi.MarkRoomAsReadRequest({
@@ -85,43 +75,14 @@ const ChatListItem: React.FC<IFunctionProps> = ({
   }, [chatRoom, activeChatRoom, markAsRead]);
 
   const handleItemClick = useCallback(async () => {
+    Mixpanel.track('Chat Item Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'ChatListItem',
+      _page: router.pathname,
+    });
     onChatRoomSelect(chatRoom);
-
-    // Mixpanel.track('Chat Item Clicked', {
-    //   _stage: 'Direct Messages',
-    //   _component: 'ChatListItem',
-    //   _isDashboard: isDashboard,
-    //   ...(!isDashboard
-    //     ? {
-    //         _target: chatRoute,
-    //       }
-    //     : {
-    //         _target: `${
-    //           router.pathname
-    //         }?tab=direct-messages&roomID=${chatRoom.id?.toString()}`,
-    //         _activeChatRoom: chatRoom,
-    //       }),
-    // });
-
-    // onChatRoomSelect(chatRoom);
-
-    // if (!isDashboard) {
-    //   return;
-    // }
-
-    // router.push(
-    //   {
-    //     query: {
-    //       ...router.query,
-    //       tab: 'direct-messages',
-    //       roomID: chatRoom.id?.toString(),
-    //     },
-    //   },
-    //   undefined,
-    //   { shallow: true }
-    // );
     // setSearchChatroom('');
-  }, [chatRoom, onChatRoomSelect]);
+  }, [chatRoom, onChatRoomSelect, router.pathname]);
 
   let lastMsg = chatRoom.lastMessage?.content?.text;
 

@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
@@ -40,17 +39,6 @@ const ChatList: React.FC<IChatList> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-  const router = useRouter();
-
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard') ||
-      router.asPath.includes('/creator/bundles')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
 
   const { unreadCountForCreator, unreadCountForUser } =
     useChatsUnreadMessages();
@@ -92,15 +80,13 @@ const ChatList: React.FC<IChatList> = ({
   useEffect(() => {
     if (
       !isMobileOrTablet &&
-      !isDashboard &&
+      // !isDashboard &&
       activeChatRoom &&
       justSentMessage
     ) {
       refetch();
     }
-  }, [activeChatRoom, justSentMessage, isDashboard, isMobileOrTablet, refetch]);
-
-  console.log(activeChatRoom, 'activeChatRoom');
+  }, [activeChatRoom, justSentMessage, isMobileOrTablet, refetch]);
 
   return (
     <SChatList
