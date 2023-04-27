@@ -265,7 +265,7 @@
       "transactions": {
         "title": "Transactions",
         "you": "You",
-        "empty": "There are no transaction yet",
+        "empty": "There are no transactions yet",
         "type": {
           "1": "bid",
           "2": "superpoll",

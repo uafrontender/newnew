@@ -60,12 +60,16 @@ const moduleExports = {
       {
         source: '/post/:path*',
         destination: '/p/:path*',
-        permanent: true
+        permanent: true,
       },
-    ]
+    ];
   },
   experimental: {
     scrollRestoration: true,
+  },
+  sentry: {
+    hideSourceMaps: true,
+    widenClientFileUpload: true,
   },
 };
 
@@ -75,6 +79,9 @@ const sentryWebpackPluginOptions = {
   // recommended:
   //   release, url, org, project, authToken, configFile, stripPrefix,
   //   urlPrefix, include, ignore
+  org: 'newnew-inc',
+  project: 'newnew-web',
+
   silent: true, // Suppresses all logs
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
