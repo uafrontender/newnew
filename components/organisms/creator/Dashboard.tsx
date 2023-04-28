@@ -18,6 +18,7 @@ import dateToTimestamp from '../../../utils/dateToTimestamp';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
 import { useAppState } from '../../../contexts/appStateContext';
+import { ChatsProvider } from '../../../contexts/chatContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -169,7 +170,11 @@ export const Dashboard: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('dashboard.title')}</STitle>
-          {!isMobile && <DynamicSection baseUrl='/creator/dashboard' />}
+          {!isMobile && (
+            <ChatsProvider>
+              <DynamicSection baseUrl='/creator/dashboard' />
+            </ChatsProvider>
+          )}
         </STitleBlock>
 
         {isLoadingExpirationPosts ? (

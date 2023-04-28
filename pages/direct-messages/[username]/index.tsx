@@ -1,4 +1,10 @@
-import React, { ReactElement, useEffect, useMemo, useRef } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import Head from 'next/head';
 import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -19,6 +25,56 @@ interface IChat {
   username: string;
 }
 
+const getChatRoomParamsFromUrl = (room: string, username?: string) => {
+  if (!room || room === 'empty') {
+    return null;
+  }
+
+  const chatType =
+    room && room.includes('-')
+      ? (room.toString().split('-')[1] as ChatTypes)
+      : ChatTypes.default;
+
+  const visavisUsername = room.includes('-') ? room.split('-')[0] : room;
+
+  switch (chatType) {
+    case ChatTypes.default: {
+      return {
+        roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+        username: visavisUsername,
+      };
+    }
+
+    case ChatTypes.announcement: {
+      // Announcements, creator role
+      if (visavisUsername === username) {
+        return {
+          myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+          roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+          username: visavisUsername,
+        };
+      }
+
+      //  Announcements, subscriber role
+      return {
+        myRole: newnewapi.ChatRoom.MyRole.SUBSCRIBER,
+        roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+        username: visavisUsername,
+      };
+    }
+    case ChatTypes.bundle: {
+      return {
+        myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+        roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
+        username: visavisUsername,
+      };
+    }
+    default: {
+      return null;
+    }
+  }
+};
+
 const Chat: NextPage<IChat> = ({ username }) => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
@@ -33,7 +89,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [router, user.loggedIn, user._persist?.rehydrated]);
 
-  const { setActiveChatRoom } = useGetChats();
+  const { setActiveChatRoom, setSearchChatroom } = useGetChats();
 
   useEffect(() => {
     // prevent user from opening chat with himself
@@ -54,54 +110,22 @@ const Chat: NextPage<IChat> = ({ username }) => {
     [username]
   );
 
+  const myRole = useMemo(() => {
+    if (username === 'empty') {
+      return undefined;
+    }
+
+    return chatType === ChatTypes.default
+      ? newnewapi.ChatRoom.MyRole.SUBSCRIBER
+      : newnewapi.ChatRoom.MyRole.CREATOR;
+  }, [username, chatType]);
+
   // Parse roomKind, username, myRole from ulr parameter [username]
   // [username] possible forms: username, username-bundle, username-announcement
-  const chatRoomParams = useMemo(() => {
-    if (!username || username === 'empty') {
-      return null;
-    }
-
-    const visavisUsername = username.includes('-')
-      ? username.split('-')[0]
-      : username;
-
-    switch (chatType) {
-      case ChatTypes.default: {
-        return {
-          roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-          username: visavisUsername,
-        };
-      }
-
-      case ChatTypes.announcement: {
-        // Announcements, creator role
-        if (visavisUsername === user.userData?.username) {
-          return {
-            myRole: newnewapi.ChatRoom.MyRole.CREATOR,
-            roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
-            username: visavisUsername,
-          };
-        }
-
-        //  Announcements, subscriber role
-        return {
-          myRole: newnewapi.ChatRoom.MyRole.SUBSCRIBER,
-          roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
-          username: visavisUsername,
-        };
-      }
-      case ChatTypes.bundle: {
-        return {
-          myRole: newnewapi.ChatRoom.MyRole.CREATOR,
-          roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-          username: visavisUsername,
-        };
-      }
-      default: {
-        return null;
-      }
-    }
-  }, [chatType, user.userData?.username, username]);
+  const chatRoomParams = getChatRoomParamsFromUrl(
+    username,
+    user.userData?.username
+  );
 
   const { data, isFetching } = useMyChatRooms(
     {
@@ -130,45 +154,6 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
 
     return chatRooms[0];
-
-    // TODO: looks like this logic is not required
-    // Announcements, creator role
-    // if (
-    //   chatRoomParams.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
-    //   chatRoomParams.roomKind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
-    // ) {
-    //   return chatRooms.filter(
-    //     (chatRoom) =>
-    //       chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
-    //       chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
-    //   )[0];
-    // }
-
-    // // other cases
-    // if (chatRoomParams.myRole) {
-    //   return chatRooms.filter(
-    //     (chatRoom) =>
-    //       chatRoom.kind === chatRoomParams.roomKind &&
-    //       chatRoom.myRole === chatRoomParams.myRole &&
-    //       chatRoom.visavis?.user?.username ===
-    //         chatRoomParams.username.toLowerCase()
-    //   )[0];
-    // }
-
-    // const filteredChatRooms = chatRooms.filter(
-    //   (chatRoom) =>
-    //     chatRoom.kind === chatRoomParams.roomKind &&
-    //     chatRoom.visavis?.user?.username ===
-    //       chatRoomParams.username?.toLowerCase()
-    // );
-
-    // if (filteredChatRooms.length === 2) {
-    //   return filteredChatRooms.filter(
-    //     (chatRoom) => chatRoom.myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER
-    //   )[0];
-    // }
-
-    // return filteredChatRooms[0];
   }, [chatRoomParams, chatRooms]);
 
   useEffect(() => {
@@ -178,22 +163,36 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [activeChatRoom, setActiveChatRoom]);
 
-  const initialTab = useMemo(() => {
-    if (username === 'empty') {
-      return undefined;
-    }
+  const handleChatRoomSelect = useCallback(
+    (chatRoom: newnewapi.IChatRoom) => {
+      setActiveChatRoom(chatRoom);
+      setSearchChatroom('');
 
-    return chatType === ChatTypes.default
-      ? newnewapi.ChatRoom.MyRole.SUBSCRIBER
-      : newnewapi.ChatRoom.MyRole.CREATOR;
-  }, [username, chatType]);
+      let route = `${
+        chatRoom.visavis?.user?.username || user.userData?.username
+      }`;
+
+      if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
+        route += '-announcement';
+      } else if (chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
+        route += '-bundle';
+      }
+
+      router.push(route, undefined, { shallow: true });
+    },
+    [router, setActiveChatRoom, setSearchChatroom, user.userData?.username]
+  );
 
   return (
     <>
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <ChatContainer isLoading={isFetching} initialTab={initialTab} />
+      <ChatContainer
+        isLoading={isFetching}
+        initialTab={myRole}
+        onChatRoomSelect={handleChatRoomSelect}
+      />
     </>
   );
 };

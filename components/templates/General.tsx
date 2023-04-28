@@ -1,16 +1,11 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -27,18 +22,17 @@ import useScrollDirection from '../../utils/hooks/useScrollDirection';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import { useNotifications } from '../../contexts/notificationsContext';
-import { useGetChats } from '../../contexts/chatContext';
+import { ChatsProvider } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
-import ChatContainer from '../organisms/direct-messages/ChatContainer';
 import { useAppState } from '../../contexts/appStateContext';
 import canBecomeCreator from '../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
-import isBrowser from '../../utils/isBrowser';
 import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContext';
+import MobileChat from '../organisms/MobileChat';
 
 interface IGeneral {
   className?: string;
@@ -68,8 +62,6 @@ export const General: React.FC<IGeneral> = (props) => {
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
-
-  const { setMobileChatOpened, mobileChatOpened } = useGetChats();
 
   const hasMounted = useHasMounted();
 
@@ -188,38 +180,12 @@ export const General: React.FC<IGeneral> = (props) => {
   const { scrollDirection } = useScrollDirection(isMobile);
 
   const openChat = useCallback(() => {
-    // if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
-    //   setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
-    // }
+    router.push(`${router.pathname}?tab=chat`);
+  }, [router]);
 
-    if (router.asPath.includes('/creator/bundles')) {
-      router.push(`/creator/bundles?tab=chat`);
-    } else {
-      router.push(`/creator/dashboard?tab=chat`);
-    }
-    setMobileChatOpened(true);
-  }, [setMobileChatOpened, router]);
-
-  useEffect(() => {
-    const checkUrl = () => {
-      if (!isBrowser()) {
-        return;
-      }
-
-      const newUrl = window.location.href;
-      if (
-        !newUrl.includes('tab=chat') &&
-        !newUrl.includes('tab=direct-messages')
-      ) {
-        setMobileChatOpened(false);
-      }
-    };
-
-    window.addEventListener('popstate', checkUrl);
-
-    return () => window.removeEventListener('popstate', checkUrl);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const mobileChatOpened =
+    (isMobile && router.query.tab === 'chat') ||
+    router.query.tab === 'direct-messages';
 
   const chatButtonVisible = useMemo(
     () => isMobile && withChat && directMessagesAvailable,
@@ -289,7 +255,9 @@ export const General: React.FC<IGeneral> = (props) => {
             {!mobileChatOpened ? (
               <FloatingMessages withCounter openChat={openChat} />
             ) : (
-              <ChatContainer />
+              <ChatsProvider>
+                <MobileChat myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
+              </ChatsProvider>
             )}
           </SChatContainer>
         )}

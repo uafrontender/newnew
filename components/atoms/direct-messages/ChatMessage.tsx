@@ -7,7 +7,6 @@ import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../Text';
-import { useGetChats } from '../../../contexts/chatContext';
 
 const UserAvatar = dynamic(() => import('../../molecules/UserAvatar'));
 
@@ -30,8 +29,6 @@ const ChatMessage: React.FC<IChatMessage> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
   const user = useAppSelector((state) => state.user);
-
-  const { mobileChatOpened } = useGetChats();
 
   const nextElDate = (nextElement?.createdAt?.seconds as number) * 1000;
   const prevElDate = (prevElement?.createdAt?.seconds as number) * 1000;
@@ -81,7 +78,6 @@ const ChatMessage: React.FC<IChatMessage> = ({
         prevSameDay={prevSameDay}
         nextSameDay={nextSameDay}
         variant={variant}
-        isMobileChatOpened={mobileChatOpened}
       >
         <SMessageText mine={isMine} weight={600} variant={3}>
           {item.content?.text}
@@ -208,7 +204,6 @@ interface ISMessageContent {
   prevSameDay?: boolean;
   nextSameDay?: boolean;
   variant?: 'primary' | 'secondary';
-  isMobileChatOpened?: boolean;
 }
 
 const SMessageContent = styled.div<ISMessageContent>`

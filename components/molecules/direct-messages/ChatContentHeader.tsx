@@ -10,7 +10,6 @@ import Button from '../../atoms/Button';
 import ChatUserData from '../../atoms/direct-messages/ChatUserData';
 import InlineSVG from '../../atoms/InlineSVG';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { useGetChats } from '../../../contexts/chatContext';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -56,8 +55,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const router = useRouter();
-
-  const { mobileChatOpened } = useGetChats();
 
   useEffect(() => {
     if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
@@ -108,7 +105,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
           <GoBackButton onClick={goBackHandler} />
         )}
         {isAvatar &&
-          !mobileChatOpened &&
           (chatRoom?.kind === 4 ? (
             <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
           ) : (

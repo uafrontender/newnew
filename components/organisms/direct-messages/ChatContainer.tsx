@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
@@ -15,11 +15,15 @@ const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 interface IChatContainer {
   isLoading?: boolean;
   initialTab: newnewapi.ChatRoom.MyRole | undefined;
+  className?: string;
+  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
 export const ChatContainer: React.FC<IChatContainer> = ({
   isLoading,
   initialTab,
+  className,
+  onChatRoomSelect,
 }) => {
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -32,20 +36,9 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   const router = useRouter();
   const { username } = router.query;
 
-  const {
-    activeChatRoom,
-    mobileChatOpened,
-    setMobileChatOpened,
-    setActiveChatRoom,
-  } = useGetChats();
+  const { activeChatRoom, setActiveChatRoom } = useGetChats();
 
   const isActiveChatRoom = username !== 'empty' || !!activeChatRoom;
-
-  useEffect(() => {
-    if (mobileChatOpened && !isMobile) {
-      setMobileChatOpened(false);
-    }
-  }, [mobileChatOpened, isMobile, setMobileChatOpened]);
 
   const handleCloseChatRoom = useCallback(() => {
     setActiveChatRoom(null);
@@ -53,10 +46,12 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   }, [router, setActiveChatRoom]);
 
   return (
-    <SContainer mobileChatOpened={mobileChatOpened}>
+    <SContainer className={className}>
       <ChatSidebar
         initialTab={initialTab}
         hidden={isMobileOrTablet && isActiveChatRoom}
+        onChatRoomSelect={onChatRoomSelect}
+        isTabs
       />
 
       <SContent hidden={isMobileOrTablet && !isActiveChatRoom}>
@@ -78,27 +73,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({
 
 export default ChatContainer;
 
-interface ISContainer {
-  mobileChatOpened: boolean;
-}
-const SContainer = styled.div<ISContainer>`
-  ${(props) => {
-    if (props.mobileChatOpened) {
-      return css`
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 0 15px;
-        background: ${props.theme.name === 'light'
-          ? props.theme.colors.white
-          : props.theme.colors.black};
-      `;
-    }
-    return css``;
-  }}
-
+const SContainer = styled.div`
   padding: 0 10px;
   overflow: hidden;
   height: 100vh;

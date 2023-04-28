@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
-import { useAppSelector } from '../../../redux-store/store';
 
 const ChatListTabs = dynamic(
   // eslint-disable-next-line import/no-unresolved
@@ -22,19 +20,17 @@ const ChatToolbar = dynamic(
 interface IChatSidebar {
   initialTab: newnewapi.ChatRoom.MyRole | undefined;
   hidden: boolean;
+  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
+  isTabs?: boolean;
 }
 
-const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
-  const user = useAppSelector((state) => state.user);
-  const router = useRouter();
-
-  const {
-    searchChatroom,
-    mobileChatOpened,
-    activeChatRoom,
-    setActiveChatRoom,
-    setSearchChatroom,
-  } = useGetChats();
+const ChatSidebar: React.FC<IChatSidebar> = ({
+  initialTab,
+  hidden,
+  isTabs,
+  onChatRoomSelect,
+}) => {
+  const { searchChatroom } = useGetChats();
 
   const { bundles, isSellingBundles, hasSoldBundles } = useBundles();
 
@@ -57,7 +53,6 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
     isSellingBundles,
     hasSoldBundles,
     setActiveTab,
-    activeChatRoom,
   ]);
 
   const changeActiveTab = useCallback(
@@ -67,32 +62,12 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
     [setActiveTab]
   );
 
-  const handleSelectChatRoom = useCallback(
-    (chatRoom: newnewapi.IChatRoom) => {
-      setActiveChatRoom(chatRoom);
-      setSearchChatroom('');
-
-      let route = `${
-        chatRoom.visavis?.user?.username || user.userData?.username
-      }`;
-
-      if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
-        route += '-announcement';
-      } else if (chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
-        route += '-bundle';
-      }
-
-      router.push(route, undefined, { shallow: true });
-    },
-    [router, setActiveChatRoom, setSearchChatroom, user.userData?.username]
-  );
-
   // TODO: move hidden to parent, just pass className here
   return (
     <SSidebar hidden={hidden}>
       <ChatToolbar />
-      {searchChatroom === '' &&
-        !mobileChatOpened &&
+      {isTabs &&
+        searchChatroom === '' &&
         bundles &&
         bundles?.length > 0 &&
         (isSellingBundles || hasSoldBundles) && (
@@ -101,7 +76,7 @@ const ChatSidebar: React.FC<IChatSidebar> = ({ initialTab, hidden }) => {
             changeActiveTab={changeActiveTab}
           />
         )}
-      <ChatList onChatRoomSelect={handleSelectChatRoom} myRole={activeTab} />
+      <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
     </SSidebar>
   );
 };

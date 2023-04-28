@@ -209,9 +209,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         });
 
         const res = await getRoom(payload);
+
         if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
         }
+
         setActiveChatRoom(res.data);
       } catch (err) {
         router.push(`${baseUrl}?tab=chat`);
@@ -251,7 +253,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
 
   const handleCloseChatRoom = useCallback(() => {
     setActiveChatRoom(null);
-    router.push(`${baseUrl}?tab=chat`, undefined, {
+    router.replace(`${baseUrl}?tab=chat`, undefined, {
       shallow: true,
     });
   }, [router, baseUrl, setActiveChatRoom]);

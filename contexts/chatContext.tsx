@@ -12,26 +12,22 @@ import { useAppSelector } from '../redux-store/store';
 import useDebouncedValue from '../utils/hooks/useDebouncedValue';
 
 interface IChatsContext {
-  mobileChatOpened: boolean;
   activeChatRoom: newnewapi.IChatRoom | null;
   searchChatroom: string;
   chatsDraft: { roomId: number | Long; text: string }[];
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => void;
   setSearchChatroom: (str: string) => void;
-  setMobileChatOpened: (mobileChatOpened: boolean) => void;
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => void;
   removeInputValueFromChatsDraft: (roomId: number | Long) => void;
   restDraft: () => void;
 }
 
 const ChatsContext = createContext<IChatsContext>({
-  mobileChatOpened: false,
   activeChatRoom: null,
   searchChatroom: '',
   chatsDraft: [],
   setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => {},
   setSearchChatroom: (str: string) => {},
-  setMobileChatOpened: (mobileChatOpened: boolean) => {},
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => {},
   removeInputValueFromChatsDraft: (roomId: number | Long) => {},
   restDraft: () => {},
@@ -43,9 +39,6 @@ interface IChatsProvider {
 
 export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
-
-  // TODO: Should be here??
-  const [mobileChatOpened, setMobileChatOpened] = useState<boolean>(false);
 
   // TODO: make it as initial data for use query ????
   const [activeChatRoom, setActiveChatRoom] =
@@ -90,7 +83,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   }, []);
 
   const resetState = useCallback(() => {
-    setMobileChatOpened(false);
     setActiveChatRoom(null);
     setSearchChatroom('');
     setChatsDraft([]);
@@ -112,12 +104,10 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      mobileChatOpened,
       activeChatRoom,
       searchChatroom: searchChatroomDebounced,
       chatsDraft,
       setActiveChatRoom,
-      setMobileChatOpened,
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,
@@ -125,11 +115,9 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     }),
     [
       activeChatRoom,
-      mobileChatOpened,
       searchChatroomDebounced,
       chatsDraft,
       setActiveChatRoom,
-      setMobileChatOpened,
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,

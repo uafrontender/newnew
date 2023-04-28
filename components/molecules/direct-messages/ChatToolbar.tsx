@@ -31,12 +31,7 @@ const ChatToolbar: React.FC = () => {
   const user = useAppSelector((state) => state.user);
 
   const { t } = useTranslation('page-Chat');
-  const {
-    setSearchChatroom,
-    mobileChatOpened,
-    setMobileChatOpened,
-    setActiveChatRoom,
-  } = useGetChats();
+  const { setSearchChatroom, setActiveChatRoom } = useGetChats();
 
   const passInputValue = useCallback(
     (str: string) => {
@@ -46,11 +41,8 @@ const ChatToolbar: React.FC = () => {
   );
 
   const goBackHandler = useCallback(() => {
-    if (mobileChatOpened) {
-      setMobileChatOpened(false);
-    }
     router.back();
-  }, [mobileChatOpened, router, setMobileChatOpened]);
+  }, [router]);
 
   const handleChatRoomSelect = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
