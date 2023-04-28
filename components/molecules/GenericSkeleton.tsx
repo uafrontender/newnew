@@ -18,8 +18,6 @@ const GenericSkeleton: React.FunctionComponent<GenericSkeleton> = ({
 }) => (
   <Skeleton
     duration={2}
-    className='skeletonSpan'
-    containerClassName='skeletonsContainer'
     {...{
       ...(bgColor
         ? {
