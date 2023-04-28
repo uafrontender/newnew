@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import PostVideoStoryItem from './PostVideoStoryItem';
@@ -47,6 +47,9 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   autoscroll,
 }) => {
   const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -69,6 +72,12 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   const [currentVideo, setCurrentVideo] = useState(0);
 
   const [hovered, setHovered] = useState(false);
+
+  const [storiesLoaderProgress, setStoriesLoaderProgress] = useState(0);
+
+  const handleSetStoriesLoaderProgess = useCallback((newValue: number) => {
+    setStoriesLoaderProgress(newValue);
+  }, []);
 
   const scrollSliderTo = useCallback(
     (to: number) => {
@@ -133,11 +142,13 @@ const PostVideoResponsesSlider: React.FunctionComponent<
               ? () => scrollSliderTo(i + 1)
               : undefined
           }
+          onActiveProgress={handleSetStoriesLoaderProgess}
         />
       )),
     [
       autoscroll,
       currentVideo,
+      handleSetStoriesLoaderProgess,
       isMuted,
       scrollSliderTo,
       videoDurationWithTime,
@@ -165,24 +176,49 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       <SimplifiedSlider currentSlide={currentVideo} wrapperRef={wrapperRef}>
         {handleMapVideoStoryItems()}
       </SimplifiedSlider>
-      <SDotsContainer
-        isEditingStories={isEditingStories}
-        style={{
-          ...(uiOffset
-            ? {
-                transform: `translateY(-${uiOffset}px)`,
-              }
-            : {}),
-        }}
-      >
-        {videos.map((item, i) => (
-          <SDot
-            key={item?.uuid ?? i}
-            active={currentVideo === i}
-            onClick={() => handleClickDotScroll(i)}
-          />
-        ))}
-      </SDotsContainer>
+      {isMobile ? (
+        <SStoriesLoadersContainer>
+          {videos.map((item, i) => (
+            <SStoriesLoader
+              key={item?.uuid ?? i}
+              active={currentVideo === i}
+              viewed={currentVideo > i}
+              onClick={() => handleClickDotScroll(i)}
+            >
+              <div
+                className='SStoriesLoaderInner'
+                style={
+                  currentVideo === i
+                    ? {
+                        transform: `scaleX(calc(${storiesLoaderProgress} / 100))`,
+                      }
+                    : {}
+                }
+              />
+            </SStoriesLoader>
+          ))}
+        </SStoriesLoadersContainer>
+      ) : null}
+      {!isMobile ? (
+        <SDotsContainer
+          isEditingStories={isEditingStories}
+          style={{
+            ...(uiOffset
+              ? {
+                  transform: `translateY(-${uiOffset}px)`,
+                }
+              : {}),
+          }}
+        >
+          {videos.map((item, i) => (
+            <SDot
+              key={item?.uuid ?? i}
+              active={currentVideo === i}
+              onClick={() => handleClickDotScroll(i)}
+            />
+          ))}
+        </SDotsContainer>
+      ) : null}
       <SScrollLeft
         view='transparent'
         iconOnly
@@ -380,5 +416,50 @@ const SDot = styled.button<{
   &:active,
   &:focus {
     outline: none;
+  }
+`;
+
+const SStoriesLoadersContainer = styled.div`
+  position: absolute;
+
+  width: 100%;
+  top: 2px;
+
+  padding-left: 2px;
+  padding-right: 2px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+`;
+
+const SStoriesLoader = styled.div<{
+  viewed: boolean;
+  active: boolean;
+}>`
+  position: relative;
+  background-color: rgba(11, 10, 19, 0.2);
+  height: 4px;
+  border-radius: 8px;
+  width: 100%;
+
+  box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.25);
+
+  .SStoriesLoaderInner {
+    position: absolute;
+
+    height: 4px;
+    border-radius: 8px;
+    width: 100%;
+
+    background-color: ${({ active, viewed }) =>
+      active || viewed ? 'rgb(255, 255, 255)' : 'transparent'};
+
+    ${({ active, viewed }) =>
+      active && !viewed
+        ? css`
+            transform-origin: left;
+          `
+        : null}
   }
 `;
