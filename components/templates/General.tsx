@@ -75,6 +75,7 @@ export const General: React.FC<IGeneral> = (props) => {
     setActiveTab,
   } = useGetChats();
 
+  // TODO: Remove hasMounted after user auth data is available in context
   const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);

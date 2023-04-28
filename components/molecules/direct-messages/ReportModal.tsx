@@ -159,7 +159,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const handleMessageChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const onlySpacesRegex = /^\s+$/;
-
         if (onlySpacesRegex.test(e.target.value)) {
           setMessage('');
         } else {
