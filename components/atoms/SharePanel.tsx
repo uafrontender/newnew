@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { FacebookShareButton, TwitterShareButton } from 'react-share';
@@ -35,6 +35,17 @@ const SharePanel: React.FunctionComponent<ISharePanel> = ({
   const { t } = useTranslation('common');
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+  const onCopyLinkTimerRef = useRef<NodeJS.Timeout | undefined>();
+
+  // Cleanup on unrender
+  useEffect(
+    () => () => {
+      if (onCopyLinkTimerRef.current) {
+        clearTimeout(onCopyLinkTimerRef.current);
+      }
+    },
+    []
+  );
 
   async function copyPostUrlToClipboard(url: string) {
     if ('clipboard' in navigator) {
@@ -53,7 +64,7 @@ const SharePanel: React.FunctionComponent<ISharePanel> = ({
       copyPostUrlToClipboard(linkToShare)
         .then(() => {
           setIsCopiedUrl(true);
-          setTimeout(() => {
+          onCopyLinkTimerRef.current = setTimeout(() => {
             setIsCopiedUrl(false);
             onCopyLink?.();
           }, 1000);
