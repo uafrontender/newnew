@@ -60,6 +60,7 @@ import getChunks from '../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../atoms/DisplayName';
+import GenericSkeleton from './GenericSkeleton';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -126,6 +127,8 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
+
+    const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
 
     // Hovered state
     const [hovered, setHovered] = useState(false);
@@ -553,8 +556,14 @@ export const PostCard: React.FC<ICard> = React.memo(
                   <Loader size='sm' />
                 </SLoaderContainer>
               ) : null}
+              <SGenericSkeleton
+                visible={!thumbnailLoaded}
+                bgColor={theme.colorsThemed.background.secondary}
+                highlightColor={theme.colorsThemed.background.quaternary}
+              />
               <SThumbnailHolder
                 className='thumnailHolder'
+                visible={thumbnailLoaded}
                 src={
                   (coverImageUrl ||
                     postParsed?.response?.thumbnailImageUrl ||
@@ -564,6 +573,9 @@ export const PostCard: React.FC<ICard> = React.memo(
                 alt='Post'
                 draggable={false}
                 hovered={hovered && videoReady && !isVideoLoading}
+                onLoad={() => {
+                  setThumbnailLoaded(true);
+                }}
               />
               <video
                 ref={(el) => {
@@ -675,8 +687,14 @@ export const PostCard: React.FC<ICard> = React.memo(
                 <Loader size='sm' />
               </SLoaderContainer>
             ) : null}
+            <SGenericSkeleton
+              visible={!thumbnailLoaded}
+              bgColor={theme.colorsThemed.background.secondary}
+              highlightColor={theme.colorsThemed.background.quaternary}
+            />
             <SThumbnailHolder
               className='thumnailHolder'
+              visible={thumbnailLoaded}
               src={
                 (coverImageUrl ||
                   postParsed?.response?.thumbnailImageUrl ||
@@ -686,6 +704,9 @@ export const PostCard: React.FC<ICard> = React.memo(
               alt='Post'
               draggable={false}
               hovered={hovered && videoReady && !isVideoLoading}
+              onLoad={() => {
+                setThumbnailLoaded(true);
+              }}
             />
             <video
               ref={(el) => {
@@ -1070,10 +1091,20 @@ const SImageHolder = styled.div<ISWrapper>`
   }
 `;
 
+const SGenericSkeleton = styled(GenericSkeleton)<{ visible: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
+`;
+
 const SThumbnailHolder = styled.img<{
+  visible: boolean;
   hovered: boolean;
 }>`
-  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
+  opacity: ${({ visible, hovered }) => (!visible || hovered ? 0 : 1)};
   transition: linear 0.3s;
 `;
 
