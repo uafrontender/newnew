@@ -12,7 +12,7 @@ import { useAppSelector } from '../../redux-store/store';
 import useErrorToasts from './useErrorToasts';
 
 interface CardsData {
-  cards: newnewapi.ICard[] | undefined;
+  cards: newnewapi.ICard[];
   isCardsLoading: boolean;
   addCardMutation: UseMutationResult<unknown, unknown, newnewapi.ICard>;
   setPrimaryCardMutation: UseMutationResult<void, unknown, string, unknown>;

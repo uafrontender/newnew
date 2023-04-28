@@ -37,7 +37,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   const cardsWithFirstPrimary = useMemo(
     () =>
-      cards?.sort((cardA, cardB) => {
+      cards.sort((cardA, cardB) => {
         if (cardA.isPrimary) {
           return -1;
         }
@@ -53,30 +53,25 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   const backgroundsByCardUuid = useMemo(() => {
     const obj: { [key: string]: string } = {};
-    cards?.forEach((card, index) => {
+    cards.forEach((card, index) => {
       obj[card.cardUuid! as string] =
         assets.cards.background[index % assets.cards.background.length];
     });
 
     return obj;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cards?.length]);
+  }, [cards]);
 
   const { scrollContainerRef, onMouseDown, onMouseMove, onMouseUp } =
     useHorizontalDraggableScroll<HTMLUListElement>();
 
   return (
     <SSettingsContainer>
-      <SCardsContainer isNoCards={!cards || cards?.length === 0}>
-        <STitle
-          variant={1}
-          weight={600}
-          isNoCards={!cards || cards?.length === 0}
-        >
+      <SCardsContainer isNoCards={cards.length === 0}>
+        <STitle variant={1} weight={600} isNoCards={cards.length === 0}>
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
         {/* TODO: make cards section look more real, handle WL creator adds aa card case */}
-        {!!cards?.length && !user.userData?.options?.isWhiteListed && (
+        {cards.length > 0 && !user.userData?.options?.isWhiteListed && (
           <>
             <SButtonSecondaryDesktop
               view='secondary'
@@ -104,7 +99,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         )}
 
         {/* Empty cards view */}
-        {!cards?.length && (
+        {cards.length === 0 && (
           <>
             {!isCardsLoading && (
               <>
@@ -133,7 +128,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           </>
         )}
 
-        {!!cards?.length && (
+        {cards.length > 0 && (
           <SCardList
             ref={scrollContainerRef}
             onMouseUp={onMouseUp}
@@ -141,7 +136,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseUp}
           >
-            {cardsWithFirstPrimary?.map((card, index) => (
+            {cardsWithFirstPrimary.map((card, index) => (
               <SCardListItem key={card.cardUuid}>
                 <Card
                   cardId={card.cardUuid as string}
@@ -150,7 +145,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   funding={card.funding as newnewapi.Card.CardFunding}
                   lastFourDigits={card.last4 as string}
                   backgroundImg={
-                    backgroundsByCardUuid
+                    Object.keys(backgroundsByCardUuid).length > 0
                       ? backgroundsByCardUuid[card.cardUuid! as string]
                       : assets.cards.background[
                           index % assets.cards.background.length
