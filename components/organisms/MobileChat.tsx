@@ -57,7 +57,6 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     [router, setSearchChatroom]
   );
 
-  // BROKEN
   useEffect(() => {
     const findChatRoom = async () => {
       try {
@@ -77,15 +76,10 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
           ? myRoleQueryValue.pages.map((page) => page.chatrooms).flat()
           : [];
 
-        console.log(chatRooms);
-        console.log(selectedChatRoomId);
-
         const foundActiveChatRoom = chatRooms.find(
           (chatroom: newnewapi.IChatRoom) =>
             selectedChatRoomId && chatroom.id === selectedChatRoomId
         );
-
-        console.log(foundActiveChatRoom);
 
         if (foundActiveChatRoom) {
           setActiveChatRoom(foundActiveChatRoom);
@@ -124,8 +118,6 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     setActiveChatRoom,
     queryClient,
   ]);
-  console.log('activeChatRoom');
-  console.log(activeChatRoom);
 
   return (
     <SContainer>
