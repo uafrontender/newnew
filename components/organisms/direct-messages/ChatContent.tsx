@@ -325,6 +325,23 @@ const ChatContent: React.FC<IFuncProps> = ({
   );
 
   const whatComponentToDisplay = useCallback(() => {
+    if ((isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis) {
+      return (
+        <BlockedUser
+          confirmBlockUser={confirmBlockUser}
+          isBlocked={isVisavisBlocked}
+          user={chatRoom.visavis}
+          onUserBlock={onUserBlock}
+          closeModal={() => {
+            Mixpanel.track('Close Block User Modal', {
+              _stage: 'Direct Messages',
+            });
+            setConfirmBlockUser(false);
+          }}
+        />
+      );
+    }
+
     if (chatRoom.visavis?.user?.options?.isTombstone) {
       return <AccountDeleted />;
     }
@@ -347,10 +364,12 @@ const ChatContent: React.FC<IFuncProps> = ({
     }
     return null;
   }, [
-    isMessagingDisabled,
-    chatRoom.visavis?.user,
-    chatRoom.visavis?.isSubscriptionActive,
+    isVisavisBlocked,
+    confirmBlockUser,
+    chatRoom.visavis,
     chatRoom.myRole,
+    isMessagingDisabled,
+    onUserBlock,
   ]);
 
   const handleTextareaFocused = useCallback(() => {
@@ -378,20 +397,6 @@ const ChatContent: React.FC<IFuncProps> = ({
         variant={variant}
       />
       <SBottomPart>
-        {(isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis && (
-          <BlockedUser
-            confirmBlockUser={confirmBlockUser}
-            isBlocked={isVisavisBlocked}
-            user={chatRoom.visavis}
-            onUserBlock={onUserBlock}
-            closeModal={() => {
-              Mixpanel.track('Close Block User Modal', {
-                _stage: 'Direct Messages',
-              });
-              setConfirmBlockUser(false);
-            }}
-          />
-        )}
         {!isTextareaHidden ? (
           <SBottomTextarea>
             <STextArea>
