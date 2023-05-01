@@ -7,7 +7,6 @@ import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
 
 const ChatListTabs = dynamic(
-  // eslint-disable-next-line import/no-unresolved
   () => import('../../molecules/direct-messages/ChatListTabs')
 );
 const ChatList = dynamic(

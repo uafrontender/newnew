@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 import { useRouter } from 'next/router';
 
 import { useAppState } from '../../../contexts/appStateContext';
-import { useGetChats } from '../../../contexts/chatContext';
 import SelectChat from '../../atoms/direct-messages/SelectChat';
 import Loader from '../../atoms/Loader';
 import ChatContent from './ChatContent';
@@ -16,6 +15,7 @@ interface IChatContainer {
   isLoading?: boolean;
   initialTab: newnewapi.ChatRoom.MyRole | undefined;
   className?: string;
+  activeChatRoom?: newnewapi.IChatRoom;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
@@ -23,6 +23,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   isLoading,
   initialTab,
   className,
+  activeChatRoom,
   onChatRoomSelect,
 }) => {
   const { resizeMode } = useAppState();
@@ -36,14 +37,11 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   const router = useRouter();
   const { username } = router.query;
 
-  const { activeChatRoom, setActiveChatRoom } = useGetChats();
-
-  const isActiveChatRoom = username !== 'empty' || !!activeChatRoom;
+  const isActiveChatRoom = username !== 'empty';
 
   const handleCloseChatRoom = useCallback(() => {
-    setActiveChatRoom(null);
     router.replace('/direct-messages', undefined, { shallow: true });
-  }, [router, setActiveChatRoom]);
+  }, [router]);
 
   return (
     <SContainer className={className}>
@@ -64,7 +62,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({
             isChatMessageAvatar
           />
         )}
-        {!activeChatRoom && !isLoading && !isMobile && <SelectChat />}
+        {!activeChatRoom && !isLoading && !isMobileOrTablet && <SelectChat />}
         {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
       </SContent>
     </SContainer>

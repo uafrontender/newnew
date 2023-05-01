@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
@@ -39,10 +40,12 @@ const ChatList: React.FC<IChatList> = ({
     'tablet',
   ].includes(resizeMode);
 
+  const router = useRouter();
+
   const { unreadCountForCreator, unreadCountForUser } =
     useChatsUnreadMessages();
 
-  const { searchChatroom, activeChatRoom } = useGetChats();
+  const { searchChatroom } = useGetChats();
 
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
@@ -73,8 +76,6 @@ const ChatList: React.FC<IChatList> = ({
     }
   }, [myRole, unreadCountForUser, refetch]);
 
-  console.log(activeChatRoom, 'activeChatRoom');
-
   return (
     <SChatList
       style={
@@ -103,9 +104,8 @@ const ChatList: React.FC<IChatList> = ({
                     onChatRoomSelect={onChatRoomSelect}
                     isActive={
                       !!(
-                        activeChatRoom &&
-                        activeChatRoom.id &&
-                        chatroom.id === activeChatRoom.id
+                        router.query.roomID &&
+                        chatroom.id === +router.query.roomID
                       )
                     }
                   />

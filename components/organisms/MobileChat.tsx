@@ -1,8 +1,9 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import styled, { css } from 'styled-components';
 import _toNumber from 'lodash/toNumber';
+import { InfiniteData, useQueryClient } from 'react-query';
 
 import { useAppState } from '../../contexts/appStateContext';
 import { useGetChats } from '../../contexts/chatContext';
@@ -27,21 +28,23 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   const router = useRouter();
   const { roomID } = router.query;
 
+  const queryClient = useQueryClient();
+
   const [isLoading, setIsLoading] = useState(false);
 
-  const { activeChatRoom, setActiveChatRoom, setSearchChatroom } =
-    useGetChats();
+  const { setSearchChatroom } = useGetChats();
 
-  const isActiveChatRoom = !!roomID || !!activeChatRoom;
+  const [activeChatRoom, setActiveChatRoom] =
+    useState<newnewapi.IChatRoom | null>(null);
+
+  const isActiveChatRoom = !!roomID;
 
   const handleCloseChatRoom = useCallback(() => {
-    setActiveChatRoom(null);
     router.replace(`${router.pathname}?tab=chat`, undefined, { shallow: true });
-  }, [router, setActiveChatRoom]);
+  }, [router]);
 
   const handleChatRoomSelect = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
-      setActiveChatRoom(chatRoom);
       setSearchChatroom('');
 
       router.replace(
@@ -50,39 +53,60 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
         { shallow: true }
       );
     },
-    [router, setActiveChatRoom, setSearchChatroom]
+    [router, setSearchChatroom]
   );
 
-  const initialRoomID = useRef(roomID);
-  const isInitialRoomLoaded = useRef(false);
-
   useEffect(() => {
-    const getChatRoom = async () => {
+    const findChatRoom = async () => {
       try {
         setIsLoading(true);
+
+        const query = queryClient.getQueriesData<
+          InfiniteData<{ chatrooms: newnewapi.IChatRoom[] }>
+        >(['private', 'getMyRooms', { myRole: 2, searchQuery: '' }]);
+
+        const queryData = query[0] ? query[0][1] : null;
+        // tslint:disable-next-statement
+        const chatrooms = queryData
+          ? queryData.pages?.map((page) => page.chatrooms).flat()
+          : [];
+
+        const foundedActiveChatRoom = chatrooms.find(
+          (chatroom: newnewapi.IChatRoom) =>
+            router.query.roomID && chatroom.id === +router.query.roomID
+        );
+
+        if (foundedActiveChatRoom) {
+          setActiveChatRoom(foundedActiveChatRoom);
+
+          return;
+        }
+
         const payload = new newnewapi.GetRoomRequest({
-          roomId: _toNumber(roomID),
+          roomId: _toNumber(router.query.roomID),
         });
 
         const res = await getRoom(payload);
 
         if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+          throw new Error('Request failed');
         }
 
         setActiveChatRoom(res.data);
-        isInitialRoomLoaded.current = true;
+
+        return;
       } catch (err) {
-        router.push(`${router.pathname}?tab=chat`);
         console.error(err);
+        router.push(`${router.pathname}?tab=chat`);
       } finally {
         setIsLoading(false);
       }
     };
-    if (initialRoomID && !isInitialRoomLoaded) {
-      getChatRoom();
+
+    if (router.query.roomID !== activeChatRoom?.id && router.query.roomID) {
+      findChatRoom();
     }
-  }, [roomID, router, activeChatRoom, setActiveChatRoom]);
+  }, [roomID, router, activeChatRoom, setActiveChatRoom, queryClient]);
 
   return (
     <SContainer>

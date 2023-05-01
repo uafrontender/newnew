@@ -7,15 +7,12 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
-import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import useDebouncedValue from '../utils/hooks/useDebouncedValue';
 
 interface IChatsContext {
-  activeChatRoom: newnewapi.IChatRoom | null;
   searchChatroom: string;
   chatsDraft: { roomId: number | Long; text: string }[];
-  setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => void;
   setSearchChatroom: (str: string) => void;
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => void;
   removeInputValueFromChatsDraft: (roomId: number | Long) => void;
@@ -23,10 +20,8 @@ interface IChatsContext {
 }
 
 const ChatsContext = createContext<IChatsContext>({
-  activeChatRoom: null,
   searchChatroom: '',
   chatsDraft: [],
-  setActiveChatRoom: (chatRoom: newnewapi.IChatRoom | null) => {},
   setSearchChatroom: (str: string) => {},
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => {},
   removeInputValueFromChatsDraft: (roomId: number | Long) => {},
@@ -40,9 +35,6 @@ interface IChatsProvider {
 export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
 
-  // TODO: make it as initial data for use query ????
-  const [activeChatRoom, setActiveChatRoom] =
-    useState<newnewapi.IChatRoom | null>(null);
   const [searchChatroom, setSearchChatroom] = useState<string>('');
 
   const [chatsDraft, setChatsDraft] = useState<
@@ -83,7 +75,6 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   }, []);
 
   const resetState = useCallback(() => {
-    setActiveChatRoom(null);
     setSearchChatroom('');
     setChatsDraft([]);
   }, []);
@@ -104,20 +95,16 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      activeChatRoom,
       searchChatroom: searchChatroomDebounced,
       chatsDraft,
-      setActiveChatRoom,
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,
       restDraft,
     }),
     [
-      activeChatRoom,
       searchChatroomDebounced,
       chatsDraft,
-      setActiveChatRoom,
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,

@@ -3,31 +3,34 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
+  useState,
 } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { useQueryClient, InfiniteData } from 'react-query';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useUpdateEffect } from 'react-use';
+import _toNumber from 'lodash/toNumber';
+
 import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import ChatLayout from '../../../components/templates/ChatLayout';
 import ChatContainer from '../../../components/organisms/direct-messages/ChatContainer';
 import { ChatsProvider, useGetChats } from '../../../contexts/chatContext';
-import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { ChatTypes } from '../../../constants/chat';
+import { getMyRooms } from '../../../api/endpoints/chat';
 
 interface IChat {
   username: string;
 }
 
 const getChatRoomParamsFromUrl = (room: string, username?: string) => {
-  if (!room || room === 'empty') {
-    return null;
+  if (!room) {
+    return undefined;
   }
 
   const chatType =
@@ -41,7 +44,7 @@ const getChatRoomParamsFromUrl = (room: string, username?: string) => {
     case ChatTypes.default: {
       return {
         roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-        username: visavisUsername,
+        searchQuery: visavisUsername,
       };
     }
 
@@ -51,7 +54,7 @@ const getChatRoomParamsFromUrl = (room: string, username?: string) => {
         return {
           myRole: newnewapi.ChatRoom.MyRole.CREATOR,
           roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
-          username: visavisUsername,
+          searchQuery: visavisUsername,
         };
       }
 
@@ -59,28 +62,26 @@ const getChatRoomParamsFromUrl = (room: string, username?: string) => {
       return {
         myRole: newnewapi.ChatRoom.MyRole.SUBSCRIBER,
         roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
-        username: visavisUsername,
+        searchQuery: visavisUsername,
       };
     }
     case ChatTypes.bundle: {
       return {
         myRole: newnewapi.ChatRoom.MyRole.CREATOR,
         roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-        username: visavisUsername,
+        searchQuery: visavisUsername,
       };
     }
     default: {
-      return null;
+      return undefined;
     }
   }
 };
 
-const Chat: NextPage<IChat> = ({ username }) => {
+const Chat: NextPage<IChat> = () => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-
-  const isInitialChatSet = useRef(false);
 
   useUpdateEffect(() => {
     // Redirect only after the persist data is pulled
@@ -89,7 +90,9 @@ const Chat: NextPage<IChat> = ({ username }) => {
     }
   }, [router, user.loggedIn, user._persist?.rehydrated]);
 
-  const { setActiveChatRoom, setSearchChatroom } = useGetChats();
+  const username = router.query.username as string;
+
+  const { setSearchChatroom } = useGetChats();
 
   useEffect(() => {
     // prevent user from opening chat with himself
@@ -98,7 +101,7 @@ const Chat: NextPage<IChat> = ({ username }) => {
       !username.includes('-') &&
       username === user.userData?.username
     ) {
-      router.push('/direct-messages');
+      router.replace('/direct-messages');
     }
   }, [router, username, user.userData?.username]);
 
@@ -120,52 +123,8 @@ const Chat: NextPage<IChat> = ({ username }) => {
       : newnewapi.ChatRoom.MyRole.CREATOR;
   }, [username, chatType]);
 
-  // Parse roomKind, username, myRole from ulr parameter [username]
-  // [username] possible forms: username, username-bundle, username-announcement
-  const chatRoomParams = getChatRoomParamsFromUrl(
-    username,
-    user.userData?.username
-  );
-
-  const { data, isFetching } = useMyChatRooms(
-    {
-      ...chatRoomParams,
-      searchQuery: chatRoomParams?.username,
-    },
-    {
-      enabled: !!chatRoomParams && !isInitialChatSet.current,
-    },
-    'getRoom'
-  );
-
-  const chatRooms = useMemo(
-    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
-    [data]
-  );
-
-  // Calculate activeChatRoom from requested chatRooms
-  const activeChatRoom = useMemo(() => {
-    if (!chatRoomParams) {
-      return null;
-    }
-
-    if (chatRooms.length === 0) {
-      return null;
-    }
-
-    return chatRooms[0];
-  }, [chatRoomParams, chatRooms]);
-
-  useEffect(() => {
-    if (activeChatRoom && !isInitialChatSet.current) {
-      setActiveChatRoom(activeChatRoom);
-      isInitialChatSet.current = true;
-    }
-  }, [activeChatRoom, setActiveChatRoom]);
-
   const handleChatRoomSelect = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
-      setActiveChatRoom(chatRoom);
       setSearchChatroom('');
 
       let route = `${
@@ -178,10 +137,121 @@ const Chat: NextPage<IChat> = ({ username }) => {
         route += '-bundle';
       }
 
-      router.push(route, undefined, { shallow: true });
+      router.replace(
+        `${route}?roomID=${chatRoom.id}&myRole=${chatRoom.myRole}`,
+        route,
+        { shallow: true }
+      );
     },
-    [router, setActiveChatRoom, setSearchChatroom, user.userData?.username]
+    [router, setSearchChatroom, user.userData?.username]
   );
+
+  const queryClient = useQueryClient();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [activeChatRoom, setActiveChatRoom] = useState<
+    newnewapi.IChatRoom | undefined
+  >(undefined);
+
+  const findChatRoom = useCallback(
+    (myRoleRequested: newnewapi.ChatRoom.MyRole) => {
+      const query = queryClient.getQueriesData<
+        InfiniteData<{ chatrooms: newnewapi.IChatRoom[] }>
+      >([
+        'private',
+        'getMyRooms',
+        { myRole: myRoleRequested, searchQuery: '' },
+      ]);
+
+      const queryData = query[0] ? query[0][1] : null;
+
+      const chatrooms = queryData
+        ? queryData.pages.map((page) => page.chatrooms).flat()
+        : [];
+
+      const foundedActiveChatRoom = chatrooms.find(
+        (chatroom: newnewapi.IChatRoom) =>
+          router.query.roomID && chatroom.id === +router.query.roomID
+      );
+
+      return foundedActiveChatRoom;
+    },
+    [queryClient, router.query.roomID]
+  );
+
+  const fetchChatRoom = useCallback(async () => {
+    const chatRoomParams = getChatRoomParamsFromUrl(username);
+
+    const chatRoomPayload = new newnewapi.GetMyRoomsRequest(chatRoomParams);
+
+    const chatroomResponse = await getMyRooms(chatRoomPayload);
+
+    if (!chatroomResponse.data || chatroomResponse.error) {
+      throw new Error('Request failed');
+    }
+
+    if (!chatroomResponse.data?.rooms[0]) {
+      throw new Error('Chat room not found');
+    }
+
+    return chatroomResponse.data?.rooms[0];
+  }, [username]);
+
+  useEffect(() => {
+    const getChatRoom = async () => {
+      try {
+        setIsLoading(true);
+        // find room in already requested witch react-query chatRooms for ChatList
+        if (router.query.myRole && router.query.roomID) {
+          const foundedActiveChatRoom = findChatRoom(
+            _toNumber(router.query.myRole)
+          );
+
+          if (foundedActiveChatRoom) {
+            setActiveChatRoom(foundedActiveChatRoom);
+            return;
+          }
+        }
+
+        if (!username || username === 'empty') {
+          setActiveChatRoom(undefined);
+          return;
+        }
+
+        // request chatRoom if it wasn't found in ChatList
+        const chatroom = await fetchChatRoom();
+
+        setActiveChatRoom(chatroom);
+
+        router.replace(
+          `${username}?roomID=${chatroom.id}&myRole=${chatroom.myRole}`,
+          username,
+          { shallow: true }
+        );
+
+        return;
+      } catch (err) {
+        console.error(err);
+        router.replace('/direct-messages', undefined, { shallow: true });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (router.query.roomID !== activeChatRoom?.id || !activeChatRoom?.id) {
+      getChatRoom();
+    }
+  }, [
+    router.query.myRole,
+    router.query.roomID,
+    username,
+    queryClient,
+    activeChatRoom?.id,
+    router,
+    fetchChatRoom,
+    findChatRoom,
+  ]);
 
   return (
     <>
@@ -189,9 +259,10 @@ const Chat: NextPage<IChat> = ({ username }) => {
         <title>{t('meta.title')}</title>
       </Head>
       <ChatContainer
-        isLoading={isFetching}
+        isLoading={isLoading}
         initialTab={myRole}
         onChatRoomSelect={handleChatRoomSelect}
+        activeChatRoom={activeChatRoom}
       />
     </>
   );

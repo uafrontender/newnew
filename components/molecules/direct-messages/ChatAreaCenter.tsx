@@ -5,10 +5,10 @@ import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import { useQueryClient } from 'react-query';
+import { useRouter } from 'next/router';
 
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
-import { useGetChats } from '../../../contexts/chatContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import Loader from '../../atoms/Loader';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
@@ -35,9 +35,9 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   variant,
 }) => {
   const { ref: loadingRef, inView } = useInView();
-  const { activeChatRoom } = useGetChats();
   const { socketConnection } = useContext(SocketContext);
 
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const {
@@ -110,8 +110,8 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       const arr = new Uint8Array(dataSocket);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       // eslint-disable-next-line eqeqeq
-      if (decoded.roomId == activeChatRoom?.id) {
-        // TODO: remove refetch, use mutation instead
+      if (router.query.roomID && decoded.roomId === +router.query.roomID) {
+        // TODO: think how to avoid it
         refetch();
       }
     };
@@ -127,7 +127,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
         );
       }
     };
-  }, [socketConnection, activeChatRoom, refetch]);
+  }, [router.query.roomID, socketConnection, refetch]);
 
   /* loading next page of messages */
   useUpdateEffect(() => {

@@ -31,7 +31,7 @@ const ChatToolbar: React.FC = () => {
   const user = useAppSelector((state) => state.user);
 
   const { t } = useTranslation('page-Chat');
-  const { setSearchChatroom, setActiveChatRoom } = useGetChats();
+  const { setSearchChatroom } = useGetChats();
 
   const passInputValue = useCallback(
     (str: string) => {
@@ -46,22 +46,24 @@ const ChatToolbar: React.FC = () => {
 
   const handleChatRoomSelect = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
-      setActiveChatRoom(chatRoom);
-
       if (
         chatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
         chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
       ) {
-        router.push(`${user.userData?.username}-announcement`, undefined, {
+        router.replace(`${user.userData?.username}-announcement`, undefined, {
           shallow: true,
         });
       } else if (chatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
-        router.push(`${chatRoom.visavis?.user?.username}-bundle`, undefined, {
-          shallow: true,
-        });
+        router.replace(
+          `${chatRoom.visavis?.user?.username}-bundle`,
+          undefined,
+          {
+            shallow: true,
+          }
+        );
       }
     },
-    [setActiveChatRoom, router, user.userData?.username]
+    [router, user.userData?.username]
   );
 
   return (

@@ -10,7 +10,8 @@ import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import _ from 'lodash';
+import _toNumber from 'lodash/toNumber';
+import { InfiniteData, useQueryClient } from 'react-query';
 
 import Button from '../../../atoms/Button';
 import { Tab } from '../../Tabs';
@@ -24,7 +25,6 @@ import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
-import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { getRoom } from '../../../../api/endpoints/chat';
@@ -62,13 +62,10 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const { resizeMode } = useAppState();
   const { unreadCountForCreator } = useChatsUnreadMessages();
-  const { activeChatRoom, setActiveChatRoom } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
-
-  const [chatRoomLoading, setChatRoomLoading] = useState(false);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -198,39 +195,75 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     };
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
-  const initialRoomId = useRef(router.query.roomID);
+  const queryClient = useQueryClient();
+  const [activeChatRoom, setActiveChatRoom] =
+    useState<newnewapi.IChatRoom | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const getChatRoom = async () => {
+    const findChatRoom = async () => {
       try {
-        setChatRoomLoading(true);
+        setIsLoading(true);
+
+        // find room in already requested witch react-query chatRooms for ChatList
+        const query = queryClient.getQueriesData<
+          InfiniteData<{ chatrooms: newnewapi.IChatRoom[] }>
+        >(['private', 'getMyRooms', { myRole: 2, searchQuery: '' }]);
+
+        const queryData = query[0] ? query[0][1] : null;
+
+        const chatrooms = queryData
+          ? queryData.pages.map((page) => page.chatrooms).flat()
+          : [];
+
+        const foundedActiveChatRoom = chatrooms.find(
+          (chatroom: newnewapi.IChatRoom) =>
+            router.query.roomID && chatroom.id === +router.query.roomID
+        );
+
+        if (foundedActiveChatRoom) {
+          setActiveChatRoom(foundedActiveChatRoom);
+
+          return;
+        }
+
         const payload = new newnewapi.GetRoomRequest({
-          roomId: _.toNumber(initialRoomId.current),
+          roomId: _toNumber(router.query.roomID),
         });
 
         const res = await getRoom(payload);
 
         if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+          throw new Error('Request failed');
         }
 
         setActiveChatRoom(res.data);
+
+        return;
       } catch (err) {
-        router.push(`${baseUrl}?tab=chat`);
         console.error(err);
+        router.push(`${baseUrl}?tab=chat`);
       } finally {
-        setChatRoomLoading(false);
+        setIsLoading(false);
       }
     };
-    if (initialRoomId.current && !activeChatRoom) {
-      getChatRoom();
+
+    if (router.query.roomID !== activeChatRoom?.id && router.query.roomID) {
+      findChatRoom();
     }
-  }, [baseUrl, router, activeChatRoom, setActiveChatRoom]);
+  }, [
+    router.query.myRole,
+    router.query.roomID,
+    queryClient,
+    activeChatRoom?.id,
+    router,
+    setActiveChatRoom,
+    baseUrl,
+  ]);
 
   const handleChatRoomSelect = useCallback(
     async (chatRoom: newnewapi.IChatRoom) => {
-      setActiveChatRoom(chatRoom);
-      await router.push(
+      await router.replace(
         `?tab=direct-messages&roomID=${chatRoom.id}`,
         undefined,
         {
@@ -238,7 +271,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         }
       );
     },
-    [setActiveChatRoom, router]
+    [router]
   );
 
   useEffect(() => {
@@ -252,11 +285,10 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   }, [isBundleDataLoaded, directMessagesAvailable, tab, baseUrl, router]);
 
   const handleCloseChatRoom = useCallback(() => {
-    setActiveChatRoom(null);
     router.replace(`${baseUrl}?tab=chat`, undefined, {
       shallow: true,
     });
-  }, [router, baseUrl, setActiveChatRoom]);
+  }, [router, baseUrl]);
 
   return (
     <STopButtons>
@@ -321,7 +353,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
           <SContent hidden={tab !== 'direct-messages'}>
             {activeChatRoom && (
               <ChatContent
-                chatRoom={activeChatRoom!!}
+                chatRoom={activeChatRoom}
                 isBackButton
                 onBackButtonClick={handleCloseChatRoom}
                 isAvatar
@@ -329,9 +361,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
               />
             )}
 
-            {!activeChatRoom && chatRoomLoading && (
-              <Loader size='md' isStatic />
-            )}
+            {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
           </SContent>
 
           <SContent hidden={tab === 'direct-messages'}>
