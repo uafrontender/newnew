@@ -227,10 +227,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           '--window-inner-height',
           `${window.innerHeight}px`
         );
-      } else if (
-        (!clearedSearchValue || clearedSearchValue.length === 1) &&
-        !isMobileOrTablet
-      ) {
+      } else {
         setIsResultsDropVisible(false);
         resetResults();
       }

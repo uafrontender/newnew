@@ -63,6 +63,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
 
+  // TODO: Remove hasMounted after user auth data is available in context
   const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);

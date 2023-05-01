@@ -58,8 +58,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const [myEarnings, setMyEarnings] = useState<
     newnewapi.GetMyEarningsResponse | undefined
   >();
-  const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
-    useState(true);
+  const [expiringPostsLoaded, setExpiringPostsLoaded] = useState(false);
   const [hasMyPosts, setHasMyPosts] = useState(false);
 
   useEffect(() => {
@@ -82,7 +81,7 @@ export const Dashboard: React.FC = React.memo(() => {
     }
   }, [user.creatorData, user.userData?.bio]);
 
-  const fetchMyExpirationPosts = async () => {
+  const fetchMyExpiringPosts = useCallback(async () => {
     try {
       const payload = new newnewapi.PagedRequest();
       const res = await getMyUrgentPosts(payload);
@@ -94,18 +93,20 @@ export const Dashboard: React.FC = React.memo(() => {
       if (res.data?.posts) {
         setExpirationPosts(res.data?.posts);
       }
-      setIsLoadingExpirationPosts(false);
     } catch (err) {
-      setIsLoadingExpirationPosts(false);
       console.error(err);
+    } finally {
+      setExpiringPostsLoaded(true);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    if (isLoadingExpirationPosts) {
-      fetchMyExpirationPosts();
+    if (!expiringPostsLoaded) {
+      fetchMyExpiringPosts();
     }
-  }, [isLoadingExpirationPosts]);
+  }, [expiringPostsLoaded, fetchMyExpiringPosts]);
+
+  // TODO: Need WS event to load new expiring posts
 
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
@@ -177,7 +178,13 @@ export const Dashboard: React.FC = React.memo(() => {
           )}
         </STitleBlock>
 
-        {isLoadingExpirationPosts ? (
+        {expiringPostsLoaded ? (
+          expirationPosts.length > 0 && (
+            <SBlock>
+              <ExpirationPosts expirationPosts={expirationPosts} />
+            </SBlock>
+          )
+        ) : (
           <SBlock>
             <Lottie
               width={64}
@@ -189,12 +196,6 @@ export const Dashboard: React.FC = React.memo(() => {
               }}
             />
           </SBlock>
-        ) : (
-          expirationPosts.length > 0 && (
-            <SBlock>
-              <ExpirationPosts expirationPosts={expirationPosts} />
-            </SBlock>
-          )
         )}
 
         {user.creatorData?.options.stripeConnectStatus &&

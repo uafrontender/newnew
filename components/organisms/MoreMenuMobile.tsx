@@ -137,10 +137,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
               )}
             </>
           ) : (
-            <ShareMenu
-              isVisible={shareMenuOpen}
-              handleClose={handleCloseShareMenu}
-            />
+            <ShareMenu handleClose={handleCloseShareMenu} />
           )}
         </SContainer>
       )}
