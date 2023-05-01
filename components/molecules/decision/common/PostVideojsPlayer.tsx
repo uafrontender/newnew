@@ -45,6 +45,7 @@ interface IPostVideojsPlayer {
   isActive?: boolean;
   shouldPrefetch?: boolean;
   onPlaybackFinished?: () => void;
+  onPlaybackProgress?: (newValue: number) => void;
 }
 
 type TSafariHtmlPlayer = HTMLVideoElement & {
@@ -64,6 +65,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   isActive,
   shouldPrefetch,
   onPlaybackFinished,
+  onPlaybackProgress,
 }) => {
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppState();
@@ -617,6 +619,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
   useEffect(() => {
     if (isInSlider) {
       if (isActive) {
+        onPlaybackProgress?.(0);
         const promise = playerRef?.current?.play()?.catch(() => {
           console.warn('Autoplay is not allowed');
         });
@@ -687,6 +690,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = ({
       window.removeEventListener('keydown', handlePressSpacebar);
     };
   }, [handleSetIsPaused, isActive, isInSlider]);
+
+  useEffect(() => {
+    const duration = playerRef?.current?.duration();
+    if (onPlaybackProgress && isActive && duration) {
+      const progress = (playbackTime / duration) * 100;
+      onPlaybackProgress?.(progress);
+    }
+  }, [isActive, onPlaybackProgress, playbackTime]);
 
   // Try to pause the video when the component unmounts
   // to avoid attempts to play broken segments
