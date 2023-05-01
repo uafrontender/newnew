@@ -103,7 +103,7 @@ const Chat: NextPage = () => {
     return parseInt(router.query.myRole);
   }, [router.query.myRole]);
 
-  const roomId = useMemo(() => {
+  const selectedChatRoomId = useMemo(() => {
     if (!router.query.roomID || Array.isArray(router.query.roomID)) {
       return undefined;
     }
@@ -228,8 +228,11 @@ const Chat: NextPage = () => {
       try {
         setIsLoading(true);
         // Find room in already requested witch react-query chatRooms for ChatList
-        if (myRole && roomId) {
-          const loadedActiveChatRoom = findLoadedChatRoom(roomId, myRole);
+        if (myRole && selectedChatRoomId) {
+          const loadedActiveChatRoom = findLoadedChatRoom(
+            selectedChatRoomId,
+            myRole
+          );
 
           if (loadedActiveChatRoom) {
             setActiveChatRoom(loadedActiveChatRoom);
@@ -264,12 +267,12 @@ const Chat: NextPage = () => {
       }
     };
 
-    if (roomId !== activeChatRoom?.id || !activeChatRoom?.id) {
+    if (selectedChatRoomId !== activeChatRoom?.id || !activeChatRoom?.id) {
       getChatRoom();
     }
   }, [
     myRole,
-    roomId,
+    selectedChatRoomId,
     room,
     queryClient,
     activeChatRoom?.id,

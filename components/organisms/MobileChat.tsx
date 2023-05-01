@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { InfiniteData, useQueryClient } from 'react-query';
 
 import { useAppState } from '../../contexts/appStateContext';
@@ -57,6 +57,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     [router, setSearchChatroom]
   );
 
+  // BROKEN
   useEffect(() => {
     const findChatRoom = async () => {
       try {
@@ -66,19 +67,28 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
           InfiniteData<{ chatrooms: newnewapi.IChatRoom[] }>
         >(['private', 'getMyRooms', { myRole: 2, searchQuery: '' }]);
 
-        const queryData = query[0] ? query[0][1] : null;
-        // tslint:disable-next-statement
-        const chatrooms = queryData
-          ? queryData.pages?.map((page) => page.chatrooms).flat()
+        const myRoleQueryKeyValueArray = query.length > 0 ? query[0] : null;
+        const myRoleQueryValue =
+          myRoleQueryKeyValueArray && myRoleQueryKeyValueArray.length > 1
+            ? myRoleQueryKeyValueArray[1]
+            : null;
+
+        const chatRooms = myRoleQueryValue
+          ? myRoleQueryValue.pages.map((page) => page.chatrooms).flat()
           : [];
 
-        const foundedActiveChatRoom = chatrooms.find(
+        console.log(chatRooms);
+        console.log(selectedChatRoomId);
+
+        const foundActiveChatRoom = chatRooms.find(
           (chatroom: newnewapi.IChatRoom) =>
             selectedChatRoomId && chatroom.id === selectedChatRoomId
         );
 
-        if (foundedActiveChatRoom) {
-          setActiveChatRoom(foundedActiveChatRoom);
+        console.log(foundActiveChatRoom);
+
+        if (foundActiveChatRoom) {
+          setActiveChatRoom(foundActiveChatRoom);
 
           return;
         }
@@ -114,6 +124,8 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     setActiveChatRoom,
     queryClient,
   ]);
+  console.log('activeChatRoom');
+  console.log(activeChatRoom);
 
   return (
     <SContainer>
@@ -123,7 +135,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
         onChatRoomSelect={handleChatRoomSelect}
       />
 
-      <SContent hidden={isMobileOrTablet && !!selectedChatRoomId}>
+      <SContent hidden={isMobileOrTablet && !selectedChatRoomId}>
         {activeChatRoom && (
           <ChatContent
             chatRoom={activeChatRoom}
@@ -167,24 +179,18 @@ const SContainer = styled.div`
 const SContent = styled.div<{
   hidden: boolean;
 }>`
+  display: ${({ hidden }) => (hidden ? 'none' : 'block')};
+
   position: relative;
   height: 100%;
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  background: ${({ theme }) => theme.colorsThemed.background.secondary};
   margin: 0 -15px;
   padding: 0;
+
   ${(props) => props.theme.media.laptop} {
     height: 100%;
     width: calc(100% - 384px);
     margin: 0 0 0 auto;
-    border-radius: ${(props) => props.theme.borderRadius.large};
+    border-radius: ${({ theme }) => theme.borderRadius.large};
   }
-
-  ${({ hidden }) => {
-    if (hidden) {
-      return css`
-        display: none;
-      `;
-    }
-    return css``;
-  }}
 `;

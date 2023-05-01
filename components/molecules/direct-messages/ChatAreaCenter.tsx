@@ -105,12 +105,20 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [messages, isAnnouncement, isLoading, chatRoom]
   );
 
+  const selectedChatRoomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
+
   useEffect(() => {
     const socketHandlerMessageCreated = (dataSocket: any) => {
       const arr = new Uint8Array(dataSocket);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       // eslint-disable-next-line eqeqeq
-      if (router.query.roomID && decoded.roomId === +router.query.roomID) {
+      if (selectedChatRoomId && decoded.roomId === selectedChatRoomId) {
         // TODO: think how to avoid it
         refetch();
       }
@@ -127,7 +135,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
         );
       }
     };
-  }, [router.query.roomID, socketConnection, refetch]);
+  }, [selectedChatRoomId, socketConnection, refetch]);
 
   /* loading next page of messages */
   useUpdateEffect(() => {

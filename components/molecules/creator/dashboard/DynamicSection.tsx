@@ -54,24 +54,29 @@ interface IDynamicSection {
 // TODO: Refactoring
 export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const theme = useTheme();
-  const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const containerRef: any = useRef(null);
-  const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
-  const { resizeMode } = useAppState();
+  const { t } = useTranslation('page-Creator');
+  const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
   const { unreadCountForCreator } = useChatsUnreadMessages();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
-  const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
-  const [markReadNotifications, setMarkReadNotifications] = useState(false);
+  const queryClient = useQueryClient();
 
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isSmallDesktop = ['laptop', 'laptopM'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
+
+  const containerRef: any = useRef(null);
+  const [animate, setAnimate] = useState(false);
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
+  const [isLoading, setIsLoading] = useState(false);
+  const [markReadNotifications, setMarkReadNotifications] = useState(false);
+  const [activeChatRoom, setActiveChatRoom] =
+    useState<newnewapi.IChatRoom | null>(null);
 
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
@@ -185,12 +190,12 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       handleMinimizeClick();
     }
   });
+
   const handleClickOutside = useCallback(() => {
     if (tab && !isDesktop && !showNewMessageModal) {
       handleMinimizeClick();
     }
   }, [tab, isDesktop, showNewMessageModal, handleMinimizeClick]);
-
   useOnClickOutside(containerRef, handleClickOutside);
 
   useEffect(() => {
@@ -205,11 +210,6 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     };
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
-  const queryClient = useQueryClient();
-  const [activeChatRoom, setActiveChatRoom] =
-    useState<newnewapi.IChatRoom | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
     const findChatRoom = async () => {
       try {
@@ -222,18 +222,17 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
 
         const queryData = query[0] ? query[0][1] : null;
 
-        const chatrooms = queryData
+        const chatRooms = queryData
           ? queryData.pages.map((page) => page.chatrooms).flat()
           : [];
 
-        const foundedActiveChatRoom = chatrooms.find(
+        const foundedActiveChatRoom = chatRooms.find(
           (chatroom: newnewapi.IChatRoom) =>
             selectedChatRoomId && chatroom.id === selectedChatRoomId
         );
 
         if (foundedActiveChatRoom) {
           setActiveChatRoom(foundedActiveChatRoom);
-
           return;
         }
 
@@ -248,8 +247,6 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         }
 
         setActiveChatRoom(res.data);
-
-        return;
       } catch (err) {
         console.error(err);
         router.push(`${baseUrl}?tab=chat`);

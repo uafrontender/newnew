@@ -516,6 +516,7 @@ const SInlineSVG = styled(InlineSVG)`
 const SButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
+
   &:disabled {
     background: ${(props) =>
       props.theme.name === 'light'

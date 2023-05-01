@@ -58,6 +58,14 @@ const ChatList: React.FC<IChatList> = ({
     [data]
   );
 
+  const selectedChatRoomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
+
   useUpdateEffect(() => {
     if (inView && !isLoading && hasNextPage) {
       fetchNextPage();
@@ -105,10 +113,7 @@ const ChatList: React.FC<IChatList> = ({
                     chatRoom={chatroom}
                     onChatRoomSelected={onChatRoomSelected}
                     isActive={
-                      !!(
-                        router.query.roomID &&
-                        chatroom.id === +router.query.roomID
-                      )
+                      !!selectedChatRoomId && chatroom.id === selectedChatRoomId
                     }
                   />
                   {index < chatRooms.length - 1 && <SChatSeparator />}
