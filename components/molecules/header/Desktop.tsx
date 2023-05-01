@@ -69,7 +69,6 @@ export const Desktop: React.FC = () => {
     <SContainer>
       <Logo isShort={!isDesktopL} />
       <SRightBlock>
-        {process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' && 'TEST'}
         {user.loggedIn && user.userData?.options?.isCreator && (
           <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 0 }}>
             <SNavText variant={3} weight={600} onClick={handlerCopy}>
