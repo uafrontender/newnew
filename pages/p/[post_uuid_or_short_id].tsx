@@ -653,7 +653,7 @@ const PostPage: NextPage<IPostPage> = ({
           }
         } else if (decoded.multipleChoice) {
           const parsedStatus = switchPostStatus(
-            'ac',
+            'mc',
             decoded.multipleChoice as newnewapi.MultipleChoice.Status
           );
 

@@ -120,7 +120,8 @@
         "other": "Other"
       },
       "additionalInfo": {
-        "placeholder": "Please tell us a bit more..."
+        "placeholder": "Please tell us a bit more...",
+        "tooShort": "Report is too short"
       },
       "button": {
         "cancel": "Cancel",

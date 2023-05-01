@@ -31,6 +31,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
 
   const headerRef = useRef(null);
 
+  // TODO: Remove hasMounted after user auth data is available in context
   const hasMounted = useHasMounted();
 
   if (!hasMounted) return null;
