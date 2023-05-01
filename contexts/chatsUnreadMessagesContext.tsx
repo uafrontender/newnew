@@ -51,7 +51,10 @@ export const ChatsUnreadMessagesProvider: React.FC<
     const controller = new AbortController();
 
     async function getUnread() {
-      if (!user.loggedIn) return;
+      if (!user.loggedIn) {
+        return;
+      }
+
       try {
         const payload = new newnewapi.EmptyRequest();
         const res = await getTotalUnreadMessageCounts(
@@ -75,6 +78,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
         controller.abort();
       }
     };
+    // Need dependency on bundles to refetch data on bundles changed
   }, [user.loggedIn, setData, bundles?.length]);
 
   useEffect(() => {
