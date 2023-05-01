@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -19,20 +19,20 @@ import ChatName from '../../atoms/direct-messages/ChatName';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
-const MyAvatarMassupdate = dynamic(
+const MyAvatarAnnouncement = dynamic(
   () => import('../../atoms/direct-messages/MyAvatarMassupdate')
 );
 
 interface IFunctionProps {
   chatRoom: newnewapi.IChatRoom;
   isActive: boolean;
-  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
+  onChatRoomSelected: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
 const ChatListItem: React.FC<IFunctionProps> = ({
   chatRoom,
   isActive,
-  onChatRoomSelect,
+  onChatRoomSelected,
 }) => {
   const { t } = useTranslation('page-Chat');
   const { resizeMode } = useAppState();
@@ -52,18 +52,20 @@ const ChatListItem: React.FC<IFunctionProps> = ({
       _component: 'ChatListItem',
       _page: router.pathname,
     });
-    onChatRoomSelect(chatRoom);
-  }, [chatRoom, onChatRoomSelect, router.pathname]);
+    onChatRoomSelected(chatRoom);
+  }, [chatRoom, onChatRoomSelected, router.pathname]);
 
-  let lastMsg = chatRoom.lastMessage?.content?.text;
-
-  if (!lastMsg) {
-    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
-      lastMsg = textTrim(t('newAnnouncement.noAnnouncement'));
-    } else {
-      lastMsg = textTrim(t('chat.noMessagesFirstLine'));
+  const lastMsg = useMemo(() => {
+    if (chatRoom.lastMessage?.content?.text) {
+      return chatRoom.lastMessage?.content?.text;
     }
-  }
+
+    if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
+      return textTrim(t('newAnnouncement.noAnnouncement'));
+    }
+
+    return textTrim(t('chat.noMessagesFirstLine'));
+  }, [chatRoom.lastMessage?.content?.text, chatRoom.kind, t]);
 
   return (
     <SChatItem
@@ -71,7 +73,7 @@ const ChatListItem: React.FC<IFunctionProps> = ({
       isActiveChat={isActive && !isMobileOrTablet}
     >
       {chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE ? (
-        <MyAvatarMassupdate />
+        <MyAvatarAnnouncement />
       ) : (
         <SUserAvatar avatarUrl={chatRoom.visavis?.user?.avatarUrl ?? ''} />
       )}

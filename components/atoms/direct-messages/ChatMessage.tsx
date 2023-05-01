@@ -15,7 +15,7 @@ interface IChatMessage {
   prevElement: newnewapi.IChatMessage;
   nextElement: newnewapi.IChatMessage;
   chatRoom: newnewapi.IChatRoom;
-  isAvatar?: boolean;
+  withAvatar?: boolean;
   variant?: 'primary' | 'secondary';
 }
 
@@ -24,7 +24,7 @@ const ChatMessage: React.FC<IChatMessage> = ({
   prevElement,
   nextElement,
   chatRoom,
-  isAvatar,
+  withAvatar,
   variant,
 }) => {
   const { t } = useTranslation('page-Chat');
@@ -52,9 +52,9 @@ const ChatMessage: React.FC<IChatMessage> = ({
       id={item.id?.toString()}
       mine={isMine}
       prevSameUser={prevSameUser}
-      isAvatar={isAvatar}
+      withAvatar={withAvatar}
     >
-      {isAvatar &&
+      {withAvatar &&
         (!prevSameUser || !prevSameDay) &&
         (isMine ? (
           <SUserAvatar
@@ -145,7 +145,7 @@ interface ISMessage {
   type?: string;
   mine?: boolean;
   prevSameUser?: boolean;
-  isAvatar?: boolean;
+  withAvatar?: boolean;
 }
 
 const SMessage = styled.div<ISMessage>`
@@ -161,7 +161,7 @@ const SMessage = styled.div<ISMessage>`
           }
           ${props.theme.media.tablet} {
             padding-right: 0;
-            padding-left: ${props.isAvatar ? '44px' : ''};
+            padding-left: ${props.withAvatar ? '44px' : ''};
             justify-content: flex-start;
           }
         `;
@@ -172,7 +172,7 @@ const SMessage = styled.div<ISMessage>`
         }
         ${props.theme.media.tablet} {
           justify-content: flex-start;
-          padding-left: ${props.isAvatar ? '44px' : ''};
+          padding-left: ${props.withAvatar ? '44px' : ''};
         }
       `;
     }

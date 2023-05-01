@@ -1,8 +1,7 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import styled, { css } from 'styled-components';
-import _toNumber from 'lodash/toNumber';
 import { InfiniteData, useQueryClient } from 'react-query';
 
 import { useAppState } from '../../contexts/appStateContext';
@@ -17,27 +16,29 @@ interface IChatContainer {
 }
 
 export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
-  const { resizeMode } = useAppState();
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-  const isTablet = ['tablet'].includes(resizeMode);
-
-  const isMobileOrTablet = isMobile || isTablet;
-
   const router = useRouter();
-  const { roomID } = router.query;
-
   const queryClient = useQueryClient();
+  const { setSearchChatroom } = useGetChats();
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const { setSearchChatroom } = useGetChats();
-
   const [activeChatRoom, setActiveChatRoom] =
     useState<newnewapi.IChatRoom | null>(null);
 
-  const isActiveChatRoom = !!roomID;
+  const selectedChatRoomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
 
   const handleCloseChatRoom = useCallback(() => {
     router.replace(`${router.pathname}?tab=chat`, undefined, { shallow: true });
@@ -73,7 +74,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
 
         const foundedActiveChatRoom = chatrooms.find(
           (chatroom: newnewapi.IChatRoom) =>
-            router.query.roomID && chatroom.id === +router.query.roomID
+            selectedChatRoomId && chatroom.id === selectedChatRoomId
         );
 
         if (foundedActiveChatRoom) {
@@ -83,7 +84,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
         }
 
         const payload = new newnewapi.GetRoomRequest({
-          roomId: _toNumber(router.query.roomID),
+          roomId: selectedChatRoomId,
         });
 
         const res = await getRoom(payload);
@@ -103,27 +104,33 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
       }
     };
 
-    if (router.query.roomID !== activeChatRoom?.id && router.query.roomID) {
+    if (selectedChatRoomId && selectedChatRoomId !== activeChatRoom?.id) {
       findChatRoom();
     }
-  }, [roomID, router, activeChatRoom, setActiveChatRoom, queryClient]);
+  }, [
+    selectedChatRoomId,
+    router,
+    activeChatRoom,
+    setActiveChatRoom,
+    queryClient,
+  ]);
 
   return (
     <SContainer>
       <ChatSidebar
         initialTab={myRole}
-        hidden={isMobileOrTablet && isActiveChatRoom}
+        hidden={isMobileOrTablet && !!selectedChatRoomId}
         onChatRoomSelect={handleChatRoomSelect}
       />
 
-      <SContent hidden={isMobileOrTablet && !isActiveChatRoom}>
+      <SContent hidden={isMobileOrTablet && !!selectedChatRoomId}>
         {activeChatRoom && (
           <ChatContent
             chatRoom={activeChatRoom}
             isBackButton={isMobileOrTablet}
             onBackButtonClick={handleCloseChatRoom}
             isMoreButton
-            isChatMessageAvatar
+            withChatMessageAvatars
           />
         )}
         {!activeChatRoom && isLoading && <Loader size='md' isStatic />}

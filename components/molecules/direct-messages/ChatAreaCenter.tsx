@@ -23,14 +23,14 @@ interface IChatAreaCenter {
   chatRoom: newnewapi.IChatRoom;
   isAnnouncement?: boolean;
   textareaFocused: boolean;
-  isChatMessageAvatar?: boolean;
+  withAvatars?: boolean;
   variant?: 'primary' | 'secondary';
 }
 
 const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   chatRoom,
   isAnnouncement,
-  isChatMessageAvatar,
+  withAvatars,
   textareaFocused,
   variant,
 }) => {
@@ -148,7 +148,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
           item={item}
           nextElement={messages[index + 1]}
           prevElement={messages[index - 1]}
-          isAvatar={isChatMessageAvatar}
+          withAvatar={withAvatars}
           variant={variant}
         />
       ))}

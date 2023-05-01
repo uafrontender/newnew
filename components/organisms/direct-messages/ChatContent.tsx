@@ -61,8 +61,8 @@ interface IFuncProps {
   chatRoom: newnewapi.IChatRoom;
   isBackButton?: boolean;
   isMoreButton?: boolean;
-  isChatMessageAvatar?: boolean;
-  isAvatar?: boolean;
+  withChatMessageAvatars?: boolean;
+  withHeaderAvatar?: boolean;
   className?: string;
   variant?: 'primary' | 'secondary';
   onBackButtonClick?: () => void;
@@ -72,8 +72,8 @@ const ChatContent: React.FC<IFuncProps> = ({
   chatRoom,
   isBackButton,
   isMoreButton,
-  isChatMessageAvatar,
-  isAvatar,
+  withChatMessageAvatars,
+  withHeaderAvatar,
   className,
   variant,
   onBackButtonClick,
@@ -367,14 +367,14 @@ const ChatContent: React.FC<IFuncProps> = ({
         onBackButtonClick={onBackButtonClick}
         isBackButton={isBackButton}
         isMoreButton={isMoreButton}
-        isAvatar={isAvatar}
+        withAvatar={withHeaderAvatar}
       />
 
       <ChatAreaCenter
         chatRoom={chatRoom}
         isAnnouncement={isAnnouncement}
         textareaFocused={textareaFocused}
-        isChatMessageAvatar={isChatMessageAvatar}
+        withAvatars={withChatMessageAvatars}
         variant={variant}
       />
       <SBottomPart>

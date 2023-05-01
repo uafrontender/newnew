@@ -28,7 +28,7 @@ interface IChatList {
 const ChatList: React.FC<IChatList> = ({
   myRole,
   hidden,
-  onChatRoomSelect,
+  onChatRoomSelect: onChatRoomSelected,
 }) => {
   const { ref: scrollRef, inView } = useInView();
   const { resizeMode } = useAppState();
@@ -53,7 +53,7 @@ const ChatList: React.FC<IChatList> = ({
       searchQuery: searchChatroom,
     });
 
-  const chatrooms = useMemo(
+  const chatRooms = useMemo(
     () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
     [data]
   );
@@ -64,12 +64,14 @@ const ChatList: React.FC<IChatList> = ({
     }
   }, [inView, isLoading, hasNextPage, fetchNextPage]);
 
+  // Refetch on unreadCountForCreator changed
   useEffect(() => {
     if (myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
       refetch();
     }
-  }, [unreadCountForCreator, refetch, myRole]);
+  }, [myRole, unreadCountForCreator, refetch]);
 
+  // Refetch on unreadCountForUser changed
   useEffect(() => {
     if (myRole === newnewapi.ChatRoom.MyRole.SUBSCRIBER) {
       refetch();
@@ -92,16 +94,16 @@ const ChatList: React.FC<IChatList> = ({
       {/* Chats */}
       {!isLoading && (
         <>
-          {chatrooms.length > 0 && (
+          {chatRooms.length > 0 && (
             <>
-              {chatrooms.map((chatroom, index) => (
+              {chatRooms.map((chatroom, index) => (
                 <React.Fragment key={chatroom.id as number}>
-                  {hasNextPage && index === chatrooms.length - 1 && (
+                  {hasNextPage && index === chatRooms.length - 1 && (
                     <SRef ref={scrollRef}>Loading...</SRef>
                   )}
                   <ChatListItem
                     chatRoom={chatroom}
-                    onChatRoomSelect={onChatRoomSelect}
+                    onChatRoomSelected={onChatRoomSelected}
                     isActive={
                       !!(
                         router.query.roomID &&
@@ -109,7 +111,7 @@ const ChatList: React.FC<IChatList> = ({
                       )
                     }
                   />
-                  {index < chatrooms.length - 1 && <SChatSeparator />}
+                  {index < chatRooms.length - 1 && <SChatSeparator />}
                 </React.Fragment>
               ))}
               {/* TODO: Remove this for dynamic section */}
@@ -123,10 +125,10 @@ const ChatList: React.FC<IChatList> = ({
           )}
 
           {/* Empty inbox */}
-          {chatrooms.length === 0 && !searchChatroom && <EmptyInbox />}
+          {chatRooms.length === 0 && !searchChatroom && <EmptyInbox />}
 
           {/* No Search Results */}
-          {chatrooms.length === 0 && searchChatroom && (
+          {chatRooms.length === 0 && searchChatroom && (
             <NoResults text={searchChatroom} />
           )}
         </>
@@ -144,6 +146,7 @@ const SChatList = styled.div`
   flex-direction: column;
   overscroll-behavior: contain;
   height: calc(100vh - 124px);
+
   /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;

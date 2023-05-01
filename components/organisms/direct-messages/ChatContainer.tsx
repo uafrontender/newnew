@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 import { useAppState } from '../../../contexts/appStateContext';
@@ -16,7 +16,7 @@ interface IChatContainer {
   initialTab: newnewapi.ChatRoom.MyRole | undefined;
   className?: string;
   activeChatRoom?: newnewapi.IChatRoom;
-  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
+  onChatRoomSelected: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
 export const ChatContainer: React.FC<IChatContainer> = ({
@@ -24,20 +24,25 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   initialTab,
   className,
   activeChatRoom,
-  onChatRoomSelect,
+  onChatRoomSelected,
 }) => {
   const { resizeMode } = useAppState();
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-  const isTablet = ['tablet'].includes(resizeMode);
-
-  const isMobileOrTablet = isMobile || isTablet;
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const router = useRouter();
   const { room } = router.query;
 
-  const isActiveChatRoom = room !== 'empty';
+  // Cant just check activeChatRoom as it may be loading
+  const chatRoomSelected = useMemo(
+    () => !!room && !Array.isArray(room) && room !== 'empty',
+    [room]
+  );
 
   const handleCloseChatRoom = useCallback(() => {
     router.replace('/direct-messages', undefined, { shallow: true });
@@ -47,19 +52,18 @@ export const ChatContainer: React.FC<IChatContainer> = ({
     <SContainer className={className}>
       <ChatSidebar
         initialTab={initialTab}
-        hidden={isMobileOrTablet && isActiveChatRoom}
-        onChatRoomSelect={onChatRoomSelect}
-        isTabs
+        hidden={isMobileOrTablet && chatRoomSelected}
+        onChatRoomSelect={onChatRoomSelected}
+        withTabs
       />
-
-      <SContent hidden={isMobileOrTablet && !isActiveChatRoom}>
+      <SContent hidden={isMobileOrTablet && !chatRoomSelected}>
         {activeChatRoom && (
           <ChatContent
             chatRoom={activeChatRoom}
             isBackButton={isMobileOrTablet}
             onBackButtonClick={handleCloseChatRoom}
             isMoreButton
-            isChatMessageAvatar
+            withChatMessageAvatars
           />
         )}
         {!activeChatRoom && !isLoading && !isMobileOrTablet && <SelectChat />}
@@ -88,24 +92,18 @@ const SContainer = styled.div`
 const SContent = styled.div<{
   hidden: boolean;
 }>`
+  display: ${({ hidden }) => (hidden ? 'none' : 'block')};
+
   position: relative;
   height: 100%;
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  background: ${({ theme }) => theme.colorsThemed.background.secondary};
   margin: 0 -15px;
   padding: 0;
+
   ${(props) => props.theme.media.laptop} {
     height: 100%;
     width: calc(100% - 384px);
     margin: 0 0 0 auto;
-    border-radius: ${(props) => props.theme.borderRadius.large};
+    border-radius: ${({ theme }) => theme.borderRadius.large};
   }
-
-  ${({ hidden }) => {
-    if (hidden) {
-      return css`
-        display: none;
-      `;
-    }
-    return css``;
-  }}
 `;

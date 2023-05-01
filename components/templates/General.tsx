@@ -184,9 +184,12 @@ export const General: React.FC<IGeneral> = (props) => {
     router.push(`${router.pathname}?tab=chat`);
   }, [router]);
 
-  const mobileChatOpened =
-    (isMobile && router.query.tab === 'chat') ||
-    router.query.tab === 'direct-messages';
+  const mobileChatOpen = useMemo(
+    () =>
+      (isMobile && router.query.tab === 'chat') ||
+      router.query.tab === 'direct-messages',
+    [isMobile, router.query.tab]
+  );
 
   const chatButtonVisible = useMemo(
     () => isMobile && withChat && directMessagesAvailable,
@@ -251,9 +254,9 @@ export const General: React.FC<IGeneral> = (props) => {
         {chatButtonVisible && (
           <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
-            zIndex={mobileChatOpened ? 11 : moreMenuMobileOpen ? 9 : 10}
+            zIndex={mobileChatOpen ? 11 : moreMenuMobileOpen ? 9 : 10}
           >
-            {!mobileChatOpened ? (
+            {!mobileChatOpen ? (
               <FloatingMessages withCounter openChat={openChat} />
             ) : (
               <ChatsProvider>
@@ -266,10 +269,10 @@ export const General: React.FC<IGeneral> = (props) => {
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (isMobile && mobileNavigationVisible && !mobileChatOpened
+              (isMobile && mobileNavigationVisible && !mobileChatOpen
                 ? 56
                 : 0) +
-              (chatButtonVisible && !mobileChatOpened ? 72 : 0)
+              (chatButtonVisible && !mobileChatOpen ? 72 : 0)
             }
             right={4}
             zIndex={moreMenuMobileOpen ? 9 : undefined}

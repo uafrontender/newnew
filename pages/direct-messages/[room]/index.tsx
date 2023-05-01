@@ -13,7 +13,6 @@ import { useQueryClient, InfiniteData } from 'react-query';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useUpdateEffect } from 'react-use';
-import _toNumber from 'lodash/toNumber';
 
 import { NextPageWithLayout } from '../../_app';
 import { useAppSelector } from '../../../redux-store/store';
@@ -96,6 +95,22 @@ const Chat: NextPage = () => {
     return router.query.room;
   }, [router.query.room]);
 
+  const myRole = useMemo(() => {
+    if (!router.query.myRole || Array.isArray(router.query.myRole)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.myRole);
+  }, [router.query.myRole]);
+
+  const roomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
+
   const chatType = useMemo<ChatTypes>(
     () =>
       room && room.includes('-')
@@ -114,7 +129,7 @@ const Chat: NextPage = () => {
       : newnewapi.ChatRoom.MyRole.CREATOR;
   }, [room, chatType]);
 
-  const handleChatRoomSelect = useCallback(
+  const handleChatRoomSelected = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
       setSearchChatroom('');
 
@@ -134,11 +149,11 @@ const Chat: NextPage = () => {
         { shallow: true }
       );
     },
-    [router, setSearchChatroom, user.userData?.username]
+    [router, user.userData?.username, setSearchChatroom]
   );
 
-  const findChatRoom = useCallback(
-    (roomId: number, role: newnewapi.ChatRoom.MyRole) => {
+  const findLoadedChatRoom = useCallback(
+    (chatRoomId: number, role: newnewapi.ChatRoom.MyRole) => {
       const query = queryClient.getQueriesData<
         InfiniteData<{ chatrooms: newnewapi.IChatRoom[] }>
       >(['private', 'getMyRooms', { myRole: role, searchQuery: '' }]);
@@ -154,7 +169,7 @@ const Chat: NextPage = () => {
         : [];
 
       const foundActiveChatRoom = chatRooms.find(
-        (chatroom: newnewapi.IChatRoom) => chatroom.id === roomId
+        (chatroom: newnewapi.IChatRoom) => chatroom.id === chatRoomId
       );
 
       return foundActiveChatRoom;
@@ -166,6 +181,7 @@ const Chat: NextPage = () => {
     if (!room) {
       return undefined;
     }
+
     const chatRoomParams = getChatRoomParamsFromUrl(
       room,
       user.userData?.username
@@ -211,17 +227,12 @@ const Chat: NextPage = () => {
     const getChatRoom = async () => {
       try {
         setIsLoading(true);
-        // find room in already requested witch react-query chatRooms for ChatList
-        // TODO: why not myRole?
-        // TODO: parse roomId in useMemo
-        if (router.query.myRole && router.query.roomID) {
-          const foundedActiveChatRoom = findChatRoom(
-            _toNumber(router.query.roomID),
-            _toNumber(router.query.myRole)
-          );
+        // Find room in already requested witch react-query chatRooms for ChatList
+        if (myRole && roomId) {
+          const loadedActiveChatRoom = findLoadedChatRoom(roomId, myRole);
 
-          if (foundedActiveChatRoom) {
-            setActiveChatRoom(foundedActiveChatRoom);
+          if (loadedActiveChatRoom) {
+            setActiveChatRoom(loadedActiveChatRoom);
             return;
           }
         }
@@ -231,7 +242,7 @@ const Chat: NextPage = () => {
           return;
         }
 
-        // request chatRoom if it wasn't found in ChatList
+        // Request chatRoom if it wasn't found in ChatList
         const chatRoom = await fetchChatRoom();
 
         if (!chatRoom) {
@@ -245,8 +256,6 @@ const Chat: NextPage = () => {
           room,
           { shallow: true }
         );
-
-        return;
       } catch (err) {
         console.error(err);
         router.replace('/direct-messages', undefined, { shallow: true });
@@ -255,18 +264,18 @@ const Chat: NextPage = () => {
       }
     };
 
-    if (router.query.roomID !== activeChatRoom?.id || !activeChatRoom?.id) {
+    if (roomId !== activeChatRoom?.id || !activeChatRoom?.id) {
       getChatRoom();
     }
   }, [
-    router.query.myRole,
-    router.query.roomID,
+    myRole,
+    roomId,
     room,
     queryClient,
     activeChatRoom?.id,
     router,
     fetchChatRoom,
-    findChatRoom,
+    findLoadedChatRoom,
   ]);
 
   return (
@@ -277,7 +286,7 @@ const Chat: NextPage = () => {
       <ChatContainer
         isLoading={isLoading}
         initialTab={initialTab}
-        onChatRoomSelect={handleChatRoomSelect}
+        onChatRoomSelected={handleChatRoomSelected}
         activeChatRoom={activeChatRoom}
       />
     </>

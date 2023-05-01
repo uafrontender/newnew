@@ -10,7 +10,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import _toNumber from 'lodash/toNumber';
 import { InfiniteData, useQueryClient } from 'react-query';
 
 import Button from '../../../atoms/Button';
@@ -81,9 +80,13 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const [showNewMessageModal, setShowNewMessageModal] =
     useState<boolean>(false);
 
-  const closeNewMsgModal = () => {
-    setShowNewMessageModal(false);
-  };
+  const selectedChatRoomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
 
   const tabs: Tab[] = useMemo(() => {
     if (directMessagesAvailable) {
@@ -115,7 +118,14 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     unreadNotificationCount,
   ]);
 
-  const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
+  const activeTabIndex = useMemo(
+    () => tabs.findIndex((el) => el.nameToken === tab),
+    [tabs, tab]
+  );
+
+  const closeNewMsgModal = useCallback(() => {
+    setShowNewMessageModal(false);
+  }, []);
 
   const handleChatClick = useCallback(() => {
     Mixpanel.track('Navigation Item Clicked', {
@@ -218,7 +228,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
 
         const foundedActiveChatRoom = chatrooms.find(
           (chatroom: newnewapi.IChatRoom) =>
-            router.query.roomID && chatroom.id === +router.query.roomID
+            selectedChatRoomId && chatroom.id === selectedChatRoomId
         );
 
         if (foundedActiveChatRoom) {
@@ -228,7 +238,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
         }
 
         const payload = new newnewapi.GetRoomRequest({
-          roomId: _toNumber(router.query.roomID),
+          roomId: selectedChatRoomId,
         });
 
         const res = await getRoom(payload);
@@ -248,12 +258,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       }
     };
 
-    if (router.query.roomID !== activeChatRoom?.id && router.query.roomID) {
+    if (selectedChatRoomId && selectedChatRoomId !== activeChatRoom?.id) {
       findChatRoom();
     }
   }, [
-    router.query.myRole,
-    router.query.roomID,
+    selectedChatRoomId,
     queryClient,
     activeChatRoom?.id,
     router,
@@ -356,7 +365,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
                 chatRoom={activeChatRoom}
                 isBackButton
                 onBackButtonClick={handleCloseChatRoom}
-                isAvatar
+                withHeaderAvatar
                 variant='secondary'
               />
             )}

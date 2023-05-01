@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -20,13 +20,13 @@ interface IChatSidebar {
   initialTab: newnewapi.ChatRoom.MyRole | undefined;
   hidden: boolean;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
-  isTabs?: boolean;
+  withTabs?: boolean;
 }
 
 const ChatSidebar: React.FC<IChatSidebar> = ({
   initialTab,
   hidden,
-  isTabs,
+  withTabs,
   onChatRoomSelect,
 }) => {
   const { searchChatroom } = useGetChats();
@@ -37,22 +37,31 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     newnewapi.ChatRoom.MyRole | undefined
   >(initialTab);
 
+  const chatsWithCreatorsAvailable = useMemo(
+    () => bundles && bundles.length > 0,
+    [bundles]
+  );
+  const chatsWithBundleOwnersAvailable = useMemo(
+    () => isSellingBundles || hasSoldBundles,
+    [isSellingBundles, hasSoldBundles]
+  );
+
+  const tabsVisible = useMemo(
+    () => chatsWithCreatorsAvailable && chatsWithBundleOwnersAvailable,
+    [chatsWithCreatorsAvailable, chatsWithBundleOwnersAvailable]
+  );
+
   useEffect(() => {
-    if (!activeTab && searchChatroom === '') {
-      if (bundles?.length && (isSellingBundles || hasSoldBundles)) {
-        setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
-      } else {
-        setActiveTab(undefined);
-      }
+    if (tabsVisible) {
+      setActiveTab((curr) => {
+        if (curr || searchChatroom) {
+          return curr;
+        }
+
+        return newnewapi.ChatRoom.MyRole.CREATOR;
+      });
     }
-  }, [
-    activeTab,
-    searchChatroom,
-    bundles?.length,
-    isSellingBundles,
-    hasSoldBundles,
-    setActiveTab,
-  ]);
+  }, [searchChatroom, tabsVisible]);
 
   const changeActiveTab = useCallback(
     (tabName: newnewapi.ChatRoom.MyRole) => {
@@ -65,16 +74,9 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
   return (
     <SSidebar hidden={hidden}>
       <ChatToolbar />
-      {isTabs &&
-        searchChatroom === '' &&
-        bundles &&
-        bundles?.length > 0 &&
-        (isSellingBundles || hasSoldBundles) && (
-          <ChatListTabs
-            activeTab={activeTab!!}
-            changeActiveTab={changeActiveTab}
-          />
-        )}
+      {withTabs && !searchChatroom && tabsVisible && activeTab && (
+        <ChatListTabs activeTab={activeTab} changeActiveTab={changeActiveTab} />
+      )}
       <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
     </SSidebar>
   );
@@ -85,23 +87,16 @@ export default ChatSidebar;
 const SSidebar = styled.div<{
   hidden: boolean;
 }>`
+  display: ${({ hidden }) => (hidden ? 'none' : 'flex')};
+
   width: 100%;
   overflow: hidden;
-  display: flex;
   flex-direction: column;
+
   ${(props) => props.theme.media.laptop} {
     background: none;
     position: static;
     width: 352px;
     z-index: 0;
   }
-
-  ${({ hidden }) => {
-    if (hidden) {
-      return css`
-        display: none;
-      `;
-    }
-    return css``;
-  }}
 `;

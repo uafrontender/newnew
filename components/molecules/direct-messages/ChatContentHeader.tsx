@@ -28,7 +28,7 @@ interface IFunctionProps {
   isVisavisBlocked: boolean;
   isBackButton?: boolean;
   isMoreButton?: boolean;
-  isAvatar?: boolean;
+  withAvatar?: boolean;
   onUserReport: () => void;
   onUserBlock: () => Promise<void>;
   onBackButtonClick?: () => void;
@@ -38,7 +38,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   isVisavisBlocked,
   isBackButton,
   isMoreButton,
-  isAvatar,
+  withAvatar,
   onUserBlock,
   onUserReport,
   onBackButtonClick,
@@ -104,7 +104,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
         {isBackButton && onBackButtonClick && (
           <GoBackButton onClick={goBackHandler} />
         )}
-        {isAvatar &&
+        {withAvatar &&
           (chatRoom?.kind === 4 ? (
             <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
           ) : (
