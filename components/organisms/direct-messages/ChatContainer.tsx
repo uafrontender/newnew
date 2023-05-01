@@ -35,9 +35,9 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   const isMobileOrTablet = isMobile || isTablet;
 
   const router = useRouter();
-  const { username } = router.query;
+  const { room } = router.query;
 
-  const isActiveChatRoom = username !== 'empty';
+  const isActiveChatRoom = room !== 'empty';
 
   const handleCloseChatRoom = useCallback(() => {
     router.replace('/direct-messages', undefined, { shallow: true });
