@@ -16,7 +16,7 @@ interface IChatsContext {
   setSearchChatroom: (str: string) => void;
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => void;
   removeInputValueFromChatsDraft: (roomId: number | Long) => void;
-  restDraft: () => void;
+  resetDraft: () => void;
 }
 
 const ChatsContext = createContext<IChatsContext>({
@@ -25,7 +25,7 @@ const ChatsContext = createContext<IChatsContext>({
   setSearchChatroom: (str: string) => {},
   addInputValueIntoChatsDraft: (roomId: number | Long, text: string) => {},
   removeInputValueFromChatsDraft: (roomId: number | Long) => {},
-  restDraft: () => {},
+  resetDraft: () => {},
 });
 
 interface IChatsProvider {
@@ -70,7 +70,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
     []
   );
 
-  const restDraft = useCallback(() => {
+  const resetDraft = useCallback(() => {
     setChatsDraft([]);
   }, []);
 
@@ -100,7 +100,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,
-      restDraft,
+      resetDraft,
     }),
     [
       searchChatroomDebounced,
@@ -108,7 +108,7 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
       setSearchChatroom,
       addInputValueIntoChatsDraft,
       removeInputValueFromChatsDraft,
-      restDraft,
+      resetDraft,
     ]
   );
 
