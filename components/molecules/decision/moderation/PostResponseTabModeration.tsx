@@ -149,7 +149,7 @@ const PostResponseTabModeration: React.FunctionComponent<
     setIsEditTitleMenuOpen(true);
   }, [setIsEditTitleMenuOpen, postUuid]);
 
-  const earnedAmount = useMemo(() => {
+  const amountSwitch = useCallback(() => {
     if (!winningOptionAc && (!options || !options.length) && !moneyBacked) {
       return undefined;
     }
@@ -160,7 +160,6 @@ const PostResponseTabModeration: React.FunctionComponent<
         true
       );
     }
-
     if (postType === 'mc' && options) {
       return formatNumber(
         options.reduce(
@@ -276,8 +275,7 @@ const PostResponseTabModeration: React.FunctionComponent<
           />
           <STextContentWrapper>
             <PostEarnings
-              postType={postType}
-              amount={earnedAmount}
+              amount={amountSwitch()}
               label={t('postResponseTabModeration.succeeded.youMade')}
             />
             <WinningOption
@@ -340,12 +338,11 @@ const PostResponseTabModeration: React.FunctionComponent<
           />
         )}
         {/* Success modal */}
-        {earnedAmount && (
+        {amountSwitch() && amountSwitch() !== '0' && (
           <PostResponseSuccessModal
+            amount={`$${amountSwitch()!!}`}
             isOpen={responseUploadSuccess}
             zIndex={20}
-            amount={earnedAmount}
-            postType={postType}
           />
         )}
         {/* Edit Post title */}
@@ -368,8 +365,7 @@ const PostResponseTabModeration: React.FunctionComponent<
 
       <STextContentWrapper>
         <PostEarnings
-          postType={postType}
-          amount={earnedAmount}
+          amount={amountSwitch()}
           label={t('postResponseTabModeration.awaiting.youWillGet')}
         />
 
@@ -429,12 +425,11 @@ const PostResponseTabModeration: React.FunctionComponent<
         {t('postResponseTabModeration.awaiting.postResponseBtn')}
       </SUploadButton>
       {/* Success modal */}
-      {earnedAmount && (
+      {amountSwitch() && amountSwitch() !== '0' && (
         <PostResponseSuccessModal
+          amount={`$${amountSwitch()!!}`}
           isOpen={responseUploadSuccess}
           zIndex={20}
-          amount={earnedAmount}
-          postType={postType}
         />
       )}
       {/* Edit Post title */}
