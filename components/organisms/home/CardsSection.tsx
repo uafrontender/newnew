@@ -400,11 +400,17 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       );
     }, [visibleListItem, collection, scrollStep, tutorialCard]);
 
+    // TODO: refactoring
     useEffect(() => {
-      if (!canScrollRight && collection?.length > 0 && onReachEnd) {
+      if (
+        !canScrollRight &&
+        collection?.length > 0 &&
+        onReachEnd &&
+        visibleListItem !== 0
+      ) {
         onReachEnd();
       }
-    }, [canScrollRight, onReachEnd, collection?.length]);
+    }, [canScrollRight, onReachEnd, collection?.length, visibleListItem]);
 
     useComponentScrollRestoration(
       scrollContainerRef.current ?? undefined,
