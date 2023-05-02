@@ -1,12 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Headline from '../Headline';
 import Text from '../Text';
 import GenericSkeleton from '../../molecules/GenericSkeleton';
+import { TPostType } from '../../../utils/switchPostType';
 
 interface IPostEarning {
+  postType: TPostType;
   amount: string | undefined;
   label: string;
   isEarnedAmountFetched?: boolean;
@@ -14,15 +17,25 @@ interface IPostEarning {
 }
 
 const PostEarnings: React.FunctionComponent<IPostEarning> = ({
+  postType,
   amount,
   label,
   isEarnedAmountFetched,
   loading,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('page-Post');
 
   if (isEarnedAmountFetched && !amount) {
     return null;
+  }
+
+  if (amount === '0' && postType === 'mc') {
+    return (
+      <SText variant={2} weight={600}>
+        {t('postResponseTabModeration.succeeded.payedByBundleVotes')}
+      </SText>
+    );
   }
 
   if (amount === '0') {
@@ -91,4 +104,8 @@ const SEarningsSkeleton = styled(SGenericSkeleton)`
   ${({ theme }) => theme.media.laptop} {
     height: 60px;
   }
+`;
+
+const SText = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
