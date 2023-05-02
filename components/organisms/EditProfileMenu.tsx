@@ -673,7 +673,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
 
     setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= minZoomProfileImage + 2) {
+      if (z + 0.2 >= minZoomProfileImage + 2) {
         return minZoomProfileImage + 2;
       }
       return z + 0.2;
