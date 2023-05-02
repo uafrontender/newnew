@@ -25,14 +25,16 @@ import logoAnimation from '../../../../public/animations/mobile_logo.json';
 import PlayIcon from '../../../../public/images/svg/icons/filled/Play.svg';
 import MaximizeIcon from '../../../../public/images/svg/icons/outlined/Maximize.svg';
 import MinimizeIcon from '../../../../public/images/svg/icons/outlined/Minimize.svg';
-import PlayerScrubber from '../../../atoms/PlayerScrubber';
+import PlayerScrubber, { TPlayerScrubber } from '../../../atoms/PlayerScrubber';
 import { useAppState } from '../../../../contexts/appStateContext';
 import Button from '../../../atoms/Button';
 import { setMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch } from '../../../../redux-store/store';
 import isSafari from '../../../../utils/isSafari';
 import isBrowser from '../../../../utils/isBrowser';
-import PostVideoFullscreenControls from './PostVideoFullscreenControls';
+import PostVideoFullscreenControls, {
+  TPostVideoFullscreenControls,
+} from './PostVideoFullscreenControls';
 import isIOS from '../../../../utils/isIOS';
 
 interface IPostVideojsPlayer {
@@ -119,7 +121,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
     const [isHovered, setIsHovered] = useState(false);
 
-    const [playbackTime, setPlaybackTime] = useState(0);
+    const playerScrubberRef = useRef<TPlayerScrubber>(null);
+    const postVideoFullscreenControlsRef =
+      useRef<TPostVideoFullscreenControls>(null);
     const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
     const [currentVolume, setCurrentVolume] = useState(0);
@@ -134,7 +138,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           // to avoid double playback start
           setIsScrubberTimeChanging(true);
           playerRef.current?.pause();
-          setPlaybackTime(newValue);
+          playerScrubberRef?.current?.changeCurrentTime(newValue);
+          postVideoFullscreenControlsRef?.current?.changeCurrentTime(newValue);
           playerRef.current?.currentTime(newValue);
 
           setTimeout(() => {
@@ -144,7 +149,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
             });
           }, 100);
         } else {
-          setPlaybackTime(newValue);
+          playerScrubberRef?.current?.changeCurrentTime(newValue);
+          postVideoFullscreenControlsRef?.current?.changeCurrentTime(newValue);
           playerRef.current?.currentTime(newValue);
         }
       },
@@ -252,7 +258,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           });
 
           p.on('timeupdate', (e) => {
-            setPlaybackTime(p.currentTime());
+            playerScrubberRef?.current?.changeCurrentTime(p.currentTime());
+            postVideoFullscreenControlsRef?.current?.changeCurrentTime(
+              p.currentTime()
+            );
           });
 
           // Loading state
@@ -668,7 +677,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           playerRef?.current?.pause();
           // Required to avoid one frame flickering when changing items in the slider
           setTimeout(() => {
-            setPlaybackTime(0);
+            playerScrubberRef?.current?.changeCurrentTime(0);
+            postVideoFullscreenControlsRef?.current?.changeCurrentTime(0);
             playerRef.current?.currentTime(0);
           }, 100);
         }
@@ -714,14 +724,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         window.removeEventListener('keydown', handlePressSpacebar);
       };
     }, [handleSetIsPaused, isActive, isInSlider]);
-
-    useEffect(() => {
-      const duration = playerRef?.current?.duration();
-      if (onPlaybackProgress && isActive && duration) {
-        const progress = (playbackTime / duration) * 100;
-        onPlaybackProgress?.(progress);
-      }
-    }, [isActive, onPlaybackProgress, playbackTime]);
 
     // Try to pause the video when the component unmounts
     // to avoid attempts to play broken segments
@@ -802,12 +804,15 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           </SLoader>
         )}
         <PlayerScrubber
+          ref={playerScrubberRef}
           isHovered={isHovered}
-          currentTime={playbackTime}
           videoDuration={playerRef?.current?.duration() || 10}
           withTime={videoDurationWithTime}
           bufferedPercent={bufferedPercent || undefined}
           handleChangeTime={handlePlayerScrubberChangeTime}
+          onPlaybackProgress={
+            isActive && onPlaybackProgress ? onPlaybackProgress : undefined
+          }
         />
         {/* Custom fullscreen controls */}
         {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
@@ -845,11 +850,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         {isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()
           ? ReactDOM?.createPortal(
               <PostVideoFullscreenControls
+                ref={postVideoFullscreenControlsRef}
                 isPaused={
                   isPaused && !!showPlayButton && !isScrubberTimeChanging
                 }
                 handleToggleVideoPaused={handleToggleVideoPaused}
-                currentTime={playbackTime}
                 videoDuration={playerRef?.current?.duration() || 10}
                 handleChangeTime={handlePlayerScrubberChangeTime}
                 isMuted={!!muted}
