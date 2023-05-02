@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
@@ -32,25 +31,26 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     setTextareaFocused,
   } = props;
 
-  const [isShiftEnter, setIsShiftEnter] = useState<boolean>(false);
+  const [isEnter, setIsEnter] = useState<boolean>(false);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
-      onChange(id, e.target.value, isShiftEnter);
+      onChange(id, e.target.value, isEnter);
     },
-    [id, onChange, isShiftEnter]
+    [id, onChange, isEnter]
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      /* eslint-disable no-unused-expressions */
       if (e.key === 'Enter' && value.length === 500) {
         gotMaxLength?.();
       }
 
-      e.key === 'Enter' && e.shiftKey === true
-        ? setIsShiftEnter(true)
-        : setIsShiftEnter(false);
+      if (e.key === 'Enter' && e.shiftKey === false) {
+        setIsEnter(true);
+      } else {
+        setIsEnter(false);
+      }
     },
     [gotMaxLength, value.length]
   );

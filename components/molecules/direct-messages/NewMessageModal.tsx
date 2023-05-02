@@ -95,17 +95,17 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
     setSearchValue(str);
   };
 
-  const filteredChatRooms = useMemo(
-    () =>
-      chatRooms.filter(
-        (chat: newnewapi.IVisavisListItem) =>
-          (chat.user?.username &&
-            chat.user?.username.toLowerCase().includes(searchValue)) ||
-          (chat.user?.nickname &&
-            chat.user?.nickname.toLowerCase().includes(searchValue))
-      ),
-    [chatRooms, searchValue]
-  );
+  const filteredChatRooms = useMemo(() => {
+    const searchValueInLowerCase = searchValue.toLowerCase();
+
+    return chatRooms.filter(
+      (chat: newnewapi.IVisavisListItem) =>
+        (chat.user?.username &&
+          chat.user?.username.toLowerCase().includes(searchValueInLowerCase)) ||
+        (chat.user?.nickname &&
+          chat.user?.nickname.toLowerCase().includes(searchValueInLowerCase))
+    );
+  }, [chatRooms, searchValue]);
 
   const chatsInAlphabetOrder = useMemo(() => {
     const obj = filteredChatRooms.reduce((acc: { [key: string]: any }, c) => {

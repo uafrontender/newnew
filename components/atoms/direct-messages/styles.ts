@@ -196,8 +196,15 @@ export const SVerificationSVG = styled(InlineSvg)`
 
 export const SChatItemLastMessage = styled(Text)`
   white-space: nowrap;
-  max-width: 228px;
+  max-width: 186px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+
+  ${({ theme }) => theme.media.mobileM} {
+    max-width: 228px;
+  }
 `;
 
 export const SUnreadCountWrapper = styled.div`

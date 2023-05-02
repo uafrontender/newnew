@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import React, {
   useState,
   useEffect,
@@ -12,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
+import { useMeasure } from 'react-use';
 
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -109,6 +109,9 @@ const ChatContent: React.FC<IFuncProps> = ({
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
+
+  const [bottomPartRef, { height: bottomPartHeight }] =
+    useMeasure<HTMLDivElement>();
 
   useEffect(() => {
     if (chatRoom.id && isSocketConnected) {
@@ -288,12 +291,8 @@ const ChatContent: React.FC<IFuncProps> = ({
   }, [sendingMessage, submitMessage, chatRoom.id]);
 
   const handleChange = useCallback(
-    (id: string, value: string, isShiftEnter: boolean) => {
-      if (
-        value.charCodeAt(value.length - 1) === 10 &&
-        !isShiftEnter &&
-        !isMobileOrTablet
-      ) {
+    (id: string, value: string, isEnter: boolean) => {
+      if (isEnter && !isMobileOrTablet) {
         setMessageText(value.slice(0, -1));
         handleSubmit();
         return;
@@ -377,7 +376,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   }, []);
 
   return (
-    <SContainer isTextareaHidden={isTextareaHidden} className={className}>
+    <SContainer className={className}>
       <ChatContentHeader
         chatRoom={chatRoom}
         isVisavisBlocked={isVisavisBlocked}
@@ -389,52 +388,57 @@ const ChatContent: React.FC<IFuncProps> = ({
         withAvatar={withHeaderAvatar}
       />
 
-      <ChatAreaCenter
+      <SChatAreaCenter
         chatRoom={chatRoom}
         isAnnouncement={isAnnouncement}
         textareaFocused={textareaFocused}
         withAvatars={withChatMessageAvatars}
         variant={variant}
+        bottomOffset={bottomPartHeight}
+        isAnnouncementLabel={!isMyAnnouncement && isAnnouncement}
       />
-      <SBottomPart>
-        {!isTextareaHidden ? (
-          <SBottomTextarea>
-            <STextArea>
-              <TextArea
-                maxlength={500}
-                value={messageText}
-                onChange={handleChange}
-                placeholder={t('chat.placeholder')}
-                gotMaxLength={handleSubmit}
-                setTextareaFocused={handleTextareaFocused}
-                variant={variant}
-              />
-            </STextArea>
-            <SButton
-              withShadow
-              view={messageTextValid ? 'primaryGrad' : 'secondary'}
-              onClick={handleSubmit}
-              loading={sendingMessage}
-              loadingAnimationColor='blue'
-              disabled={
-                sendingMessage || !messageTextValid || messageText.length < 1
-              }
-            >
-              <SInlineSVG
-                svg={!sendingMessage ? sendIcon : ''}
-                fill={
-                  messageTextValid && messageText.length > 0
-                    ? theme.colors.white
-                    : theme.colorsThemed.text.primary
+
+      <SBottomPart ref={bottomPartRef}>
+        <SBottomPartContentWrapper>
+          {isTextareaHidden ? (
+            whatComponentToDisplay()
+          ) : (
+            <SBottomTextarea>
+              <STextArea>
+                <TextArea
+                  maxlength={500}
+                  value={messageText}
+                  onChange={handleChange}
+                  placeholder={t('chat.placeholder')}
+                  gotMaxLength={handleSubmit}
+                  setTextareaFocused={handleTextareaFocused}
+                  variant={variant}
+                />
+              </STextArea>
+              <SButton
+                withShadow
+                view={messageTextValid ? 'primaryGrad' : 'secondary'}
+                onClick={handleSubmit}
+                loading={sendingMessage}
+                loadingAnimationColor='blue'
+                disabled={
+                  sendingMessage || !messageTextValid || messageText.length < 1
                 }
-                width='24px'
-                height='24px'
-              />
-            </SButton>
-          </SBottomTextarea>
-        ) : (
-          whatComponentToDisplay()
-        )}
+              >
+                <SInlineSVG
+                  svg={!sendingMessage ? sendIcon : ''}
+                  fill={
+                    messageTextValid && messageText.length > 0
+                      ? theme.colors.white
+                      : theme.colorsThemed.text.primary
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SButton>
+            </SBottomTextarea>
+          )}
+        </SBottomPartContentWrapper>
       </SBottomPart>
       {chatRoom.visavis && (
         <ReportModal
@@ -458,9 +462,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
 export default ChatContent;
 
-const SContainer = styled.div<{
-  isTextareaHidden: boolean;
-}>`
+const SContainer = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -472,13 +474,6 @@ const SContainer = styled.div<{
   ${(props) => props.theme.media.tablet} {
     padding: 0;
     flex-shrink: unset;
-
-    ${({ isTextareaHidden }) =>
-      isTextareaHidden
-        ? css`
-            padding-bottom: 60px;
-          `
-        : null}
   }
 `;
 
@@ -490,16 +485,22 @@ const SBottomPart = styled.div`
   left: 0;
   right: 0;
   background: ${(props) => props.theme.colorsThemed.background.secondary};
-  padding: 10px 16px 20px;
 
   ${(props) => props.theme.media.tablet} {
     position: absolute;
-    padding: 20px 24px;
     bottom: 0;
     left: 0;
     right: 0;
     background: none;
     min-height: 80px;
+  }
+`;
+
+const SBottomPartContentWrapper = styled.div`
+  padding: 10px 16px 20px;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 20px 24px;
   }
 `;
 
@@ -528,4 +529,31 @@ const SButton = styled(Button)`
         ? props.theme.colors.white
         : props.theme.colorsThemed.button.background.secondary};
   }
+`;
+
+const SChatAreaCenter = styled(ChatAreaCenter)<{
+  bottomOffset: number;
+  isAnnouncementLabel: boolean;
+}>`
+  ${({ bottomOffset, theme, isAnnouncementLabel }) =>
+    bottomOffset
+      ? css`
+          && {
+            bottom: ${`${bottomOffset}px`};
+          }
+
+          && {
+            // 80px chat area header height
+            ${theme.media.tablet} {
+              bottom: 0;
+              min-height: ${`calc(100% - ${
+                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
+              }px)`};
+              height: ${`calc(100vh - ${
+                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
+              }px)`};
+            }
+          }
+        `
+      : null}
 `;

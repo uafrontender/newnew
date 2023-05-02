@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import { useQueryClient } from 'react-query';
@@ -25,6 +25,7 @@ interface IChatAreaCenter {
   textareaFocused: boolean;
   withAvatars?: boolean;
   variant?: 'primary' | 'secondary';
+  className?: string;
 }
 
 const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
@@ -33,6 +34,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   withAvatars,
   textareaFocused,
   variant,
+  className,
 }) => {
   const { ref: loadingRef, inView } = useInView();
   const { socketConnection } = useContext(SocketContext);
@@ -92,7 +94,8 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       messages.length === 0 &&
       !isAnnouncement &&
       !isLoading &&
-      chatRoom.myRole === 1,
+      chatRoom.myRole === 1 &&
+      chatRoom.visavis?.isSubscriptionActive,
     [messages, isAnnouncement, isLoading, chatRoom]
   );
 
@@ -145,7 +148,11 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer textareaFocused={textareaFocused}>
+    <SContainer
+      textareaFocused={textareaFocused}
+      className={className}
+      isAnnouncement={isAnnouncement}
+    >
       {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
       {hasNoMessagesYet && <NoMessagesYet />}
 
@@ -170,6 +177,7 @@ export default ChatAreaCenter;
 
 interface ISContainer {
   textareaFocused: boolean;
+  isAnnouncement?: boolean;
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
@@ -188,6 +196,13 @@ const SContainer = styled.div<ISContainer>`
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior: contain;
+
+  ${({ isAnnouncement }) =>
+    isAnnouncement
+      ? css`
+          padding-top: 75px;
+        `
+      : null}
 
   ${(props) => props.theme.media.tablet} {
     position: static;
