@@ -1,9 +1,10 @@
 {
   "header": "恭喜！",
+  "payedByBundleVotes_NEED_TRANSLATION": "Voters paid using bundles votes",
   "youMade": "你做了",
   "makeNewPostButton": "再發一個帖子",
   "subtitle": "",
   "itsLiveTitle": "已上線！",
-  "shareCaptionBid_NEED_TRANSALTION": "Copy the link to share your Bid on your social platforms.",
-  "shareCaptionSuperpoll_NEED_TRANSALTION": "Copy the link to share your Superpoll on your social platforms."
+  "shareCaptionBid_NEED_TRANSLATION": "Copy the link to share your Bid on your social platforms.",
+  "shareCaptionSuperpoll_NEED_TRANSLATION": "Copy the link to share your Superpoll on your social platforms."
 }
