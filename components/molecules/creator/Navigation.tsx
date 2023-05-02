@@ -77,8 +77,21 @@ export const Navigation = () => {
   const renderItem = useCallback(
     (item: NavigationItem) => {
       const active = router.route.includes(item.url);
+      const queryParams = router.query;
+      const queryString =
+        queryParams.tab &&
+        (item.url === '/creator/dashboard' || item.url === '/creator/bundles')
+          ? `${queryParams.tab ? `?tab=${queryParams.tab}` : ''}${
+              queryParams.tab === 'direct-messages' && queryParams.roomID
+                ? `&roomID=${queryParams.roomID}`
+                : ''
+            }`
+          : '';
       return (
-        <Link key={item.url} href={item.url}>
+        <Link
+          key={`${item.url}${queryString}`}
+          href={`${item.url}${queryString}`}
+        >
           <SItem
             id={item.id}
             active={active}
@@ -106,6 +119,7 @@ export const Navigation = () => {
       );
     },
     [
+      router.query,
       router.route,
       theme.colorsThemed.accent.blue,
       theme.colorsThemed.text.tertiary,
