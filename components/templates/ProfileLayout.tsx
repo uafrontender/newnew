@@ -218,12 +218,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     user.uuid,
   ]);
 
-  // const handleSendMessageClick = useCallback(() => {
-  //   if (isMobileOrTablet) {
-  //     setHiddenMessagesArea(false);
-  //   }
-  // }, [isMobileOrTablet, setHiddenMessagesArea]);
-
   const moreButtonRef = useRef() as any;
 
   const bundleExpired = useMemo(() => {
