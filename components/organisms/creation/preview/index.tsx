@@ -82,10 +82,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
-      let error = minLength(tCommon, text, min);
+      let error = minLength(tCommon, text.trim(), min);
 
       if (!error) {
-        error = maxLength(tCommon, text, max);
+        error = maxLength(tCommon, text.trim(), max);
       }
 
       return error;
