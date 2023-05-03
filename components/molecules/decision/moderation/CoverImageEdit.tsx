@@ -54,8 +54,7 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
           const minWidth = isMobile ? 252 : 280;
           const cropAreaAspectRatio = minWidth / minHeight;
 
-          console.log(properlySizedImage);
-          let minZoom;
+          let minZoom = 1;
           if (
             properlySizedImage.height * cropAreaAspectRatio >
             properlySizedImage.width
