@@ -188,7 +188,8 @@
   },
   "myLink": {
     "copy": "My link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "shareLink": "Share link"
   },
   "socials": {
     "copy": "Copy Link",

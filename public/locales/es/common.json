@@ -188,7 +188,8 @@
   },
   "myLink": {
     "copy": "Mi enlace",
-    "copied": "¡Copiado!"
+    "copied": "¡Copiado!",
+    "shareLink_NEED_TRANSLATION": "Share link"
   },
   "socials": {
     "copy": "Copiar enlace",
