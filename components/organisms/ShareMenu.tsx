@@ -10,10 +10,15 @@ import SharePanel from '../atoms/SharePanel';
 
 interface IShareMenu {
   absolute?: boolean;
+  className?: string;
   handleClose: () => void;
 }
 
-const ShareMenu: React.FC<IShareMenu> = ({ handleClose, absolute }) => {
+const ShareMenu: React.FC<IShareMenu> = ({
+  handleClose,
+  absolute,
+  className,
+}) => {
   const user = useAppSelector((state) => state.user);
   const containerRef = useRef<HTMLDivElement>();
 
@@ -23,6 +28,7 @@ const ShareMenu: React.FC<IShareMenu> = ({ handleClose, absolute }) => {
   return (
     <AnimatePresence>
       <SContainer
+        className={className}
         absolute={absolute ?? false}
         ref={(el) => {
           containerRef.current = el!!;
