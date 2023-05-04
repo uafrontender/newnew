@@ -32,7 +32,8 @@
     "unblockGroup": "Unblock group",
     "delete": "Delete",
     "deleteDecision": "Delete {{postType}}",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "share": "Share"
   },
   "postType": {
     "ac": "Bid",
