@@ -24,12 +24,14 @@ const SOCIAL_ICONS = {
 interface ISharePanel {
   linkToShare: string;
   className?: string;
+  iconsSize?: 's' | 'm';
   onCopyLink?: () => void;
 }
 
 const SharePanel: React.FunctionComponent<ISharePanel> = ({
   className,
   linkToShare,
+  iconsSize,
   onCopyLink,
 }) => {
   const { t } = useTranslation('common');
@@ -89,7 +91,7 @@ const SharePanel: React.FunctionComponent<ISharePanel> = ({
 
   return (
     <SWrapper className={className}>
-      <SItem key='facebook' itemType='facebook'>
+      <SItem key='facebook' itemType='facebook' iconsSize={iconsSize}>
         <FacebookShareButton
           url={linkToShare}
           className='overridenReactShareButton'
@@ -106,7 +108,7 @@ const SharePanel: React.FunctionComponent<ISharePanel> = ({
           {t(`socials.facebook`)}
         </SItemTitle>
       </SItem>
-      <SItem key='twitter' itemType='twitter'>
+      <SItem key='twitter' iconsSize={iconsSize} itemType='twitter'>
         <TwitterShareButton
           url={linkToShare}
           className='overridenReactShareButton'
@@ -123,8 +125,8 @@ const SharePanel: React.FunctionComponent<ISharePanel> = ({
           {t(`socials.twitter`)}
         </SItemTitle>
       </SItem>
-      <SItem key='copy' itemType='copy'>
-        <SItemButton type='copy' onClick={handlerCopy}>
+      <SItem key='copy' itemType='copy' iconsSize={iconsSize}>
+        <SItemButton type='copy' iconsSize={iconsSize} onClick={handlerCopy}>
           <InlineSvg
             svg={SOCIAL_ICONS.copy as string}
             width='50%'
@@ -150,6 +152,7 @@ const SWrapper = styled.div`
 
 const SItem = styled.div<{
   itemType: ISItemButton['type'];
+  iconsSize?: 's' | 'm';
 }>`
   flex: 1;
   display: flex;
@@ -157,12 +160,12 @@ const SItem = styled.div<{
   flex-direction: column;
 
   .overridenReactShareButton {
-    width: 48px;
-    height: 48px;
+    width: ${({ iconsSize }) => (iconsSize === 's' ? '36px' : '48px')};
+    height: ${({ iconsSize }) => (iconsSize === 's' ? '36px' : '48px')};
     display: flex;
     overflow: hidden;
     align-items: center;
-    border-radius: 16px;
+    border-radius: ${({ iconsSize }) => (iconsSize === 's' ? '12px' : '16px')};
     border: none;
     justify-content: center;
     background: ${(props) =>
@@ -174,15 +177,16 @@ const SItem = styled.div<{
 
 interface ISItemButton {
   type: 'facebook' | 'twitter' | 'instagram' | 'tiktok' | 'copy';
+  iconsSize?: 's' | 'm';
 }
 
 const SItemButton = styled.div<ISItemButton>`
-  width: 48px;
-  height: 48px;
+  width: ${({ iconsSize }) => (iconsSize === 's' ? '36px' : '48px')};
+  height: ${({ iconsSize }) => (iconsSize === 's' ? '36px' : '48px')};
   display: flex;
   overflow: hidden;
   align-items: center;
-  border-radius: 16px;
+  border-radius: ${({ iconsSize }) => (iconsSize === 's' ? '12px' : '16px')};
   justify-content: center;
   background: ${(props) => props.theme.colorsThemed.social[props.type].main};
 
