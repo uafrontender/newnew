@@ -35,7 +35,8 @@ export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppState();
   const { appConstants } = useGetAppConstants();
-  const { isSellingBundles, toggleIsSellingBundles } = useBundles();
+  const { isSellingBundles, isBundleDataLoaded, toggleIsSellingBundles } =
+    useBundles();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -53,13 +54,13 @@ export const DashboardBundles: React.FC = React.memo(() => {
         _stage: 'Dashboard',
       }
     );
+
     setTurnBundleModalOpen((prevState) => !prevState);
   }, [turnBundleModalOpen]);
 
   const onToggleBundles = useCallback(async () => {
     toggleIsSellingBundles()
       .then(() => {
-        setTurnBundleModalOpen(false);
         setSuccessModalOpen(true);
       })
       .catch((err) => {
@@ -87,7 +88,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
           <STitle variant={4}>{t('myBundles.title')}</STitle>
           {!isMobile && <DynamicSection baseUrl='/creator/bundles' />}
         </STitleBlock>
-        {isSellingBundles === undefined ? (
+        {!isBundleDataLoaded ? (
           <SLoader size='md' />
         ) : (
           <>
@@ -127,7 +128,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
       {turnBundleModalOpen && (
         <TurnBundleModal
           show
-          modalType='initial'
+          modalType={successModalOpen ? 'covered' : 'initial'}
           zIndex={1001}
           isBundlesEnabled={isSellingBundles}
           onToggleBundles={onToggleBundles}
@@ -140,7 +141,10 @@ export const DashboardBundles: React.FC = React.memo(() => {
           isBundlesEnabled={isSellingBundles}
           modalType='following'
           zIndex={1002}
-          onClose={() => setSuccessModalOpen(false)}
+          onClose={() => {
+            setTurnBundleModalOpen(false);
+            setSuccessModalOpen(false);
+          }}
         />
       )}
     </SContainer>
