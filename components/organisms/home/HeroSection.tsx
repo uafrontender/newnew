@@ -143,6 +143,14 @@ const SWrapper = styled(motion.section)`
   margin-top: -15px;
   margin-bottom: 20px;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
     padding-bottom: 60px;
