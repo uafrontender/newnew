@@ -370,7 +370,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
                   )}
                 </SSectionTopLineButtons>
               </SSectionTopLine>
-              <SSectionContent>
+              <SSectionContent isSmallPadding={tab === 'chat'}>
                 {tab === 'notifications' ? (
                   <NotificationsList
                     markReadNotifications={markReadNotifications}
@@ -513,9 +513,9 @@ const SChatButton = styled(Button)`
   margin-left: 12px;
 `;
 
-const SSectionContent = styled.div`
+const SSectionContent = styled.div<{ isSmallPadding: boolean }>`
   height: calc(100% - 52px);
-  padding: 0 24px;
+  padding: ${({ isSmallPadding }) => (isSmallPadding ? '0 12px' : '0 24px')};
   display: flex;
   position: relative;
   overflow-y: scroll;
