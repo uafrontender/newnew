@@ -18,7 +18,7 @@ interface IPostVideoResponseUploaded {
   uiOffset?: number;
   isEditingStories?: boolean;
   handleToggleMuted: () => void;
-  handleDeleteUnuploadedAdditonalResponse?: () => void;
+  handleDeleteUnUploadedAdditionalResponse?: () => void;
 }
 
 const PostVideoResponseUploaded: React.FunctionComponent<
@@ -28,7 +28,7 @@ const PostVideoResponseUploaded: React.FunctionComponent<
   uiOffset,
   isEditingStories,
   handleToggleMuted,
-  handleDeleteUnuploadedAdditonalResponse,
+  handleDeleteUnUploadedAdditionalResponse,
 }) => {
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -81,8 +81,8 @@ const PostVideoResponseUploaded: React.FunctionComponent<
           videoDurationWithTime={!isEditingStories}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
           handleDeleteAdditionalVideo={handleDeleteAdditionalResponse}
-          handleDeleteUnuploadedAdditonalResponse={
-            handleDeleteUnuploadedAdditonalResponse
+          handleDeleteUnUploadedAdditionalResponse={
+            handleDeleteUnUploadedAdditionalResponse
           }
           autoscroll
         />

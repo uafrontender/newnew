@@ -125,8 +125,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
       const res = await getVisavisList(payload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
 
       setChatRooms(res.data.visavis);
       setLoading(false);
@@ -179,8 +180,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             chat.user?.username.toLowerCase().includes(searchValue)) ||
           (chat.user?.nickname &&
             chat.user?.nickname.toLowerCase().includes(searchValue))
-        )
+        ) {
           arr.push(chat);
+        }
       });
 
       setFilteredChatrooms(arr);

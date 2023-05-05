@@ -63,9 +63,13 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           const payload = new newnewapi.GetUserRequest({
             uuid: usersIBlockedIds[i],
           });
+
           const res = await getUserByUsername(payload);
-          if (!res.data || res.error)
+
+          if (!res.data || res.error) {
             throw new Error(res.error?.message ?? 'Request failed');
+          }
+
           if (res.data) {
             users.push(res.data);
           }

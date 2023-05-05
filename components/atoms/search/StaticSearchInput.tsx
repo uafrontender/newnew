@@ -202,12 +202,23 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           payload,
           quickSearchAbortControllerRef?.current?.signal
         );
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data.creators) setResultsCreators(res.data.creators);
-        if (res.data.posts) setResultsPosts(res.data.posts);
-        if (res.data.hashtags) setResultsHashtags(res.data.hashtags);
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+
+        if (res.data.creators) {
+          setResultsCreators(res.data.creators);
+        }
+
+        if (res.data.posts) {
+          setResultsPosts(res.data.posts);
+        }
+
+        if (res.data.hashtags) {
+          setResultsHashtags(res.data.hashtags);
+        }
+
         setIsLoading(false);
       } catch (err) {
         console.error(err);
