@@ -94,25 +94,11 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
   );
 
   const handleZoomOutCoverImage = () => {
-    if (zoomCoverImage <= 1) {
-      return;
-    }
-
     setZoomCoverImage((z) => Math.max(z - 0.2, minZoomCoverImage));
   };
 
   const handleZoomInCoverImage = () => {
-    if (zoomCoverImage >= minZoomCoverImage + 2) {
-      return;
-    }
-
-    setZoomCoverImage((z) => {
-      if (z + 0.2 >= minZoomCoverImage + 2) {
-        return minZoomCoverImage + 2;
-      }
-
-      return z + 0.2;
-    });
+    setZoomCoverImage((z) => Math.min(z + 0.2, minZoomCoverImage + 2));
   };
 
   const onCropCompleteCoverImage = useCallback(
@@ -259,7 +245,10 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomCoverImage <= 1 || updateCoverImageLoading}
+                  disabled={
+                    zoomCoverImage <= minZoomCoverImage ||
+                    updateCoverImageLoading
+                  }
                   onClick={handleZoomOutCoverImage}
                 >
                   <InlineSVG

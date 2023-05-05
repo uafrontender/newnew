@@ -1221,7 +1221,6 @@ export const CreationSecondStepContent: React.FC<
             tabs={tabs}
             draggable={false}
             activeTabIndex={activeTabIndex}
-            withTabIndicator={isDesktop}
           />
           {isMobile && (
             <SCloseIconWrapper>
