@@ -615,7 +615,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
         setCurrentAdditionalResponseStep('regular');
       } else {
-        throw new Error(res.error.message ?? 'An error occured');
+        throw new Error(res.error.message ?? 'An error occurred');
       }
     } catch (err) {
       console.error(err);

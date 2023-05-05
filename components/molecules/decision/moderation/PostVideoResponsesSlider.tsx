@@ -29,7 +29,7 @@ interface IPostVideoResponsesSlider {
   isDeletingAdditionalResponse: boolean;
   videoDurationWithTime?: boolean;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
-  handleDeleteUnuploadedAdditonalResponse?: () => void;
+  handleDeleteUnUploadedAdditionalResponse?: () => void;
   autoscroll?: boolean;
 }
 
@@ -43,7 +43,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   isDeletingAdditionalResponse,
   videoDurationWithTime,
   handleDeleteAdditionalVideo,
-  handleDeleteUnuploadedAdditonalResponse,
+  handleDeleteUnUploadedAdditionalResponse,
   autoscroll,
 }) => {
   const { resizeMode } = useAppState();
@@ -101,7 +101,11 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         _videoIndex: `postVideoThumbnailItem_${i}`,
         _component: 'PostVideoResponsesSlider',
       });
-      if (currentVideo === i) return;
+
+      if (currentVideo === i) {
+        return;
+      }
+
       scrollSliderTo(i);
     },
     [currentVideo, postParsed?.postUuid, scrollSliderTo]
@@ -280,10 +284,14 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           uiOffset={uiOffset ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
-          handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
-          handleDeleteUnuploadedAdditonalResponse={
-            handleDeleteUnuploadedAdditonalResponse
-          }
+          handleDeleteAdditionalVideo={(videoUuid: string) => {
+            handleDeleteAdditionalVideo?.(videoUuid);
+            setCurrentVideo(0);
+          }}
+          handleDeleteUnUploadedAdditionalResponse={() => {
+            handleDeleteUnUploadedAdditionalResponse?.();
+            setCurrentVideo(0);
+          }}
         />
       ) : null}
     </SWrapper>

@@ -373,12 +373,15 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             id='authenticate-form'
             onSubmit={(e) => {
               e.preventDefault();
+
               if (
                 !emailInputValid ||
                 isSubmitLoading ||
                 emailInput.length === 0
-              )
+              ) {
                 return;
+              }
+
               handleSubmitEmail();
             }}
           >

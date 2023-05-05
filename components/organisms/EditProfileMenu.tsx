@@ -508,8 +508,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await getImageUploadUrl(imageUrlPayload);
 
-        if (!res.data || res.error)
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'An error occurred');
+        }
 
         const uploadResponse = await fetch(res.data.uploadUrl, {
           method: 'PUT',
@@ -673,7 +674,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
 
     setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= minZoomProfileImage + 2) {
+      if (z + 0.2 >= minZoomProfileImage + 2) {
         return minZoomProfileImage + 2;
       }
       return z + 0.2;
@@ -704,8 +705,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await getImageUploadUrl(imageUrlPayload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'An error occurred');
+      }
 
       const uploadResponse = await fetch(res.data.uploadUrl, {
         method: 'PUT',
