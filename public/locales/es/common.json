@@ -32,7 +32,8 @@
     "unblockGroup": "Desbloquear grupo",
     "delete": "Borrar",
     "deleteDecision": "Borrar {{postType}}",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "share": "Compartir"
   },
   "postType": {
     "ac": "Bid",
@@ -188,7 +189,8 @@
   },
   "myLink": {
     "copy": "Mi enlace",
-    "copied": "¡Copiado!"
+    "copied": "¡Copiado!",
+    "shareLink_NEED_TRANSLATION": "Share link"
   },
   "socials": {
     "copy": "Copiar enlace",

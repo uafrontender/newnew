@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -12,111 +13,135 @@ import isFirefox from '../../utils/isFirefox';
 
 interface IPlayerScrubber {
   isHovered: boolean;
-  currentTime: number;
   videoDuration: number;
   withTime?: boolean;
   bufferedPercent?: number;
   handleChangeTime: (newTime: number) => void;
+  onPlaybackProgress?: (newTime: number) => void;
 }
 
-const PlayerScrubber: React.FC<IPlayerScrubber> = ({
-  isHovered,
-  currentTime,
-  videoDuration,
-  withTime,
-  bufferedPercent,
-  handleChangeTime,
-}) => {
-  const sliderRef = useRef<HTMLInputElement>();
-  const [isChanging, setIsChanging] = useState(false);
-  const progress = useMemo(
-    () => (currentTime / videoDuration) * 100,
-    [currentTime, videoDuration]
-  );
-
-  const formattedCurrent = useMemo(
-    () =>
-      currentTime
-        ? moment
-            .duration(currentTime, 'seconds')
-            // @ts-ignore
-            ?.format('mm:ss', { trim: false })
-        : '00:00',
-    [currentTime]
-  );
-  const formattedDuration = useMemo(
-    () =>
-      videoDuration && typeof videoDuration === 'number'
-        ? moment
-            .duration(videoDuration, 'seconds')
-            // @ts-ignore
-            ?.format('mm:ss', { trim: false })
-        : '',
-    [videoDuration]
-  );
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.stopPropagation();
-      handleChangeTime(
-        (videoDuration / 100) * (parseFloat(e.target.value) as number)
-      );
-    },
-    [handleChangeTime, videoDuration]
-  );
-
-  useEffect(() => {
-    if (sliderRef.current) {
-      sliderRef.current.style.setProperty(
-        '--sx',
-        `calc(${progress / 100} * 100%)`
-      );
-    }
-  }, [progress]);
-
-  return (
-    <SContainer isHovered={isHovered} isChanging={isChanging}>
-      <SSlider
-        ref={(el) => {
-          sliderRef.current = el!!;
-        }}
-        value={progress}
-        min={0}
-        max={100}
-        step={0.1}
-        aria-labelledby='Video seek'
-        bufferedPercent={bufferedPercent}
-        onTouchStart={(e) => {
-          e.stopPropagation();
-          setIsChanging(true);
-        }}
-        onTouchEnd={(e) => {
-          e.stopPropagation();
-          setIsChanging(false);
-        }}
-        onTouchCancel={(e) => {
-          e.stopPropagation();
-          setIsChanging(false);
-        }}
-        onMouseEnter={() => setIsChanging(true)}
-        onMouseLeave={() => setIsChanging(false)}
-        onMouseUp={(e) => {
-          if (isFirefox()) {
-            e.preventDefault();
-            sliderRef.current?.blur();
-          }
-        }}
-        onBlur={() => setIsChanging(false)}
-        onChange={handleChange}
-      />
-      {withTime ? (
-        <STime
-          show={isChanging}
-        >{`${formattedCurrent} / ${formattedDuration}`}</STime>
-      ) : null}
-    </SContainer>
-  );
+type PlayerScrubberHandle = {
+  changeCurrentTime: (newValue: number) => void;
 };
+
+export type TPlayerScrubber = React.ElementRef<typeof PlayerScrubber>;
+
+const PlayerScrubber = React.forwardRef<PlayerScrubberHandle, IPlayerScrubber>(
+  (
+    {
+      isHovered,
+      videoDuration,
+      withTime,
+      bufferedPercent,
+      handleChangeTime,
+      onPlaybackProgress,
+    },
+    ref
+  ) => {
+    const sliderRef = useRef<HTMLInputElement>();
+    const [isChanging, setIsChanging] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    useImperativeHandle(ref, () => ({
+      changeCurrentTime(newValue: number) {
+        setCurrentTime(newValue);
+      },
+    }));
+
+    const progress = useMemo(
+      () => (currentTime / videoDuration) * 100,
+      [currentTime, videoDuration]
+    );
+
+    const formattedCurrent = useMemo(
+      () =>
+        currentTime
+          ? moment
+              .duration(currentTime, 'seconds')
+              // @ts-ignore
+              ?.format('mm:ss', { trim: false })
+          : '00:00',
+      [currentTime]
+    );
+    const formattedDuration = useMemo(
+      () =>
+        videoDuration && typeof videoDuration === 'number'
+          ? moment
+              .duration(videoDuration, 'seconds')
+              // @ts-ignore
+              ?.format('mm:ss', { trim: false })
+          : '',
+      [videoDuration]
+    );
+
+    const handleChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        handleChangeTime(
+          (videoDuration / 100) * (parseFloat(e.target.value) as number)
+        );
+      },
+      [handleChangeTime, videoDuration]
+    );
+
+    useEffect(() => {
+      if (sliderRef.current) {
+        sliderRef.current.style.setProperty(
+          '--sx',
+          `calc(${progress / 100} * 100%)`
+        );
+      }
+    }, [progress]);
+
+    useEffect(() => {
+      if (onPlaybackProgress) {
+        onPlaybackProgress?.(progress);
+      }
+    }, [onPlaybackProgress, progress]);
+
+    return (
+      <SContainer isHovered={isHovered} isChanging={isChanging}>
+        <SSlider
+          ref={(el) => {
+            sliderRef.current = el!!;
+          }}
+          value={progress}
+          min={0}
+          max={100}
+          step={0.1}
+          aria-labelledby='Video seek'
+          bufferedPercent={bufferedPercent}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            setIsChanging(true);
+          }}
+          onTouchEnd={(e) => {
+            e.stopPropagation();
+            setIsChanging(false);
+          }}
+          onTouchCancel={(e) => {
+            e.stopPropagation();
+            setIsChanging(false);
+          }}
+          onMouseEnter={() => setIsChanging(true)}
+          onMouseLeave={() => setIsChanging(false)}
+          onMouseUp={(e) => {
+            if (isFirefox()) {
+              e.preventDefault();
+              sliderRef.current?.blur();
+            }
+          }}
+          onBlur={() => setIsChanging(false)}
+          onChange={handleChange}
+        />
+        {withTime ? (
+          <STime
+            show={isChanging}
+          >{`${formattedCurrent} / ${formattedDuration}`}</STime>
+        ) : null}
+      </SContainer>
+    );
+  }
+);
 
 export default PlayerScrubber;
 

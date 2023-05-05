@@ -541,10 +541,12 @@ const STab = styled.button<ISTab>`
   background: transparent;
   border: transparent;
 
-  padding-bottom: ${({ withTabIndicator }) => (withTabIndicator ? '6px' : '0')};
+  padding-bottom: ${({ withTabIndicator }) =>
+    withTabIndicator ? '10px' : '0'};
 
-  margin-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
-  margin-right: 12px;
+  padding-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
+  padding-right: 12px;
+  padding-top: 6px;
 
   white-space: nowrap;
   font-weight: 600;
