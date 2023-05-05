@@ -64,7 +64,6 @@ const useMyPosts = (
         console.error(error);
       },
       ...(options || {}),
-      // Does not refetch on going back to the page (from creation)
     } as Omit<
       UseInfiniteQueryOptions<{
         posts: newnewapi.IPost[];

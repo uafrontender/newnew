@@ -38,6 +38,7 @@ import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import { Mixpanel } from '../../../utils/mixpanel';
 import useComponentScrollRestoration from '../../../utils/hooks/useComponentScrollRestoration';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -80,6 +81,8 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
     const [visibleListItem, setVisibleListItem] = useState(0);
+
+    const { overlayModeEnabled } = useOverlayMode();
 
     // Dragging state
     const [clientX, setClientX] = useState<number>(0);
@@ -400,11 +403,17 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       );
     }, [visibleListItem, collection, scrollStep, tutorialCard]);
 
+    // TODO: refactoring
     useEffect(() => {
-      if (!canScrollRight && collection?.length > 0 && onReachEnd) {
+      if (
+        !canScrollRight &&
+        collection?.length > 0 &&
+        onReachEnd &&
+        visibleListItem !== 0
+      ) {
         onReachEnd();
       }
-    }, [canScrollRight, onReachEnd, collection?.length]);
+    }, [canScrollRight, onReachEnd, collection?.length, visibleListItem]);
 
     useComponentScrollRestoration(
       scrollContainerRef.current ?? undefined,
@@ -463,6 +472,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
             onMouseDown={mouseDownHandler}
             onMouseMove={mouseMoveHandler}
             onMouseLeave={mouseUpHandler}
+            isOverlayMode={overlayModeEnabled}
           >
             {!loading ? (
               collectionToRender?.map(renderItem)
@@ -564,14 +574,14 @@ const SListContainer = styled.div`
   position: relative;
 `;
 
-const SListWrapper = styled.div`
+const SListWrapper = styled.div<{ isOverlayMode: boolean }>`
   width: 100%;
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
 
   position: relative;
-  overflow-x: auto;
+  overflow-x: ${({ isOverlayMode }) => (isOverlayMode ? 'hidden' : 'auto')};
   flex-direction: column;
 
   /* Hide scrollbar */

@@ -125,7 +125,7 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
       {isMobile && <SGoBackButton onClick={() => router.back()} />}
       <SHeadline variant={5}>
         <span>{t('stripe.titleSetUpStripe')}</span>
-        <InlineSvg svg={StripeLogo} width='80px' />
+        <SInlineSvg svg={StripeLogo} width='80px' />
       </SHeadline>
       <SUl>
         <li>{t('stripe.bullets.1')}</li>
@@ -266,7 +266,7 @@ const SControlsDiv = styled.div`
     }
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     padding-right: 60px;
   }
 
@@ -276,8 +276,7 @@ const SControlsDiv = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-  display: flex;
-  align-items: flex-start;
+  display: inline-block;
   font-weight: 600;
   margin-bottom: 40px;
   font-size: 24px;
@@ -312,7 +311,7 @@ const SButton = styled(Button)<{
 }>`
   margin-bottom: 24px;
   font-size: 16px;
-  margin-right: 32px;
+  margin-right: 24px;
   span {
     display: flex;
 
@@ -373,4 +372,10 @@ const SButtonUpdate = styled(SButton)`
     margin: 0 0 24px;
     text-align: center;
   }
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  display: inline-block;
+  vertical-align: middle;
+  height: 35px;
 `;

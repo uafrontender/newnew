@@ -107,7 +107,8 @@ const SContentContainer = styled.div`
   height: 100%;
 
   ${({ theme }) => theme.media.laptop} {
-    width: 50%;
+    width: 51%;
+    padding-right: 32px;
     left: unset;
     right: 0;
   }
