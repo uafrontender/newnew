@@ -8,6 +8,8 @@ import Text from '../../../atoms/Text';
 import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
 import { formatNumber } from '../../../../utils/format';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import Lottie from '../../../atoms/Lottie';
 
 interface IFunctionProps {
   isBundlesEnabled: boolean;
@@ -102,7 +104,17 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
         <SHeaderLine>
           <STitle variant={6}>{t('myBundles.earnings.title')}</STitle>
         </SHeaderLine>
-        {!myEarnings?.soldBundles ? (
+        {isLoading ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : !myEarnings?.soldBundles ? (
           <SNoEarnings>
             <SText variant={3}>{t('myBundles.earnings.noSoldYet')}</SText>
           </SNoEarnings>
