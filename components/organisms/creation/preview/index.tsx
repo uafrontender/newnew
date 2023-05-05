@@ -82,10 +82,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
-      let error = minLength(tCommon, text, min);
+      let error = minLength(tCommon, text.trim(), min);
 
       if (!error) {
-        error = maxLength(tCommon, text, max);
+        error = maxLength(tCommon, text.trim(), max);
       }
 
       return error;
@@ -238,8 +238,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
         const res = await getCoverImageUploadUrl(imageUrlPayload);
 
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'An error occured');
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'An error occurred');
+        }
 
         const uploadResponse = await fetch(res.data.uploadUrl, {
           method: 'PUT',

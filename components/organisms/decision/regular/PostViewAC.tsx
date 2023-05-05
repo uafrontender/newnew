@@ -183,8 +183,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     try {
       const res = await refetchPost();
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
     } catch (err) {
       console.error(err);
     }

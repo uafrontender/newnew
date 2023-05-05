@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import { useRouter } from 'next/router';
 import styled, { keyframes } from 'styled-components';
 
@@ -7,30 +13,22 @@ import Indicator from '../atoms/Indicator';
 import isBrowser from '../../utils/isBrowser';
 import { Mixpanel } from '../../utils/mixpanel';
 
-interface ITabs {
-  t: any;
-  tabs: Tab[];
-  draggable?: boolean;
-  activeTabIndex: number;
-  hideIndicatorOnResizing?: boolean;
-  withTabIndicator?: boolean;
-}
-
 export interface Tab {
   url: string;
   counter?: number;
   nameToken: string;
 }
 
+interface ITabs {
+  t: any;
+  tabs: Tab[];
+  draggable?: boolean;
+  activeTabIndex: number;
+  hideIndicatorOnResizing?: boolean;
+}
+
 const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
-  const {
-    t,
-    tabs,
-    draggable,
-    activeTabIndex,
-    withTabIndicator,
-    hideIndicatorOnResizing,
-  } = props;
+  const { t, tabs, draggable, activeTabIndex, hideIndicatorOnResizing } = props;
   const router = useRouter();
 
   const [isResizing, setIsResizing] = useState(false);
@@ -42,9 +40,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   const [containerWidth, setContainerWidth] = useState<number>(
     isBrowser() ? window?.innerWidth : 768
   );
-  const [tabsWidth, setTabsWidth] = useState<number>(tabs.length * 100);
-
-  const shouldDrag = (draggable ?? true) && tabsWidth!! >= containerWidth!!;
+  const [tabsWidth, setTabsWidth] = useState<number>(0);
+  const shouldDrag = useMemo(
+    () => (draggable ?? true) && !!tabsWidth && tabsWidth >= containerWidth!!,
+    [draggable, tabsWidth, containerWidth]
+  );
 
   const [isDragging, setIsDragging] = useState(false);
   const [posLeft, setPosLeft] = useState<number>(0);
@@ -74,52 +74,76 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   );
 
   // Scrolling the tabs with mouse & touch
-  const extractPositionDelta = (e: any) => {
-    const left = e.clientX || e.deltaX;
+  const extractPositionDelta = useCallback(
+    (e: any) => {
+      const left = e.clientX || e.deltaX;
 
-    const delta = {
-      left: left - prevLeft,
-    };
+      const delta = {
+        left: left - prevLeft,
+      };
 
-    setPrevLeft(left);
+      setPrevLeft(left);
 
-    return delta;
-  };
+      return delta;
+    },
+    [prevLeft]
+  );
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!shouldDrag) return;
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!shouldDrag) {
+        return;
+      }
 
-    setIsDragging(true);
-    extractPositionDelta(e);
+      setIsDragging(true);
+      extractPositionDelta(e);
 
-    const { left } = extractPositionDelta(e.touches[0]);
+      const { left } = extractPositionDelta(e.touches[0]);
 
-    if (posLeft + left <= 0) {
-      setPosLeft(posLeft + left);
-    }
-  };
+      setPosLeft((curr) => {
+        if (curr + left <= 0) {
+          return curr + left;
+        }
+        return curr;
+      });
+    },
+    [shouldDrag, extractPositionDelta]
+  );
 
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!shouldDrag) return;
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!shouldDrag) {
+        return;
+      }
 
-    if (!isDragging) {
+      if (!isDragging) {
+        return;
+      }
+      const { left } = extractPositionDelta(e.touches[0]);
+
+      setPosLeft((curr) => {
+        const newLeft = curr + left;
+
+        // Too far to the right
+        if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) {
+          return curr;
+        }
+
+        // Too far to the left
+        if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) {
+          return curr;
+        }
+
+        return newLeft;
+      });
+    },
+    [shouldDrag, isDragging, tabsWidth, containerWidth, extractPositionDelta]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    if (!shouldDrag) {
       return;
     }
-    const { left } = extractPositionDelta(e.touches[0]);
-
-    const newLeft = posLeft + left;
-
-    // Too far to the right
-    if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) return;
-
-    // Too far to the left
-    if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) return;
-
-    setPosLeft(newLeft);
-  };
-
-  const handleTouchEnd = () => {
-    if (!shouldDrag) return;
 
     setIsDragging(false);
 
@@ -135,47 +159,73 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       setPosLeft(posLeft);
       setPrevLeft(posLeft);
     }
-  };
+  }, [shouldDrag, posLeft, containerWidth, tabsWidth]);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!shouldDrag) return;
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!shouldDrag) {
+        return;
+      }
 
-    setIsDragging(true);
-    extractPositionDelta(e);
+      setIsDragging(true);
+      extractPositionDelta(e);
 
-    const { left } = extractPositionDelta(e);
+      const { left } = extractPositionDelta(e);
+      setPosLeft((curr) => {
+        if (curr + left <= 0) {
+          return curr + left;
+        }
+        return curr;
+      });
+    },
+    [shouldDrag, extractPositionDelta]
+  );
 
-    if (posLeft + left <= 0) {
-      setPosLeft(posLeft + left);
-    }
-  };
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!shouldDrag) {
+        return;
+      }
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!shouldDrag) return;
+      if (!isDragging) {
+        return;
+      }
 
-    if (!isDragging) {
+      if (mouseInitial && e.clientX !== mouseInitial) {
+        setWasDragged(true);
+      }
+
+      const { left } = extractPositionDelta(e);
+
+      const newLeft = posLeft + left;
+
+      // Too far to the right
+      if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) {
+        return;
+      }
+
+      // Too far to the left
+      if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) {
+        return;
+      }
+
+      setPosLeft(newLeft);
+    },
+    [
+      shouldDrag,
+      isDragging,
+      containerWidth,
+      mouseInitial,
+      posLeft,
+      tabsWidth,
+      extractPositionDelta,
+    ]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    if (!shouldDrag) {
       return;
     }
-
-    if (mouseInitial && e.clientX !== mouseInitial) {
-      setWasDragged(true);
-    }
-
-    const { left } = extractPositionDelta(e);
-
-    const newLeft = posLeft + left;
-
-    // Too far to the right
-    if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) return;
-
-    // Too far to the left
-    if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) return;
-
-    setPosLeft(newLeft);
-  };
-
-  const handleMouseUp = () => {
-    if (!shouldDrag) return;
 
     setIsDragging(false);
 
@@ -191,73 +241,94 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       setPosLeft(posLeft);
       setPrevLeft(posLeft);
     }
-  };
+  }, [shouldDrag, containerWidth, tabsWidth, posLeft]);
 
   // Wheel event
   // Tries to prevent back navigation gesture on MacOS
-  const preventBackNavigationOnScroll = () => {
-    if (window?.innerWidth >= tabsWidth) return;
+  const preventBackNavigationOnScroll = useCallback(() => {
+    if (window?.innerWidth >= tabsWidth) {
+      return;
+    }
+
     if (isBrowser()) {
       document.documentElement.style.overscrollBehaviorX = 'contain';
       document.documentElement.style.overflowX = 'hidden';
     }
-  };
+  }, [tabsWidth]);
 
-  const resumeBackNavigationOnScroll = () => {
-    if (window?.innerWidth >= tabsWidth) return;
+  const resumeBackNavigationOnScroll = useCallback(() => {
+    if (window?.innerWidth >= tabsWidth) {
+      return;
+    }
+
     if (isBrowser()) {
       document.documentElement.style.overscrollBehaviorX = 'auto';
       document.documentElement.style.overflowX = '';
     }
-  };
+  }, [tabsWidth]);
 
-  const handleOnWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    if (window?.innerWidth >= tabsWidth || isDragging) return;
+  const handleOnWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      e.stopPropagation();
 
-    const newLeft = posLeft - e.deltaX;
+      if (window?.innerWidth >= tabsWidth || isDragging) {
+        return;
+      }
 
-    // Too far to the right
-    if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) return;
+      const newLeft = posLeft - e.deltaX;
 
-    // Too far to the left
-    if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) return;
+      // Too far to the right
+      if (newLeft <= 0 && newLeft + tabsWidth!! < containerWidth) {
+        return;
+      }
 
-    setPosLeft(newLeft);
-  };
+      // Too far to the left
+      if (newLeft >= 0 && containerWidth - newLeft < tabsWidth!!) {
+        return;
+      }
+
+      setPosLeft(newLeft);
+    },
+    [tabsWidth, isDragging, containerWidth, posLeft]
+  );
 
   // Button-specific handlers to prevent unwanted cliks on Mouse event
-  const handleButtonMouseDownCapture = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    if (!shouldDrag) return;
-    setMouseInitial(e.clientX);
-  };
+  const handleButtonMouseDownCapture = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      if (!shouldDrag) {
+        return;
+      }
+      setMouseInitial(e.clientX);
+    },
+    [shouldDrag]
+  );
 
-  const handleButtonMouseLeave = () => {
+  const handleButtonMouseLeave = useCallback(() => {
     if (wasDragged) {
       setWasDragged(false);
       setMouseInitial(undefined);
     }
-  };
+  }, [wasDragged]);
 
-  const handleButtonClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    tab: Tab
-  ) => {
-    if (wasDragged) {
-      e.preventDefault();
-      setWasDragged(false);
+  const handleButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, tab: Tab) => {
+      if (wasDragged) {
+        e.preventDefault();
+        setWasDragged(false);
+        setMouseInitial(undefined);
+        return;
+      }
+
       setMouseInitial(undefined);
-      return;
-    }
-    setMouseInitial(undefined);
-    Mixpanel.track('Tab Clicked', {
-      tabName: tab.nameToken,
-      tabUrl: tab.url,
-    });
-    handleChangeRoute(tab.url);
-  };
+
+      Mixpanel.track('Tab Clicked', {
+        tabName: tab.nameToken,
+        tabUrl: tab.url,
+      });
+      handleChangeRoute(tab.url);
+    },
+    [wasDragged, handleChangeRoute]
+  );
 
   useEffect(() => {
     const tabsWidthUpdated = tabRefs.current.reduce((acc, tabEl) => {
@@ -271,7 +342,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     }, 0);
 
     setTabsWidth(tabsWidthUpdated + (tabs.length + 1) * 24);
-  }, [tabs.length]);
+  }, [t, tabs.length]);
 
   useEffect(() => {
     let timeout: any;
@@ -302,11 +373,11 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     return () => window?.removeEventListener('resize', updateContainerWidth);
   }, []);
 
-  // Needs dependency to tabs and t object to react to text width changes
   useEffect(() => {
     if (activeTabIndex === -1) {
       return;
     }
+
     const boundingRect =
       tabRefs.current[activeTabIndex].getBoundingClientRect();
 
@@ -329,16 +400,21 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
     activeTabIndex,
     windowSize,
     isResizing,
-    tabs,
-    t,
     setPrevLeft,
     setPosLeft,
     setActiveTabIndicator,
+
+    // Needs dependency to tabs, t and shouldDrag object to react to text width changes
+    tabs,
+    t,
+    shouldDrag,
   ]);
 
   useEffect(() => {
-    if (!shouldDrag) setPosLeft(0);
-  }, [shouldDrag]);
+    if (!shouldDrag) {
+      setPosLeft(0);
+    }
+  }, [t, shouldDrag]);
 
   return (
     <STabs
@@ -383,7 +459,6 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
               activeTab={i === activeTabIndex}
               extraMargin={i === 0 && shouldDrag}
               onMouseLeave={handleButtonMouseLeave}
-              withTabIndicator={withTabIndicator}
               onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
             >
               {t(`tabs.${tab.nameToken}`)}
@@ -394,19 +469,17 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
               )}
             </STab>
           ))}
-        {withTabIndicator && (
-          <SActiveTabIndicator
-            style={{
-              width: activeTabIndicator.width,
-              left: activeTabIndicator.left,
-              ...(isResizing && hideIndicatorOnResizing
-                ? {
-                    background: 'transparent',
-                  }
-                : {}),
-            }}
-          />
-        )}
+        <SActiveTabIndicator
+          style={{
+            width: activeTabIndicator.width,
+            left: activeTabIndicator.left,
+            ...(isResizing && hideIndicatorOnResizing
+              ? {
+                  background: 'transparent',
+                }
+              : {}),
+          }}
+        />
       </STabsContainer>
     </STabs>
   );
@@ -416,7 +489,6 @@ export default Tabs;
 
 Tabs.defaultProps = {
   draggable: true,
-  withTabIndicator: true,
 };
 
 const STabs = styled.div`
@@ -434,9 +506,9 @@ const STabsContainer = styled.div<{
   display: flex;
   justify-content: ${({ shouldDrag }) =>
     shouldDrag ? 'flex-start' : 'center'};
-  gap: 24px;
 
-  width: ${({ shouldDrag }) => (shouldDrag ? 'min-content' : '100%')};
+  margin: auto;
+  width: min-content;
   overflow: hidden;
   position: relative;
 `;
@@ -444,7 +516,6 @@ const STabsContainer = styled.div<{
 interface ISTab {
   activeTab: boolean;
   extraMargin: boolean;
-  withTabIndicator?: boolean;
 }
 
 const STab = styled.button<ISTab>`
@@ -457,9 +528,11 @@ const STab = styled.button<ISTab>`
   background: transparent;
   border: transparent;
 
-  padding-bottom: ${({ withTabIndicator }) => (withTabIndicator ? '6px' : '0')};
+  padding-bottom: 10px;
 
-  margin-left: ${({ extraMargin }) => (extraMargin ? '24px' : 'initial')};
+  padding-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
+  padding-right: 12px;
+  padding-top: 6px;
 
   white-space: nowrap;
   font-weight: 600;
@@ -473,7 +546,7 @@ const STab = styled.button<ISTab>`
       : theme.colorsThemed.text.secondary};
 
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 
   /* No select */
   -webkit-touch-callout: none;
