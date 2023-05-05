@@ -203,6 +203,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       }
     } catch (err: any) {
       setIsSubmitLoading(false);
+      // TODO: Process error. Don't show the one from BE.
+      // TODO: If email with this account was deleted, show modal
       setSubmitError(err?.message ?? 'genericError');
     }
   };
