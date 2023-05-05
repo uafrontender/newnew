@@ -29,7 +29,7 @@ interface IPostVideoResponsesSlider {
   isDeletingAdditionalResponse: boolean;
   videoDurationWithTime?: boolean;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
-  handleDeleteUnuploadedAdditonalResponse?: () => void;
+  handleDeleteUnUploadedAdditionalResponse?: () => void;
   autoscroll?: boolean;
 }
 
@@ -43,7 +43,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   isDeletingAdditionalResponse,
   videoDurationWithTime,
   handleDeleteAdditionalVideo,
-  handleDeleteUnuploadedAdditonalResponse,
+  handleDeleteUnUploadedAdditionalResponse,
   autoscroll,
 }) => {
   const { resizeMode } = useAppState();
@@ -101,7 +101,11 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         _videoIndex: `postVideoThumbnailItem_${i}`,
         _component: 'PostVideoResponsesSlider',
       });
-      if (currentVideo === i) return;
+
+      if (currentVideo === i) {
+        return;
+      }
+
       scrollSliderTo(i);
     },
     [currentVideo, postParsed?.postUuid, scrollSliderTo]
@@ -280,10 +284,14 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           uiOffset={uiOffset ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
-          handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
-          handleDeleteUnuploadedAdditonalResponse={
-            handleDeleteUnuploadedAdditonalResponse
-          }
+          handleDeleteAdditionalVideo={(videoUuid: string) => {
+            handleDeleteAdditionalVideo?.(videoUuid);
+            setCurrentVideo(0);
+          }}
+          handleDeleteUnUploadedAdditionalResponse={() => {
+            handleDeleteUnUploadedAdditionalResponse?.();
+            setCurrentVideo(0);
+          }}
         />
       ) : null}
     </SWrapper>
@@ -423,10 +431,10 @@ const SStoriesLoadersContainer = styled.div`
   position: absolute;
 
   width: 100%;
-  top: 2px;
+  top: 6px;
 
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 6px;
+  padding-right: 6px;
 
   display: flex;
   justify-content: space-between;
@@ -439,8 +447,8 @@ const SStoriesLoader = styled.div<{
 }>`
   position: relative;
   background-color: rgba(11, 10, 19, 0.2);
-  height: 4px;
-  border-radius: 8px;
+  height: 2px;
+  border-radius: 16px;
   width: 100%;
 
   box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.25);
@@ -448,8 +456,8 @@ const SStoriesLoader = styled.div<{
   .SStoriesLoaderInner {
     position: absolute;
 
-    height: 4px;
-    border-radius: 8px;
+    height: 2px;
+    border-radius: 16px;
     width: 100%;
 
     background-color: ${({ active, viewed }) =>

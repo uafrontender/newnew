@@ -67,6 +67,7 @@ const CoverImagePreviewEdit: React.FunctionComponent<
   });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
+  const [minZoomCoverImage, setMinZoomCoverImage] = useState(1);
   const [updateCoverImageLoading, setUpdateCoverImageLoading] = useState(false);
 
   const hasChanged = useMemo(
@@ -75,7 +76,8 @@ const CoverImagePreviewEdit: React.FunctionComponent<
   );
 
   const onFileChange = useCallback(
-    (newImageUrl: string, originalImageWidth: number) => {
+    (newImageUrl: string, originalImageWidth: number, minZoom: number) => {
+      setMinZoomCoverImage(minZoom);
       setCoverImageInEdit(newImageUrl);
       setOriginalCoverImageWidth(originalImageWidth);
     },
@@ -178,6 +180,8 @@ const CoverImagePreviewEdit: React.FunctionComponent<
               <CoverImageCropper
                 crop={cropCoverImage}
                 zoom={zoomCoverImage}
+                minZoom={minZoomCoverImage}
+                maxZoom={minZoomCoverImage + 2}
                 coverImageInEdit={coverImageInEdit}
                 originalImageWidth={originalCoverImageWidth}
                 disabled={updateCoverImageLoading}

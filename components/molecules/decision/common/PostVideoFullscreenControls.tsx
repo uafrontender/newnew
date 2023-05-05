@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -27,7 +28,7 @@ interface IPostVideoFullscreenControls {
   isPaused: boolean;
   handleToggleVideoPaused: () => void;
   // Scrubber
-  currentTime: number;
+  // currentTime: number;
   videoDuration: number;
   handleChangeTime: (newTime: number) => void;
   // Volume
@@ -37,209 +38,231 @@ interface IPostVideoFullscreenControls {
   handleChangeVolume: (newValue: number) => void;
 }
 
-const PostVideoFullscreenControls: React.FC<IPostVideoFullscreenControls> = ({
-  isPaused,
-  handleToggleVideoPaused,
-  currentTime,
-  videoDuration,
-  handleChangeTime,
-  isMuted,
-  handleToggleMuted,
-  currentVolume,
-  handleChangeVolume,
-}) => {
-  const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+type PostVideoFullscreenControlsHandle = {
+  changeCurrentTime: (newValue: number) => void;
+};
 
-  // Time
-  const timeSliderRef = useRef<HTMLInputElement>();
-  const progress = useMemo(
-    () => (currentTime / videoDuration) * 100,
-    [currentTime, videoDuration]
-  );
-  const formattedCurrent = useMemo(
-    () =>
-      currentTime
-        ? moment
-            .duration(currentTime, 'seconds')
-            // @ts-ignore
-            ?.format('mm:ss', { trim: false })
-        : '00:00',
-    [currentTime]
-  );
-  const formattedDuration = useMemo(
-    () =>
-      videoDuration && typeof videoDuration === 'number'
-        ? moment
-            .duration(videoDuration, 'seconds')
-            // @ts-ignore
-            ?.format('mm:ss', { trim: false })
-        : '',
-    [videoDuration]
-  );
+export type TPostVideoFullscreenControls = React.ElementRef<
+  typeof PostVideoFullscreenControls
+>;
 
-  const handleTimeChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      handleChangeTime(
-        (videoDuration / 100) * (parseFloat(e.target.value) as number)
-      );
+const PostVideoFullscreenControls = React.forwardRef<
+  PostVideoFullscreenControlsHandle,
+  IPostVideoFullscreenControls
+>(
+  (
+    {
+      isPaused,
+      handleToggleVideoPaused,
+      // currentTime,
+      videoDuration,
+      handleChangeTime,
+      isMuted,
+      handleToggleMuted,
+      currentVolume,
+      handleChangeVolume,
     },
-    [handleChangeTime, videoDuration]
-  );
+    ref
+  ) => {
+    const { resizeMode } = useAppState();
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
 
-  useEffect(() => {
-    if (timeSliderRef.current) {
-      timeSliderRef.current.style.setProperty(
-        '--sx',
-        `calc(${progress / 100} * 100%)`
-      );
-    }
-  }, [progress]);
+    // Time
+    const [currentTime, setCurrentTime] = useState(0);
+    useImperativeHandle(ref, () => ({
+      changeCurrentTime(newValue: number) {
+        setCurrentTime(newValue);
+      },
+    }));
+    const timeSliderRef = useRef<HTMLInputElement>();
+    const progress = useMemo(
+      () => (currentTime / videoDuration) * 100,
+      [currentTime, videoDuration]
+    );
+    const formattedCurrent = useMemo(
+      () =>
+        currentTime
+          ? moment
+              .duration(currentTime, 'seconds')
+              // @ts-ignore
+              ?.format('mm:ss', { trim: false })
+          : '00:00',
+      [currentTime]
+    );
+    const formattedDuration = useMemo(
+      () =>
+        videoDuration && typeof videoDuration === 'number'
+          ? moment
+              .duration(videoDuration, 'seconds')
+              // @ts-ignore
+              ?.format('mm:ss', { trim: false })
+          : '',
+      [videoDuration]
+    );
 
-  // Volume
-  const soundControlsRef = useRef<HTMLDivElement>();
-  const volumeSliderRef = useRef<HTMLInputElement>();
-  const volumeParsed = useMemo(() => currentVolume * 100, [currentVolume]);
-  const [isSoundControlsHovered, setIsSoundControlsHovered] = useState(false);
+    const handleTimeChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        handleChangeTime(
+          (videoDuration / 100) * (parseFloat(e.target.value) as number)
+        );
+      },
+      [handleChangeTime, videoDuration]
+    );
 
-  const handleVolumeChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      handleChangeVolume((parseFloat(e.target.value) as number) / 100);
-      if (parseFloat(e.target.value) > 0) {
-        handleToggleMuted(false);
-      } else {
-        handleToggleMuted(true);
+    useEffect(() => {
+      if (timeSliderRef.current) {
+        timeSliderRef.current.style.setProperty(
+          '--sx',
+          `calc(${progress / 100} * 100%)`
+        );
       }
-    },
-    [handleChangeVolume, handleToggleMuted]
-  );
+    }, [progress]);
 
-  const handleToggleMutedInner = useCallback(
-    (newValue: number) => {
-      handleChangeVolume(newValue);
-      if (newValue > 0) {
-        handleToggleMuted(false);
-      } else {
-        handleToggleMuted(true);
+    // Volume
+    const soundControlsRef = useRef<HTMLDivElement>();
+    const volumeSliderRef = useRef<HTMLInputElement>();
+    const volumeParsed = useMemo(() => currentVolume * 100, [currentVolume]);
+    const [isSoundControlsHovered, setIsSoundControlsHovered] = useState(false);
+
+    const handleVolumeChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        handleChangeVolume((parseFloat(e.target.value) as number) / 100);
+        if (parseFloat(e.target.value) > 0) {
+          handleToggleMuted(false);
+        } else {
+          handleToggleMuted(true);
+        }
+      },
+      [handleChangeVolume, handleToggleMuted]
+    );
+
+    const handleToggleMutedInner = useCallback(
+      (newValue: number) => {
+        handleChangeVolume(newValue);
+        if (newValue > 0) {
+          handleToggleMuted(false);
+        } else {
+          handleToggleMuted(true);
+        }
+      },
+      [handleChangeVolume, handleToggleMuted]
+    );
+
+    useEffect(() => {
+      if (volumeSliderRef.current) {
+        volumeSliderRef.current.style.setProperty(
+          '--sx',
+          `calc(${volumeParsed / 100} * 100%)`
+        );
       }
-    },
-    [handleChangeVolume, handleToggleMuted]
-  );
+    }, [volumeParsed]);
 
-  useEffect(() => {
-    if (volumeSliderRef.current) {
-      volumeSliderRef.current.style.setProperty(
-        '--sx',
-        `calc(${volumeParsed / 100} * 100%)`
-      );
-    }
-  }, [volumeParsed]);
+    const handleSoundControlsClickOutsideMobile = () => {
+      if (isMobileOrTablet) {
+        setIsSoundControlsHovered(false);
+      }
+    };
 
-  const handleSoundControlsClickOutsideMobile = () => {
-    if (isMobileOrTablet) {
-      setIsSoundControlsHovered(false);
-    }
-  };
+    useOnTouchStartOutside(
+      soundControlsRef,
+      handleSoundControlsClickOutsideMobile
+    );
 
-  useOnTouchStartOutside(
-    soundControlsRef,
-    handleSoundControlsClickOutsideMobile
-  );
-
-  return (
-    <SFullscreenControlsContainer>
-      <SPlayPauseButton
-        iconOnly
-        view='primaryGrad'
-        size='sm'
-        onClick={() => handleToggleVideoPaused()}
-      >
-        <InlineSvg
-          fill='#FFFFFF'
-          svg={!isPaused ? PauseIcon : PlayIcon}
-          width='20px'
-          height='20px'
-        />
-      </SPlayPauseButton>
-      <STime>{`${formattedCurrent} / ${formattedDuration}`}</STime>
-      <SSlider
-        ref={(el) => {
-          timeSliderRef.current = el!!;
-        }}
-        value={progress}
-        min={0}
-        max={100}
-        step={0.1}
-        aria-labelledby='Video seek'
-        onChange={handleTimeChange}
-        onMouseUp={(e) => {
-          if (isFirefox()) {
-            e.preventDefault();
-            timeSliderRef.current?.blur();
-          }
-        }}
-      />
-      <SSoundControls
-        ref={(el) => {
-          soundControlsRef.current = el!!;
-        }}
-        onMouseEnter={() => setIsSoundControlsHovered(true)}
-        onTouchStart={() => setIsSoundControlsHovered(true)}
-        onMouseLeave={() => setIsSoundControlsHovered(false)}
-      >
+    return (
+      <SFullscreenControlsContainer>
+        <SPlayPauseButton
+          iconOnly
+          view='primaryGrad'
+          size='sm'
+          onClick={() => handleToggleVideoPaused()}
+        >
+          <InlineSvg
+            fill='#FFFFFF'
+            svg={!isPaused ? PauseIcon : PlayIcon}
+            width='20px'
+            height='20px'
+          />
+        </SPlayPauseButton>
+        <STime>{`${formattedCurrent} / ${formattedDuration}`}</STime>
         <SSlider
           ref={(el) => {
-            volumeSliderRef.current = el!!;
+            timeSliderRef.current = el!!;
           }}
-          withThumb
-          value={volumeParsed}
-          style={{
-            transition: 'width 0.2s linear',
-            width: isSoundControlsHovered ? '80px' : '0px',
-            visibility: isSoundControlsHovered ? 'visible' : 'hidden',
-            ...(isSafari()
-              ? {
-                  display: isSoundControlsHovered ? 'block' : 'none',
-                }
-              : {}),
-          }}
+          value={progress}
           min={0}
           max={100}
           step={0.1}
-          aria-labelledby='Volume input'
-          onChange={handleVolumeChange}
+          aria-labelledby='Video seek'
+          onChange={handleTimeChange}
           onMouseUp={(e) => {
             if (isFirefox()) {
               e.preventDefault();
-              volumeSliderRef.current?.blur();
+              timeSliderRef.current?.blur();
             }
           }}
         />
-        <SSoundButton
-          iconOnly
-          size='sm'
-          view='transparent'
-          onClick={() => {
-            handleToggleMutedInner(!isMuted ? 0 : 1);
+        <SSoundControls
+          ref={(el) => {
+            soundControlsRef.current = el!!;
           }}
+          onMouseEnter={() => setIsSoundControlsHovered(true)}
+          onTouchStart={() => setIsSoundControlsHovered(true)}
+          onMouseLeave={() => setIsSoundControlsHovered(false)}
         >
-          <InlineSvg
-            svg={isMuted ? VolumeOff : VolumeOn}
-            width='24px'
-            height='24px'
-            fill='#FFFFFF'
+          <SSlider
+            ref={(el) => {
+              volumeSliderRef.current = el!!;
+            }}
+            withThumb
+            value={volumeParsed}
+            style={{
+              transition: 'width 0.2s linear',
+              width: isSoundControlsHovered ? '80px' : '0px',
+              visibility: isSoundControlsHovered ? 'visible' : 'hidden',
+              ...(isSafari()
+                ? {
+                    display: isSoundControlsHovered ? 'block' : 'none',
+                  }
+                : {}),
+            }}
+            min={0}
+            max={100}
+            step={0.1}
+            aria-labelledby='Volume input'
+            onChange={handleVolumeChange}
+            onMouseUp={(e) => {
+              if (isFirefox()) {
+                e.preventDefault();
+                volumeSliderRef.current?.blur();
+              }
+            }}
           />
-        </SSoundButton>
-      </SSoundControls>
-    </SFullscreenControlsContainer>
-  );
-};
+          <SSoundButton
+            iconOnly
+            size='sm'
+            view='transparent'
+            onClick={() => {
+              handleToggleMutedInner(!isMuted ? 0 : 1);
+            }}
+          >
+            <InlineSvg
+              svg={isMuted ? VolumeOff : VolumeOn}
+              width='24px'
+              height='24px'
+              fill='#FFFFFF'
+            />
+          </SSoundButton>
+        </SSoundControls>
+      </SFullscreenControlsContainer>
+    );
+  }
+);
 
 export default PostVideoFullscreenControls;
 

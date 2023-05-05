@@ -184,8 +184,7 @@ const CommentsBottomSection: React.FunctionComponent<
   useEffect(
     () => () => {
       if (commentsRoomId) {
-        if (commentsRoomId)
-          removeChannel(`comments_${commentsRoomId.toString()}`);
+        removeChannel(`comments_${commentsRoomId.toString()}`);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

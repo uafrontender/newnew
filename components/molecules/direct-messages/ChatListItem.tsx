@@ -97,8 +97,10 @@ const ChatlistItem: React.FC<IFunctionProps> = ({ chatRoom }) => {
         roomId: chatRoom.id as number,
       });
       const res = await markRoomAsRead(payload);
-      if (!res.data || res.error)
+
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
     } catch (err) {
       console.error(err);
     }

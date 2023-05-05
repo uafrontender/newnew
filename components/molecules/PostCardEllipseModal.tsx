@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
@@ -10,9 +10,13 @@ import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import { useAppSelector } from '../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../atoms/EllipseModal';
+import SharePanel from '../atoms/SharePanel';
 import { Mixpanel } from '../../utils/mixpanel';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
+
+import InlineSvg from '../atoms/InlineSVG';
+import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;
@@ -50,36 +54,16 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const { showErrorToastPredefined } = useErrorToasts();
 
   // Share
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+  const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
+  const handleOpenShareMenu = useCallback(() => {
+    setIsShareMenuOpen(true);
+  }, []);
 
-  const handleCopyLink = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/p/${postShortId || postUuid}`;
-      Mixpanel.track('Copy Link Post Modal', {
-        _stage: 'Post',
-        _postUuid: postUuid,
-      });
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            onClose();
-            setIsCopiedUrl(false);
-          }, 1000);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [postShortId, postUuid, onClose]);
+  const handleCloseShareMenu = useCallback(() => {
+    setIsShareMenuOpen(false);
+    onClose();
+  }, [onClose]);
 
   // Following
   const [isFollowingDecision, setIsFollowingDecision] = useState(false);
@@ -162,47 +146,77 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
     }
   }, [user.loggedIn, postUuid, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setIsShareMenuOpen(false);
+    }
+  }, [isOpen]);
+
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
-      <EllipseModalButton onClick={handleCopyLink}>
-        {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
-      </EllipseModalButton>
-      {postCreator.uuid !== user.userData?.userUuid && (
-        <EllipseModalButton onClick={handleFollowDecision}>
-          {
-            // eslint-disable-next-line no-nested-ternary
-            isFollowingLoading ? (
-              <Skeleton
-                height='17px'
-                highlightColor={theme.colorsThemed.background.primary}
-                baseColor={theme.colorsThemed.background.secondary}
-              />
-            ) : !isFollowingDecision ? (
-              t('ellipse.followDecision', {
-                postType: t(`postType.${postType}`),
-              })
-            ) : (
-              t('ellipse.unFollowDecision', {
-                postType: t(`postType.${postType}`),
-              })
-            )
-          }
-        </EllipseModalButton>
-      )}
-      {postCreator.uuid !== user.userData?.userUuid && (
-        <EllipseModalButton
-          tone='error'
-          onClick={() => {
-            Mixpanel.track('Report Open Post Modal', {
-              _stage: 'Post',
-              _postUuid: postUuid,
-            });
-            handleReportOpen();
-            onClose();
-          }}
-        >
-          {t('ellipse.report')}
-        </EllipseModalButton>
+      {!isShareMenuOpen ? (
+        <>
+          <EllipseModalButton onClick={() => handleOpenShareMenu()}>
+            <span>
+              {t('ellipse.share')}
+              {` `}
+            </span>
+            <SInlineSvg
+              fill={
+                theme.name === 'dark'
+                  ? theme.colorsThemed.text.primary
+                  : theme.colorsThemed.text.secondary
+              }
+              svg={shareIconFilled}
+              height='16px'
+              width='16px'
+              wrapperType='span'
+            />
+          </EllipseModalButton>
+          {postCreator.uuid !== user.userData?.userUuid && (
+            <EllipseModalButton onClick={handleFollowDecision}>
+              {
+                // eslint-disable-next-line no-nested-ternary
+                isFollowingLoading ? (
+                  <Skeleton
+                    height='17px'
+                    highlightColor={theme.colorsThemed.background.primary}
+                    baseColor={theme.colorsThemed.background.secondary}
+                  />
+                ) : !isFollowingDecision ? (
+                  t('ellipse.followDecision', {
+                    postType: t(`postType.${postType}`),
+                  })
+                ) : (
+                  t('ellipse.unFollowDecision', {
+                    postType: t(`postType.${postType}`),
+                  })
+                )
+              }
+            </EllipseModalButton>
+          )}
+          {postCreator.uuid !== user.userData?.userUuid && (
+            <EllipseModalButton
+              tone='error'
+              onClick={() => {
+                Mixpanel.track('Report Open Post Modal', {
+                  _stage: 'Post',
+                  _postUuid: postUuid,
+                });
+                handleReportOpen();
+                onClose();
+              }}
+            >
+              {t('ellipse.report')}
+            </EllipseModalButton>
+          )}
+        </>
+      ) : (
+        <SSharePanel
+          linkToShare={`${window.location.origin}/p/${postShortId}`}
+          iconsSize='m'
+          onCopyLink={handleCloseShareMenu}
+        />
       )}
     </EllipseModal>
   );
@@ -214,3 +228,22 @@ PostCardEllipseModal.defaultProps = {
 };
 
 export default PostCardEllipseModal;
+
+const SInlineSvg = styled(InlineSvg)`
+  display: inline-flex;
+  position: relative;
+  top: 3px;
+`;
+
+const SSharePanel = styled(SharePanel)`
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 24px;
+  display: flex;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+`;

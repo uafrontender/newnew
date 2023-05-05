@@ -9,6 +9,7 @@ interface IProfileImage {
 const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => {
   const theme = useTheme();
   const [loaded, setLoaded] = useState(false);
+
   return (
     <SProfileImage>
       <SGenericSkeleton

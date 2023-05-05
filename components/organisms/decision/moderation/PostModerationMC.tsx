@@ -187,8 +187,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       try {
         const res = await refetchPost();
 
-        if (!res.data || res.error)
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
         if (res.data.multipleChoice) {
           if (res.data.multipleChoice?.winningOptionId && !winningOption) {
