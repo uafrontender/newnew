@@ -66,7 +66,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
   };
 
   const handleZoomInProfileImage = () => {
-    setZoomProfileImage((z) => Math.min(zoomProfileImage + 0.2, minZoom + 2));
+    setZoomProfileImage((z) => Math.min(z + 0.2, minZoom + 2));
   };
 
   const onCropCompleteProfileImage = useCallback(

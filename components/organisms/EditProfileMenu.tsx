@@ -644,6 +644,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
           // eslint-disable-next-line react/no-this-in-sfc
           setOriginalProfileImageWidth(properlySizedImage.width);
+
+          // Circle, aspect ration 1:1, used for cropper with auto-cover
           const minZoom =
             Math.max(properlySizedImage.height, properlySizedImage.width) /
             Math.min(properlySizedImage.height, properlySizedImage.width);
@@ -669,16 +671,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const handleZoomInProfileImage = () => {
-    if (zoomProfileImage >= minZoomProfileImage + 2) {
-      return;
-    }
-
-    setZoomProfileImage((z) => {
-      if (z + 0.2 >= minZoomProfileImage + 2) {
-        return minZoomProfileImage + 2;
-      }
-      return z + 0.2;
-    });
+    setZoomProfileImage((z) => Math.min(z + 0.2, minZoomProfileImage));
   };
 
   const onCropCompleteProfileImage = useCallback(
