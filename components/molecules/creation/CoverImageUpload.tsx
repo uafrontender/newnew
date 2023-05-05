@@ -10,6 +10,7 @@ import resizeImage from '../../../utils/resizeImage';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import { useAppState } from '../../../contexts/appStateContext';
+import getMinZoomForVerticalCoverCropper from '../../../utils/getMinZoomForVerticalCoverCropper';
 
 interface ICoverImageUpload {
   coverImageToBeSaved: string;
@@ -61,24 +62,13 @@ const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
 
           const minHeight = isMobile ? 448 : 498;
           const minWidth = isMobile ? 252 : 280;
-          const cropAreaAspectRatio = minWidth / minHeight;
 
-          let minZoom = 1;
-          if (
-            properlySizedImage.height * cropAreaAspectRatio >
-            properlySizedImage.width
-          ) {
-            if (properlySizedImage.width < minWidth) {
-              minZoom = minWidth / properlySizedImage.width;
-            } else {
-              minZoom =
-                (properlySizedImage.height * cropAreaAspectRatio) /
-                properlySizedImage.width;
-            }
-          } else {
-            // objectFit='vertical-cover' will do the job
-            minZoom = 1;
-          }
+          const minZoom = getMinZoomForVerticalCoverCropper(
+            properlySizedImage.width,
+            properlySizedImage.height,
+            minWidth,
+            minHeight
+          );
 
           onFileChange(
             properlySizedImage.url,
