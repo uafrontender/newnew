@@ -136,7 +136,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleSetReadyToUploadAdditionalResponse,
   ]);
 
-  const handleDeleteUnuploadedAdditonalResponse = useCallback(async () => {
+  const handleDeleteUnUploadedAdditionalResponse = useCallback(async () => {
     try {
       await handleVideoDelete();
       handleSetCurrentAdditionalResponseStep('regular');
@@ -384,8 +384,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
           isEditingStories={isEditingStories}
           uiOffset={uiOffset}
           handleToggleMuted={handleToggleMuted}
-          handleDeleteUnuploadedAdditonalResponse={
-            handleDeleteUnuploadedAdditonalResponse
+          handleDeleteUnUploadedAdditionalResponse={
+            handleDeleteUnUploadedAdditionalResponse
           }
         />
       ) : (

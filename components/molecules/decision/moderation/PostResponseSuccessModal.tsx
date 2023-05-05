@@ -17,16 +17,18 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import SharePanel from '../../../atoms/SharePanel';
 import Caption from '../../../atoms/Caption';
+import { TPostType } from '../../../../utils/switchPostType';
 
 interface IPostResponseSuccessModal {
   isOpen: boolean;
   zIndex: number;
   amount: string;
+  postType: TPostType;
 }
 
 const PostResponseSuccessModal: React.FunctionComponent<
   IPostResponseSuccessModal
-> = ({ amount, isOpen, zIndex }) => {
+> = ({ isOpen, zIndex, amount, postType }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('modal-ResponseSuccessModal');
@@ -81,12 +83,20 @@ const PostResponseSuccessModal: React.FunctionComponent<
             </SCloseButton>
           )}
           <SHeadline variant={4}>{t('header')}</SHeadline>
-          <SText variant={2} weight={500}>
-            {t('youMade')}
-          </SText>
-          <SHeadline id='earned-amount' variant={1}>
-            {amount}
-          </SHeadline>
+          {amount === '0' && postType === 'mc' ? (
+            <SText variant={2} weight={500}>
+              {t('payedByBundleVotes')}
+            </SText>
+          ) : (
+            <>
+              <SText variant={2} weight={500}>
+                {t('youMade')}
+              </SText>
+              <SHeadline id='earned-amount' variant={1}>
+                ${amount}
+              </SHeadline>
+            </>
+          )}
           <SMakeAnotherPostButton>
             <Link href='/creation' scroll>
               <a href='/creation'>

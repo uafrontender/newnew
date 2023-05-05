@@ -1,5 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { useTheme } from 'styled-components';
+import GenericSkeleton from '../GenericSkeleton';
 
 interface IProfileBackground {
   pictureURL: string;
@@ -9,18 +10,42 @@ interface IProfileBackground {
 const ProfileBackground: React.FunctionComponent<IProfileBackground> = ({
   pictureURL,
   children,
-}) => (
-  <SProfileBackground pictureURL={pictureURL}>
-    <img src={pictureURL} alt='Profile cover' draggable={false} />
-    <SButtonsContainer>{children}</SButtonsContainer>
-  </SProfileBackground>
-);
+}) => {
+  const theme = useTheme();
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <SProfileBackground pictureURL={pictureURL}>
+      <SGenericSkeleton
+        visible={!loaded}
+        bgColor={theme.colorsThemed.background.tertiary}
+        highlightColor={theme.colorsThemed.background.quaternary}
+      />
+      <img
+        src={pictureURL}
+        alt='Profile cover'
+        draggable={false}
+        onLoad={() => {
+          setLoaded(true);
+        }}
+      />
+      <SButtonsContainer>{children}</SButtonsContainer>
+    </SProfileBackground>
+  );
+};
 
 export default ProfileBackground;
 
 interface ISProfileBackground {
   pictureURL: string;
 }
+
+const SGenericSkeleton = styled(GenericSkeleton)<{ visible: boolean }>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
+`;
 
 const SProfileBackground = styled.div<ISProfileBackground>`
   position: relative;

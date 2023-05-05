@@ -477,8 +477,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
 
-        if (!imgUploadRes.data || imgUploadRes.error)
+        if (!imgUploadRes.data || imgUploadRes.error) {
           throw new Error(imgUploadRes.error?.message ?? 'Upload error');
+        }
 
         const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
           method: 'PUT',

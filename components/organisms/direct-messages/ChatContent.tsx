@@ -223,8 +223,10 @@ const ChatContent: React.FC<IFuncProps> = ({ chatRoom }) => {
             },
           });
           const res = await sendMessage(payload);
-          if (!res.data || res.error)
+
+          if (!res.data || res.error) {
             throw new Error(res.error?.message ?? 'Request failed');
+          }
 
           setJustSentMessage(true);
           setSendingMessage(false);

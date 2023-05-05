@@ -726,6 +726,7 @@
     "succeeded": {
       "topHeader": "Response \npublished!",
       "youMade": "You made",
+      "payedByBundleVotes": "Voters paid using bundles votes",
       "shareBtn": "Share",
       "linkCopied": "Link copied!"
     },

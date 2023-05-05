@@ -148,8 +148,10 @@ export const Dashboard: React.FC = React.memo(() => {
       });
       const res = await getMyEarnings(payload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
+
       setMyEarnings(res.data);
       setIsEarningsLoading(false);
     } catch (err) {
