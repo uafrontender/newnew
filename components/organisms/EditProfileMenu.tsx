@@ -671,7 +671,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const handleZoomInProfileImage = () => {
-    setZoomProfileImage((z) => Math.min(z + 0.2, minZoomProfileImage));
+    setZoomProfileImage((z) => Math.min(z + 0.2, minZoomProfileImage + 2));
   };
 
   const onCropCompleteProfileImage = useCallback(

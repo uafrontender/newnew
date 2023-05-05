@@ -98,7 +98,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
   };
 
   const handleZoomInCoverImage = () => {
-    setZoomCoverImage((z) => Math.min(z + 0.2, minZoomCoverImage));
+    setZoomCoverImage((z) => Math.min(z + 0.2, minZoomCoverImage + 2));
   };
 
   const onCropCompleteCoverImage = useCallback(
