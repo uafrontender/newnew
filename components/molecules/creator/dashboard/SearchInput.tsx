@@ -108,7 +108,7 @@ interface ISInputWrapper {
 
 const SInputWrapper = styled.div<ISInputWrapper>`
   top: 50%;
-  width: ${(props) => (props.active ? '235px' : '44px')};
+  width: ${(props) => (props.active ? '220px' : '44px')};
   right: ${(props) => (props.active ? '-56px' : 0)};
 
   display: flex;
@@ -150,7 +150,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
     `}
 
   ${({ theme }) => theme.media.laptopL} {
-    width: ${(props) => (props.active ? '210px' : '44px')};
+    width: ${(props) => (props.active ? '145px' : '44px')};
   }
 `;
 
@@ -158,7 +158,7 @@ const SInput = styled.input`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
   border: none;
-  margin: 0 8px;
+  margin: 0 4px 0 8px;
   outline: none;
   font-size: 14px;
   background: transparent;

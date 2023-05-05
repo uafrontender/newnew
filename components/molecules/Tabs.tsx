@@ -528,10 +528,11 @@ const STab = styled.button<ISTab>`
   background: transparent;
   border: transparent;
 
-  padding-bottom: 6px;
+  padding-bottom: 10px;
 
-  margin-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
-  margin-right: 12px;
+  padding-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
+  padding-right: 12px;
+  padding-top: 6px;
 
   white-space: nowrap;
   font-weight: 600;

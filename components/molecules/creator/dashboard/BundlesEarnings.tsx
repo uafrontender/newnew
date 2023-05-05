@@ -8,8 +8,7 @@ import Text from '../../../atoms/Text';
 import { getMyBundleEarnings } from '../../../../api/endpoints/bundles';
 import { formatNumber } from '../../../../utils/format';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
-import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import Lottie from '../../../atoms/Lottie';
+import Loader from '../../../atoms/Loader';
 
 interface IFunctionProps {
   isBundlesEnabled: boolean;
@@ -104,21 +103,12 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
         <SHeaderLine>
           <STitle variant={6}>{t('myBundles.earnings.title')}</STitle>
         </SHeaderLine>
-        {isLoading ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : !myEarnings?.soldBundles ? (
+        {!myEarnings?.soldBundles && !isLoading && (
           <SNoEarnings>
             <SText variant={3}>{t('myBundles.earnings.noSoldYet')}</SText>
           </SNoEarnings>
-        ) : (
+        )}
+        {myEarnings?.soldBundles && !isLoading && (
           <>
             <STotal>
               <STotalEarned
@@ -136,6 +126,11 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
             </SBundles>
           </>
         )}
+        {isLoading && (
+          <SLoaderWrapper>
+            <Loader size='md' />
+          </SLoaderWrapper>
+        )}
       </SBlock>
     );
   }
@@ -148,17 +143,20 @@ interface ISBlock {
 }
 
 const SBlock = styled.section<ISBlock>`
+  position: relative;
+  padding: 24px;
+
   background: ${({ theme }) =>
     theme.name === 'light'
       ? theme.colorsThemed.background.primary
       : theme.colorsThemed.background.secondary};
-  padding: 24px;
   border-radius: ${(props) => props.theme.borderRadius.large};
   ${(props) =>
     !props.noMargin &&
     css`
       margin-bottom: 24px;
     `}
+
   ${(props) => props.theme.media.tablet} {
     max-width: 100%;
   }
@@ -268,4 +266,10 @@ const SBundlePrice = styled.div<ISBundlePrice>`
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 4px;
+`;
+
+const SLoaderWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `;
