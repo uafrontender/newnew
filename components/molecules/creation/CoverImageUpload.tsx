@@ -9,10 +9,15 @@ import isImage from '../../../utils/isImage';
 import resizeImage from '../../../utils/resizeImage';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface ICoverImageUpload {
   coverImageToBeSaved: string;
-  onFileChange: (newImageUrl: string, originalImageWidth: number) => void;
+  onFileChange: (
+    newImageUrl: string,
+    originalImageWidth: number,
+    minZoom: number
+  ) => void;
   handleDeleteFile: () => void;
 }
 
@@ -23,6 +28,10 @@ const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
 }) => {
   const { t } = useTranslation('page-Creation');
   const { showErrorToastPredefined } = useErrorToasts();
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -49,7 +58,33 @@ const CoverImageUpload: React.FunctionComponent<ICoverImageUpload> = ({
         if (reader.result) {
           const imageUrl = reader.result as string;
           const properlySizedImage = await resizeImage(imageUrl, 1000);
-          onFileChange(properlySizedImage.url, properlySizedImage.width);
+
+          const minHeight = isMobile ? 448 : 498;
+          const minWidth = isMobile ? 252 : 280;
+          const cropAreaAspectRatio = minWidth / minHeight;
+
+          let minZoom = 1;
+          if (
+            properlySizedImage.height * cropAreaAspectRatio >
+            properlySizedImage.width
+          ) {
+            if (properlySizedImage.width < minWidth) {
+              minZoom = minWidth / properlySizedImage.width;
+            } else {
+              minZoom =
+                (properlySizedImage.height * cropAreaAspectRatio) /
+                properlySizedImage.width;
+            }
+          } else {
+            // objectFit='vertical-cover' will do the job
+            minZoom = 1;
+          }
+
+          onFileChange(
+            properlySizedImage.url,
+            properlySizedImage.width,
+            minZoom
+          );
         }
       });
     }
