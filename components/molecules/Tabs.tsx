@@ -25,18 +25,10 @@ interface ITabs {
   draggable?: boolean;
   activeTabIndex: number;
   hideIndicatorOnResizing?: boolean;
-  withTabIndicator?: boolean;
 }
 
 const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
-  const {
-    t,
-    tabs,
-    draggable,
-    activeTabIndex,
-    withTabIndicator,
-    hideIndicatorOnResizing,
-  } = props;
+  const { t, tabs, draggable, activeTabIndex, hideIndicatorOnResizing } = props;
   const router = useRouter();
 
   const [isResizing, setIsResizing] = useState(false);
@@ -467,7 +459,6 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
               activeTab={i === activeTabIndex}
               extraMargin={i === 0 && shouldDrag}
               onMouseLeave={handleButtonMouseLeave}
-              withTabIndicator={withTabIndicator}
               onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
             >
               {t(`tabs.${tab.nameToken}`)}
@@ -478,19 +469,17 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
               )}
             </STab>
           ))}
-        {withTabIndicator && (
-          <SActiveTabIndicator
-            style={{
-              width: activeTabIndicator.width,
-              left: activeTabIndicator.left,
-              ...(isResizing && hideIndicatorOnResizing
-                ? {
-                    background: 'transparent',
-                  }
-                : {}),
-            }}
-          />
-        )}
+        <SActiveTabIndicator
+          style={{
+            width: activeTabIndicator.width,
+            left: activeTabIndicator.left,
+            ...(isResizing && hideIndicatorOnResizing
+              ? {
+                  background: 'transparent',
+                }
+              : {}),
+          }}
+        />
       </STabsContainer>
     </STabs>
   );
@@ -500,7 +489,6 @@ export default Tabs;
 
 Tabs.defaultProps = {
   draggable: true,
-  withTabIndicator: true,
 };
 
 const STabs = styled.div`
@@ -528,7 +516,6 @@ const STabsContainer = styled.div<{
 interface ISTab {
   activeTab: boolean;
   extraMargin: boolean;
-  withTabIndicator?: boolean;
 }
 
 const STab = styled.button<ISTab>`
@@ -541,8 +528,7 @@ const STab = styled.button<ISTab>`
   background: transparent;
   border: transparent;
 
-  padding-bottom: ${({ withTabIndicator }) =>
-    withTabIndicator ? '10px' : '0'};
+  padding-bottom: 10px;
 
   padding-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
   padding-right: 12px;
