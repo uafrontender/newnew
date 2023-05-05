@@ -66,13 +66,15 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         const res = await signInWithEmail(requestPayload);
 
-        if (!res!! || res!!.error || !res.data)
+        if (!res!! || res!!.error || !res.data) {
           throw new Error(res!!.error?.message ?? 'An error occurred');
+        }
 
         const { data } = res!!;
 
-        if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS)
+        if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS) {
           throw new Error('No data');
+        }
 
         dispatch(
           setUserData({
@@ -97,14 +99,17 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
             },
           })
         );
+
         // Set credential cookies
-        if (data.credential?.expiresAt?.seconds)
+        if (data.credential?.expiresAt?.seconds) {
           setCookie('accessToken', data.credential?.accessToken, {
             expires: new Date(
               (data.credential.expiresAt.seconds as number) * 1000
             ),
             path: '/',
           });
+        }
+
         setCookie('refreshToken', data.credential?.refreshToken, {
           // Expire in 10 years
           maxAge: 10 * 365 * 24 * 60 * 60,

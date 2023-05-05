@@ -76,8 +76,9 @@ const Notification: React.FC<INotification> = ({
 
   useEffect(() => {
     if (url === '/direct-messages' && target) {
-      if (target.creatorDashboard && target?.creatorDashboard.section === 1)
+      if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
         setUrl('/creator/subscribers');
+      }
 
       if (target.userProfile && target?.userProfile.userUsername) {
         setUrl(`/direct-messages/${target.userProfile.userUsername}`);
@@ -86,22 +87,24 @@ const Notification: React.FC<INotification> = ({
       if (
         target.postResponse &&
         (target?.postResponse.postShortId || target?.postResponse.postUuid)
-      )
+      ) {
         setUrl(
           `/p/${
             target?.postResponse.postShortId || target?.postResponse.postUuid
           }`
         );
+      }
 
       if (
         target.postAnnounce &&
         (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
-      )
+      ) {
         setUrl(
           `/p/${
             target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
           }`
         );
+      }
     }
   }, [url, target]);
 

@@ -110,8 +110,9 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
 
       const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
 
       const url = res.data.setupUrl;
       window.location.href = url;

@@ -12,6 +12,9 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
+    // Useful but disabled by default
+    "curly": "error",
+
     "react/prop-types": "off",
     "no-use-before-define": "off",
     "function-paren-newline": "off",

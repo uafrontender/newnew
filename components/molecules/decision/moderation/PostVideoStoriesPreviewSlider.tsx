@@ -17,7 +17,7 @@ interface IPostVideoStoriesPreviewSlider {
   isDeletingAdditionalResponse: boolean;
   handleChangeCurrentActive: (idx: number) => void;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
-  handleDeleteUnuploadedAdditonalResponse?: () => void;
+  handleDeleteUnUploadedAdditionalResponse?: () => void;
 }
 
 const PostVideoStoriesPreviewSlider: React.FunctionComponent<
@@ -29,7 +29,7 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
   isDeletingAdditionalResponse,
   handleChangeCurrentActive,
   handleDeleteAdditionalVideo,
-  handleDeleteUnuploadedAdditonalResponse,
+  handleDeleteUnUploadedAdditionalResponse,
 }) => {
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -86,8 +86,8 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
             handleDeleteVideo={() =>
               handleDeleteAdditionalVideo?.(video?.uuid!!)
             }
-            handleDeleteUnuploadedAdditonalResponse={() =>
-              handleDeleteUnuploadedAdditonalResponse?.()
+            handleDeleteUnUploadedAdditionalResponse={() =>
+              handleDeleteUnUploadedAdditionalResponse?.()
             }
           />
         ))}
