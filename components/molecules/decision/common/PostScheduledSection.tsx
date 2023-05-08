@@ -380,6 +380,7 @@ const SSubtitle1 = styled(Text)`
 
 const SSubtitle2 = styled(SSubtitle)`
   grid-area: subtitle_2;
+  white-space: pre-wrap;
 `;
 
 // Timer
