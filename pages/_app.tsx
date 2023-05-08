@@ -108,7 +108,7 @@ Router.events.on('routeChangeComplete', (url) => {
 });
 Router.events.on('routeChangeError', (err, url) => {
   if (!NO_LOADER_ROUTES.includes(url)) {
-    NProgress.done();
+    NProgress.remove();
   }
 });
 
