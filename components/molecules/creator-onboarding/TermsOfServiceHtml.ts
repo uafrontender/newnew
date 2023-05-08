@@ -26,16 +26,6 @@ Table of Contents
 </h1>
 <ul>
 <li>
-  <div>
-    IMPORTANT NOTICE
-  </div>
-</li>
-<li>
-<div>
-  Table of Contents
-</div>
-</li>
-<li>
 <div>
   1. Acceptance of the Terms of Use
 </div>

@@ -139,7 +139,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
   const { socketConnection } = useContext(SocketContext);
 
-  const { postParsed, postStatus, refetchPost, handleSetIsConfirmToClosePost } =
+  const { postParsed, refetchPost, handleSetIsConfirmToClosePost } =
     usePostInnerState();
   const postUuid = useMemo(() => postParsed?.postUuid, [postParsed?.postUuid]);
 
@@ -261,16 +261,17 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const cannotLeavePage = useMemo(() => {
     if (
       openedTab === 'response' &&
-      postStatus === 'waiting_for_response' &&
-      (responseFileUploadLoading || responseFileProcessingLoading)
+      (responseFileUploadLoading ||
+        responseFileProcessingLoading ||
+        responseFileProcessingProgress === 100)
     ) {
       return true;
     }
     return false;
   }, [
     openedTab,
-    postStatus,
     responseFileProcessingLoading,
+    responseFileProcessingProgress,
     responseFileUploadLoading,
   ]);
 
@@ -614,7 +615,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
         setCurrentAdditionalResponseStep('regular');
       } else {
-        throw new Error(res.error.message ?? 'An error occured');
+        throw new Error(res.error.message ?? 'An error occurred');
       }
     } catch (err) {
       console.error(err);

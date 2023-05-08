@@ -453,10 +453,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         >
           <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
         </SButtonBack>
-        {/* NB! Temp */}
-        {user.userData?.avatarUrl && (
-          <ProfileImage src={user.userData?.avatarUrl} />
-        )}
+        <ProfileImage src={user.userData?.avatarUrl} />
         <SUserData>
           <SUsernameWrapper>
             <SUsername variant={4}>

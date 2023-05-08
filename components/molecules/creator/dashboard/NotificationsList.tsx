@@ -155,30 +155,35 @@ export const NotificationsList: React.FC<IFunction> = ({
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
     if (target) {
-      if (target.creatorDashboard && target?.creatorDashboard.section === 2)
+      if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
         return '/direct-messages';
+      }
 
-      if (target.creatorDashboard && target?.creatorDashboard.section === 1)
+      if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
         return '/creator/subscribers';
+      }
 
-      if (target.userProfile && target?.userProfile.userUsername)
+      if (target.userProfile && target?.userProfile.userUsername) {
         return `/direct-messages/${target.userProfile.userUsername}`;
+      }
 
       if (
         target.postResponse &&
         (target?.postResponse.postShortId || target?.postResponse.postUuid)
-      )
+      ) {
         return `/p/${
           target?.postResponse.postShortId || target?.postResponse.postUuid
         }`;
+      }
 
       if (
         target.postAnnounce &&
         (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
-      )
+      ) {
         return `/p/${
           target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
         }`;
+      }
     }
     return '/direct-messages';
   };

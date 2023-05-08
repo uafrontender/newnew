@@ -143,6 +143,14 @@ const SWrapper = styled(motion.section)`
   margin-top: -15px;
   margin-bottom: 20px;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
     padding-bottom: 60px;
@@ -207,6 +215,11 @@ const SHeadline = styled(Headline)`
   }
 
   ${({ theme }) => theme.media.laptopM} {
+    font-size: 64px;
+    line-height: 68px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
     font-size: 80px;
     line-height: 92px;
   }
@@ -285,11 +298,19 @@ const SLargeAnimation = styled(AnimationChain)`
 
   ${({ theme }) => theme.media.laptopM} {
     margin-top: 0;
+    width: 50vw;
+    max-width: 50vw;
+    height: 520px;
+    order: unset;
+    z-index: -1;
+    right: -20px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
     width: 736px;
     max-width: 736px;
     height: 658px;
-    order: unset;
-    z-index: -1;
+    right: -44px;
   }
 `;
 

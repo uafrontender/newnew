@@ -347,8 +347,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       !biggestGroup?.price?.usdCents ||
       !biggestGroup?.amountOfVotes ||
       !appConstants?.mcVotePrice
-    )
+    ) {
       return 0;
+    }
 
     // Mirrored from BE `get_price_for_votes`
     // price per vote for the number of votes in the biggest group

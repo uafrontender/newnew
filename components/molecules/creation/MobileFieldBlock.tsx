@@ -278,7 +278,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 <SCalendarBottomGrad />
               </SCalendarWrapper>
               <SSeparator />
-              <SModalToggleWrapper>
+              <SModalToggleWrapper hidden={value?.type !== 'schedule'}>
                 <STimePickerWrapper>
                   <TimePicker
                     disabled={value?.type === 'right-away'}
@@ -603,12 +603,16 @@ const SInlineSVGWrapper = styled.div`
 
 const SInlineSVG = styled(InlineSVG)``;
 
-const SModalToggleWrapper = styled.div`
+const SModalToggleWrapper = styled.div<{ hidden?: boolean }>`
   width: 100%;
   margin: 12px 0;
   display: flex;
-  align-items: center;
+  flex-direction: row
+  align-items: start;
   justify-content: center;
+  height: ${({ hidden }) => (hidden ? '0px' : '44px')};
+  transition: height 0.2s ease;
+  overflow: hidden;
 `;
 
 const SSeparator = styled.div`

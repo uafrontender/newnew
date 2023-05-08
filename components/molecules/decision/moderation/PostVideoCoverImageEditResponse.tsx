@@ -61,6 +61,7 @@ const PostVideoCoverImageEditResponse: React.FunctionComponent<
   });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
+  const [minZoomCoverImage, setMinZoomCoverImage] = useState(1);
 
   const hasChanged = useMemo(
     () => originalCoverUrl !== coverImageToBeSaved,
@@ -68,29 +69,21 @@ const PostVideoCoverImageEditResponse: React.FunctionComponent<
   );
 
   const onFileChange = useCallback(
-    (newImageUrl: string, originalImageWidth: number) => {
-      setCoverImageInEdit(newImageUrl);
+    (newImageUrl: string, originalImageWidth: number, minZoom: number) => {
+      setMinZoomCoverImage(minZoom);
+      setZoomCoverImage(minZoom);
       setOriginalCoverImageWidth(originalImageWidth);
+      setCoverImageInEdit(newImageUrl);
     },
     []
   );
 
   const handleZoomOutCoverImage = () => {
-    if (zoomCoverImage <= 1) return;
-
-    setZoomCoverImage((z) => {
-      if (zoomCoverImage - 0.2 <= 1) return 1;
-      return z - 0.2;
-    });
+    setZoomCoverImage((z) => Math.max(z - 0.2, minZoomCoverImage));
   };
 
   const handleZoomInCoverImage = () => {
-    if (zoomCoverImage >= 3) return;
-
-    setZoomCoverImage((z) => {
-      if (zoomCoverImage + 0.2 >= 3) return 3;
-      return z + 0.2;
-    });
+    setZoomCoverImage((z) => Math.min(z + 0.2, minZoomCoverImage + 2));
   };
 
   const onCropCompleteCoverImage = useCallback(
@@ -157,6 +150,8 @@ const PostVideoCoverImageEditResponse: React.FunctionComponent<
               <CoverImageCropper
                 crop={cropCoverImage}
                 zoom={zoomCoverImage}
+                minZoom={minZoomCoverImage}
+                maxZoom={minZoomCoverImage + 2}
                 coverImageInEdit={coverImageInEdit}
                 originalImageWidth={originalCoverImageWidth}
                 disabled={false}
@@ -169,7 +164,7 @@ const PostVideoCoverImageEditResponse: React.FunctionComponent<
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomCoverImage <= 1}
+                  disabled={zoomCoverImage <= minZoomCoverImage}
                   onClick={handleZoomOutCoverImage}
                 >
                   <InlineSVG
@@ -181,18 +176,22 @@ const PostVideoCoverImageEditResponse: React.FunctionComponent<
                 </Button>
                 <CoverImageZoomSlider
                   value={zoomCoverImage}
-                  min={1}
-                  max={3}
+                  min={minZoomCoverImage}
+                  max={minZoomCoverImage + 2}
                   step={0.1}
                   ariaLabel='Zoom'
                   disabled={false}
-                  onChange={(e) => setZoomCoverImage(Number(e.target.value))}
+                  onChange={(e) =>
+                    setZoomCoverImage(
+                      Math.max(Number(e.target.value), minZoomCoverImage)
+                    )
+                  }
                 />
                 <Button
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomCoverImage >= 3}
+                  disabled={zoomCoverImage >= minZoomCoverImage + 2}
                   onClick={handleZoomInCoverImage}
                 >
                   <InlineSVG

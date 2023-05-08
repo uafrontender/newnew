@@ -88,8 +88,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
             user.userTutorialsProgress.remainingAcSteps &&
             user.userTutorialsProgress.remainingAcSteps[0] ===
               newnewapi.AcTutorialStep.AC_TIMER
-          )
+          ) {
             setIsTooltipVisible(true);
+          }
+
           setTutorialTitle(t('tutorials.ac.timer.title'));
           setTutorialText(t('tutorials.ac.timer.text'));
           break;
@@ -98,8 +100,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
             user.userTutorialsProgress.remainingCfSteps &&
             user.userTutorialsProgress.remainingCfSteps[0] ===
               newnewapi.CfTutorialStep.CF_TIMER
-          )
+          ) {
             setIsTooltipVisible(true);
+          }
+
           setTutorialTitle(t('tutorials.cf.timer.title'));
           setTutorialText(t('tutorials.cf.timer.text'));
           break;
@@ -108,8 +112,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
             user.userTutorialsProgress.remainingMcSteps &&
             user.userTutorialsProgress.remainingMcSteps[0] ===
               newnewapi.McTutorialStep.MC_TIMER
-          )
+          ) {
             setIsTooltipVisible(true);
+          }
+
           setTutorialTitle(t('tutorials.mc.timer.title'));
           setTutorialText(t('tutorials.mc.timer.text'));
           break;

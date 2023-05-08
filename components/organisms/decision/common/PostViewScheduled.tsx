@@ -100,8 +100,10 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     }, [dispatch]);
 
     const handleFollowDecision = async () => {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
+      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid) {
         return;
+      }
+
       try {
         Mixpanel.track('Favorite Post', {
           _stage: 'Post',

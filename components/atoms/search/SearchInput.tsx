@@ -216,18 +216,22 @@ const SearchInput: React.FC = React.memo(() => {
         payload,
         quickSearchAbortControllerRef?.current?.signal
       );
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
 
       if (res.data.creators) {
         setResultsCreators(res.data.creators);
       }
+
       if (res.data.posts) {
         setResultsPosts(res.data.posts);
       }
+
       if (res.data.hashtags) {
         setResultsHashtags(res.data.hashtags);
       }
+
       setIsLoading(false);
     } catch (err) {
       console.error(err);
@@ -243,10 +247,7 @@ const SearchInput: React.FC = React.memo(() => {
     if (clearedSearchValue?.length > 1) {
       getQuickSearchResult(clearedSearchValue);
       setIsResultsDropVisible(true);
-    } else if (
-      (!clearedSearchValue || clearedSearchValue.length === 1) &&
-      !isMobileOrTablet
-    ) {
+    } else {
       setIsResultsDropVisible(false);
       resetResults();
     }

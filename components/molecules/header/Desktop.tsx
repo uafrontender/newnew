@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 import { useAppState } from '../../../contexts/appStateContext';
 import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import ShareMenu from '../../organisms/ShareMenu';
 
 export const Desktop: React.FC = () => {
   const { t } = useTranslation();
@@ -34,47 +35,28 @@ export const Desktop: React.FC = () => {
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
+  const handleOpenShareMenu = () => {
+    setShareMenuOpen(true);
+  };
 
-  const handlerCopy = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/${user.userData?.username}`;
-
-      Mixpanel.track('Copy My Link', {
-        _stage: 'Header',
-      });
-
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            setIsCopiedUrl(false);
-          }, 1500);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [user.userData?.username]);
+  const handleCloseShareMenu = () => {
+    setShareMenuOpen(false);
+  };
 
   return (
     <SContainer>
       <Logo isShort={!isDesktopL} />
       <SRightBlock>
-        {process.env.NEXT_PUBLIC_ENVIRONMENT === 'test' && 'TEST'}
         {user.loggedIn && user.userData?.options?.isCreator && (
           <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 0 }}>
-            <SNavText variant={3} weight={600} onClick={handlerCopy}>
-              {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
+            <SNavText variant={3} weight={600} onClick={handleOpenShareMenu}>
+              {t('myLink.shareLink')}
             </SNavText>
+            {shareMenuOpen ? (
+              <SShareMenu absolute handleClose={handleCloseShareMenu} />
+            ) : null}
           </SItemWithMargin>
         )}
         <SItemWithMargin>
@@ -341,4 +323,16 @@ const SBundleIcon = styled.img`
   width: 24px;
   height: 24px;
   margin-right: 4px;
+`;
+
+const SShareMenu = styled(ShareMenu)`
+  right: -2px;
+  left: unset;
+  top: 30px;
+  z-index: 201;
+
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.quaternary};
 `;

@@ -186,7 +186,7 @@ const PostPage: NextPage<IPostPage> = ({
         const res = await setPostTitle(payload);
 
         if (!res.data || res.error) {
-          throw new Error(res?.error?.message || 'An error occured');
+          throw new Error(res?.error?.message || 'An error occurred');
         }
 
         updatePostTitleMutation.mutate({
@@ -653,7 +653,7 @@ const PostPage: NextPage<IPostPage> = ({
           }
         } else if (decoded.multipleChoice) {
           const parsedStatus = switchPostStatus(
-            'ac',
+            'mc',
             decoded.multipleChoice as newnewapi.MultipleChoice.Status
           );
 
