@@ -67,6 +67,7 @@ const CoverImagePreviewEdit: React.FunctionComponent<
   });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
+  const [minZoomCoverImage, setMinZoomCoverImage] = useState(1);
   const [updateCoverImageLoading, setUpdateCoverImageLoading] = useState(false);
 
   const hasChanged = useMemo(
@@ -75,29 +76,21 @@ const CoverImagePreviewEdit: React.FunctionComponent<
   );
 
   const onFileChange = useCallback(
-    (newImageUrl: string, originalImageWidth: number) => {
-      setCoverImageInEdit(newImageUrl);
+    (newImageUrl: string, originalImageWidth: number, minZoom: number) => {
+      setMinZoomCoverImage(minZoom);
+      setZoomCoverImage(minZoom);
       setOriginalCoverImageWidth(originalImageWidth);
+      setCoverImageInEdit(newImageUrl);
     },
     []
   );
 
   const handleZoomOutCoverImage = () => {
-    if (zoomCoverImage <= 1) return;
-
-    setZoomCoverImage((z) => {
-      if (zoomCoverImage - 0.2 <= 1) return 1;
-      return z - 0.2;
-    });
+    setZoomCoverImage((z) => Math.max(z - 0.2, minZoomCoverImage));
   };
 
   const handleZoomInCoverImage = () => {
-    if (zoomCoverImage >= 3) return;
-
-    setZoomCoverImage((z) => {
-      if (zoomCoverImage + 0.2 >= 3) return 3;
-      return z + 0.2;
-    });
+    setZoomCoverImage((z) => Math.min(z + 0.2, minZoomCoverImage + 2));
   };
 
   const onCropCompleteCoverImage = useCallback(
@@ -178,6 +171,8 @@ const CoverImagePreviewEdit: React.FunctionComponent<
               <CoverImageCropper
                 crop={cropCoverImage}
                 zoom={zoomCoverImage}
+                minZoom={minZoomCoverImage}
+                maxZoom={minZoomCoverImage + 2}
                 coverImageInEdit={coverImageInEdit}
                 originalImageWidth={originalCoverImageWidth}
                 disabled={updateCoverImageLoading}
@@ -190,7 +185,10 @@ const CoverImagePreviewEdit: React.FunctionComponent<
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomCoverImage <= 1 || updateCoverImageLoading}
+                  disabled={
+                    zoomCoverImage <= minZoomCoverImage ||
+                    updateCoverImageLoading
+                  }
                   onClick={handleZoomOutCoverImage}
                 >
                   <InlineSVG
@@ -202,18 +200,25 @@ const CoverImagePreviewEdit: React.FunctionComponent<
                 </Button>
                 <CoverImageZoomSlider
                   value={zoomCoverImage}
-                  min={1}
-                  max={3}
+                  min={minZoomCoverImage}
+                  max={minZoomCoverImage + 2}
                   step={0.1}
                   ariaLabel='Zoom'
                   disabled={updateCoverImageLoading}
-                  onChange={(e) => setZoomCoverImage(Number(e.target.value))}
+                  onChange={(e) =>
+                    setZoomCoverImage(
+                      Math.max(Number(e.target.value), minZoomCoverImage)
+                    )
+                  }
                 />
                 <Button
                   iconOnly
                   size='sm'
                   view='transparent'
-                  disabled={zoomCoverImage >= 3 || updateCoverImageLoading}
+                  disabled={
+                    zoomCoverImage >= minZoomCoverImage + 2 ||
+                    updateCoverImageLoading
+                  }
                   onClick={handleZoomInCoverImage}
                 >
                   <InlineSVG

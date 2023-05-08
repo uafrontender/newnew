@@ -32,7 +32,8 @@
     "unblockGroup": "解除屏蔽該組",
     "delete": "刪除",
     "deleteDecision": "刪除{{postType}}",
-    "cancel": "取消"
+    "cancel": "取消",
+    "share": "分享"
   },
   "postType": {
     "ac": "Bid",
@@ -120,7 +121,8 @@
         "other": "其他"
       },
       "additionalInfo": {
-        "placeholder": "請再提供更多詳情......"
+        "placeholder": "請再提供更多詳情......",
+        "tooShort_NEED_TRANSLATION": "Report is too short"
       },
       "button": {
         "cancel": "取消",
@@ -187,7 +189,8 @@
   },
   "myLink": {
     "copy": "我的連結",
-    "copied": "已複製！"
+    "copied": "已複製！",
+    "shareLink_NEED_TRANSLATION": "Share link"
   },
   "socials": {
     "copy": "複製連結",

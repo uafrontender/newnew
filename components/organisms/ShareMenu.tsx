@@ -9,15 +9,15 @@ import { useAppSelector } from '../../redux-store/store';
 import SharePanel from '../atoms/SharePanel';
 
 interface IShareMenu {
-  isVisible: boolean;
   absolute?: boolean;
+  className?: string;
   handleClose: () => void;
 }
 
 const ShareMenu: React.FC<IShareMenu> = ({
-  isVisible,
   handleClose,
   absolute,
+  className,
 }) => {
   const user = useAppSelector((state) => state.user);
   const containerRef = useRef<HTMLDivElement>();
@@ -27,22 +27,21 @@ const ShareMenu: React.FC<IShareMenu> = ({
 
   return (
     <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          absolute={absolute ?? false}
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <SSharePanel
-            linkToShare={`${window.location.origin}/${user.userData?.username}`}
-            onCopyLink={handleClose}
-          />
-        </SContainer>
-      )}
+      <SContainer
+        className={className}
+        absolute={absolute ?? false}
+        ref={(el) => {
+          containerRef.current = el!!;
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <SSharePanel
+          linkToShare={`${window.location.origin}/${user.userData?.username}`}
+          onCopyLink={handleClose}
+        />
+      </SContainer>
     </AnimatePresence>
   );
 };

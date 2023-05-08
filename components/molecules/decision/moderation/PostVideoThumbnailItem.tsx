@@ -21,7 +21,7 @@ interface IPostVideoThumbnailItem {
   isDeletingAdditionalResponse: boolean;
   handleClick: () => void;
   handleDeleteVideo: () => void;
-  handleDeleteUnuploadedAdditonalResponse: () => void;
+  handleDeleteUnUploadedAdditionalResponse: () => void;
 }
 
 const PostVideoThumbnailItem: React.FunctionComponent<
@@ -33,7 +33,7 @@ const PostVideoThumbnailItem: React.FunctionComponent<
   handleClick,
   isDeletingAdditionalResponse,
   handleDeleteVideo,
-  handleDeleteUnuploadedAdditonalResponse,
+  handleDeleteUnUploadedAdditionalResponse,
 }) => {
   const { t } = useTranslation('page-Post');
   const { postParsed } = usePostInnerState();
@@ -117,7 +117,7 @@ const PostVideoThumbnailItem: React.FunctionComponent<
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={() => {
           if (isNonUploadedYet) {
-            handleDeleteUnuploadedAdditonalResponse();
+            handleDeleteUnUploadedAdditionalResponse();
           } else {
             handleDeleteVideo();
           }

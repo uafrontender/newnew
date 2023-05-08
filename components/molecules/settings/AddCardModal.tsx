@@ -53,7 +53,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     const { setupIntent, error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL}${
           router.locale !== 'en-US' ? `/${router.locale}` : ''
         }/profile/settings/card-setup-complete`,
       },

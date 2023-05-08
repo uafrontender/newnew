@@ -62,8 +62,10 @@ export const Earnings: React.FC<IFunctionProps> = ({
           endDate: dateToTimestamp(new Date()),
         });
         const res = await getMyEarnings(payload);
-        if (!res.data || res.error)
+
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
         setMyEarnings(res.data);
 
@@ -86,12 +88,18 @@ export const Earnings: React.FC<IFunctionProps> = ({
   useEffect(() => {
     if (myEarnings) {
       let sum = 0;
-      if (myEarnings.auEarnings?.usdCents)
+
+      if (myEarnings.auEarnings?.usdCents) {
         sum += myEarnings.auEarnings?.usdCents;
-      if (myEarnings.mcEarnings?.usdCents)
+      }
+
+      if (myEarnings.mcEarnings?.usdCents) {
         sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.bundleEarnings?.usdCents)
+      }
+
+      if (myEarnings.bundleEarnings?.usdCents) {
         sum += myEarnings.bundleEarnings?.usdCents;
+      }
 
       setTotalEarnings(sum);
     }

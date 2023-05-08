@@ -6,12 +6,15 @@ import isImage from '../../../../utils/isImage';
 import resizeImage from '../../../../utils/resizeImage';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
+import { useAppState } from '../../../../contexts/appStateContext';
+import getMinZoomForVerticalCoverCropper from '../../../../utils/getMinZoomForVerticalCoverCropper';
 
 interface ICoverImageEdit {
   customCoverImageUrl?: string;
   handleSetCustomCoverImageUrl: (
     newImageUrl: string,
-    originalImageWidth: number
+    originalImageWidth: number,
+    minZoom: number
   ) => void;
   handleUnsetCustomCoverImageUrl: () => void;
 }
@@ -22,6 +25,10 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
   handleUnsetCustomCoverImageUrl,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -44,9 +51,20 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
           const imageUrl = reader.result as string;
           const properlySizedImage = await resizeImage(imageUrl, 1000);
 
+          const minHeight = isMobile ? 448 : 498;
+          const minWidth = isMobile ? 252 : 280;
+
+          const minZoom = getMinZoomForVerticalCoverCropper(
+            properlySizedImage.width,
+            properlySizedImage.height,
+            minWidth,
+            minHeight
+          );
+
           handleSetCustomCoverImageUrl(
             properlySizedImage.url,
-            properlySizedImage.width
+            properlySizedImage.width,
+            minZoom
           );
         }
       });

@@ -110,8 +110,9 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
 
       const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
 
       const url = res.data.setupUrl;
       window.location.href = url;
@@ -126,7 +127,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
       {isMobile && <SGoBackButton onClick={() => router.back()} />}
       <SHeadline variant={5}>
         <span>{t('stripeSection.titleSetUpStripe')}</span>
-        <InlineSvg svg={StripeLogo} width='80px' />
+        <SInlineSvg svg={StripeLogo} width='80px' />
       </SHeadline>
       <SUl>
         <li>{t('stripeSection.bullets.1')}</li>
@@ -253,8 +254,7 @@ const SControlsDiv = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-  display: flex;
-  align-items: flex-start;
+  display: inline-block;
 
   margin-bottom: 40px;
 
@@ -306,4 +306,10 @@ const SButton = styled(Button)<{
           }
         `
       : ''};
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  display: inline-block;
+  vertical-align: middle;
+  height: 35px;
 `;

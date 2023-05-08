@@ -1,24 +1,14 @@
-/* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable no-nested-ternary */
-// Temp disabled until backend is in place
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
-import isEmail from 'validator/lib/isEmail';
 // import Skeleton from 'react-loading-skeleton';
 
 // Redux
-import { useAppSelector, useAppDispatch } from '../../redux-store/store';
+import { useAppDispatch } from '../../redux-store/store';
 import {
   setSignupEmailInput,
   setSignupTimerValue,
@@ -32,17 +22,13 @@ import { SignupReason } from '../../utils/signUpReasons';
 
 // Components
 import AnimatedPresence from '../atoms/AnimatedPresence';
-import InlineSvg from '../atoms/InlineSVG';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 import GoBackButton from '../molecules/GoBackButton';
 import TextWithLine from '../atoms/TextWithLine';
-import SignInTextInput from '../atoms/SignInTextInput';
-import EmailSignInButton from '../molecules/signup/EmailSignInButton';
 import SignInButton from '../molecules/signup/SignInButton';
 
 // Icons
-import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
 import AppleIcon from '../../public/images/svg/auth/icon-apple.svg';
 import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
@@ -58,6 +44,7 @@ import { I18nNamespaces } from '../../@types/i18next';
 import { loadStateLS, removeStateLS } from '../../utils/localStorage';
 import { useAppState } from '../../contexts/appStateContext';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
+import EmailSignInForm from '../molecules/signup/EmailSignInForm';
 
 export interface ISignupMenu {
   goal?: string;
@@ -111,22 +98,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     resizeMode
   );
   // const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-
-  const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-
-  // Email input
-  const [emailInput, setEmailInput] = useState(signupEmailInput ?? '');
-  const [emailInputValid, setEmailInputValid] = useState(false);
-
-  // Loading of email submission
-  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
-
-  // NB! We won't have 'already exists' errors, but will probably
-  // need some case for banned users, etc.
-  const [submitError, setSubmitError] = useState<
-    keyof I18nNamespaces['page-SignUp']['error'] | ''
-  >('');
 
   const [textWidth, setTextWidth] = useState<number | undefined>();
 
@@ -134,76 +106,65 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     setTextWidth((curr) => Math.max(curr || 0, newTextWidth));
   }, []);
 
-  const handleSubmitEmail = async () => {
-    setIsSubmitLoading(true);
-    setSubmitError('');
+  const handleSubmitEmail = async (emailInput: string) => {
+    const localHasSoldBundles = loadStateLS('creatorHasSoldBundles') as boolean;
 
-    try {
-      const localHasSoldBundles = loadStateLS(
-        'creatorHasSoldBundles'
-      ) as boolean;
+    if (localHasSoldBundles) {
+      removeStateLS('creatorHasSoldBundles');
+    }
 
-      if (localHasSoldBundles) {
-        removeStateLS('creatorHasSoldBundles');
-      }
+    const payload = new newnewapi.SendVerificationEmailRequest({
+      emailAddress: emailInput,
+      useCase:
+        newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
+      ...(redirectURL
+        ? {
+            redirectUrl: redirectURL,
+          }
+        : {}),
+    });
 
-      const payload = new newnewapi.SendVerificationEmailRequest({
-        emailAddress: emailInput,
-        useCase:
-          newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
-        ...(redirectURL
-          ? {
-              redirectUrl: redirectURL,
-            }
-          : {}),
-      });
+    const { data, error } = await sendVerificationEmail(payload);
 
-      const { data, error } = await sendVerificationEmail(payload);
+    if (!data || error) {
+      throw new Error(error?.message ?? 'Request failed');
+    }
 
-      if (!data || error) {
-        throw new Error(error?.message ?? 'Request failed');
-      }
+    if (
+      data.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+      data.status !==
+        newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+    ) {
+      // TODO: Add texts for individual error statuses
+      throw new Error('Request failed');
+    }
 
-      if (
-        data.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-        data.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
-      ) {
-        // TODO: Add texts for individual error statuses
-        throw new Error('Request failed');
-      }
+    dispatch(setSignupEmailInput(emailInput));
+    dispatch(setSignupTimerValue(data.retryAfter));
 
-      dispatch(setSignupEmailInput(emailInput));
-      dispatch(setSignupTimerValue(data.retryAfter));
+    authLayoutContext.setShouldHeroUnmount(true);
 
-      authLayoutContext.setShouldHeroUnmount(true);
+    const parameters = {
+      to: goal,
+      reason,
+      redirectUrl: redirectURL,
+    };
 
-      const parameters = {
-        to: goal,
-        reason,
-        redirectUrl: redirectURL,
-      };
+    const queryString = Object.entries(parameters)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
+      .join('&');
 
-      const queryString = Object.entries(parameters)
-        .filter(([key, value]) => value)
-        .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
-        .join('&');
+    const verificationPath = `/verify-email${
+      queryString ? `?${queryString}` : ''
+    }`;
 
-      const verificationPath = `/verify-email${
-        queryString ? `?${queryString}` : ''
-      }`;
-
-      if (!isSafari()) {
-        setTimeout(() => {
-          router.replace(verificationPath);
-        }, 1000);
-      } else {
+    if (!isSafari()) {
+      setTimeout(() => {
         router.replace(verificationPath);
-      }
-    } catch (err: any) {
-      setIsSubmitLoading(false);
-      setSubmitError(err?.message ?? 'genericError');
+      }, 1000);
+    } else {
+      router.replace(verificationPath);
     }
   };
 
@@ -213,13 +174,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     }
   };
 
-  // Check if email is valid
-  useEffect(() => {
-    if (emailInput.length > 0) {
-      setEmailInputValid(isEmail(emailInput));
-    }
-  }, [emailInput, setEmailInputValid]);
-
+  // eslint-disable-next-line no-nested-ternary
   const redirectUrlParam = redirectURL
     ? `?redirect_url=${encodeURIComponent(redirectURL)}`
     : goal === 'create'
@@ -228,13 +183,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
   return (
     <SSignupMenu
-      isLoading={isSubmitLoading}
-      // style={{
-      //   ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-      //     transform: 'translateX(-1000px)',
-      //     transition: '0.6s linear'
-      //   } : {})
-      // }}
+    // style={{
+    //   ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
+    //     transform: 'translateX(-1000px)',
+    //     transition: '0.6s linear'
+    //   } : {})
+    // }}
     >
       <SMenuWrapper>
         <SSignInBackButton
@@ -369,65 +323,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               }
             />
           </motion.div>
-          <SEmailSignInForm
-            id='authenticate-form'
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (
-                !emailInputValid ||
-                isSubmitLoading ||
-                emailInput.length === 0
-              )
-                return;
-              handleSubmitEmail();
-            }}
-          >
-            <motion.div variants={item}>
-              <SignInTextInput
-                id='authenticate-input'
-                name='email'
-                type='email'
-                autoComplete='true'
-                value={emailInput}
-                isValid={emailInputValid}
-                disabled={isSubmitLoading}
-                onFocus={() => {
-                  if (submitError) {
-                    setSubmitError('');
-                  }
-                }}
-                onChange={(e) => setEmailInput(e.target.value)}
-                placeholder={t('signUpOptions.email')}
-                errorCaption={t('error.emailInvalid')}
-              />
-            </motion.div>
-            {submitError ? (
-              <AnimatedPresence animateWhenInView={false} animation='t-09'>
-                <SErrorDiv>
-                  <>
-                    <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-                    {t(`error.${submitError}`)}
-                  </>
-                </SErrorDiv>
-              </AnimatedPresence>
-            ) : null}
-            <motion.div variants={item}>
-              <EmailSignInButton
-                type='submit'
-                disabled={
-                  !emailInputValid || isSubmitLoading || emailInput.length === 0
-                }
-                onClick={() => {
-                  Mixpanel.track('Sign In With Email Clicked', {
-                    _stage: 'Sign Up',
-                    _email: emailInput,
-                  });
-                }}
-              >
-                <span>{t('signUpOptions.signInButton')}</span>
-              </EmailSignInButton>
-            </motion.div>
-          </SEmailSignInForm>
+          <EmailSignInForm
+            onSubmit={handleSubmitEmail}
+            animationVariants={item}
+          />
         </MSContentWrapper>
         <AnimatedPresence
           animateWhenInView={false}
@@ -441,6 +340,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               <a
                 href='https://privacy.newnew.co'
                 target='_blank'
+                rel='noreferrer'
                 onClickCapture={() =>
                   Mixpanel.track('Privacy Link Clicked', {
                     _stage: 'Sign Up',
@@ -454,6 +354,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               <a
                 href='https://terms.newnew.co'
                 target='_blank'
+                rel='noreferrer'
                 onClickCapture={() =>
                   Mixpanel.track('Terms Link Clicked', {
                     _stage: 'Sign Up',
@@ -468,6 +369,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               <a
                 href='https://communityguidelines.newnew.co'
                 target='_blank'
+                rel='noreferrer'
                 onClickCapture={() =>
                   Mixpanel.track('Community Guidelines Link Clicked', {
                     _stage: 'Sign Up',
@@ -511,7 +413,7 @@ const item: Variants = {
   },
 };
 
-const SSignupMenu = styled.div<{ isLoading?: boolean }>`
+const SSignupMenu = styled.div`
   position: absolute;
   top: 0;
   right: 0;
@@ -519,8 +421,6 @@ const SSignupMenu = styled.div<{ isLoading?: boolean }>`
   display: flex;
   height: 100%;
   width: 100%;
-
-  cursor: ${({ isLoading }) => (isLoading ? 'wait' : 'default')};
 
   ${({ theme }) => theme.media.tablet} {
     width: 50%;
@@ -695,29 +595,6 @@ const SContinueWithSpan = styled.span`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
-`;
-
-const SEmailSignInForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const SErrorDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.accent.error};
-
-  & > div {
-    margin-right: 4px;
-  }
 `;
 
 const SLegalText = styled(Text)`

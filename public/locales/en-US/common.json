@@ -32,7 +32,8 @@
     "unblockGroup": "Unblock group",
     "delete": "Delete",
     "deleteDecision": "Delete {{postType}}",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "share": "Share"
   },
   "postType": {
     "ac": "Bid",
@@ -120,7 +121,8 @@
         "other": "Other"
       },
       "additionalInfo": {
-        "placeholder": "Please tell us a bit more..."
+        "placeholder": "Please tell us a bit more...",
+        "tooShort": "Report is too short"
       },
       "button": {
         "cancel": "Cancel",
@@ -187,7 +189,8 @@
   },
   "myLink": {
     "copy": "My link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "shareLink": "Share link"
   },
   "socials": {
     "copy": "Copy Link",

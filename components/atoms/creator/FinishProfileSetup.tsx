@@ -41,14 +41,17 @@ export const FinishProfileSetup = () => {
   ]);
 
   const getString = useCallback(() => {
-    if (!isAccountDetailsCompleted && !isCreatorConnectedToStripe)
+    if (!isAccountDetailsCompleted && !isCreatorConnectedToStripe) {
       return t('dashboard.earnings.toDosIssue.text');
+    }
 
-    if (!isCreatorConnectedToStripe)
+    if (!isCreatorConnectedToStripe) {
       return t('dashboard.earnings.toDosIssue.textBank');
+    }
 
-    if (!isAccountDetailsCompleted)
+    if (!isAccountDetailsCompleted) {
       return t('dashboard.earnings.toDosIssue.textBio');
+    }
 
     return '';
   }, [isAccountDetailsCompleted, isCreatorConnectedToStripe, t]);

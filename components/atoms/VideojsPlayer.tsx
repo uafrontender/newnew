@@ -15,7 +15,7 @@ import 'videojs-contrib-quality-levels';
 import Button from './Button';
 import Lottie from './Lottie';
 import InlineSVG from './InlineSVG';
-import PlayerScrubber from './PlayerScrubber';
+import PlayerScrubber, { TPlayerScrubber } from './PlayerScrubber';
 
 import PlayIcon from '../../public/images/svg/icons/filled/Play.svg';
 import volumeOn from '../../public/images/svg/icons/filled/VolumeON.svg';
@@ -71,7 +71,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const [playbackTime, setPlaybackTime] = useState(0);
+  const playerScrubberRef = useRef<TPlayerScrubber>(null);
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
   const handlePlayerScrubberChangeTime = useCallback(
@@ -81,7 +81,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
         // to avoid double playback start
         setIsScrubberTimeChanging(true);
         playerRef.current?.pause();
-        setPlaybackTime(newValue);
+        playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
 
         setTimeout(() => {
@@ -91,7 +91,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
           });
         }, 100);
       } else {
-        setPlaybackTime(newValue);
+        playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
       }
     },
@@ -168,7 +168,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       });
 
       p.on('timeupdate', (e) => {
-        setPlaybackTime(p.currentTime());
+        playerScrubberRef?.current?.changeCurrentTime(p.currentTime());
       });
 
       // Loading state & Autoplay
@@ -298,8 +298,8 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       )}
       {withScrubber ? (
         <PlayerScrubber
+          ref={playerScrubberRef}
           isHovered={isHovered}
-          currentTime={playbackTime}
           videoDuration={playerRef?.current?.duration() || 10}
           withTime
           handleChangeTime={handlePlayerScrubberChangeTime}

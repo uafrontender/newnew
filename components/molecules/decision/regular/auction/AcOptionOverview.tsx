@@ -57,8 +57,9 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
 
         const res = await fetchBidsForOption(getCurrentBidsPayload);
 
-        if (!res.data || res.error)
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
         if (res.data && res.data.bids) {
           setBidsHistory((curr) => {

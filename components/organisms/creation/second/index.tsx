@@ -183,9 +183,9 @@ export const CreationSecondStepContent: React.FC<
 
         switch (res.data.status) {
           case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
-            return tCommon('error.text.min');
+            return tCommon('error.text.min', { value: CREATION_TITLE_MIN });
           case newnewapi.ValidateTextResponse.Status.TOO_LONG:
-            return tCommon('error.text.max');
+            return tCommon('error.text.max', { value: CREATION_TITLE_MAX });
           case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE:
             return tCommon('error.text.badWords');
           case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION:
@@ -209,10 +209,10 @@ export const CreationSecondStepContent: React.FC<
       max: number,
       type: newnewapi.ValidateTextRequest.Kind
     ) => {
-      let error = minLength(tCommon, text, min);
+      let error = minLength(tCommon, text.trim(), min);
 
       if (!error) {
-        error = maxLength(tCommon, text, max);
+        error = maxLength(tCommon, text.trim(), max);
       }
 
       if (!error) {
@@ -1221,7 +1221,6 @@ export const CreationSecondStepContent: React.FC<
             tabs={tabs}
             draggable={false}
             activeTabIndex={activeTabIndex}
-            withTabIndicator={isDesktop}
           />
           {isMobile && (
             <SCloseIconWrapper>

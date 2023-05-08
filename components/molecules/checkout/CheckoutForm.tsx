@@ -346,18 +346,22 @@ const SSaveCard = styled.div`
 `;
 
 const SEmailInput = styled(Input)`
-  padding: 10.5px 20px;
   margin-bottom: 12px;
-  border-color: transparent;
 
-  &::placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  }
-  &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  }
-  &::-ms-input-placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  input {
+    padding: 10.5px 20px;
+
+    border-color: transparent;
+
+    &::placeholder {
+      color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    }
+    &:-ms-input-placeholder {
+      color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    }
+    &::-ms-input-placeholder {
+      color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    }
   }
 `;
 

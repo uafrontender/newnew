@@ -11,6 +11,7 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import EllipseMenu, { EllipseMenuButton } from '../atoms/EllipseMenu';
+import SharePanel from '../atoms/SharePanel';
 
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
@@ -18,6 +19,9 @@ import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../../utils/mixpanel';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
+
+import InlineSvg from '../atoms/InlineSVG';
+import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
@@ -55,40 +59,16 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         usePushNotifications();
 
       const { showErrorToastPredefined } = useErrorToasts();
+      const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
 
-      // Share
-      const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+      const handleOpenShareMenu = useCallback(() => {
+        setIsShareMenuOpen(true);
+      }, []);
 
-      async function copyPostUrlToClipboard(url: string) {
-        if ('clipboard' in navigator) {
-          await navigator.clipboard.writeText(url);
-        } else {
-          document.execCommand('copy', true, url);
-        }
-      }
-
-      const handleCopyLink = useCallback(() => {
-        if (window) {
-          const url = `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-            postShortId || postUuid
-          }`;
-          Mixpanel.track('Copy Link Post Modal', {
-            _stage: 'Post',
-            _postUuid: postUuid,
-          });
-          copyPostUrlToClipboard(url)
-            .then(() => {
-              setIsCopiedUrl(true);
-              setTimeout(() => {
-                onClose();
-                setIsCopiedUrl(false);
-              }, 1000);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-      }, [postShortId, postUuid, onClose]);
+      const handleCloseShareMenu = useCallback(() => {
+        setIsShareMenuOpen(false);
+        onClose();
+      }, [onClose]);
 
       // Following
       const [isFollowingDecision, setIsFollowingDecision] = useState(false);
@@ -181,50 +161,86 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         }
       }, [user.loggedIn, postUuid, isVisible]);
 
+      useEffect(() => {
+        if (!isVisible) {
+          setIsShareMenuOpen(false);
+        }
+      }, [isVisible]);
+
       return (
         <SEllipseMenu
           isOpen={isVisible}
           onClose={onClose}
           anchorElement={anchorElement}
         >
-          <SEllipseMenuButton variant={3} onClick={() => handleCopyLink()}>
-            {isCopiedUrl ? t('ellipse.linkCopied') : t('ellipse.copyLink')}
-          </SEllipseMenuButton>
-          {postCreator.uuid !== user.userData?.userUuid && (
+          {!isShareMenuOpen ? (
             <>
-              {!isFollowingLoading ? (
-                <SEllipseMenuButton variant={3} onClick={handleFollowDecision}>
-                  {!isFollowingDecision
-                    ? t('ellipse.followDecision', {
-                        postType: t(`postType.${postType}`),
-                      })
-                    : t('ellipse.unFollowDecision', {
-                        postType: t(`postType.${postType}`),
-                      })}
-                </SEllipseMenuButton>
-              ) : (
-                <Skeleton
-                  count={1}
-                  height='34px'
-                  width='164px'
-                  highlightColor={theme.colorsThemed.background.primary}
-                />
-              )}
               <SEllipseMenuButton
                 variant={3}
-                tone='error'
-                onClick={() => {
-                  Mixpanel.track('Report Open Post Modal', {
-                    _stage: 'Post',
-                    _postUuid: postUuid,
-                  });
-                  handleReportOpen();
-                  onClose();
-                }}
+                onClick={() => handleOpenShareMenu()}
               >
-                {t('ellipse.report')}
+                <span>
+                  {t('ellipse.share')}
+                  {` `}
+                </span>
+                <SInlineSvg
+                  fill={
+                    theme.name === 'dark'
+                      ? theme.colorsThemed.text.primary
+                      : theme.colorsThemed.text.secondary
+                  }
+                  svg={shareIconFilled}
+                  height='16px'
+                  width='16px'
+                  wrapperType='span'
+                />
               </SEllipseMenuButton>
+              {postCreator.uuid !== user.userData?.userUuid && (
+                <>
+                  {!isFollowingLoading ? (
+                    <SEllipseMenuButton
+                      variant={3}
+                      onClick={handleFollowDecision}
+                    >
+                      {!isFollowingDecision
+                        ? t('ellipse.followDecision', {
+                            postType: t(`postType.${postType}`),
+                          })
+                        : t('ellipse.unFollowDecision', {
+                            postType: t(`postType.${postType}`),
+                          })}
+                    </SEllipseMenuButton>
+                  ) : (
+                    <Skeleton
+                      count={1}
+                      height='34px'
+                      width='164px'
+                      highlightColor={theme.colorsThemed.background.primary}
+                    />
+                  )}
+                  <SEllipseMenuButton
+                    variant={3}
+                    tone='error'
+                    onClick={() => {
+                      Mixpanel.track('Report Open Post Modal', {
+                        _stage: 'Post',
+                        _postUuid: postUuid,
+                      });
+                      handleReportOpen();
+                      onClose();
+                    }}
+                  >
+                    {t('ellipse.report')}
+                  </SEllipseMenuButton>
+                </>
+              )}
             </>
+          ) : (
+            <SSharePanel
+              linkToShare={`${window.location.origin}/p/${postShortId}`}
+              iconsSize='s'
+              onCopyLink={handleCloseShareMenu}
+            />
           )}
         </SEllipseMenu>
       );
@@ -239,4 +255,24 @@ const SEllipseMenu = styled(EllipseMenu)`
 
 const SEllipseMenuButton = styled(EllipseMenuButton)`
   text-align: right;
+  vertical-align: middle;
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  display: inline-flex;
+  position: relative;
+  top: 3px;
+`;
+
+const SSharePanel = styled(SharePanel)`
+  width: min-content;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+
+  padding: 8px;
 `;

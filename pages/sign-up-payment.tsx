@@ -46,8 +46,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
       try {
         setIsLoading(true);
 
-        if (!stripe_setup_intent_client_secret)
+        if (!stripe_setup_intent_client_secret) {
           throw new Error('No setup intent');
+        }
 
         const requestPayload = new newnewapi.SendVerificationEmailRequest({
           stripeSetupIntentClientSecret: stripe_setup_intent_client_secret,

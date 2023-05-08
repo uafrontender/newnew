@@ -213,7 +213,7 @@ const SHeadline = styled(Headline)`
 `;
 
 const SText = styled(Text)`
-  max-width: 250px;
+  max-width: 320px;
   margin-top: 4px;
   text-align: center;
   overflow-wrap: break-word;

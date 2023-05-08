@@ -1,21 +1,36 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { useTheme } from 'styled-components';
+import GenericSkeleton from '../GenericSkeleton';
 
 interface IProfileImage {
-  src: string;
+  src: string | undefined;
 }
 
-const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => (
-  <SProfileImage>
-    <img
-      src={src}
-      alt='User avatar'
-      width='100%'
-      height='100%'
-      draggable={false}
-    />
-  </SProfileImage>
-);
+const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => {
+  const theme = useTheme();
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <SProfileImage>
+      <SGenericSkeleton
+        visible={!loaded}
+        bgColor={theme.colorsThemed.background.tertiary}
+        highlightColor={theme.colorsThemed.background.quaternary}
+      />
+      <SImg
+        visible={loaded}
+        src={src}
+        alt='User avatar'
+        width='100%'
+        height='100%'
+        draggable={false}
+        onLoad={() => {
+          setLoaded(true);
+        }}
+      />
+    </SProfileImage>
+  );
+};
 
 export default ProfileImage;
 
@@ -51,4 +66,15 @@ const SProfileImage = styled.div`
   ${(props) => props.theme.media.laptop} {
     top: 192px;
   }
+`;
+
+const SGenericSkeleton = styled(GenericSkeleton)<{ visible: boolean }>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
+`;
+
+const SImg = styled.img<{ visible: boolean }>`
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
 `;

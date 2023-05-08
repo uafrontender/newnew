@@ -97,8 +97,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
           error ||
           !data ||
           data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
-        )
+        ) {
           throw new Error(error?.message ?? 'Request failed');
+        }
 
         if (redirect === 'settings') {
           dispatch(
@@ -113,8 +114,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 
           const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-          if (!becomeCreatorRes.data || becomeCreatorRes.error)
+          if (!becomeCreatorRes.data || becomeCreatorRes.error) {
             throw new Error('Become creator failed');
+          }
 
           dispatch(
             setUserData({

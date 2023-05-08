@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import PostVideoStoryItem from './PostVideoStoryItem';
@@ -29,7 +29,7 @@ interface IPostVideoResponsesSlider {
   isDeletingAdditionalResponse: boolean;
   videoDurationWithTime?: boolean;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
-  handleDeleteUnuploadedAdditonalResponse?: () => void;
+  handleDeleteUnUploadedAdditionalResponse?: () => void;
   autoscroll?: boolean;
 }
 
@@ -43,10 +43,13 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   isDeletingAdditionalResponse,
   videoDurationWithTime,
   handleDeleteAdditionalVideo,
-  handleDeleteUnuploadedAdditonalResponse,
+  handleDeleteUnUploadedAdditionalResponse,
   autoscroll,
 }) => {
   const { resizeMode } = useAppState();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -70,6 +73,12 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
   const [hovered, setHovered] = useState(false);
 
+  const [storiesLoaderProgress, setStoriesLoaderProgress] = useState(0);
+
+  const handleSetStoriesLoaderProgess = useCallback((newValue: number) => {
+    setStoriesLoaderProgress(newValue);
+  }, []);
+
   const scrollSliderTo = useCallback(
     (to: number) => {
       let scrollTo = to;
@@ -92,7 +101,11 @@ const PostVideoResponsesSlider: React.FunctionComponent<
         _videoIndex: `postVideoThumbnailItem_${i}`,
         _component: 'PostVideoResponsesSlider',
       });
-      if (currentVideo === i) return;
+
+      if (currentVideo === i) {
+        return;
+      }
+
       scrollSliderTo(i);
     },
     [currentVideo, postParsed?.postUuid, scrollSliderTo]
@@ -133,11 +146,13 @@ const PostVideoResponsesSlider: React.FunctionComponent<
               ? () => scrollSliderTo(i + 1)
               : undefined
           }
+          onActiveProgress={handleSetStoriesLoaderProgess}
         />
       )),
     [
       autoscroll,
       currentVideo,
+      handleSetStoriesLoaderProgess,
       isMuted,
       scrollSliderTo,
       videoDurationWithTime,
@@ -165,24 +180,49 @@ const PostVideoResponsesSlider: React.FunctionComponent<
       <SimplifiedSlider currentSlide={currentVideo} wrapperRef={wrapperRef}>
         {handleMapVideoStoryItems()}
       </SimplifiedSlider>
-      <SDotsContainer
-        isEditingStories={isEditingStories}
-        style={{
-          ...(uiOffset
-            ? {
-                transform: `translateY(-${uiOffset}px)`,
-              }
-            : {}),
-        }}
-      >
-        {videos.map((item, i) => (
-          <SDot
-            key={item?.uuid ?? i}
-            active={currentVideo === i}
-            onClick={() => handleClickDotScroll(i)}
-          />
-        ))}
-      </SDotsContainer>
+      {isMobile ? (
+        <SStoriesLoadersContainer>
+          {videos.map((item, i) => (
+            <SStoriesLoader
+              key={item?.uuid ?? i}
+              active={currentVideo === i}
+              viewed={currentVideo > i}
+              onClick={() => handleClickDotScroll(i)}
+            >
+              <div
+                className='SStoriesLoaderInner'
+                style={
+                  currentVideo === i
+                    ? {
+                        transform: `scaleX(calc(${storiesLoaderProgress} / 100))`,
+                      }
+                    : {}
+                }
+              />
+            </SStoriesLoader>
+          ))}
+        </SStoriesLoadersContainer>
+      ) : null}
+      {!isMobile ? (
+        <SDotsContainer
+          isEditingStories={isEditingStories}
+          style={{
+            ...(uiOffset
+              ? {
+                  transform: `translateY(-${uiOffset}px)`,
+                }
+              : {}),
+          }}
+        >
+          {videos.map((item, i) => (
+            <SDot
+              key={item?.uuid ?? i}
+              active={currentVideo === i}
+              onClick={() => handleClickDotScroll(i)}
+            />
+          ))}
+        </SDotsContainer>
+      ) : null}
       <SScrollLeft
         view='transparent'
         iconOnly
@@ -244,10 +284,14 @@ const PostVideoResponsesSlider: React.FunctionComponent<
           uiOffset={uiOffset ?? 0}
           handleChangeCurrentActive={scrollSliderTo}
           isDeletingAdditionalResponse={isDeletingAdditionalResponse}
-          handleDeleteAdditionalVideo={handleDeleteAdditionalVideo}
-          handleDeleteUnuploadedAdditonalResponse={
-            handleDeleteUnuploadedAdditonalResponse
-          }
+          handleDeleteAdditionalVideo={(videoUuid: string) => {
+            handleDeleteAdditionalVideo?.(videoUuid);
+            setCurrentVideo(0);
+          }}
+          handleDeleteUnUploadedAdditionalResponse={() => {
+            handleDeleteUnUploadedAdditionalResponse?.();
+            setCurrentVideo(0);
+          }}
         />
       ) : null}
     </SWrapper>
@@ -380,5 +424,50 @@ const SDot = styled.button<{
   &:active,
   &:focus {
     outline: none;
+  }
+`;
+
+const SStoriesLoadersContainer = styled.div`
+  position: absolute;
+
+  width: 100%;
+  top: 6px;
+
+  padding-left: 6px;
+  padding-right: 6px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+`;
+
+const SStoriesLoader = styled.div<{
+  viewed: boolean;
+  active: boolean;
+}>`
+  position: relative;
+  background-color: rgba(11, 10, 19, 0.2);
+  height: 2px;
+  border-radius: 16px;
+  width: 100%;
+
+  box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.25);
+
+  .SStoriesLoaderInner {
+    position: absolute;
+
+    height: 2px;
+    border-radius: 16px;
+    width: 100%;
+
+    background-color: ${({ active, viewed }) =>
+      active || viewed ? 'rgb(255, 255, 255)' : 'transparent'};
+
+    ${({ active, viewed }) =>
+      active && !viewed
+        ? css`
+            transform-origin: left;
+          `
+        : null}
   }
 `;

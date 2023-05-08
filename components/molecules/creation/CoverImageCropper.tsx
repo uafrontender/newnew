@@ -7,6 +7,8 @@ import { useAppState } from '../../../contexts/appStateContext';
 type TCoverImageCropper = {
   crop: Point;
   zoom: number;
+  minZoom: number;
+  maxZoom: number;
   coverImageInEdit: string;
   originalImageWidth: number;
   disabled: boolean;
@@ -18,8 +20,10 @@ type TCoverImageCropper = {
 };
 
 const CoverImageCropper: React.FunctionComponent<TCoverImageCropper> = ({
-  zoom,
   crop,
+  zoom,
+  minZoom,
+  maxZoom,
   coverImageInEdit,
   originalImageWidth,
   disabled,
@@ -51,6 +55,8 @@ const CoverImageCropper: React.FunctionComponent<TCoverImageCropper> = ({
           cropShape='rect'
           showGrid={false}
           zoom={zoom}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
           aspect={1}
           classes={{
             containerClassName: 'cropper-container',
@@ -76,9 +82,6 @@ const SCropperWrapper = styled.div<{
 }>`
   position: relative;
   min-height: 500px;
-
-  ${({ theme }) => theme.media.tablet} {
-  }
 
   .cropper-container {
     border-radius: ${({ theme }) => theme.borderRadius.medium};
