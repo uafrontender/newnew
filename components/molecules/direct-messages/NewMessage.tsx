@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { newnewapi } from 'newnew-api';
+
 import NewMessageButton from '../../atoms/direct-messages/NewMessageButton';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
 
-const NewMessage: React.FC = () => {
+interface INewMessage {
+  onNewMessageSelect: (chatRoom: newnewapi.IChatRoom) => void;
+}
+
+const NewMessage: React.FC<INewMessage> = ({ onNewMessageSelect }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const openModal = () => {
@@ -25,7 +31,11 @@ const NewMessage: React.FC = () => {
     <>
       <NewMessageButton handleClick={openModal} />
       {showModal && (
-        <NewMessageModal showModal={showModal} closeModal={closeModal} />
+        <NewMessageModal
+          showModal={showModal}
+          closeModal={closeModal}
+          onNewMessageSelect={onNewMessageSelect}
+        />
       )}
     </>
   );

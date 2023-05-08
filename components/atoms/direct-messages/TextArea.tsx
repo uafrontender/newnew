@@ -1,13 +1,10 @@
-/* eslint-disable no-nested-ternary */
-import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
-import { useRouter } from 'next/router';
 import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import { useGetChats } from '../../../contexts/chatContext';
 
 interface ITextArea {
   id?: string;
@@ -16,6 +13,7 @@ interface ITextArea {
   maxlength?: number;
   onChange: (key: string, value: string, isShiftEnter: boolean) => void;
   placeholder: string;
+  variant?: 'primary' | 'secondary';
   gotMaxLength?: () => void;
   setTextareaFocused?: () => void;
 }
@@ -26,43 +24,33 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     maxlength,
     value,
     error,
+    variant,
     onChange,
     placeholder,
     gotMaxLength,
     setTextareaFocused,
   } = props;
 
-  const [isShiftEnter, setisShiftEnter] = useState<boolean>(false);
-  const router = useRouter();
-  const { mobileChatOpened } = useGetChats();
-
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard') ||
-      router.asPath.includes('/creator/bundles')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
+  const [isEnter, setIsEnter] = useState<boolean>(false);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
-      onChange(id, e.target.value, isShiftEnter);
+      onChange(id, e.target.value, isEnter);
     },
-    [id, onChange, isShiftEnter]
+    [id, onChange, isEnter]
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      /* eslint-disable no-unused-expressions */
       if (e.key === 'Enter' && value.length === 500) {
         gotMaxLength?.();
       }
 
-      e.key === 'Enter' && e.shiftKey === true
-        ? setisShiftEnter(true)
-        : setisShiftEnter(false);
+      if (e.key === 'Enter' && e.shiftKey === false) {
+        setIsEnter(true);
+      } else {
+        setIsEnter(false);
+      }
     },
     [gotMaxLength, value.length]
   );
@@ -73,11 +61,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
 
   return (
     <SWrapper>
-      <SContent
-        error={!!error}
-        isDashboard={isDashboard}
-        isMobileChatOpened={mobileChatOpened}
-      >
+      <SContent error={!!error} variant={variant}>
         <STextArea
           maxRows={8}
           value={value}
@@ -116,18 +100,20 @@ const SWrapper = styled.div`
 
 interface ISContent {
   error: boolean;
-  isDashboard?: boolean;
-  isMobileChatOpened?: boolean;
+  variant?: 'primary' | 'secondary';
 }
 
 const SContent = styled.div<ISContent>`
   position: relative;
-  background: ${({ theme, isDashboard, isMobileChatOpened }) =>
-    !isDashboard || isMobileChatOpened
-      ? theme.name === 'light'
-        ? theme.colors.white
-        : theme.colorsThemed.background.tertiary
-      : theme.colorsThemed.background.tertiary};
+  background: ${({ variant, theme }) => {
+    if (variant === 'secondary') {
+      return theme.colorsThemed.background.tertiary;
+    }
+
+    return theme.name === 'light'
+      ? theme.colors.white
+      : theme.colorsThemed.background.tertiary;
+  }};
   border-radius: 16px;
 
   border-width: 0;

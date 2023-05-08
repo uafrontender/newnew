@@ -1,14 +1,17 @@
-/* eslint-disable no-nested-ternary */
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
+import { useQueryClient } from 'react-query';
+import { useRouter } from 'next/router';
+
 import useChatRoomMessages from '../../../utils/hooks/useChatRoomMessages';
 import isIOS from '../../../utils/isIOS';
-import { useGetChats } from '../../../contexts/chatContext';
 import { SocketContext } from '../../../contexts/socketContext';
+import Loader from '../../atoms/Loader';
+import { markRoomAsRead } from '../../../api/endpoints/chat';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -20,16 +23,24 @@ interface IChatAreaCenter {
   chatRoom: newnewapi.IChatRoom;
   isAnnouncement?: boolean;
   textareaFocused: boolean;
+  withAvatars?: boolean;
+  variant?: 'primary' | 'secondary';
+  className?: string;
 }
 
 const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   chatRoom,
   isAnnouncement,
+  withAvatars,
   textareaFocused,
+  variant,
+  className,
 }) => {
   const { ref: loadingRef, inView } = useInView();
-  const { activeChatRoom, justSentMessage } = useGetChats();
   const { socketConnection } = useContext(SocketContext);
+
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const {
     data,
@@ -38,6 +49,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     fetchNextPage,
     refetch,
     isFetchingNextPage,
+    isFetched,
   } = useChatRoomMessages({
     limit: isIOS() ? 8 : 20,
     roomId: chatRoom?.id,
@@ -48,18 +60,42 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [data]
   );
 
-  useEffect(() => {
-    if (activeChatRoom && justSentMessage) {
-      refetch();
+  const markAsRead = useCallback(async () => {
+    try {
+      const payload = new newnewapi.MarkRoomAsReadRequest({
+        roomId: chatRoom.id as number,
+      });
+      const res = await markRoomAsRead(payload);
+      if (!res.data || res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      // Update chat list
+      queryClient.invalidateQueries({
+        queryKey: ['private', 'getMyRooms'],
+      });
+    } catch (err) {
+      console.error(err);
     }
-  }, [activeChatRoom, justSentMessage, refetch]);
+  }, [chatRoom, queryClient]);
+
+  useEffect(() => {
+    if (
+      chatRoom.unreadMessageCount &&
+      chatRoom.unreadMessageCount > 0 &&
+      isFetched
+    ) {
+      markAsRead();
+    }
+  }, [chatRoom, isFetched, markAsRead]);
 
   const hasWelcomeMessage = useMemo(
     () =>
       messages.length === 0 &&
       !isAnnouncement &&
       !isLoading &&
-      chatRoom.myRole === 1,
+      chatRoom.myRole === 1 &&
+      chatRoom.visavis?.isSubscriptionActive,
     [messages, isAnnouncement, isLoading, chatRoom]
   );
 
@@ -72,13 +108,24 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [messages, isAnnouncement, isLoading, chatRoom]
   );
 
+  const selectedChatRoomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
+
   useEffect(() => {
     const socketHandlerMessageCreated = (dataSocket: any) => {
       const arr = new Uint8Array(dataSocket);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       // eslint-disable-next-line eqeqeq
-      if (decoded.roomId == activeChatRoom?.id) {
+      if (selectedChatRoomId && decoded.roomId === selectedChatRoomId) {
+        // TODO: think how to avoid it
         refetch();
+        // TODO: not the best solution but there is no alternative in current implementation
+        markAsRead();
       }
     };
     if (socketConnection) {
@@ -93,7 +140,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
         );
       }
     };
-  }, [socketConnection, activeChatRoom, refetch]);
+  }, [selectedChatRoomId, socketConnection, refetch, markAsRead]);
 
   /* loading next page of messages */
   useUpdateEffect(() => {
@@ -103,7 +150,11 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer textareaFocused={textareaFocused}>
+    <SContainer
+      textareaFocused={textareaFocused}
+      className={className}
+      isAnnouncement={isAnnouncement}
+    >
       {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
       {hasNoMessagesYet && <NoMessagesYet />}
 
@@ -114,8 +165,11 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
           item={item}
           nextElement={messages[index + 1]}
           prevElement={messages[index - 1]}
+          withAvatar={withAvatars}
+          variant={variant}
         />
       ))}
+      {messages.length === 0 && isLoading && <Loader isStatic size='md' />}
       {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
     </SContainer>
   );
@@ -125,6 +179,7 @@ export default ChatAreaCenter;
 
 interface ISContainer {
   textareaFocused: boolean;
+  isAnnouncement?: boolean;
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
@@ -143,6 +198,13 @@ const SContainer = styled.div<ISContainer>`
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior: contain;
+
+  ${({ isAnnouncement }) =>
+    isAnnouncement
+      ? css`
+          padding-top: 75px;
+        `
+      : null}
 
   ${(props) => props.theme.media.tablet} {
     position: static;

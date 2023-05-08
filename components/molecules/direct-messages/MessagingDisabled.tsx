@@ -13,13 +13,14 @@ import DisplayName from '../../atoms/DisplayName';
 
 interface IMessagingDisabled {
   user: newnewapi.IUser;
+  variant?: 'primary' | 'secondary';
 }
 
 const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
-  ({ user }) => {
+  ({ user, variant }) => {
     const { t } = useTranslation('page-Chat');
     return (
-      <SBottomAction>
+      <SBottomAction variant={variant}>
         <SBottomActionLeft>
           <SBottomActionIcon>🙊</SBottomActionIcon>
           <SBottomActionText>
