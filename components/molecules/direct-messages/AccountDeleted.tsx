@@ -10,11 +10,14 @@ import {
   SBottomActionTitle,
 } from '../../atoms/direct-messages/styles';
 
-const AccountDeleted: React.FC = React.memo(() => {
+interface IAccountDeleted {
+  variant?: 'primary' | 'secondary';
+}
+const AccountDeleted: React.FC<IAccountDeleted> = React.memo(({ variant }) => {
   const { t } = useTranslation('page-Chat');
 
   return (
-    <SBottomAction>
+    <SBottomAction variant={variant}>
       <SBottomActionLeft>
         <SBottomActionIcon>😞</SBottomActionIcon>
         <SBottomActionText>

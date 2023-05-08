@@ -19,7 +19,9 @@ export const SearchResults = () => {
 
   useEffect(() => {
     if (router) {
-      if (router.query.query) setSearchValue(router.query.query as string);
+      if (router.query.query) {
+        setSearchValue(router.query.query as string);
+      }
       if (router.query.tab) {
         if (router.query.tab === 'creators') {
           setActiveTab('creators');
