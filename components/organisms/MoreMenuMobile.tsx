@@ -9,7 +9,7 @@ import Text from '../atoms/Text';
 import InlineSvg from '../atoms/InlineSVG';
 import Indicator from '../atoms/Indicator';
 
-import { useGetChats } from '../../contexts/chatContext';
+import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContext';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
@@ -36,7 +36,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const { bundles, directMessagesAvailable } = useBundles();
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
-  const { unreadCount } = useGetChats();
+  const { unreadCount } = useChatsUnreadMessages();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
