@@ -31,6 +31,7 @@ const SAnnouncementHeader = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
+  z-index: 1;
 `;
 
 const SAnnouncementText = styled.div`

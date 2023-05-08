@@ -7,10 +7,10 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
-import _ from 'lodash';
+import { InfiniteData, useQueryClient } from 'react-query';
 
 import Button from '../../../atoms/Button';
 import { Tab } from '../../Tabs';
@@ -24,7 +24,6 @@ import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
-import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 import { getRoom } from '../../../../api/endpoints/chat';
@@ -32,6 +31,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { useBundles } from '../../../../contexts/bundlesContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import Loader from '../../../atoms/Loader';
+import { useChatsUnreadMessages } from '../../../../contexts/chatsUnreadMessagesContext';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -43,7 +43,6 @@ const NewMessageModal = dynamic(
 );
 const NotificationsList = dynamic(() => import('./NotificationsList'));
 const ChatList = dynamic(() => import('../../direct-messages/ChatList'));
-// const Chat = dynamic(() => import('./Chat'));
 const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 const Indicator = dynamic(() => import('../../../atoms/Indicator'));
 const Tabs = dynamic(() => import('../../Tabs'));
@@ -52,34 +51,32 @@ interface IDynamicSection {
   baseUrl: string;
 }
 
+// TODO: Refactoring
 export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const theme = useTheme();
-  const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const containerRef: any = useRef(null);
-  const [animate, setAnimate] = useState(false);
-  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
-  const { resizeMode } = useAppState();
-  const {
-    unreadCountForCreator,
-    activeTab,
-    activeChatRoom,
-    setActiveChatRoom,
-    setActiveTab,
-  } = useGetChats();
+  const { t } = useTranslation('page-Creator');
+  const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
+  const { unreadCountForCreator } = useChatsUnreadMessages();
   const { unreadNotificationCount } = useNotifications();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
-  const { directMessagesAvailable, isBundleDataLoaded } = useBundles();
-  const [markReadNotifications, setMarkReadNotifications] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [chatRoomLoading, setChatRoomLoading] = useState(false);
-
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isSmallDesktop = ['laptop', 'laptopM'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet && !isSmallDesktop;
+
+  const containerRef: any = useRef(null);
+  const [animate, setAnimate] = useState(false);
+  const [animation, setAnimation] = useState<TElementAnimations>('o-12');
+  const [isLoading, setIsLoading] = useState(false);
+  const [markReadNotifications, setMarkReadNotifications] = useState(false);
+  const [activeChatRoom, setActiveChatRoom] =
+    useState<newnewapi.IChatRoom | null>(null);
 
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
@@ -88,9 +85,13 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const [showNewMessageModal, setShowNewMessageModal] =
     useState<boolean>(false);
 
-  const closeNewMsgModal = () => {
-    setShowNewMessageModal(false);
-  };
+  const selectedChatRoomId = useMemo(() => {
+    if (!router.query.roomID || Array.isArray(router.query.roomID)) {
+      return undefined;
+    }
+
+    return parseInt(router.query.roomID);
+  }, [router.query.roomID]);
 
   const tabs: Tab[] = useMemo(() => {
     if (directMessagesAvailable) {
@@ -122,7 +123,14 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     unreadNotificationCount,
   ]);
 
-  const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
+  const activeTabIndex = useMemo(
+    () => tabs.findIndex((el) => el.nameToken === tab),
+    [tabs, tab]
+  );
+
+  const closeNewMsgModal = useCallback(() => {
+    setShowNewMessageModal(false);
+  }, []);
 
   const handleChatClick = useCallback(() => {
     Mixpanel.track('Navigation Item Clicked', {
@@ -182,12 +190,14 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       handleMinimizeClick();
     }
   });
+
   const handleClickOutside = useCallback(() => {
     if (tab && !isDesktop && !showNewMessageModal) {
       handleMinimizeClick();
     }
   }, [tab, isDesktop, showNewMessageModal, handleMinimizeClick]);
   useOnClickOutside(containerRef, handleClickOutside);
+
   useEffect(() => {
     if (!isDesktop && tab) {
       enableOverlayMode();
@@ -201,39 +211,74 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
   useEffect(() => {
-    if (
-      router.asPath.includes(`${baseUrl}?tab=direct-messages`) &&
-      !activeChatRoom
-    ) {
-      if (router.query.roomID) {
-        (async () => {
-          try {
-            setChatRoomLoading(true);
-            const payload = new newnewapi.GetRoomRequest({
-              roomId: _.toNumber(router.query.roomID),
-            });
+    const findChatRoom = async () => {
+      try {
+        setIsLoading(true);
 
-            const res = await getRoom(payload);
-            if (!res.data || res.error) {
-              throw new Error(res.error?.message ?? 'Request failed');
-            }
-            setActiveChatRoom(res.data);
-          } catch (err) {
-            router.push(`${baseUrl}?tab=chat`);
-            console.error(err);
-          } finally {
-            setChatRoomLoading(false);
-          }
-        })();
+        // find room in already requested witch react-query chatRooms for ChatList
+        const query = queryClient.getQueriesData<
+          InfiniteData<{ chatrooms: newnewapi.IChatRoom[] }>
+        >(['private', 'getMyRooms', { myRole: 2, searchQuery: '' }]);
+
+        const queryData = query[0] ? query[0][1] : null;
+
+        const chatRooms = queryData
+          ? queryData.pages.map((page) => page.chatrooms).flat()
+          : [];
+
+        const foundedActiveChatRoom = chatRooms.find(
+          (chatroom: newnewapi.IChatRoom) =>
+            selectedChatRoomId && chatroom.id === selectedChatRoomId
+        );
+
+        if (foundedActiveChatRoom) {
+          setActiveChatRoom(foundedActiveChatRoom);
+          return;
+        }
+
+        const payload = new newnewapi.GetRoomRequest({
+          roomId: selectedChatRoomId,
+        });
+
+        const res = await getRoom(payload);
+
+        if (!res.data || res.error) {
+          throw new Error('Request failed');
+        }
+
+        setActiveChatRoom(res.data);
+      } catch (err) {
+        console.error(err);
+        router.push(`${baseUrl}?tab=chat`);
+      } finally {
+        setIsLoading(false);
       }
-    }
-  }, [baseUrl, router, activeChatRoom, setActiveChatRoom]);
+    };
 
-  useEffect(() => {
-    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
-      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
+    if (selectedChatRoomId && selectedChatRoomId !== activeChatRoom?.id) {
+      findChatRoom();
     }
-  }, [activeTab, setActiveTab]);
+  }, [
+    selectedChatRoomId,
+    queryClient,
+    activeChatRoom?.id,
+    router,
+    setActiveChatRoom,
+    baseUrl,
+  ]);
+
+  const handleChatRoomSelect = useCallback(
+    async (chatRoom: newnewapi.IChatRoom) => {
+      await router.replace(
+        `?tab=direct-messages&roomID=${chatRoom.id}`,
+        undefined,
+        {
+          shallow: true,
+        }
+      );
+    },
+    [router]
+  );
 
   useEffect(() => {
     if (
@@ -244,6 +289,12 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       router.replace(`${baseUrl}?tab=notifications`);
     }
   }, [isBundleDataLoaded, directMessagesAvailable, tab, baseUrl, router]);
+
+  const handleCloseChatRoom = useCallback(() => {
+    router.replace(`${baseUrl}?tab=chat`, undefined, {
+      shallow: true,
+    });
+  }, [router, baseUrl]);
 
   return (
     <STopButtons>
@@ -305,82 +356,86 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
           ref={containerRef}
           isDashboardMessages={tab === 'direct-messages'}
         >
-          {tab === 'direct-messages' ? (
-            <>
-              {activeChatRoom && !chatRoomLoading && (
-                <>
-                  <ChatContent chatRoom={activeChatRoom!!} />
-                  <ChatList hidden />
-                </>
-              )}
-              {!activeChatRoom && chatRoomLoading && (
-                <Loader size='md' isStatic />
-              )}
-            </>
-          ) : (
-            <>
-              <SSectionTopLine tab={tab as string}>
-                <STabsWrapper>
-                  <Tabs
-                    t={t}
-                    tabs={tabs}
-                    draggable={false}
-                    activeTabIndex={activeTabIndex}
-                  />
-                </STabsWrapper>
-                <SSectionTopLineButtons>
-                  {tab === 'notifications' ? (
-                    <>
-                      {unreadNotificationCount > 0 && (
-                        <STopLineButton
-                          view='secondary'
-                          onClick={handleMarkAllAsRead}
-                        >
-                          {t('dashboard.button.markAllAsRead')}
-                        </STopLineButton>
-                      )}
-                      {!isDesktop && (
-                        <STopLineButton
-                          view='secondary'
-                          onClick={handleMinimizeClick}
-                        >
-                          {t('dashboard.button.minimize')}
-                        </STopLineButton>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <SearchInput />
-                      <SChatButton
-                        view='secondary'
-                        onClick={handleBulkMessageClick}
-                      >
-                        <SChatInlineSVG
-                          svg={NewMessageIcon}
-                          fill={theme.colorsThemed.text.primary}
-                          width='20px'
-                          height='20px'
-                        />
-                      </SChatButton>
-                      <NewMessageModal
-                        showModal={showNewMessageModal}
-                        closeModal={closeNewMsgModal}
-                      />
-                    </>
-                  )}
-                </SSectionTopLineButtons>
-              </SSectionTopLine>
-              <SSectionContent isSmallPadding={tab === 'chat'}>
+          <SContent hidden={tab !== 'direct-messages'}>
+            {activeChatRoom && (
+              <ChatContent
+                chatRoom={activeChatRoom}
+                isBackButton
+                onBackButtonClick={handleCloseChatRoom}
+                withHeaderAvatar
+                variant='secondary'
+              />
+            )}
+
+            {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
+          </SContent>
+
+          <SContent hidden={tab === 'direct-messages'}>
+            <SSectionTopLine tab={tab as string}>
+              <STabsWrapper>
+                <Tabs
+                  t={t}
+                  tabs={tabs}
+                  draggable={false}
+                  activeTabIndex={activeTabIndex}
+                />
+              </STabsWrapper>
+              <SSectionTopLineButtons>
                 {tab === 'notifications' ? (
-                  <NotificationsList
-                    markReadNotifications={markReadNotifications}
-                  />
+                  <>
+                    {unreadNotificationCount > 0 && (
+                      <STopLineButton
+                        view='secondary'
+                        onClick={handleMarkAllAsRead}
+                      >
+                        {t('dashboard.button.markAllAsRead')}
+                      </STopLineButton>
+                    )}
+                    {!isDesktop && (
+                      <STopLineButton
+                        view='secondary'
+                        onClick={handleMinimizeClick}
+                      >
+                        {t('dashboard.button.minimize')}
+                      </STopLineButton>
+                    )}
+                  </>
                 ) : (
-                  <ChatList />
+                  <>
+                    <SearchInput />
+                    <SChatButton
+                      view='secondary'
+                      onClick={handleBulkMessageClick}
+                    >
+                      <SChatInlineSVG
+                        svg={NewMessageIcon}
+                        fill={theme.colorsThemed.text.primary}
+                        width='20px'
+                        height='20px'
+                      />
+                    </SChatButton>
+                    <NewMessageModal
+                      showModal={showNewMessageModal}
+                      closeModal={closeNewMsgModal}
+                      onNewMessageSelect={handleChatRoomSelect}
+                    />
+                  </>
                 )}
-              </SSectionContent>
-            </>
-          )}
+              </SSectionTopLineButtons>
+            </SSectionTopLine>
+            <SSectionContent isSmallPadding={tab === 'chat'}>
+              {tab === 'notifications' ? (
+                <NotificationsList
+                  markReadNotifications={markReadNotifications}
+                />
+              ) : (
+                <ChatList
+                  myRole={newnewapi.ChatRoom.MyRole.CREATOR}
+                  onChatRoomSelect={handleChatRoomSelect}
+                />
+              )}
+            </SSectionContent>
+          </SContent>
         </SAnimatedContainer>
       </AnimatedPresence>
     </STopButtons>
@@ -546,4 +601,19 @@ const SSectionContent = styled.div<{ isSmallPadding: boolean }>`
       background: ${({ theme }) => theme.colorsThemed.background.outlines2};
     }
   }
+`;
+
+const SContent = styled.div<{
+  hidden: boolean;
+}>`
+  height: 100%;
+
+  ${({ hidden }) => {
+    if (hidden) {
+      return css`
+        display: none;
+      `;
+    }
+    return css``;
+  }}
 `;
