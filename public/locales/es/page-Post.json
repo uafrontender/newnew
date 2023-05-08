@@ -279,7 +279,7 @@
     "decision": {
       "title": "Próximamente...",
       "subtitle_1": "{{postType}} está en vivo en breve.",
-      "subtitle_2": "¡Recibe una notificación cuando esté disponible!",
+      "subtitle_2": "¡Recibe una notificación\ncuando esté disponible!",
       "timer": {
         "days": "Días",
         "hours": "Horas",
