@@ -23,6 +23,7 @@ interface IBlockedUser {
   isBlocked?: boolean;
   isAnnouncement?: boolean;
   user: newnewapi.IVisavisUser;
+  variant?: 'primary' | 'secondary';
 }
 
 const BlockedUser: React.FC<IBlockedUser> = ({
@@ -32,13 +33,14 @@ const BlockedUser: React.FC<IBlockedUser> = ({
   user,
   closeModal,
   isAnnouncement,
+  variant,
 }) => {
   const { t } = useTranslation('page-Chat');
 
   return (
     <>
       {isBlocked && (
-        <SBottomAction>
+        <SBottomAction variant={variant}>
           <SBottomActionLeft>
             <SBottomActionIcon>🤐</SBottomActionIcon>
             <SBottomActionText>

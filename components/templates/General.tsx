@@ -1,12 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -28,17 +22,17 @@ import useScrollDirection from '../../utils/hooks/useScrollDirection';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import { useNotifications } from '../../contexts/notificationsContext';
-import { useGetChats } from '../../contexts/chatContext';
+import { ChatsProvider } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
-import ChatContainer from '../organisms/direct-messages/ChatContainer';
 import { useAppState } from '../../contexts/appStateContext';
 import canBecomeCreator from '../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
-import isBrowser from '../../utils/isBrowser';
+import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContext';
+import MobileChat from '../organisms/MobileChat';
 
 interface IGeneral {
   className?: string;
@@ -67,13 +61,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
-  const {
-    unreadCount,
-    setMobileChatOpened,
-    mobileChatOpened,
-    activeTab,
-    setActiveTab,
-  } = useGetChats();
+  const { unreadCount } = useChatsUnreadMessages();
 
   // TODO: Remove hasMounted after user auth data is available in context
   const hasMounted = useHasMounted();
@@ -193,38 +181,15 @@ export const General: React.FC<IGeneral> = (props) => {
   const { scrollDirection } = useScrollDirection(isMobile);
 
   const openChat = useCallback(() => {
-    if (activeTab !== newnewapi.ChatRoom.MyRole.CREATOR) {
-      setActiveTab(newnewapi.ChatRoom.MyRole.CREATOR);
-    }
+    router.push(`${router.pathname}?tab=chat`);
+  }, [router]);
 
-    if (router.asPath.includes('/creator/bundles')) {
-      router.push(`/creator/bundles?tab=chat`);
-    } else {
-      router.push(`/creator/dashboard?tab=chat`);
-    }
-    setMobileChatOpened(true);
-  }, [activeTab, setActiveTab, setMobileChatOpened, router]);
-
-  useEffect(() => {
-    const checkUrl = () => {
-      if (!isBrowser()) {
-        return;
-      }
-
-      const newUrl = window.location.href;
-      if (
-        !newUrl.includes('tab=chat') &&
-        !newUrl.includes('tab=direct-messages')
-      ) {
-        setMobileChatOpened(false);
-      }
-    };
-
-    window.addEventListener('popstate', checkUrl);
-
-    return () => window.removeEventListener('popstate', checkUrl);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const mobileChatOpen = useMemo(
+    () =>
+      (isMobile && router.query.tab === 'chat') ||
+      router.query.tab === 'direct-messages',
+    [isMobile, router.query.tab]
+  );
 
   const chatButtonVisible = useMemo(
     () => isMobile && withChat && directMessagesAvailable,
@@ -289,12 +254,14 @@ export const General: React.FC<IGeneral> = (props) => {
         {chatButtonVisible && (
           <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
-            zIndex={mobileChatOpened ? 11 : moreMenuMobileOpen ? 9 : 10}
+            zIndex={mobileChatOpen ? 11 : moreMenuMobileOpen ? 9 : 10}
           >
-            {!mobileChatOpened ? (
+            {!mobileChatOpen ? (
               <FloatingMessages withCounter openChat={openChat} />
             ) : (
-              <ChatContainer />
+              <ChatsProvider>
+                <MobileChat myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
+              </ChatsProvider>
             )}
           </SChatContainer>
         )}
@@ -302,10 +269,10 @@ export const General: React.FC<IGeneral> = (props) => {
           <ReportBugButton
             bottom={
               (isMobile ? 24 : 16) +
-              (isMobile && mobileNavigationVisible && !mobileChatOpened
+              (isMobile && mobileNavigationVisible && !mobileChatOpen
                 ? 56
                 : 0) +
-              (chatButtonVisible && !mobileChatOpened ? 72 : 0)
+              (chatButtonVisible && !mobileChatOpen ? 72 : 0)
             }
             right={4}
             zIndex={moreMenuMobileOpen ? 9 : undefined}

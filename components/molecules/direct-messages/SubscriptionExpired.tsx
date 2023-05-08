@@ -20,16 +20,18 @@ const BuyBundleModal = dynamic(() => import('../bundles/BuyBundleModal'));
 interface ISubscriptionExpired {
   user: newnewapi.IUser;
   myRole: newnewapi.ChatRoom.MyRole;
+  variant?: 'primary' | 'secondary';
+  onRenewal: () => void;
 }
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
-  ({ user, myRole }) => {
+  ({ user, myRole, variant, onRenewal }) => {
     const { t } = useTranslation('page-Chat');
     const [buyBundleModalOpen, setBuyBundleModalOpen] = useState(false);
 
     return (
       <>
-        <SBottomActionContainer>
+        <SBottomActionContainer variant={variant}>
           <SBottomActionLeft>
             <SBottomActionIcon>🙊</SBottomActionIcon>
             <SBottomActionText>
@@ -68,6 +70,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
           onClose={() => {
             setBuyBundleModalOpen(false);
           }}
+          onSuccess={onRenewal}
         />
       </>
     );
