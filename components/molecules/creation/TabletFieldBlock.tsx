@@ -81,7 +81,21 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                 value={value}
                 onBlur={handleBlur}
                 onChange={(e) => {
+                  if (inputProps?.pattern) {
+                    const regExp = new RegExp(inputProps?.pattern);
+                    if (e?.target?.value && !regExp.test(e?.target?.value)) {
+                      return;
+                    }
+                  }
+
                   onChange(id, e?.target?.value);
+                }}
+                onKeyDown={(e) => {
+                  if (inputProps?.type === 'number') {
+                    if (e.key === '+' || e.key === '-' || e.key === 'e') {
+                      e.preventDefault();
+                    }
+                  }
                 }}
                 withLabel={!!inputLabel}
                 placeholder={
