@@ -4,10 +4,10 @@ import InlineSVG from '../InlineSVG';
 
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 
-const MyAvatarMassupdate: React.FC = React.memo(() => {
+const MyAvatarAnnouncement: React.FC = React.memo(() => {
   const theme = useTheme();
   return (
-    <SMyAvatarMassupdate>
+    <SMyAvatarAnnouncement>
       <SInlineSVG
         svg={megaphone}
         fill={
@@ -18,18 +18,18 @@ const MyAvatarMassupdate: React.FC = React.memo(() => {
         width='26px'
         height='26px'
       />
-    </SMyAvatarMassupdate>
+    </SMyAvatarAnnouncement>
   );
 });
 
-export default MyAvatarMassupdate;
+export default MyAvatarAnnouncement;
 
 const SInlineSVG = styled(InlineSVG)`
   min-width: 24px;
   min-height: 24px;
 `;
 
-const SMyAvatarMassupdate = styled.div`
+const SMyAvatarAnnouncement = styled.div`
   width: 48px;
   height: 48px;
   flex-shrink: 0;
@@ -39,6 +39,7 @@ const SMyAvatarMassupdate = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
   ${SInlineSVG} {
     margin-right: 0;
   }

@@ -1,14 +1,12 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useAppSelector } from '../../../redux-store/store';
 import Text from '../Text';
-import { useGetChats } from '../../../contexts/chatContext';
 
 const UserAvatar = dynamic(() => import('../../molecules/UserAvatar'));
 
@@ -17,6 +15,8 @@ interface IChatMessage {
   prevElement: newnewapi.IChatMessage;
   nextElement: newnewapi.IChatMessage;
   chatRoom: newnewapi.IChatRoom;
+  withAvatar?: boolean;
+  variant?: 'primary' | 'secondary';
 }
 
 const ChatMessage: React.FC<IChatMessage> = ({
@@ -24,22 +24,11 @@ const ChatMessage: React.FC<IChatMessage> = ({
   prevElement,
   nextElement,
   chatRoom,
+  withAvatar,
+  variant,
 }) => {
   const { t } = useTranslation('page-Chat');
   const user = useAppSelector((state) => state.user);
-  const router = useRouter();
-
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard') ||
-      router.asPath.includes('/creator/bundles')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
-
-  const { mobileChatOpened } = useGetChats();
 
   const nextElDate = (nextElement?.createdAt?.seconds as number) * 1000;
   const prevElDate = (prevElement?.createdAt?.seconds as number) * 1000;
@@ -63,9 +52,9 @@ const ChatMessage: React.FC<IChatMessage> = ({
       id={item.id?.toString()}
       mine={isMine}
       prevSameUser={prevSameUser}
-      isDashboard={isDashboard}
+      withAvatar={withAvatar}
     >
-      {!isDashboard &&
+      {withAvatar &&
         (!prevSameUser || !prevSameDay) &&
         (isMine ? (
           <SUserAvatar
@@ -88,8 +77,7 @@ const ChatMessage: React.FC<IChatMessage> = ({
         nextSameUser={nextSameUser}
         prevSameDay={prevSameDay}
         nextSameDay={nextSameDay}
-        isDashboard={isDashboard}
-        isMobileChatOpened={mobileChatOpened}
+        variant={variant}
       >
         <SMessageText mine={isMine} weight={600} variant={3}>
           {item.content?.text}
@@ -117,6 +105,7 @@ const ChatMessage: React.FC<IChatMessage> = ({
             type='info'
             prevSameUser={prevSameUser}
             nextSameUser={nextSameUser}
+            variant={variant}
           >
             <SMessageText type='info' weight={600} variant={3}>
               {date}
@@ -156,7 +145,7 @@ interface ISMessage {
   type?: string;
   mine?: boolean;
   prevSameUser?: boolean;
-  isDashboard?: boolean;
+  withAvatar?: boolean;
 }
 
 const SMessage = styled.div<ISMessage>`
@@ -172,7 +161,7 @@ const SMessage = styled.div<ISMessage>`
           }
           ${props.theme.media.tablet} {
             padding-right: 0;
-            padding-left: ${!props.isDashboard ? '44px' : ''};
+            padding-left: ${props.withAvatar ? '44px' : ''};
             justify-content: flex-start;
           }
         `;
@@ -183,7 +172,7 @@ const SMessage = styled.div<ISMessage>`
         }
         ${props.theme.media.tablet} {
           justify-content: flex-start;
-          padding-left: ${!props.isDashboard ? '44px' : ''};
+          padding-left: ${props.withAvatar ? '44px' : ''};
         }
       `;
     }
@@ -214,8 +203,7 @@ interface ISMessageContent {
   nextSameUser?: boolean;
   prevSameDay?: boolean;
   nextSameDay?: boolean;
-  isDashboard?: boolean;
-  isMobileChatOpened?: boolean;
+  variant?: 'primary' | 'secondary';
 }
 
 const SMessageContent = styled.div<ISMessageContent>`
@@ -229,7 +217,7 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
     if (
       props.theme.name === 'light' &&
-      (!props.isDashboard || props.isMobileChatOpened)
+      (!props.variant || props.variant === 'primary')
     ) {
       return props.theme.colors.white;
     }

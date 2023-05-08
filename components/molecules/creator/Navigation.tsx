@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -77,8 +76,28 @@ export const Navigation = () => {
   const renderItem = useCallback(
     (item: NavigationItem) => {
       const active = router.route.includes(item.url);
+      const routerQuery = router.query;
+
+      const queryParams =
+        (item.url === '/creator/dashboard' ||
+          item.url === '/creator/bundles') &&
+        routerQuery.tab
+          ? {
+              tab: routerQuery.tab,
+              ...(routerQuery.tab === 'direct-messages'
+                ? { roomID: routerQuery.roomID }
+                : {}),
+            }
+          : null;
+
       return (
-        <Link key={item.url} href={item.url}>
+        <Link
+          key={`${item.url}`}
+          href={{
+            pathname: item.url,
+            query: queryParams,
+          }}
+        >
           <SItem
             id={item.id}
             active={active}
@@ -106,6 +125,7 @@ export const Navigation = () => {
       );
     },
     [
+      router.query,
       router.route,
       theme.colorsThemed.accent.blue,
       theme.colorsThemed.text.tertiary,

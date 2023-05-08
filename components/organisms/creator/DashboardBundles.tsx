@@ -13,6 +13,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
 import { useBundles } from '../../../contexts/bundlesContext';
 import { useAppState } from '../../../contexts/appStateContext';
+import { ChatsProvider } from '../../../contexts/chatContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -86,7 +87,11 @@ export const DashboardBundles: React.FC = React.memo(() => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>{t('myBundles.title')}</STitle>
-          {!isMobile && <DynamicSection baseUrl='/creator/bundles' />}
+          {!isMobile && (
+            <ChatsProvider>
+              <DynamicSection baseUrl='/creator/bundles' />
+            </ChatsProvider>
+          )}
         </STitleBlock>
         {!isBundleDataLoaded ? (
           <SLoader size='md' />
