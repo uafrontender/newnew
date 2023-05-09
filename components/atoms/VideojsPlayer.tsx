@@ -153,32 +153,32 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       }
 
       // Autoplay
-      p.on('ready', (e) => {
+      p?.on('ready', (e) => {
         playerRef.current?.play()?.catch(() => {
           handleSetIsPaused(true);
         });
       });
 
       // Paused state
-      p.on('play', () => {
+      p?.on('play', () => {
         handleSetIsPaused(false);
       });
-      p.on('pause', () => {
+      p?.on('pause', () => {
         handleSetIsPaused(true);
       });
 
-      p.on('timeupdate', (e) => {
+      p?.on('timeupdate', (e) => {
         playerScrubberRef?.current?.changeCurrentTime(p.currentTime());
       });
 
       // Loading state & Autoplay
-      p.on('loadstart', (e) => {
+      p?.on('loadstart', (e) => {
         setIsLoading(true);
         playerRef.current?.play()?.catch(() => {
           handleSetIsPaused(true);
         });
       });
-      p.on('canplay', (e) => {
+      p?.on('canplay', (e) => {
         setIsLoading(false);
       });
     },
