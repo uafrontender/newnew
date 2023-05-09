@@ -203,7 +203,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           });
         } else {
           onChange(id, {
-            time: moment().add(1, 'minute').format('hh:mm'),
+            time: moment().add(2, 'minute').format('hh:mm'),
           });
         }
 
