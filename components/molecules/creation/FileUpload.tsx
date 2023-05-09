@@ -363,6 +363,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     );
 
     if (loadingUpload) {
+      const ETAisValid = !Number.isNaN(etaUpload) && etaUpload !== Infinity;
       const minutesLeft = Math.floor(etaUpload / 60);
       const secondsLeft = Math.ceil(etaUpload % 60);
 
@@ -389,11 +390,12 @@ const FileUpload: React.FC<IFileUpload> = ({
           </SLoadingDescription>
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
-              {t('secondStep.video.loading.process', {
-                seconds: secondsLeftString,
-                minutes: minutesLeftString,
-                progress: progressUpload,
-              })}
+              {ETAisValid &&
+                t('secondStep.video.loading.process', {
+                  seconds: secondsLeftString,
+                  minutes: minutesLeftString,
+                  progress: progressUpload,
+                })}
             </SLoadingDescription>
             {progressUpload !== 100 ? (
               <SLoadingBottomBlockButton

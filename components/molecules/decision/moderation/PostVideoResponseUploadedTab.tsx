@@ -236,6 +236,10 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     let content;
 
     if (responseFileUploadLoading) {
+      const ETAisValid =
+        !Number.isNaN(responseFileUploadETA) &&
+        responseFileUploadETA !== Infinity;
+
       const minutesLeft = Math.floor(responseFileUploadETA / 60);
       const secondsLeft = Math.ceil(responseFileUploadETA % 60);
       const minutesLeftString =
@@ -265,11 +269,12 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
             </SLoadingDescription>
             <SLoadingBottomBlock>
               <SLoadingDescription variant={2} weight={600}>
-                {t('postVideo.uploadResponseForm.video.loading.process', {
-                  seconds: secondsLeftString,
-                  minutes: minutesLeftString,
-                  progress: responseFileUploadProgress,
-                })}
+                {ETAisValid &&
+                  t('postVideo.uploadResponseForm.video.loading.process', {
+                    seconds: secondsLeftString,
+                    minutes: minutesLeftString,
+                    progress: responseFileUploadProgress,
+                  })}
               </SLoadingDescription>
               {responseFileUploadProgress !== 100 ? (
                 <SLoadingBottomBlockButton
