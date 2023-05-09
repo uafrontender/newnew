@@ -246,18 +246,18 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           });
 
           // Paused state
-          p.on('play', () => {
+          p?.on('play', () => {
             handleSetIsPaused(false);
           });
-          p.on('pause', () => {
+          p?.on('pause', () => {
             handleSetIsPaused(true);
           });
 
-          p.on('error', (e: any) => {
+          p?.on('error', (e: any) => {
             console.error(e);
           });
 
-          p.on('timeupdate', (e) => {
+          p?.on('timeupdate', (e) => {
             playerScrubberRef?.current?.changeCurrentTime(p.currentTime());
             postVideoFullscreenControlsRef?.current?.changeCurrentTime(
               p.currentTime()
@@ -265,17 +265,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           });
 
           // Loading state
-          p.on('loadstart', (e) => {
+          p?.on('loadstart', (e) => {
             setIsLoading(true);
           });
-          p.on('canplay', (e) => {
+          p?.on('canplay', (e) => {
             setCurrentVolume(p?.volume());
             setIsLoading(false);
           });
 
           // Playback finished handler
           if (onPlaybackFinished) {
-            p.on('ended', () => {
+            p?.on('ended', () => {
               onPlaybackFinished();
               if (
                 playerRef?.current?.isFullscreen() ||
@@ -289,7 +289,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
               }
             });
           } else {
-            p.on('ended', () => {
+            p?.on('ended', () => {
               p?.play()?.catch(() => {
                 handleSetIsPaused(true);
               });
@@ -297,19 +297,19 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           }
 
           // Buffered percent
-          p.on('progress', () => {
+          p?.on('progress', () => {
             if (p?.bufferedPercent()) {
               setBufferedPercent(p.bufferedPercent() * 100);
             }
           });
 
           // Fullscreen
-          p.on('fullscreenchange', (e) => {
+          p?.on('fullscreenchange', (e) => {
             setIsFullscreen(p?.isFullscreen());
           });
 
           if (!isSafari()) {
-            p.on('volumechange', (e) => {
+            p?.on('volumechange', (e) => {
               setCurrentVolume(p?.volume());
               if (p?.volume() === 0 || p?.muted()) {
                 dispatch(setMutedMode(true));
