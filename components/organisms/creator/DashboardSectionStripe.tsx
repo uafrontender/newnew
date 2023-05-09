@@ -143,18 +143,9 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
                   background: theme.colorsThemed.accent.success,
                 }
               : {}),
-            ...(stripeNeedAttention
-              ? {
-                  cursor: 'default',
-                }
-              : {}),
           }}
           onClick={() => {
-            if (
-              !isConnectedToStripe &&
-              !stripeProcessing &&
-              !stripeNeedAttention
-            ) {
+            if (!isConnectedToStripe && !stripeProcessing) {
               Mixpanel.track('Redirect to Stripe', {
                 _button: getStripeButtonTextKey(stripeConnectStatus),
                 _stage: 'Dashboard',
@@ -171,7 +162,7 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
           />
           <span>{t(getStripeButtonTextKey(stripeConnectStatus))}</span>
         </SButton>
-        {(isConnectedToStripe || stripeNeedAttention) && (
+        {isConnectedToStripe && (
           <SButtonUpdate
             view='transparent'
             onClick={() => {
