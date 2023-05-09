@@ -190,7 +190,7 @@
   "myLink": {
     "copy": "我的連結",
     "copied": "已複製！",
-    "shareLink_NEED_TRANSLATION": "Share link"
+    "shareLink": "分享鏈接"
   },
   "socials": {
     "copy": "複製連結",
