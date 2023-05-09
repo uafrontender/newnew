@@ -360,8 +360,8 @@ const SReuploadButton = styled.button`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    left: initial;
-    right: 48px;
+    left: 50%;
+    transform: translateX(-50%);
     top: 16px;
   }
 `;
