@@ -725,6 +725,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       };
     }, [handleSetIsPaused, isActive, isInSlider]);
 
+    // Update scrubber in non-Safari fullscreen controls for a paused video
+    useEffect(() => {
+      if (isFullscreen && fullscreenInteracted && !isSafari() && !isIOS()) {
+        if (playerRef?.current) {
+          postVideoFullscreenControlsRef?.current?.changeCurrentTime(
+            playerRef?.current?.currentTime()
+          );
+        }
+      }
+    }, [fullscreenInteracted, isFullscreen]);
+
     // Try to pause the video when the component unmounts
     // to avoid attempts to play broken segments
     useEffect(
