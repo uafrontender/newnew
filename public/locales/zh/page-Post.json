@@ -726,7 +726,7 @@
     "succeeded": {
       "topHeader": "回應\n已發布！",
       "youMade": "你做了",
-      "payedByBundleVotes_NEED_TRANSLATION": "Voters paid using bundles votes",
+      "payedByBundleVotes": "投票者使用bundle投票支付",
       "shareBtn": "分享",
       "linkCopied": "鏈接已複製！"
     },

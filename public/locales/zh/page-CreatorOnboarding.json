@@ -99,8 +99,8 @@
           "upload": "上傳照片",
           "uploadNew": "上傳新圖片"
         },
-        "errors_NEED_TRANSLATION": {
-          "inappropriate": "Uploaded image cannot be used"
+        "errors": {
+          "inappropriate": "上傳的圖片無法使用"
         }
       }
     },
