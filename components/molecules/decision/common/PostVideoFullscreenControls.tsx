@@ -28,7 +28,6 @@ interface IPostVideoFullscreenControls {
   isPaused: boolean;
   handleToggleVideoPaused: () => void;
   // Scrubber
-  // currentTime: number;
   videoDuration: number;
   handleChangeTime: (newTime: number) => void;
   // Volume
@@ -54,7 +53,6 @@ const PostVideoFullscreenControls = React.forwardRef<
     {
       isPaused,
       handleToggleVideoPaused,
-      // currentTime,
       videoDuration,
       handleChangeTime,
       isMuted,
