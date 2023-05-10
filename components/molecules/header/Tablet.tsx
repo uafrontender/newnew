@@ -11,7 +11,7 @@ import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 
-import { useGetChats } from '../../../contexts/chatContext';
+import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 import { useAppSelector } from '../../../redux-store/store';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
@@ -28,7 +28,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 export const Tablet: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { unreadCount } = useGetChats();
+  const { unreadCount } = useChatsUnreadMessages();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppState();

@@ -8,7 +8,8 @@
     "welcomeMessage": "Ahora puedes enviar un mensaje",
     "noMessagesFirstLine": "No hay mensajes aquí todavía...",
     "noMessagesSecondLine": "Envia un mensaje para iniciar la conversación.",
-    "typing": "Escribiendo..."
+    "typing": "Escribiendo...",
+    "notFound_NEED_TO_TRANSLATE": "Chat not found"
   },
   "userBlocked": {
     "title": "Has bloqueado a ",

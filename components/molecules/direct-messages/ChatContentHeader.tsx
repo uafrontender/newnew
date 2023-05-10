@@ -1,11 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
@@ -16,7 +10,6 @@ import Button from '../../atoms/Button';
 import ChatUserData from '../../atoms/direct-messages/ChatUserData';
 import InlineSVG from '../../atoms/InlineSVG';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { useGetChats } from '../../../contexts/chatContext';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -33,26 +26,28 @@ const AnnouncementHeader = dynamic(
 interface IFunctionProps {
   chatRoom: newnewapi.IChatRoom;
   isVisavisBlocked: boolean;
+  isBackButton?: boolean;
+  isMoreButton?: boolean;
+  withAvatar?: boolean;
   onUserReport: () => void;
   onUserBlock: () => Promise<void>;
+  onBackButtonClick?: () => void;
 }
 
 const ChatContentHeader: React.FC<IFunctionProps> = ({
   isVisavisBlocked,
+  isBackButton,
+  isMoreButton,
+  withAvatar,
   onUserBlock,
   onUserReport,
+  onBackButtonClick,
   chatRoom,
 }) => {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
+
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -60,9 +55,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const router = useRouter();
-
-  const { setActiveChatRoom, setHiddenMessagesArea, mobileChatOpened } =
-    useGetChats();
 
   useEffect(() => {
     if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
@@ -86,57 +78,19 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     setEllipseMenuOpen(false);
   }, []);
 
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard') ||
-      router.asPath.includes('/creator/bundles')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
-
   // TODO: rework routing, pushing state on back button clicked is wrong
   const goBackHandler = useCallback(async () => {
-    setHiddenMessagesArea(true);
-    if (isDashboard) {
-      if (router.asPath.includes('/creator/bundles')) {
-        Mixpanel.track('Navigation Item Clicked', {
-          _stage: 'Chat',
-          _button: 'Back button',
-          _component: 'ChatContentHeader',
-          _target: '/creator/bundles?tab=chat',
-        });
+    Mixpanel.track('Navigation Item Clicked', {
+      _stage: 'Chat',
+      _button: 'Back button',
+      _component: 'ChatContentHeader',
+      _page: router.pathname,
+    });
 
-        await router.push(`/creator/bundles?tab=chat`);
-      } else {
-        Mixpanel.track('Navigation Item Clicked', {
-          _stage: 'Chat',
-          _button: 'Back button',
-          _component: 'ChatContentHeader',
-          _target: '/creator/dashboard?tab=chat',
-        });
-        await router.push(`/creator/dashboard?tab=chat`);
-      }
-
-      setActiveChatRoom(null);
-    } else if (isMobileOrTablet) {
-      Mixpanel.track('Navigation Item Clicked', {
-        _stage: 'Chat',
-        _button: 'Back button',
-        _component: 'ChatContentHeader',
-        _target: '/direct-messages',
-      });
-
-      router.push(`/direct-messages`);
+    if (onBackButtonClick) {
+      onBackButtonClick();
     }
-  }, [
-    setActiveChatRoom,
-    setHiddenMessagesArea,
-    isDashboard,
-    router,
-    isMobileOrTablet,
-  ]);
+  }, [router.pathname, onBackButtonClick]);
 
   const handleUserClick = useCallback(() => {
     if (chatRoom?.visavis?.user?.username) {
@@ -147,11 +101,10 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   return (
     <>
       <STopPart>
-        {(isMobileOrTablet || isDashboard) && (
+        {isBackButton && onBackButtonClick && (
           <GoBackButton onClick={goBackHandler} />
         )}
-        {isDashboard &&
-          !mobileChatOpened &&
+        {withAvatar &&
           (chatRoom?.kind === 4 ? (
             <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
           ) : (
@@ -167,7 +120,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
           isAnnouncement={isAnnouncement}
           chatRoom={chatRoom}
         />
-        {!isDashboard && (
+        {isMoreButton && (
           <SActionsDiv>
             {!isMyAnnouncement && (
               <SMoreButton
