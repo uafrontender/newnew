@@ -29,6 +29,7 @@ import errorIcon from '../../../../public/images/svg/icons/filled/Alert.svg';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import SetThumbnailButtonIconOnly from '../../../atoms/decision/SetThumbnailButtonIconOnly';
 import { useAppState } from '../../../../contexts/appStateContext';
+import spinnerIcon from '../../../../public/images/svg/icons/filled/Spinner.svg';
 
 interface IPostVideoResponseUploadedTab {
   id: string;
@@ -268,22 +269,29 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
               {t('postVideo.uploadResponseForm.video.loading.description')}
             </SLoadingDescription>
             <SLoadingBottomBlock>
-              <SLoadingDescription variant={2} weight={600}>
-                {ETAisValid &&
-                  t('postVideo.uploadResponseForm.video.loading.process', {
-                    seconds: secondsLeftString,
-                    minutes: minutesLeftString,
-                    progress: responseFileUploadProgress,
-                  })}
-              </SLoadingDescription>
-              {responseFileUploadProgress !== 100 ? (
-                <SLoadingBottomBlockButton
-                  view='secondary'
-                  onClick={() => handleCancelUploadAndClearLocalFile()}
-                >
-                  {t('postVideo.uploadResponseForm.button.cancel')}
-                </SLoadingBottomBlockButton>
-              ) : null}
+              {ETAisValid ? (
+                <>
+                  <SLoadingDescription variant={2} weight={600}>
+                    {t('postVideo.uploadResponseForm.video.loading.process', {
+                      seconds: secondsLeftString,
+                      minutes: minutesLeftString,
+                      progress: responseFileUploadProgress,
+                    })}
+                  </SLoadingDescription>
+                  {responseFileUploadProgress !== 100 ? (
+                    <SLoadingBottomBlockButton
+                      view='secondary'
+                      onClick={() => handleCancelUploadAndClearLocalFile()}
+                    >
+                      {t('postVideo.uploadResponseForm.button.cancel')}
+                    </SLoadingBottomBlockButton>
+                  ) : null}
+                </>
+              ) : (
+                <SSpinnerWrapper>
+                  <InlineSvg svg={spinnerIcon} width='24px' />
+                </SSpinnerWrapper>
+              )}
             </SLoadingBottomBlock>
             <SLoadingProgress>
               <SLoadingProgressFilled progress={responseFileUploadProgress} />
@@ -629,5 +637,25 @@ const SErrorBottomBlock = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
+  }
+`;
+
+const SSpinnerWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  div {
+    animation: spin 0.7s linear infinite;
   }
 `;

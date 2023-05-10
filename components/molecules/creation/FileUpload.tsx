@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
-import InlineSVG from '../../atoms/InlineSVG';
+import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
 import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
 
@@ -29,6 +29,7 @@ import {
   TThumbnailParameters,
   usePostCreationState,
 } from '../../../contexts/postCreationContext';
+import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
 
 const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -389,22 +390,29 @@ const FileUpload: React.FC<IFileUpload> = ({
             {t('secondStep.video.loading.description')}
           </SLoadingDescription>
           <SLoadingBottomBlock>
-            <SLoadingDescription variant={2} weight={600}>
-              {ETAisValid &&
-                t('secondStep.video.loading.process', {
-                  seconds: secondsLeftString,
-                  minutes: minutesLeftString,
-                  progress: progressUpload,
-                })}
-            </SLoadingDescription>
-            {progressUpload !== 100 ? (
-              <SLoadingBottomBlockButton
-                view='secondary'
-                onClick={() => handleCancelUploadAndClearLocalFile()}
-              >
-                {t('secondStep.button.cancel')}
-              </SLoadingBottomBlockButton>
-            ) : null}
+            {ETAisValid ? (
+              <>
+                <SLoadingDescription variant={2} weight={600}>
+                  {t('secondStep.video.loading.process', {
+                    seconds: secondsLeftString,
+                    minutes: minutesLeftString,
+                    progress: progressUpload,
+                  })}
+                </SLoadingDescription>
+                {progressUpload !== 100 ? (
+                  <SLoadingBottomBlockButton
+                    view='secondary'
+                    onClick={() => handleCancelUploadAndClearLocalFile()}
+                  >
+                    {t('secondStep.button.cancel')}
+                  </SLoadingBottomBlockButton>
+                ) : null}
+              </>
+            ) : (
+              <SSpinnerWrapper>
+                <InlineSvg svg={spinnerIcon} width='24px' />
+              </SSpinnerWrapper>
+            )}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={progressUpload} />
@@ -816,20 +824,25 @@ const SLoadingProgress = styled.div`
   border-radius: 16px;
 `;
 
-// const SSpinnerWrapper = styled.div`
-//   @keyframes spin {
-//     from {
-//       transform: rotate(0deg);
-//     }
-//     to {
-//       transform: rotate(360deg);
-//     }
-//   }
+const SSpinnerWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
 
-//   div {
-//     animation: spin 0.7s linear infinite;
-//   }
-// `;
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  div {
+    animation: spin 0.7s linear infinite;
+  }
+`;
 
 interface ISProgress {
   progress?: number;

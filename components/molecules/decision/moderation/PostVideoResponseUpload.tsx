@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
-import InlineSVG from '../../../atoms/InlineSVG';
+import InlineSVG, { InlineSvg } from '../../../atoms/InlineSVG';
 import DeleteVideo from '../../creation/DeleteVideo';
 
 import { MAX_VIDEO_SIZE } from '../../../../constants/general';
@@ -25,6 +25,7 @@ import { usePostModerationResponsesContext } from '../../../../contexts/postMode
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../../contexts/appStateContext';
+import spinnerIcon from '../../../../public/images/svg/icons/filled/Spinner.svg';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -274,6 +275,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       const ETAisValid =
         !Number.isNaN(responseFileUploadETA) &&
         responseFileUploadETA !== Infinity;
+
       const minutesLeft = Math.floor(responseFileUploadETA / 60);
       const secondsLeft = Math.ceil(responseFileUploadETA % 60);
       const minutesLeftString =
@@ -303,22 +305,29 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             {t('postVideo.uploadResponseForm.video.loading.description')}
           </SLoadingDescription>
           <SLoadingBottomBlock>
-            <SLoadingDescription variant={2} weight={600}>
-              {ETAisValid &&
-                t('postVideo.uploadResponseForm.video.loading.process', {
-                  seconds: secondsLeftString,
-                  minutes: minutesLeftString,
-                  progress: responseFileUploadProgress,
-                })}
-            </SLoadingDescription>
-            {responseFileUploadProgress !== 100 ? (
-              <SLoadingBottomBlockButton
-                view='secondary'
-                onClick={() => handleCancelUploadAndClearLocalFile()}
-              >
-                {t('postVideo.uploadResponseForm.button.cancel')}
-              </SLoadingBottomBlockButton>
-            ) : null}
+            {ETAisValid ? (
+              <>
+                <SLoadingDescription variant={2} weight={600}>
+                  {t('postVideo.uploadResponseForm.video.loading.process', {
+                    seconds: secondsLeftString,
+                    minutes: minutesLeftString,
+                    progress: responseFileUploadProgress,
+                  })}
+                </SLoadingDescription>
+                {responseFileUploadProgress !== 100 ? (
+                  <SLoadingBottomBlockButton
+                    view='secondary'
+                    onClick={() => handleCancelUploadAndClearLocalFile()}
+                  >
+                    {t('postVideo.uploadResponseForm.button.cancel')}
+                  </SLoadingBottomBlockButton>
+                ) : null}
+              </>
+            ) : (
+              <SSpinnerWrapper>
+                <InlineSvg svg={spinnerIcon} width='24px' />
+              </SSpinnerWrapper>
+            )}
           </SLoadingBottomBlock>
           <SLoadingProgress>
             <SLoadingProgressFilled progress={responseFileUploadProgress} />
@@ -724,5 +733,25 @@ const SErrorBottomBlock = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
+  }
+`;
+
+const SSpinnerWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  div {
+    animation: spin 0.7s linear infinite;
   }
 `;
