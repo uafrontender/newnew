@@ -12,17 +12,18 @@ interface IDragToRepositionLabel {
   isPressed: boolean;
 }
 
-const DragToRepositionLabel: React.FunctionComponent<IDragToRepositionLabel> =
-  ({ text, top, customZ, isPressed }) => (
-    <SDraToRepositionLabel
-      top={top ?? undefined}
-      customZ={customZ ?? undefined}
-      isPressed={isPressed}
-    >
-      <InlineSvg svg={MoveIcon} fill='#FFFFFF' height='24px' width='24px' />
-      <div>{text}</div>
-    </SDraToRepositionLabel>
-  );
+const DragToRepositionLabel: React.FunctionComponent<
+  IDragToRepositionLabel
+> = ({ text, top, customZ, isPressed }) => (
+  <SDraToRepositionLabel
+    top={top ?? undefined}
+    customZ={customZ ?? undefined}
+    isPressed={isPressed}
+  >
+    <InlineSvg svg={MoveIcon} fill='#FFFFFF' height='24px' width='24px' />
+    <div>{text}</div>
+  </SDraToRepositionLabel>
+);
 
 DragToRepositionLabel.defaultProps = {
   top: undefined,
@@ -38,7 +39,9 @@ const SDraToRepositionLabel = styled.div<{
 }>`
   position: absolute;
   top: ${({ top }) => top || 'calc(50% - 20px)'};
-  left: calc(50% - 113px);
+  /* left: calc(50% - 113px); */
+  left: 50%;
+  white-space: pre;
 
   display: flex;
   justify-content: flex-start;
@@ -58,7 +61,8 @@ const SDraToRepositionLabel = styled.div<{
   cursor: move;
   transition: transform 0.2s ease-in-out;
 
-  transform: ${({ isPressed }) => (isPressed ? 'scale(0.95)' : 'initial')};
+  transform: ${({ isPressed }) =>
+    isPressed ? 'translateX(-50%) scale(0.95)' : 'translateX(-50%)'};
   transform-origin: center;
   background-color: ${({ isPressed }) =>
     isPressed ? 'rgba(11, 10, 19, 0.85);' : 'rgba(11, 10, 19, 0.65);'};

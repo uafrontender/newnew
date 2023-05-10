@@ -4,7 +4,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import Indicator from '../../../atoms/Indicator';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
-import { useGetChats } from '../../../../contexts/chatContext';
+import { useChatsUnreadMessages } from '../../../../contexts/chatsUnreadMessagesContext';
 
 interface IFloatingMessages {
   withCounter?: boolean;
@@ -15,7 +15,7 @@ export const FloatingMessages: React.FC<IFloatingMessages> = ({
   withCounter,
   openChat,
 }) => {
-  const { unreadCountForCreator } = useGetChats();
+  const { unreadCountForCreator } = useChatsUnreadMessages();
   return (
     <SContainer onClick={openChat}>
       <InlineSVG svg={chatIcon} width='24px' height='24px' />
