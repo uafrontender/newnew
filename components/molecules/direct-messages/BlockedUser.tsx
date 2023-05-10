@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import dynamic from 'next/dynamic';
 import {
   SBottomAction,
   SBottomActionButton,
@@ -14,12 +13,8 @@ import {
 import { Mixpanel } from '../../../utils/mixpanel';
 import DisplayName from '../../atoms/DisplayName';
 
-const BlockUserModal = dynamic(() => import('./BlockUserModal'));
-
 interface IBlockedUser {
   onUserBlock: () => void;
-  closeModal: () => void;
-  confirmBlockUser: boolean;
   isBlocked?: boolean;
   isAnnouncement?: boolean;
   user: newnewapi.IVisavisUser;
@@ -29,9 +24,7 @@ interface IBlockedUser {
 const BlockedUser: React.FC<IBlockedUser> = ({
   onUserBlock,
   isBlocked,
-  confirmBlockUser,
   user,
-  closeModal,
   isAnnouncement,
   variant,
 }) => {
@@ -77,13 +70,6 @@ const BlockedUser: React.FC<IBlockedUser> = ({
           </SBottomActionButton>
         </SBottomAction>
       )}
-      <BlockUserModal
-        confirmBlockUser={confirmBlockUser}
-        onUserBlock={onUserBlock}
-        user={user}
-        closeModal={closeModal}
-        isAnnouncement={isAnnouncement}
-      />
     </>
   );
 };
