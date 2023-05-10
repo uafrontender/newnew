@@ -607,7 +607,8 @@ const SModalToggleWrapper = styled.div<{ hidden?: boolean }>`
   width: 100%;
   margin: 12px 0;
   display: flex;
-  flex-direction: row
+  flex-direction: row;
+  flex-shrink: 0;
   align-items: start;
   justify-content: center;
   height: ${({ hidden }) => (hidden ? '0px' : '44px')};
