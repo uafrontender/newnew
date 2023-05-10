@@ -135,7 +135,8 @@
           "tooShort": "名字太短",
           "invalidChar": "名字中有無效字元",
           "inappropriate": "禁止使用冒犯性詞語",
-          "linksForbidden": "不允許插入連結"
+          "linksForbidden": "不允許插入連結",
+          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and Trailing spaces aren't allowed"
         }
       },
       "username": {

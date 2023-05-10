@@ -24,7 +24,8 @@
           "tooShort": "Firstname is too short",
           "invalidChar": "Firstname has invalid characters",
           "inappropriate": "Offensive words are forbidden",
-          "linksForbidden": "Links not allowed"
+          "linksForbidden": "Links not allowed",
+          "sideSpacesForbidden": "Leading and Trailing spaces aren't allowed"
         }
       },
       "lastName": {
@@ -35,7 +36,8 @@
           "tooShort": "Lastname is too short",
           "invalidChar": "Lastname has invalid characters",
           "inappropriate": "Offensive words are forbidden",
-          "linksForbidden": "Links not allowed"
+          "linksForbidden": "Links not allowed",
+          "sideSpacesForbidden": "Leading and Trailing spaces aren't allowed"
         }
       },
       "username": {
@@ -64,7 +66,8 @@
           "tooShort": "Name is too short",
           "invalidChar": "Name has invalid characters",
           "inappropriate": "Offensive words are forbidden",
-          "linksForbidden": "Links not allowed"
+          "linksForbidden": "Links not allowed",
+          "sideSpacesForbidden": "Leading and Trailing spaces aren't allowed"
         }
       },
       "email": {

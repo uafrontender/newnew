@@ -31,7 +31,9 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
   const [errorBordersShown, setErrorBordersShown] = useState(false);
 
   useEffect(() => {
-    if (isTaken) setErrorBordersShown(true);
+    if (isTaken) {
+      setErrorBordersShown(true);
+    }
   }, [isTaken]);
 
   return (
@@ -63,7 +65,7 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
               : {}),
           }}
           onBlur={() => {
-            if (value && (value as string).length > 0 && !isValid) {
+            if (!isValid) {
               setErrorBordersShown(true);
             } else {
               setErrorBordersShown(false);

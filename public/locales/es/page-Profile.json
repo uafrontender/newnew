@@ -135,7 +135,8 @@
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre tiene caracteres inválidos",
           "inappropriate": "Las palabras ofensivas no están permitidas",
-          "linksForbidden": "Los enlaces no están permitidos"
+          "linksForbidden": "Los enlaces no están permitidos",
+          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and Trailing spaces aren't allowed"
         }
       },
       "username": {
