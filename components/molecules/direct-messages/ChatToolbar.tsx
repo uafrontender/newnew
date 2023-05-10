@@ -61,6 +61,10 @@ const ChatToolbar: React.FC = () => {
             shallow: true,
           }
         );
+      } else {
+        router.replace(`${chatRoom.visavis?.user?.username}`, undefined, {
+          shallow: true,
+        });
       }
     },
     [router, user.userData?.username]
