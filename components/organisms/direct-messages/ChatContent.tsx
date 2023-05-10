@@ -485,13 +485,15 @@ const ChatContent: React.FC<IFuncProps> = ({
           }}
         />
       )}
-      <BlockUserModal
-        isOpen={isConfirmBlockUserModalOpen}
-        onUserBlock={onUserBlock}
-        user={chatRoom.visavis!!}
-        closeModal={handleCloseConfirmBlockUserModal}
-        isAnnouncement={isAnnouncement}
-      />
+      {chatRoom.visavis ? (
+        <BlockUserModal
+          isOpen={isConfirmBlockUserModalOpen}
+          onUserBlock={onUserBlock}
+          user={chatRoom.visavis}
+          closeModal={handleCloseConfirmBlockUserModal}
+          isAnnouncement={isAnnouncement}
+        />
+      ) : null}
     </SContainer>
   );
 };
