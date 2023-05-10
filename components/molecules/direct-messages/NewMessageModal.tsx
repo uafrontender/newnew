@@ -33,6 +33,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
 import Loader from '../../atoms/Loader';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -67,6 +68,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastCustom } = useErrorToasts();
 
   const [searchValue, setSearchValue] = useState('');
 
@@ -176,7 +178,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
           closeModal();
         } catch (err) {
-          console.error(err);
+          showErrorToastCustom(t('chat.notFound'));
         }
       };
 
@@ -201,7 +203,14 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         </SChatItemContainer>
       );
     },
-    [filteredChatRooms.length, chatRooms, onNewMessageSelect, closeModal]
+    [
+      filteredChatRooms.length,
+      chatRooms,
+      onNewMessageSelect,
+      closeModal,
+      showErrorToastCustom,
+      t,
+    ]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
