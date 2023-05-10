@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -12,14 +12,14 @@ import DisplayName from '../../atoms/DisplayName';
 
 interface IBlockUserModal {
   user: newnewapi.IVisavisUser;
-  confirmBlockUser: boolean;
+  isOpen: boolean;
   onUserBlock?: () => void;
   closeModal: () => void;
   isAnnouncement?: boolean;
 }
 
 const BlockUserModal: React.FC<IBlockUserModal> = ({
-  confirmBlockUser,
+  isOpen,
   onUserBlock,
   user,
   closeModal,
@@ -29,18 +29,19 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
 
   const { changeUserBlockedStatus } = useGetBlockedUsers();
 
-  const handleConfirmClick = () => {
+  const handleConfirmClick = useCallback(async () => {
     Mixpanel.track('Confirm Block User Button Clicked', {
       _stage: 'Direct Messages',
       _component: 'BlockUserModal',
       _userUuid: user.user?.uuid,
     });
-    changeUserBlockedStatus(user.user?.uuid, true);
+    await changeUserBlockedStatus(user.user?.uuid, true);
     onUserBlock?.();
     closeModal();
-  };
+  }, [changeUserBlockedStatus, closeModal, onUserBlock, user.user?.uuid]);
+
   return (
-    <Modal show={confirmBlockUser} onClose={closeModal} additionalz={1000}>
+    <Modal show={isOpen} onClose={closeModal} additionalz={1000}>
       <SContainer>
         <SModal>
           <SModalTitle>
