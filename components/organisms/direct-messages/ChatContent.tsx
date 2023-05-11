@@ -37,6 +37,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
+import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -115,12 +116,20 @@ const ChatContent: React.FC<IFuncProps> = ({
   const [messageTextValid, setMessageTextValid] = useState(false);
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
-  const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
+  const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
+    useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
 
   const [bottomPartRef, { height: bottomPartHeight }] =
     useMeasure<HTMLDivElement>();
+
+  const handleCloseConfirmBlockUserModal = useCallback(() => {
+    Mixpanel.track('Close Block User Modal', {
+      _stage: 'Direct Messages',
+    });
+    setIsConfirmBlockUserModalOpen(false);
+  }, []);
 
   useEffect(() => {
     if (chatRoom.id && isSocketConnected) {
@@ -216,21 +225,20 @@ const ChatContent: React.FC<IFuncProps> = ({
 
   const onUserBlock = useCallback(async () => {
     if (!isVisavisBlocked) {
-      if (!confirmBlockUser) {
+      if (!isConfirmBlockUserModalOpen) {
         Mixpanel.track('Block User Modal Opened', {
           _stage: 'Direct Messages',
           _component: 'ChatContent',
         });
-        setConfirmBlockUser(true);
+        setIsConfirmBlockUserModalOpen(true);
       }
     } else {
       await changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
-
-      refetchChatRoom();
     }
+    refetchChatRoom();
   }, [
     isVisavisBlocked,
-    confirmBlockUser,
+    isConfirmBlockUserModalOpen,
     chatRoom.visavis?.user?.uuid,
     changeUserBlockedStatus,
     refetchChatRoom,
@@ -330,28 +338,21 @@ const ChatContent: React.FC<IFuncProps> = ({
       !chatRoom ||
       (isAnnouncement && !isMyAnnouncement),
     [
-      isVisavisBlocked,
       isMessagingDisabled,
+      isVisavisBlocked,
+      chatRoom,
       isAnnouncement,
       isMyAnnouncement,
-      chatRoom,
     ]
   );
 
   const whatComponentToDisplay = useCallback(() => {
-    if ((isVisavisBlocked === true || confirmBlockUser) && chatRoom.visavis) {
+    if (isVisavisBlocked === true && !!chatRoom.visavis) {
       return (
         <BlockedUser
-          confirmBlockUser={confirmBlockUser}
           isBlocked={isVisavisBlocked}
           user={chatRoom.visavis}
           onUserBlock={onUserBlock}
-          closeModal={() => {
-            Mixpanel.track('Close Block User Modal', {
-              _stage: 'Direct Messages',
-            });
-            setConfirmBlockUser(false);
-          }}
           variant={variant}
         />
       );
@@ -384,7 +385,6 @@ const ChatContent: React.FC<IFuncProps> = ({
     return null;
   }, [
     isVisavisBlocked,
-    confirmBlockUser,
     chatRoom.visavis,
     chatRoom.myRole,
     isMessagingDisabled,
@@ -485,6 +485,15 @@ const ChatContent: React.FC<IFuncProps> = ({
           }}
         />
       )}
+      {chatRoom.visavis ? (
+        <BlockUserModal
+          isOpen={isConfirmBlockUserModalOpen}
+          onUserBlock={onUserBlock}
+          user={chatRoom.visavis}
+          closeModal={handleCloseConfirmBlockUserModal}
+          isAnnouncement={isAnnouncement}
+        />
+      ) : null}
     </SContainer>
   );
 };
