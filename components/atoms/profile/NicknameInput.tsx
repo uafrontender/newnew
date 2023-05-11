@@ -22,8 +22,12 @@ const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
   const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      return;
+    }
+    if (isValid) {
+      setErrorBordersShown(false);
+    }
 
     if (!isValid && errorCaption) {
       setErrorBordersShown(true);
