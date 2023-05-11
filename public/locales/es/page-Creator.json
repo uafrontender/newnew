@@ -28,10 +28,10 @@
         "amount": "Tus ganancias en Stripe son",
         "amountSecondLine": "Gestiona tu saldo en Stripe.",
         "stripeButton": "Dirígeme a Stripe",
-        "date": "se enviará automáticamente el {{date}}.",
+        "date_NEED_TRANSLATION": "Your payment will automatically be sent on {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente",
-        "nextPayout_NEED_TRANSLATION": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
+        "nextPayout": "Tu siguiente pago de ${{amount}} será enviado el {{date}}."
       },
       "toDosIssue": {
         "text": "Añade una biografía y tus datos bancarios para retirar tus ganancias",

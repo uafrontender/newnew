@@ -51,8 +51,11 @@ export const Notifications = () => {
   //   newnewapi.INotification[]
   // >([]);
 
-  const { unreadNotificationCount, fetchNotificationCount } =
-    useNotifications();
+  const {
+    unreadNotificationCount,
+    notificationsDataLoaded,
+    fetchNotificationCount,
+  } = useNotifications();
 
   const loadData = useCallback(
     async (
@@ -104,6 +107,13 @@ export const Notifications = () => {
       setReadAllToTime(undefined);
     }
   }, [notifications, fetchNotificationCount]);
+
+  useEffect(() => {
+    // If all notifications read in other tabs/apps
+    if (unreadNotificationCount === 0 && notificationsDataLoaded) {
+      setReadAllToTime(Date.now());
+    }
+  }, [unreadNotificationCount, notificationsDataLoaded]);
 
   useEffect(() => {
     if (inView && !loading && hasMore) {

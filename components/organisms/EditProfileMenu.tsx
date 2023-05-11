@@ -59,6 +59,7 @@ import useErrorToasts, {
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
+import { NAME_LENGTH_LIMIT } from '../../utils/consts';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
@@ -270,7 +271,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           validateTextAbortControllerRef.current?.signal
         );
 
-        if (!res.data?.status) throw new Error('An error occurred');
+        if (!res.data?.status) {
+          throw new Error('An error occurred');
+        }
 
         if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
@@ -354,9 +357,28 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setDataInEdit({ ...workingData });
 
       if (key === 'nickname') {
+        const typedValue = value as ModalMenuUserData['nickname'];
+        if (typedValue.trim() !== typedValue) {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.nicknameError = 'sideSpacesForbidden';
+            return errorsWorking;
+          });
+          return;
+        }
+
+        if (typedValue.length > NAME_LENGTH_LIMIT) {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.nicknameError = 'tooLong';
+            return errorsWorking;
+          });
+          return;
+        }
+
         validateTextViaAPIDebounced(
           newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-          value as ModalMenuUserData['nickname']
+          typedValue
         );
       } else if (key === 'username') {
         if (value === user.userData?.username) {
