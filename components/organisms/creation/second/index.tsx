@@ -283,6 +283,7 @@ export const CreationSecondStepContent: React.FC<
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
 
   const validateTitleDebounced = useDebounce(post.title, 500);
+
   const formatStartsAt = useCallback(() => {
     const time = moment(
       `${post.startsAt.time} ${post.startsAt['hours-format']}`,
@@ -337,15 +338,11 @@ export const CreationSecondStepContent: React.FC<
       !post.announcementVideoUrl ||
       !optionsAreValid ||
       !targetBackersValid ||
-      formatExpiresAt().unix() < currentMoment.unix() ||
-      (post.startsAt.type !== 'right-away' &&
-        formatStartsAt().unix() <= currentMoment.endOf('minute').unix()),
+      formatExpiresAt().unix() < currentMoment.unix(),
     [
       formatExpiresAt,
-      formatStartsAt,
       optionsAreValid,
       post.announcementVideoUrl,
-      post.startsAt.type,
       post.title,
       targetBackersValid,
       titleError,
@@ -1188,7 +1185,6 @@ export const CreationSecondStepContent: React.FC<
   useEffect(() => {
     const updateTime = setInterval(() => {
       setCurrentMoment(moment());
-
       if (post.startsAt.type === 'right-away') {
         const newStartAt = {
           type: post.startsAt.type,
@@ -1197,6 +1193,26 @@ export const CreationSecondStepContent: React.FC<
           'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
         };
         setCreationStartDate(newStartAt);
+      } else {
+        const time = moment(
+          `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+          ['hh:mm a']
+        );
+        const startsAt = moment(post.startsAt.date)
+          .hours(time.hours())
+          .minutes(time.minutes());
+
+        if (
+          startsAt.startOf('minute').unix() <= moment().startOf('minute').unix()
+        ) {
+          const newStartAt = {
+            type: 'right-away',
+            date: moment().format(),
+            time: moment().format('hh:mm'),
+            'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
+          };
+          setCreationStartDate(newStartAt);
+        }
       }
     }, 1000);
 

@@ -726,7 +726,7 @@
     "succeeded": {
       "topHeader": "¡Respuesta \npublicada!",
       "youMade": "Ganaste",
-      "payedByBundleVotes_NEED_TRANSLATION": "Voters paid using bundles votes",
+      "payedByBundleVotes": "Los votantes pagaron usando votos de bundles",
       "shareBtn": "Compartir",
       "linkCopied": "¡Enlace copiado!"
     },

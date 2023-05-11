@@ -1,10 +1,10 @@
 {
   "header": "¡Felicidades!",
-  "payedByBundleVotes_NEED_TRANSLATION": "Voters paid using bundles votes",
+  "payedByBundleVotes": "Los votantes pagaron usando votos de bundles",
   "youMade": "Ganaste",
   "makeNewPostButton": "Hacer otra publicación",
   "subtitle": "",
   "itsLiveTitle": "Ahora está en vivo!",
-  "shareCaptionBid_NEED_TRANSLATION": "Copy the link to share your Bid on your social platforms.",
-  "shareCaptionSuperpoll_NEED_TRANSLATION": "Copy the link to share your Superpoll on your social platforms."
+  "shareCaptionBid": "Copia el enlace para compartir tu Oferta en tus plataformas sociales.",
+  "shareCaptionSuperpoll": "Copia el enlace para compartir tu Superpoll en tus plataformas sociales."
 }

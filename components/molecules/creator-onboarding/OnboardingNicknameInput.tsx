@@ -18,8 +18,13 @@ const OnboardingSectionNicknameInput: React.FunctionComponent<
   const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      return;
+    }
+
+    if (isValid) {
+      setErrorBordersShown(false);
+    }
   }, [focused, isValid]);
 
   return (
