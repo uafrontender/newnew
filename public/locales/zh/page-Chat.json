@@ -8,7 +8,8 @@
     "welcomeMessage": "你現在可以發訊息",
     "noMessagesFirstLine": "還沒有訊息...",
     "noMessagesSecondLine": "發送訊息，開始對話,",
-    "typing": "正在輸入......"
+    "typing": "正在輸入......",
+    "notFound_NEED_TO_TRANSLATE": "Chat not found"
   },
   "userBlocked": {
     "title": "你屏蔽了",
