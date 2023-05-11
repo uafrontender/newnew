@@ -136,7 +136,7 @@
           "invalidChar": "El nombre tiene caracteres inválidos",
           "inappropriate": "Las palabras ofensivas no están permitidas",
           "linksForbidden": "Los enlaces no están permitidos",
-          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and Trailing spaces aren't allowed"
+          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and trailing spaces aren't allowed"
         }
       },
       "username": {

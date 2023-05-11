@@ -136,7 +136,7 @@
           "invalidChar": "Name has invalid characters",
           "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed",
-          "sideSpacesForbidden": "Leading and Trailing spaces aren't allowed"
+          "sideSpacesForbidden": "Leading and trailing spaces aren't allowed"
         }
       },
       "username": {
