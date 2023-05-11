@@ -102,8 +102,8 @@
           "upload": "Subir foto",
           "uploadNew": "Subir nueva imagen"
         },
-        "errors_NEED_TRANSLATION": {
-          "inappropriate": "Uploaded image cannot be used"
+        "errors": {
+          "inappropriate": "No se puede utilizar la imagen cargada"
         }
       }
     },
