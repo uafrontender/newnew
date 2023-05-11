@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -79,7 +79,7 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
         changeBody.time = moment().format('hh:mm');
         changeBody['hours-format'] = moment().format('a');
       } else {
-        changeBody.time = moment().add(1, 'minute').format('hh:mm');
+        changeBody.time = moment().add(2, 'minute').format('hh:mm');
       }
 
       onChange(id, changeBody);
@@ -88,6 +88,22 @@ const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     },
     [id, onChange]
   );
+
+  // Animation for a case when props changed from outside
+  useEffect(() => {
+    setAnimation((curr) => {
+      if (curr === 'o-12' && value.type === 'schedule') {
+        return curr;
+      }
+
+      if (curr === 'o-12-reverse' && value.type === 'right-away') {
+        return curr;
+      }
+
+      setAnimate(true);
+      return value.type === 'schedule' ? 'o-12' : 'o-12-reverse';
+    });
+  }, [value.type]);
 
   return (
     <SContainer>

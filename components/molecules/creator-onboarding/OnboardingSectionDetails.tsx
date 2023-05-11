@@ -52,6 +52,7 @@ import useErrorToasts, {
 } from '../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -163,7 +164,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
   // TODO: improve firstName validation
   const [firstNameError, setFirstnameError] = useState('');
   const handleFirstnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (firstNameError) {
+    if (!e.target.value || e.target.value.length < 1) {
+      setFirstnameError('tooShort');
+    } else if (e.target.value.length > NAME_LENGTH_LIMIT) {
+      setFirstnameError('tooLong');
+    } else if (e.target.value.trim() !== e.target.value) {
+      setFirstnameError('sideSpacesForbidden');
+    } else {
       setFirstnameError('');
     }
 
@@ -178,7 +185,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
   // TODO: improve lastName validation
   const [lastNameError, setLastnameError] = useState('');
   const handleLastnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (lastNameError) {
+    if (!e.target.value || e.target.value.length < 1) {
+      setLastnameError('tooShort');
+    } else if (e.target.value.length > NAME_LENGTH_LIMIT) {
+      setLastnameError('tooLong');
+    } else if (e.target.value.trim() !== e.target.value) {
+      setLastnameError('sideSpacesForbidden');
+    } else {
       setLastnameError('');
     }
 
@@ -211,6 +224,16 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setNicknameInEdit('');
     } else {
       setNicknameInEdit(e.target.value);
+    }
+
+    if (e.target.value.trim() !== e.target.value) {
+      setNicknameError('sideSpacesForbidden');
+      return;
+    }
+
+    if (e.target.value.length > NAME_LENGTH_LIMIT) {
+      setNicknameError('tooLong');
+      return;
     }
 
     validateNicknameViaAPIDebounced(e.target.value);
@@ -303,7 +326,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
           validateTextAbortControllerRef?.current?.signal
         );
 
-        if (!res.data?.status) throw new Error('An error occurred');
+        if (!res.data?.status) {
+          throw new Error('An error occurred');
+        }
 
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setNicknameError(errorSwitch(res.data?.status));
@@ -824,19 +849,23 @@ const OnboardingSectionDetails: React.FunctionComponent<
               id='settings_first_name_input'
               type='text'
               value={firstNameInEdit}
-              isValid={firstNameInEdit.length > 1 ? true : false}
               placeholder={t('detailsSection.form.firstName.placeholder')}
               onChange={handleFirstnameInput}
-              errorCaption={t('detailsSection.form.firstName.errors.tooShort')}
+              errorCaption={t(
+                `detailsSection.form.firstName.errors.${firstNameError}` as any
+              )}
+              isValid={firstNameError === ''}
             />
             <OnboardingInput
               id='settings_last_name_input'
               type='text'
               value={lastNameInEdit}
-              isValid={lastNameInEdit.length > 1 ? true : false}
               placeholder={t('detailsSection.form.lastName.placeholder')}
               onChange={handleLastnameInput}
-              errorCaption={t('detailsSection.form.lastName.errors.tooShort')}
+              errorCaption={t(
+                `detailsSection.form.lastName.errors.${lastNameError}` as any
+              )}
+              isValid={lastNameError === ''}
             />
           </SFieldPairContainer>
           <SFieldPairContainer>

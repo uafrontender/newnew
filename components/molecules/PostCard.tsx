@@ -1104,7 +1104,7 @@ const SThumbnailHolder = styled.img<{
   visible: boolean;
   hovered: boolean;
 }>`
-  opacity: ${({ visible, hovered }) => (!visible || hovered ? 0 : 1)};
+  opacity: ${({ hovered }) => (hovered ? 0 : 1)};
   transition: linear 0.3s;
 `;
 

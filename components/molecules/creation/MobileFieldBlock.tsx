@@ -203,7 +203,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           });
         } else {
           onChange(id, {
-            time: moment().add(1, 'minute').format('hh:mm'),
+            time: moment().add(2, 'minute').format('hh:mm'),
           });
         }
 
@@ -607,7 +607,8 @@ const SModalToggleWrapper = styled.div<{ hidden?: boolean }>`
   width: 100%;
   margin: 12px 0;
   display: flex;
-  flex-direction: row
+  flex-direction: row;
+  flex-shrink: 0;
   align-items: start;
   justify-content: center;
   height: ${({ hidden }) => (hidden ? '0px' : '44px')};

@@ -247,8 +247,8 @@
     "texts": {
       "title-published": "已上線！",
       "title-scheduled": "已經安排好了！",
-      "shareCaptionBid_NEED_TRANSLATION": "Copy the link to share your Bid on your social platforms.",
-      "shareCaptionSuperpoll_NEED_TRANSLATION": "Copy the link to share your Superpoll on your social platforms."
+      "shareCaptionBid": "複製鏈接以在你的社群平台上分享你的Bid。",
+      "shareCaptionSuperpoll": "複製鏈接以在你的社群平台上分享你的Superpoll。"
     }
   },
   "tutorials": {
