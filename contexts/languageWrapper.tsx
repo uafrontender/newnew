@@ -12,7 +12,7 @@ const LanguageWrapper: React.FunctionComponent<ILanguageWrapper> = ({
 }) => {
   const { i18n } = useTranslation();
   const [cookies] = useCookies();
-  const { replace, locale, asPath, pathname } = useRouter();
+  const { replace, locale, asPath, pathname, query } = useRouter();
 
   useEffect(() => {
     if (
@@ -20,13 +20,20 @@ const LanguageWrapper: React.FunctionComponent<ILanguageWrapper> = ({
       cookies.preferredLocale !== locale &&
       i18n?.changeLanguage
     ) {
-      replace(pathname, asPath, {
-        locale: cookies.preferredLocale,
-        shallow: true,
-      });
+      replace(
+        {
+          pathname,
+          query,
+        },
+        asPath,
+        {
+          locale: cookies.preferredLocale,
+          shallow: true,
+        }
+      );
       i18n.changeLanguage(cookies.preferredLocale);
     }
-  }, [asPath, cookies.preferredLocale, i18n, locale, pathname, replace]);
+  }, [asPath, cookies.preferredLocale, i18n, locale, pathname, query, replace]);
 
   return <>{children}</>;
 };

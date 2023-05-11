@@ -574,7 +574,7 @@ const SSelectWinnerOption = styled.div<{
           z-index: initial;
         `};
 
-  display: ${({ hidden }) => (!hidden ? 'flex' : 'none')};
+  display: ${({ hidden }) => (hidden ? 'none' : 'flex')};
   flex-direction: column;
   justify-content: center;
 

@@ -1,16 +1,10 @@
-/* eslint-disable no-unused-expressions */
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-} from 'react';
+import React, { useCallback, useState, useRef, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import { useQuery } from 'react-query';
+
 import {
   SChatItemContainer,
   SChatItemCenter,
@@ -21,7 +15,6 @@ import {
   SUserAvatar,
   SChatItemLine,
 } from '../../atoms/direct-messages/styles';
-import UserAvatar from '../UserAvatar';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import GradientMask from '../../atoms/GradientMask';
 import { useAppSelector } from '../../../redux-store/store';
@@ -29,16 +22,18 @@ import InlineSVG from '../../atoms/InlineSVG';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import Modal from '../../organisms/Modal';
 
-import { getVisavisList } from '../../../api/endpoints/chat';
+import {
+  getMyRooms,
+  getRoom,
+  getVisavisList,
+} from '../../../api/endpoints/chat';
 
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
-import { useGetChats } from '../../../contexts/chatContext';
 import { Mixpanel } from '../../../utils/mixpanel';
-import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
 import Loader from '../../atoms/Loader';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -53,6 +48,7 @@ const NewAnnouncement = dynamic(
 interface INewMessageModal {
   showModal: boolean;
   closeModal: () => void;
+  onNewMessageSelect: (newChatRoom: newnewapi.IChatRoom) => void;
 }
 interface IChatroomsSorted {
   letter: string;
@@ -62,6 +58,7 @@ interface IChatroomsSorted {
 const NewMessageModal: React.FC<INewMessageModal> = ({
   showModal,
   closeModal,
+  onNewMessageSelect,
 }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
@@ -71,79 +68,50 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const { showErrorToastCustom } = useErrorToasts();
 
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
-
-  const router = useRouter();
-
-  const [usernameQuery, setUsernameQuery] = useState('');
-  const usernameQueryDebounced = useDebouncedValue(usernameQuery, 500);
-  const [roomKind, setRoomKind] = useState<newnewapi.ChatRoom.Kind>(
-    newnewapi.ChatRoom.Kind.CREATOR_TO_ONE
-  );
-
-  const { setActiveChatRoom, mobileChatOpened, setHiddenMessagesArea } =
-    useGetChats();
-  const { data } = useMyChatRooms({
-    myRole: newnewapi.ChatRoom.MyRole.CREATOR,
-    roomKind,
-    searchQuery: usernameQueryDebounced,
-  });
-
-  const targetChatrooms = useMemo(
-    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
-    [data]
-  );
-
-  const [chatroomsSortedList, setChatroomsSortedList] = useState<
-    IChatroomsSorted[]
-  >([]);
   const [searchValue, setSearchValue] = useState('');
 
-  const [filteredChatrooms, setFilteredChatrooms] = useState<
-    newnewapi.IVisavisListItem[]
-  >([]);
-
-  const [loading, setLoading] = useState(false);
-  const [chatRooms, setChatRooms] = useState<newnewapi.IVisavisListItem[]>([]);
-
-  const passInputValue = (str: string) => {
-    setSearchValue(str);
-  };
-
-  const loadData = useCallback(async () => {
-    if (loading) return;
-    try {
-      setLoading(true);
+  const { data, isLoading } = useQuery<newnewapi.IVisavisListItem[]>(
+    ['private', 'fetchVisavisList'],
+    async ({ signal }) => {
       const payload = new newnewapi.EmptyRequest();
 
-      const res = await getVisavisList(payload);
+      const res = await getVisavisList(payload, signal);
 
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }
 
-      setChatRooms(res.data.visavis);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
+      return res.data.visavis;
+    },
+    {
+      onError: (error) => {
+        console.error(error);
+      },
     }
-  }, [loading]);
+  );
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const chatRooms = useMemo(() => data || [], [data]);
 
-  useEffect(() => {
-    const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
+  const passInputValue = (str: string) => {
+    setSearchValue(str);
+  };
+
+  const filteredChatRooms = useMemo(() => {
+    const searchValueInLowerCase = searchValue.toLowerCase();
+
+    return chatRooms.filter(
+      (chat: newnewapi.IVisavisListItem) =>
+        (chat.user?.username &&
+          chat.user?.username.toLowerCase().includes(searchValueInLowerCase)) ||
+        (chat.user?.nickname &&
+          chat.user?.nickname.toLowerCase().includes(searchValueInLowerCase))
+    );
+  }, [chatRooms, searchValue]);
+
+  const chatsInAlphabetOrder = useMemo(() => {
+    const obj = filteredChatRooms.reduce((acc: { [key: string]: any }, c) => {
       if (c.user && c.user.username) {
         const letter = c.user.username[0];
         acc[letter] = (acc[letter] || []).concat(c);
@@ -153,111 +121,39 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
     // `map` over the object entries to return an array of objects
     const arr = Object.entries(obj)
-      /* eslint-disable arrow-body-style */
-      .map(([letter, chats]) => {
-        return { letter, chats };
-      })
-      .sort((a, b) => {
-        if (a.letter < b.letter) {
-          return -1;
-        }
-        if (a.letter > b.letter) {
-          return 1;
-        }
-        return 0;
-      });
+      .map(([letter, chats]) => ({ letter, chats }))
+      .sort((a, b) => a.letter.localeCompare(b.letter));
 
-    setChatroomsSortedList(arr);
-  }, [chatRooms]);
-
-  useEffect(() => {
-    if (searchValue.length > 0) {
-      const arr: newnewapi.IVisavisListItem[] = [];
-
-      chatRooms.forEach((chat: newnewapi.IVisavisListItem) => {
-        if (
-          (chat.user?.username &&
-            chat.user?.username.toLowerCase().includes(searchValue)) ||
-          (chat.user?.nickname &&
-            chat.user?.nickname.toLowerCase().includes(searchValue))
-        ) {
-          arr.push(chat);
-        }
-      });
-
-      setFilteredChatrooms(arr);
-    } else {
-      setFilteredChatrooms([]);
-    }
-  }, [searchValue, chatRooms]);
-
-  const isDashboard = useMemo(() => {
-    if (
-      router.asPath.includes('/creator/dashboard') ||
-      router.asPath.includes('/creator/bundles')
-    ) {
-      return true;
-    }
-    return false;
-  }, [router.asPath]);
-
-  useEffect(() => {
-    // TODO: visavilist should include only creators on dashboard
-    if (showModal && isDashboard && targetChatrooms.length === 1) {
-      setActiveChatRoom(targetChatrooms[0]);
-      if (router.asPath.includes('/creator/bundles')) {
-        router.push(
-          `/creator/bundles?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
-        );
-      } else {
-        router.push(
-          `/creator/dashboard?tab=direct-messages&roomID=${targetChatrooms[0].id?.toString()}`
-        );
-      }
-
-      if (mobileChatOpened) {
-        setHiddenMessagesArea(false);
-      }
-      closeModal();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showModal, targetChatrooms]);
+    return arr;
+  }, [filteredChatRooms]);
 
   const openMyAnnouncement = useCallback(async () => {
     Mixpanel.track('My Announcement Clicked', {
       _stage: 'Direct Messages',
       _component: 'NewMessageModal',
-      _isDashboard: isDashboard,
-      ...(!isDashboard
-        ? {
-            _target: `/direct-messages/${user.userData?.username}-announcement`,
-          }
-        : {
-            _roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
-            _username: user.userData?.username,
-          }),
     });
 
-    if (!isDashboard) {
-      await router.push(
-        `/direct-messages/${user.userData?.username}-announcement`
-      );
-      if (isMobileOrTablet) {
-        setHiddenMessagesArea(false);
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        myRole: newnewapi.ChatRoom.MyRole.CREATOR,
+        roomKind: newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE,
+      });
+
+      const targetChatRoomResponse = await getMyRooms(payload);
+
+      if (!targetChatRoomResponse.data || targetChatRoomResponse.error) {
+        throw new Error('Request failed');
       }
+
+      const targetChatRoom = targetChatRoomResponse.data.rooms[0] || null;
+
+      await onNewMessageSelect(targetChatRoom);
+
       closeModal();
-    } else {
-      user.userData?.username && setUsernameQuery(user.userData?.username);
-      setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE);
+    } catch (err) {
+      console.error(err);
     }
-  }, [
-    isMobileOrTablet,
-    router,
-    isDashboard,
-    user.userData?.username,
-    closeModal,
-    setHiddenMessagesArea,
-  ]);
+  }, [onNewMessageSelect, closeModal]);
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IVisavisListItem, index: number) => {
@@ -265,30 +161,24 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         Mixpanel.track('Chat Item Clicked', {
           _stage: 'Direct Messages',
           _component: 'NewMessageModal',
-          _isDashboard: isDashboard,
-          ...(!isDashboard
-            ? {
-                _target: `/direct-messages/${chat.user?.username}`,
-                _visavis: chat.user?.username,
-              }
-            : {
-                _roomKind: newnewapi.ChatRoom.Kind.CREATOR_TO_ONE,
-                _visavis: chat.user?.username,
-              }),
         });
 
-        if (!isDashboard) {
-          await router.push(`/direct-messages/${chat.user?.username}`);
+        try {
+          const payload = new newnewapi.GetRoomRequest({
+            roomId: chat.chatroomId,
+          });
 
-          if (isMobileOrTablet) {
-            setHiddenMessagesArea(false);
+          const res = await getRoom(payload);
+
+          if (!res.data || res.error) {
+            throw new Error(res.error?.message ?? 'Request failed');
           }
+
+          await onNewMessageSelect(res.data);
+
           closeModal();
-        } else {
-          setRoomKind(newnewapi.ChatRoom.Kind.CREATOR_TO_ONE);
-          if (chat.user?.username) {
-            setUsernameQuery(chat.user?.username);
-          }
+        } catch (err) {
+          showErrorToastCustom(t('chat.notFound'));
         }
       };
 
@@ -296,9 +186,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
         <SChatItemContainer key={`visavis-list-item-${chat.chatroomId}`}>
           <SChatItemM onClick={handleItemClick}>
             {chat.user?.thumbnailAvatarUrl && (
-              <SUserAvatar>
-                <UserAvatar avatarUrl={chat.user?.thumbnailAvatarUrl} />
-              </SUserAvatar>
+              <SUserAvatar avatarUrl={chat.user?.thumbnailAvatarUrl} />
             )}
             <SChatItemCenter>
               <SChatItemLine>
@@ -309,20 +197,19 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
               <SUserAlias>@{chat.user?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
-          {filteredChatrooms.length > 0
-            ? index !== filteredChatrooms.length - 1 && <SChatSeparator />
+          {filteredChatRooms.length > 0
+            ? index !== filteredChatRooms.length - 1 && <SChatSeparator />
             : chatRooms && index !== chatRooms.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
     [
-      filteredChatrooms.length,
+      filteredChatRooms.length,
       chatRooms,
-      isDashboard,
-      router,
-      isMobileOrTablet,
+      onNewMessageSelect,
       closeModal,
-      setHiddenMessagesArea,
+      showErrorToastCustom,
+      t,
     ]
   );
 
@@ -355,37 +242,28 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             passInputValue={passInputValue}
           />
           <SWrapper>
-            {
-              /* eslint-disable no-nested-ternary */
-              searchValue.length > 0 ? (
-                filteredChatrooms.length > 0 ? (
-                  <SSectionContent ref={scrollRef}>
-                    {filteredChatrooms.map(renderChatItem)}
-                  </SSectionContent>
-                ) : (
-                  <>
-                    <NoResults text={searchValue} />
-                  </>
-                )
-              ) : (
-                <SSectionContent ref={scrollRef}>
-                  {user.userData?.options?.isOfferingBundles && (
-                    <NewAnnouncement handleClick={openMyAnnouncement} />
-                  )}
-                  {chatroomsSortedList.length > 0 &&
-                    chatroomsSortedList.map((section: IChatroomsSorted) => (
-                      <SSection key={section.letter}>
-                        <SLetter>{section.letter}</SLetter>
-                        {section.chats.map(renderChatItem)}
-                      </SSection>
-                    ))}
-                </SSectionContent>
-              )
-            }
+            {!isLoading && (
+              <SSectionContent ref={scrollRef}>
+                {user.userData?.options?.isOfferingBundles && !searchValue && (
+                  <NewAnnouncement handleClick={openMyAnnouncement} />
+                )}
+                {chatsInAlphabetOrder.length > 0 &&
+                  chatsInAlphabetOrder.map((section: IChatroomsSorted) => (
+                    <SSection key={section.letter}>
+                      {!searchValue && <SLetter>{section.letter}</SLetter>}
+                      {section.chats.map(renderChatItem)}
+                    </SSection>
+                  ))}
+
+                {searchValue && chatsInAlphabetOrder.length === 0 && (
+                  <NoResults text={searchValue} />
+                )}
+              </SSectionContent>
+            )}
 
             <GradientMask positionTop active={showTopGradient} />
             <GradientMask active={showBottomGradient} />
-            {loading && <Loader isStatic size='md' />}
+            {isLoading && <Loader isStatic size='md' />}
           </SWrapper>
         </SModal>
       </SContainer>
