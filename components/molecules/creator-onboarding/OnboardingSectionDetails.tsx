@@ -52,6 +52,7 @@ import useErrorToasts, {
 } from '../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -165,6 +166,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const handleFirstnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value || e.target.value.length < 1) {
       setFirstnameError('tooShort');
+    } else if (e.target.value.length > NAME_LENGTH_LIMIT) {
+      setFirstnameError('tooLong');
     } else if (e.target.value.trim() !== e.target.value) {
       setFirstnameError('sideSpacesForbidden');
     } else {
@@ -184,6 +187,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const handleLastnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value || e.target.value.length < 1) {
       setLastnameError('tooShort');
+    } else if (e.target.value.length > NAME_LENGTH_LIMIT) {
+      setLastnameError('tooLong');
     } else if (e.target.value.trim() !== e.target.value) {
       setLastnameError('sideSpacesForbidden');
     } else {
@@ -223,6 +228,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
     if (e.target.value.trim() !== e.target.value) {
       setNicknameError('sideSpacesForbidden');
+      return;
+    }
+
+    if (e.target.value.length > NAME_LENGTH_LIMIT) {
+      setNicknameError('tooLong');
       return;
     }
 
