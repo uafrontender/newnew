@@ -14,6 +14,7 @@ import { SocketContext } from './socketContext';
 
 const NotificationsContext = createContext({
   unreadNotificationCount: 0,
+  notificationsDataLoaded: false,
   fetchNotificationCount: () => {},
 });
 
@@ -27,7 +28,7 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   const user = useAppSelector((state) => state.user);
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsDataLoaded, setNotificationsDataLoaded] = useState(false);
   const { socketConnection } = useContext(SocketContext);
 
   const fetchNotificationCount = useCallback(async () => {
@@ -36,7 +37,6 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
     }
 
     try {
-      setNotificationsLoading(true);
       const payload = new newnewapi.EmptyRequest();
       const res = await getUnreadNotificationCount(payload);
       if (!res.data || res.error) {
@@ -51,9 +51,9 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
       } else {
         setUnreadNotificationCount(0);
       }
+      setNotificationsDataLoaded(true);
     } catch (err) {
       console.error(err);
-      setNotificationsLoading(false);
       setUnreadNotificationCount(0);
     }
   }, [user.loggedIn]);
@@ -88,10 +88,10 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   const contextValue = useMemo(
     () => ({
       unreadNotificationCount,
-      notificationsLoading,
+      notificationsDataLoaded,
       fetchNotificationCount,
     }),
-    [unreadNotificationCount, fetchNotificationCount, notificationsLoading]
+    [unreadNotificationCount, notificationsDataLoaded, fetchNotificationCount]
   );
 
   return (

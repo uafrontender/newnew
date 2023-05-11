@@ -30,6 +30,7 @@ import usePagination, {
   Paging,
 } from '../../../../utils/hooks/usePagination';
 import findName from '../../../../utils/findName';
+import { useNotifications } from '../../../../contexts/notificationsContext';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -42,6 +43,8 @@ export const NotificationsList: React.FC<IFunction> = ({
   const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
+  const { unreadNotificationCount, notificationsDataLoaded } =
+    useNotifications();
   const [unreadNotifications, setUnreadNotifications] = useState<
     number[] | null
   >(null);
@@ -151,6 +154,13 @@ export const NotificationsList: React.FC<IFunction> = ({
       clearInterval(updateTimeInterval);
     };
   }, []);
+
+  useEffect(() => {
+    // If all notifications read in other tabs/apps
+    if (notificationsDataLoaded && unreadNotificationCount === 0) {
+      setUnreadNotifications([]);
+    }
+  }, [notificationsDataLoaded, unreadNotificationCount]);
 
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
