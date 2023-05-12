@@ -38,7 +38,7 @@
         "textBio": "Añade una biografía para retirar tus ganancias",
         "textBank": "Añade tus datos bancarios para retirar tus ganancias",
         "button": "Añadir",
-        "stripeIssue": "Hay un problema con tu cuenta de Stripe o la configuración de tu cuenta de Stripe no está finalizada",
+        "stripeIssue": "Hay un problema con tu cuenta de Stripe o la configuración de su cuenta de Stripe no está finalizada",
         "stripeIssueButton": "Ver cuenta de Stripe"
       },
       "makeDecision": {
