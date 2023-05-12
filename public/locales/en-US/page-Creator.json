@@ -38,7 +38,7 @@
         "textBio": "Add a bio to withdraw your earnings",
         "textBank": "Add your bank info to withdraw your earnings",
         "button": "Add",
-        "stripeIssue": "There's an issue with your Stripe account",
+        "stripeIssue": "There's an issue with your Stripe account or the setup of your Stripe account is not finalized",
         "stripeIssueButton": "See Stripe account"
       },
       "makeDecision": {
