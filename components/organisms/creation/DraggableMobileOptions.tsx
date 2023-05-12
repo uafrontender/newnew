@@ -24,6 +24,7 @@ interface IDraggableMobileOptions {
   ) => Promise<string>;
 }
 
+// TODO: why mobile? Used on desktop too
 export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
   props
 ) => {
@@ -34,6 +35,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
   const onReorder = (value: any) => {
     onChange(id, value);
   };
+
   const handleOptionChange = (index: number, item: any) => {
     const newArr = [...options];
 
@@ -57,6 +59,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
       handleChange={handleOptionChange}
     />
   );
+
   const handleAddNewOption = () => {
     Mixpanel.track('Superpoll Add New Option');
     onChange(id, [
