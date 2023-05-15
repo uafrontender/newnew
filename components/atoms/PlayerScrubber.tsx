@@ -421,4 +421,8 @@ const STime = styled.div<{
   ${({ theme }) => theme.media.laptop} {
     left: initial;
   }
+
+  @-moz-document url-prefix() {
+    bottom: 16px;
+  }
 `;
