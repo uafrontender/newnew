@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { debounce } from 'lodash';
 
 import Button from '../../../atoms/Button';
 import Modal, { ModalType } from '../../../organisms/Modal';
@@ -44,11 +43,27 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
   const [titleInEdit, setTitleInEdit] = useState(postParsed?.title || '');
   const [isTitleValid, setIsTitleValid] = useState(true);
   const [titleValidationError, setTitleValidationError] = useState('');
-  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(true);
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
   const isTitleSame = useMemo(
-    () => titleInEdit === postParsed?.title,
+    () => titleInEdit?.trim() === postParsed?.title?.trim(),
     [postParsed?.title, titleInEdit]
+  );
+
+  const isDisabled = useMemo(
+    () =>
+      !titleInEdit ||
+      !isTitleValid ||
+      isUpdateTitleLoading ||
+      isAPIValidateLoading ||
+      isTitleSame,
+    [
+      isAPIValidateLoading,
+      isTitleSame,
+      isTitleValid,
+      isUpdateTitleLoading,
+      titleInEdit,
+    ]
   );
 
   const validateUsernameAbortControllerRef = useRef<
@@ -56,6 +71,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
   >();
   const validateTitleViaAPI = useCallback(
     async (text: string) => {
+      let result = false;
       if (validateUsernameAbortControllerRef.current) {
         validateUsernameAbortControllerRef.current?.abort();
       }
@@ -102,6 +118,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
           case newnewapi.ValidateTextResponse.Status.OK: {
             setIsTitleValid(true);
             setTitleValidationError('');
+            result = true;
             break;
           }
           default:
@@ -110,39 +127,48 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
 
         setIsAPIValidateLoading(false);
       } catch (err) {
+        result = true;
         console.error(err);
+      } finally {
+        setIsAPIValidateLoading(false);
       }
+
+      return result;
     },
     [tCommon]
   );
 
-  const validateTitleViaAPIDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateTitleViaAPI(text);
-      }, 250),
-    [validateTitleViaAPI]
-  );
-
   const handleUpdateNewTitleText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setIsTitleValid(true);
+      setTitleValidationError('');
+
       setTitleInEdit(e.target.value);
-      if (e.target.value?.length > 0) {
-        validateTitleViaAPIDebounced(e.target.value);
-      }
     },
-    [validateTitleViaAPIDebounced]
+    []
   );
 
   const handleConfirmNewPostTitle = useCallback(async () => {
-    if (isAPIValidateLoading) return;
+    if (isAPIValidateLoading || isUpdateTitleLoading) return;
+
     try {
+      const validationResult = await validateTitleViaAPI(titleInEdit);
+      if (!validationResult) {
+        return;
+      }
       await handleUpdatePostTitle(titleInEdit);
       closeModal();
     } catch (err) {
       console.error(err);
     }
-  }, [closeModal, handleUpdatePostTitle, isAPIValidateLoading, titleInEdit]);
+  }, [
+    closeModal,
+    handleUpdatePostTitle,
+    isAPIValidateLoading,
+    isUpdateTitleLoading,
+    titleInEdit,
+    validateTitleViaAPI,
+  ]);
 
   return (
     <Modal
@@ -150,6 +176,9 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
       modalType={modalType}
       additionalz={12}
       onClose={closeModal}
+      onEnterKeyUp={
+        !isMobile && !isDisabled ? handleConfirmNewPostTitle : undefined
+      }
     >
       {isMobile ? (
         <SWrapperMobile>
@@ -177,15 +206,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
               id='edit-title-submit'
               size='sm'
               view='primaryGrad'
-              disabled={
-                !titleInEdit ||
-                !isTitleValid ||
-                isUpdateTitleLoading ||
-                isTitleSame
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
+              disabled={isDisabled}
               onClick={handleConfirmNewPostTitle}
             >
               {t('saveBtn')}
@@ -225,15 +246,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
               id='edit-title-submit'
               view='primaryGrad'
               size='sm'
-              disabled={
-                !titleInEdit ||
-                !isTitleValid ||
-                isUpdateTitleLoading ||
-                isTitleSame
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-              }}
+              disabled={isDisabled}
               onClick={handleConfirmNewPostTitle}
             >
               {t('saveBtn')}
