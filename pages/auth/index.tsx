@@ -167,17 +167,17 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
         setIsLoading(false);
         if (data.redirectUrl) {
-          router?.push(data.redirectUrl);
+          router?.replace(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router?.push('/creator/dashboard');
+          router?.replace('/creator/dashboard');
         } else {
-          router?.push('/');
+          router?.replace('/');
         }
       } catch (err) {
         // NB! Might need an error toast
         console.error(err);
         setIsLoading(false);
-        router?.push('/');
+        router?.replace('/');
       }
     }
 
