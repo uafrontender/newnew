@@ -50,6 +50,22 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
     [postParsed?.title, titleInEdit]
   );
 
+  const isDisabled = useMemo(
+    () =>
+      !titleInEdit ||
+      !isTitleValid ||
+      isUpdateTitleLoading ||
+      isAPIValidateLoading ||
+      isTitleSame,
+    [
+      isAPIValidateLoading,
+      isTitleSame,
+      isTitleValid,
+      isUpdateTitleLoading,
+      titleInEdit,
+    ]
+  );
+
   const validateUsernameAbortControllerRef = useRef<
     AbortController | undefined
   >();
@@ -160,6 +176,9 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
       modalType={modalType}
       additionalz={12}
       onClose={closeModal}
+      onEnterKeyUp={
+        !isMobile && !isDisabled ? handleConfirmNewPostTitle : undefined
+      }
     >
       {isMobile ? (
         <SWrapperMobile>
@@ -187,13 +206,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
               id='edit-title-submit'
               size='sm'
               view='primaryGrad'
-              disabled={
-                !titleInEdit ||
-                !isTitleValid ||
-                isUpdateTitleLoading ||
-                isAPIValidateLoading ||
-                isTitleSame
-              }
+              disabled={isDisabled}
               onClick={handleConfirmNewPostTitle}
             >
               {t('saveBtn')}
@@ -233,13 +246,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
               id='edit-title-submit'
               view='primaryGrad'
               size='sm'
-              disabled={
-                !titleInEdit ||
-                !isTitleValid ||
-                isUpdateTitleLoading ||
-                isAPIValidateLoading ||
-                isTitleSame
-              }
+              disabled={isDisabled}
               onClick={handleConfirmNewPostTitle}
             >
               {t('saveBtn')}
