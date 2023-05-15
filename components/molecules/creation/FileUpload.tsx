@@ -363,6 +363,10 @@ const FileUpload: React.FC<IFileUpload> = ({
       </SDropBox>
     );
 
+    if (!localFile) {
+      return content;
+    }
+
     if (loadingUpload) {
       const ETAisValid = !Number.isNaN(etaUpload) && etaUpload !== Infinity;
       const minutesLeft = Math.floor(etaUpload / 60);

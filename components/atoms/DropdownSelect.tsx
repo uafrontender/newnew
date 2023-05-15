@@ -254,6 +254,8 @@ const SOptionsContainer = styled(motion.div)<{
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
+  box-shadow: ${(props) => props.theme.shadows.intenseGrey};
+
   div {
     display: flex;
     flex-direction: column;
