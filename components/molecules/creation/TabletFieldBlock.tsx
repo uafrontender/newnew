@@ -52,6 +52,27 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
     }
   }, [inputProps, id, onChange, value]);
 
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e?.target?.value;
+      if (inputProps?.pattern) {
+        const regExp = new RegExp(inputProps?.pattern);
+        if (newValue && !regExp.test(newValue)) {
+          return;
+        }
+      }
+
+      if (inputProps?.type === 'number') {
+        const clearedValue = parseInt(newValue);
+        onChange(id, clearedValue.toString());
+        return;
+      }
+
+      onChange(id, newValue);
+    },
+    [id, inputProps?.pattern, inputProps?.type, onChange]
+  );
+
   const selectOptions = useMemo(
     () =>
       options?.map((item: any) => ({
@@ -80,16 +101,7 @@ const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
                 ref={inputRef}
                 value={value}
                 onBlur={handleBlur}
-                onChange={(e) => {
-                  if (inputProps?.pattern) {
-                    const regExp = new RegExp(inputProps?.pattern);
-                    if (e?.target?.value && !regExp.test(e?.target?.value)) {
-                      return;
-                    }
-                  }
-
-                  onChange(id, e?.target?.value);
-                }}
+                onChange={handleChange}
                 onKeyDown={(e) => {
                   if (inputProps?.type === 'number') {
                     if (e.key === '+' || e.key === '-' || e.key === 'e') {
