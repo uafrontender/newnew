@@ -10,13 +10,16 @@ import NewMessage from './NewMessage';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useAppState } from '../../../contexts/appStateContext';
-import { useAppSelector } from '../../../redux-store/store';
 
 const GoBackButton = dynamic(
   () => import('../../atoms/direct-messages/GoBackButton')
 );
 
-const ChatToolbar: React.FC = () => {
+interface IChatToolbar {
+  onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
+}
+
+const ChatToolbar: React.FC<IChatToolbar> = ({ onChatRoomSelect }) => {
   const { resizeMode } = useAppState();
 
   const isMobileOrTablet = [
@@ -28,7 +31,6 @@ const ChatToolbar: React.FC = () => {
   ].includes(resizeMode);
 
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
 
   const { t } = useTranslation('page-Chat');
   const { setSearchChatroom } = useGetChats();
@@ -46,28 +48,9 @@ const ChatToolbar: React.FC = () => {
 
   const handleChatRoomSelect = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
-      if (
-        chatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR &&
-        chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE
-      ) {
-        router.replace(`${user.userData?.username}-announcement`, undefined, {
-          shallow: true,
-        });
-      } else if (chatRoom?.myRole === newnewapi.ChatRoom.MyRole.CREATOR) {
-        router.replace(
-          `${chatRoom.visavis?.user?.username}-bundle`,
-          undefined,
-          {
-            shallow: true,
-          }
-        );
-      } else {
-        router.replace(`${chatRoom.visavis?.user?.username}`, undefined, {
-          shallow: true,
-        });
-      }
+      onChatRoomSelect(chatRoom);
     },
-    [router, user.userData?.username]
+    [onChatRoomSelect]
   );
 
   return (

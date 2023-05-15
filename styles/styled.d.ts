@@ -188,6 +188,7 @@ declare module 'styled-components' {
       mediumBlue: string;
       intenseBlue: string;
       mediumGrey: string;
+      intenseGrey: string;
       cookie: string;
       dashboardNotifications: string;
     };

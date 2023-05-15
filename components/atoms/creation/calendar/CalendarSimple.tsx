@@ -231,6 +231,7 @@ const SListHolder = styled.div<ISListHolder>`
   overflow: hidden;
   position: absolute;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  box-shadow: ${(props) => props.theme.shadows.intenseGrey};
   border-radius: 16px;
   flex-direction: column;
 
