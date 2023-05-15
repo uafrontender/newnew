@@ -139,7 +139,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
-  const boostFormRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -234,8 +234,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
     // Have to execute in a microtask to allow rendering take place first
     setTimeout(() => {
-      if (handleScrollIntoListView && boostFormRef.current) {
-        handleScrollIntoListView(boostFormRef.current);
+      if (handleScrollIntoListView && containerRef.current) {
+        handleScrollIntoListView(containerRef.current);
       }
     }, 0);
   };
@@ -445,7 +445,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       key={option.id.toString()}
       ref={(el) => {
         if (el) {
-          boostFormRef.current = el;
+          containerRef.current = el;
         }
       }}
       style={{
