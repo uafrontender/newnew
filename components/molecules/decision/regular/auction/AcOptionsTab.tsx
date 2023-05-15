@@ -114,29 +114,17 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     }
   };
 
-  // TODO: Standardize and turn into utility function
-  const handleScrollCardIntoListView = useCallback((element: HTMLElement) => {
-    if (containerRef.current) {
-      const listHeight = containerRef.current.offsetHeight;
-      const currentScrollPosition = containerRef.current.scrollTop;
-      const elementPosition = element.offsetTop;
-      const elementHeight = element.offsetHeight;
-      // Lower
-      if (
-        elementPosition + elementHeight >
-        listHeight + currentScrollPosition
-      ) {
-        containerRef.current.scrollTop = elementPosition + elementHeight;
+  const handleScrollCardIntoListView = useCallback(
+    (element: HTMLElement) => {
+      if (containerRef.current && !isMobile) {
+        element.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+        });
       }
-
-      // Higher
-      // TODO: Refactor
-      // 84 is a height of an option card itself + gap
-      if (elementPosition < currentScrollPosition + 100) {
-        containerRef.current.scrollTop = elementPosition - 100;
-      }
-    }
-  }, []);
+    },
+    [isMobile]
+  );
 
   // TODO: When scrolling stabilizes, use this approach to scroll to supported option
   /* const scrollToOptionById = useCallback(
@@ -175,23 +163,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       scrollToOptionById(optionBeingSupported);
     }
   }, [optionBeingSupported, isMobile, scrollToOptionById]); */
-
-  useEffect(() => {
-    if (optionBeingSupported && containerRef.current && !isMobile) {
-      let optIdx = options.findIndex(
-        (o) => o.id.toString() === optionBeingSupported
-      );
-      optIdx += 2;
-      const childDiv = containerRef.current.children[optIdx];
-
-      if (childDiv) {
-        childDiv.scrollIntoView({
-          block: 'nearest',
-          behavior: 'smooth',
-        });
-      }
-    }
-  }, [options, optionBeingSupported, isMobile]);
 
   useEffect(() => {
     if (inView) {
