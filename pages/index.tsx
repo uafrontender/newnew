@@ -12,6 +12,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled, { useTheme } from 'styled-components';
+import jwtDecode from 'jwt-decode';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -46,6 +47,7 @@ interface IHome {
   staticBids: TStaticPost[];
   initialNextPageTokenRA?: string;
   popularPosts?: newnewapi.NonPagedPostsResponse;
+  assumeIsCreator: boolean;
 }
 
 // No sense to memorize
@@ -54,11 +56,14 @@ const Home: NextPage<IHome> = ({
   staticSuperpolls,
   assumeLoggedIn,
   popularPosts,
+  assumeIsCreator,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
+
+  const [isCreator, setIsCreator] = useState(assumeIsCreator);
 
   const [popularPostsArr, setPopularPostsAdd] = useState(popularPosts?.posts);
 
@@ -116,6 +121,12 @@ const Home: NextPage<IHome> = ({
     return assumeLoggedIn;
   }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
 
+  useEffect(() => {
+    if (user._persist?.rehydrated) {
+      setIsCreator(user.userData?.options?.isCreator || false);
+    }
+  }, [user.userData?.options?.isCreator, user._persist?.rehydrated]);
+
   return (
     <>
       <Head>
@@ -127,7 +138,7 @@ const Home: NextPage<IHome> = ({
       </Head>
       {!isUserLoggedIn && <HeroSection />}
 
-      {user.userData?.options?.isCreator && (
+      {isCreator && (
         <>
           <SHeading>
             <SHeadline>{t('section.your')}</SHeadline>
@@ -178,11 +189,9 @@ const Home: NextPage<IHome> = ({
         padding={isUserLoggedIn ? 'small' : 'large'}
       />
 
-      {(!isUserLoggedIn || !user.userData?.options?.isCreator) && (
-        <FaqSection />
-      )}
+      {(!isUserLoggedIn || !isCreator) && <FaqSection />}
 
-      {!user.userData?.options?.isCreator &&
+      {!isCreator &&
         canBecomeCreator(
           user.userData?.dateOfBirth,
           appConstants.minCreatorAgeYears
@@ -265,6 +274,19 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
     SUPPORTED_LANGUAGES
   );
 
+  const decodedToken: {
+    account_id: string;
+    account_type: string;
+    date: string;
+    is_creator: boolean;
+    iat: number;
+    exp: number;
+    aud: string;
+    iss: string;
+  } = jwtDecode(accessToken);
+
+  const assumeIsCreator = decodedToken.is_creator || false;
+
   const staticSuperpolls = [
     {
       username: '☀️Sunny Claire',
@@ -337,6 +359,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
         assumeLoggedIn,
         staticSuperpolls,
         staticBids,
+        assumeIsCreator,
         ...translationContext,
       },
     };
@@ -346,6 +369,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
         assumeLoggedIn,
         staticSuperpolls,
         staticBids,
+        assumeIsCreator,
         ...translationContext,
       },
     };
