@@ -28,7 +28,7 @@
         "amount": "Tus ganancias en Stripe son",
         "amountSecondLine": "Gestiona tu saldo en Stripe.",
         "stripeButton": "Dirígeme a Stripe",
-        "date_NEED_TRANSLATION": "Your payment will automatically be sent on {{date}}.",
+        "date": "Tu pago será automáticamente enviado el {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente",
         "nextPayout": "Tu siguiente pago de ${{amount}} será enviado el {{date}}."
