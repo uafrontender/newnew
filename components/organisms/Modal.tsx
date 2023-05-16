@@ -21,6 +21,7 @@ interface IModal {
   custombackdropfiltervalue?: number;
   children: ReactNode;
   onClose?: () => void;
+  onEnterKeyUp?: () => void;
 }
 
 const Modal: React.FC<IModal> = React.memo((props) => {
@@ -33,6 +34,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     custombackdropfiltervalue,
     children,
     onClose,
+    onEnterKeyUp,
   } = props;
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
@@ -53,6 +55,22 @@ const Modal: React.FC<IModal> = React.memo((props) => {
       blurredBody.classList.toggle('blurred', show);
     }
   }, [show]);
+
+  useEffect(() => {
+    const enterKeyUpHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        onEnterKeyUp?.();
+      }
+    };
+
+    if (isBrowser() && onEnterKeyUp) {
+      window.addEventListener('keyup', enterKeyUpHandler);
+    }
+
+    return () => {
+      window.removeEventListener('keyup', enterKeyUpHandler);
+    };
+  }, [onEnterKeyUp]);
 
   if (!show || !isBrowser()) {
     return null;
