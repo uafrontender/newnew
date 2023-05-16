@@ -64,7 +64,7 @@ const SOption = styled.div<ISOption>`
   position: relative;
   background: ${(props) =>
     props.selected ? props.theme.colorsThemed.accent.blue : 'transparent'};
-  transition: background-color ease 0.5s;
+  transition: background-color ease 0.2s;
   border-radius: 12px;
   pointer-events: ${(props) => (props.selected ? 'none' : 'unset')};
 `;
