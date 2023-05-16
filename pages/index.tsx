@@ -274,18 +274,26 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
     SUPPORTED_LANGUAGES
   );
 
-  const decodedToken: {
-    account_id: string;
-    account_type: string;
-    date: string;
-    is_creator: boolean;
-    iat: number;
-    exp: number;
-    aud: string;
-    iss: string;
-  } = jwtDecode(accessToken);
+  let assumeIsCreator = false;
 
-  const assumeIsCreator = decodedToken.is_creator || false;
+  try {
+    if (accessToken) {
+      const decodedToken: {
+        account_id: string;
+        account_type: string;
+        date: string;
+        is_creator: boolean;
+        iat: number;
+        exp: number;
+        aud: string;
+        iss: string;
+      } = jwtDecode(accessToken);
+
+      assumeIsCreator = decodedToken.is_creator || false;
+    }
+  } catch (err) {
+    assumeIsCreator = false;
+  }
 
   const staticSuperpolls = [
     {
