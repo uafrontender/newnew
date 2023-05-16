@@ -201,6 +201,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
 
       const { left } = extractPositionDelta(e);
 
+      if (Number.isNaN(left)) {
+        return;
+      }
+
       const newLeft = posLeft + left;
 
       // Too far to the right
