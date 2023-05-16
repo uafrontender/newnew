@@ -121,6 +121,10 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       }
       const { left } = extractPositionDelta(e.touches[0]);
 
+      if (Number.isNaN(left)) {
+        return;
+      }
+
       setPosLeft((curr) => {
         const newLeft = curr + left;
 
