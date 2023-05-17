@@ -682,6 +682,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   };
 
   const handleSetStageToEditingGeneralUnsetPicture = () => {
+    setUpdateProfileImageLoading(false);
     handleSetStageToEditingGeneral();
     setAvatarUrlInEdit('');
     setZoomProfileImage(1);
@@ -732,7 +733,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         },
       });
 
-      if (!uploadResponse.ok) throw new Error('Upload failed');
+      if (!uploadResponse.ok) {
+        throw new Error('Upload failed');
+      }
 
       setAvatarUrlInEdit(res.data.publicUrl);
 
@@ -770,6 +773,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       if (!currStage) {
         handleClose(true);
       } else if (currStage === 'edit-general') {
+        setUpdateProfileImageLoading(false);
         handleSetStageToEditingGeneral();
       }
     };
