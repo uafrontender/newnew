@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -140,7 +139,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
-  const boostFormRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>();
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -235,8 +234,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
     // Have to execute in a microtask to allow rendering take place first
     setTimeout(() => {
-      if (handleScrollIntoListView && boostFormRef.current) {
-        handleScrollIntoListView(boostFormRef.current);
+      if (handleScrollIntoListView && containerRef.current) {
+        handleScrollIntoListView(containerRef.current);
       }
     }, 0);
   };
@@ -442,13 +441,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   }, [isSupportFormOpen]);
 
   return (
-    <motion.div
+    <div
       key={option.id.toString()}
-      layout='position'
-      transition={{
-        type: 'spring',
-        damping: 20,
-        stiffness: 300,
+      ref={(el) => {
+        if (el) {
+          containerRef.current = el;
+        }
       }}
       style={{
         display: 'flex',
@@ -462,12 +460,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }}
     >
       <SContainer
-        layout='position'
-        transition={{
-          type: 'spring',
-          damping: 20,
-          stiffness: 300,
-        }}
         $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={(e) => handleClickOptionBodyOpenEllipseMenu(e)}
@@ -641,20 +633,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </STutorialTooltipHolder>
           )}
       </SContainer>
-      <SSupportBidForm
-        ref={(el) => {
-          if (el) {
-            boostFormRef.current = el;
-          }
-        }}
-        // layout
-        layout='size'
-        transition={{
-          type: 'spring',
-          damping: 20,
-          stiffness: 300,
-        }}
-      >
+      <SSupportBidForm>
         {!isMobile && isSupportFormOpen && (
           <>
             <SBidAmountTextInput
@@ -885,7 +864,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         closeModal={handleRemoveClose}
         handleConfirmDelete={handleRemoveSubmit}
       />
-    </motion.div>
+    </div>
   );
 };
 
@@ -896,7 +875,7 @@ AcOptionCard.defaultProps = {
 
 export default AcOptionCard;
 
-const SContainer = styled(motion.div)<{
+const SContainer = styled.div<{
   $isDisabled: boolean;
   $isBlue: boolean;
 }>`
@@ -1139,7 +1118,7 @@ const SSupportButtonDesktop = styled(Button)<{
       : null}
 `;
 
-const SSupportBidForm = styled(motion.div)`
+const SSupportBidForm = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 16px;

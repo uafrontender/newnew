@@ -190,7 +190,7 @@
   "myLink": {
     "copy": "Mi enlace",
     "copied": "¡Copiado!",
-    "shareLink_NEED_TRANSLATION": "Share link"
+    "shareLink": "Compartir enlace"
   },
   "socials": {
     "copy": "Copiar enlace",

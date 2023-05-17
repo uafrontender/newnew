@@ -124,17 +124,17 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         setIsLoading(false);
         if (data.redirectUrl) {
-          router?.push(data.redirectUrl);
+          router?.replace(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
-          router?.push('/creator/dashboard');
+          router?.replace('/creator/dashboard');
         } else {
-          router?.push('/');
+          router?.replace('/');
         }
       } catch (err) {
         // NB! Might need an error toast
         setIsLoading(false);
         setSignInError(true);
-        // router.push('/');
+        // router.replace('/');
       }
     }
 

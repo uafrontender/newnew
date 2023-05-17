@@ -25,7 +25,7 @@
           "invalidChar": "El nombre contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
           "linksForbidden": "Los enlaces no están permitidos",
-          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and trailing spaces aren't allowed"
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "lastName": {
@@ -37,7 +37,7 @@
           "invalidChar": "El nombre contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
           "linksForbidden": "Los enlaces no están permitidos",
-          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and trailing spaces aren't allowed"
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "username": {
@@ -67,7 +67,7 @@
           "invalidChar": "El nombre contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
           "linksForbidden": "Los enlaces no están permitidos",
-          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and trailing spaces aren't allowed"
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "email": {

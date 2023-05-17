@@ -114,46 +114,55 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     }
   };
 
-  // TODO: Standardize and turn into utility function
-  const handleScrollCardIntoListView = useCallback((element: HTMLElement) => {
-    if (containerRef.current) {
-      const listHeight = containerRef.current.offsetHeight;
-      const currentScrollPosition = containerRef.current.scrollTop;
-      const elementPosition = element.offsetTop;
-      const elementHeight = element.offsetHeight;
-      // Lower
-      if (
-        elementPosition + elementHeight >
-        listHeight + currentScrollPosition
-      ) {
-        containerRef.current.scrollTop = elementPosition + elementHeight;
-      }
-
-      // Higher
-      // TODO: Refactor
-      // 84 is a height of an option card itself + gap
-      if (elementPosition < currentScrollPosition + 100) {
-        containerRef.current.scrollTop = elementPosition - 100;
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (optionBeingSupported && containerRef.current && !isMobile) {
-      let optIdx = options.findIndex(
-        (o) => o.id.toString() === optionBeingSupported
-      );
-      optIdx += 2;
-      const childDiv = containerRef.current.children[optIdx];
-
-      if (childDiv) {
-        childDiv.scrollIntoView({
+  const handleScrollCardIntoListView = useCallback(
+    (element: HTMLElement) => {
+      if (containerRef.current && !isMobile) {
+        element.scrollIntoView({
           block: 'nearest',
           behavior: 'smooth',
         });
       }
+    },
+    [isMobile]
+  );
+
+  // TODO: When scrolling stabilizes, use this approach to scroll to supported option
+  /* const scrollToOptionById = useCallback(
+    (optionId: string) => {
+      if (containerRef.current) {
+        let optIdx = options.findIndex((o) => o.id.toString() === optionId);
+        optIdx += 2;
+        const childDiv = containerRef.current.children[optIdx];
+
+        if (childDiv) {
+          childDiv.scrollIntoView({
+            block: 'nearest',
+            behavior: 'smooth',
+          });
+        }
+      }
+    },
+    [options]
+  );
+
+  const onAddOrUpdateOptionFromResponse = useCallback(
+    (newOption: newnewapi.Auction.Option) => {
+      handleAddOrUpdateOptionFromResponse(newOption);
+
+      setTimeout(() => {
+        if (!isMobile) {
+          scrollToOptionById(newOption.id.toString());
+        }
+      }, 0);
+    },
+    [isMobile, handleAddOrUpdateOptionFromResponse, scrollToOptionById]
+  );
+
+  useEffect(() => {
+    if (optionBeingSupported && !isMobile) {
+      scrollToOptionById(optionBeingSupported);
     }
-  }, [options, optionBeingSupported, isMobile]);
+  }, [optionBeingSupported, isMobile, scrollToOptionById]); */
 
   useEffect(() => {
     if (inView) {
