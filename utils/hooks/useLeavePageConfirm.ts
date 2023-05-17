@@ -15,7 +15,7 @@ export const useLeavePageConfirm = (
   callback?: () => void
 ) => {
   const initialPageIdx = useRef<number>(
-    typeof window !== 'undefined' ? window.history.state.idx : NaN
+    typeof window !== 'undefined' && window?.history?.state?.idx ? window.history.state.idx : NaN
   );
 
   const [actionToCancel, setActionToCancel] = useState<
@@ -52,7 +52,7 @@ export const useLeavePageConfirm = (
 
   useEffect(() => {
     const beforeHistoryChangeHandler = (route: string) => {
-      const currentPageIdx = window.history.state.idx;
+      const currentPageIdx = window?.history?.state?.idx;
       const routeTrimmed = getPathFromUrl(route);
 
       if (
