@@ -71,6 +71,19 @@ const SearchInput: React.FC = React.memo(() => {
 
   const isSmallDesktop = ['laptop'].includes(resizeMode);
 
+  const pushRouteOrClose = useCallback(
+    (path: string) => {
+      if (router.asPath === path) {
+        setSearchValue('');
+        setIsResultsDropVisible(false);
+        dispatch(setGlobalSearchActive(false));
+      } else {
+        router.push(path);
+      }
+    },
+    [router, dispatch]
+  );
+
   const handleSeeResults = (query: string) => {
     Mixpanel.track('Search All Results Clicked', {
       _query: query,
@@ -83,14 +96,14 @@ const SearchInput: React.FC = React.memo(() => {
     const isHashtag = chunks.length === 1 && firstChunk.type === 'hashtag';
 
     if (isHashtag) {
-      router.push(`/search?query=${firstChunk.text}&tab=posts`);
+      pushRouteOrClose(`/search?query=${firstChunk.text}&tab=posts`);
     } else {
       const noHashQuery = clearedQuery.replace('#', '');
       const encodedQuery = encodeURIComponent(noHashQuery);
       if (resultsPosts.length === 0 && resultsCreators.length > 0) {
-        router.push(`/search?query=${encodedQuery}&tab=creators`);
+        pushRouteOrClose(`/search?query=${encodedQuery}&tab=creators`);
       } else {
-        router.push(`/search?query=${encodedQuery}&tab=posts`);
+        pushRouteOrClose(`/search?query=${encodedQuery}&tab=posts`);
       }
     }
   };

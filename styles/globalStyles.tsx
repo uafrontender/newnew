@@ -33,7 +33,7 @@ const GlobalStyle = createGlobalStyle`
 
   /* Fonts */
   *, *:before, *:after {
-    font-family: Gilroy, Segoe UI Emoji, Arial, Helvetica, sans-serif;
+    font-family: Gilroy, Apple Color Emoji, Segoe UI Emoji, Arial, Helvetica, sans-serif;
 
     font-smooth: always;
     -webkit-font-smoothing: antialiased;

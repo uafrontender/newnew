@@ -38,7 +38,7 @@
         "textBio": "添加個人簡介和銀行資訊以支取你的收入",
         "textBank": "添加個人簡介和銀行資訊以支取你的收入",
         "button": "添加",
-        "stripeIssue": "您的Stripe帳戶有問題或者帳戶無完全",
+        "stripeIssue_NEED_TRANSLATION": "There is a problem with your Stripe account or its setup is unfinished",
         "stripeIssueButton": "查看Stripe帳戶"
       },
       "makeDecision": {
