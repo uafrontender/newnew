@@ -105,6 +105,14 @@ export default HeroVisual;
 
 const SHeroVisual = styled(motion.div)`
   position: relative;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;
 
 const SImageWrapper = styled.div`
