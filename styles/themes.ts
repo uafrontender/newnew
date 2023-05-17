@@ -61,6 +61,7 @@ export const lightTheme: DefaultTheme = {
     },
     accent: {
       blue: '#1D6AFF',
+      blueHover: '#237fff',
       pink: '#FF1D6A',
       yellow: '#FFE604',
       green: '#0FF34F',
@@ -316,6 +317,7 @@ export const darkTheme: DefaultTheme = {
     },
     accent: {
       blue: '#1D6AFF',
+      blueHover: '#237fff',
       pink: '#FF1D6A',
       yellow: '#FFE604',
       green: '#0FF34F',

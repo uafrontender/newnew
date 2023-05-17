@@ -56,6 +56,7 @@ declare module 'styled-components' {
       };
       accent: {
         blue: string;
+        blueHover: string;
         pink: string;
         yellow: string;
         green: string;

@@ -12,6 +12,13 @@ const GlobalStyle = createGlobalStyle`
     -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
   }
 
+   /* Disable scrollbar Firefox */
+  @-moz-document url-prefix() {
+    html{
+      scrollbar-width: none;
+    }
+  }
+
   /* Smooth theme transitions */
   html.theming,
   html.theming * {
@@ -33,7 +40,7 @@ const GlobalStyle = createGlobalStyle`
 
   /* Fonts */
   *, *:before, *:after {
-    font-family: Gilroy, Segoe UI Emoji, Arial, Helvetica, sans-serif;
+    font-family: Gilroy, Apple Color Emoji, Segoe UI Emoji, Arial, Helvetica, sans-serif;
 
     font-smooth: always;
     -webkit-font-smoothing: antialiased;

@@ -60,17 +60,20 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({ query }) => {
 
   return (
     <div>
-      <SCardsSection>
-        <PostList
-          loading={isLoading || isFetchingNextPage}
-          collection={posts}
-        />
-      </SCardsSection>
-      {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
-      {hasNoResults && !isLoading && (
+      {hasNoResults && !isLoading ? (
         <SNoResults>
           <NoResults />
         </SNoResults>
+      ) : (
+        <>
+          <SCardsSection>
+            <PostList
+              loading={isLoading || isFetchingNextPage}
+              collection={posts}
+            />
+          </SCardsSection>
+          {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
+        </>
       )}
     </div>
   );
@@ -81,6 +84,7 @@ export default SearchDecisions;
 const SCardsSection = styled.div`
   display: flex;
   flex-wrap: wrap;
+  min-height: 400px;
 `;
 
 const SRef = styled.span`
