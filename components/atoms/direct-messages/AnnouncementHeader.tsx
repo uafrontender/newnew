@@ -17,7 +17,7 @@ const AnnouncementHeader: React.FC<IAnnouncementHeader> = React.memo(
       <SAnnouncementHeader>
         <SAnnouncementText>
           {t('announcement.topMessageStart')}
-          <SDisplayName user={user} />
+          <SDisplayName user={user} href={`/${user?.username}`} />
           {t('announcement.topMessageEnd')}
         </SAnnouncementText>
       </SAnnouncementHeader>
@@ -39,7 +39,7 @@ const SAnnouncementText = styled.div`
   white-space: pre;
   align-items: center;
 
-  font-size: 14px;
+  max-width: 95vw;
   padding: 12px 24px;
   margin-top: 16px;
   margin-bottom: 16px;
@@ -48,8 +48,10 @@ const SAnnouncementText = styled.div`
     props.theme.name === 'light'
       ? props.theme.colors.white
       : props.theme.colorsThemed.background.tertiary};
+  font-size: 14px;
 `;
 
 const SDisplayName = styled(DisplayName)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  cursor: pointer;
 `;
