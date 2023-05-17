@@ -2,7 +2,6 @@ import Router from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useBeforeUnload } from 'react-use';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
-import useSynchronizedHistory from './useSynchronizedHistory';
 
 function getPathFromUrl(url: string) {
   const queryStartsAt = url.indexOf('?');
@@ -15,7 +14,6 @@ export const useLeavePageConfirm = (
   allowedRoutes: string[],
   callback?: () => void
 ) => {
-  const { syncedHistoryPushState } = useSynchronizedHistory();
   const initialPageIdx = useRef<number>(
     typeof window !== 'undefined' ? window.history.state.idx : NaN
   );
@@ -38,7 +36,7 @@ export const useLeavePageConfirm = (
 
   useEffect(() => {
     if (actionToCancel === 'back') {
-      syncedHistoryPushState({}, Router.pathname);
+      window.history.forward();
     }
 
     if (actionToCancel === 'forward') {
