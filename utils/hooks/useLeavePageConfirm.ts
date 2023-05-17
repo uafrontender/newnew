@@ -1,7 +1,8 @@
 import Router from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useBeforeUnload } from 'react-use';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import useSynchronizedHistory from './useSynchronizedHistory';
 
 function getPathFromUrl(url: string) {
   const queryStartsAt = url.indexOf('?');
@@ -14,7 +15,14 @@ export const useLeavePageConfirm = (
   allowedRoutes: string[],
   callback?: () => void
 ) => {
-  const [isCanceled, setIsCancelled] = useState(false);
+  const { syncedHistoryPushState } = useSynchronizedHistory();
+  const initialPageIdx = useRef<number>(
+    typeof window !== 'undefined' ? window.history.state.idx : NaN
+  );
+
+  const [actionToCancel, setActionToCancel] = useState<
+    'redirect' | 'back' | 'forward' | ''
+  >('');
   const allowedRoutesWithLocales = useMemo(() => {
     let routes = [...allowedRoutes];
 
@@ -29,19 +37,58 @@ export const useLeavePageConfirm = (
   useBeforeUnload(isConfirm, message);
 
   useEffect(() => {
-    if (isCanceled) {
-      Router.replace(Router.pathname, Router.asPath, { shallow: true });
-      setIsCancelled(false);
+    if (actionToCancel === 'back') {
+      syncedHistoryPushState({}, Router.pathname);
     }
-  }, [isCanceled]);
+
+    if (actionToCancel === 'forward') {
+      Router.back();
+    }
+
+    if (actionToCancel === 'redirect') {
+      Router.replace(Router.pathname, Router.asPath, { shallow: true });
+    }
+
+    setActionToCancel('');
+  }, [actionToCancel]);
 
   useEffect(() => {
     const beforeHistoryChangeHandler = (route: string) => {
+      const currentPageIdx = window.history.state.idx;
       const routeTrimmed = getPathFromUrl(route);
-      if (!allowedRoutesWithLocales.includes(routeTrimmed) && isConfirm) {
-        if (!isCanceled && !window.confirm(message)) {
+
+      if (
+        !allowedRoutesWithLocales.includes(routeTrimmed) &&
+        isConfirm &&
+        !actionToCancel
+      ) {
+        // Prevent reacting when there is nothing to change (double acting)
+        if (
+          Router.pathname === routeTrimmed &&
+          !Number.isNaN(initialPageIdx.current) &&
+          currentPageIdx === initialPageIdx.current
+        ) {
+          return;
+        }
+
+        const isConfirmed = window.confirm(message);
+        if (!isConfirmed) {
           Router.events.emit('routeChangeError', '', '', { shallow: false });
-          setIsCancelled(true);
+
+          if (
+            !Number.isNaN(initialPageIdx.current) &&
+            currentPageIdx > initialPageIdx.current
+          ) {
+            setActionToCancel('forward');
+          } else if (
+            !Number.isNaN(initialPageIdx.current) &&
+            currentPageIdx < initialPageIdx.current
+          ) {
+            setActionToCancel('back');
+          } else {
+            setActionToCancel('redirect');
+          }
+
           // eslint-disable-next-line no-throw-literal
           throw 'Route Canceled';
         } else {
@@ -55,7 +102,7 @@ export const useLeavePageConfirm = (
     return () => {
       Router.events.off('beforeHistoryChange', beforeHistoryChangeHandler);
     };
-  }, [isConfirm, message, allowedRoutesWithLocales, callback, isCanceled]);
+  }, [isConfirm, message, allowedRoutesWithLocales, actionToCancel, callback]);
 };
 
 export default useLeavePageConfirm;
