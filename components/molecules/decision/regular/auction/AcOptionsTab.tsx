@@ -126,44 +126,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     [isMobile]
   );
 
-  // TODO: When scrolling stabilizes, use this approach to scroll to supported option
-  /* const scrollToOptionById = useCallback(
-    (optionId: string) => {
-      if (containerRef.current) {
-        let optIdx = options.findIndex((o) => o.id.toString() === optionId);
-        optIdx += 2;
-        const childDiv = containerRef.current.children[optIdx];
-
-        if (childDiv) {
-          childDiv.scrollIntoView({
-            block: 'nearest',
-            behavior: 'smooth',
-          });
-        }
-      }
-    },
-    [options]
-  );
-
-  const onAddOrUpdateOptionFromResponse = useCallback(
-    (newOption: newnewapi.Auction.Option) => {
-      handleAddOrUpdateOptionFromResponse(newOption);
-
-      setTimeout(() => {
-        if (!isMobile) {
-          scrollToOptionById(newOption.id.toString());
-        }
-      }, 0);
-    },
-    [isMobile, handleAddOrUpdateOptionFromResponse, scrollToOptionById]
-  );
-
-  useEffect(() => {
-    if (optionBeingSupported && !isMobile) {
-      scrollToOptionById(optionBeingSupported);
-    }
-  }, [optionBeingSupported, isMobile, scrollToOptionById]); */
-
   useEffect(() => {
     if (inView) {
       fetchNextPage();
