@@ -12,6 +12,13 @@ const GlobalStyle = createGlobalStyle`
     -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
   }
 
+   /* Disable scrollbar Firefox */
+  @-moz-document url-prefix() {
+    html{
+      scrollbar-width: none;
+    }
+  }
+
   /* Smooth theme transitions */
   html.theming,
   html.theming * {

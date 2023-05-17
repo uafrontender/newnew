@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from 'react';
 import { useRouter } from 'next/router';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import Indicator from '../atoms/Indicator';
 
@@ -349,7 +349,7 @@ const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
       return w + acc;
     }, 0);
 
-    setTabsWidth(tabsWidthUpdated + (tabs.length + 1) * 24);
+    setTabsWidth(tabsWidthUpdated + 24);
   }, [t, tabs.length]);
 
   useEffect(() => {
@@ -538,9 +538,16 @@ const STab = styled.button<ISTab>`
 
   padding-bottom: 10px;
 
-  padding-left: ${({ extraMargin }) => (extraMargin ? '24px' : '12px')};
+  padding-left: 12px;
   padding-right: 12px;
   padding-top: 6px;
+
+  ${({ extraMargin }) =>
+    extraMargin
+      ? css`
+          margin-left: 12px;
+        `
+      : null}
 
   white-space: nowrap;
   font-weight: 600;
