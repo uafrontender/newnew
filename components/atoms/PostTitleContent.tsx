@@ -69,6 +69,6 @@ const SHashtag = styled.span`
   cursor: pointer;
 
   :hover {
-    filter: brightness(120%);
+    color: ${(props) => props.theme.colorsThemed.accent.blueHover};
   }
 `;
