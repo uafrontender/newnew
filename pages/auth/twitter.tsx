@@ -128,7 +128,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
       } catch (err) {
         // NB! Might need an error toast
         setIsLoading(false);
-        router?.push('/');
+        router?.replace('/');
       }
     }
 

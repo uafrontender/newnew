@@ -9,7 +9,7 @@
     "noMessagesFirstLine": "No hay mensajes aquí todavía...",
     "noMessagesSecondLine": "Envia un mensaje para iniciar la conversación.",
     "typing": "Escribiendo...",
-    "notFound_NEED_TO_TRANSLATE": "Chat not found"
+    "notFound": "Conversación no encontrada"
   },
   "userBlocked": {
     "title": "Has bloqueado a ",

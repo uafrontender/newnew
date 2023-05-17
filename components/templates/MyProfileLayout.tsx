@@ -44,6 +44,7 @@ import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../atoms/DisplayName';
 import { getMySpending as getMySpendingLimitLeft } from '../../api/endpoints/payments';
 import { SocketContext } from '../../contexts/socketContext';
+import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
 
 type TPageType =
   | 'activelyBidding'
@@ -77,6 +78,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const { resizeMode } = useAppState();
   const { socketConnection } = useContext(SocketContext);
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
 
@@ -442,7 +444,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           withShrink
           iconOnly
           onClick={() => {
-            router.back();
+            goBackOrRedirect('/');
           }}
           onClickCapture={() => {
             Mixpanel.track('Click Back Button', {
