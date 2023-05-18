@@ -102,6 +102,7 @@ export default SearchCreators;
 const SCardsSection = styled.div`
   display: flex;
   flex-wrap: wrap;
+  min-height: 400px;
 `;
 
 const SRef = styled.span`

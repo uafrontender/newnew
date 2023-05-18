@@ -61,6 +61,7 @@ export const lightTheme: DefaultTheme = {
     },
     accent: {
       blue: '#1D6AFF',
+      blueHover: '#237fff',
       pink: '#FF1D6A',
       yellow: '#FFE604',
       green: '#0FF34F',
@@ -204,6 +205,7 @@ export const lightTheme: DefaultTheme = {
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey:
       '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
+    intenseGrey: '0px 0px 5px 5px rgba(11, 10, 19, 0.1);',
     cookie:
       '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
     dashboardNotifications: '0px 0px 35px rgba(100, 110, 129, 0.1)',
@@ -315,6 +317,7 @@ export const darkTheme: DefaultTheme = {
     },
     accent: {
       blue: '#1D6AFF',
+      blueHover: '#237fff',
       pink: '#FF1D6A',
       yellow: '#FFE604',
       green: '#0FF34F',
@@ -458,6 +461,7 @@ export const darkTheme: DefaultTheme = {
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey:
       '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
+    intenseGrey: '0px 0px 5px 5px rgba(11,10,19,0.2);',
     cookie:
       '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
     dashboardNotifications: 'unset',

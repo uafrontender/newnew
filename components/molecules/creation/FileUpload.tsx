@@ -37,7 +37,7 @@ const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
 
 interface IFileUpload {
   id: string;
-  value: any;
+  value: newnewapi.IVideoUrls | null | undefined;
   etaUpload: number;
   errorUpload: boolean;
   loadingUpload: boolean;
@@ -362,6 +362,10 @@ const FileUpload: React.FC<IFileUpload> = ({
         </SButton>
       </SDropBox>
     );
+
+    if (!localFile && !value) {
+      return content;
+    }
 
     if (loadingUpload) {
       const ETAisValid = !Number.isNaN(etaUpload) && etaUpload !== Infinity;

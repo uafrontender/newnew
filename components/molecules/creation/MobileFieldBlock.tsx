@@ -97,9 +97,23 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(id, e.target.value);
+      const newValue = e?.target?.value;
+      if (inputProps?.pattern) {
+        const regExp = new RegExp(inputProps?.pattern);
+        if (newValue && !regExp.test(newValue)) {
+          return;
+        }
+      }
+
+      if (inputProps?.type === 'number') {
+        const clearedValue = parseInt(newValue);
+        onChange(id, clearedValue.toString());
+        return;
+      }
+
+      onChange(id, newValue);
     },
-    [id, onChange]
+    [id, inputProps?.pattern, inputProps?.type, onChange]
   );
 
   const handleFocus = useCallback(() => {

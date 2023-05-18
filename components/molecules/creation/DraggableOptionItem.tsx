@@ -64,12 +64,15 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       text: clearedValue,
     });
   };
+
+  // This causes unstable UX when 2 empty options added, when user moves them etc.
   const handleInputBlur = async (e: any) => {
     const clearedValue = clearValue(e.target.value);
     Mixpanel.track('Superpoll Option Text Change', {
       _stage: 'Creation',
       _text: clearedValue,
     });
+
     if (clearedValue.length < 1 && index > 1) {
       handleChange(index, null);
       return;
@@ -85,21 +88,20 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       )
     );
   };
+
   const handleInputFocus = () => {
     setError('');
   };
+
   const handleDelete = () => {
     Mixpanel.track('Superpoll Delete Option', { _stage: 'Creation' });
     handleChange(index, null);
   };
+
   const handlePointerDown = (event: any) => {
     Mixpanel.track('Superpoll Dragging Option Start', { _stage: 'Creation' });
     dragControls.start(event);
     setIsDragging(true);
-  };
-  const handlePointerUp = () => {
-    Mixpanel.track('Superpoll Dragging Option End', { _stage: 'Creation' });
-    setIsDragging(false);
   };
 
   const validateTitleDebounced = useDebounce(value, 500);
@@ -123,6 +125,25 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
 
     func();
   }, [validation, index, validateTitleDebounced]);
+
+  useEffect(() => {
+    if (isDragging) {
+      const onRelease = () => {
+        Mixpanel.track('Superpoll Dragging Option End', { _stage: 'Creation' });
+        setIsDragging(false);
+      };
+
+      window.addEventListener('mouseup', onRelease);
+      window.addEventListener('touchend', onRelease);
+
+      return () => {
+        window.removeEventListener('mouseup', onRelease);
+        window.removeEventListener('touchend', onRelease);
+      };
+    }
+
+    return () => {};
+  }, [isDragging]);
 
   return (
     <SWrapper
@@ -164,10 +185,7 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
           </AnimatedPresence>
         ) : null}
       </STextAreaWrapper>
-      <SRightPart
-        onPointerUp={handlePointerUp}
-        onPointerDown={handlePointerDown}
-      >
+      <SRightPart onPointerDown={handlePointerDown}>
         <InlineSVG
           svg={changeOrderIcon}
           fill={theme.colorsThemed.text.primary}
