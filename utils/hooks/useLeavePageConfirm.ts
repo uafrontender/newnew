@@ -2,6 +2,7 @@ import Router from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useBeforeUnload } from 'react-use';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import isBrowser from '../isBrowser';
 
 function getPathFromUrl(url: string) {
   const queryStartsAt = url.indexOf('?');
@@ -15,7 +16,9 @@ export const useLeavePageConfirm = (
   callback?: () => void
 ) => {
   const initialPageIdx = useRef<number>(
-    typeof window !== 'undefined' && window?.history?.state?.idx ? window.history.state.idx : NaN
+    typeof window !== 'undefined' && window?.history?.state?.idx
+      ? window.history.state.idx
+      : NaN
   );
 
   const [actionToCancel, setActionToCancel] = useState<
@@ -52,45 +55,47 @@ export const useLeavePageConfirm = (
 
   useEffect(() => {
     const beforeHistoryChangeHandler = (route: string) => {
-      const currentPageIdx = window?.history?.state?.idx;
-      const routeTrimmed = getPathFromUrl(route);
+      if (isBrowser()) {
+        const currentPageIdx = window?.history?.state?.idx;
+        const routeTrimmed = getPathFromUrl(route);
 
-      if (
-        !allowedRoutesWithLocales.includes(routeTrimmed) &&
-        isConfirm &&
-        !actionToCancel
-      ) {
-        // Prevent reacting when there is nothing to change (double acting)
         if (
-          Router.pathname === routeTrimmed &&
-          !Number.isNaN(initialPageIdx.current) &&
-          currentPageIdx === initialPageIdx.current
+          !allowedRoutesWithLocales.includes(routeTrimmed) &&
+          isConfirm &&
+          !actionToCancel
         ) {
-          return;
-        }
-
-        const isConfirmed = window.confirm(message);
-        if (!isConfirmed) {
-          Router.events.emit('routeChangeError', '', '', { shallow: false });
-
+          // Prevent reacting when there is nothing to change (double acting)
           if (
+            Router.pathname === routeTrimmed &&
             !Number.isNaN(initialPageIdx.current) &&
-            currentPageIdx > initialPageIdx.current
+            currentPageIdx === initialPageIdx.current
           ) {
-            setActionToCancel('forward');
-          } else if (
-            !Number.isNaN(initialPageIdx.current) &&
-            currentPageIdx < initialPageIdx.current
-          ) {
-            setActionToCancel('back');
-          } else {
-            setActionToCancel('redirect');
+            return;
           }
 
-          // eslint-disable-next-line no-throw-literal
-          throw 'Route Canceled';
-        } else {
-          callback?.();
+          const isConfirmed = window.confirm(message);
+          if (!isConfirmed) {
+            Router.events.emit('routeChangeError', '', '', { shallow: false });
+
+            if (
+              !Number.isNaN(initialPageIdx.current) &&
+              currentPageIdx > initialPageIdx.current
+            ) {
+              setActionToCancel('forward');
+            } else if (
+              !Number.isNaN(initialPageIdx.current) &&
+              currentPageIdx < initialPageIdx.current
+            ) {
+              setActionToCancel('back');
+            } else {
+              setActionToCancel('redirect');
+            }
+
+            // eslint-disable-next-line no-throw-literal
+            throw 'Route Canceled';
+          } else {
+            callback?.();
+          }
         }
       }
     };
