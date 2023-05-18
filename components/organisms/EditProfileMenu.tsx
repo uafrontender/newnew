@@ -163,7 +163,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -231,6 +231,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
+          setUserLoggedIn(false);
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
@@ -238,10 +239,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
+          setUserLoggedIn(false);
         }
       }
     },
-    [setFormErrors, dispatch]
+    [setFormErrors, dispatch, setUserLoggedIn]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -325,6 +327,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
+          setUserLoggedIn(false);
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
@@ -332,10 +335,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
+          setUserLoggedIn(false);
         }
       }
     },
-    [setFormErrors, dispatch]
+    [setFormErrors, dispatch, setUserLoggedIn]
   );
 
   const validateTextViaAPIDebounced = useMemo(
@@ -594,10 +598,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
+        setUserLoggedIn(false);
       } else if ((err as Error).message === 'Refresh token invalid') {
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+        setUserLoggedIn(false);
       } else {
         showErrorToastPredefined(undefined);
       }
@@ -621,6 +627,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEditAnimatedExtension,
     coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
+    setUserLoggedIn,
   ]);
 
   // Profile image editing
@@ -746,6 +753,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setUpdateProfileImageLoading(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
+        setUserLoggedIn(false);
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
@@ -753,6 +761,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+        setUserLoggedIn(false);
       }
     }
   }, [
@@ -760,6 +769,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     avatarUrlInEdit,
     handleSetStageToEditingGeneral,
     dispatch,
+    setUserLoggedIn,
   ]);
 
   useEffect(() => {

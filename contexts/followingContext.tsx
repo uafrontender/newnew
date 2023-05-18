@@ -11,6 +11,7 @@ import React, {
 import { getCreatorsIFollow } from '../api/endpoints/user';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
+import { useAppState } from './appStateContext';
 
 export const FollowingsContext = createContext({
   followingsIds: [] as string[],
@@ -28,6 +29,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
 }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+  const { setUserLoggedIn } = useAppState();
 
   const [followingsIds, setFollowingsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,6 +74,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
         setIsLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
+          setUserLoggedIn(false);
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
@@ -79,6 +82,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
+          setUserLoggedIn(false);
         }
       }
     }

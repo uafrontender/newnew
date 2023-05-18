@@ -69,7 +69,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -114,6 +114,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
+          setUserLoggedIn(false);
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
@@ -121,10 +122,11 @@ const OnboardingSectionAbout: React.FunctionComponent<
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
+          setUserLoggedIn(false);
         }
       }
     },
-    [setBioError, dispatch]
+    [setBioError, dispatch, setUserLoggedIn]
   );
 
   const validateBioViaApiDebounced = useMemo(
@@ -186,6 +188,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
+        setUserLoggedIn(false);
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
@@ -193,6 +196,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+        setUserLoggedIn(false);
       }
     }
   }, [
@@ -200,6 +204,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
     dispatch,
     router,
     user.creatorData?.options?.stripeConnectStatus,
+    setUserLoggedIn,
   ]);
 
   useEffect(() => {

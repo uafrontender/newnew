@@ -30,6 +30,7 @@ import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { loadStateLS, saveStateLS } from '../utils/localStorage';
 import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
+import { useAppState } from './appStateContext';
 
 interface ISyncUserWrapper {
   children: React.ReactNode;
@@ -40,6 +41,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 }) => {
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn } = useAppState();
   const user = useAppSelector((state) => state.user);
   const { socketConnection } = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
@@ -200,6 +202,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       console.error(err);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
+        setUserLoggedIn(false);
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
@@ -207,6 +210,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
+        setUserLoggedIn(false);
       }
     }
   }, [dispatch, user.creatorData?.options, updateCreatorDataSteps]);
@@ -246,6 +250,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         console.error(err);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
+          setUserLoggedIn(false);
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
@@ -253,6 +258,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
+          setUserLoggedIn(false);
         }
       }
     };
@@ -510,6 +516,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         console.error(err);
         if ((err as Error).message === 'No token') {
           dispatch(logoutUserClearCookiesAndRedirect());
+          setUserLoggedIn(false);
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
@@ -517,6 +524,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
+          setUserLoggedIn(false);
         }
       }
     }

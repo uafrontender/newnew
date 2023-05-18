@@ -83,7 +83,7 @@ interface EncDec<T = keyof NewnewapiType> {
  * @param response browser Fetch API response
  */
 const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
-  const clonedResponseObj = response.clone()
+  const clonedResponseObj = response.clone();
   const contentType = response.headers.get('content-type');
 
   return new Promise((resolve, reject) => {
@@ -102,11 +102,14 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
     }
 
     // Try to extract actual error message
-    clonedResponseObj.text().then((text) => {
-      reject(new Error(text || 'An error occurred'));
-    }).catch(() => {
-      reject(new Error('An error occurred'));
-    })
+    clonedResponseObj
+      .text()
+      .then((text) => {
+        reject(new Error(text || 'An error occurred'));
+      })
+      .catch(() => {
+        reject(new Error('An error occurred'));
+      });
   });
 };
 
@@ -292,7 +295,9 @@ export async function fetchProtobufProtectedIntercepted<
     if (!accessToken && !refreshToken) {
       throw new Error('No token');
     }
-    if (!accessToken && refreshToken) throw new Error('Access token invalid');
+    if (!accessToken && refreshToken) {
+      throw new Error('Access token invalid');
+    }
 
     // Try to make request if access and refresh tokens are present
     res = await fetchProtobuf<RequestType, ResponseType>(

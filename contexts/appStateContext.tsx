@@ -13,12 +13,22 @@ import styled from 'styled-components';
 
 import isBrowser from '../utils/isBrowser';
 import { sizes, TResizeMode } from '../styles/media';
+import { cookiesInstance } from '../api/apiConfigs';
+import jwtDecode from 'jwt-decode';
 
 export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
+  userLoggedIn: boolean;
+  userIsCreator: boolean;
+  setUserLoggedIn: (isLoggedIn: boolean) => void;
+  setUserIsCreator: (isCreator: boolean) => void;
 }>({
-  // Default value is irrelevant as state gets it on init
+  // Default values are irrelevant as state gets it on init
   resizeMode: 'mobile',
+  userLoggedIn: false,
+  userIsCreator: false,
+  setUserLoggedIn: () => {},
+  setUserIsCreator: () => {},
 });
 
 interface IAppStateContextProvider {
@@ -44,14 +54,44 @@ function getResizeMode(uaString: string): TResizeMode {
   return 'mobile';
 }
 
+function getIsCreator(): boolean {
+  const accessToken = cookiesInstance.get('accessToken');
+  if (accessToken) {
+    const decodedToken: {
+      account_id: string;
+      account_type: string;
+      date: string;
+      is_creator: boolean;
+      iat: number;
+      exp: number;
+      aud: string;
+      iss: string;
+    } = jwtDecode(accessToken);
+
+    return decodedToken.is_creator || false;
+  }
+  return false;
+}
+
 const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   uaString,
   children,
 }) => {
+  const [userLoggedIn, setUserLoggedIn] = useState(
+    cookiesInstance.get('accessToken') !== undefined
+  );
+  const [userIsCreator, setUserIsCreator] = useState(getIsCreator());
   const [resizeMode, setResizeMode] = useState<TResizeMode>(
     getResizeMode(uaString)
   );
   const ref: MutableRefObject<HTMLDivElement | null> = useRef(null);
+
+  const setUserLoggedInState = useCallback((isLoggedIn: boolean) => {
+    setUserLoggedIn(isLoggedIn);
+    if (!isLoggedIn) {
+      setUserIsCreator(false);
+    }
+  }, []);
 
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: TResizeMode | undefined;
@@ -82,9 +122,13 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
 
   const contextValue = useMemo(
     () => ({
+      userLoggedIn,
+      userIsCreator,
       resizeMode,
+      setUserLoggedIn: setUserLoggedInState,
+      setUserIsCreator,
     }),
-    [resizeMode]
+    [userLoggedIn, resizeMode]
   );
 
   return (

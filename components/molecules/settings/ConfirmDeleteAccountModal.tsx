@@ -10,6 +10,7 @@ import { useAppDispatch } from '../../../redux-store/store';
 import { deleteMyAccount } from '../../../api/endpoints/user';
 import { logoutUserClearCookiesAndRedirect } from '../../../redux-store/slices/userStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IConfirmDeleteAccountModal {
   isVisible: boolean;
@@ -22,6 +23,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn } = useAppState();
 
   async function deleteUser() {
     try {
@@ -31,6 +33,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
 
       if (!res.error) {
         dispatch(logoutUserClearCookiesAndRedirect());
+        setUserLoggedIn(false);
       }
     } catch (err) {
       console.error(err);
