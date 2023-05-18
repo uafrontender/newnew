@@ -76,6 +76,7 @@ export type NextPageWithLayout = NextPage & {
 
 interface IMyApp extends AppProps {
   Component: NextPageWithLayout;
+  accessToken?: string;
   uaString: string;
   colorMode: string;
   themeFromCookie?: 'light' | 'dark';
@@ -113,7 +114,14 @@ Router.events.on('routeChangeError', (err, url) => {
 });
 
 const MyApp = (props: IMyApp): ReactElement => {
-  const { Component, pageProps, uaString, colorMode, themeFromCookie } = props;
+  const {
+    Component,
+    pageProps,
+    accessToken,
+    uaString,
+    colorMode,
+    themeFromCookie,
+  } = props;
   const store = useStore();
   const user = useAppSelector((state) => state.user);
   const { locale } = useRouter();
@@ -226,7 +234,10 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider cookies={cookiesInstance}>
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary>
-            <AppStateContextProvider uaString={uaString}>
+            <AppStateContextProvider
+              accessToken={accessToken}
+              uaString={uaString}
+            >
               <GlobalTheme
                 initialTheme={colorMode}
                 themeFromCookie={themeFromCookie}
@@ -310,6 +321,7 @@ const MyAppWithTranslationAndRecaptchaProviderAndRedux = wrapper.withRedux(
 MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
   appContext: any
 ) => {
+  const accessToken = appContext.ctx?.req.cookies?.accessToken;
   const appProps = await App.getInitialProps(appContext);
 
   if (appContext.ctx?.req.cookies?.timezone) {
@@ -320,6 +332,7 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
 
     return {
       ...appProps,
+      accessToken: accessToken || undefined,
       colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
       uaString: appContext.ctx?.req?.headers?.['user-agent'],
       themeFromCookie: isDayTime ? 'light' : 'dark',
@@ -328,6 +341,7 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
 
   return {
     ...appProps,
+    accessToken: accessToken || undefined,
     colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
   };

@@ -32,6 +32,7 @@ export const AppStateContext = createContext<{
 });
 
 interface IAppStateContextProvider {
+  accessToken?: string;
   uaString: string;
   children: React.ReactNode;
 }
@@ -54,8 +55,7 @@ function getResizeMode(uaString: string): TResizeMode {
   return 'mobile';
 }
 
-function getIsCreator(): boolean {
-  const accessToken = cookiesInstance.get('accessToken');
+function getIsCreator(accessToken: string | undefined): boolean {
   if (accessToken) {
     const decodedToken: {
       account_id: string;
@@ -74,13 +74,13 @@ function getIsCreator(): boolean {
 }
 
 const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
+  accessToken,
   uaString,
   children,
 }) => {
-  const [userLoggedIn, setUserLoggedIn] = useState(
-    cookiesInstance.get('accessToken') !== undefined
-  );
-  const [userIsCreator, setUserIsCreator] = useState(getIsCreator());
+  // Should we check that token is valid or just it's presence here?
+  const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
+  const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
   const [resizeMode, setResizeMode] = useState<TResizeMode>(
     getResizeMode(uaString)
   );
