@@ -119,7 +119,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
             votingAllowed={false}
             optionBeingSupported=''
             handleSetSupportedBid={() => {}}
-            handleAddOrUpdateOptionFromResponse={() => {}}
+            handleUpdateOptionFromResponse={() => {}}
           />
         ))}
         {hasNextOptionsPage ? (

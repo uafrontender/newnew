@@ -42,6 +42,7 @@ interface IAcOptionsTab {
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
   hasNextPage: boolean;
+  lastContributedOptionId?: number;
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<
     InfiniteQueryObserverResult<
       {
@@ -51,9 +52,7 @@ interface IAcOptionsTab {
       unknown
     >
   >;
-  handleAddOrUpdateOptionFromResponse: (
-    newOption: newnewapi.Auction.Option
-  ) => void;
+  handleUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
   handleRemoveOption: (optionToRemove: newnewapi.Auction.Option) => void;
 }
 
@@ -66,8 +65,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   options,
   optionsLoading,
   hasNextPage,
+  lastContributedOptionId,
   fetchNextPage,
-  handleAddOrUpdateOptionFromResponse,
+  handleUpdateOptionFromResponse,
   handleRemoveOption,
 }) => {
   const { t } = useTranslation('page-Post');
@@ -125,6 +125,25 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     },
     [isMobile]
   );
+
+  useEffect(() => {
+    if (lastContributedOptionId) {
+      if (containerRef.current) {
+        // Index can change if any elements except option card exist in the container
+        const optIdx = options.findIndex(
+          (o) => o.id === lastContributedOptionId
+        );
+        const childDiv = containerRef.current.children[optIdx];
+
+        if (childDiv) {
+          childDiv.scrollIntoView({
+            block: 'nearest',
+            behavior: 'smooth',
+          });
+        }
+      }
+    }
+  }, [lastContributedOptionId, options]);
 
   useEffect(() => {
     if (inView) {
@@ -215,9 +234,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               handleSetSupportedBid={(id: string) =>
                 setOptionBeingSupported(id)
               }
-              handleAddOrUpdateOptionFromResponse={
-                handleAddOrUpdateOptionFromResponse
-              }
+              handleUpdateOptionFromResponse={handleUpdateOptionFromResponse}
               handleRemoveOption={() => {
                 Mixpanel.track('Remove Option', {
                   _stage: 'Post',
