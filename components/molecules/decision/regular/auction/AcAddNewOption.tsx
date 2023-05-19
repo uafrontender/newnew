@@ -9,7 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import Link from 'next/link';
 
 import {

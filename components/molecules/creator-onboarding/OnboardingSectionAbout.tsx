@@ -10,7 +10,7 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';

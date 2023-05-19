@@ -9,7 +9,8 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme, css } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
-import { debounce, isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import validator from 'validator';
 import { Area, Point } from 'react-easy-crop/types';
 
