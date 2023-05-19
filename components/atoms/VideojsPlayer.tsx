@@ -368,11 +368,25 @@ const SWrapper = styled.div<{
     display: none !important;
   }
 
+  .video-js {
+    &:focus-visible,
+    &:focus,
+    &:active {
+      outline: none !important;
+    }
+  }
+
   video {
     width: 100% !important;
     height: 100% !important;
     object-fit: ${({ videoOrientation }) =>
       videoOrientation === 'vertical' ? 'cover' : 'contain'};
+
+    &:focus-visible,
+    &:focus,
+    &:active {
+      outline: none !important;
+    }
   }
 
   /* Hide controls */
