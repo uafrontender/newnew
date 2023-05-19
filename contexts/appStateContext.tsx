@@ -10,11 +10,11 @@ import React, {
 } from 'react';
 import { parse } from 'next-useragent';
 import styled from 'styled-components';
+import jwtDecode from 'jwt-decode';
+import { newnewapi } from 'newnew-api';
 
 import isBrowser from '../utils/isBrowser';
 import { sizes, TResizeMode } from '../styles/media';
-import jwtDecode from 'jwt-decode';
-import { newnewapi } from 'newnew-api';
 import { cookiesInstance, refreshCredentials } from '../api/apiConfigs';
 
 export const AppStateContext = createContext<{
@@ -94,7 +94,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     }
   }, []);
 
-  const refreshToken = useCallback(async () => {
+  const refreshTokens = useCallback(async () => {
     const refreshToken = cookiesInstance.get('refreshToken');
     if (!refreshToken) {
       return;
@@ -113,7 +113,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       throw new Error('Refresh token invalid');
     }
 
-    if (resRefresh.data.credential?.expiresAt?.seconds)
+    if (resRefresh.data.credential?.expiresAt?.seconds) {
       cookiesInstance.set(
         'accessToken',
         resRefresh.data.credential?.accessToken,
@@ -124,6 +124,8 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
           path: '/',
         }
       );
+    }
+
     cookiesInstance.set(
       'refreshToken',
       resRefresh.data.credential?.refreshToken,
@@ -140,12 +142,12 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       setUserIsCreator((curr) => {
         if (!curr) {
           // Refresh token to get the one with is_creator true
-          refreshToken();
+          refreshTokens();
         }
         return isCreator;
       });
     },
-    [refreshToken]
+    [refreshTokens]
   );
 
   const handleResizeObserver = useCallback(() => {
@@ -203,10 +205,12 @@ export default AppStateContextProvider;
 
 export function useAppState() {
   const context = useContext(AppStateContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useAppState must be used inside a `AppStateContext.Provider`'
     );
+  }
+
   return context;
 }
 

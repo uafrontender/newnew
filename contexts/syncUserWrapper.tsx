@@ -216,7 +216,13 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         setUserLoggedIn(false);
       }
     }
-  }, [dispatch, user.creatorData?.options, updateCreatorDataSteps]);
+  }, [
+    dispatch,
+    user.creatorData?.options,
+    setUserIsCreator,
+    updateCreatorDataSteps,
+    setUserLoggedIn,
+  ]);
 
   useEffect(() => {
     const setUserTimeZone = async () => {

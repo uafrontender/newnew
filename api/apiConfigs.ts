@@ -334,13 +334,14 @@ export async function fetchProtobufProtectedIntercepted<
         // Refresh failed, session "expired"
         // (i.e. user probably logged in from another device, or exceeded
         // max number of logged in devices/browsers)
-        if (!resRefresh.data || resRefresh.error)
+        if (!resRefresh.data || resRefresh.error) {
           throw new Error('Refresh token invalid');
+        }
 
         // Refreshed succeeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
-          if (resRefresh.data.credential?.expiresAt?.seconds)
+          if (resRefresh.data.credential?.expiresAt?.seconds) {
             cookiesInstance.set(
               'accessToken',
               resRefresh.data.credential?.accessToken,
@@ -352,6 +353,7 @@ export async function fetchProtobufProtectedIntercepted<
                 path: '/',
               }
             );
+          }
           cookiesInstance.set(
             'refreshToken',
             resRefresh.data.credential?.refreshToken,
@@ -392,17 +394,21 @@ export async function fetchProtobufProtectedIntercepted<
         return res;
       } catch (errSecondAttempt) {
         // If error is auth-related - throw
-        if ((errSecondAttempt as Error).message === 'Refresh token invalid')
+        if ((errSecondAttempt as Error).message === 'Refresh token invalid') {
           throw new Error((errSecondAttempt as Error).message);
+        }
         // Return as APIResponse.error
         return {
           error: errSecondAttempt as Error,
         };
       }
     }
+
     // If error is auth-related - throw
-    if ((errFirstAttempt as Error).message === 'No token')
+    if ((errFirstAttempt as Error).message === 'No token') {
       throw new Error((errFirstAttempt as Error).message);
+    }
+
     // Return as APIResponse.error
     return {
       error: errFirstAttempt as Error,

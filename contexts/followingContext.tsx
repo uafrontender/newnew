@@ -63,8 +63,9 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
 
         const res = await getCreatorsIFollow(payload);
 
-        if (!res.data || res.error)
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
 
         setFollowingsIds(res.data.userUuids);
 

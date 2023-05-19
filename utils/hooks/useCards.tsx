@@ -40,8 +40,9 @@ const useCards = (): CardsData => {
 
       const res = await getCards(payload, signal);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
+      }
 
       return res.data.cards;
     },

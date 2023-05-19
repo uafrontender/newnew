@@ -87,7 +87,7 @@ function usePagination<T>(
 
       setLoading(false);
     },
-    [loadData]
+    [pageSize, loadData]
   );
 
   useEffect(() => {
@@ -134,6 +134,7 @@ function usePagination<T>(
         return;
       }
 
+      // eslint-disable-next-line consistent-return
       return loadMoreData(lifeCycleIdRef.current, limit);
     },
     [delayed, loading, data, hasMore, initialLoadDone, loadMoreData]

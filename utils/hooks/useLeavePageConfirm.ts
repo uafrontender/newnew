@@ -73,6 +73,7 @@ export const useLeavePageConfirm = (
             return;
           }
 
+          // eslint-disable-next-line no-alert
           const isConfirmed = window.confirm(message);
           if (!isConfirmed) {
             Router.events.emit('routeChangeError', '', '', { shallow: false });
