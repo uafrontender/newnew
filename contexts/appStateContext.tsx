@@ -13,8 +13,9 @@ import styled from 'styled-components';
 
 import isBrowser from '../utils/isBrowser';
 import { sizes, TResizeMode } from '../styles/media';
-import { cookiesInstance } from '../api/apiConfigs';
 import jwtDecode from 'jwt-decode';
+import { newnewapi } from 'newnew-api';
+import { cookiesInstance, refreshCredentials } from '../api/apiConfigs';
 
 export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
@@ -93,6 +94,60 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     }
   }, []);
 
+  const refreshToken = useCallback(async () => {
+    const refreshToken = cookiesInstance.get('refreshToken');
+    if (!refreshToken) {
+      return;
+    }
+
+    const refreshPayload = new newnewapi.RefreshCredentialRequest({
+      refreshToken,
+    });
+
+    const resRefresh = await refreshCredentials(refreshPayload);
+
+    // Refresh failed, session "expired"
+    // (i.e. user probably logged in from another device, or exceeded
+    // max number of logged in devices/browsers)
+    if (!resRefresh.data || resRefresh.error) {
+      throw new Error('Refresh token invalid');
+    }
+
+    if (resRefresh.data.credential?.expiresAt?.seconds)
+      cookiesInstance.set(
+        'accessToken',
+        resRefresh.data.credential?.accessToken,
+        {
+          expires: new Date(
+            (resRefresh.data.credential.expiresAt.seconds as number) * 1000
+          ),
+          path: '/',
+        }
+      );
+    cookiesInstance.set(
+      'refreshToken',
+      resRefresh.data.credential?.refreshToken,
+      {
+        // Expire in 10 years
+        maxAge: 10 * 365 * 24 * 60 * 60,
+        path: '/',
+      }
+    );
+  }, []);
+
+  const setUserIsCreatorState = useCallback(
+    async (isCreator: boolean) => {
+      setUserIsCreator((curr) => {
+        if (!curr) {
+          // Refresh token to get the one with is_creator true
+          refreshToken();
+        }
+        return isCreator;
+      });
+    },
+    [refreshToken]
+  );
+
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: TResizeMode | undefined;
     Object.entries(sizes).forEach(([key, value]) => {
@@ -126,9 +181,15 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       userIsCreator,
       resizeMode,
       setUserLoggedIn: setUserLoggedInState,
-      setUserIsCreator,
+      setUserIsCreator: setUserIsCreatorState,
     }),
-    [userLoggedIn, resizeMode]
+    [
+      userLoggedIn,
+      userIsCreator,
+      resizeMode,
+      setUserLoggedInState,
+      setUserIsCreatorState,
+    ]
   );
 
   return (

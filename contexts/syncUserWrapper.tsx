@@ -41,7 +41,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 }) => {
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { setUserLoggedIn } = useAppState();
+  const { setUserLoggedIn, setUserIsCreator } = useAppState();
   const user = useAppSelector((state) => state.user);
   const { socketConnection } = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
@@ -177,7 +177,10 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           } as TUserData)
         );
       }
+
       if (data?.me?.options?.isCreator) {
+        setUserIsCreator(true);
+
         try {
           const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(getMyOnboardingStatePayload);

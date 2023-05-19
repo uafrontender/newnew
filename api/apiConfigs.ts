@@ -232,7 +232,9 @@ export async function fetchProtobuf<
 }
 
 // Tries to refresh credentials if access token has expired
-const refreshCredentials = (payload: newnewapi.RefreshCredentialRequest) =>
+export const refreshCredentials = (
+  payload: newnewapi.RefreshCredentialRequest
+) =>
   fetchProtobuf<
     newnewapi.RefreshCredentialRequest,
     newnewapi.RefreshCredentialResponse
@@ -321,7 +323,7 @@ export async function fetchProtobufProtectedIntercepted<
 
     return res;
   } catch (errFirstAttempt) {
-    // Invalid acces token, refresh and try again
+    // Invalid access token, refresh and try again
     if ((errFirstAttempt as Error).message === 'Access token invalid') {
       try {
         const refreshPayload = new newnewapi.RefreshCredentialRequest({
