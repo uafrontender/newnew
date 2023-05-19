@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useContext,
 } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -48,6 +49,8 @@ import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
+import { SocketContext } from '../../../../contexts/socketContext';
+import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -68,8 +71,21 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { showErrorToastPredefined } = useErrorToasts();
 
   const [showModal, setShowModal] = useState(false);
-  const { postInCreation, setPostData, setCreationStartDate, clearCreation } =
-    usePostCreationState();
+
+  // Socket
+  const { socketConnection } = useContext(SocketContext);
+
+  const {
+    postInCreation,
+    setPostData,
+    setCreationStartDate,
+    clearCreation,
+    setCreationFileUploadError,
+    setCreationFileProcessingETA,
+    setCreationFileProcessingProgress,
+    setCreationFileProcessingLoading,
+  } = usePostCreationState();
+
   const {
     post,
     auction,
@@ -79,7 +95,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     fileProcessing,
     customCoverImageUrl,
   } = useMemo(() => postInCreation, [postInCreation]);
+
   const { userData } = useAppSelector((state) => state.user);
+
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text.trim(), min);
@@ -506,6 +524,74 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       clearInterval(updateStartDate);
     };
   }, [post.startsAt, setCreationStartDate]);
+
+  const handlerSocketUpdated = useCallback(
+    async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        if (
+          decoded?.estimatedTimeLeft?.seconds &&
+          !Number.isNaN(decoded.estimatedTimeLeft.seconds as number)
+        ) {
+          setCreationFileProcessingETA(
+            decoded.estimatedTimeLeft.seconds as number
+          );
+        }
+
+        if (decoded.fractionCompleted > fileProcessing.progress) {
+          setCreationFileProcessingProgress(decoded.fractionCompleted);
+        }
+
+        if (
+          decoded.fractionCompleted === 100 &&
+          decoded.status ===
+            newnewapi.VideoProcessingProgress.Status.SUCCEEDED &&
+          videoProcessing.targetUrls?.hlsStreamUrl
+        ) {
+          const available = await waitResourceIsAvailable(
+            videoProcessing.targetUrls?.hlsStreamUrl,
+            {
+              maxAttempts: 60,
+              retryTimeMs: 1000,
+            }
+          );
+
+          if (available) {
+            setCreationFileProcessingLoading(false);
+          } else {
+            setCreationFileUploadError(true);
+            showErrorToastPredefined(undefined);
+          }
+        } else if (
+          decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
+        ) {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(undefined);
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [videoProcessing, fileProcessing]
+  );
+
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, handlerSocketUpdated]);
 
   // Redirect if post state is empty
   useEffect(() => {
