@@ -5,10 +5,11 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useContext,
 } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import _compact from 'lodash/compact';
+import compact from 'lodash/compact';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -48,6 +49,9 @@ import { I18nNamespaces } from '../../../../@types/i18next';
 import useRecaptcha from '../../../../utils/hooks/useRecaptcha';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
+import { SocketContext } from '../../../../contexts/socketContext';
+import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
+import useGoBackOrRedirect from '../../../../utils/useGoBackOrRedirect';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -64,12 +68,26 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const playerRef: any = useRef(null);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const [showModal, setShowModal] = useState(false);
-  const { postInCreation, setPostData, setCreationStartDate, clearCreation } =
-    usePostCreationState();
+
+  // Socket
+  const { socketConnection } = useContext(SocketContext);
+
+  const {
+    postInCreation,
+    setPostData,
+    setCreationStartDate,
+    clearCreation,
+    setCreationFileUploadError,
+    setCreationFileProcessingETA,
+    setCreationFileProcessingProgress,
+    setCreationFileProcessingLoading,
+  } = usePostCreationState();
+
   const {
     post,
     auction,
@@ -79,7 +97,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     fileProcessing,
     customCoverImageUrl,
   } = useMemo(() => postInCreation, [postInCreation]);
+
   const { userData } = useAppSelector((state) => state.user);
+
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text.trim(), min);
@@ -205,8 +225,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const handleClose = useCallback(() => {
     Mixpanel.track('Post Edit', { _stage: 'Creation' });
-    router.back();
-  }, [router]);
+    goBackOrRedirect('/creation');
+  }, [goBackOrRedirect]);
 
   const handleCloseModal = useCallback(() => {
     setIsGoingToHomepage(true);
@@ -402,7 +422,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const settings: any = useMemo(
     () =>
-      _compact([
+      compact([
         tab === 'auction' && {
           key: 'minimalBid',
           value: t('preview.values.minimalBid', { value: auction.minimalBid }),
@@ -453,8 +473,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     ]
   );
   const handleGoBack = useCallback(() => {
-    router.back();
-  }, [router]);
+    goBackOrRedirect('/creation');
+  }, [goBackOrRedirect]);
 
   const renderSetting = (item: any) => (
     <SItem key={item.key}>
@@ -506,6 +526,74 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       clearInterval(updateStartDate);
     };
   }, [post.startsAt, setCreationStartDate]);
+
+  const handlerSocketUpdated = useCallback(
+    async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        if (
+          decoded?.estimatedTimeLeft?.seconds &&
+          !Number.isNaN(decoded.estimatedTimeLeft.seconds as number)
+        ) {
+          setCreationFileProcessingETA(
+            decoded.estimatedTimeLeft.seconds as number
+          );
+        }
+
+        if (decoded.fractionCompleted > fileProcessing.progress) {
+          setCreationFileProcessingProgress(decoded.fractionCompleted);
+        }
+
+        if (
+          decoded.fractionCompleted === 100 &&
+          decoded.status ===
+            newnewapi.VideoProcessingProgress.Status.SUCCEEDED &&
+          videoProcessing.targetUrls?.hlsStreamUrl
+        ) {
+          const available = await waitResourceIsAvailable(
+            videoProcessing.targetUrls?.hlsStreamUrl,
+            {
+              maxAttempts: 60,
+              retryTimeMs: 1000,
+            }
+          );
+
+          if (available) {
+            setCreationFileProcessingLoading(false);
+          } else {
+            setCreationFileUploadError(true);
+            showErrorToastPredefined(undefined);
+          }
+        } else if (
+          decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
+        ) {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(undefined);
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [videoProcessing, fileProcessing]
+  );
+
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, handlerSocketUpdated]);
 
   // Redirect if post state is empty
   useEffect(() => {

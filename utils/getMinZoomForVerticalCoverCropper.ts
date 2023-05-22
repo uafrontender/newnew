@@ -8,13 +8,13 @@ function getMinZoomForVerticalCoverCropper(
   if (height * cropAreaAspectRatio > width) {
     if (width < minWidth) {
       return minWidth / width;
-    } else {
-      return (height * cropAreaAspectRatio) / width;
     }
-  } else {
-    // objectFit='vertical-cover' will do the job
-    return 1;
+
+    return (height * cropAreaAspectRatio) / width;
   }
+
+  // objectFit='vertical-cover' will do the job
+  return 1;
 }
 
 export default getMinZoomForVerticalCoverCropper;

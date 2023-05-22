@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 // @ts-nocheck
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 
 import Lottie from './Lottie';

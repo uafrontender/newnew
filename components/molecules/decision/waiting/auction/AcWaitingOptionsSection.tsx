@@ -136,7 +136,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
             minAmount={0}
             votingAllowed={false}
             handleSetSupportedBid={() => {}}
-            handleAddOrUpdateOptionFromResponse={() => {}}
+            handleUpdateOptionFromResponse={() => {}}
             handleRemoveOption={() => {
               Mixpanel.track('Removed Option', {
                 _stage: 'Post',

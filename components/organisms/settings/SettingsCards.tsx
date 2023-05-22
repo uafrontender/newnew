@@ -51,6 +51,9 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
     [cards]
   );
 
+  // Dependency on cards isn't added on purpose to prevent background updates on cards order change if primary card has changed.
+  // So cards has static backgrounds for one session
+  // TODO: ideally store background for card in the DB
   const backgroundsByCardUuid = useMemo(() => {
     const obj: { [key: string]: string } = {};
     cards.forEach((card, index) => {
@@ -59,7 +62,8 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
     });
 
     return obj;
-  }, [cards]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cards.length]);
 
   const { scrollContainerRef, onMouseDown, onMouseMove, onMouseUp } =
     useHorizontalDraggableScroll<HTMLUListElement>();
@@ -145,11 +149,10 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                   funding={card.funding as newnewapi.Card.CardFunding}
                   lastFourDigits={card.last4 as string}
                   backgroundImg={
-                    Object.keys(backgroundsByCardUuid).length > 0
-                      ? backgroundsByCardUuid[card.cardUuid! as string]
-                      : assets.cards.background[
-                          index % assets.cards.background.length
-                        ]
+                    backgroundsByCardUuid[card.cardUuid! as string] ||
+                    assets.cards.background[
+                      index % assets.cards.background.length
+                    ]
                   }
                   disabledForActions={!!user.userData?.options?.isWhiteListed}
                 />

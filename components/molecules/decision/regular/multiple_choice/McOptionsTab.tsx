@@ -12,7 +12,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import {

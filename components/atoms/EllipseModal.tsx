@@ -1,7 +1,7 @@
 import React, { ReactElement, useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 
 import Modal from '../organisms/Modal';
 import Button from './Button';

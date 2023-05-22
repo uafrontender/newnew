@@ -1,7 +1,8 @@
 /* eslint-disable no-plusplus */
 import { newnewapi } from 'newnew-api';
 import { useMemo } from 'react';
-import { cloneDeep, uniqBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 import {
   InfiniteData,
   useInfiniteQuery,
@@ -151,8 +152,9 @@ const useAcOptions = (
       ? query?.data?.pages.map((page) => page.acOptions).flat()
       : [];
 
-    if (flatOptions.length === 0)
+    if (flatOptions.length === 0) {
       return flatOptions as TAcOptionWithHighestField[];
+    }
 
     return sortOptions(
       flatOptions as TAcOptionWithHighestField[],

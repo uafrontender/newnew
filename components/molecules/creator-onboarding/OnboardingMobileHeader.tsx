@@ -1,20 +1,25 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 import GoBackButton from '../GoBackButton';
 import Logo from '../Logo';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const OnboardingMobileHeader: React.FunctionComponent = () => {
-  const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
+
+  const handleBack = useCallback(() => {
+    goBackOrRedirect('/');
+  }, [goBackOrRedirect]);
 
   return (
     <SOnboardingProgressBarContainer>
@@ -26,10 +31,7 @@ const OnboardingMobileHeader: React.FunctionComponent = () => {
           }}
         />
       ) : null}
-      <SBackButton
-        defer={isMobile ? 250 : undefined}
-        onClick={() => router.back()}
-      />
+      <SBackButton defer={isMobile ? 250 : undefined} onClick={handleBack} />
     </SOnboardingProgressBarContainer>
   );
 };

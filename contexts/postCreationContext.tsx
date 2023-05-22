@@ -510,9 +510,11 @@ export default PostCreationContextProvider;
 
 export function usePostCreationState() {
   const context = useContext(PostCreationContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'usePostCreationState must be used inside a `PostCreationContextProvider`'
     );
+  }
+
   return context;
 }
