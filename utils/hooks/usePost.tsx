@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from 'react-query';
 import { newnewapi } from 'newnew-api';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { fetchPostByUUID } from '../../api/endpoints/post';
 import useErrorToasts from './useErrorToasts';

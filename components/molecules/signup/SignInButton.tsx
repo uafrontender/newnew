@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 import { useIsomorphicLayoutEffect } from 'react-use';
 

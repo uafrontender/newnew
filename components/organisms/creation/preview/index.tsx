@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
-import _compact from 'lodash/compact';
+import compact from 'lodash/compact';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -422,7 +422,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const settings: any = useMemo(
     () =>
-      _compact([
+      compact([
         tab === 'auction' && {
           key: 'minimalBid',
           value: t('preview.values.minimalBid', { value: auction.minimalBid }),
