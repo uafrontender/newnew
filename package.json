@@ -20,12 +20,14 @@
     "test": "npm run jest && npm run cypress:ci",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/"
+    "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/",
+    "analyze": "ANALYZE=true npm run build"
   },
   "pre-commit": [
     "lint"
   ],
   "dependencies": {
+    "@next/bundle-analyzer": "^13.4.3",
     "@reduxjs/toolkit": "1.8.2",
     "@sentry/browser": "7.1.1",
     "@sentry/integrations": "7.1.1",
@@ -37,6 +39,7 @@
     "@types/uuid": "8.3.4",
     "@types/videojs-contrib-quality-levels": "2.0.1",
     "date-fns": "2.27.0",
+    "date-fns-tz": "^2.0.0",
     "framer-motion": "6.3.11",
     "hls-parser": "0.10.6",
     "i18n-iso-countries": "7.5.0",
@@ -49,7 +52,6 @@
     "mixpanel-browser": "2.45.0",
     "moment": "2.29.1",
     "moment-duration-format": "2.3.2",
-    "moment-timezone": "0.5.39",
     "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#400f8dbd160c797fc3085ff3fb991b9e4c2c2c32",
     "next": "12.1.6",
     "next-i18next": "13.0.0",

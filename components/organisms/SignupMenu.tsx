@@ -45,6 +45,7 @@ import { loadStateLS, removeStateLS } from '../../utils/localStorage';
 import { useAppState } from '../../contexts/appStateContext';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
 import EmailSignInForm from '../molecules/signup/EmailSignInForm';
+import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
 
 export interface ISignupMenu {
   goal?: string;
@@ -59,6 +60,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-SignUp');
   const { appConstants } = useGetAppConstants();
   const availableSocialProviders = useMemo<{
@@ -197,7 +199,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
             Mixpanel.track('Back Button Clicked', {
               _stage: 'Sign Up',
             });
-            router.back();
+            goBackOrRedirect('/');
           }}
         >
           <span>{t('button.back')}</span>

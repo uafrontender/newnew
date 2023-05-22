@@ -608,6 +608,7 @@ export const SInputWrapper = styled.label<ISInputWrapper>`
   ${({ theme }) => theme.media.laptop} {
     right: 0;
     width: ${({ width }) => width || '364px'};
+    transition: none;
   }
 
   ${({ theme, active }) =>

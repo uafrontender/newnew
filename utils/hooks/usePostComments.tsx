@@ -8,7 +8,8 @@ import {
   useMutation,
   useQueryClient,
 } from 'react-query';
-import { cloneDeep, uniqBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 
 import { getComments } from '../../api/endpoints/comments';
 import { TCommentWithReplies } from '../../components/interfaces/tcomment';

@@ -964,13 +964,15 @@ export const CreationSecondStepContent: React.FC<
         return;
       }
 
-      if (
-        decoded.taskUuid === videoProcessing?.taskUuid &&
-        decoded?.estimatedTimeLeft?.seconds
-      ) {
-        setCreationFileProcessingETA(
-          decoded.estimatedTimeLeft.seconds as number
-        );
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        if (
+          decoded?.estimatedTimeLeft?.seconds &&
+          !Number.isNaN(decoded.estimatedTimeLeft.seconds as number)
+        ) {
+          setCreationFileProcessingETA(
+            decoded.estimatedTimeLeft.seconds as number
+          );
+        }
 
         if (decoded.fractionCompleted > fileProcessing.progress) {
           setCreationFileProcessingProgress(decoded.fractionCompleted);

@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { newnewapi } from 'newnew-api';
 import {
   InfiniteData,

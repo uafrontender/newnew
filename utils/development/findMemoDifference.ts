@@ -6,13 +6,13 @@
  */
 function findMemoDifference(origObj: any, newObj: any) {
   const result: any = {};
-  Object.entries(origObj).map(([key, value]) => {
+  Object.entries(origObj).forEach(([key, value]) => {
     if (value !== newObj[key]) {
       result[key] = newObj[key];
     }
   });
 
-  Object.entries(newObj).map(([key, value]) => {
+  Object.entries(newObj).forEach(([key, value]) => {
     if (!origObj[key]) {
       result[key] = value;
     }
