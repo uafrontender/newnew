@@ -21,6 +21,7 @@ import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const maxDate = new Date();
 
@@ -35,6 +36,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     const { appConstants } = useGetAppConstants();
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const { goBackOrRedirect } = useGoBackOrRedirect();
     const { t } = useTranslation('page-Profile');
     const { showErrorToastPredefined } = useErrorToasts();
 
@@ -166,7 +168,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             show={!!editEmail}
             skipCurrentEmailVerificationStep={!currentEmail}
             onClose={() => {
-              router.back();
+              goBackOrRedirect('/profile/settings');
             }}
           />
           <SettingsBirthDateInput

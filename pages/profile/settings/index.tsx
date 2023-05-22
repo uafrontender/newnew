@@ -45,10 +45,12 @@ import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
 
   // const { showErrorToastPredefined } = useErrorToasts();
 
@@ -295,7 +297,7 @@ const MyProfileSettingsIndex = () => {
             Mixpanel.track('Back button Clicked', {
               _stage: 'Settings',
             });
-            router.back();
+            goBackOrRedirect('/profile/my-posts');
           }}
         >
           {isMobile ? t('Settings.heading') : t('Settings.button.back')}

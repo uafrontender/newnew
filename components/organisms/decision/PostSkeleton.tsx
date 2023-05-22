@@ -1,16 +1,16 @@
 import React from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import GoBackButton from '../../molecules/GoBackButton';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const PostSkeleton = () => {
   const theme = useTheme();
-  const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-Post');
 
   const { resizeMode } = useAppState();
@@ -21,7 +21,7 @@ const PostSkeleton = () => {
   return (
     <>
       {!isMobile && (
-        <SGoBackButton longArrow onClick={() => router.back()}>
+        <SGoBackButton longArrow onClick={() => goBackOrRedirect('/')}>
           {t('back')}
         </SGoBackButton>
       )}
@@ -30,7 +30,7 @@ const PostSkeleton = () => {
           {isMobile && (
             <>
               <SExpiresSection>
-                <SGoBackButtonMobile onClick={() => router.back()} />
+                <SGoBackButtonMobile onClick={() => goBackOrRedirect('/')} />
                 <Skeleton
                   count={1}
                   borderRadius={16}
@@ -97,7 +97,7 @@ export default PostSkeleton;
 
 export const PostSkeletonView = () => {
   const theme = useTheme();
-  const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
 
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -110,7 +110,7 @@ export const PostSkeletonView = () => {
         {isMobile && (
           <>
             <SExpiresSection>
-              <SGoBackButtonMobile onClick={() => router.back()} />
+              <SGoBackButtonMobile onClick={() => goBackOrRedirect('/')} />
               <Skeleton
                 count={1}
                 borderRadius={16}

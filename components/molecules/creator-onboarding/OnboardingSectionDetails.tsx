@@ -53,6 +53,7 @@ import useErrorToasts, {
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -146,6 +147,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   IOnboardingSectionDetails
 > = ({ isAvatarCustom, availableCountries }) => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -993,7 +995,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   _button: 'Back button',
                   _component: 'OnboardingSectionDetails',
                 });
-                router.back();
+                goBackOrRedirect('/');
               }}
             >
               {t('detailsSection.button.back')}
@@ -1035,7 +1037,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
           setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
           onClose={() => {
             setCropMenuOpen(false);
-            // window.history.back();
+
             if (isBrowser()) {
               window.history.replaceState(null, '');
             }
