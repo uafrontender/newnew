@@ -17,7 +17,8 @@ import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 import * as Sentry from '@sentry/browser';
 import Router, { useRouter } from 'next/router';
-import moment from 'moment-timezone';
+import moment from 'moment';
+import { utcToZonedTime } from 'date-fns-tz';
 import countries from 'i18n-iso-countries';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
@@ -314,7 +315,10 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
 
   if (appContext.ctx?.req.cookies?.timezone) {
     const timezoneFromClient = appContext.ctx?.req.cookies?.timezone;
-    const hoursClient = moment().tz(timezoneFromClient).hours();
+    const hoursClient = utcToZonedTime(
+      new Date(),
+      timezoneFromClient
+    ).getHours();
 
     const isDayTime = hoursClient > 7 && hoursClient < 18;
 
