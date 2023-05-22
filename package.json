@@ -20,7 +20,8 @@
     "test": "npm run jest && npm run cypress:ci",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/"
+    "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/",
+    "analyze": "ANALYZE=true npm run build"
   },
   "pre-commit": [
     "lint"
