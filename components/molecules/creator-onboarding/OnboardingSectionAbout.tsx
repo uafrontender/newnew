@@ -30,6 +30,7 @@ import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -65,6 +66,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   IOnboardingSectionAbout
 > = () => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -233,7 +235,11 @@ const OnboardingSectionAbout: React.FunctionComponent<
   return (
     <>
       <SContainer>
-        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        {isMobile && (
+          <SGoBackButton
+            onClick={() => goBackOrRedirect('/creator/dashboard')}
+          />
+        )}
         <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
         <STopContainer>
           <SFormItemContainer>
@@ -263,7 +269,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
                   _button: 'Back button',
                   _component: 'OnboardingSectionAbout',
                 });
-                router.back();
+                goBackOrRedirect('/creator/dashboard');
               }}
             >
               {t('aboutSection.button.back')}
