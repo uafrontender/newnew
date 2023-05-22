@@ -146,9 +146,11 @@ export const ChatsUnreadMessagesProvider: React.FC<
 
 export function useChatsUnreadMessages() {
   const context = useContext(ChatsUnreadMessagesContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useChatsUnreadMessages must be used inside a `ChatProvider`'
     );
+  }
+
   return context;
 }

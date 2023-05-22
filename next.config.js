@@ -14,6 +14,20 @@ const moduleExports = {
 
     return config;
   },
+  // By default, Next.js will run ESLint for all files in the pages/ and components/
+  eslint: {
+    dirs: [
+      'api',
+      'components',
+      'constants',
+      'contexts',
+      'HOC',
+      'pages',
+      'redux-store',
+      'styles',
+      'utils',
+    ],
+  },
   images: {
     domains: [
       'randomuser.me',

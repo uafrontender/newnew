@@ -66,7 +66,7 @@ const MyProfileSettingsIndex = () => {
   );
 
   const { colorMode } = useAppSelector((state: any) => state.ui);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   // Measurements
   const isMobileOrTablet = [
     'mobile',
@@ -109,6 +109,7 @@ const MyProfileSettingsIndex = () => {
         throw new Error(res.error?.message ?? 'Log out failed');
       }
 
+      setUserLoggedIn(false);
       dispatch(logoutUser(''));
 
       // Unset credential cookies
@@ -125,18 +126,20 @@ const MyProfileSettingsIndex = () => {
       console.error(err);
       setIsLogoutLoading(false);
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
 
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie]);
+  }, [dispatch, setIsLogoutLoading, removeCookie, setUserLoggedIn]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 

@@ -151,8 +151,9 @@ const useAcOptions = (
       ? query?.data?.pages.map((page) => page.acOptions).flat()
       : [];
 
-    if (flatOptions.length === 0)
+    if (flatOptions.length === 0) {
       return flatOptions as TAcOptionWithHighestField[];
+    }
 
     return sortOptions(
       flatOptions as TAcOptionWithHighestField[],

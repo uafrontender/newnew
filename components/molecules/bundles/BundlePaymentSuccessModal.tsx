@@ -16,6 +16,7 @@ import Button from '../../atoms/Button';
 import AnimatedBackground from '../../atoms/AnimationBackground';
 import getBundleOfferLevel from '../../../utils/getCurrentBundleLevel';
 import DisplayName from '../../atoms/DisplayName';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 interface IBuyBundleModal {
   show: boolean;
@@ -29,6 +30,7 @@ interface IBuyBundleModal {
 const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
   ({ show, creator, bundleOffer, modalType, zIndex, onClose }) => {
     const { t } = useTranslation('common');
+    const { appConstants } = useGetAppConstants();
     const theme = useTheme();
     const router = useRouter();
 
@@ -37,7 +39,10 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
 
     const unitOfTimeLeft = monthsOfAccess > 1 ? 'months' : 'month';
 
-    const bundleOfferLevel = getBundleOfferLevel(bundleOffer.votesAmount!);
+    const bundleOfferLevel = getBundleOfferLevel(
+      bundleOffer.votesAmount!,
+      appConstants.bundleOffers
+    );
 
     const onUserLinkClicked = useCallback(() => {
       if (router.asPath === `/${creator?.username}`) {

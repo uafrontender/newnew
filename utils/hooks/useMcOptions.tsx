@@ -140,8 +140,9 @@ const useMcOptions = (
       ? query?.data?.pages.map((page) => page.mcOptions).flat()
       : [];
 
-    if (flatOptions.length === 0)
+    if (flatOptions.length === 0) {
       return flatOptions as TMcOptionWithHighestField[];
+    }
 
     return sortOptions(
       flatOptions as TMcOptionWithHighestField[],

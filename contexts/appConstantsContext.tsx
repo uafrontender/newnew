@@ -62,9 +62,11 @@ export default AppConstantsContextProvider;
 
 export function useGetAppConstants() {
   const context = useContext(AppConstantsContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useGetAppConstants must be used inside a `AppConstantsContext.Provider`'
     );
+  }
+
   return context;
 }
