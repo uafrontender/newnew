@@ -103,9 +103,11 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
 
 export function useNotifications() {
   const context = useContext(NotificationsContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useNotifications must be used inside a `NotificationsProvider`'
     );
+  }
+
   return context;
 }

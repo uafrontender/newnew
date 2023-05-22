@@ -10,7 +10,6 @@ import Desktop from '../molecules/header/Desktop';
 import Container from '../atoms/Grid/Container';
 
 import { useAppSelector } from '../../redux-store/store';
-import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useAppState } from '../../contexts/appStateContext';
 
 interface IHeader {
@@ -30,11 +29,6 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
 
   const headerRef = useRef(null);
-
-  // TODO: Remove hasMounted after user auth data is available in context
-  const hasMounted = useHasMounted();
-
-  if (!hasMounted) return null;
 
   return (
     <SWrapper

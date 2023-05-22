@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAppSelector } from '../../redux-store/store';
 
 import BottomNavigationItem, {
   TBottomNavigationItem,
 } from '../molecules/BottomNavigationItem';
 import MoreMenuMobile from './MoreMenuMobile';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IBottomNavigation {
   visible: boolean;
@@ -18,7 +18,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   const { visible, collection, moreMenuMobileOpen, handleCloseMobileMenu } =
     props;
 
-  const user = useAppSelector((state) => state.user);
+  const { userIsCreator } = useAppState();
 
   const renderItem = useCallback(
     (item: TBottomNavigationItem) => (
@@ -32,7 +32,9 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   );
 
   useEffect(() => {
-    if (!visible) handleCloseMobileMenu();
+    if (!visible) {
+      handleCloseMobileMenu();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
@@ -40,7 +42,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
     <SContainer
       id='bottom-nav-mobile'
       visible={visible}
-      isCreator={!!user.userData?.options?.isCreator}
+      isCreator={userIsCreator}
     >
       {collection?.map(renderItem)}
       <MoreMenuMobile

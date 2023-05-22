@@ -352,9 +352,11 @@ export default PostContextProvider;
 
 export function usePostInnerState() {
   const context = useContext(PostInnerContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'usePostInnerState must be used inside a `PostInnerContextProvider`'
     );
+  }
+
   return context;
 }

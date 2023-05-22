@@ -20,6 +20,7 @@ import {
 } from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IEmailAuthRedirectPage {
   email_address: string;
@@ -33,6 +34,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn: setAppStateUserLoggedIn, setUserIsCreator } =
+    useAppState();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
@@ -116,9 +119,11 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           path: '/',
         });
 
+        dispatch(setUserLoggedIn(true));
+        setAppStateUserLoggedIn(true);
+        setUserIsCreator(!!data.me?.options?.isCreator);
         dispatch(setSignupEmailInput(''));
         dispatch(setSignupTimerValue(0));
-        dispatch(setUserLoggedIn(true));
 
         resumePushNotification();
 
