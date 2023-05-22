@@ -27,6 +27,7 @@ import {
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../contexts/appStateContext';
 
 type TAppleResponseBody = {
   state: string;
@@ -45,6 +46,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn: setAppStateUserLoggedIn, setUserIsCreator } =
+    useAppState();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -162,6 +165,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         });
 
         dispatch(setUserLoggedIn(true));
+        setAppStateUserLoggedIn(true);
+        setUserIsCreator(!!data.me?.options?.isCreator);
 
         resumePushNotification();
 

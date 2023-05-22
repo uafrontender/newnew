@@ -30,6 +30,7 @@ import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { loadStateLS, saveStateLS } from '../utils/localStorage';
 import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
+import { useAppState } from './appStateContext';
 
 interface ISyncUserWrapper {
   children: React.ReactNode;
@@ -40,6 +41,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 }) => {
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn, setUserIsCreator } = useAppState();
   const user = useAppSelector((state) => state.user);
   const { socketConnection } = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
@@ -175,7 +177,10 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
           } as TUserData)
         );
       }
+
       if (data?.me?.options?.isCreator) {
+        setUserIsCreator(true);
+
         try {
           const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(getMyOnboardingStatePayload);
@@ -199,17 +204,25 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     } catch (err) {
       console.error(err);
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       }
     }
-  }, [dispatch, user.creatorData?.options, updateCreatorDataSteps]);
+  }, [
+    dispatch,
+    user.creatorData?.options,
+    setUserIsCreator,
+    updateCreatorDataSteps,
+    setUserLoggedIn,
+  ]);
 
   useEffect(() => {
     const setUserTimeZone = async () => {
@@ -245,11 +258,13 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
@@ -509,11 +524,13 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       } catch (err) {
         console.error(err);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );

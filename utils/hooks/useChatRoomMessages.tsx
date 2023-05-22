@@ -1,7 +1,6 @@
 import { newnewapi } from 'newnew-api';
 import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
 import { getMessages } from '../../api/endpoints/chat';
-import Long from 'long';
 
 interface IUseChatRoomMessages {
   roomId: number | Long | null | undefined;
@@ -22,7 +21,7 @@ const useChatRoomMessages = (
     ['private', 'getMessages', params],
     async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetMessagesRequest({
-        roomId: params.roomId,
+        roomId: params.roomId as number,
         paging: {
           pageToken: pageParam,
           ...(params.limit ? { limit: params.limit } : { limit: 10 }),

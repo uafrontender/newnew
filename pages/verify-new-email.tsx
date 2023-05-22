@@ -17,6 +17,7 @@ import { setUserData } from '../redux-store/slices/userStateSlice';
 import { becomeCreator } from '../api/endpoints/user';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { useAppState } from '../contexts/appStateContext';
 
 interface IVerifyNewEmail {}
 
@@ -25,6 +26,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn, setUserIsCreator } = useAppState();
 
   const router = useRouter();
   const { email, retryAfter, redirect } = router.query;
@@ -72,6 +74,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
             },
           })
         );
+
+        setUserLoggedIn(true);
+        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
       }
 
       if (redirect === 'settings') {

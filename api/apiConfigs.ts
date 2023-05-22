@@ -83,7 +83,7 @@ interface EncDec<T = keyof NewnewapiType> {
  * @param response browser Fetch API response
  */
 const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
-  const clonedResponseObj = response.clone()
+  const clonedResponseObj = response.clone();
   const contentType = response.headers.get('content-type');
 
   return new Promise((resolve, reject) => {
@@ -102,11 +102,14 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
     }
 
     // Try to extract actual error message
-    clonedResponseObj.text().then((text) => {
-      reject(new Error(text || 'An error occurred'));
-    }).catch(() => {
-      reject(new Error('An error occurred'));
-    })
+    clonedResponseObj
+      .text()
+      .then((text) => {
+        reject(new Error(text || 'An error occurred'));
+      })
+      .catch(() => {
+        reject(new Error('An error occurred'));
+      });
   });
 };
 
@@ -229,7 +232,9 @@ export async function fetchProtobuf<
 }
 
 // Tries to refresh credentials if access token has expired
-const refreshCredentials = (payload: newnewapi.RefreshCredentialRequest) =>
+export const refreshCredentials = (
+  payload: newnewapi.RefreshCredentialRequest
+) =>
   fetchProtobuf<
     newnewapi.RefreshCredentialRequest,
     newnewapi.RefreshCredentialResponse
@@ -292,7 +297,9 @@ export async function fetchProtobufProtectedIntercepted<
     if (!accessToken && !refreshToken) {
       throw new Error('No token');
     }
-    if (!accessToken && refreshToken) throw new Error('Access token invalid');
+    if (!accessToken && refreshToken) {
+      throw new Error('Access token invalid');
+    }
 
     // Try to make request if access and refresh tokens are present
     res = await fetchProtobuf<RequestType, ResponseType>(
@@ -316,7 +323,7 @@ export async function fetchProtobufProtectedIntercepted<
 
     return res;
   } catch (errFirstAttempt) {
-    // Invalid acces token, refresh and try again
+    // Invalid access token, refresh and try again
     if ((errFirstAttempt as Error).message === 'Access token invalid') {
       try {
         const refreshPayload = new newnewapi.RefreshCredentialRequest({
@@ -327,13 +334,14 @@ export async function fetchProtobufProtectedIntercepted<
         // Refresh failed, session "expired"
         // (i.e. user probably logged in from another device, or exceeded
         // max number of logged in devices/browsers)
-        if (!resRefresh.data || resRefresh.error)
+        if (!resRefresh.data || resRefresh.error) {
           throw new Error('Refresh token invalid');
+        }
 
         // Refreshed succeeded, re-set access and refresh tokens
         // Client side
         if (!serverSideTokens) {
-          if (resRefresh.data.credential?.expiresAt?.seconds)
+          if (resRefresh.data.credential?.expiresAt?.seconds) {
             cookiesInstance.set(
               'accessToken',
               resRefresh.data.credential?.accessToken,
@@ -345,6 +353,7 @@ export async function fetchProtobufProtectedIntercepted<
                 path: '/',
               }
             );
+          }
           cookiesInstance.set(
             'refreshToken',
             resRefresh.data.credential?.refreshToken,
@@ -385,17 +394,21 @@ export async function fetchProtobufProtectedIntercepted<
         return res;
       } catch (errSecondAttempt) {
         // If error is auth-related - throw
-        if ((errSecondAttempt as Error).message === 'Refresh token invalid')
+        if ((errSecondAttempt as Error).message === 'Refresh token invalid') {
           throw new Error((errSecondAttempt as Error).message);
+        }
         // Return as APIResponse.error
         return {
           error: errSecondAttempt as Error,
         };
       }
     }
+
     // If error is auth-related - throw
-    if ((errFirstAttempt as Error).message === 'No token')
+    if ((errFirstAttempt as Error).message === 'No token') {
       throw new Error((errFirstAttempt as Error).message);
+    }
+
     // Return as APIResponse.error
     return {
       error: errFirstAttempt as Error,

@@ -61,8 +61,9 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     const payload = new newnewapi.EmptyRequest({});
     const res = await getMyBundles(payload);
 
-    if (!res.data || res.error)
+    if (!res.data || res.error) {
       throw new Error(res.error?.message ?? 'Request failed');
+    }
 
     return res.data.creatorBundles;
   }, []);
@@ -91,8 +92,9 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     const payload = new newnewapi.GetMyBundleEarningsRequest();
     const res = await getMyBundleEarnings(payload);
 
-    if (!res.data || res.error)
+    if (!res.data || res.error) {
       throw new Error(res.error?.message ?? 'Request failed');
+    }
 
     const earnings = res.data.totalBundleEarnings?.usdCents ?? 0;
     return earnings > 0;
@@ -257,14 +259,14 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     busyTogglingSellingBundles,
     isSellingBundlesStatusLoaded,
     isSellingBundles,
+    showErrorToastPredefined,
   ]);
 
   // A single place to set up the rules for all elements navigating to DM views
-  const directMessagesAvailable = useMemo(() => {
-    return (
-      (bundles && bundles.length > 0) || isSellingBundles || hasSoldBundles
-    );
-  }, [bundles, isSellingBundles, hasSoldBundles]);
+  const directMessagesAvailable = useMemo(
+    () => (bundles && bundles.length > 0) || isSellingBundles || hasSoldBundles,
+    [bundles, isSellingBundles, hasSoldBundles]
+  );
 
   const isBundleDataLoaded = useMemo(
     () =>
@@ -291,6 +293,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       directMessagesAvailable,
       isSellingBundles,
       hasSoldBundles,
+      isBundleDataLoaded,
       toggleIsSellingBundles,
     ]
   );
@@ -304,9 +307,11 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
 export function useBundles() {
   const context = useContext(BundlesContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useNotifications must be used inside a `NotificationsProvider`'
     );
+  }
+
   return context;
 }

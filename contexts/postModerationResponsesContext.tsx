@@ -505,8 +505,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const handleUploadVideoProcessed = useCallback(async () => {
     setCoreResponseUploading(true);
     try {
-      let hasCoverImage = false;
-
       const payload = new newnewapi.UploadPostResponseRequest({
         postUuid,
         responseVideoUrl: uploadedResponseVideoUrl,
@@ -517,19 +515,28 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       if (res.data) {
         // If there's a cover image to be uploaded, try to do it
         if (customCoverImageUrlResponse) {
-          hasCoverImage = await handleUploadCustomCoverImage();
+          await handleUploadCustomCoverImage();
         }
-
-        console.log(hasCoverImage);
 
         // @ts-ignore
         let responseObj;
-        if (res.data.auction) responseObj = res.data.auction.response;
-        if (res.data.multipleChoice)
+        if (res.data.auction) {
+          responseObj = res.data.auction.response;
+        }
+
+        if (res.data.multipleChoice) {
           responseObj = res.data.multipleChoice.response;
-        if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
+        }
+
+        if (res.data.crowdfunding) {
+          responseObj = res.data.crowdfunding.response;
+        }
+
         // @ts-ignore
-        if (responseObj) handleUpdateResponseVideo(responseObj);
+        if (responseObj) {
+          handleUpdateResponseVideo(responseObj);
+        }
+
         await refetchPost();
         setUploadedResponseVideoUrl('');
         setResponseUploadSuccess(true);
@@ -847,9 +854,11 @@ export default PostModerationResponsesContextProvider;
 
 export function usePostModerationResponsesContext() {
   const context = useContext(PostModerationResponsesContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'usePostModerationResponsesContext must be used inside a `PostModerationResponsesContextProvider`'
     );
+  }
+
   return context;
 }

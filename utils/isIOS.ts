@@ -1,7 +1,7 @@
 import isBrowser from './isBrowser';
 
 function isIOS() {
-  if (isBrowser())
+  if (isBrowser()) {
     return (
       [
         'iPad Simulator',
@@ -14,6 +14,8 @@ function isIOS() {
       // iPad on iOS 13 detection
       (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
     );
+  }
+
   return false;
 }
 
