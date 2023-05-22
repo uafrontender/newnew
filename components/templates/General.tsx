@@ -24,7 +24,6 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { ChatsProvider } from '../../contexts/chatContext';
 import ReportBugButton from '../molecules/ReportBugButton';
-import useHasMounted from '../../utils/hooks/useHasMounted';
 import ModalNotifications from '../molecules/ModalNotifications';
 import BaseLayout from './BaseLayout';
 import { useBundles } from '../../contexts/bundlesContext';
@@ -55,16 +54,13 @@ export const General: React.FC<IGeneral> = (props) => {
   const user = useAppSelector((state) => state.user);
   const { banner, globalSearchActive } = useAppSelector((state) => state.ui);
   const { appConstants } = useGetAppConstants();
-  const { resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
-
-  // TODO: Remove hasMounted after user auth data is available in context
-  const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -78,8 +74,8 @@ export const General: React.FC<IGeneral> = (props) => {
       },
     ];
 
-    if (user.loggedIn) {
-      if (user.userData?.options?.isCreator) {
+    if (userLoggedIn) {
+      if (userIsCreator) {
         bottomNavigationShadow = [
           {
             key: 'home',
@@ -156,11 +152,11 @@ export const General: React.FC<IGeneral> = (props) => {
 
     return bottomNavigationShadow;
   }, [
-    user.loggedIn,
+    userLoggedIn,
     unreadNotificationCount,
     user.userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
-    user.userData?.options?.isCreator,
+    userIsCreator,
     unreadCount,
     bundles,
   ]);
@@ -230,27 +226,23 @@ export const General: React.FC<IGeneral> = (props) => {
           </Container>
         </SContent>
         <Footer />
-        {hasMounted && (
-          <>
-            <BottomNavigation
-              collection={bottomNavigation}
-              moreMenuMobileOpen={moreMenuMobileOpen}
-              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-              visible={mobileNavigationVisible && !globalSearchActive}
-            />
-            <SortingContainer
-              id='sorting-container'
-              withCookie={cookies.accepted !== 'true'}
-              bottomNavigationVisible={mobileNavigationVisible}
-            />
-            <CookieContainer
-              bottomNavigationVisible={mobileNavigationVisible}
-              zIndex={moreMenuMobileOpen ? 9 : 10}
-            >
-              <Cookie />
-            </CookieContainer>
-          </>
-        )}
+        <BottomNavigation
+          collection={bottomNavigation}
+          moreMenuMobileOpen={moreMenuMobileOpen}
+          handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+          visible={mobileNavigationVisible && !globalSearchActive}
+        />
+        <SortingContainer
+          id='sorting-container'
+          withCookie={cookies.accepted !== 'true'}
+          bottomNavigationVisible={mobileNavigationVisible}
+        />
+        <CookieContainer
+          bottomNavigationVisible={mobileNavigationVisible}
+          zIndex={moreMenuMobileOpen ? 9 : 10}
+        >
+          <Cookie />
+        </CookieContainer>
         {chatButtonVisible && (
           <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}

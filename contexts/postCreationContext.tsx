@@ -515,5 +515,6 @@ export function usePostCreationState() {
       'usePostCreationState must be used inside a `PostCreationContextProvider`'
     );
   }
+
   return context;
 }

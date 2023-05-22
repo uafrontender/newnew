@@ -149,7 +149,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -285,18 +285,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setUsernameError, dispatch, user.userData?.username]
+    [setUsernameError, dispatch, user.userData?.username, setUserLoggedIn]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -341,18 +343,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setNicknameError, dispatch]
+    [setNicknameError, dispatch, setUserLoggedIn]
   );
 
   const validateNicknameViaAPIDebounced = useMemo(
@@ -619,6 +623,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
           })
         );
 
+        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+
         const acceptTermsPayload = new newnewapi.EmptyRequest({});
 
         const res = await acceptCreatorTerms(acceptTermsPayload);
@@ -659,11 +665,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
 
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );

@@ -31,7 +31,7 @@ export const Tablet: React.FC = () => {
   const { unreadCount } = useChatsUnreadMessages();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
-  const { resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
 
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
@@ -44,25 +44,25 @@ export const Tablet: React.FC = () => {
   const isLaptop = ['laptop'].includes(resizeMode);
 
   const searchInputWidth = useMemo(() => {
-    if (user.userData?.options?.isCreator && isLaptop) {
+    if (userIsCreator && isLaptop) {
       return '290px';
     }
 
-    if (user.userData?.options?.isCreator) {
+    if (userIsCreator) {
       return '220px';
     }
 
     return undefined;
-  }, [isLaptop, user.userData?.options?.isCreator]);
+  }, [isLaptop, userIsCreator]);
 
   return (
     <SContainer>
       <Logo isShort style={{ flexShrink: 0 }} />
       <SRightBlock>
-        {!user.loggedIn && <StaticSearchInput />}
-        {user.loggedIn && (
+        {!userLoggedIn && <StaticSearchInput />}
+        {userLoggedIn && (
           <>
-            {user.userData?.options?.isCreator && (
+            {userIsCreator && (
               <Link href='/creator/dashboard'>
                 <a>
                   <SDashboardButton
@@ -138,9 +138,9 @@ export const Tablet: React.FC = () => {
           </>
         )}
 
-        {user.loggedIn ? (
+        {userLoggedIn ? (
           <>
-            {user.userData?.options?.isCreator && (
+            {userIsCreator && (
               <>
                 <SItemWithMargin>
                   <Link href='/creation'>
@@ -176,7 +176,7 @@ export const Tablet: React.FC = () => {
                 </SItemWithMargin>
               </>
             )}
-            {!user.userData?.options?.isCreator && (
+            {!userIsCreator && (
               <>
                 {canBecomeCreator(
                   user.userData?.dateOfBirth,

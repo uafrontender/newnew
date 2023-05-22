@@ -132,10 +132,11 @@ export default MultipleBeforePopStateContextProvider;
 
 export const useMultipleBeforePopState = () => {
   const context = useContext(MultipleBeforePopStateContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useMultipleBeforePopState must be used inside a `MultipleBeforePopStateContext.Provider`'
     );
+  }
 
   const {
     handleAddBeforePopStateCallback,

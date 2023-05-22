@@ -25,7 +25,7 @@ import ShareMenu from '../../organisms/ShareMenu';
 export const Desktop: React.FC = () => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const theme = useTheme();
   const { appConstants } = useGetAppConstants();
 
@@ -49,7 +49,7 @@ export const Desktop: React.FC = () => {
     <SContainer>
       <Logo isShort={!isDesktopL} />
       <SRightBlock>
-        {user.loggedIn && user.userData?.options?.isCreator && (
+        {userLoggedIn && userIsCreator && (
           <SItemWithMargin style={{ paddingRight: isDesktopL ? 16 : 0 }}>
             <SNavText variant={3} weight={600} onClick={handleOpenShareMenu}>
               {t('myLink.shareLink')}
@@ -62,16 +62,13 @@ export const Desktop: React.FC = () => {
         <SItemWithMargin>
           <StaticSearchInput
             width={
-              user.userData?.options?.isCreator &&
-              bundles &&
-              bundles.length > 0 &&
-              !isDesktopL
+              userIsCreator && bundles && bundles.length > 0 && !isDesktopL
                 ? '250px'
                 : undefined
             }
           />
         </SItemWithMargin>
-        {user.loggedIn && (
+        {userLoggedIn && (
           <>
             {directMessagesAvailable && (
               <SItemWithMargin>
@@ -96,9 +93,9 @@ export const Desktop: React.FC = () => {
           </>
         )}
 
-        {user.loggedIn ? (
+        {userLoggedIn ? (
           <>
-            {user.userData?.options?.isCreator && (
+            {userIsCreator && (
               <SItemWithMargin>
                 <Link href='/creator/dashboard'>
                   <a>
@@ -147,7 +144,7 @@ export const Desktop: React.FC = () => {
                 </Link>
               </SItemWithMargin>
             )}
-            {user.userData?.options?.isCreator && (
+            {userIsCreator && (
               <>
                 <SItemWithMargin>
                   <Link href='/creation'>
@@ -185,7 +182,7 @@ export const Desktop: React.FC = () => {
                 </SItemWithMargin>
               </>
             )}
-            {!user.userData?.options?.isCreator && (
+            {!userIsCreator && (
               <>
                 {canBecomeCreator(
                   user.userData?.dateOfBirth,

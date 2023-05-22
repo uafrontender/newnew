@@ -192,9 +192,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [lastContributedOptionId, setLastContributedOptionId] = useState<
+    number | undefined
+  >();
   const handleAddOrUpdateOptionFromResponse = useCallback(
     async (newOption: newnewapi.Auction.Option) => {
       addOrUpdateAcOptionMutation?.mutate(newOption);
+      setLastContributedOptionId(newOption.id as number);
     },
     [addOrUpdateAcOptionMutation]
   );
@@ -555,10 +559,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             options={options}
             optionsLoading={isOptionsLoading}
             hasNextPage={!!hasNextOptionsPage}
+            lastContributedOptionId={lastContributedOptionId}
             fetchNextPage={fetchNextOptionsPage}
-            handleAddOrUpdateOptionFromResponse={
-              handleAddOrUpdateOptionFromResponse
-            }
+            handleUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             handleRemoveOption={handleRemoveOption}
           />
           {postStatus === 'voting' && (
