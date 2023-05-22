@@ -14,7 +14,8 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
-import { debounce, isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -53,6 +54,7 @@ import useErrorToasts, {
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const OnboardingEditProfileImageModal = dynamic(
   () => import('./OnboardingEditProfileImageModal')
@@ -146,10 +148,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
   IOnboardingSectionDetails
 > = ({ isAvatarCustom, availableCountries }) => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -285,18 +288,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setUsernameError, dispatch, user.userData?.username]
+    [setUsernameError, dispatch, user.userData?.username, setUserLoggedIn]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -341,18 +346,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setNicknameError, dispatch]
+    [setNicknameError, dispatch, setUserLoggedIn]
   );
 
   const validateNicknameViaAPIDebounced = useMemo(
@@ -619,6 +626,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
           })
         );
 
+        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+
         const acceptTermsPayload = new newnewapi.EmptyRequest({});
 
         const res = await acceptCreatorTerms(acceptTermsPayload);
@@ -659,11 +668,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
 
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -993,7 +1004,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   _button: 'Back button',
                   _component: 'OnboardingSectionDetails',
                 });
-                router.back();
+                goBackOrRedirect('/');
               }}
             >
               {t('detailsSection.button.back')}
@@ -1035,7 +1046,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
           setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
           onClose={() => {
             setCropMenuOpen(false);
-            // window.history.back();
+
             if (isBrowser()) {
               window.history.replaceState(null, '');
             }

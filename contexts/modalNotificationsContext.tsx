@@ -41,7 +41,7 @@ const ModalNotificationsContextProvider: React.FC<
       show,
       close,
     }),
-    [notifications]
+    [notifications, show, close]
   );
 
   return (

@@ -14,6 +14,7 @@ function formatTimeLeft(timeLeft: number): FormattedTimeLeft[] | undefined {
   if (yearsLeft > 0) {
     const remainingMonths = monthsLeft - yearsLeft * 12;
     const months: FormattedTimeLeft[] =
+      // eslint-disable-next-line no-nested-ternary
       remainingMonths === 0
         ? []
         : remainingMonths === 1

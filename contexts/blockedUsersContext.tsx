@@ -54,8 +54,11 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
           userUuid: uuid,
         });
         const res = await markUser(payload);
-        if (!res.data || res.error)
+
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
+
         block
           ? setUsersIBlocked((curr) => [...curr, uuid])
           : setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
@@ -66,7 +69,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         setIsChangingUserBlockedStatus(false);
       }
     },
-    []
+    [showErrorToastPredefined]
   );
 
   useEffect(() => {
@@ -84,8 +87,11 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         setUsersBlockedLoading(true);
         const payload = new newnewapi.EmptyRequest();
         const res = await getMyBlockedUsers(payload);
-        if (!res.data || res.error)
+
+        if (!res.data || res.error) {
           throw new Error(res.error?.message ?? 'Request failed');
+        }
+
         setUsersIBlocked(res.data.userUuidsIBlocked);
         setUsersBlockedMe(res.data.userUuidsBlockedMe);
         setUsersBlockedLoaded(true);
@@ -95,7 +101,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       }
     }
     fetchBlockedUsers();
-  }, [user.loggedIn]);
+  }, [user.loggedIn, usersBlockedLoading]);
 
   useEffect(() => {
     const socketHandlerUserBlockStatusChanged = async (data: any) => {
@@ -147,9 +153,11 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
 
 export function useGetBlockedUsers() {
   const context = useContext(BlockedUsersContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useGetBlockedUsers must be used inside a `BlockedUsersProvider`'
     );
+  }
+
   return context;
 }

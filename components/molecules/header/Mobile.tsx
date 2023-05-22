@@ -20,7 +20,7 @@ export const Mobile: React.FC = () => {
   const { t } = useTranslation();
   const { appConstants } = useGetAppConstants();
 
-  const { resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
 
   const isMobileS = ['mobile', 'mobileS'].includes(resizeMode);
   const isMobileM = ['mobileM'].includes(resizeMode);
@@ -30,15 +30,15 @@ export const Mobile: React.FC = () => {
     <SContainer>
       <Logo isShort />
       <SRightBlock>
-        {isMobileS && user.loggedIn ? (
+        {isMobileS && userLoggedIn ? (
           <SearchInput />
         ) : (
           <StaticSearchInput
             // TODO: remove nested ternary
             width={
-              isMobileL && user.loggedIn
+              isMobileL && userLoggedIn
                 ? '40vw'
-                : isMobileM && user.loggedIn
+                : isMobileM && userLoggedIn
                 ? '150px'
                 : undefined
             }
@@ -47,8 +47,8 @@ export const Mobile: React.FC = () => {
         <SItemWithMargin>
           <Link
             href={
-              user.loggedIn
-                ? user.userData?.options?.isCreator
+              userLoggedIn
+                ? userIsCreator
                   ? '/profile/my-posts'
                   : '/profile'
                 : '/sign-up'
@@ -60,8 +60,8 @@ export const Mobile: React.FC = () => {
                 avatarUrl={user.userData?.avatarUrl}
                 onClick={() =>
                   Mixpanel.track('My Avatar Clicked', {
-                    _target: user.loggedIn
-                      ? user.userData?.options?.isCreator
+                    _target: userLoggedIn
+                      ? userIsCreator
                         ? '/profile/my-posts'
                         : '/profile'
                       : '/sign-up',
@@ -71,9 +71,9 @@ export const Mobile: React.FC = () => {
             </a>
           </Link>
         </SItemWithMargin>
-        {user.loggedIn && (
+        {userLoggedIn && (
           <>
-            {user.userData?.options?.isCreator && (
+            {userIsCreator && (
               <SItemWithMargin>
                 <Link href='/creation'>
                   <a>
@@ -95,7 +95,7 @@ export const Mobile: React.FC = () => {
                 </Link>
               </SItemWithMargin>
             )}
-            {!user.userData?.options?.isCreator &&
+            {!userIsCreator &&
               canBecomeCreator(
                 user.userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears

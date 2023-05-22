@@ -94,7 +94,9 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
 
 export default SettingsAccordion;
 
-const SSettingsAccrodionContainer = styled.div``;
+const SSettingsAccrodionContainer = styled.div`
+  overflow: hidden;
+`;
 
 const SSettingsAccordionItem = styled.div<{
   isDimmed: boolean;

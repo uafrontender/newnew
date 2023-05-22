@@ -121,7 +121,9 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
 
 export function useGetChats() {
   const context = useContext(ChatsContext);
-  if (!context)
+  if (!context) {
     throw new Error('useGetChat must be used inside a `ChatProvider`');
+  }
+
   return context;
 }

@@ -11,14 +11,29 @@ const secondsToDHM = (sec: number, mode: 'noTrim' | 'trim' = 'trim'): DHM => {
     (sec - hours * 3600 - days * 3600 * 24) / 60
   );
 
-  if (days < 10 && days >= 1) days = mode === 'noTrim' ? days : `0${days}`;
-  if (hours < 10 && hours >= 1) hours = mode === 'noTrim' ? hours : `0${hours}`;
-  if (minutes < 10 && minutes >= 1)
-    minutes = mode === 'noTrim' ? minutes : `0${minutes}`;
+  if (days < 10 && days >= 1) {
+    days = mode === 'noTrim' ? days : `0${days}`;
+  }
 
-  if (days < 1) days = mode === 'noTrim' ? '0' : '00';
-  if (hours < 1) hours = mode === 'noTrim' ? '0' : '00';
-  if (minutes < 1) minutes = mode === 'noTrim' ? '0' : '00';
+  if (hours < 10 && hours >= 1) {
+    hours = mode === 'noTrim' ? hours : `0${hours}`;
+  }
+
+  if (minutes < 10 && minutes >= 1) {
+    minutes = mode === 'noTrim' ? minutes : `0${minutes}`;
+  }
+
+  if (typeof days === 'number' && days < 1) {
+    days = mode === 'noTrim' ? '0' : '00';
+  }
+
+  if (typeof hours === 'number' && hours < 1) {
+    hours = mode === 'noTrim' ? '0' : '00';
+  }
+
+  if (typeof minutes === 'number' && minutes < 1) {
+    minutes = mode === 'noTrim' ? '0' : '00';
+  }
 
   days = days.toString();
   hours = hours.toString();

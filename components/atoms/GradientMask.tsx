@@ -1,4 +1,4 @@
-import { isNumber } from 'lodash';
+import isNumber from 'lodash/isNumber';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -79,6 +79,7 @@ const SGradientMask = styled.div<IGradientMask>`
       }
       return `bottom: ${props.positionBottom ?? 0}px`;
     }}
+  }
 
   ${(props) => props.theme.media.laptopL} {
     height: ${(props) => (props.active ? props.height || '80px' : 0)};
