@@ -245,11 +245,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const handleCloseEditProfileMenu = useCallback(
     (preventGoBack = false) => {
       if (isBrowser() && !preventGoBack) {
-        window.history.back();
+        goBackOrRedirect('/');
       }
       setIsEditProfileMenuOpen(false);
     },
-    [setIsEditProfileMenuOpen]
+    [goBackOrRedirect, setIsEditProfileMenuOpen]
   );
 
   const handleOpenEditProfileMenu = () => {
