@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { AuthLayoutContext } from '../AuthLayout';
@@ -12,6 +12,7 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
   const theme = useTheme();
   const authLayoutContext = useContext(AuthLayoutContext);
 
+  const imageHash = useRef(Math.floor(Math.random() * 1000000));
   const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>(
     'intro'
   );
@@ -61,8 +62,8 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
           }}
           src={
             theme.name === 'dark'
-              ? assets.signup.darkIntoAnimated()
-              : assets.signup.lightIntoAnimated()
+              ? `${assets.signup.darkIntoAnimated()}?${imageHash.current}`
+              : `${assets.signup.lightIntoAnimated()}?${imageHash.current}`
           }
           onLoad={onIntroLoaded}
         />
