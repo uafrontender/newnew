@@ -5,6 +5,7 @@ import NextErrorComponent from 'next/error';
 import * as Sentry from '@sentry/nextjs';
 import { useAppDispatch } from '../redux-store/store';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
+import { useAppState } from '../contexts/appStateContext';
 
 interface IErrorPage {
   statusCode: number;
@@ -17,6 +18,8 @@ const MyError: NextPage<IErrorPage> = ({
   hasGetInitialPropsRun,
   title: errorMsg,
 }) => {
+  const { setUserLoggedIn } = useAppState();
+
   if (!hasGetInitialPropsRun && errorMsg) {
     // getInitialProps is not called in case of
     // https://github.com/vercel/next.js/issues/8592. As a workaround, we pass
@@ -31,16 +34,18 @@ const MyError: NextPage<IErrorPage> = ({
     // User was probably not authenticated in the first place
     // Redirect to homepage
     if (errorMsg === 'No token') {
+      setUserLoggedIn(false);
       dispatch(logoutUserClearCookiesAndRedirect());
     }
     // Refresh token was present, session probably expired
     // Redirect to sign up page
     if (errorMsg === 'Refresh token invalid') {
+      setUserLoggedIn(false);
       dispatch(
         logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
       );
     }
-  }, [errorMsg, dispatch]);
+  }, [errorMsg, dispatch, setUserLoggedIn]);
 
   return <NextErrorComponent statusCode={statusCode} />;
 };

@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable no-unused-expressions */
 // prevent inheriting parent element's onClick
 const preventParentClick = (fn?: any, defaultOnly?: any) => {
   return (e: any, ...params: any) => {

@@ -5,7 +5,6 @@ import React, {
   useEffect,
   ReactElement,
   useMemo,
-  useLayoutEffect,
   useCallback,
 } from 'react';
 import styled from 'styled-components';
@@ -14,6 +13,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import PostCard, {
   SUserAvatarOutside,
@@ -235,8 +235,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       return `${desktopItemWidth}px`;
     }, [isMobile, isTablet, isLaptop]);
 
-    // TODO: probably needs useIsomorphicLayoutEffect
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       setCardWidth(getCardWidth());
     }, [getCardWidth]);
 

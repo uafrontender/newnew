@@ -54,8 +54,9 @@ const usePost = (
 
       const res = await fetchPostByUUID(getPostPayload, signal);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Post not found');
+      }
 
       return res.data;
     },

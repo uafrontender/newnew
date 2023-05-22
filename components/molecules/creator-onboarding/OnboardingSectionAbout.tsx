@@ -27,7 +27,6 @@ import {
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
-import isSafari from '../../../utils/isSafari';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
@@ -69,7 +68,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -113,18 +112,20 @@ const OnboardingSectionAbout: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setBioError, dispatch]
+    [setBioError, dispatch, setUserLoggedIn]
   );
 
   const validateBioViaApiDebounced = useMemo(
@@ -185,11 +186,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
       console.log(err);
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -200,6 +203,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
     dispatch,
     router,
     user.creatorData?.options?.stripeConnectStatus,
+    setUserLoggedIn,
   ]);
 
   useEffect(() => {
