@@ -28,17 +28,17 @@
         "amount": "Tus ganancias en Stripe son",
         "amountSecondLine": "Gestiona tu saldo en Stripe.",
         "stripeButton": "Dirígeme a Stripe",
-        "date": "se enviará automáticamente el {{date}}.",
+        "date": "Tu pago será automáticamente enviado el {{date}}.",
         "submit": "Más información",
         "noPayouts": "No tienes ningún pago pendiente",
-        "nextPayout_NEED_TRANSLATION": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
+        "nextPayout": "Tu siguiente pago de ${{amount}} será enviado el {{date}}."
       },
       "toDosIssue": {
         "text": "Añade una biografía y tus datos bancarios para retirar tus ganancias",
         "textBio": "Añade una biografía para retirar tus ganancias",
         "textBank": "Añade tus datos bancarios para retirar tus ganancias",
         "button": "Añadir",
-        "stripeIssue": "Hay un problema con tu cuenta de Stripe",
+        "stripeIssue_NEED_TRANSLATION": "There is a problem with your Stripe account or its setup is unfinished",
         "stripeIssueButton": "Ver cuenta de Stripe"
       },
       "makeDecision": {

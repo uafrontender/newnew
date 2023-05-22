@@ -73,7 +73,7 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
   // TODO: move hidden to parent, just pass className here
   return (
     <SSidebar hidden={hidden}>
-      <ChatToolbar />
+      <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
       {withTabs && !searchChatroom && tabsVisible && activeTab && (
         <ChatListTabs activeTab={activeTab} changeActiveTab={changeActiveTab} />
       )}

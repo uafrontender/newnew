@@ -122,7 +122,7 @@
       },
       "additionalInfo": {
         "placeholder": "請再提供更多詳情......",
-        "tooShort_NEED_TRANSLATION": "Report is too short"
+        "tooShort": "報告太短"
       },
       "button": {
         "cancel": "取消",
@@ -176,7 +176,7 @@
       "customOptions": "在任何Superpoll中添加定制選項",
       "chat": "一對一私聊",
       "buyButton": "購買更多投票",
-      "bundlesDisabled_NEED_TRANSLATION": "*The bundles were turned off\nby the creator",
+      "bundlesDisabled": "*Bundle已被\n創作者關閉",
       "unit": {
         "day": "天",
         "days": "天",
@@ -190,7 +190,7 @@
   "myLink": {
     "copy": "我的連結",
     "copied": "已複製！",
-    "shareLink_NEED_TRANSLATION": "Share link"
+    "shareLink": "分享鏈接"
   },
   "socials": {
     "copy": "複製連結",

@@ -135,7 +135,8 @@
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre tiene caracteres inválidos",
           "inappropriate": "Las palabras ofensivas no están permitidas",
-          "linksForbidden": "Los enlaces no están permitidos"
+          "linksForbidden": "Los enlaces no están permitidos",
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "username": {
@@ -265,7 +266,7 @@
       "transactions": {
         "title": "Transacciones",
         "you": "Tú",
-        "empty_NEED_TRANSLATION": "There are no transactions yet",
+        "empty": "Aún no hay transacciones",
         "type": {
           "1": "bid",
           "2": "superpoll",
