@@ -51,6 +51,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
 import { SocketContext } from '../../../../contexts/socketContext';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
+import useGoBackOrRedirect from '../../../../utils/useGoBackOrRedirect';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -67,6 +68,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const playerRef: any = useRef(null);
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -223,8 +225,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   const handleClose = useCallback(() => {
     Mixpanel.track('Post Edit', { _stage: 'Creation' });
-    router.back();
-  }, [router]);
+    goBackOrRedirect('/creation');
+  }, [goBackOrRedirect]);
 
   const handleCloseModal = useCallback(() => {
     setIsGoingToHomepage(true);
@@ -471,8 +473,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     ]
   );
   const handleGoBack = useCallback(() => {
-    router.back();
-  }, [router]);
+    goBackOrRedirect('/creation');
+  }, [goBackOrRedirect]);
 
   const renderSetting = (item: any) => (
     <SItem key={item.key}>
