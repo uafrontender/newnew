@@ -24,7 +24,8 @@
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
-          "linksForbidden": "Los enlaces no están permitidos"
+          "linksForbidden": "Los enlaces no están permitidos",
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "lastName": {
@@ -35,7 +36,8 @@
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
-          "linksForbidden": "Los enlaces no están permitidos"
+          "linksForbidden": "Los enlaces no están permitidos",
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "username": {
@@ -64,7 +66,8 @@
           "tooShort": "El nombre es demasiado corto",
           "invalidChar": "El nombre contiene caracteres inválidios",
           "inappropriate": "Las palabras ofensivas están prohibidas",
-          "linksForbidden": "Los enlaces no están permitidos"
+          "linksForbidden": "Los enlaces no están permitidos",
+          "sideSpacesForbidden": "No se admiten espacios al principio y al final del texto"
         }
       },
       "email": {
@@ -99,8 +102,8 @@
           "upload": "Subir foto",
           "uploadNew": "Subir nueva imagen"
         },
-        "errors_NEED_TRANSLATION": {
-          "inappropriate": "Uploaded image cannot be used"
+        "errors": {
+          "inappropriate": "No se puede utilizar la imagen cargada"
         }
       }
     },

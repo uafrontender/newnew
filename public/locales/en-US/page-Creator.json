@@ -28,7 +28,7 @@
         "amount": "Your Stripe earnings are",
         "amountSecondLine": "Manage your balance on Stripe.",
         "stripeButton": "Take me to Stripe",
-        "date": "will automatically be sent on {{date}}.",
+        "date": "Your payment will automatically be sent on {{date}}.",
         "submit": "Learn More",
         "noPayouts": "You don’t have any upcoming payouts",
         "nextPayout": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
@@ -38,7 +38,7 @@
         "textBio": "Add a bio to withdraw your earnings",
         "textBank": "Add your bank info to withdraw your earnings",
         "button": "Add",
-        "stripeIssue": "There's an issue with your Stripe account",
+        "stripeIssue": "There is a problem with your Stripe account or its setup is unfinished",
         "stripeIssueButton": "See Stripe account"
       },
       "makeDecision": {

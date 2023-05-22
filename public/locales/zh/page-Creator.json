@@ -28,17 +28,17 @@
         "amount": "你的Stripe收入為",
         "amountSecondLine": "在Stripe上管理你的餘額。",
         "stripeButton": "轉至Stripe",
-        "date": "將於{{date}}自動發送,",
+        "date_NEED_TRANSLATION": "Your payment will automatically be sent on {{date}}.",
         "submit": "瞭解更多",
         "noPayouts": "沒有任何即將支付的款項",
-        "nextPayout_NEED_TRANSLATION": "Your next payout of ${{amount}} will automatically be sent on {{date}}."
+        "nextPayout": "你的下一筆付款 ${{amount}} 將在 {{date}} 自動發送。"
       },
       "toDosIssue": {
         "text": "添加個人簡介和銀行資訊以支取你的收入",
         "textBio": "添加個人簡介和銀行資訊以支取你的收入",
         "textBank": "添加個人簡介和銀行資訊以支取你的收入",
         "button": "添加",
-        "stripeIssue": "您的Stripe帳戶有問題",
+        "stripeIssue_NEED_TRANSLATION": "There is a problem with your Stripe account or its setup is unfinished",
         "stripeIssueButton": "查看Stripe帳戶"
       },
       "makeDecision": {

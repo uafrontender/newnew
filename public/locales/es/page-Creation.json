@@ -247,8 +247,8 @@
     "texts": {
       "title-published": "Ahora está en vivo!",
       "title-scheduled": "Ya está programado!",
-      "shareCaptionBid_NEED_TRANSLATION": "Copy the link to share your Bid on your social platforms.",
-      "shareCaptionSuperpoll_NEED_TRANSLATION": "Copy the link to share your Superpoll on your social platforms."
+      "shareCaptionBid": "Copia el enlace para compartir tu Oferta en tus plataformas sociales.",
+      "shareCaptionSuperpoll": "Copia el enlace para compartir tu Superpoll en tus plataformas sociales."
     }
   },
   "tutorials": {

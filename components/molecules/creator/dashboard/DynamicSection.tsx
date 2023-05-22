@@ -575,6 +575,7 @@ const SSectionContent = styled.div<{ isSmallPadding: boolean }>`
   position: relative;
   overflow-y: scroll;
   flex-direction: column;
+
   // Scrollbar
   &::-webkit-scrollbar {
     width: 4px;
@@ -584,6 +585,7 @@ const SSectionContent = styled.div<{ isSmallPadding: boolean }>`
     background: transparent;
     border-radius: 4px;
     transition: 0.2s linear;
+    margin-bottom: 16px;
   }
   &::-webkit-scrollbar-thumb {
     background: transparent;

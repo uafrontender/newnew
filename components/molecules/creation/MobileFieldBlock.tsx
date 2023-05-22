@@ -97,9 +97,23 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(id, e.target.value);
+      const newValue = e?.target?.value;
+      if (inputProps?.pattern) {
+        const regExp = new RegExp(inputProps?.pattern);
+        if (newValue && !regExp.test(newValue)) {
+          return;
+        }
+      }
+
+      if (inputProps?.type === 'number') {
+        const clearedValue = parseInt(newValue);
+        onChange(id, clearedValue.toString());
+        return;
+      }
+
+      onChange(id, newValue);
     },
-    [id, onChange]
+    [id, inputProps?.pattern, inputProps?.type, onChange]
   );
 
   const handleFocus = useCallback(() => {
@@ -203,7 +217,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           });
         } else {
           onChange(id, {
-            time: moment().add(1, 'minute').format('hh:mm'),
+            time: moment().add(2, 'minute').format('hh:mm'),
           });
         }
 
@@ -607,7 +621,8 @@ const SModalToggleWrapper = styled.div<{ hidden?: boolean }>`
   width: 100%;
   margin: 12px 0;
   display: flex;
-  flex-direction: row
+  flex-direction: row;
+  flex-shrink: 0;
   align-items: start;
   justify-content: center;
   height: ${({ hidden }) => (hidden ? '0px' : '44px')};
