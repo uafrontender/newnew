@@ -1,7 +1,8 @@
 /* eslint-disable no-plusplus */
 import { newnewapi } from 'newnew-api';
 import { useMemo } from 'react';
-import { cloneDeep, uniqBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 import {
   InfiniteData,
   useInfiniteQuery,

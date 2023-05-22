@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 export const useDropDownDirection = (ref: any, listHeight: number) => {
   const [direction, setDirection] = useState('down');

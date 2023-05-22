@@ -14,7 +14,8 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
-import { debounce, isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 

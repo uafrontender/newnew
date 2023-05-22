@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { newnewapi } from 'newnew-api';
 import { useCookies } from 'react-cookie';
 import React, {
@@ -290,7 +290,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         const { data } = await getTutorialsStatus(payload);
         if (data) {
           if (
-            !_.isEqual(data, localUserTutorialsProgress) &&
+            !isEqual(data, localUserTutorialsProgress) &&
             localUserTutorialsProgress
           ) {
             const syncedObj: newnewapi.IGetTutorialsStatusResponse = {
@@ -550,7 +550,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
         saveStateLS('userTutorialsProgress', user.userTutorialsProgress);
       }
 
-      if (!_.isEqual(user.userTutorialsProgress, localUserTutorialsProgress)) {
+      if (!isEqual(user.userTutorialsProgress, localUserTutorialsProgress)) {
         dispatch(
           setUserTutorialsProgress(
             localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse

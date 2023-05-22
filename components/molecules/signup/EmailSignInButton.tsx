@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import styled from 'styled-components';
 
 type TEmailSignInButton = React.ComponentPropsWithoutRef<'button'> & {};
