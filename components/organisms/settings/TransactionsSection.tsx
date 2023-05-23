@@ -50,8 +50,14 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
       });
       const res = await getMyTransactions(payload);
       const { data, error } = res;
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
-      if (data.transactions) setMyTransactions(data.transactions);
+
+      if (!data || error) {
+        throw new Error(error?.message ?? 'Request failed');
+      }
+
+      if (data.transactions) {
+        setMyTransactions(data.transactions);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -82,7 +88,9 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
   }, [currentPage]);
 
   useEffect(() => {
-    if (prevPage !== currentPage) fetchMyTransactions();
+    if (prevPage !== currentPage) {
+      fetchMyTransactions();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, prevPage]);
 
