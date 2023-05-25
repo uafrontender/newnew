@@ -81,14 +81,14 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           );
 
           if (
-            !res.data ||
+            !res?.data ||
             res.error ||
             (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
               res.data.status !==
                 newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
           ) {
             throw new Error(
-              res.error?.message ??
+              res?.error?.message ??
                 t(
                   getSmsNotificationSubscriptionErrorMessage(
                     res.data?.status
@@ -110,14 +110,14 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           );
 
           if (
-            !res.data ||
+            !res?.data ||
             res.error ||
             (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
               res.data.status !==
                 newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
           ) {
             throw new Error(
-              res.error?.message ??
+              res?.error?.message ??
                 t(
                   getSmsNotificationSubscriptionErrorMessage(
                     res.data?.status
@@ -147,7 +147,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           guestId
         );
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unsubscribe from SMS failed');
           showErrorToastCustom(t('smsNotifications.error.requestFailed'));
         }
@@ -156,7 +156,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           creatorUuid: subscription.userId,
         });
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unsubscribe from SMS failed');
           showErrorToastCustom(t('smsNotifications.error.requestFailed'));
         }
@@ -181,14 +181,14 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         });
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
             res.data.status !==
               newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(
                 getSmsNotificationSubscriptionErrorMessage(
                   res.data?.status
@@ -226,7 +226,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           guestId
         );
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unable to get sms notifications status');
           throw new Error('Request failed');
         }
@@ -255,7 +255,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
       getSmsNotificationsSubscriptionStatus({
         creatorUuid: subscription.userId,
       }).then((res) => {
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unable to get sms notifications status');
           return;
         }

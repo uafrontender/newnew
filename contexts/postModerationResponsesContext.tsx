@@ -288,8 +288,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       const res = await getVideoUploadUrl(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'An error occurred');
       }
 
       const xhr = new XMLHttpRequest();
@@ -341,8 +341,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       const resProcessing = await startVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      if (!resProcessing?.data || resProcessing.error) {
+        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
       }
 
       setVideoProcessing({
@@ -403,8 +403,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
         const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-        if (!resProcessing.data || resProcessing.error) {
-          throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        if (!resProcessing?.data || resProcessing.error) {
+          throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
       }
 
@@ -455,11 +455,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       );
 
       if (
-        !getCoverImageUploadUrlResponse.data ||
+        !getCoverImageUploadUrlResponse?.data ||
         getCoverImageUploadUrlResponse.error
       ) {
         throw new Error(
-          getCoverImageUploadUrlResponse.error?.message ||
+          getCoverImageUploadUrlResponse?.error?.message ||
             'Could not get cover image upload URL'
         );
       }
@@ -475,7 +475,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         }
       );
 
-      if (!uploadResponse.ok) {
+      if (!uploadResponse?.ok) {
         throw new Error('Could not upload cover image to S3');
       }
 
@@ -489,9 +489,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         updateCoverImagePayload
       );
 
-      if (updateCoverImageRes.error) {
+      if (!updateCoverImageRes || updateCoverImageRes.error) {
         throw new Error(
-          updateCoverImageRes.error?.message || 'Could not set cover image'
+          updateCoverImageRes?.error?.message || 'Could not set cover image'
         );
       }
 

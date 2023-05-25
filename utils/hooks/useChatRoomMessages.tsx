@@ -30,7 +30,7 @@ const useChatRoomMessages = (
 
       const chatroomMessagesResponse = await getMessages(payload, signal);
 
-      if (!chatroomMessagesResponse.data || chatroomMessagesResponse.error) {
+      if (!chatroomMessagesResponse?.data || chatroomMessagesResponse.error) {
         throw new Error('Request failed');
       }
 

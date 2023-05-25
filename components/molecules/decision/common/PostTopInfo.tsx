@@ -302,14 +302,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           );
 
           if (
-            !res.data ||
+            !res?.data ||
             res.error ||
             (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
               res.data.status !==
                 newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
           ) {
             throw new Error(
-              res.error?.message ??
+              res?.error?.message ??
                 t(
                   getSmsNotificationSubscriptionErrorMessage(
                     res.data?.status
@@ -331,14 +331,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           );
 
           if (
-            !res.data ||
+            !res?.data ||
             res.error ||
             (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
               res.data.status !==
                 newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
           ) {
             throw new Error(
-              res.error?.message ??
+              res?.error?.message ??
                 t(
                   getSmsNotificationSubscriptionErrorMessage(
                     res.data?.status
@@ -374,7 +374,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           guestId
         );
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unsubscribe from SMS failed');
           showErrorToastCustom(tCommon('smsNotifications.error.requestFailed'));
         }
@@ -383,7 +383,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           postUuid: subscription.postUuid,
         });
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unsubscribe from SMS failed');
           showErrorToastCustom(tCommon('smsNotifications.error.requestFailed'));
         }
@@ -408,14 +408,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         });
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           (res.data.status !== newnewapi.SmsNotificationsStatus.SUCCESS &&
             res.data.status !==
               newnewapi.SmsNotificationsStatus.SERVICE_SMS_SENT)
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               tCommon(
                 getSmsNotificationSubscriptionErrorMessage(
                   res.data?.status
@@ -453,14 +453,12 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           { postUuid: subscription.postUuid },
           guestId
         );
-        console.log(res.data);
-        if (!res.data || res.error) {
+
+        if (!res?.data || res.error) {
           console.error('Unable to get sms notifications status');
           throw new Error('Request failed');
         }
-        console.log(
-          res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
-        );
+
         setSubscribedToSmsNotifications(
           res.data.status === newnewapi.SmsNotificationsStatus.SUCCESS
         );
@@ -485,7 +483,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       getSmsNotificationsSubscriptionStatus({
         postUuid: subscription.postUuid,
       }).then((res) => {
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           console.error('Unable to get sms notifications status');
           return;
         }

@@ -67,8 +67,8 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       const res = await getMyNotifications(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       setUnreadNotifications((curr) => {
