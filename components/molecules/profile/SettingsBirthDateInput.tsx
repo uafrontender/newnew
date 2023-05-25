@@ -270,7 +270,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               }}
             />
             <SCustomInput>
-              <input
+              <SInput
                 ref={(node) => {
                   explicitInputRef.current = node!!;
                   (ref as Function)(node);
@@ -490,7 +490,7 @@ const SDatePicker = styled.div`
 
         &:hover:enabled,
         &:focus,
-        &:active {
+        &:active:not(:disabled) {
           outline: none;
 
           border-color: ${({ theme }) =>
@@ -710,5 +710,11 @@ const SErrorDiv = styled.div`
 
   & > div {
     margin-right: 4px;
+  }
+`;
+
+const SInput = styled.input`
+  &:disabled {
+    opacity: 0.6;
   }
 `;
