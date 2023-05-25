@@ -180,7 +180,7 @@ const Chat: NextPage = () => {
     const chatRoomPayload = new newnewapi.GetMyRoomsRequest(chatRoomParams);
     const chatroomResponse = await getMyRooms(chatRoomPayload);
 
-    if (!chatroomResponse.data || chatroomResponse.error) {
+    if (!chatroomResponse?.data || chatroomResponse.error) {
       throw new Error('Request failed');
     }
 

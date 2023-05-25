@@ -264,8 +264,8 @@ const ChatContent: React.FC<IFuncProps> = ({
           });
           const res = await sendMessage(payload);
 
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
           }
 
           // TODO: don't like this, need to think

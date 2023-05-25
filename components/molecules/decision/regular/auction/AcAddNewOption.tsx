@@ -285,12 +285,12 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         const res = await placeBidOnAuction(stripeContributionRequest);
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(getPayWithCardErrorMessage(res.data?.status))
           );
         }

@@ -57,7 +57,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        if (!becomeCreatorRes.data || becomeCreatorRes.error) {
+        if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
           throw new Error('Become creator failed');
         }
 

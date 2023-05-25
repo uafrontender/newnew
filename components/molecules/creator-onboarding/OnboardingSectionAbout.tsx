@@ -162,8 +162,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
 
       const updateMeRes = await updateMe(updateBioPayload);
 
-      if (!updateMeRes.data || updateMeRes.error) {
-        throw new Error(updateMeRes.error?.message ?? 'Request failed');
+      if (!updateMeRes?.data || updateMeRes.error) {
+        throw new Error(updateMeRes?.error?.message ?? 'Request failed');
       }
 
       dispatch(

@@ -26,7 +26,7 @@ export const getServerSideProps = async (ctx) => {
 
   const postsResponse = await searchPosts(payload);
 
-  if (postsResponse.data && !postsResponse.error) {
+  if (postsResponse?.data && !postsResponse.error) {
     postIds = postsResponse?.data?.posts
       .map((post) => {
         if (post.auction) {

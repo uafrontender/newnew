@@ -119,7 +119,7 @@ const useAcOptions = (
 
       const optionsResponse = await fetchCurrentBidsForPost(payload);
 
-      if (!optionsResponse.data || optionsResponse.error) {
+      if (!optionsResponse?.data || optionsResponse.error) {
         throw new Error('Request failed');
       }
 
