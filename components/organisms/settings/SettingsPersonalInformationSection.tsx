@@ -102,7 +102,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
 
           const updateDateResponse = await updateMe(updateDatePayload);
 
-          if (!updateDateResponse.data || updateDateResponse.error) {
+          if (!updateDateResponse?.data || updateDateResponse.error) {
             throw new Error('Date update error');
           }
 

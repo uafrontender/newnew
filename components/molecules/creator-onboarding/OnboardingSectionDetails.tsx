@@ -509,8 +509,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
 
-        if (!imgUploadRes.data || imgUploadRes.error) {
-          throw new Error(imgUploadRes.error?.message ?? 'Upload error');
+        if (!imgUploadRes?.data || imgUploadRes.error) {
+          throw new Error(imgUploadRes?.error?.message ?? 'Upload error');
         }
 
         const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
@@ -563,8 +563,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
       });
 
       const updateMeRes = await updateMe(updateMePayload);
-      if (!updateMeRes.data || updateMeRes.error) {
-        throw new Error(updateMeRes.error?.message || 'Request failed');
+      if (!updateMeRes?.data || updateMeRes.error) {
+        throw new Error(updateMeRes?.error?.message || 'Request failed');
       }
 
       // Update Redux state
@@ -590,8 +590,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
         const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
         if (
+          !res?.data ||
           res.error ||
-          !res.data ||
           (res.data.status !==
             newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
             res.data.status !==
@@ -609,7 +609,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        if (!becomeCreatorRes.data || becomeCreatorRes.error) {
+        if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
           throw new Error('Become creator failed');
         }
 

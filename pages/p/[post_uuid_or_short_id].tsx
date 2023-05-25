@@ -187,7 +187,7 @@ const PostPage: NextPage<IPostPage> = ({
 
         const res = await setPostTitle(payload);
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           throw new Error(res?.error?.message || 'An error occurred');
         }
 
@@ -503,7 +503,7 @@ const PostPage: NextPage<IPostPage> = ({
   //         fetchRecommenedPostsPayload
   //       );
 
-  //       if (postsResponse.data && postsResponse.data.posts) {
+  //       if (postsResponse?.data && postsResponse.data.posts) {
   //         setRecommendedPosts((curr) => [
   //           ...curr,
   //           ...(postsResponse.data?.posts as newnewapi.Post[]),
@@ -941,7 +941,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         context.req.cookies?.accessToken ?? undefined
       );
 
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         return {
           redirect: {
             destination: '/',

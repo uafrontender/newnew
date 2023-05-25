@@ -58,7 +58,7 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
       });
 
       const res = await unsubscribeFromEmailNotifications(payload);
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         throw new Error(t('error.requestFailed'));
       }
 

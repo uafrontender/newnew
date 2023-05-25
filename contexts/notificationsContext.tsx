@@ -39,8 +39,8 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
     try {
       const payload = new newnewapi.EmptyRequest();
       const res = await getUnreadNotificationCount(payload);
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       if (

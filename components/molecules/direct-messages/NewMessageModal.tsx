@@ -79,8 +79,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
       const res = await getVisavisList(payload, signal);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       return res.data.visavis;
@@ -141,7 +141,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
       const targetChatRoomResponse = await getMyRooms(payload);
 
-      if (!targetChatRoomResponse.data || targetChatRoomResponse.error) {
+      if (!targetChatRoomResponse?.data || targetChatRoomResponse.error) {
         throw new Error('Request failed');
       }
 
@@ -170,8 +170,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 
           const res = await getRoom(payload);
 
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
           }
 
           await onNewMessageSelect(res.data);

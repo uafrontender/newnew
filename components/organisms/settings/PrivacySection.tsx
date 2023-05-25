@@ -66,8 +66,8 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 
           const res = await getUserByUsername(payload);
 
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
           }
 
           if (res.data) {

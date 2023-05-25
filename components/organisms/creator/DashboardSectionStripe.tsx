@@ -108,8 +108,8 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
 
       const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       const url = res.data.setupUrl;

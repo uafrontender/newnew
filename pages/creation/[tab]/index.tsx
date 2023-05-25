@@ -17,6 +17,7 @@ import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { usePostCreationState } from '../../../contexts/postCreationContext';
+import useInitialScrollToTop from '../../../utils/hooks/useInitialScrollToTop';
 
 interface ICreationSecondStep {}
 
@@ -26,6 +27,7 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
 
   const { clearCreation } = usePostCreationState();
 
+  useInitialScrollToTop();
   useLeavePageConfirm(
     true,
     t('secondStep.modal.leave.message'),

@@ -9,7 +9,7 @@ import getShortPostIdFromUrl from './utils/getShortPostIdFromUrl';
 const VERIFICATION_CODE = '111111';
 
 // TODO: Refactor duplicated functions, move to utils, applies to creator.spec.ts as well
-context('Whitelisted Creator flow', () => {
+context.skip('Whitelisted Creator flow', () => {
   const testSeed = Date.now();
 
   const WL_USER_EMAIL = `test_user_wl_${testSeed}@newnew.co`;

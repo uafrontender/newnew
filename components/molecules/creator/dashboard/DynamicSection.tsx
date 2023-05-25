@@ -242,7 +242,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
 
         const res = await getRoom(payload);
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           throw new Error('Request failed');
         }
 
