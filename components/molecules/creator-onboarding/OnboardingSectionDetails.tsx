@@ -55,10 +55,8 @@ import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
 
-const OnboardingEditProfileImageModal = dynamic(
-  () => import('./OnboardingEditProfileImageModal')
-);
 const LoadingModal = dynamic(() => import('../LoadingModal'));
 const CheckboxWithALink = dynamic(() => import('./CheckboxWithALink'));
 const GoBackButton = dynamic(() => import('../GoBackButton'));
