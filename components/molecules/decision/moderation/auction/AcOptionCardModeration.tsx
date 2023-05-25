@@ -254,6 +254,7 @@ const AcOptionCardModeration: React.FunctionComponent<
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
               canDeleteOptionInitial={!isWinner}
+              canBlockUser={!!option.creator}
               handleClose={() => {
                 setIsEllipseMenuOpen(false);
                 handleUnsetScrollBlocked?.();

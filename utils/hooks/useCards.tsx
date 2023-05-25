@@ -58,8 +58,8 @@ const useCards = (): CardsData => {
       });
       const response = await setPrimaryCard(payload);
 
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'An error occurred');
+      if (!response?.data || response.error) {
+        throw new Error(response?.error?.message || 'An error occurred');
       }
     },
     onSuccess: (_, cardUuid: string) => {
@@ -119,8 +119,8 @@ const useCards = (): CardsData => {
       });
       const response = await deleteCard(payload);
 
-      if (!response.data || response.error) {
-        throw new Error(response.error?.message || 'An error occurred');
+      if (!response?.data || response.error) {
+        throw new Error(response?.error?.message || 'An error occurred');
       }
 
       return response.data;

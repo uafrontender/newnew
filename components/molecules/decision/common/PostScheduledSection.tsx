@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import isBrowser from '../../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
@@ -42,7 +43,9 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   const isPageVisible = usePageVisibility();
   const { overlayModeEnabled } = useOverlayMode();
 
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isScrolledDown, setIsScrolledDown] = useState<boolean | undefined>(
+    undefined
+  );
 
   const { refetchPost } = usePostInnerState();
 
@@ -61,7 +64,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
         setSeconds(() => (timestampSeconds - Date.now()) / 1000);
-      }, 300);
+      }, 1000);
     }
     return () => clearInterval(interval.current);
   }, [isPageVisible, timestampSeconds]);
@@ -70,16 +73,16 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));
   }, [seconds]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = document?.documentElement?.scrollTop;
-      if (scrollTop && scrollTop > 200) {
-        setIsScrolledDown(true);
-      } else {
-        setIsScrolledDown(false);
-      }
-    };
+  const handleScroll = useCallback(() => {
+    const scrollTop = document?.documentElement?.scrollTop;
+    if (scrollTop && scrollTop > 200) {
+      setIsScrolledDown(true);
+    } else {
+      setIsScrolledDown(false);
+    }
+  }, []);
 
+  useEffect(() => {
     if (isBrowser()) {
       document?.addEventListener('scroll', handleScroll);
     }
@@ -89,7 +92,11 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, []);
+  }, [handleScroll]);
+
+  useIsomorphicLayoutEffect(() => {
+    handleScroll();
+  }, [handleScroll]);
 
   useEffect(() => {
     async function refetchOnHasEnded() {
@@ -101,6 +108,10 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasEnded]);
+
+  if (isScrolledDown === undefined) {
+    return null;
+  }
 
   if (hasEnded) {
     return (

@@ -138,7 +138,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
 
             const res = await fetchPostByUUID(payload);
 
-            if (!res.data || res.error) {
+            if (!res?.data || res.error) {
               throw new Error('Request failed');
             }
 
