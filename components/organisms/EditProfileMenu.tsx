@@ -535,8 +535,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await getImageUploadUrl(imageUrlPayload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'An error occurred');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'An error occurred');
         }
 
         const uploadResponse = await fetch(res.data.uploadUrl, {
@@ -576,7 +576,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await updateMe(payload);
 
-      if (!res.data || res.error) throw new Error('Request failed');
+      if (!res?.data || res.error) {
+        throw new Error('Request failed');
+      }
 
       dispatch(
         setUserData({
@@ -729,8 +731,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await getImageUploadUrl(imageUrlPayload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'An error occurred');
       }
 
       const uploadResponse = await fetch(res.data.uploadUrl, {

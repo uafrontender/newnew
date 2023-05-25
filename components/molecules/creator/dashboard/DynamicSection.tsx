@@ -210,6 +210,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     };
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
+  // TODO: rework this part lead to bugs
   useEffect(() => {
     const findChatRoom = async () => {
       try {
@@ -242,7 +243,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
 
         const res = await getRoom(payload);
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           throw new Error('Request failed');
         }
 
@@ -290,10 +291,11 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     }
   }, [isBundleDataLoaded, directMessagesAvailable, tab, baseUrl, router]);
 
-  const handleCloseChatRoom = useCallback(() => {
-    router.replace(`${baseUrl}?tab=chat`, undefined, {
+  const handleCloseChatRoom = useCallback(async () => {
+    await router.replace(`${baseUrl}?tab=chat`, undefined, {
       shallow: true,
     });
+    setActiveChatRoom(null);
   }, [router, baseUrl]);
 
   return (

@@ -18,7 +18,7 @@ const useMyChatRoom = (
 
       const res = await getRoom(payload, signal);
 
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         throw new Error('Request failed');
       }
 

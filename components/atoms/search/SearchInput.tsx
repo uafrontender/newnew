@@ -229,8 +229,8 @@ const SearchInput: React.FC = React.memo(() => {
         payload,
         quickSearchAbortControllerRef?.current?.signal
       );
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       if (res.data.creators) {

@@ -34,7 +34,7 @@ const useSearchCreators = (
 
       const creatorsResponse = await searchCreators(payload, signal);
 
-      if (!creatorsResponse.data || creatorsResponse.error) {
+      if (!creatorsResponse?.data || creatorsResponse.error) {
         throw new Error('Request failed');
       }
 

@@ -109,7 +109,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     // Refresh failed, session "expired"
     // (i.e. user probably logged in from another device, or exceeded
     // max number of logged in devices/browsers)
-    if (!resRefresh.data || resRefresh.error) {
+    if (!resRefresh?.data || resRefresh.error) {
       throw new Error('Refresh token invalid');
     }
 

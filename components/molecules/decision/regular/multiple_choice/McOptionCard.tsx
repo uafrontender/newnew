@@ -460,12 +460,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         const res = await voteOnPost(stripeContributionRequest);
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(getPayWithCardErrorMessage(res.data?.status))
           );
         }
@@ -528,7 +528,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         const res = await voteWithBundleVotes(payload);
 
         if (
-          !res.data ||
+          !res?.data ||
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
           res.error
         ) {

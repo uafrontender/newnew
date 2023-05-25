@@ -208,7 +208,7 @@ const SDay = styled(Text)<ISDay>`
   pointer-events: ${(props) =>
     props.isDisabled || props.isActive ? 'none' : 'unset'};
 
-  :hover {
+  :active {
     background: ${(props) =>
       props.isActive
         ? props.theme.colorsThemed.accent.blue

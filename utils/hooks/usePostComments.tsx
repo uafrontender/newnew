@@ -82,7 +82,7 @@ const usePostComments = (
 
       const postsResponse = await getMessages(payload, signal);
 
-      if (!postsResponse.data || postsResponse.error) {
+      if (!postsResponse?.data || postsResponse.error) {
         throw new Error('Request failed');
       }
 
