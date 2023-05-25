@@ -62,8 +62,8 @@ export const ChatsUnreadMessagesProvider: React.FC<
           controller.signal
         );
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         setData(res.data);

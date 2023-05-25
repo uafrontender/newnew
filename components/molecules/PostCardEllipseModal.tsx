@@ -131,7 +131,9 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
 
         const res = await fetchPostByUUID(payload);
 
-        if (!res.data || res.error) throw new Error('Request failed');
+        if (!res?.data || res.error) {
+          throw new Error('Request failed');
+        }
 
         setIsFollowingDecision(!!switchPostType(res.data)[0].isFavoritedByMe);
       } catch (err) {

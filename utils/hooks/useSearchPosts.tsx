@@ -38,7 +38,7 @@ const useSearchPosts = (
 
       const postsResponse = await searchPosts(payload, signal);
 
-      if (!postsResponse.data || postsResponse.error) {
+      if (!postsResponse?.data || postsResponse.error) {
         throw new Error('Request failed');
       }
 

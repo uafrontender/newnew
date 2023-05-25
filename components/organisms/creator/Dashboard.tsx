@@ -116,8 +116,10 @@ export const Dashboard: React.FC = React.memo(() => {
       });
       const postsResponse = await getMyPosts(payload);
 
-      if (postsResponse.data && postsResponse.data.posts) {
-        if (postsResponse.data.posts.length > 0) setHasMyPosts(true);
+      if (postsResponse?.data && postsResponse.data.posts) {
+        if (postsResponse.data.posts.length > 0) {
+          setHasMyPosts(true);
+        }
       }
       setIsLoading(false);
     } catch (err) {
@@ -149,8 +151,8 @@ export const Dashboard: React.FC = React.memo(() => {
       });
       const res = await getMyEarnings(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       setMyEarnings(res.data);

@@ -63,8 +63,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         });
         const res = await getMyEarnings(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         setMyEarnings(res.data);

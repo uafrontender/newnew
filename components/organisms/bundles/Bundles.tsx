@@ -71,9 +71,9 @@ export const Bundles: React.FC = React.memo(() => {
 
       const res = await searchCreators(payload);
 
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         showErrorToastPredefined(undefined);
-        throw new Error(res.error?.message ?? 'Request failed');
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       // Do not pass data about creator themselves to pagination controller

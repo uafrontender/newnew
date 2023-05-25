@@ -55,8 +55,8 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         });
         const res = await markUser(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         block
@@ -88,8 +88,8 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         const payload = new newnewapi.EmptyRequest();
         const res = await getMyBlockedUsers(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         setUsersIBlocked(res.data.userUuidsIBlocked);

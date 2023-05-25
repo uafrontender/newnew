@@ -12,6 +12,7 @@ interface IAcOptionCardModerationEllipseMenu {
   optionId: number;
   isUserBlocked: boolean;
   canDeleteOptionInitial: boolean;
+  canBlockUser: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
@@ -27,6 +28,7 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
   optionId,
   isUserBlocked,
   canDeleteOptionInitial,
+  canBlockUser,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
@@ -89,19 +91,21 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<
       >
         {t('ellipse.reportBid')}
       </EllipseMenuButton>
-      <EllipseMenuButton
-        variant={3}
-        onClick={async () => {
-          if (isUserBlocked) {
-            await handleUnblockUser();
-            return;
-          }
-          handleOpenBlockUserModal();
-          handleClose();
-        }}
-      >
-        {!isUserBlocked ? t('ellipse.blockUser') : t('ellipse.unblockUser')}
-      </EllipseMenuButton>
+      {canBlockUser && (
+        <EllipseMenuButton
+          variant={3}
+          onClick={async () => {
+            if (isUserBlocked) {
+              await handleUnblockUser();
+              return;
+            }
+            handleOpenBlockUserModal();
+            handleClose();
+          }}
+        >
+          {!isUserBlocked ? t('ellipse.blockUser') : t('ellipse.unblockUser')}
+        </EllipseMenuButton>
+      )}
       <EllipseMenuButton
         variant={3}
         disabled={

@@ -108,7 +108,7 @@ const useMcOptions = (
         signal
       );
 
-      if (!optionsResponse.data || optionsResponse.error) {
+      if (!optionsResponse?.data || optionsResponse.error) {
         throw new Error('Request failed');
       }
 

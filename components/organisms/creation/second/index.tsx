@@ -424,8 +424,8 @@ export const CreationSecondStepContent: React.FC<
 
       const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      if (!resProcessing?.data || resProcessing.error) {
+        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
       }
 
       setCreationVideo('');
@@ -471,8 +471,8 @@ export const CreationSecondStepContent: React.FC<
 
         const res = await getVideoUploadUrl(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'An error occurred');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'An error occurred');
         }
 
         const xhr = new XMLHttpRequest();
@@ -525,8 +525,8 @@ export const CreationSecondStepContent: React.FC<
 
         const resProcessing = await startVideoProcessing(payloadProcessing);
 
-        if (!resProcessing.data || resProcessing.error) {
-          throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        if (!resProcessing?.data || resProcessing.error) {
+          throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
 
         setCreationVideoProcessing({

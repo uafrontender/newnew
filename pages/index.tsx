@@ -307,7 +307,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
 
     return {
       props: {
-        ...(popularPosts.data && popularPosts.data.toJSON().posts
+        ...(popularPosts?.data && popularPosts.data.toJSON().posts
           ? {
               popularPosts:
                 popularPosts.data.toJSON() as newnewapi.NonPagedPostsResponse,
