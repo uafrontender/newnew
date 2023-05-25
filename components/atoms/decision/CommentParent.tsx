@@ -34,6 +34,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { deleteComment, sendComment } from '../../../api/endpoints/comments';
 import { SocketContext } from '../../../contexts/socketContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import Loader from '../Loader';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -62,7 +63,7 @@ interface ICommentParent {
   handleAddComment: (
     text: string,
     parentId: number
-  ) => Promise<APIResponse<newnewapi.IChatMessage>>;
+  ) => Promise<APIResponse<newnewapi.ICommentMessage>>;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
@@ -116,7 +117,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
     const [confirmDeleteComment, setConfirmDeleteComment] =
       useState<boolean>(false);
 
-    const isReplyFormOpen = useMemo(() => comment?.isOpen, [comment?.isOpen]);
+    const isReplyFormOpen = useMemo(() => !!comment?.isOpen, [comment?.isOpen]);
 
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -141,7 +142,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         parentCommentId: comment.id as number,
       },
       {
-        enabled: comment?.isOpen,
+        enabled: isReplyFormOpen,
       }
     );
 
@@ -439,15 +440,14 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
             </SCommentHeader>
             {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
             {/* TODO: SReply is not clickable element */}
-            {!comment.parentId &&
-              !comment.isDeleted &&
+            {!comment.isDeleted &&
               (!isReplyFormOpen ? (
                 <SReply onClick={replyHandler}>
                   {t('comments.sendReply')}
                 </SReply>
               ) : (
                 <>
-                  {replies.length === 0 ? (
+                  {comment.numberOfReplies === 0 ? (
                     <SReply onClick={replyHandler}>
                       {t('comments.hideReplies')}
                     </SReply>
@@ -464,20 +464,19 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                   />
                 </>
               ))}
-            {!comment.parentId &&
-              !comment.isDeleted &&
-              replies &&
-              replies.length > 0 && (
-                <SReply onClick={replyHandler}>
-                  {isReplyFormOpen
-                    ? t('comments.hideReplies')
-                    : t('comments.viewReplies')}{' '}
-                  {replies.length}{' '}
-                  {replies.length > 1
-                    ? t('comments.replies')
-                    : t('comments.reply')}
-                </SReply>
-              )}
+            {!comment.isDeleted &&
+            comment.numberOfReplies &&
+            (comment.numberOfReplies as number) > 0 ? (
+              <SReply onClick={replyHandler}>
+                {isReplyFormOpen
+                  ? t('comments.hideReplies')
+                  : t('comments.viewReplies')}{' '}
+                {comment.numberOfReplies?.toString()}{' '}
+                {(comment.numberOfReplies as number) > 1
+                  ? t('comments.replies')
+                  : t('comments.reply')}
+              </SReply>
+            ) : null}
             {isReplyFormOpen &&
               replies &&
               replies.map((item, i) => (
@@ -497,6 +496,11 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               !isLoading && (
                 <SReply onClick={() => fetchNextPage()}>Load replies</SReply>
               )}
+            {isLoading || isFetchingNextPage ? (
+              <SLoaderDiv>
+                <Loader size='sm' isStatic />
+              </SLoaderDiv>
+            ) : null}
           </SCommentContent>
           <DeleteCommentModal
             isVisible={confirmDeleteComment}
@@ -734,4 +738,8 @@ const SSeparator = styled.div`
       ? props.theme.colorsThemed.background.outlines1
       : props.theme.colorsThemed.background.tertiary};
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+`;
+
+const SLoaderDiv = styled.div`
+  position: relative;
 `;

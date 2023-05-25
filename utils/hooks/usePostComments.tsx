@@ -22,7 +22,7 @@ interface IUsePostComments {
 }
 
 const processComments = (
-  commentsRaw: Array<newnewapi.IChatMessage | TCommentWithReplies>
+  commentsRaw: Array<newnewapi.ICommentMessage | TCommentWithReplies>
 ): TCommentWithReplies[] => {
   const workingArr = uniqBy(commentsRaw, 'id');
 
@@ -35,7 +35,7 @@ const usePostComments = (
   params: IUsePostComments,
   options?: Omit<
     UseInfiniteQueryOptions<{
-      comments: newnewapi.IChatMessage[];
+      comments: newnewapi.ICommentMessage[];
       paging: newnewapi.IPagingResponse | null | undefined;
     }>,
     'queryKey' | 'queryFn'
@@ -79,7 +79,7 @@ const usePostComments = (
       refetchOnWindowFocus: false,
     } as Omit<
       UseInfiniteQueryOptions<{
-        comments: newnewapi.IChatMessage[];
+        comments: newnewapi.ICommentMessage[];
         paging: newnewapi.IPagingResponse | null | undefined;
       }>,
       'queryKey' | 'queryFn'
@@ -117,9 +117,9 @@ const usePostComments = (
   );
 
   const addCommentMutation = useMutation({
-    mutationFn: (card: newnewapi.IChatMessage) =>
+    mutationFn: (comment: newnewapi.ICommentMessage) =>
       new Promise((res) => {
-        res(card);
+        res(comment);
       }),
     onSuccess: (_, newComment) => {
       queryClient.setQueryData(
@@ -128,7 +128,7 @@ const usePostComments = (
         (
           data:
             | InfiniteData<{
-                comments: newnewapi.IChatMessage[];
+                comments: newnewapi.ICommentMessage[];
                 paging: newnewapi.IPagingResponse | null | undefined;
               }>
             | undefined
@@ -159,9 +159,9 @@ const usePostComments = (
   });
 
   const removeCommentMutation = useMutation({
-    mutationFn: (card: newnewapi.IChatMessage) =>
+    mutationFn: (comment: newnewapi.ICommentMessage) =>
       new Promise((res) => {
-        res(card);
+        res(comment);
       }),
     onSuccess: (_, deletedComment) => {
       queryClient.setQueryData(
@@ -170,7 +170,7 @@ const usePostComments = (
         (
           data:
             | InfiniteData<{
-                comments: newnewapi.IChatMessage[];
+                comments: newnewapi.ICommentMessage[];
                 paging: newnewapi.IPagingResponse | null | undefined;
               }>
             | undefined
@@ -206,6 +206,53 @@ const usePostComments = (
     },
   });
 
+  const updateCommentNumberOfRepliesMutation = useMutation({
+    mutationFn: (comment: newnewapi.ICommentMessage) =>
+      new Promise((res) => {
+        res(comment);
+      }),
+    onSuccess: (_, updatedComment) => {
+      queryClient.setQueryData(
+        [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                comments: newnewapi.ICommentMessage[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const msgIndex = workingData.pages[k].comments.findIndex(
+                (c) => c.id === updatedComment?.id
+              );
+
+              if (msgIndex !== -1) {
+                workingData.pages[k].comments[msgIndex].numberOfReplies =
+                  updatedComment.numberOfReplies;
+                break;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
+  });
+
   useEffect(() => {
     if (flatComments) {
       setProcessedComments(() => processComments(flatComments));
@@ -218,6 +265,7 @@ const usePostComments = (
     handleToggleCommentRepliesById,
     addCommentMutation,
     removeCommentMutation,
+    updateCommentNumberOfRepliesMutation,
     ...query,
   };
 };

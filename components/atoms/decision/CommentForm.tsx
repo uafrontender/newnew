@@ -62,7 +62,7 @@ interface ICommentForm {
   value?: string;
   onBlur?: () => void;
   onFocus?: () => void;
-  onSubmit: (text: string) => Promise<APIResponse<newnewapi.IChatMessage>>;
+  onSubmit: (text: string) => Promise<APIResponse<newnewapi.ICommentMessage>>;
   onChange?: (text: string) => void;
 }
 

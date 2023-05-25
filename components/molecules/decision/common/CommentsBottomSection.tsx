@@ -22,6 +22,8 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import usePostComments from '../../../../utils/hooks/usePostComments';
 import Comments, { SScrollContainer } from './Comments';
 import { APIResponse } from '../../../../api/apiConfigs';
+import { useAppState } from '../../../../contexts/appStateContext';
+import CommentsMobile from './CommentsMobile';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -36,6 +38,11 @@ const CommentsBottomSection: React.FunctionComponent<
 > = ({ postUuid, postShortId, canDeleteComments, onFormFocus, onFormBlur }) => {
   const user = useAppSelector((state) => state.user);
   const { showErrorToastPredefined } = useErrorToasts();
+  const { resizeMode } = useAppState();
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const { socketConnection, isSocketConnected } = useContext(SocketContext);
@@ -48,6 +55,7 @@ const CommentsBottomSection: React.FunctionComponent<
     processedComments: comments,
     addCommentMutation,
     removeCommentMutation,
+    updateCommentNumberOfRepliesMutation,
     handleOpenCommentByIdx,
     handleToggleCommentRepliesById,
     fetchNextPage,
@@ -133,6 +141,7 @@ const CommentsBottomSection: React.FunctionComponent<
     const socketHandlerMessageCreated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CommentMessageCreated.decode(arr);
+
       if (
         decoded?.newComment &&
         decoded.newComment!!.sender?.uuid !== user.userData?.userUuid &&
@@ -150,6 +159,14 @@ const CommentsBottomSection: React.FunctionComponent<
       }
     };
 
+    const socketHandlerNumberOfRepliesChanged = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CommentNumberOfRepliesChanged.decode(arr);
+      if (decoded.updatedComment) {
+        updateCommentNumberOfRepliesMutation?.mutate(decoded.updatedComment);
+      }
+    };
+
     if (socketConnection) {
       socketConnection?.on(
         'CommentMessageCreated',
@@ -158,6 +175,10 @@ const CommentsBottomSection: React.FunctionComponent<
       socketConnection?.on(
         'CommentMessageDeleted',
         socketHandlerMessageDeleted
+      );
+      socketConnection?.on(
+        'CommentNumberOfRepliesChanged',
+        socketHandlerNumberOfRepliesChanged
       );
     }
 
@@ -170,6 +191,10 @@ const CommentsBottomSection: React.FunctionComponent<
         socketConnection?.off(
           'CommentMessageDeleted',
           socketHandlerMessageDeleted
+        );
+        socketConnection?.off(
+          'CommentNumberOfRepliesChanged',
+          socketHandlerNumberOfRepliesChanged
         );
       }
     };
@@ -208,20 +233,37 @@ const CommentsBottomSection: React.FunctionComponent<
             onBlur={onFormBlur ?? undefined}
             onFocus={onFormFocus ?? undefined}
           />
-          <Comments
-            comments={comments}
-            postUuid={postUuid}
-            onCommentDelete={handleDeleteComment}
-            openCommentProgrammatically={handleOpenCommentByIdx}
-            handleAddComment={handleAddComment}
-            isLoading={commentsLoading}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            onFormBlur={onFormBlur ?? undefined}
-            onFormFocus={onFormFocus ?? undefined}
-            canDeleteComments={canDeleteComments}
-            handleToggleCommentRepliesById={handleToggleCommentRepliesById}
-          />
+          {isMobile ? (
+            <CommentsMobile
+              comments={comments}
+              postUuid={postUuid}
+              onCommentDelete={handleDeleteComment}
+              openCommentProgrammatically={handleOpenCommentByIdx}
+              handleAddComment={handleAddComment}
+              isLoading={commentsLoading}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              onFormBlur={onFormBlur ?? undefined}
+              onFormFocus={onFormFocus ?? undefined}
+              canDeleteComments={canDeleteComments}
+              handleToggleCommentRepliesById={handleToggleCommentRepliesById}
+            />
+          ) : (
+            <Comments
+              comments={comments}
+              postUuid={postUuid}
+              onCommentDelete={handleDeleteComment}
+              openCommentProgrammatically={handleOpenCommentByIdx}
+              handleAddComment={handleAddComment}
+              isLoading={commentsLoading}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              onFormBlur={onFormBlur ?? undefined}
+              onFormFocus={onFormFocus ?? undefined}
+              canDeleteComments={canDeleteComments}
+              handleToggleCommentRepliesById={handleToggleCommentRepliesById}
+            />
+          )}
         </SActionSection>
       </STabContainer>
     </>
