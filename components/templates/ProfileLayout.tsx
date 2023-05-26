@@ -47,6 +47,7 @@ import { Mixpanel } from '../../utils/mixpanel';
 import DisplayName from '../atoms/DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
+import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -58,6 +59,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   children,
 }) => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
 
@@ -241,7 +243,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             withShrink
             iconOnly
             onClick={() => {
-              router.back();
+              goBackOrRedirect('/');
             }}
             onClickCapture={() => {
               Mixpanel.track('Click Back Button', {
@@ -367,7 +369,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
             {
               // eslint-disable-next-line no-nested-ternary
-              creatorsBundle && user.options?.isOfferingBundles ? (
+              creatorsBundle &&
+              user.options?.isOfferingBundles &&
+              !isBlocked ? (
                 !bundleExpired ? (
                   <CustomLink href={`/direct-messages/${user.username}`}>
                     <SSendButton

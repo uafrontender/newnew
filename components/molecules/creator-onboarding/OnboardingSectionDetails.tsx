@@ -1,8 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable react/no-danger */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
   useEffect,
@@ -14,7 +9,8 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
-import { debounce, isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -53,10 +49,9 @@ import useErrorToasts, {
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
 
-const OnboardingEditProfileImageModal = dynamic(
-  () => import('./OnboardingEditProfileImageModal')
-);
 const LoadingModal = dynamic(() => import('../LoadingModal'));
 const CheckboxWithALink = dynamic(() => import('./CheckboxWithALink'));
 const GoBackButton = dynamic(() => import('../GoBackButton'));
@@ -146,10 +141,11 @@ const OnboardingSectionDetails: React.FunctionComponent<
   IOnboardingSectionDetails
 > = ({ isAvatarCustom, availableCountries }) => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -285,18 +281,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setUsernameError, dispatch, user.userData?.username]
+    [setUsernameError, dispatch, user.userData?.username, setUserLoggedIn]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -341,18 +339,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setNicknameError, dispatch]
+    [setNicknameError, dispatch, setUserLoggedIn]
   );
 
   const validateNicknameViaAPIDebounced = useMemo(
@@ -439,7 +439,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       Object.values(dateInEdit).length === 3
         ? !Object.values(dateInEdit).some((v) => v === undefined)
         : false,
-    image: imageInEdit ? true : false,
+    image: !!imageInEdit,
     agreedToTos: true,
   });
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -502,8 +502,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
 
-        if (!imgUploadRes.data || imgUploadRes.error) {
-          throw new Error(imgUploadRes.error?.message ?? 'Upload error');
+        if (!imgUploadRes?.data || imgUploadRes.error) {
+          throw new Error(imgUploadRes?.error?.message ?? 'Upload error');
         }
 
         const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
@@ -556,8 +556,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
       });
 
       const updateMeRes = await updateMe(updateMePayload);
-      if (!updateMeRes.data || updateMeRes.error) {
-        throw new Error(updateMeRes.error?.message || 'Request failed');
+      if (!updateMeRes?.data || updateMeRes.error) {
+        throw new Error(updateMeRes?.error?.message || 'Request failed');
       }
 
       // Update Redux state
@@ -583,8 +583,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
         const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
         if (
+          !res?.data ||
           res.error ||
-          !res.data ||
           (res.data.status !==
             newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
             res.data.status !==
@@ -602,7 +602,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        if (!becomeCreatorRes.data || becomeCreatorRes.error) {
+        if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
           throw new Error('Become creator failed');
         }
 
@@ -618,6 +618,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
             },
           })
         );
+
+        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
 
         const acceptTermsPayload = new newnewapi.EmptyRequest({});
 
@@ -659,11 +661,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
 
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -993,7 +997,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   _button: 'Back button',
                   _component: 'OnboardingSectionDetails',
                 });
-                router.back();
+                goBackOrRedirect('/');
               }}
             >
               {t('detailsSection.button.back')}
@@ -1035,7 +1039,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
           setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
           onClose={() => {
             setCropMenuOpen(false);
-            // window.history.back();
+
             if (isBrowser()) {
               window.history.replaceState(null, '');
             }

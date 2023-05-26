@@ -12,7 +12,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import {
@@ -139,12 +139,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const res = await createCustomOption(payload);
 
       if (
-        !res.data ||
+        !res?.data ||
+        res.error ||
         res.data.status !==
-          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
-        res.error
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS
       ) {
-        throw new Error(t(addOptionErrorMessage(res.data?.status)));
+        throw new Error(t(addOptionErrorMessage(res?.data?.status)));
       }
 
       const optionFromResponse = (res.data
@@ -303,12 +303,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const res = await createCustomOption(payload);
 
       if (
-        !res.data ||
+        !res?.data ||
+        res.error ||
         res.data.status !==
-          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS ||
-        res.error
+          newnewapi.CreateCustomMcOptionResponse.Status.SUCCESS
       ) {
-        throw new Error(t(addOptionErrorMessage(res.data?.status)));
+        throw new Error(t(addOptionErrorMessage(res?.data?.status)));
       }
 
       const optionFromResponse = (res.data

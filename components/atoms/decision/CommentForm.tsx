@@ -150,7 +150,9 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
             validateTextAbortControllerRef?.current?.signal
           );
 
-          if (!res.data?.status) throw new Error('An error occurred');
+          if (!res?.data?.status) {
+            throw new Error('An error occurred');
+          }
 
           setIsAPIValidateLoading(false);
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
@@ -203,7 +205,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
             const res = await onSubmit(commentText);
 
-            if (res.data && !res.error) {
+            if (res?.data && !res.error) {
               setCommentText('');
             } else {
               throw new Error(res?.error?.message || 'Could not add comment');

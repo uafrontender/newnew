@@ -16,6 +16,7 @@ import {
 } from '../redux-store/slices/userStateSlice';
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import useGoBackOrRedirect from '../utils/useGoBackOrRedirect';
 
 interface IEmailAuthRedirectPage {
   stripe_setup_intent_client_secret: string;
@@ -25,6 +26,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   stripe_setup_intent_client_secret,
 }) => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const dispatch = useAppDispatch();
 
   const { showErrorToastPredefined } = useErrorToasts();
@@ -92,7 +94,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         showErrorToastPredefined(undefined);
         console.error(err.message, 'error');
-        router.back();
+        goBackOrRedirect('/');
       }
     }
 

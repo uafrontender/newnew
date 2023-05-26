@@ -31,8 +31,9 @@ const useCuratedList = (
 
       const res = await getCuratedPosts(getPostPayload, signal);
 
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Post not found');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Post not found');
+      }
 
       return res.data.posts;
     },

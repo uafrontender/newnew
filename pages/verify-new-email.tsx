@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
@@ -17,6 +16,7 @@ import { setUserData } from '../redux-store/slices/userStateSlice';
 import { becomeCreator } from '../api/endpoints/user';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
+import { useAppState } from '../contexts/appStateContext';
 
 interface IVerifyNewEmail {}
 
@@ -25,6 +25,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn, setUserIsCreator } = useAppState();
 
   const router = useRouter();
   const { email, retryAfter, redirect } = router.query;
@@ -55,7 +56,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        if (!becomeCreatorRes.data || becomeCreatorRes.error) {
+        if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
           throw new Error('Become creator failed');
         }
 
@@ -72,6 +73,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
             },
           })
         );
+
+        setUserLoggedIn(true);
+        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
       }
 
       if (redirect === 'settings') {

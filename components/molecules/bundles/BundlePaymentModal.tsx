@@ -142,12 +142,12 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
         const res = await buyCreatorsBundle(stripeContributionRequest);
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               tPost(getPayWithCardErrorMessage(res.data?.status))
           );
         }

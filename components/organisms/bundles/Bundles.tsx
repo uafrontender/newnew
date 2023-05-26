@@ -1,9 +1,7 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import styled, { useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import assets from '../../../constants/assets';
@@ -29,9 +27,10 @@ import BundleCreatorsList from '../../molecules/bundles/BundleCreatorsList';
 import { useAppState } from '../../../contexts/appStateContext';
 import MobileBundleCreatorsList from '../../molecules/bundles/MobileBundleCreatorsList';
 import { Mixpanel } from '../../../utils/mixpanel';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 export const Bundles: React.FC = React.memo(() => {
-  const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-Bundles');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -71,9 +70,9 @@ export const Bundles: React.FC = React.memo(() => {
 
       const res = await searchCreators(payload);
 
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         showErrorToastPredefined(undefined);
-        throw new Error(res.error?.message ?? 'Request failed');
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       // Do not pass data about creator themselves to pagination controller
@@ -142,14 +141,14 @@ export const Bundles: React.FC = React.memo(() => {
                     _button: 'Back button',
                     _component: 'Bundles',
                   });
-                  router.back();
+                  goBackOrRedirect('/');
                 }}
               />
             ) : (
               <GoBackButton
                 longArrow
                 onClick={() => {
-                  router.back();
+                  goBackOrRedirect('/');
                   Mixpanel.track('Navigation Item Clicked', {
                     _stage: 'Bundles',
                     _button: 'Back button',
@@ -179,14 +178,18 @@ export const Bundles: React.FC = React.memo(() => {
             {bundles &&
               bundles
                 .slice(0, visibleBundlesNumber)
-                .map((bundle, index) => (
-                  <BundleCard key={index} creatorBundle={bundle} />
+                .map((bundle) => (
+                  <BundleCard
+                    key={bundle.creator?.uuid}
+                    creatorBundle={bundle}
+                  />
                 ))}
 
             {!isMobile &&
               bundles &&
               [
                 ...Array(Math.max(visibleBundlesNumber - bundles.length, 0)),
+                // eslint-disable-next-line react/no-array-index-key
               ].map((v, index) => <BundleCard key={`${index}-holder`} />)}
           </SBundlesContainer>
         </SAnimationContainer>

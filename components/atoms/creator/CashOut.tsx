@@ -12,7 +12,7 @@ import { formatNumber } from '../../../utils/format';
 
 import cashOutIcon from '../../../public/images/svg/icons/filled/CashOut.svg';
 import stripeTitleIcon from '../../../public/images/svg/icons/filled/StripeTitle.svg';
-import { getExpressDashboardLoginLink } from '../../../api/endpoints/stripe';
+import getExpressDashboardLoginLink from '../../../api/endpoints/stripe';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import NoCashOut from './NoCashOut';
@@ -57,8 +57,8 @@ const CashOut: React.FC<ICashOut> = ({
         const payload = new newnewapi.EmptyRequest();
         const res = await getExpressDashboardLoginLink(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         setStripeLink(res.data);

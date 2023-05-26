@@ -2,7 +2,7 @@ import { AnimatePresence, motion, MotionStyle } from 'framer-motion';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import isBrowser from '../../utils/isBrowser';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';

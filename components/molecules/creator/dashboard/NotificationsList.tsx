@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-lonely-if */
-/* eslint-disable no-nested-ternary */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -67,8 +64,8 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       const res = await getMyNotifications(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       setUnreadNotifications((curr) => {
@@ -310,24 +307,27 @@ export const NotificationsList: React.FC<IFunction> = ({
 
   return (
     <div ref={scrollRef}>
-      {!notifications?.length && (loading || !initialLoadDone) ? (
-        <Lottie
-          width={64}
-          height={64}
-          options={{
-            loop: true,
-            autoplay: true,
-            animationData: loadingAnimation,
-          }}
-        />
-      ) : notifications && notifications.length < 1 ? (
-        <NoResults />
-      ) : (
-        notifications &&
-        notifications.map((notification) =>
-          renderNotificationItem(notification, currentTime)
+      {
+        // eslint-disable-next-line no-nested-ternary
+        !notifications?.length && (loading || !initialLoadDone) ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : notifications && notifications.length < 1 ? (
+          <NoResults />
+        ) : (
+          notifications &&
+          notifications.map((notification) =>
+            renderNotificationItem(notification, currentTime)
+          )
         )
-      )}
+      }
       {hasMore && !loading && initialLoadDone && (
         <SRef ref={scrollRefNotifications}>
           <Lottie

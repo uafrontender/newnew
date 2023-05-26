@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
@@ -137,6 +136,7 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
       >
         {code.map((symbol, i) => (
           <input
+            // eslint-disable-next-line react/no-array-index-key
             key={i}
             name='email-verification'
             inputMode='numeric'

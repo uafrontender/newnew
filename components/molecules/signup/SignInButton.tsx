@@ -1,12 +1,7 @@
-import React, {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { debounce } from 'lodash';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import InlineSvg from '../../atoms/InlineSVG';
 import RippleAnimation from '../../atoms/RippleAnimation';
@@ -120,8 +115,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
     [disabled, setRippleOrigin, setIsRippling]
   );
 
-  // TODO: probably needs useIsomorphicLayoutEffect
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (spanRef.current) {
       setTextWidth(spanRef.current.getBoundingClientRect().width);
     }

@@ -62,8 +62,8 @@ export const ChatsUnreadMessagesProvider: React.FC<
           controller.signal
         );
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         setData(res.data);
@@ -146,9 +146,11 @@ export const ChatsUnreadMessagesProvider: React.FC<
 
 export function useChatsUnreadMessages() {
   const context = useContext(ChatsUnreadMessagesContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useChatsUnreadMessages must be used inside a `ChatProvider`'
     );
+  }
+
   return context;
 }

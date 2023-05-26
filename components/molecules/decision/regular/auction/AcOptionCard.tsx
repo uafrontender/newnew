@@ -97,9 +97,7 @@ interface IAcOptionCard {
   optionBeingSupported?: string;
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
-  handleAddOrUpdateOptionFromResponse: (
-    newOption: newnewapi.Auction.Option
-  ) => void;
+  handleUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
   handleRemoveOption?: () => void;
   handleSetScrollBlocked?: () => void;
   handleUnsetScrollBlocked?: () => void;
@@ -118,7 +116,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   optionBeingSupported,
   minAmount,
   handleSetSupportedBid,
-  handleAddOrUpdateOptionFromResponse,
+  handleUpdateOptionFromResponse,
   handleRemoveOption,
   handleSetScrollBlocked,
   handleUnsetScrollBlocked,
@@ -371,12 +369,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         const res = await placeBidOnAuction(stripeContributionRequest);
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(getPayWithCardErrorMessage(res.data?.status))
           );
         }
@@ -384,7 +382,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         const optionFromResponse = (res.data
           .option as newnewapi.Auction.Option)!!;
         optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        handleUpdateOptionFromResponse(optionFromResponse);
 
         setPaymentSuccessValue(paymentAmountInCents);
         handleSetSupportedBid('');
@@ -403,7 +401,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setupIntent,
       postUuid,
       router,
-      handleAddOrUpdateOptionFromResponse,
+      handleUpdateOptionFromResponse,
       paymentAmountInCents,
       handleSetSupportedBid,
       t,

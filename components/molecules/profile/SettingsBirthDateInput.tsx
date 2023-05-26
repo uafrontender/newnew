@@ -1,6 +1,5 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
-/* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
 import React, { forwardRef, useState, useEffect, useRef, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -46,6 +45,7 @@ import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import getDateFormatForTimeZone from '../../../utils/getDateFormatForTimeZone';
 import { useAppState } from '../../../contexts/appStateContext';
+import isBrowser from '../../../utils/isBrowser';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -270,7 +270,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               }}
             />
             <SCustomInput>
-              <input
+              <SInput
                 ref={(node) => {
                   explicitInputRef.current = node!!;
                   (ref as Function)(node);
@@ -309,6 +309,20 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           </>
         );
       });
+
+      useEffect(() => {
+        if (isBrowser()) {
+          const accordionContainer = document?.getElementById(
+            'settings-accordion-container'
+          );
+
+          if (calendarOpen && accordionContainer) {
+            accordionContainer.style.cssText = 'overflow: unset;';
+          } else if (accordionContainer) {
+            accordionContainer.style.cssText = '';
+          }
+        }
+      }, [calendarOpen]);
 
       return (
         <SContainer onMouseEnter={() => handleSetActive?.()}>
@@ -490,7 +504,7 @@ const SDatePicker = styled.div`
 
         &:hover:enabled,
         &:focus,
-        &:active {
+        &:active:not(:disabled) {
           outline: none;
 
           border-color: ${({ theme }) =>
@@ -710,5 +724,11 @@ const SErrorDiv = styled.div`
 
   & > div {
     margin-right: 4px;
+  }
+`;
+
+const SInput = styled.input`
+  &:disabled {
+    opacity: 0.6;
   }
 `;

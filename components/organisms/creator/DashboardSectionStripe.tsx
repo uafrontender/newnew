@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -21,6 +20,7 @@ import GoBackButton from '../../molecules/GoBackButton';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import opnUrlInNewTab from '../../../utils/openUrlInNewTab';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -50,7 +50,7 @@ const getStripeButtonTextKey = (
 };
 
 const DashboardSectionStripe: React.FC = React.memo(() => {
-  const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation('page-Creator');
@@ -108,8 +108,8 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
 
       const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       const url = res.data.setupUrl;
@@ -122,7 +122,9 @@ const DashboardSectionStripe: React.FC = React.memo(() => {
 
   return (
     <SContainer>
-      {isMobile && <SGoBackButton onClick={() => router.back()} />}
+      {isMobile && (
+        <SGoBackButton onClick={() => goBackOrRedirect('/creator/dashboard')} />
+      )}
       <SHeadline variant={5}>
         <span>{t('stripe.titleSetUpStripe')}</span>
         <SInlineSvg svg={StripeLogo} width='80px' />

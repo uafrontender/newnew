@@ -29,7 +29,7 @@ function getChunks(text: string, ignoreStart: boolean): Chunk[] {
     );
     chunks.push(...getChunks(remainder, true));
   } else {
-    chunks.push({ type: 'text', text: text });
+    chunks.push({ type: 'text', text });
   }
 
   return chunks;

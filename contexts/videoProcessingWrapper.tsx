@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 import { SocketContext } from './socketContext';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
+import { useAppState } from './appStateContext';
 
 interface IVideoProcessingWrapper {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
   IVideoProcessingWrapper
 > = ({ children }) => {
   const router = useRouter();
+  const { userLoggedIn } = useAppState();
   const { showErrorToastCustom } = useErrorToasts();
   const { socketConnection } = useContext(SocketContext);
 
@@ -77,7 +79,11 @@ const VideoProcessingWrapper: React.FunctionComponent<
 
   useEffect(() => {
     if (socketConnection) {
-      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
+      if (userLoggedIn) {
+        socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
+      } else {
+        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
+      }
     }
 
     return () => {
@@ -86,7 +92,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, handlerSocketUpdated]);
+  }, [socketConnection, handlerSocketUpdated, userLoggedIn]);
 
   return <>{children}</>;
 };

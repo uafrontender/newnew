@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import isBrowser from '../../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
@@ -10,7 +9,6 @@ import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 import Text from '../../../atoms/Text';
-import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
 import assets from '../../../../constants/assets';
@@ -21,17 +19,13 @@ import { useAppState } from '../../../../contexts/appStateContext';
 interface IPostScheduledSection {
   postType: TPostType;
   timestampSeconds: number;
-  isFollowing: boolean;
   variant: 'decision' | 'moderation';
-  handleFollowDecision: () => {};
 }
 
 const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   postType,
   timestampSeconds,
-  isFollowing,
   variant,
-  handleFollowDecision,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
@@ -42,14 +36,15 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   const isPageVisible = usePageVisibility();
   const { overlayModeEnabled } = useOverlayMode();
 
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isScrolledDown, setIsScrolledDown] = useState<boolean | undefined>(
+    undefined
+  );
 
   const { refetchPost } = usePostInnerState();
 
   // Timer
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
-  const expirationDate = new Date(timestampSeconds);
 
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
     secondsToDHMS(parsed, 'noTrim')
@@ -61,7 +56,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
         setSeconds(() => (timestampSeconds - Date.now()) / 1000);
-      }, 300);
+      }, 1000);
     }
     return () => clearInterval(interval.current);
   }, [isPageVisible, timestampSeconds]);
@@ -70,16 +65,16 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     setParsedSeconds(secondsToDHMS(seconds, 'noTrim'));
   }, [seconds]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = document?.documentElement?.scrollTop;
-      if (scrollTop && scrollTop > 200) {
-        setIsScrolledDown(true);
-      } else {
-        setIsScrolledDown(false);
-      }
-    };
+  const handleScroll = useCallback(() => {
+    const scrollTop = document?.documentElement?.scrollTop;
+    if (scrollTop && scrollTop > 200) {
+      setIsScrolledDown(true);
+    } else {
+      setIsScrolledDown(false);
+    }
+  }, []);
 
+  useEffect(() => {
     if (isBrowser()) {
       document?.addEventListener('scroll', handleScroll);
     }
@@ -89,7 +84,11 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, []);
+  }, [handleScroll]);
+
+  useIsomorphicLayoutEffect(() => {
+    handleScroll();
+  }, [handleScroll]);
 
   useEffect(() => {
     async function refetchOnHasEnded() {
@@ -101,6 +100,10 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasEnded]);
+
+  if (isScrolledDown === undefined) {
+    return null;
+  }
 
   if (hasEnded) {
     return (
@@ -348,12 +351,6 @@ const SImgContainer = styled.div`
   }
 `;
 
-const SHourglassImg = styled.img`
-  display: block;
-  width: 100%;
-  height: 100%;
-`;
-
 const STitle = styled(Headline)`
   grid-area: title;
 
@@ -420,18 +417,6 @@ const STimerTime = styled(Headline)`
 
 const STimerCaption = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
-
-const SCTAButton = styled(Button)`
-  height: 56px;
-  width: 100%;
-
-  ${({ theme }) => theme.media.tablet} {
-    width: fit-content;
-
-    margin-left: auto;
-    margin-right: auto;
-  }
 `;
 
 const SLoadingContainer = styled.div`

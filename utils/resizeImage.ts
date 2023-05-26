@@ -11,6 +11,7 @@ async function resizeImage(
   return new Promise((resolve, reject) => {
     const img = new Image();
 
+    // eslint-disable-next-line func-names
     img.addEventListener('load', function () {
       if (this.height < maxSide && this.width < maxSide) {
         return resolve({

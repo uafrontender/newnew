@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
@@ -66,8 +65,8 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 
           const res = await getUserByUsername(payload);
 
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
           }
 
           if (res.data) {

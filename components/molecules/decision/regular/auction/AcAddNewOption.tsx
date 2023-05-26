@@ -9,7 +9,7 @@ import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import Link from 'next/link';
 
 import {
@@ -91,7 +91,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
@@ -285,12 +284,12 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         const res = await placeBidOnAuction(stripeContributionRequest);
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(getPayWithCardErrorMessage(res.data?.status))
           );
         }

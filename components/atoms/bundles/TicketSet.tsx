@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import VoteIconLight from '../../../public/images/decision/vote-icon-light.png';
@@ -28,6 +27,7 @@ const TicketSet: React.FC<ITicketSet> = ({
     >
       {[...Array(numberOFTickets)].map((v, index) => (
         <SIcon
+          // eslint-disable-next-line react/no-array-index-key
           key={index}
           src={
             // eslint-disable-next-line no-nested-ternary

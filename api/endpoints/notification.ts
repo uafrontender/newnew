@@ -106,8 +106,8 @@ export const updateMyNotificationsState = (
 export const unsubscribeFromEmailNotifications = (
   payload: newnewapi.UnsubscribeFromEmailNotificationsRequest,
   signal?: RequestInit['signal']
-) => {
-  return fetchProtobuf<
+) =>
+  fetchProtobuf<
     newnewapi.UnsubscribeFromEmailNotificationsRequest,
     newnewapi.EmptyResponse
   >(
@@ -118,4 +118,3 @@ export const unsubscribeFromEmailNotifications = (
     payload,
     signal ?? undefined
   );
-};

@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import {
@@ -8,7 +7,8 @@ import {
   useMutation,
   useQueryClient,
 } from 'react-query';
-import { cloneDeep, uniqBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 
 import { getMessages } from '../../api/endpoints/chat';
 import { TCommentWithReplies } from '../../components/interfaces/tcomment';
@@ -81,7 +81,7 @@ const usePostComments = (
 
       const postsResponse = await getMessages(payload, signal);
 
-      if (!postsResponse.data || postsResponse.error) {
+      if (!postsResponse?.data || postsResponse.error) {
         throw new Error('Request failed');
       }
 

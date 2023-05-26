@@ -1,10 +1,4 @@
-import React, {
-  ReactElement,
-  useContext,
-  useMemo,
-  useEffect,
-  useState,
-} from 'react';
+import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -12,7 +6,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled, { useTheme } from 'styled-components';
-import jwtDecode from 'jwt-decode';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -32,6 +25,7 @@ import { useGetAppConstants } from '../contexts/appConstantsContext';
 import assets from '../constants/assets';
 import { SocketContext } from '../contexts/socketContext';
 import { ChannelsContext } from '../contexts/channelsContext';
+import { useAppState } from '../contexts/appStateContext';
 
 const HeroSection = dynamic(
   () => import('../components/organisms/home/HeroSection')
@@ -42,28 +36,23 @@ const CardsSection = dynamic(
 
 interface IHome {
   top10posts?: newnewapi.NonPagedPostsResponse;
-  assumeLoggedIn?: boolean;
   staticSuperpolls: TStaticPost[];
   staticBids: TStaticPost[];
   initialNextPageTokenRA?: string;
   popularPosts?: newnewapi.NonPagedPostsResponse;
-  assumeIsCreator: boolean;
 }
 
 // No sense to memorize
 const Home: NextPage<IHome> = ({
   staticBids,
   staticSuperpolls,
-  assumeLoggedIn,
   popularPosts,
-  assumeIsCreator,
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
-
-  const [isCreator, setIsCreator] = useState(assumeIsCreator);
+  const { userLoggedIn, userIsCreator } = useAppState();
 
   const [popularPostsArr, setPopularPostsAdd] = useState(popularPosts?.posts);
 
@@ -113,20 +102,6 @@ const Home: NextPage<IHome> = ({
     };
   }, [socketConnection]);
 
-  const isUserLoggedIn = useMemo(() => {
-    if (user._persist?.rehydrated) {
-      return user.loggedIn;
-    }
-
-    return assumeLoggedIn;
-  }, [user._persist?.rehydrated, user.loggedIn, assumeLoggedIn]);
-
-  useEffect(() => {
-    if (user._persist?.rehydrated) {
-      setIsCreator(user.userData?.options?.isCreator || false);
-    }
-  }, [user.userData?.options?.isCreator, user._persist?.rehydrated]);
-
   return (
     <>
       <Head>
@@ -136,9 +111,9 @@ const Home: NextPage<IHome> = ({
         <meta property='og:description' content={t('meta.description')} />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {!isUserLoggedIn && <HeroSection />}
+      {!userLoggedIn && <HeroSection />}
 
-      {isCreator && (
+      {userIsCreator && (
         <>
           <SHeading>
             <SHeadline>{t('section.your')}</SHeadline>
@@ -153,7 +128,7 @@ const Home: NextPage<IHome> = ({
           title={t('section.popular')}
           category='popular'
           collection={popularPostsArr}
-          padding={isUserLoggedIn ? 'small' : 'large'}
+          padding={userLoggedIn ? 'small' : 'large'}
           // onReachEnd={loadMoreCollectionRA}
           // seeMoreLink='/profile/purchases'
         />
@@ -171,7 +146,7 @@ const Home: NextPage<IHome> = ({
         }
         posts={staticSuperpolls}
         isStatic
-        padding={isUserLoggedIn ? 'small' : 'large'}
+        padding={userLoggedIn ? 'small' : 'large'}
       />
 
       {/* AC posts example */}
@@ -186,12 +161,12 @@ const Home: NextPage<IHome> = ({
         }
         posts={staticBids}
         isStatic
-        padding={isUserLoggedIn ? 'small' : 'large'}
+        padding={userLoggedIn ? 'small' : 'large'}
       />
 
-      {(!isUserLoggedIn || !isCreator) && <FaqSection />}
+      {(!userLoggedIn || !userIsCreator) && <FaqSection />}
 
-      {!isCreator &&
+      {!userIsCreator &&
         canBecomeCreator(
           user.userData?.dateOfBirth,
           appConstants.minCreatorAgeYears
@@ -254,11 +229,6 @@ export default Home;
 export const getServerSideProps: GetServerSideProps<IHome> = async (
   context
 ) => {
-  const { req } = context;
-  const accessToken = req.cookies?.accessToken;
-
-  const assumeLoggedIn = !!accessToken && !Array.isArray(accessToken);
-
   const translationContext = await serverSideTranslations(
     context.locale!!,
     [
@@ -273,27 +243,6 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
     null,
     SUPPORTED_LANGUAGES
   );
-
-  let assumeIsCreator = false;
-
-  try {
-    if (accessToken) {
-      const decodedToken: {
-        account_id: string;
-        account_type: string;
-        date: string;
-        is_creator: boolean;
-        iat: number;
-        exp: number;
-        aud: string;
-        iss: string;
-      } = jwtDecode(accessToken);
-
-      assumeIsCreator = decodedToken.is_creator || false;
-    }
-  } catch (err) {
-    assumeIsCreator = false;
-  }
 
   const staticSuperpolls = [
     {
@@ -358,26 +307,22 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
 
     return {
       props: {
-        ...(popularPosts.data && popularPosts.data.toJSON().posts
+        ...(popularPosts?.data && popularPosts.data.toJSON().posts
           ? {
               popularPosts:
                 popularPosts.data.toJSON() as newnewapi.NonPagedPostsResponse,
             }
           : {}),
-        assumeLoggedIn,
         staticSuperpolls,
         staticBids,
-        assumeIsCreator,
         ...translationContext,
       },
     };
   } catch (err) {
     return {
       props: {
-        assumeLoggedIn,
         staticSuperpolls,
         staticBids,
-        assumeIsCreator,
         ...translationContext,
       },
     };

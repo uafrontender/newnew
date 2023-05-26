@@ -93,7 +93,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
 
         const res = await getRoom(payload);
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           throw new Error('Request failed');
         }
 

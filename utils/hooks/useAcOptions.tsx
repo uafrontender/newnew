@@ -1,7 +1,7 @@
-/* eslint-disable no-plusplus */
 import { newnewapi } from 'newnew-api';
 import { useMemo } from 'react';
-import { cloneDeep, uniqBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 import {
   InfiniteData,
   useInfiniteQuery,
@@ -27,7 +27,6 @@ const sortOptions = (
   unsortedArr: TAcOptionWithHighestField[],
   userUuid: string | undefined
 ) => {
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < unsortedArr.length; i++) {
     // eslint-disable-next-line no-param-reassign
     unsortedArr[i].isHighest = false;
@@ -118,7 +117,7 @@ const useAcOptions = (
 
       const optionsResponse = await fetchCurrentBidsForPost(payload);
 
-      if (!optionsResponse.data || optionsResponse.error) {
+      if (!optionsResponse?.data || optionsResponse.error) {
         throw new Error('Request failed');
       }
 
@@ -151,8 +150,9 @@ const useAcOptions = (
       ? query?.data?.pages.map((page) => page.acOptions).flat()
       : [];
 
-    if (flatOptions.length === 0)
+    if (flatOptions.length === 0) {
       return flatOptions as TAcOptionWithHighestField[];
+    }
 
     return sortOptions(
       flatOptions as TAcOptionWithHighestField[],

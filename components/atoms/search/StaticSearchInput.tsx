@@ -216,8 +216,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           quickSearchAbortControllerRef?.current?.signal
         );
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         if (res.data.creators) {
@@ -608,6 +608,7 @@ export const SInputWrapper = styled.label<ISInputWrapper>`
   ${({ theme }) => theme.media.laptop} {
     right: 0;
     width: ${({ width }) => width || '364px'};
+    transition: none;
   }
 
   ${({ theme, active }) =>

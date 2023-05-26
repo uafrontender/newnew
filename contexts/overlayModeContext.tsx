@@ -46,7 +46,7 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
       enableOverlayMode,
       disableOverlayMode,
     }),
-    [requests]
+    [requests, enableOverlayMode, disableOverlayMode]
   );
 
   return (
@@ -60,12 +60,18 @@ export function useOverlayMode() {
   const context = useContext(OverlayModeContext);
   const id = useRef(uuidv4());
 
-  if (!context)
+  if (!context) {
     throw new Error(
       'useOverlayMode must be used inside a `OverlayModeProvider`'
     );
+  }
 
+  // Adding context to deps results in infinite loop
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const enable = useCallback(() => context.enableOverlayMode(id.current), []);
+
+  // Adding context to deps results in infinite loop
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const disable = useCallback(() => context.disableOverlayMode(id.current), []);
 
   return {

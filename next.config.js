@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const { withSentryConfig } = require('@sentry/nextjs');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const { i18n } = require('./next-i18next.config');
 
 const moduleExports = {
@@ -13,6 +17,20 @@ const moduleExports = {
     });
 
     return config;
+  },
+  // By default, Next.js will run ESLint for all files in the pages/ and components/
+  eslint: {
+    dirs: [
+      'api',
+      'components',
+      'constants',
+      'contexts',
+      'HOC',
+      'pages',
+      'redux-store',
+      'styles',
+      'utils',
+    ],
   },
   images: {
     domains: [
@@ -93,4 +111,7 @@ const sentryWebpackPluginOptions = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);
+module.exports = withSentryConfig(
+  withBundleAnalyzer(moduleExports),
+  sentryWebpackPluginOptions
+);

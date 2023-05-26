@@ -1,6 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable arrow-body-style */
 import React, { useState, useMemo, createContext } from 'react';
 import { useRouter } from 'next/router';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -122,20 +119,18 @@ interface IBackgroundVisual {
 
 const BackgroundVisual: React.FunctionComponent<IBackgroundVisual> = ({
   view,
-}) => {
-  return (
-    <SBackgroundVisual>
-      <AnimatePresence>
-        {view === 'hero-visual' && (
-          <HeroVisualContainer>
-            <HeroVisual key='hero-visual' />
-          </HeroVisualContainer>
-        )}
-        {view === 'floating-items' && <VerifyEmailVisual />}
-      </AnimatePresence>
-    </SBackgroundVisual>
-  );
-};
+}) => (
+  <SBackgroundVisual>
+    <AnimatePresence>
+      {view === 'hero-visual' && (
+        <HeroVisualContainer>
+          <HeroVisual key='hero-visual' />
+        </HeroVisualContainer>
+      )}
+      {view === 'floating-items' && <VerifyEmailVisual />}
+    </AnimatePresence>
+  </SBackgroundVisual>
+);
 
 const SBackgroundVisual = styled.div`
   display: none;

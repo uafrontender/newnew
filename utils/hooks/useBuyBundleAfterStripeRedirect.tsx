@@ -57,12 +57,12 @@ function useBuyBundleAfterStripeRedirect(
       const res = await buyCreatorsBundle(stripeContributionRequest);
 
       if (
-        !res.data ||
+        !res?.data ||
         res.error ||
         res.data.status !== newnewapi.BuyCreatorsBundleResponse.Status.SUCCESS
       ) {
         throw new Error(
-          res.error?.message ?? t('modal.buyBundle.error.requestFailed')
+          res?.error?.message ?? t('modal.buyBundle.error.requestFailed')
         );
       }
 

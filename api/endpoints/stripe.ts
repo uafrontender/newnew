@@ -3,7 +3,7 @@ import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 const BASE_URL_BUNDLE = `${BASE_URL}/stripe`;
 
-export const getExpressDashboardLoginLink = (
+const getExpressDashboardLoginLink = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
@@ -18,3 +18,5 @@ export const getExpressDashboardLoginLink = (
     payload,
     signal ?? undefined
   );
+
+export default getExpressDashboardLoginLink;
