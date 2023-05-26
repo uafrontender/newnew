@@ -46,6 +46,7 @@ import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import getDateFormatForTimeZone from '../../../utils/getDateFormatForTimeZone';
 import { useAppState } from '../../../contexts/appStateContext';
+import isBrowser from '../../../utils/isBrowser';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -309,6 +310,20 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           </>
         );
       });
+
+      useEffect(() => {
+        if (isBrowser()) {
+          const accordionContainer = document?.getElementById(
+            'settings-accordion-container'
+          );
+
+          if (calendarOpen && accordionContainer) {
+            accordionContainer.style.cssText = 'overflow: unset;';
+          } else if (accordionContainer) {
+            accordionContainer.style.cssText = '';
+          }
+        }
+      }, [calendarOpen]);
 
       return (
         <SContainer onMouseEnter={() => handleSetActive?.()}>
