@@ -369,7 +369,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
             {
               // eslint-disable-next-line no-nested-ternary
-              creatorsBundle && user.options?.isOfferingBundles ? (
+              creatorsBundle &&
+              user.options?.isOfferingBundles &&
+              !isBlocked ? (
                 !bundleExpired ? (
                   <CustomLink href={`/direct-messages/${user.username}`}>
                     <SSendButton

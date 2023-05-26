@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -72,7 +71,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
                   }
                 >
                   {unreadCount && unreadCount > 0 ? (
-                    <Indicator counter={unreadCount} animate={false} />
+                    <Indicator counter={unreadCount} />
                   ) : null}
                   <SText
                     variant={2}

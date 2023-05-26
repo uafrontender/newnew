@@ -1,8 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable react/no-danger */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
   useEffect,
@@ -444,7 +439,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       Object.values(dateInEdit).length === 3
         ? !Object.values(dateInEdit).some((v) => v === undefined)
         : false,
-    image: imageInEdit ? true : false,
+    image: !!imageInEdit,
     agreedToTos: true,
   });
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);

@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 
 import GoBackButton from '../GoBackButton';
 import Logo from '../Logo';

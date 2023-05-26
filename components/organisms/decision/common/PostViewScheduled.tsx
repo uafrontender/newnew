@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-lonely-if */
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -9,14 +7,12 @@ import { useTranslation } from 'react-i18next';
 // Utils
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import { markPost } from '../../../../api/endpoints/post';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostScheduledSection from '../../../molecules/decision/common/PostScheduledSection';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
-import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import McOptionsTabModeration from '../../../molecules/decision/moderation/multiple_choice/McOptionsTabModeration';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
@@ -43,8 +39,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
-    const { promptUserWithPushNotificationsPermissionModal } =
-      usePushNotifications();
 
     const { postParsed, typeOfPost, handleGoBackInsidePost } =
       usePostInnerState();
@@ -91,53 +85,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       [post.postUuid, removeMcOptionMutation]
     );
 
-    const [isFollowing, setIsFollowing] = useState(
-      post.isFavoritedByMe ?? false
-    );
-
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
     }, [dispatch]);
-
-    const handleFollowDecision = async () => {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid) {
-        return;
-      }
-
-      try {
-        Mixpanel.track('Favorite Post', {
-          _stage: 'Post',
-          _postUuid: post.postUuid,
-        });
-        const markAsFavoritePayload = new newnewapi.MarkPostRequest({
-          markAs: !isFollowing
-            ? newnewapi.MarkPostRequest.Kind.FAVORITE
-            : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsFavoritePayload);
-
-        if (!res.error) {
-          setIsFollowing(!isFollowing);
-        }
-
-        if (!isFollowing) {
-          promptUserWithPushNotificationsPermissionModal();
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    /* const subscription: SubscriptionToPost = useMemo(
-      () => ({
-        type: 'post',
-        postUuid: post.postUuid,
-        postTitle: post.title,
-      }),
-      [post]
-    ); */
 
     return (
       <SWrapper>
@@ -196,38 +146,37 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               </SToggleOptionsButton>
             ) : null}
           </div>
-          {variant === 'moderation' && postType === 'mc' ? (
-            openedTab === 'hourglass' ? (
+          {
+            // eslint-disable-next-line no-nested-ternary
+            variant === 'moderation' && postType === 'mc' ? (
+              openedTab === 'hourglass' ? (
+                <PostScheduledSection
+                  postType={postType}
+                  timestampSeconds={new Date(
+                    (post.startsAt?.seconds as number) * 1000
+                  ).getTime()}
+                  variant={variant}
+                />
+              ) : (
+                <McOptionsTabModeration
+                  post={postParsed as newnewapi.MultipleChoice}
+                  options={options}
+                  hasNextPage={!!hasNextOptionsPage}
+                  fetchNextPage={fetchNextOptionsPage}
+                  winningOptionId={undefined}
+                  handleRemoveOption={handleRemoveOption}
+                />
+              )
+            ) : (
               <PostScheduledSection
                 postType={postType}
                 timestampSeconds={new Date(
                   (post.startsAt?.seconds as number) * 1000
                 ).getTime()}
-                isFollowing={isFollowing}
                 variant={variant}
-                handleFollowDecision={handleFollowDecision}
-              />
-            ) : (
-              <McOptionsTabModeration
-                post={postParsed as newnewapi.MultipleChoice}
-                options={options}
-                hasNextPage={!!hasNextOptionsPage}
-                fetchNextPage={fetchNextOptionsPage}
-                winningOptionId={undefined}
-                handleRemoveOption={handleRemoveOption}
               />
             )
-          ) : (
-            <PostScheduledSection
-              postType={postType}
-              timestampSeconds={new Date(
-                (post.startsAt?.seconds as number) * 1000
-              ).getTime()}
-              isFollowing={isFollowing}
-              variant={variant}
-              handleFollowDecision={handleFollowDecision}
-            />
-          )}
+          }
         </SActivitiesContainer>
       </SWrapper>
     );

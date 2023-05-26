@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import {

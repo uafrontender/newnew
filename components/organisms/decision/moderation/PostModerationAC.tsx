@@ -178,7 +178,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchPostLatestData = useCallback(async () => {
       try {
         const res = await refetchPost();
@@ -189,6 +188,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       } catch (err) {
         console.error(err);
       }
+      // Made not to depend on refetchPost from post inner state
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

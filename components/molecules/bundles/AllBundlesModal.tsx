@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -62,15 +61,17 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
         >
           {isMobile && <SMobileTitle>{t('bundlesModal.title')}</SMobileTitle>}
           {setsOfBundles.map((set, setIndex) => (
+            // eslint-disable-next-line react/no-array-index-key
             <SBundleSetContainer key={setIndex}>
-              {set.map((bundle, index) => (
+              {set.map((bundle) => (
                 <SBundleCard
-                  key={`${setIndex}-${index}`}
+                  key={bundle.creator?.uuid}
                   small
                   creatorBundle={bundle}
                 />
               ))}
               {[...Array(setSize - set.length)].map((v, index) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <BundleCard key={`${setIndex}-${index}-holder`} small />
               ))}
             </SBundleSetContainer>

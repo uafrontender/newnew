@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-unused-vars */
 import React, {
   createContext,
   useEffect,
@@ -59,9 +57,11 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
           throw new Error(res?.error?.message ?? 'Request failed');
         }
 
-        block
-          ? setUsersIBlocked((curr) => [...curr, uuid])
-          : setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
+        if (block) {
+          setUsersIBlocked((curr) => [...curr, uuid]);
+        } else {
+          setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
+        }
       } catch (err) {
         console.error(err);
         showErrorToastPredefined(undefined);
@@ -110,13 +110,14 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       if (!decoded) {
         return;
       }
-      console.log(decoded);
 
-      decoded.isBlocked
-        ? setUsersBlockedMe((curr) => [...curr, decoded.userUuid])
-        : setUsersBlockedMe((curr) =>
-            curr.filter((uuid) => uuid !== decoded.userUuid)
-          );
+      if (decoded.isBlocked) {
+        setUsersBlockedMe((curr) => [...curr, decoded.userUuid]);
+      } else {
+        setUsersBlockedMe((curr) =>
+          curr.filter((uuid) => uuid !== decoded.userUuid)
+        );
+      }
     };
     if (socketConnection) {
       socketConnection?.on(
