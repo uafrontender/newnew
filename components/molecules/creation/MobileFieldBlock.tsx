@@ -87,7 +87,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const { isTimeOfTheDaySame, localTimeOfTheDay } = useMemo(() => {
     const currentTime = moment();
     const h = currentTime.hour();
-    const ltd = h >= 12 ? 'pm' : 'am';
+    const ltd: 'pm' | 'am' = h >= 12 ? 'pm' : 'am';
 
     return {
       isTimeOfTheDaySame: ltd === value?.['hours-format'],
@@ -300,7 +300,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                     hoursFormat={value['hours-format']}
                     isDaySame={isDaySame}
                     isTimeOfTheDaySame={isTimeOfTheDaySame}
-                    localTimeOfTheDay={localTimeOfTheDay as any}
+                    localTimeOfTheDay={localTimeOfTheDay}
                     onChange={handleTimeChange}
                   />
                 </STimePickerWrapper>

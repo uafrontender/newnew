@@ -430,8 +430,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           videoElement,
           options,
           () => {
-            // eslint-disable-next-line no-unused-expressions
-            handlePlayerReady && handlePlayerReady(player);
+            handlePlayerReady?.(player);
 
             // Add id to safari
             const vjsTech = videoRef.current?.querySelector('.vjs-tech');

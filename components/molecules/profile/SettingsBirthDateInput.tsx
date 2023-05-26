@@ -1,6 +1,5 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
-/* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
 import React, { forwardRef, useState, useEffect, useRef, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';

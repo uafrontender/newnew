@@ -1,29 +1,21 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import styled from 'styled-components';
 
 export interface IIndicator {
   counter?: number;
-  animate?: boolean;
   minified?: boolean;
-  onAnimationEnd?: () => void;
 }
 
-const Indicator: React.FC<IIndicator> = (props) => {
-  const { counter = 0, animate, minified, onAnimationEnd, ...rest } = props;
-
+const Indicator: React.FC<IIndicator> = ({ counter = 0, minified }) => {
   const bigCounter = counter >= 100;
   const valueToDisplay = bigCounter ? 99 : counter;
 
   if (minified) {
-    return <SMinifiedIndicator {...rest} />;
+    return <SMinifiedIndicator />;
   }
 
   return (
-    <SIndicator bigCounter={bigCounter} {...rest}>
-      {/* NB! Commented this one out as this animated component proved to be quite buggy so far */}
-      {/* {animate ? <CountUp useEasing end={valueToDisplay} onEnd={onAnimationEnd} duration={5} /> : valueToDisplay} */}
+    <SIndicator bigCounter={bigCounter}>
       {valueToDisplay}
       {bigCounter ? '+' : ''}
     </SIndicator>
@@ -34,9 +26,7 @@ export default Indicator;
 
 Indicator.defaultProps = {
   counter: 0,
-  animate: true,
   minified: false,
-  onAnimationEnd: () => {},
 };
 
 interface ISIndicator {

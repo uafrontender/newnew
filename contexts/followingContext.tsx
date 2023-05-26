@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import React, {
   createContext,

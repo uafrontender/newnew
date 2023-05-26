@@ -51,7 +51,7 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
           />
           {item.counter !== undefined && item.counter > 0 && (
             <SIndicatorContainer>
-              <Indicator counter={item.counter} animate={false} />
+              <Indicator counter={item.counter} />
             </SIndicatorContainer>
           )}
         </SNavItem>

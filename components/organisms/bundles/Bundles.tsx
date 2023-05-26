@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
@@ -179,14 +178,18 @@ export const Bundles: React.FC = React.memo(() => {
             {bundles &&
               bundles
                 .slice(0, visibleBundlesNumber)
-                .map((bundle, index) => (
-                  <BundleCard key={index} creatorBundle={bundle} />
+                .map((bundle) => (
+                  <BundleCard
+                    key={bundle.creator?.uuid}
+                    creatorBundle={bundle}
+                  />
                 ))}
 
             {!isMobile &&
               bundles &&
               [
                 ...Array(Math.max(visibleBundlesNumber - bundles.length, 0)),
+                // eslint-disable-next-line react/no-array-index-key
               ].map((v, index) => <BundleCard key={`${index}-holder`} />)}
           </SBundlesContainer>
         </SAnimationContainer>
