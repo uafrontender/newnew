@@ -1,5 +1,3 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-plusplus */
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import isBrowser from '../../utils/isBrowser';
@@ -71,11 +69,12 @@ const SimplifiedSlider: React.FunctionComponent<ISimplifiedSlider> = ({
         <SList>
           {children.map((item, i) => (
             <SSlide
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
               style={{
                 width: slideWidth,
               }}
               tabIndex={-1}
-              key={i}
               className='slide'
             >
               {item}

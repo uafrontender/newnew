@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useCallback, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
@@ -29,11 +27,6 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
   const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
   const { signupEmailInput } = useAppSelector((state) => state.user);
-
-  // Redirect if the user is logged in
-  // useEffect(() => {
-  //   if (loggedIn) router.replace('/');
-  // }, [loggedIn, router]);
 
   useEffect(() => {
     if (!signupEmailInput) {

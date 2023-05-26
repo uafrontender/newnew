@@ -1,6 +1,3 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -85,6 +82,7 @@ export const PostList: React.FC<IList> = ({
           .fill('_')
           .map((_, i) => (
             <CardSkeleton
+              // eslint-disable-next-line react/no-array-index-key
               key={i}
               count={1}
               cardWidth='100%'

@@ -49,8 +49,6 @@ const PostVideoThumbnailItem: React.FunctionComponent<
   const deleteButtonRef = useRef<HTMLButtonElement>();
 
   const [helperVisible, setHelperVisible] = useState(false);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleClickDeleteButtonMixpanel = useCallback(
