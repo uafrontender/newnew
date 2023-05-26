@@ -1,5 +1,4 @@
 /* eslint-disable no-continue */
-/* eslint-disable no-plusplus */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';

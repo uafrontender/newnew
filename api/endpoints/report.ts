@@ -1,5 +1,4 @@
 import { newnewapi } from 'newnew-api';
-import Long from 'long';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 const BASE_URL_CHAT = `${BASE_URL}/reporting`;
@@ -66,7 +65,7 @@ export const reportEventOption = (
     message,
     content: {
       auOption: {
-        auOptionId: optionId,
+        auOptionId: optionId as number,
       },
     },
   });
@@ -84,7 +83,7 @@ export const reportSuperpollOption = (
     message,
     content: {
       mcOption: {
-        mcOptionId: optionId,
+        mcOptionId: optionId as number,
       },
     },
   });
@@ -102,7 +101,7 @@ export const reportMessage = (
     message,
     content: {
       chatMessage: {
-        chatMessageId: messageId,
+        chatMessageId: messageId as number,
       },
     },
   });

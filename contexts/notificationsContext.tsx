@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, {
   createContext,
   useEffect,
@@ -39,8 +38,8 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
     try {
       const payload = new newnewapi.EmptyRequest();
       const res = await getUnreadNotificationCount(payload);
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       if (
@@ -103,9 +102,11 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
 
 export function useNotifications() {
   const context = useContext(NotificationsContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'useNotifications must be used inside a `NotificationsProvider`'
     );
+  }
+
   return context;
 }

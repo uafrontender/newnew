@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 import React, { useRef, useState, useCallback, useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';

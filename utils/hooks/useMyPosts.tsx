@@ -1,5 +1,4 @@
-/* eslint-disable no-plusplus */
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { newnewapi } from 'newnew-api';
 import {
   InfiniteData,
@@ -49,7 +48,7 @@ const useMyPosts = (
 
       const postsResponse = await getMyPosts(payload, signal);
 
-      if (!postsResponse.data || postsResponse.error) {
+      if (!postsResponse?.data || postsResponse.error) {
         throw new Error('Request failed');
       }
 

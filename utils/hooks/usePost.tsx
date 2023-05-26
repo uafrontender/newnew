@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from 'react-query';
 import { newnewapi } from 'newnew-api';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { fetchPostByUUID } from '../../api/endpoints/post';
 import useErrorToasts from './useErrorToasts';
@@ -54,8 +54,9 @@ const usePost = (
 
       const res = await fetchPostByUUID(getPostPayload, signal);
 
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Post not found');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Post not found');
+      }
 
       return res.data;
     },

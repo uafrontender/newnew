@@ -68,64 +68,68 @@ export interface ICreationState {
   customCoverImageUrl?: string;
 }
 
-const defaultPostState: ICreationState = {
-  post: {
-    title: '',
-    startsAt: {
-      type: 'right-away',
-      date: moment().format(),
-      time: moment().format('hh:mm'),
-      'hours-format': moment().format('a') as 'am' | 'pm',
-    },
-    expiresAt: '1-hour',
-    options: {
-      commentsEnabled: true,
-    },
-    announcementVideoUrl: '',
-    thumbnailParameters: {
-      startTime: 1,
-      endTime: 30,
-    },
-  },
-  auction: {
-    minimalBid: 2,
-  },
-  crowdfunding: {
-    targetBackerCount: undefined,
-  },
-  multiplechoice: {
-    choices: [
-      {
-        id: 1,
-        text: '',
+// Function returns new instance of the object each time
+// protecting default state and inner objects from modification
+function getDefaultPostState(): ICreationState {
+  return {
+    post: {
+      title: '',
+      startsAt: {
+        type: 'right-away',
+        date: moment().format(),
+        time: moment().format('hh:mm'),
+        'hours-format': moment().format('a') as 'am' | 'pm',
       },
-      {
-        id: 2,
-        text: '',
+      expiresAt: '1-hour',
+      options: {
+        commentsEnabled: true,
       },
-    ],
-    options: {
-      allowSuggestions: true,
+      announcementVideoUrl: '',
+      thumbnailParameters: {
+        startTime: 1,
+        endTime: 30,
+      },
     },
-  },
-  videoProcessing: {
-    taskUuid: '',
-    targetUrls: {},
-  },
-  fileUpload: {
-    error: false,
-    loading: false,
-    progress: 0,
-    eta: 0,
-  },
-  fileProcessing: {
-    error: false,
-    loading: false,
-    progress: 0,
-    eta: 0,
-  },
-  customCoverImageUrl: undefined,
-};
+    auction: {
+      minimalBid: 2,
+    },
+    crowdfunding: {
+      targetBackerCount: undefined,
+    },
+    multiplechoice: {
+      choices: [
+        {
+          id: 1,
+          text: '',
+        },
+        {
+          id: 2,
+          text: '',
+        },
+      ],
+      options: {
+        allowSuggestions: true,
+      },
+    },
+    videoProcessing: {
+      taskUuid: '',
+      targetUrls: {},
+    },
+    fileUpload: {
+      error: false,
+      loading: false,
+      progress: 0,
+      eta: 0,
+    },
+    fileProcessing: {
+      error: false,
+      loading: false,
+      progress: 0,
+      eta: 0,
+    },
+    customCoverImageUrl: undefined,
+  };
+}
 
 const PostCreationContext = createContext<{
   postInCreation: ICreationState;
@@ -156,7 +160,7 @@ const PostCreationContext = createContext<{
   clearCreation: () => void;
   clearPostData: () => void;
 }>({
-  postInCreation: defaultPostState,
+  postInCreation: getDefaultPostState(),
   setPostData: (() => {}) as any,
   setCreationTitle: (() => {}) as any,
   setCreationVideo: (() => {}) as any,
@@ -196,8 +200,9 @@ const PostCreationContextProvider: React.FunctionComponent<
     [appConstants.minAcBid]
   );
 
-  const [postInCreation, setPostInCreation] =
-    useState<ICreationState>(defaultPostState);
+  const [postInCreation, setPostInCreation] = useState<ICreationState>(
+    getDefaultPostState()
+  );
 
   const setPostData = useCallback((newValue: TPostData) => {
     setPostInCreation((curr) => {
@@ -394,6 +399,8 @@ const PostCreationContextProvider: React.FunctionComponent<
   }, []);
 
   const clearCreation = useCallback(() => {
+    const defaultPostState = getDefaultPostState();
+
     setPostInCreation((curr) => {
       const workingObj = { ...curr };
       workingObj.post = { ...defaultPostState.post };
@@ -510,9 +517,11 @@ export default PostCreationContextProvider;
 
 export function usePostCreationState() {
   const context = useContext(PostCreationContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'usePostCreationState must be used inside a `PostCreationContextProvider`'
     );
+  }
+
   return context;
 }

@@ -37,7 +37,7 @@ const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
 
 interface IFileUpload {
   id: string;
-  value: any;
+  value: newnewapi.IVideoUrls | null | undefined;
   etaUpload: number;
   errorUpload: boolean;
   loadingUpload: boolean;
@@ -230,8 +230,8 @@ const FileUpload: React.FC<IFileUpload> = ({
 
       const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      if (!resProcessing?.data || resProcessing.error) {
+        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
       }
 
       setLocalFile(null);
@@ -363,7 +363,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       </SDropBox>
     );
 
-    if (!localFile) {
+    if (!localFile && !value) {
       return content;
     }
 

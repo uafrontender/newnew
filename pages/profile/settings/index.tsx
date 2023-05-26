@@ -45,10 +45,12 @@ import assets from '../../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
 
   // const { showErrorToastPredefined } = useErrorToasts();
 
@@ -66,7 +68,7 @@ const MyProfileSettingsIndex = () => {
   );
 
   const { colorMode } = useAppSelector((state: any) => state.ui);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   // Measurements
   const isMobileOrTablet = [
     'mobile',
@@ -105,10 +107,11 @@ const MyProfileSettingsIndex = () => {
       const payload = new newnewapi.EmptyRequest({});
       const res = await logout(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Log out failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Log out failed');
       }
 
+      setUserLoggedIn(false);
       dispatch(logoutUser(''));
 
       // Unset credential cookies
@@ -125,18 +128,20 @@ const MyProfileSettingsIndex = () => {
       console.error(err);
       setIsLogoutLoading(false);
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
 
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie]);
+  }, [dispatch, setIsLogoutLoading, removeCookie, setUserLoggedIn]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 
@@ -295,7 +300,7 @@ const MyProfileSettingsIndex = () => {
             Mixpanel.track('Back button Clicked', {
               _stage: 'Settings',
             });
-            router.back();
+            goBackOrRedirect('/profile/my-posts');
           }}
         >
           {isMobile ? t('Settings.heading') : t('Settings.button.back')}

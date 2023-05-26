@@ -142,14 +142,14 @@ const useStripeSetupIntent = ({
 
       const response = await createStripeSetupIntent(payload);
 
-      if (
-        !response.data ||
-        response.error ||
-        !response.data?.stripeSetupIntentClientSecret
-      ) {
+      if (!response?.data || response.error) {
+        throw new Error(response?.error?.message ?? 'Request failed');
+      }
+
+      if (!response.data.stripeSetupIntentClientSecret) {
         return {
           errorKey: getCreateStripeSetupIntentErrorStatusTextKey(
-            response.data?.status
+            response.data.status
           ),
         };
       }
@@ -190,15 +190,17 @@ const useStripeSetupIntent = ({
           updateStripeSetupIntentRequest
         );
 
+        if (!response?.data || response.error) {
+          throw new Error(response?.error?.message ?? 'Request failed');
+        }
+
         if (
-          !response.data ||
-          response.error ||
-          response.data?.status !==
-            newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
+          response.data.status !==
+          newnewapi.UpdateStripeSetupIntentResponse.Status.SUCCESS
         ) {
           return {
             errorKey: getUpdateStripeSetupIntentErrorStatusTextKey(
-              response.data?.status
+              response.data.status
             ),
           };
         }

@@ -307,6 +307,7 @@ const McOptionCardModeration: React.FunctionComponent<
               isVisible={isEllipseMenuOpen}
               isBySubscriber={!isCreatorsOption}
               canDeleteOptionInitial={canBeDeleted && !isWinner}
+              canBlockUser={!!option.creator}
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
               handleClose={handleCloseEllipseMenuUnblockScroll}

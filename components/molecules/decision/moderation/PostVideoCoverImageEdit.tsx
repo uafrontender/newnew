@@ -129,8 +129,8 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
 
         const res = await getCoverImageUploadUrl(imageUrlPayload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'An error occurred');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'An error occurred');
         }
 
         const uploadResponse = await fetch(res.data.uploadUrl, {

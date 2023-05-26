@@ -1,7 +1,7 @@
 import React, { ReactElement, useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 
 import Modal from '../organisms/Modal';
 import Button from './Button';
@@ -165,29 +165,21 @@ const SButton = styled.button`
   text-align: center;
   cursor: pointer;
 
-  &:focus,
-  &:hover {
-    outline: none;
-  }
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
-  &:focus:enabled,
-  &:hover:enabled {
+  &:active {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
-  }
-
-  &:focus:enabled:not(:focus-visible):not(:hover) {
-    background-color: initial;
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: default;
-  }
-
-  @media (hover: none) {
-    &:hover:enabled {
-      background-color: initial;
-    }
   }
 `;

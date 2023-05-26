@@ -183,8 +183,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     try {
       const res = await refetchPost();
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
     } catch (err) {
       console.error(err);
@@ -192,9 +192,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [lastContributedOptionId, setLastContributedOptionId] = useState<
+    number | undefined
+  >();
   const handleAddOrUpdateOptionFromResponse = useCallback(
     async (newOption: newnewapi.Auction.Option) => {
       addOrUpdateAcOptionMutation?.mutate(newOption);
+      setLastContributedOptionId(newOption.id as number);
     },
     [addOrUpdateAcOptionMutation]
   );
@@ -314,12 +318,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         );
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(getPayWithCardErrorMessage(res.data?.status))
           );
         }
@@ -555,10 +559,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             options={options}
             optionsLoading={isOptionsLoading}
             hasNextPage={!!hasNextOptionsPage}
+            lastContributedOptionId={lastContributedOptionId}
             fetchNextPage={fetchNextOptionsPage}
-            handleAddOrUpdateOptionFromResponse={
-              handleAddOrUpdateOptionFromResponse
-            }
+            handleUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             handleRemoveOption={handleRemoveOption}
           />
           {postStatus === 'voting' && (

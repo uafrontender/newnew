@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
@@ -20,6 +18,7 @@ import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg
 import VerificationPassedInverted from '../../../public/images/svg/icons/filled/VerificationPassedInverted.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const getStripeButtonTextKey = (
   stripeConnectStatus:
@@ -49,7 +48,7 @@ const getStripeButtonTextKey = (
 };
 
 const OnboardingSectionStripe: React.FunctionComponent = () => {
-  const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   // const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -110,8 +109,8 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
 
       const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
 
       const url = res.data.setupUrl;
@@ -124,7 +123,9 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
 
   return (
     <SContainer>
-      {isMobile && <SGoBackButton onClick={() => router.back()} />}
+      {isMobile && (
+        <SGoBackButton onClick={() => goBackOrRedirect('/creator/dashboard')} />
+      )}
       <SHeadline variant={5}>
         <span>{t('stripeSection.titleSetUpStripe')}</span>
         <SInlineSvg svg={StripeLogo} width='80px' />
@@ -168,23 +169,20 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
       </SButton>
       <SControlsDiv>
         {!isMobile && (
-          <Link href='/creator/dashboard'>
-            <a>
-              <GoBackButton
-                noArrow
-                onClick={() => {
-                  Mixpanel.track('Navigation Item Clicked', {
-                    _stage: 'Onboarding',
-                    _component: 'OnboardingSectionStripe',
-                    _button: 'back button',
-                    _target: '/creator/dashboard',
-                  });
-                }}
-              >
-                {t('aboutSection.button.back')}
-              </GoBackButton>
-            </a>
-          </Link>
+          <GoBackButton
+            noArrow
+            onClick={() => {
+              Mixpanel.track('Navigation Item Clicked', {
+                _stage: 'Onboarding',
+                _component: 'OnboardingSectionStripe',
+                _button: 'back button',
+                _target: '/creator/dashboard',
+              });
+              goBackOrRedirect('/creator/dashboard');
+            }}
+          >
+            {t('aboutSection.button.back')}
+          </GoBackButton>
         )}
         {/* <Link href='/creator-onboarding-subrate'>
           <a>

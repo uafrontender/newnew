@@ -59,6 +59,7 @@ import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import useCuratedList, {
   useCuratedListSubscription,
 } from '../../utils/hooks/useCuratedList';
+import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -84,6 +85,7 @@ const PostPage: NextPage<IPostPage> = ({
   isServerSide,
 }) => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
@@ -185,7 +187,7 @@ const PostPage: NextPage<IPostPage> = ({
 
         const res = await setPostTitle(payload);
 
-        if (!res.data || res.error) {
+        if (!res?.data || res.error) {
           throw new Error(res?.error?.message || 'An error occurred');
         }
 
@@ -422,13 +424,13 @@ const PostPage: NextPage<IPostPage> = ({
     ) {
       return;
     }
-
-    if (window.history.state && window.history.state.idx > 0) {
-      router.back();
-    } else {
-      router.replace(`/${postParsed?.creator?.username}`);
-    }
-  }, [isConfirmToClosePost, postParsed?.creator?.username, router, t]);
+    goBackOrRedirect(`/${postParsed?.creator?.username}`);
+  }, [
+    isConfirmToClosePost,
+    postParsed?.creator?.username,
+    t,
+    goBackOrRedirect,
+  ]);
 
   const handleGoBackInsidePost = useCallback(() => {
     Mixpanel.track('Go Back Inside Post', {
@@ -441,12 +443,13 @@ const PostPage: NextPage<IPostPage> = ({
     ) {
       return;
     }
-    if (window.history.state && window.history.state.idx > 0) {
-      router.back();
-    } else {
-      router.replace(`/${postParsed?.creator?.username}`);
-    }
-  }, [isConfirmToClosePost, postParsed?.creator?.username, router, t]);
+    goBackOrRedirect(`/${postParsed?.creator?.username}`);
+  }, [
+    isConfirmToClosePost,
+    postParsed?.creator?.username,
+    t,
+    goBackOrRedirect,
+  ]);
 
   const handleSeeNewDeletedBox = useCallback(() => {
     Mixpanel.track('Post Failed Button Click', {
@@ -500,7 +503,7 @@ const PostPage: NextPage<IPostPage> = ({
   //         fetchRecommenedPostsPayload
   //       );
 
-  //       if (postsResponse.data && postsResponse.data.posts) {
+  //       if (postsResponse?.data && postsResponse.data.posts) {
   //         setRecommendedPosts((curr) => [
   //           ...curr,
   //           ...(postsResponse.data?.posts as newnewapi.Post[]),
@@ -938,7 +941,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         context.req.cookies?.accessToken ?? undefined
       );
 
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         return {
           redirect: {
             destination: '/',

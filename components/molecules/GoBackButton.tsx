@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { debounce } from 'lodash';
+import _debounce from 'lodash/debounce';
 
 // Components
 import InlineSvg from '../atoms/InlineSVG';
@@ -26,7 +26,7 @@ const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
   ...rest
 }) => {
   const handleClickDebounced = useMemo(
-    () => debounce(onClick!!, defer ?? 0),
+    () => _debounce(onClick!!, defer ?? 0),
     [onClick, defer]
   );
 

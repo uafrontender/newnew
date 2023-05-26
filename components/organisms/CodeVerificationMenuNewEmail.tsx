@@ -44,7 +44,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const { t } = useTranslation('page-VerifyEmail');
   const user = useAppSelector((state) => state.user);
 
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -114,7 +114,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 
           const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-          if (!becomeCreatorRes.data || becomeCreatorRes.error) {
+          if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
             throw new Error('Become creator failed');
           }
 
@@ -131,6 +131,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
               },
             })
           );
+
+          setUserLoggedIn(true);
+          setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
         }
 
         setIsSignInWithEmailLoading(false);
@@ -155,6 +158,8 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
       redirect,
       dispatch,
       router,
+      setUserLoggedIn,
+      setUserIsCreator,
     ]
   );
 

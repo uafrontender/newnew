@@ -430,8 +430,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           videoElement,
           options,
           () => {
-            // eslint-disable-next-line no-unused-expressions
-            handlePlayerReady && handlePlayerReady(player);
+            handlePlayerReady?.(player);
 
             // Add id to safari
             const vjsTech = videoRef.current?.querySelector('.vjs-tech');
@@ -692,10 +691,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         const tagName = document?.activeElement?.tagName?.toLowerCase();
 
         const shouldPause =
-          document?.hasFocus() &&
-          tagName &&
-          tagName !== 'input' &&
-          tagName !== 'textarea';
+          (document?.hasFocus() &&
+            tagName &&
+            tagName !== 'input' &&
+            tagName !== 'textarea') ||
+          (!isSafari() && isFullscreen);
 
         if (!shouldPause) {
           return;
@@ -723,7 +723,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       return () => {
         window.removeEventListener('keydown', handlePressSpacebar);
       };
-    }, [handleSetIsPaused, isActive, isInSlider]);
+    }, [handleSetIsPaused, isActive, isFullscreen, isInSlider]);
 
     // Update scrubber in non-Safari fullscreen controls for a paused video
     useEffect(() => {
@@ -947,6 +947,12 @@ const SWrapper = styled.div<{
     display: none !important;
   }
 
+  .video-js {
+    &:focus-visible {
+      outline: none !important;
+    }
+  }
+
   video {
     /* Fix background image flickering through */
     width: calc(100% + 1px) !important;
@@ -954,6 +960,10 @@ const SWrapper = styled.div<{
 
     object-fit: ${({ videoOrientation, isFullScreen }) =>
       videoOrientation === 'vertical' && !isFullScreen ? 'cover' : 'contain'};
+
+    &:focus-visible {
+      outline: none !important;
+    }
   }
 
   /* Mostly useless, added just in case */

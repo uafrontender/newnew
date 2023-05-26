@@ -18,6 +18,7 @@ import {
 } from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface ITwitterAuthRedirectPage {
   oauth_token: string;
@@ -31,6 +32,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
+  const { setUserLoggedIn: setAppStateUserLoggedIn, setUserIsCreator } =
+    useAppState();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -114,6 +117,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         });
 
         dispatch(setUserLoggedIn(true));
+        setAppStateUserLoggedIn(true);
+        setUserIsCreator(!!data.me?.options?.isCreator);
 
         resumePushNotification();
 

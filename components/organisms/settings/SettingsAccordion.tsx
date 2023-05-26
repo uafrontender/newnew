@@ -52,7 +52,7 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
   }, [sectionsState, setActiveSection]);
 
   return (
-    <SSettingsAccrodionContainer>
+    <SSettingsAccrodionContainer id='settings-accordion-container'>
       {sections &&
         sections.map((section, i) => (
           <SSettingsAccordionItem
@@ -94,7 +94,9 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
 
 export default SettingsAccordion;
 
-const SSettingsAccrodionContainer = styled.div``;
+const SSettingsAccrodionContainer = styled.div`
+  overflow: hidden;
+`;
 
 const SSettingsAccordionItem = styled.div<{
   isDimmed: boolean;

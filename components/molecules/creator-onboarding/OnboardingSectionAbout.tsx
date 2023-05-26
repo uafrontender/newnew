@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
   useEffect,
@@ -10,7 +8,7 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -27,10 +25,10 @@ import {
 } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
-import isSafari from '../../../utils/isSafari';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -66,10 +64,11 @@ const OnboardingSectionAbout: React.FunctionComponent<
   IOnboardingSectionAbout
 > = () => {
   const router = useRouter();
+  const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -113,18 +112,20 @@ const OnboardingSectionAbout: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
+          setUserLoggedIn(false);
           dispatch(logoutUserClearCookiesAndRedirect());
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
+          setUserLoggedIn(false);
           dispatch(
             logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
     },
-    [setBioError, dispatch]
+    [setBioError, dispatch, setUserLoggedIn]
   );
 
   const validateBioViaApiDebounced = useMemo(
@@ -159,8 +160,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
 
       const updateMeRes = await updateMe(updateBioPayload);
 
-      if (!updateMeRes.data || updateMeRes.error) {
-        throw new Error(updateMeRes.error?.message ?? 'Request failed');
+      if (!updateMeRes?.data || updateMeRes.error) {
+        throw new Error(updateMeRes?.error?.message ?? 'Request failed');
       }
 
       dispatch(
@@ -185,11 +186,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
       console.log(err);
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
+        setUserLoggedIn(false);
         dispatch(logoutUserClearCookiesAndRedirect());
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
+        setUserLoggedIn(false);
         dispatch(
           logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
         );
@@ -200,6 +203,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
     dispatch,
     router,
     user.creatorData?.options?.stripeConnectStatus,
+    setUserLoggedIn,
   ]);
 
   useEffect(() => {
@@ -229,7 +233,11 @@ const OnboardingSectionAbout: React.FunctionComponent<
   return (
     <>
       <SContainer>
-        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        {isMobile && (
+          <SGoBackButton
+            onClick={() => goBackOrRedirect('/creator/dashboard')}
+          />
+        )}
         <SHeading variant={5}>{t('aboutSection.heading')}</SHeading>
         <STopContainer>
           <SFormItemContainer>
@@ -259,7 +267,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
                   _button: 'Back button',
                   _component: 'OnboardingSectionAbout',
                 });
-                router.back();
+                goBackOrRedirect('/creator/dashboard');
               }}
             >
               {t('aboutSection.button.back')}

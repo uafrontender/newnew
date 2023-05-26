@@ -81,9 +81,9 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
         });
         const response = await checkCardStatus(payload, controller.signal);
 
-        if (!response.data || response.error) {
+        if (!response?.data || response.error) {
           // skip abort request error
-          if (response.error && (response.error as any)?.code !== 20) {
+          if (response?.error && (response.error as any).code !== 20) {
             throw new Error(response.error?.message || 'An error occurred');
           }
 

@@ -288,8 +288,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       const res = await getVideoUploadUrl(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'An error occurred');
       }
 
       const xhr = new XMLHttpRequest();
@@ -341,8 +341,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
       const resProcessing = await startVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      if (!resProcessing?.data || resProcessing.error) {
+        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
       }
 
       setVideoProcessing({
@@ -403,8 +403,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
         const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-        if (!resProcessing.data || resProcessing.error) {
-          throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        if (!resProcessing?.data || resProcessing.error) {
+          throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
       }
 
@@ -455,11 +455,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       );
 
       if (
-        !getCoverImageUploadUrlResponse.data ||
+        !getCoverImageUploadUrlResponse?.data ||
         getCoverImageUploadUrlResponse.error
       ) {
         throw new Error(
-          getCoverImageUploadUrlResponse.error?.message ||
+          getCoverImageUploadUrlResponse?.error?.message ||
             'Could not get cover image upload URL'
         );
       }
@@ -475,7 +475,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         }
       );
 
-      if (!uploadResponse.ok) {
+      if (!uploadResponse?.ok) {
         throw new Error('Could not upload cover image to S3');
       }
 
@@ -489,9 +489,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         updateCoverImagePayload
       );
 
-      if (updateCoverImageRes.error) {
+      if (!updateCoverImageRes || updateCoverImageRes.error) {
         throw new Error(
-          updateCoverImageRes.error?.message || 'Could not set cover image'
+          updateCoverImageRes?.error?.message || 'Could not set cover image'
         );
       }
 
@@ -505,8 +505,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const handleUploadVideoProcessed = useCallback(async () => {
     setCoreResponseUploading(true);
     try {
-      let hasCoverImage = false;
-
       const payload = new newnewapi.UploadPostResponseRequest({
         postUuid,
         responseVideoUrl: uploadedResponseVideoUrl,
@@ -517,19 +515,28 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       if (res.data) {
         // If there's a cover image to be uploaded, try to do it
         if (customCoverImageUrlResponse) {
-          hasCoverImage = await handleUploadCustomCoverImage();
+          await handleUploadCustomCoverImage();
         }
-
-        console.log(hasCoverImage);
 
         // @ts-ignore
         let responseObj;
-        if (res.data.auction) responseObj = res.data.auction.response;
-        if (res.data.multipleChoice)
+        if (res.data.auction) {
+          responseObj = res.data.auction.response;
+        }
+
+        if (res.data.multipleChoice) {
           responseObj = res.data.multipleChoice.response;
-        if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
+        }
+
+        if (res.data.crowdfunding) {
+          responseObj = res.data.crowdfunding.response;
+        }
+
         // @ts-ignore
-        if (responseObj) handleUpdateResponseVideo(responseObj);
+        if (responseObj) {
+          handleUpdateResponseVideo(responseObj);
+        }
+
         await refetchPost();
         setUploadedResponseVideoUrl('');
         setResponseUploadSuccess(true);
@@ -847,9 +854,11 @@ export default PostModerationResponsesContextProvider;
 
 export function usePostModerationResponsesContext() {
   const context = useContext(PostModerationResponsesContext);
-  if (!context)
+  if (!context) {
     throw new Error(
       'usePostModerationResponsesContext must be used inside a `PostModerationResponsesContextProvider`'
     );
+  }
+
   return context;
 }

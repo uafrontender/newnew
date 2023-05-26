@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-expressions */
 import React, {
   useRef,
   useMemo,
@@ -424,8 +423,8 @@ export const CreationSecondStepContent: React.FC<
 
       const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      if (!resProcessing?.data || resProcessing.error) {
+        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
       }
 
       setCreationVideo('');
@@ -471,8 +470,8 @@ export const CreationSecondStepContent: React.FC<
 
         const res = await getVideoUploadUrl(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'An error occurred');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'An error occurred');
         }
 
         const xhr = new XMLHttpRequest();
@@ -525,8 +524,8 @@ export const CreationSecondStepContent: React.FC<
 
         const resProcessing = await startVideoProcessing(payloadProcessing);
 
-        if (!resProcessing.data || resProcessing.error) {
-          throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        if (!resProcessing?.data || resProcessing.error) {
+          throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
 
         setCreationVideoProcessing({
@@ -964,13 +963,15 @@ export const CreationSecondStepContent: React.FC<
         return;
       }
 
-      if (
-        decoded.taskUuid === videoProcessing?.taskUuid &&
-        decoded?.estimatedTimeLeft?.seconds
-      ) {
-        setCreationFileProcessingETA(
-          decoded.estimatedTimeLeft.seconds as number
-        );
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        if (
+          decoded?.estimatedTimeLeft?.seconds &&
+          !Number.isNaN(decoded.estimatedTimeLeft.seconds as number)
+        ) {
+          setCreationFileProcessingETA(
+            decoded.estimatedTimeLeft.seconds as number
+          );
+        }
 
         if (decoded.fractionCompleted > fileProcessing.progress) {
           setCreationFileProcessingProgress(decoded.fractionCompleted);
@@ -1085,14 +1086,23 @@ export const CreationSecondStepContent: React.FC<
 
   useEffect(() => {
     switch (activeTabIndex) {
-      case 1:
-        tutorialType !== 'MC' && setTutorialType('MC');
+      case 1: {
+        if (tutorialType !== 'MC') {
+          setTutorialType('MC');
+        }
         break;
-      case 2:
-        tutorialType !== 'CF' && setTutorialType('CF');
+      }
+      case 2: {
+        if (tutorialType !== 'CF') {
+          setTutorialType('CF');
+        }
         break;
-      default:
-        tutorialType !== 'AC' && setTutorialType('AC');
+      }
+      default: {
+        if (tutorialType !== 'AC') {
+          setTutorialType('AC');
+        }
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTabIndex]);
@@ -1100,23 +1110,37 @@ export const CreationSecondStepContent: React.FC<
   useEffect(() => {
     if (user.userTutorialsProgressSynced) {
       switch (tutorialType) {
-        case 'MC':
-          user.userTutorialsProgress.remainingMcCrCurrentStep &&
+        case 'MC': {
+          if (
+            user.userTutorialsProgress.remainingMcCrCurrentStep &&
             user.userTutorialsProgress.remainingMcCrCurrentStep[0] ===
-              newnewapi.McCreationTutorialStep.MC_CR_HERO &&
+              newnewapi.McCreationTutorialStep.MC_CR_HERO
+          ) {
             setIsTutorialVisible(true);
+          }
           break;
-        case 'CF':
-          user.userTutorialsProgress.remainingCfCrCurrentStep &&
+        }
+
+        case 'CF': {
+          if (
+            user.userTutorialsProgress.remainingCfCrCurrentStep &&
             user.userTutorialsProgress.remainingCfCrCurrentStep[0] ===
-              newnewapi.CfCreationTutorialStep.CF_CR_HERO &&
+              newnewapi.CfCreationTutorialStep.CF_CR_HERO
+          ) {
             setIsTutorialVisible(true);
+          }
           break;
-        default:
-          user.userTutorialsProgress.remainingAcCrCurrentStep &&
+        }
+
+        default: {
+          if (
+            user.userTutorialsProgress.remainingAcCrCurrentStep &&
             user.userTutorialsProgress.remainingAcCrCurrentStep[0] ===
-              newnewapi.AcCreationTutorialStep.AC_CR_HERO &&
+              newnewapi.AcCreationTutorialStep.AC_CR_HERO
+          ) {
             setIsTutorialVisible(true);
+          }
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
