@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 import { newnewapi } from 'newnew-api';
 import { useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
@@ -28,7 +27,6 @@ const sortOptions = (
   unsortedArr: TAcOptionWithHighestField[],
   userUuid: string | undefined
 ) => {
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < unsortedArr.length; i++) {
     // eslint-disable-next-line no-param-reassign
     unsortedArr[i].isHighest = false;

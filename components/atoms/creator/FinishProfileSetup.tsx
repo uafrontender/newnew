@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -23,17 +21,17 @@ export const FinishProfileSetup = () => {
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {
-      user.userData?.bio && user.userData?.bio.length > 0
-        ? setAccountDetailsCompleted(true)
-        : setAccountDetailsCompleted(false);
+      const detailsCompleted =
+        !!user.userData?.bio && user.userData?.bio.length > 0;
+      setAccountDetailsCompleted(detailsCompleted);
     }
   }, [user.creatorData?.isLoaded, user.userData?.bio]);
 
   useEffect(() => {
     if (user.creatorData?.isLoaded) {
-      user.creatorData?.options?.isCreatorConnectedToStripe
-        ? setIisCreatorConnectedToStripe(true)
-        : setIisCreatorConnectedToStripe(false);
+      const isConnectedToStripe =
+        !!user.creatorData?.options?.isCreatorConnectedToStripe;
+      setIisCreatorConnectedToStripe(isConnectedToStripe);
     }
   }, [
     user.creatorData?.options?.isCreatorConnectedToStripe,
@@ -75,6 +73,7 @@ export const FinishProfileSetup = () => {
       </SCashOutTopBlock>
       <Link
         href={
+          // eslint-disable-next-line no-nested-ternary
           !isAccountDetailsCompleted
             ? '/creator-onboarding-about'
             : !isCreatorConnectedToStripe
@@ -89,6 +88,7 @@ export const FinishProfileSetup = () => {
               Mixpanel.track('Navigation Item Clicked', {
                 _button: 'Add',
                 _stage: 'Dashboard',
+                // eslint-disable-next-line no-nested-ternary
                 _target: !isAccountDetailsCompleted
                   ? '/creator-onboarding-about'
                   : !isCreatorConnectedToStripe

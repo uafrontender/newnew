@@ -52,7 +52,7 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
   }, [sectionsState, setActiveSection]);
 
   return (
-    <SSettingsAccrodionContainer>
+    <SSettingsAccrodionContainer id='settings-accordion-container'>
       {sections &&
         sections.map((section, i) => (
           <SSettingsAccordionItem

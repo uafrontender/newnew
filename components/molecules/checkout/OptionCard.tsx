@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
@@ -64,11 +62,6 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
         <Text variant={3} weight={600}>
           {label}
         </Text>
-        {/* <SFeesText
-          variant={2}
-        >
-          { t('options.card.fees') }
-        </SFeesText> */}
       </SLabelContent>
     </SOptionCard>
   );
@@ -118,8 +111,4 @@ const SLabelContent = styled.div`
   justify-content: space-between;
 
   padding-left: 3px;
-`;
-
-const SFeesText = styled(Text)`
-  justify-self: flex-end;
 `;

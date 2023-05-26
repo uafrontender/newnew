@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -11,7 +9,6 @@ import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useOverlayMode } from '../../../../contexts/overlayModeContext';
 
 import Text from '../../../atoms/Text';
-import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
 import assets from '../../../../constants/assets';
@@ -22,17 +19,13 @@ import { useAppState } from '../../../../contexts/appStateContext';
 interface IPostScheduledSection {
   postType: TPostType;
   timestampSeconds: number;
-  isFollowing: boolean;
   variant: 'decision' | 'moderation';
-  handleFollowDecision: () => {};
 }
 
 const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   postType,
   timestampSeconds,
-  isFollowing,
   variant,
-  handleFollowDecision,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
@@ -52,7 +45,6 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   // Timer
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
-  const expirationDate = new Date(timestampSeconds);
 
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
     secondsToDHMS(parsed, 'noTrim')
@@ -359,12 +351,6 @@ const SImgContainer = styled.div`
   }
 `;
 
-const SHourglassImg = styled.img`
-  display: block;
-  width: 100%;
-  height: 100%;
-`;
-
 const STitle = styled(Headline)`
   grid-area: title;
 
@@ -431,18 +417,6 @@ const STimerTime = styled(Headline)`
 
 const STimerCaption = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
-
-const SCTAButton = styled(Button)`
-  height: 56px;
-  width: 100%;
-
-  ${({ theme }) => theme.media.tablet} {
-    width: fit-content;
-
-    margin-left: auto;
-    margin-right: auto;
-  }
 `;
 
 const SLoadingContainer = styled.div`

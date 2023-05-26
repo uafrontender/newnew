@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -34,14 +32,12 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
     string | undefined | null
   >('');
   const [bidsLoading, setBidsLoading] = useState(false);
-  const [loadingBidsError, setLoadingBidsError] = useState('');
 
   const fetchBids = useCallback(
     async (pageToken?: string) => {
       if (bidsLoading) return;
       try {
         setBidsLoading(true);
-        setLoadingBidsError('');
 
         const getCurrentBidsPayload = new newnewapi.GetAcBidsRequest({
           postUuid,
@@ -75,7 +71,6 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
         setBidsLoading(false);
       } catch (err) {
         setBidsLoading(false);
-        setLoadingBidsError((err as Error).message);
         console.error(err);
       }
     },

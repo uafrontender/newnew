@@ -1,5 +1,4 @@
 /* eslint-disable no-continue */
-/* eslint-disable no-plusplus */
 import React, {
   useCallback,
   useEffect,

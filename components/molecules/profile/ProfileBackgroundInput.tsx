@@ -1,6 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -100,35 +97,38 @@ const ProfileBackgroundInput: React.FunctionComponent<
     >
       {pictureInEditUrl ? (
         <>
-          {originalPictureUrl === pictureInEditUrl ? (
-            <SOriginalImgDiv pictureUrl={originalPictureUrl}>
-              <img
-                src={originalPictureUrl}
-                alt='Profile cover'
-                draggable={false}
+          {
+            // eslint-disable-next-line no-nested-ternary
+            originalPictureUrl === pictureInEditUrl ? (
+              <SOriginalImgDiv pictureUrl={originalPictureUrl}>
+                <img
+                  src={originalPictureUrl}
+                  alt='Profile cover'
+                  draggable={false}
+                />
+              </SOriginalImgDiv>
+            ) : !coverUrlInEditAnimated ? (
+              <ProfileBackgroundCropper
+                pictureUrlInEdit={pictureInEditUrl!!}
+                crop={crop}
+                zoom={zoom}
+                initialObjectFit={initialObjectFit}
+                mobileCropWidth={mobileCropWidth}
+                disabled={disabled}
+                onCropChange={disabled ? () => {} : onCropChange}
+                onCropComplete={disabled ? () => {} : onCropComplete}
+                onZoomChange={disabled ? () => {} : onZoomChange}
               />
-            </SOriginalImgDiv>
-          ) : !coverUrlInEditAnimated ? (
-            <ProfileBackgroundCropper
-              pictureUrlInEdit={pictureInEditUrl!!}
-              crop={crop}
-              zoom={zoom}
-              initialObjectFit={initialObjectFit}
-              mobileCropWidth={mobileCropWidth}
-              disabled={disabled}
-              onCropChange={disabled ? () => {} : onCropChange}
-              onCropComplete={disabled ? () => {} : onCropComplete}
-              onZoomChange={disabled ? () => {} : onZoomChange}
-            />
-          ) : (
-            <SOriginalImgDiv pictureUrl={pictureInEditUrl!!}>
-              <img
-                src={pictureInEditUrl!!}
-                alt='Profile cover'
-                draggable={false}
-              />
-            </SOriginalImgDiv>
-          )}
+            ) : (
+              <SOriginalImgDiv pictureUrl={pictureInEditUrl!!}>
+                <img
+                  src={pictureInEditUrl!!}
+                  alt='Profile cover'
+                  draggable={false}
+                />
+              </SOriginalImgDiv>
+            )
+          }
           <SDeleteImgButton
             iconOnly
             size='sm'
