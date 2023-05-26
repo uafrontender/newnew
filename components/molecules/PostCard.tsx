@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/no-array-index-key */
 import React, {
   useCallback,
   useContext,
@@ -12,7 +10,7 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { css, keyframes, useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -508,9 +506,10 @@ export const PostCard: React.FC<ICard> = React.memo(
         <>
           {getChunks(title).map((chunk, chunkIndex) => {
             if (chunk.type === 'hashtag') {
+              // eslint-disable-next-line react/no-array-index-key
               return <SHashtag key={chunkIndex}>#{chunk.text}</SHashtag>;
             }
-
+            // eslint-disable-next-line react/no-array-index-key
             return <Fragment key={chunkIndex}>{chunk.text}</Fragment>;
           })}
         </>
@@ -796,64 +795,67 @@ export const PostCard: React.FC<ICard> = React.memo(
             {getTitleContent(postParsed.title)}
           </STextOutside>
           <SBottomEnd type={typeOfPost}>
-            {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
-              totalVotes === 1 && typeOfPost === 'mc' ? (
-                <SButton
-                  withDim
-                  withShrink
-                  view='primary'
-                  onClick={handleBidClick}
-                  cardType={typeOfPost}
-                >
-                  {t('button.withActivity.mcSingular', {
-                    votes: formatNumber(totalVotes ?? 0, true),
-                    total: formatNumber(
-                      (postParsed as newnewapi.Crowdfunding)
-                        .targetBackerCount ?? 0,
-                      true
-                    ),
-                    backed: formatNumber(currentBackerCount ?? 0, true),
-                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
-                  })}
-                </SButton>
+            {
+              // eslint-disable-next-line no-nested-ternary
+              totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
+                totalVotes === 1 && typeOfPost === 'mc' ? (
+                  <SButton
+                    withDim
+                    withShrink
+                    view='primary'
+                    onClick={handleBidClick}
+                    cardType={typeOfPost}
+                  >
+                    {t('button.withActivity.mcSingular', {
+                      votes: formatNumber(totalVotes ?? 0, true),
+                      total: formatNumber(
+                        (postParsed as newnewapi.Crowdfunding)
+                          .targetBackerCount ?? 0,
+                        true
+                      ),
+                      backed: formatNumber(currentBackerCount ?? 0, true),
+                      amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                    })}
+                  </SButton>
+                ) : (
+                  <SButton
+                    withDim
+                    withShrink
+                    view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                    onClick={handleBidClick}
+                    cardType={typeOfPost}
+                    progress={
+                      typeOfPost === 'cf'
+                        ? Math.floor(
+                            (currentBackerCount * 100) /
+                              (postParsed as newnewapi.Crowdfunding)
+                                .targetBackerCount
+                          )
+                        : 0
+                    }
+                    withProgress={typeOfPost === 'cf'}
+                  >
+                    {t(`button.withActivity.${typeOfPost}`, {
+                      votes: formatNumber(totalVotes ?? 0, true),
+                      total: formatNumber(
+                        (postParsed as newnewapi.Crowdfunding)
+                          .targetBackerCount ?? 0,
+                        true
+                      ),
+                      backed: formatNumber(currentBackerCount ?? 0, true),
+                      amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                    })}
+                  </SButton>
+                )
               ) : (
-                <SButton
-                  withDim
-                  withShrink
-                  view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-                  onClick={handleBidClick}
-                  cardType={typeOfPost}
-                  progress={
-                    typeOfPost === 'cf'
-                      ? Math.floor(
-                          (currentBackerCount * 100) /
-                            (postParsed as newnewapi.Crowdfunding)
-                              .targetBackerCount
-                        )
-                      : 0
-                  }
-                  withProgress={typeOfPost === 'cf'}
-                >
-                  {t(`button.withActivity.${typeOfPost}`, {
-                    votes: formatNumber(totalVotes ?? 0, true),
-                    total: formatNumber(
-                      (postParsed as newnewapi.Crowdfunding)
-                        .targetBackerCount ?? 0,
-                      true
-                    ),
-                    backed: formatNumber(currentBackerCount ?? 0, true),
-                    amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
-                  })}
-                </SButton>
+                <SButtonFirst withShrink onClick={handleBidClick}>
+                  {postStatus === 'voting' &&
+                  postParsed.creator?.uuid !== user.userData?.userUuid
+                    ? t(`button.withoutActivity.${typeOfPost}`)
+                    : t(`button.seeResults.${typeOfPost}`)}
+                </SButtonFirst>
               )
-            ) : (
-              <SButtonFirst withShrink onClick={handleBidClick}>
-                {postStatus === 'voting' &&
-                postParsed.creator?.uuid !== user.userData?.userUuid
-                  ? t(`button.withoutActivity.${typeOfPost}`)
-                  : t(`button.seeResults.${typeOfPost}`)}
-              </SButtonFirst>
-            )}
+            }
           </SBottomEnd>
         </SBottomContentOutside>
         {postParsed?.creator && isReportModalOpen && (
@@ -1275,44 +1277,6 @@ const SLoaderContainer = styled.div`
   height: 100%;
 
   z-index: 10;
-`;
-
-const SLineAnimation = keyframes`
-  0% {
-    transform: scaleX(0);
-  }
-  70% {
-    transform: scaleX(.4);
-  }
-  100% {
-    transform: scaleX(1);
-  }
-`;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const SLoadingLine = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-
-  height: 2px;
-  background-color: rgba(0, 0, 0, 0.2);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-
-    height: 2px;
-
-    animation: ${SLineAnimation} 1.5s infinite;
-    transform-origin: left;
-
-    background-color: ${({ theme }) => theme.colors.blue};
-  }
 `;
 
 const SBottomContentOutside = styled.div`

@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useCallback } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';

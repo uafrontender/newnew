@@ -1,6 +1,5 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-expressions */
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';

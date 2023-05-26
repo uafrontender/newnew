@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */

@@ -1,19 +1,17 @@
 /* eslint-disable no-continue */
-/* eslint-disable no-plusplus */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-labels */
 function getImageMeta(buffer: Uint8Array) {
-
-  if (check(buffer, [0xFF, 0xD8, 0xFF])) {
+  if (check(buffer, [0xff, 0xd8, 0xff])) {
     return {
       ext: 'jpg',
       mime: 'image/jpeg',
       animated: false,
     };
   }
-  if (check(buffer, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])) {
+  if (check(buffer, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) {
     // apng has `61 63 54 4C` before first `00 00 00 08`
-    if (findIndex(buffer, [0x61, 0x63, 0x54, 0x4C]) === -1) {
+    if (findIndex(buffer, [0x61, 0x63, 0x54, 0x4c]) === -1) {
       return {
         ext: 'png',
         mime: 'image/png',
@@ -34,7 +32,7 @@ function getImageMeta(buffer: Uint8Array) {
     };
   }
   if (check(buffer, [0x57, 0x45, 0x42, 0x50], 8)) {
-    if (findIndex(buffer, [0x41, 0x4E, 0x49, 0x4D]) === -1) {
+    if (findIndex(buffer, [0x41, 0x4e, 0x49, 0x4d]) === -1) {
       return {
         ext: 'webp',
         mime: 'image/webp',
@@ -59,7 +57,7 @@ const check = (buffer: Uint8Array, codes: number[], offset: number = 0) => {
     }
   }
   return true;
-}
+};
 
 const findIndex = (buffer: Uint8Array, codes: number[]) => {
   const from = 0;
@@ -74,13 +72,13 @@ const findIndex = (buffer: Uint8Array, codes: number[]) => {
     return i;
   }
   return -1;
-}
+};
 
 const isAnimatedImageWithMeta = async (file: File) => {
   const buff = await file.arrayBuffer();
 
   const meta = getImageMeta(new Uint8Array(buff));
-  console.log(meta)
+  console.log(meta);
 
   if (!meta) return undefined;
 

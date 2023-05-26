@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useMemo, useCallback, Fragment } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -114,6 +113,7 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                         components={[
                           <>
                             {formattedTimeLeft?.map((time, index) => (
+                              // eslint-disable-next-line react/no-array-index-key
                               <Fragment key={index}>
                                 {index > 0
                                   ? t('modal.creatorsBundle.and')

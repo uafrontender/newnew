@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 import ChangeCollectionType from '../../atoms/ChangeCollectionType';
-
 import SortOption from '../../atoms/SortOption';
 import { useAppState } from '../../../contexts/appStateContext';
 
@@ -32,22 +30,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
     ? JSON.parse(sort as string) || {}
     : undefined;
 
-  const sortOptions: any = useMemo(
-    () => [
-      {
-        key: 'sortingtype',
-        options: [
-          {
-            key: 'all',
-          },
-          {
-            key: 'num_bids',
-          },
-        ],
-      },
-    ],
-    []
-  );
   const collectionTypeOptions: any = useMemo(
     () => [
       // {
@@ -97,7 +79,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
 
   const handleClearSorting = useCallback(() => {
     const newQuery = { ...router.query };
-
     delete newQuery.sort;
 
     router.push({
@@ -105,25 +86,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       pathname: router.pathname,
     });
   }, [router]);
-
-  const handleSortChange = useCallback(
-    (newSort: object = {}) => {
-      if ((newSort as any).sortingtype === 'all') {
-        handleClearSorting();
-        return;
-      }
-      const newQuery = {
-        ...router.query,
-        sort: JSON.stringify(newSort),
-      };
-      router.push({
-        query: newQuery,
-        pathname: router.pathname,
-      });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    },
-    [router, handleClearSorting]
-  );
 
   return (
     <SContainer>
@@ -134,16 +96,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           disabled={disabled}
           onChange={handleCollectionTypeChange}
         />
-        {/* {category !== 'biggest' &&
-          category !== 'for-you' &&
-          category !== 'recent-activity' && (
-            <Sorting
-              category={category}
-              options={sortOptions}
-              selected={sorts}
-              onChange={handleSortChange}
-            />
-          )} */}
       </SWrapper>
       {sorts && !isMobile && (
         <SSortOption
