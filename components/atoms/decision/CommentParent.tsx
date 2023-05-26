@@ -496,7 +496,10 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               !isLoading && (
                 <SReply onClick={() => fetchNextPage()}>Load replies</SReply>
               )}
-            {isLoading || isFetchingNextPage ? (
+            {(comment.numberOfReplies &&
+              (comment.numberOfReplies as number) > 0 &&
+              isLoading) ||
+            isFetchingNextPage ? (
               <SLoaderDiv>
                 <Loader size='sm' isStatic />
               </SLoaderDiv>
@@ -742,4 +745,5 @@ const SSeparator = styled.div`
 
 const SLoaderDiv = styled.div`
   position: relative;
+  height: 50px;
 `;
