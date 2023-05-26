@@ -71,7 +71,6 @@ export const RenderCalendarYear = (props: any) => {
   const totalMonth = Math.round(maxDate.diff(minDate, 'months', true)) + 1;
   const elements = [];
   let now = moment(minDate, 'DD/MMM/YYYY');
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < totalMonth; i++) {
     elements.push(
       <RenderMonthCard key={i} currentMonth={now.clone()} {...props} />
@@ -232,7 +231,6 @@ export const RenderDays = (props: any) => {
   const renderDay = () => {
     const elements = [];
     let now = moment(date, 'DD/MMM/YYYY');
-    // eslint-disable-next-line no-plusplus
     for (let i = 1; i <= daysInMonth; i++) {
       elements.push(
         <RenderSingleDay
@@ -250,7 +248,6 @@ export const RenderDays = (props: any) => {
   };
   const renderUnwantedDay = (count: number) => {
     const elements = [];
-    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < count; i++) {
       elements.push(<SUnwantedDays key={i} />);
     }

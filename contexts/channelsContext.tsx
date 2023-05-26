@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-plusplus */
-/* eslint-disable consistent-return */
-/* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
 import React, {
   createContext,

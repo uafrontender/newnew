@@ -1,5 +1,3 @@
-/* eslint-disable prefer-template */
-/* eslint-disable arrow-body-style */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -26,8 +24,6 @@ const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
     const parsed = Math.ceil((endsAt - Date.now()) / 1000);
     const hasStarted = Date.now() > startsAt;
     const hasEnded = Date.now() >= endsAt;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const expirationDate = new Date(endsAt);
 
     const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
       secondsToDHMS(parsed)

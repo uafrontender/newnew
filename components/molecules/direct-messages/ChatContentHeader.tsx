@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -59,9 +58,9 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   useEffect(() => {
     if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
       setIsAnnouncement(true);
-      chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
-        ? setIsMyAnnouncement(true)
-        : setIsMyAnnouncement(false);
+      setIsMyAnnouncement(
+        chatRoom.myRole === newnewapi.ChatRoom.MyRole.CREATOR
+      );
     } else {
       setIsAnnouncement(false);
       setIsMyAnnouncement(false);

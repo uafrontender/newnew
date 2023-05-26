@@ -832,8 +832,15 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   useEffect(() => {
     const hasInvalidFields = Object.entries(dataInEdit).some(([key, value]) => {
+      const typedKey = key as keyof ModalMenuUserData;
+
       // Skip these fields
-      if (key === 'genderPronouns' || key === 'bio') {
+      if (typedKey === 'genderPronouns' || typedKey === 'bio') {
+        return false;
+      }
+
+      // Can't validate non string value, only genderPronouns have them
+      if (typeof value !== 'string') {
         return false;
       }
 
@@ -842,13 +849,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         return true;
       }
 
-      const initialValue = (user.userData as any)[key] ?? '';
+      const initialValue = user.userData[typedKey] ?? '';
 
       if (value === initialValue) {
         return false;
       }
 
-      return !validateInputText(value as string);
+      return !validateInputText(value);
     });
 
     if (hasInvalidFields) {
