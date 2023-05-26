@@ -91,7 +91,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();

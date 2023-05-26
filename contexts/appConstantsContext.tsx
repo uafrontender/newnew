@@ -11,7 +11,7 @@ import { getAppConstants } from '../api/endpoints/infrastructure';
 export const AppConstantsContext = createContext<{
   appConstants: Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>;
 }>({
-  appConstants: {} as any,
+  appConstants: {} as Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>,
 });
 
 interface IAppConstantsContextProvider {
@@ -23,7 +23,7 @@ const AppConstantsContextProvider: React.FC<IAppConstantsContextProvider> = ({
 }) => {
   const [appConstants, setAppConstants] = useState<
     Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>
-  >({} as any);
+  >({} as Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>);
 
   const contextValue = useMemo(
     () => ({

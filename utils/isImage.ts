@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 const imgExtenstions = [
   '.jpg',
   '.JPG',

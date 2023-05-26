@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -6,11 +5,9 @@ import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { toast } from 'react-toastify';
 
 import { NextPageWithLayout } from './_app';
 import PostList from '../components/organisms/see-more/PostList';
@@ -19,16 +16,11 @@ import HomeLayout from '../components/templates/HomeLayout';
 
 import { useAppSelector } from '../redux-store/store';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
-import {
-  fetchBiggestPosts,
-  fetchCuratedPosts,
-  fetchForYouPosts,
-} from '../api/endpoints/post';
+import { fetchBiggestPosts, fetchForYouPosts } from '../api/endpoints/post';
 import { getMyPosts } from '../api/endpoints/user';
 import { APIResponse } from '../api/apiConfigs';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
-// import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import assets from '../constants/assets';
 import { I18nNamespaces } from '../@types/i18next';
 
@@ -60,9 +52,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
 
   // Posts
   // Top section/Curated posts
-  const [topSectionCollection, setTopSectionCollection] = useState<
-    newnewapi.Post[]
-  >((top10posts.posts as newnewapi.Post[]) ?? []);
+  const topSectionCollection = useRef<newnewapi.Post[]>(
+    (top10posts.posts as newnewapi.Post[]) ?? []
+  );
 
   // Searched and sorted posts
   const [collectionLoaded, setCollectionLoaded] = useState<newnewapi.Post[]>(
@@ -427,8 +419,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         />
         <meta property='og:image' content={assets.openGraphImage.common} />
       </Head>
-      {topSectionCollection?.length > 0 && (
-        <TopSection collection={topSectionCollection} />
+      {topSectionCollection.current?.length > 0 && (
+        <TopSection collection={topSectionCollection.current} />
       )}
       <SWrapper name={router.query.category?.toString() ?? ''}>
         <TitleBlock

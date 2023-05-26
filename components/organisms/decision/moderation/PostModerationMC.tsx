@@ -143,13 +143,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     // Total votes
     const totalVotes = useMemo(() => post.totalVotes ?? 0, [post.totalVotes]);
 
-    // Options
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const numberOfOptions = useMemo(
-      () => post.optionCount ?? '',
-      [post.optionCount]
-    );
-
     // Winning option
     const [winningOption, setWinningOption] = useState<
       newnewapi.MultipleChoice.Option | undefined
