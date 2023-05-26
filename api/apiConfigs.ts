@@ -317,8 +317,8 @@ export async function fetchProtobufProtectedIntercepted<
     );
 
     // Throw an error if the access token was invalid
-    if (!res.data && res.error?.message === 'Access token invalid') {
-      throw new Error(res.error?.message);
+    if (!res?.data && res.error?.message === 'Access token invalid') {
+      throw new Error(res?.error?.message);
     }
 
     return res;
@@ -334,7 +334,7 @@ export async function fetchProtobufProtectedIntercepted<
         // Refresh failed, session "expired"
         // (i.e. user probably logged in from another device, or exceeded
         // max number of logged in devices/browsers)
-        if (!resRefresh.data || resRefresh.error) {
+        if (!resRefresh?.data || resRefresh.error) {
           throw new Error('Refresh token invalid');
         }
 

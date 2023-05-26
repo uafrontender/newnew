@@ -263,7 +263,7 @@ export const getServerSideProps: GetServerSideProps<
 
     const res = await getUserByUsername(getUserRequestPayload);
 
-    if (!res.data || res.error) {
+    if (!res?.data || res.error) {
       return {
         redirect: {
           destination: '/404',

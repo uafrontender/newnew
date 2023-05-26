@@ -61,8 +61,8 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     const payload = new newnewapi.EmptyRequest({});
     const res = await getMyBundles(payload);
 
-    if (!res.data || res.error) {
-      throw new Error(res.error?.message ?? 'Request failed');
+    if (!res?.data || res.error) {
+      throw new Error(res?.error?.message ?? 'Request failed');
     }
 
     return res.data.creatorBundles;
@@ -73,7 +73,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
     const res = await getBundleStatus(payload);
 
-    if (!res.data || res.error) {
+    if (!res?.data || res.error) {
       throw new Error('Request failed');
     }
 
@@ -92,8 +92,8 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
     const payload = new newnewapi.GetMyBundleEarningsRequest();
     const res = await getMyBundleEarnings(payload);
 
-    if (!res.data || res.error) {
-      throw new Error(res.error?.message ?? 'Request failed');
+    if (!res?.data || res.error) {
+      throw new Error(res?.error?.message ?? 'Request failed');
     }
 
     const earnings = res.data.totalBundleEarnings?.usdCents ?? 0;
@@ -243,7 +243,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
       const res = await setBundleStatus(payload);
 
-      if (!res.data || res.error) {
+      if (!res?.data || res.error) {
         throw new Error('Request failed');
       }
 

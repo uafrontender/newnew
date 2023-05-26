@@ -209,8 +209,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
       const resProcessing = await stopVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      if (!resProcessing?.data || resProcessing.error) {
+        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
       }
 
       setLocalFile(null);

@@ -31,8 +31,8 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
           const payload = new newnewapi.GetMyBundleEarningsRequest();
           const res = await getMyBundleEarnings(payload);
 
-          if (!res.data || res.error) {
-            throw new Error(res.error?.message ?? 'Request failed');
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
           }
 
           setMyEarnings(res.data);

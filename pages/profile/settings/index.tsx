@@ -107,8 +107,8 @@ const MyProfileSettingsIndex = () => {
       const payload = new newnewapi.EmptyRequest({});
       const res = await logout(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Log out failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Log out failed');
       }
 
       setUserLoggedIn(false);

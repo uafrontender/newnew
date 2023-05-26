@@ -226,8 +226,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     try {
       const res = await refetchPost();
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'Request failed');
       }
     } catch (err) {
       console.error(err);
@@ -381,12 +381,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         );
 
         if (
-          !res.data ||
+          !res?.data ||
           res.error ||
           res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         ) {
           throw new Error(
-            res.error?.message ??
+            res?.error?.message ??
               t(getPayWithCardErrorMessage(res.data?.status))
           );
         }

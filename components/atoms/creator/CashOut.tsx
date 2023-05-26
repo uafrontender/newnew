@@ -57,8 +57,8 @@ const CashOut: React.FC<ICashOut> = ({
         const payload = new newnewapi.EmptyRequest();
         const res = await getExpressDashboardLoginLink(payload);
 
-        if (!res.data || res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
         }
 
         setStripeLink(res.data);
