@@ -45,7 +45,7 @@ const usePostComments = (
 
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
-    async ({ pageParam, signal }) => {
+    async ({ pageParam, signal, meta }) => {
       const payload = new newnewapi.GetCommentsRequest({
         postUuid: params.postUuid,
         ...(params?.parentCommentId
@@ -63,6 +63,8 @@ const usePostComments = (
       if (!postsResponse?.data || postsResponse.error) {
         throw new Error('Request failed');
       }
+
+      // const commentsWithField = postsResponse?.data?.comments;
 
       return {
         comments: postsResponse?.data?.comments || [],
@@ -105,6 +107,8 @@ const usePostComments = (
 
   const handleToggleCommentRepliesById = useCallback(
     (idToOpen: number, newState: boolean) => {
+      console.log(idToOpen);
+      console.log(newState);
       setProcessedComments((curr) => {
         const working = [...curr];
         const idxToOpen = working.findIndex((c) => c.id === idToOpen);

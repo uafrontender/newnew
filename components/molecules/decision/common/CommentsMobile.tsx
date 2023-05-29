@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { newnewapi } from 'newnew-api';
 
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
@@ -87,15 +86,6 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
     [postUuid]
   );
 
-  // Virtualization
-  const commentsVirtualizer = useWindowVirtualizer({
-    count: comments.length,
-    estimateSize: () => 190,
-    overscan: 15,
-  });
-
-  const commentItems = commentsVirtualizer.getVirtualItems();
-
   const [commentsReplies, setCommentsReplies] = useState<
     Record<number, { isOpen: boolean; text: string }>
   >({});
@@ -164,9 +154,9 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
         }
       } else {
         if (!flat[idx]?.parentCommentId || flat[idx]?.parentCommentId === 0) {
-          commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
-            align: 'center',
-          });
+          // commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
+          //   align: 'center',
+          // });
 
           flashCommentOnScroll(`comment_id_${flat[idx].id}`);
         } else if (flat[idx]?.parentCommentId) {
@@ -175,9 +165,9 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
           );
 
           if (parentIdx !== -1) {
-            commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
-              align: 'center',
-            });
+            // commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
+            //   align: 'center',
+            // });
 
             openCommentProgrammatically(parentIdx);
 
@@ -212,11 +202,11 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
         {comments && comments.length > 0 && (
           <SCommentsContainer>
             <SCommentsVisible>
-              {commentItems.map((virtualItem) => {
-                const isLoaderRow = virtualItem.index > comments.length - 1;
+              {comments.map((item, index) => {
+                const isLoaderRow = index > comments.length - 1;
 
                 return (
-                  <div key={virtualItem.index}>
+                  <div key={item.id?.toString() || index.toString()}>
                     {isLoaderRow && hasNextPage ? (
                       <SLoaderDiv>
                         <Loader size='sm' isStatic />
@@ -225,19 +215,16 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
                       <CommentParent
                         postUuid={postUuid}
                         canDeleteComment={canDeleteComments}
-                        lastChild={virtualItem.index === comments.length - 1}
-                        comment={comments[virtualItem.index]}
+                        lastChild={index === comments.length - 1}
+                        comment={comments[index]}
                         isDeletingComment={isDeletingComment}
                         handleAddComment={handleAddComment}
                         handleDeleteComment={handleDeleteComment}
-                        index={virtualItem.index}
-                        ref={commentsVirtualizer.measureElement}
+                        index={index}
                         onFormBlur={onFormBlur ?? undefined}
                         onFormFocus={onFormFocus ?? undefined}
                         commentReply={
-                          commentsReplies[
-                            comments[virtualItem.index].id as number
-                          ]
+                          commentsReplies[comments[index].id as number]
                         }
                         updateCommentReplies={updateCommentReplies}
                         handleToggleReplies={handleToggleCommentRepliesById}

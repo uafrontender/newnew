@@ -64,9 +64,11 @@ const Comments: React.FunctionComponent<IComments> = ({
   );
 
   // Comment from URL
-  const { commentIdFromUrl, handleResetCommentIdFromUrl } = useContext(
-    CommentFromUrlContext
-  );
+  const {
+    commentIdFromUrl,
+    newCommentContentFromUrl,
+    handleResetCommentIdFromUrl,
+  } = useContext(CommentFromUrlContext);
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -115,6 +117,7 @@ const Comments: React.FunctionComponent<IComments> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   useComponentScrollRestoration(
     scrollRef.current || undefined,
     'comments-scrolling-container'
@@ -215,6 +218,8 @@ const Comments: React.FunctionComponent<IComments> = ({
             align: 'center',
           });
 
+          openCommentProgrammatically(idx);
+
           flashCommentOnScroll(`comment_id_${flat[idx].id}`);
         } else if (flat[idx].parentCommentId) {
           const parentIdx = comments.findIndex(
@@ -241,7 +246,9 @@ const Comments: React.FunctionComponent<IComments> = ({
           }
         }
 
-        handleResetCommentIdFromUrl?.();
+        if (!newCommentContentFromUrl) {
+          handleResetCommentIdFromUrl?.();
+        }
       }
     }
 
@@ -249,7 +256,13 @@ const Comments: React.FunctionComponent<IComments> = ({
       findComment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, comments, isMobile, isLoading]);
+  }, [
+    commentIdFromUrl,
+    newCommentContentFromUrl,
+    comments,
+    isMobile,
+    isLoading,
+  ]);
 
   return (
     <>

@@ -59,6 +59,7 @@ interface ICommentForm {
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
+  commentId?: number;
   value?: string;
   onBlur?: () => void;
   onFocus?: () => void;
@@ -74,6 +75,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       position,
       zIndex,
       isRoot,
+      commentId,
       onBlur,
       onFocus,
       onSubmit,
@@ -101,8 +103,12 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Comment content from URL
-    const { newCommentContentFromUrl, handleResetNewCommentContentFromUrl } =
-      useContext(CommentFromUrlContext);
+    const {
+      newCommentContentFromUrl,
+      commentIdFromUrl,
+      handleResetNewCommentContentFromUrl,
+      handleResetCommentIdFromUrl,
+    } = useContext(CommentFromUrlContext);
 
     const [focusedInput, setFocusedInput] = useState<boolean>(false);
 
@@ -184,10 +190,17 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           if (isValid) {
             // Redirect only after the persist data is pulled
             if (!user.loggedIn && user._persist?.rehydrated) {
-              if (!isRoot) {
+              if (!isRoot && commentId) {
+                // router.push(
+                //   `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                //     window.location.href
+                //   )}`
+                // );
                 router.push(
                   `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                    window.location.href
+                    `${process.env.NEXT_PUBLIC_APP_URL}/${
+                      router.locale !== 'en-US' ? `${router.locale}/` : ''
+                    }p/${postUuidOrShortId}?comment_content=${commentText}&comment_id=${commentId}#comments`
                   )}`
                 );
               } else {
@@ -225,6 +238,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         user._persist?.rehydrated,
         onSubmit,
         isRoot,
+        commentId,
         router,
         postUuidOrShortId,
         showErrorToastPredefined,
@@ -270,14 +284,35 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     }, [onBlur]);
 
     useEffect(() => {
-      if (!isRoot || !newCommentContentFromUrl) return;
+      if (!newCommentContentFromUrl) {
+        return;
+      }
+
+      if (isRoot && commentIdFromUrl) {
+        return;
+      }
+
+      if (
+        !isRoot &&
+        !newCommentContentFromUrl &&
+        commentIdFromUrl !== commentId?.toString()
+      ) {
+        return;
+      }
 
       if (newCommentContentFromUrl) {
         setCommentText(newCommentContentFromUrl);
         handleResetNewCommentContentFromUrl?.();
+        handleResetCommentIdFromUrl?.();
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [newCommentContentFromUrl]);
+    }, [
+      newCommentContentFromUrl,
+      commentIdFromUrl,
+      isRoot,
+      commentId,
+      handleResetNewCommentContentFromUrl,
+      handleResetCommentIdFromUrl,
+    ]);
 
     return (
       <SCommentsForm
@@ -353,6 +388,7 @@ CommentForm.defaultProps = {
   zIndex: undefined,
   position: undefined,
   isRoot: false,
+  commentId: undefined,
   postUuidOrShortId: '',
 };
 

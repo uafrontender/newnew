@@ -39,9 +39,7 @@ import switchPostStatus, {
 import { useAppSelector } from '../../redux-store/store';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
-import CommentFromUrlContextProvider, {
-  CommentFromUrlContext,
-} from '../../contexts/commentFromUrlContext';
+import CommentFromUrlContextProvider from '../../contexts/commentFromUrlContext';
 import PostInnerContextProvider from '../../contexts/postInnerContext';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
@@ -114,11 +112,11 @@ const PostPage: NextPage<IPostPage> = ({
     [custom_option_text]
   );
   const saveCardFromRedirect = useMemo(() => save_card, [save_card]);
-  const commentIdFromUrl = useMemo(() => comment_id, [comment_id]);
-  const commentContentFromUrl = useMemo(
-    () => comment_content,
-    [comment_content]
-  );
+  // const commentIdFromUrl = useMemo(() => comment_id, [comment_id]);
+  // const commentContentFromUrl = useMemo(
+  //   () => comment_content,
+  //   [comment_content]
+  // );
 
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
 
@@ -319,8 +317,8 @@ const PostPage: NextPage<IPostPage> = ({
     () => saveCardFromRedirect ?? undefined
   );
 
-  const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
-    useContext(CommentFromUrlContext);
+  // const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
+  //   useContext(CommentFromUrlContext);
 
   const [deletePostOpen, setDeletePostOpen] = useState(false);
 
@@ -532,19 +530,19 @@ const PostPage: NextPage<IPostPage> = ({
   }, [postParsed?.isFavoritedByMe]);
 
   // Comment ID from URL
-  useEffect(() => {
-    if (commentIdFromUrl) {
-      handleSetCommentIdFromUrl?.(commentIdFromUrl);
-    }
-    if (commentContentFromUrl) {
-      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+  // useEffect(() => {
+  //   if (commentIdFromUrl) {
+  //     handleSetCommentIdFromUrl?.(commentIdFromUrl);
+  //   }
+  //   if (commentContentFromUrl) {
+  //     handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
 
-      router.replace(`/p/${postUuidOrShortId}`, undefined, {
-        shallow: true,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, commentContentFromUrl]);
+  //     router.replace(`/p/${postUuidOrShortId}`, undefined, {
+  //       shallow: true,
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [commentIdFromUrl, commentContentFromUrl]);
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {
@@ -880,11 +878,15 @@ const PostPage: NextPage<IPostPage> = ({
     </motion.div>
   );
 };
+
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
   <GeneralLayout noMobileNavigation noPaddingMobile>
-    <CommentFromUrlContextProvider>
+    <CommentFromUrlContextProvider
+      commentIdFromUrl={page?.props?.comment_id || undefined}
+      commentContentFromUrl={page?.props?.comment_content || undefined}
+    >
       <AnimatePresence>
         <React.Fragment key={page.props.postUuidOrShortId}>
           {page}

@@ -32,6 +32,7 @@ import canBecomeCreator from '../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
 import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContext';
 import MobileChat from '../organisms/MobileChat';
+import useHasMounted from '../../utils/hooks/useHasMounted';
 
 interface IGeneral {
   className?: string;
@@ -61,6 +62,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
+  const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -232,17 +234,21 @@ export const General: React.FC<IGeneral> = (props) => {
           handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
           visible={mobileNavigationVisible && !globalSearchActive}
         />
-        <SortingContainer
-          id='sorting-container'
-          withCookie={cookies.accepted !== 'true'}
-          bottomNavigationVisible={mobileNavigationVisible}
-        />
-        <CookieContainer
-          bottomNavigationVisible={mobileNavigationVisible}
-          zIndex={moreMenuMobileOpen ? 9 : 10}
-        >
-          <Cookie />
-        </CookieContainer>
+        {hasMounted ? (
+          <>
+            <SSortingContainer
+              id='sorting-container'
+              withCookie={cookies.accepted !== 'true'}
+              bottomNavigationVisible={mobileNavigationVisible}
+            />
+            <CookieContainer
+              bottomNavigationVisible={mobileNavigationVisible}
+              zIndex={moreMenuMobileOpen ? 9 : 10}
+            >
+              <Cookie />
+            </CookieContainer>
+          </>
+        ) : null}
         {chatButtonVisible && (
           <SChatContainer
             bottomNavigationVisible={mobileNavigationVisible}
@@ -370,7 +376,7 @@ interface ISortingContainer {
   bottomNavigationVisible: boolean;
 }
 
-const SortingContainer = styled.div<ISortingContainer>`
+const SSortingContainer = styled.div<ISortingContainer>`
   left: 50%;
   bottom: ${(props) =>
     props.bottomNavigationVisible

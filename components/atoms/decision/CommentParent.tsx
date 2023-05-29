@@ -127,6 +127,12 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       [user.loggedIn, user.userData?.userUuid, comment.sender?.uuid]
     );
 
+    useEffect(() => {
+      if (comment.numberOfReplies > 0) {
+        console.log(isReplyFormOpen);
+      }
+    }, [comment.numberOfReplies, isReplyFormOpen]);
+
     const {
       processedComments: replies,
       addCommentMutation,
@@ -453,6 +459,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                     </SReply>
                   ) : null}
                   <CommentForm
+                    commentId={comment.id as number}
                     onSubmit={(newMsg: string) =>
                       handleAddComment(newMsg, comment.id as number)
                     }
