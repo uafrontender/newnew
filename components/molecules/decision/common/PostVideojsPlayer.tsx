@@ -228,7 +228,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                   .then(() => {
                     // Autoplay started!
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     console.warn('Autoplay is not allowed');
                     // Autoplay was prevented.
                     // Try to mute and start over, catch with displaying pause button
@@ -656,7 +656,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
               .then(() => {
                 // Autoplay started!
               })
-              .catch((error) => {
+              .catch(() => {
                 // Autoplay was prevented.
                 // Try to mute and start over, catch with displaying pause button
                 console.warn('Autoplay is not allowed');
