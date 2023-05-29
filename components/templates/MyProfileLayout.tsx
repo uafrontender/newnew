@@ -728,6 +728,9 @@ const SSpending = styled.div`
   right: 12px;
   color: transparent;
   cursor: default;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   :hover {
     opacity: 0.7;
