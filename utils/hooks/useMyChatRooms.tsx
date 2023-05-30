@@ -21,6 +21,7 @@ const useMyChatRooms = (
   >,
   additionalKey?: string
 ) => {
+  // TODO: Add logic to request to show all announcements
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addAnnouncements =
     !!params.searchQuery &&
