@@ -112,11 +112,11 @@ const PostPage: NextPage<IPostPage> = ({
     [custom_option_text]
   );
   const saveCardFromRedirect = useMemo(() => save_card, [save_card]);
-  // const commentIdFromUrl = useMemo(() => comment_id, [comment_id]);
-  // const commentContentFromUrl = useMemo(
-  //   () => comment_content,
-  //   [comment_content]
-  // );
+  const commentIdFromUrl = useMemo(() => comment_id, [comment_id]);
+  const commentContentFromUrl = useMemo(
+    () => comment_content,
+    [comment_content]
+  );
 
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
 
@@ -530,19 +530,14 @@ const PostPage: NextPage<IPostPage> = ({
   }, [postParsed?.isFavoritedByMe]);
 
   // Comment ID from URL
-  // useEffect(() => {
-  //   if (commentIdFromUrl) {
-  //     handleSetCommentIdFromUrl?.(commentIdFromUrl);
-  //   }
-  //   if (commentContentFromUrl) {
-  //     handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
-
-  //     router.replace(`/p/${postUuidOrShortId}`, undefined, {
-  //       shallow: true,
-  //     });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [commentIdFromUrl, commentContentFromUrl]);
+  useEffect(() => {
+    if (commentContentFromUrl || commentIdFromUrl) {
+      router.replace(`/p/${postUuidOrShortId}`, undefined, {
+        shallow: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentIdFromUrl, commentContentFromUrl]);
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {

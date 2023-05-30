@@ -107,8 +107,6 @@ const usePostComments = (
 
   const handleToggleCommentRepliesById = useCallback(
     (idToOpen: number, newState: boolean) => {
-      console.log(idToOpen);
-      console.log(newState);
       setProcessedComments((curr) => {
         const working = [...curr];
         const idxToOpen = working.findIndex((c) => c.id === idToOpen);
@@ -258,7 +256,27 @@ const usePostComments = (
 
   useEffect(() => {
     if (flatComments) {
-      setProcessedComments(() => processComments(flatComments));
+      setProcessedComments((curr) => {
+        const commentsProcessed = processComments(flatComments);
+        const openedCommentsIds = [];
+        for (let i = 0; i < curr.length; i++) {
+          if (curr[i].isOpen === true) {
+            openedCommentsIds.push(curr[i].id);
+          }
+        }
+
+        openedCommentsIds.forEach((commentId) => {
+          const indexOfComment = commentsProcessed.findIndex(
+            (c) => c.id === commentId
+          );
+
+          if (indexOfComment !== -1) {
+            commentsProcessed[indexOfComment].isOpen = true;
+          }
+        });
+
+        return commentsProcessed;
+      });
     }
   }, [flatComments]);
 
