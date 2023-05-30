@@ -221,17 +221,15 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           // https://videojs.com/blog/autoplay-best-practices-with-video-js/#programmatic-autoplay-and-successfailure-detection
           p.ready(() => {
             if (!isInSlider || (isInSlider && isActive)) {
-              const promise = p.play()?.catch(() => {
-                console.warn('Autoplay is not allowed');
-              });
+              const promise = p.play();
 
               if (promise !== undefined) {
                 promise
                   .then(() => {
                     // Autoplay started!
                   })
-                  .catch((error) => {
-                    console.error(error);
+                  .catch(() => {
+                    console.warn('Autoplay is not allowed');
                     // Autoplay was prevented.
                     // Try to mute and start over, catch with displaying pause button
                     dispatch(setMutedMode(true));
@@ -651,19 +649,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       if (isInSlider) {
         if (isActive) {
           onPlaybackProgress?.(0);
-          const promise = playerRef?.current?.play()?.catch(() => {
-            console.warn('Autoplay is not allowed');
-          });
+          const promise = playerRef?.current?.play();
 
           if (promise !== undefined) {
             promise
               .then(() => {
                 // Autoplay started!
               })
-              .catch((error) => {
-                console.error(error);
+              .catch(() => {
                 // Autoplay was prevented.
                 // Try to mute and start over, catch with displaying pause button
+                console.warn('Autoplay is not allowed');
                 dispatch(setMutedMode(true));
                 setTimeout(() => {
                   playerRef.current?.play()?.catch((e) => {
