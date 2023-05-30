@@ -916,6 +916,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         'component-PostCard',
         'modal-PaymentModal',
         'modal-EditPostTitle',
+        'page-Creation',
       ],
       null,
       SUPPORTED_LANGUAGES
