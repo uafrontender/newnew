@@ -1,6 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable arrow-body-style */
-/* eslint-disable padded-blocks */
 import React, { useEffect, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -62,7 +59,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           const payload = new newnewapi.GetUserRequest({
             uuid: usersIBlockedIds[i],
           });
-
+          // eslint-disable-next-line no-await-in-loop
           const res = await getUserByUsername(payload);
 
           if (!res?.data || res.error) {

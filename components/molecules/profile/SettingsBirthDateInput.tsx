@@ -1,6 +1,5 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
-/* eslint-disable arrow-body-style */
 import React, { forwardRef, useState, useEffect, useRef, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import DatePicker, {
@@ -117,12 +116,10 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
         () =>
           Array(12)
             .fill('')
-            .map((_, i) => {
-              return {
-                name: getLocalizedMonth(i, locale),
-                value: i,
-              };
-            }),
+            .map((_, i) => ({
+              name: getLocalizedMonth(i, locale),
+              value: i,
+            })),
         [locale]
       );
       const years: TDropdownSelectItem<number>[] = useMemo(() => {
@@ -145,30 +142,28 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 
       const handleRenderCustomHeader = (
         props: ReactDatePickerCustomHeaderProps
-      ) => {
-        return (
-          <SDatePickerHeader>
-            <DropdownSelect<number>
-              label={props.date.getFullYear().toString()}
-              options={years}
-              selected={props.date.getFullYear()}
-              width='110px'
-              maxItems={4}
-              closeOnSelect
-              onSelect={(val) => props.changeYear(val)}
-            />
-            <DropdownSelect<number>
-              label={getLocalizedMonth(props.date.getMonth(), locale)}
-              options={months}
-              selected={props.date.getMonth()}
-              width='183px'
-              maxItems={4}
-              closeOnSelect
-              onSelect={(val) => props.changeMonth(val)}
-            />
-          </SDatePickerHeader>
-        );
-      };
+      ) => (
+        <SDatePickerHeader>
+          <DropdownSelect<number>
+            label={props.date.getFullYear().toString()}
+            options={years}
+            selected={props.date.getFullYear()}
+            width='110px'
+            maxItems={4}
+            closeOnSelect
+            onSelect={(val) => props.changeYear(val)}
+          />
+          <DropdownSelect<number>
+            label={getLocalizedMonth(props.date.getMonth(), locale)}
+            options={months}
+            selected={props.date.getMonth()}
+            width='183px'
+            maxItems={4}
+            closeOnSelect
+            onSelect={(val) => props.changeMonth(val)}
+          />
+        </SDatePickerHeader>
+      );
 
       // eslint-disable-next-line react/no-unstable-nested-components
       const CustomInputForwardRef = forwardRef<

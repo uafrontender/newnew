@@ -516,7 +516,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 <Trans
                   t={t}
                   i18nKey='acPost.paymentModalFooter.body'
-                  // @ts-ignore
                   components={[<DisplayName user={postCreator} />]}
                 />
                 {' *'}
@@ -548,7 +547,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 <Trans
                   t={t}
                   i18nKey='acPost.paymentModalHeader.title'
-                  // @ts-ignore
                   components={[
                     <DisplayName
                       user={postCreator}
@@ -586,7 +584,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.ac'
-          // @ts-ignore
           components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
