@@ -1,8 +1,4 @@
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable arrow-body-style */
-/* eslint-disable padded-blocks */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';

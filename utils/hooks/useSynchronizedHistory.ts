@@ -1,4 +1,3 @@
-/* eslint-disable object-shorthand */
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 import isBrowser from '../isBrowser';
@@ -7,7 +6,9 @@ const useSynchronizedHistory = () => {
   const router = useRouter();
 
   const syncedHistoryPushState = useCallback((data: any, url: string) => {
-    if (!isBrowser) return;
+    if (!isBrowser) {
+      return;
+    }
 
     const idx = window?.history?.state?.idx ?? 0;
     const { locale } = router;
@@ -15,11 +16,11 @@ const useSynchronizedHistory = () => {
     window.history.pushState(
       {
         ...data,
-        url: url,
+        url,
         as: url,
         options: {
           shallow: true,
-          locale: locale,
+          locale,
           _shouldResolveHref: true,
         },
         __N: true,
@@ -28,7 +29,7 @@ const useSynchronizedHistory = () => {
       '',
       url
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const syncedHistoryReplaceState = useCallback((data: any, url: string) => {
@@ -40,20 +41,20 @@ const useSynchronizedHistory = () => {
     window.history.replaceState(
       {
         ...data,
-        url: url,
+        url,
         as: url,
         options: {
           shallow: true,
-          locale: locale,
+          locale,
           _shouldResolveHref: true,
         },
         __N: true,
-        idx: idx,
+        idx,
       },
       '',
       url
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { syncedHistoryPushState, syncedHistoryReplaceState };

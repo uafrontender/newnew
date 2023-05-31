@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
@@ -219,7 +217,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                             <Trans
                               t={t}
                               i18nKey='mcPostSuccess.wantsToKnow'
-                              // @ts-ignore
                               components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>
@@ -252,7 +249,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
                         {winningOption.totalAmount?.usdCents &&
                         winningOption.totalAmount?.usdCents > 0
                           ? `($${formatNumber(
-                              winningOption.totalAmount?.usdCents / 100 ?? 0,
+                              winningOption.totalAmount.usdCents / 100 ?? 0,
                               true
                             )})`
                           : ''}

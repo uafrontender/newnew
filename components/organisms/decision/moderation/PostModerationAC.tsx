@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useContext,

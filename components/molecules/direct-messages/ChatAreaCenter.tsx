@@ -120,7 +120,6 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     const socketHandlerMessageCreated = (dataSocket: any) => {
       const arr = new Uint8Array(dataSocket);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      // eslint-disable-next-line eqeqeq
       if (selectedChatRoomId && decoded.roomId === selectedChatRoomId) {
         // TODO: think how to avoid it
         refetch();

@@ -187,6 +187,7 @@ const CommentsBottomSection: React.FunctionComponent<
         removeChannel(`comments_${commentsRoomId.toString()}`);
       }
     },
+    // TODO: should it depend on commentsRoomId? Why not?
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );

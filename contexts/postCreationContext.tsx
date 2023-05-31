@@ -445,9 +445,7 @@ const PostCreationContextProvider: React.FunctionComponent<
     if (defaultMinAcBid) {
       setCreationMinBid(defaultMinAcBid / 100);
     }
-    // Linter wants `setCreationMinBid`, however it's not necessary here
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultMinAcBid]);
+  }, [defaultMinAcBid, setCreationMinBid]);
 
   const contextValueMemo = useMemo(
     () => ({

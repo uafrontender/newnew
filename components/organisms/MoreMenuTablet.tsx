@@ -33,13 +33,13 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
+  const copyPostUrlToClipboard = useCallback(async (url: string) => {
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
     } else {
       document.execCommand('copy', true, url);
     }
-  }
+  }, []);
 
   const handlerCopy = useCallback(() => {
     if (window) {
@@ -60,8 +60,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           console.log(err);
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user.userData?.username, copyPostUrlToClipboard]);
 
   return (
     <AnimatePresence>

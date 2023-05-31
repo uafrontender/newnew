@@ -1,5 +1,3 @@
-/* eslint-disable prefer-template */
-/* eslint-disable arrow-body-style */
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import { useUpdateEffect } from 'react-use';

@@ -1,8 +1,5 @@
-/* eslint-disable consistent-return */ import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+/* eslint-disable consistent-return */
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { useTheme } from 'styled-components';
