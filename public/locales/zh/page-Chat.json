@@ -80,6 +80,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "announcements": "的公告",
     "beforeName": "",
     "suffix": "",
     "afterName": "的公告",
