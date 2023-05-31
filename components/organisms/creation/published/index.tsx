@@ -1,10 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -20,6 +21,9 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
 import DisplayName from '../../../atoms/DisplayName';
 import SharePanel from '../../../atoms/SharePanel';
+import { SocketContext } from '../../../../contexts/socketContext';
+import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
+import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -32,7 +36,20 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
-  const { postInCreation, clearCreation } = usePostCreationState();
+
+  const { showErrorToastPredefined } = useErrorToasts();
+
+  // Socket
+  const { socketConnection } = useContext(SocketContext);
+
+  const {
+    postInCreation,
+    clearCreation,
+    setCreationFileProcessingETA,
+    setCreationFileProcessingProgress,
+    setCreationFileProcessingLoading,
+    setCreationFileUploadError,
+  } = usePostCreationState();
   const { post, videoProcessing, fileProcessing, postData } = useMemo(
     () => postInCreation,
     [postInCreation]
@@ -150,6 +167,73 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handlerSocketUpdated = useCallback(
+    async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        if (
+          decoded?.estimatedTimeLeft?.seconds &&
+          !Number.isNaN(decoded.estimatedTimeLeft.seconds as number)
+        ) {
+          setCreationFileProcessingETA(
+            decoded.estimatedTimeLeft.seconds as number
+          );
+        }
+
+        if (decoded.fractionCompleted > fileProcessing.progress) {
+          setCreationFileProcessingProgress(decoded.fractionCompleted);
+        }
+
+        if (
+          decoded.fractionCompleted === 100 &&
+          decoded.status ===
+            newnewapi.VideoProcessingProgress.Status.SUCCEEDED &&
+          videoProcessing.targetUrls?.hlsStreamUrl
+        ) {
+          const available = await waitResourceIsAvailable(
+            videoProcessing.targetUrls?.hlsStreamUrl,
+            {
+              maxAttempts: 60,
+              retryTimeMs: 1000,
+            }
+          );
+
+          if (available) {
+            setCreationFileProcessingLoading(false);
+          } else {
+            setCreationFileUploadError(true);
+            showErrorToastPredefined(undefined);
+          }
+        } else if (
+          decoded.status === newnewapi.VideoProcessingProgress.Status.FAILED
+        ) {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(undefined);
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [videoProcessing, fileProcessing]
+  );
+
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection?.on('VideoProcessingProgress', handlerSocketUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
+      }
+    };
+  }, [socketConnection, handlerSocketUpdated]);
 
   if (!post.title) {
     return <LoadingView />;
