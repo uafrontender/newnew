@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useContext,
@@ -641,7 +639,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.mc'
-              // @ts-ignore
               components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
@@ -668,7 +665,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
               <Trans
                 t={t}
                 i18nKey='mcPost.optionsTab.actionSection.offersBundles'
-                // @ts-ignore
                 components={[<DisplayName user={post.creator} />]}
               />
             )}

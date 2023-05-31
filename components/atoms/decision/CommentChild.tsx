@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -109,29 +108,32 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
           ref={ref}
           data-index={index}
         >
-          {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
-            comment.sender?.options?.isVerified ||
-            comment.sender?.uuid === user.userData?.userUuid ? (
-              <Link
-                href={
-                  comment.sender?.uuid === user.userData?.userUuid
-                    ? '/profile'
-                    : `/${comment.sender?.username}`
-                }
-              >
-                <a>
-                  <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-                </a>
-              </Link>
+          {
+            // eslint-disable-next-line no-nested-ternary
+            !comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
+              comment.sender?.options?.isVerified ||
+              comment.sender?.uuid === user.userData?.userUuid ? (
+                <Link
+                  href={
+                    comment.sender?.uuid === user.userData?.userUuid
+                      ? '/profile'
+                      : `/${comment.sender?.username}`
+                  }
+                >
+                  <a>
+                    <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+                  </a>
+                </Link>
+              ) : (
+                <SUserAvatar
+                  noHover
+                  avatarUrl={comment.sender?.avatarUrl ?? ''}
+                />
+              )
             ) : (
-              <SUserAvatar
-                noHover
-                avatarUrl={comment.sender?.avatarUrl ?? ''}
-              />
+              <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
             )
-          ) : (
-            <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
-          )}
+          }
           <SCommentContent>
             <SCommentHeader>
               {!comment.isDeleted ? (

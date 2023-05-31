@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
@@ -61,7 +60,7 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       {transaction?.amount?.usdCents && (
         <SAmount variant={3} weight={600} direction='from'>
           <span>-&nbsp;</span>
-          {`$${formatNumber(transaction?.amount.usdCents / 100 ?? 0, false)}`}
+          {`$${formatNumber(transaction.amount.usdCents / 100 ?? 0, false)}`}
         </SAmount>
       )}
       <SDate variant={2}>

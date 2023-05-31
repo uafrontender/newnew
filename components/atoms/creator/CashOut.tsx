@@ -43,11 +43,10 @@ const CashOut: React.FC<ICashOut> = ({
 
   const validateCash = useCallback(
     () =>
-      nextCashOutAmount &&
       nextCashOutAmount.usdCents !== undefined &&
       nextCashOutAmount.usdCents !== null &&
       nextCashOutAmount.usdCents > 0,
-    [nextCashOutAmount]
+    [nextCashOutAmount.usdCents]
   );
 
   useEffect(() => {
@@ -73,8 +72,7 @@ const CashOut: React.FC<ICashOut> = ({
     if (isLoading === null && validateCash()) {
       getStripeLink();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, nextCashOutAmount.usdCents]);
+  }, [isLoading, validateCash]);
 
   if (!nextCashOutAmount?.usdCents || !validateCash()) {
     return <NoCashOut />;

@@ -685,29 +685,26 @@ export const CreationSecondStepContent: React.FC<
               id: '5-minutes',
               title: t('secondStep.field.expiresAt.options.5-minutes'),
             },
-            {
-              id: '10-minutes',
-              title: t('secondStep.field.expiresAt.options.10-minutes'),
-            },
           ]
         : []),
       // Debatable, but reserve ability to make 10 minutes for staging, as well
-      ...(process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'production'
         ? [
             {
               id: '10-minutes',
               title: t('secondStep.field.expiresAt.options.10-minutes'),
             },
+            {
+              id: '1-hour',
+              title: t('secondStep.field.expiresAt.options.1-hour'),
+            },
+            {
+              id: '3-hours',
+              title: t('secondStep.field.expiresAt.options.3-hours'),
+            },
           ]
         : []),
-      {
-        id: '1-hour',
-        title: t('secondStep.field.expiresAt.options.1-hour'),
-      },
-      {
-        id: '3-hours',
-        title: t('secondStep.field.expiresAt.options.3-hours'),
-      },
+
       {
         id: '6-hours',
         title: t('secondStep.field.expiresAt.options.6-hours'),

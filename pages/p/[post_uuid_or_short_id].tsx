@@ -1,6 +1,3 @@
-/* eslint-disable prefer-template */
-/* eslint-disable operator-assignment */
-/* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
 import React, {
@@ -985,8 +982,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         };
 
         if (Object.keys(queryObject).length !== 0) {
-          queryString =
-            '?' + new URLSearchParams(queryObject as any).toString();
+          queryString = `?${new URLSearchParams(
+            queryObject as any
+          ).toString()}`;
         }
 
         return {

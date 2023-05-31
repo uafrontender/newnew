@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { Fragment } from 'react';
@@ -18,7 +19,6 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
     <>
       {getChunks(children).map((chunk, index) => {
         if (chunk.type === 'text') {
-          // eslint-disable-next-line react/no-array-index-key
           return <Fragment key={`text-chunk-${index}`}>{chunk.text}</Fragment>;
         }
 
@@ -26,7 +26,6 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
           if (target === 'router') {
             return (
               <SHashtag
-                // eslint-disable-next-line react/no-array-index-key
                 key={`text-chunk-${index}`}
                 onClick={() =>
                   router.push(`/search?query=${chunk.text}&tab=posts`)
@@ -39,7 +38,6 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
 
           return (
             <Link
-              // eslint-disable-next-line react/no-array-index-key
               key={`text-chunk-${index}`}
               href={`/search?query=${chunk.text}&tab=posts`}
               target={target}

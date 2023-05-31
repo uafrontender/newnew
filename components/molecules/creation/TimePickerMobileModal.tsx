@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 import React, {
   useCallback,
   useEffect,
@@ -130,7 +129,10 @@ const TimePickerMobileModal: React.FunctionComponent<
       const boundingRect = hoursScrollerRef.current?.getBoundingClientRect();
       for (let i = 0; i < hoursRefs.current.length; i++) {
         const itemRect = hoursRefs.current[i]?.getBoundingClientRect();
-        if (!itemRect) continue;
+        if (!itemRect) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
         const pos = itemRect.top - boundingRect!!.top!!;
         if (pos > 48 && pos < 72) {
           handleUpdateHours(hours[i].value);

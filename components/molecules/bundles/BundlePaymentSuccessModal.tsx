@@ -95,7 +95,6 @@ const BundlePaymentSuccessModal: React.FC<IBuyBundleModal> = React.memo(
                   <Trans
                     t={t}
                     i18nKey='modal.buyBundleSuccess.for'
-                    // @ts-ignore
                     components={[
                       <SDisplayName
                         user={creator}

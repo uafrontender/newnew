@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -14,6 +14,9 @@ import Loader from '../../atoms/Loader';
 import { useBundles } from '../../../contexts/bundlesContext';
 import { useAppState } from '../../../contexts/appStateContext';
 import { ChatsProvider } from '../../../contexts/chatContext';
+import { useAppSelector } from '../../../redux-store/store';
+import TurnBundleModal from '../../molecules/creator/dashboard/TurnBundleModal';
+import SuccessBundleModal from '../../molecules/creator/dashboard/SuccessBundleModal';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -25,15 +28,10 @@ const BundlesEarnings = dynamic(
 const SuperpollBundle = dynamic(
   () => import('../../molecules/creator/dashboard/SuperpollBundle')
 );
-const TurnBundleModal = dynamic(
-  () => import('../../molecules/creator/dashboard/TurnBundleModal')
-);
-const SuccessBundleModal = dynamic(
-  () => import('../../molecules/creator/dashboard/SuccessBundleModal')
-);
 
 export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
   const { appConstants } = useGetAppConstants();
   const { isSellingBundles, isBundleDataLoaded, toggleIsSellingBundles } =
@@ -81,6 +79,11 @@ export const DashboardBundles: React.FC = React.memo(() => {
     [isSellingBundles]
   );
 
+  const notWhitelisted = useMemo(
+    () => user._persist?.rehydrated && !user?.userData?.options?.isWhiteListed,
+    [user._persist?.rehydrated, user?.userData?.options?.isWhiteListed]
+  );
+
   return (
     <SContainer>
       {!isMobile && <Navigation />}
@@ -97,7 +100,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
           <SLoader size='md' />
         ) : (
           <>
-            {isSellingBundles && (
+            {isSellingBundles && notWhitelisted && (
               <BundlesEarnings isBundlesEnabled={isSellingBundles} />
             )}
             <SBlock>
@@ -124,7 +127,7 @@ export const DashboardBundles: React.FC = React.memo(() => {
                 {appConstants.bundleOffers?.map(renderListItem)}
               </SBundles>
             </SBlock>
-            {!isSellingBundles && (
+            {!isSellingBundles && notWhitelisted && (
               <BundlesEarnings isBundlesEnabled={isSellingBundles} />
             )}
           </>

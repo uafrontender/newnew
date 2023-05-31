@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-labels */
 function getImageMeta(buffer: Uint8Array) {
@@ -66,6 +65,7 @@ const findIndex = (buffer: Uint8Array, codes: number[]) => {
   outerLoop: for (let i = from; i < to; i++) {
     for (let j = 0; j < codes.length; j++) {
       if (buffer[i + j] !== codes[j]) {
+        // eslint-disable-next-line no-continue
         continue outerLoop;
       }
     }

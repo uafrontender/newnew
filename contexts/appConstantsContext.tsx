@@ -28,7 +28,6 @@ const AppConstantsContextProvider: React.FC<IAppConstantsContextProvider> = ({
   const contextValue = useMemo(
     () => ({
       appConstants,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
     [appConstants]
   );

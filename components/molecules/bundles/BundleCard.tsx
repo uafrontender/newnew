@@ -70,7 +70,6 @@ const BundleCard: React.FC<IBundleCard> = ({
             <Trans
               t={t}
               i18nKey='bundle.access'
-              // @ts-ignore
               components={[
                 <>
                   {formattedTimeLeft.map((time, index) => (
