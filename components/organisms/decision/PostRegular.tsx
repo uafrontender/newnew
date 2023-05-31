@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Trans, useTranslation } from 'next-i18next';

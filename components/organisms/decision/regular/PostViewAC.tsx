@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useContext,
@@ -574,7 +572,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
               options={options}
               minAmount={
                 post.minimalBid?.usdCents
-                  ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0))
+                  ? parseInt((post.minimalBid.usdCents / 100).toFixed(0))
                   : 5
               }
               handleAddOrUpdateOptionFromResponse={
@@ -600,7 +598,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.ac'
-              // @ts-ignore
               components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>

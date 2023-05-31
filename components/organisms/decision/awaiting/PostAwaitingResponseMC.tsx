@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useEffect,
@@ -278,7 +276,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                             <Trans
                               t={t}
                               i18nKey='mcPostAwaiting.wantsToKnow'
-                              // @ts-ignore
                               components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>
@@ -311,7 +308,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                         {winningOption.totalAmount?.usdCents &&
                         winningOption.totalAmount?.usdCents > 0
                           ? `($${formatNumber(
-                              winningOption.totalAmount?.usdCents / 100 ?? 0,
+                              winningOption.totalAmount.usdCents / 100 ?? 0,
                               true
                             )})`
                           : ''}

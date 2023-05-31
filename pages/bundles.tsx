@@ -77,7 +77,7 @@ export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
     props: {
       ...translationContext,
       // setup intent on this page is always for bundles
-      // eslint-disable-next-line camelcase, object-shorthand
+      // eslint-disable-next-line camelcase
       ...(setup_intent_client_secret &&
       !Array.isArray(setup_intent_client_secret)
         ? {
@@ -86,7 +86,7 @@ export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
               setup_intent_client_secret,
           }
         : {}),
-      // eslint-disable-next-line camelcase, object-shorthand
+      // eslint-disable-next-line camelcase
       ...(save_card && !Array.isArray(save_card)
         ? {
             // eslint-disable-next-line camelcase

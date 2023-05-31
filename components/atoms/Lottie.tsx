@@ -233,7 +233,7 @@ class Lottie extends React.Component<ILottie> {
       : this.handleClickToPause;
 
     return (
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
       <div
         ref={(c) => {
           this.el = c;
@@ -242,7 +242,7 @@ class Lottie extends React.Component<ILottie> {
         title={title}
         style={lottieStyles}
         onClick={onClickHandler}
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/no-noninteractive-tabindex,max-len
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         aria-label={ariaLabel}
       />

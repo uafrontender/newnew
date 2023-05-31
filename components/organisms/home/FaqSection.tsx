@@ -17,7 +17,7 @@ import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 interface IEmbedLink {
   href: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const EmbedLink = ({ href, children }: IEmbedLink) => (
@@ -27,7 +27,7 @@ const EmbedLink = ({ href, children }: IEmbedLink) => (
 );
 
 interface IPoint {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant: 1 | 2;
 }
 
@@ -82,7 +82,6 @@ const FaqSection = () => {
                   i18nKey={`faq.items.${i}.answer` as any}
                   t={t}
                   components={[
-                    // @ts-ignore
                     <EmbedLink
                       href={
                         // eslint-disable-next-line no-nested-ternary
@@ -93,9 +92,8 @@ const FaqSection = () => {
                           : '/sign-up?to=create'
                       }
                     />,
-                    // @ts-ignore
+
                     <Point variant={2} />,
-                    // @ts-ignore
                     <Point variant={1} />,
                   ]}
                 />
@@ -108,7 +106,6 @@ const FaqSection = () => {
         <Trans
           i18nKey='faq.learMore'
           t={t}
-          // @ts-ignore
           components={[
             <SLink
               href='https://intercom.help/NewNewHelpCenter/en'

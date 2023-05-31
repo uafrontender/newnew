@@ -1,4 +1,3 @@
-/* eslint-disable no-lonely-if */
 import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
