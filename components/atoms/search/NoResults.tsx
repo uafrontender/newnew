@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';

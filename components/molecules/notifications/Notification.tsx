@@ -174,6 +174,7 @@ const Notification: React.FC<INotification> = ({
               _target: url,
               _component: 'Notification',
             });
+            markNotificationAsRead();
           }}
         >
           {content?.relatedUser?.uuid !== user.userData?.userUuid ? (

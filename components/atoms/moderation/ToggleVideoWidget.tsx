@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -26,11 +25,41 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
       id='toggle-video-widget'
       style={{ ...(wrapperCSS || {}) }}
     >
-      {!responseUploaded ? (
-        <SWrapper>
-          <STabBtn
-            disabled={disabled}
-            active={currentTab === 'announcement'}
+      {
+        // eslint-disable-next-line no-nested-ternary
+        !responseUploaded ? (
+          <SWrapper>
+            <STabBtn
+              disabled={disabled}
+              active={currentTab === 'announcement'}
+              onClick={() => {
+                Mixpanel.track('Change Tab', {
+                  _stage: 'Post',
+                  _tabName: 'announcement',
+                  _component: 'ToggleVideoWidget',
+                });
+                handleChangeTab('announcement');
+              }}
+            >
+              {t('postVideo.tabs.announcement')}
+            </STabBtn>
+            <STabBtn
+              disabled={disabled}
+              active={currentTab === 'response'}
+              onClick={() => {
+                Mixpanel.track('Change Tab', {
+                  _stage: 'Post',
+                  _tabName: 'response',
+                  _component: 'ToggleVideoWidget',
+                });
+                handleChangeTab('response');
+              }}
+            >
+              {t('postVideo.tabs.response')}
+            </STabBtn>
+          </SWrapper>
+        ) : currentTab === 'response' ? (
+          <SBackToOriginalBtn
             onClick={() => {
               Mixpanel.track('Change Tab', {
                 _stage: 'Post',
@@ -40,11 +69,10 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
               handleChangeTab('announcement');
             }}
           >
-            {t('postVideo.tabs.announcement')}
-          </STabBtn>
-          <STabBtn
-            disabled={disabled}
-            active={currentTab === 'response'}
+            {t('postVideo.tabs.backToOriginalVideo')}
+          </SBackToOriginalBtn>
+        ) : (
+          <SBackToOriginalBtn
             onClick={() => {
               Mixpanel.track('Change Tab', {
                 _stage: 'Post',
@@ -54,36 +82,10 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
               handleChangeTab('response');
             }}
           >
-            {t('postVideo.tabs.response')}
-          </STabBtn>
-        </SWrapper>
-      ) : currentTab === 'response' ? (
-        <SBackToOriginalBtn
-          onClick={() => {
-            Mixpanel.track('Change Tab', {
-              _stage: 'Post',
-              _tabName: 'announcement',
-              _component: 'ToggleVideoWidget',
-            });
-            handleChangeTab('announcement');
-          }}
-        >
-          {t('postVideo.tabs.backToOriginalVideo')}
-        </SBackToOriginalBtn>
-      ) : (
-        <SBackToOriginalBtn
-          onClick={() => {
-            Mixpanel.track('Change Tab', {
-              _stage: 'Post',
-              _tabName: 'response',
-              _component: 'ToggleVideoWidget',
-            });
-            handleChangeTab('response');
-          }}
-        >
-          {t('postVideo.tabs.backToResponse')}
-        </SBackToOriginalBtn>
-      )}
+            {t('postVideo.tabs.backToResponse')}
+          </SBackToOriginalBtn>
+        )
+      }
     </SToggleVideoWidget>
   );
 };

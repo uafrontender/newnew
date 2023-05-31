@@ -1,6 +1,6 @@
 import { newnewapi } from 'newnew-api';
 import React, { useCallback, useMemo, useState, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
@@ -21,6 +21,7 @@ import { useBundles } from '../../../contexts/bundlesContext';
 import { formatNumber } from '../../../utils/format';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
+import GenericSkeleton from '../GenericSkeleton';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -35,11 +36,15 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
 }) => {
   const { t } = useTranslation('common');
   const router = useRouter();
+  const theme = useTheme();
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   // Ellipse menu
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -126,9 +131,21 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         />
       )}
       <SUserAvatarContainer>
-        <SUserAvatar>
-          <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
-        </SUserAvatar>
+        <SUserAvatarInnerContainer>
+          <SUserAvatar
+            avatarUrl={creator.avatarUrl ?? ''}
+            visible={avatarLoaded}
+            onLoad={() => {
+              setAvatarLoaded(true);
+            }}
+          />
+          {!avatarLoaded && (
+            <SAvatarSkeleton
+              bgColor={theme.colorsThemed.background.secondary}
+              highlightColor={theme.colorsThemed.background.quaternary}
+            />
+          )}
+        </SUserAvatarInnerContainer>
       </SUserAvatarContainer>
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
         <SDisplayName user={creator} />
@@ -153,7 +170,20 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SButton>
       )}
       <SBackground>
-        <SImage src={creator.coverUrl ?? ''} layout='fill' />
+        <SImage
+          src={creator.coverUrl ?? ''}
+          layout='fill'
+          visible={backgroundLoaded}
+          onLoad={() => {
+            setBackgroundLoaded(true);
+          }}
+        />
+        {!backgroundLoaded && (
+          <SBackgroundSkeleton
+            bgColor={theme.colorsThemed.background.secondary}
+            highlightColor={theme.colorsThemed.background.tertiary}
+          />
+        )}
       </SBackground>
       {/* Modals */}
       {isMobile && (
@@ -205,9 +235,21 @@ const SCard = styled.div`
   height: auto;
   cursor: pointer;
   transition: 0.2s linear;
+
   &:hover {
     transform: translateY(-8px);
   }
+`;
+
+const SBackgroundSkeleton = styled(GenericSkeleton)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  overflow: hidden;
+  z-index: 0;
 `;
 
 const SBackground = styled.div`
@@ -220,8 +262,9 @@ const SBackground = styled.div`
   overflow: hidden;
 `;
 
-const SImage = styled(Image)`
+const SImage = styled(Image)<{ visible: boolean }>`
   object-fit: cover;
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
 `;
 
 const SUserAvatarContainer = styled.div`
@@ -235,7 +278,16 @@ const SUserAvatarContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const SUserAvatar = styled.div`
+const SAvatarSkeleton = styled(GenericSkeleton)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+`;
+
+const SUserAvatarInnerContainer = styled.div`
   width: 100%;
   height: 100%;
   flex-shrink: 0;
@@ -244,12 +296,17 @@ const SUserAvatar = styled.div`
   border: 3px solid ${({ theme }) => theme.colorsThemed.background.primary};
   position: relative;
   z-index: 1;
+
   & > * {
     width: 100%;
     height: 100%;
     min-width: 100%;
     min-height: 100%;
   }
+`;
+
+const SUserAvatar = styled(UserAvatar)<{ visible: boolean }>`
+  opacity: ${({ visible }) => (visible ? 1 : 0)};
 `;
 
 const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`

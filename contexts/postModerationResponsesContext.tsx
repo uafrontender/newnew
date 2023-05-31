@@ -518,7 +518,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           await handleUploadCustomCoverImage();
         }
 
-        // @ts-ignore
         let responseObj;
         if (res.data.auction) {
           responseObj = res.data.auction.response;
@@ -532,7 +531,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           responseObj = res.data.crowdfunding.response;
         }
 
-        // @ts-ignore
         if (responseObj) {
           handleUpdateResponseVideo(responseObj);
         }

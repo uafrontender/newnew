@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useEffect,
@@ -212,7 +210,6 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
                       <Trans
                         t={t}
                         i18nKey='acPostAwaiting.wantsToKnow'
-                        // @ts-ignore
                         components={[<DisplayName user={post.creator} />]}
                       />
                     </SWantsToKnow>

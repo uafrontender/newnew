@@ -743,8 +743,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <Trans
               t={t}
               i18nKey={`postFailedBox.reason.${failureReason}` as any}
-              // @ts-ignore
-              components={<DisplayName user={creator} />}
+              components={[<DisplayName user={creator} />]}
             />
           }
           buttonCaption={tCommon('button.takeMeHome')}

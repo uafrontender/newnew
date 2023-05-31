@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -143,7 +142,7 @@ const AcOptionCardModeration: React.FunctionComponent<
               <div>
                 {option.totalAmount?.usdCents
                   ? `$${formatNumber(
-                      option?.totalAmount?.usdCents / 100 ?? 0,
+                      option.totalAmount.usdCents / 100 ?? 0,
                       false
                     )}`
                   : '$0'}
@@ -288,7 +287,7 @@ const AcOptionCardModeration: React.FunctionComponent<
             <div>
               {option.totalAmount?.usdCents
                 ? `$${formatNumber(
-                    option?.totalAmount?.usdCents / 100 ?? 0,
+                    option.totalAmount.usdCents / 100 ?? 0,
                     false
                   )}`
                 : '$0'}
