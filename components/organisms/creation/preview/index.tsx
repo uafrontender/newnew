@@ -592,7 +592,6 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
   // Redirect if post state is empty

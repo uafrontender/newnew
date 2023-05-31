@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
@@ -216,7 +214,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                             <Trans
                               t={t}
                               i18nKey='acPostSuccess.wantsToKnow'
-                              // @ts-ignore
                               components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>

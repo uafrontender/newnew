@@ -1,8 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable quotes */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';

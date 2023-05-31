@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import TextArea from 'react-textarea-autosize';
@@ -78,12 +79,10 @@ const RichTextInput: React.FC<IRichTextInput> = ({
         <SInputRenderer>
           {chunks.map((chunk, index) => {
             if (chunk.type === 'text') {
-              // eslint-disable-next-line react/no-array-index-key
               return <span key={index}>{chunk.text}</span>;
             }
 
             if (chunk.type === 'hashtag') {
-              // eslint-disable-next-line react/no-array-index-key
               return <Hashtag key={index}>#{chunk.text}</Hashtag>;
             }
 

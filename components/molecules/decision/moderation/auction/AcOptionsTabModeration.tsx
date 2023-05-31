@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
