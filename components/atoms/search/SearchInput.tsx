@@ -1,6 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
@@ -188,7 +185,6 @@ const SearchInput: React.FC = React.memo(() => {
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
-      // eslint-disable-next-line max-len
       setInputRightPosition(
         -(
           window.innerWidth -
@@ -213,45 +209,48 @@ const SearchInput: React.FC = React.memo(() => {
 
   const quickSearchAbortControllerRef = useRef<AbortController | undefined>();
 
-  async function getQuickSearchResult(query: string) {
-    try {
-      if (quickSearchAbortControllerRef.current) {
-        quickSearchAbortControllerRef.current?.abort();
+  const getQuickSearchResult = useCallback(
+    async (query: string) => {
+      try {
+        if (quickSearchAbortControllerRef.current) {
+          quickSearchAbortControllerRef.current?.abort();
+        }
+        quickSearchAbortControllerRef.current = new AbortController();
+
+        setIsLoading(true);
+        const payload = new newnewapi.QuickSearchRequest({
+          query,
+        });
+
+        const res = await quickSearch(
+          payload,
+          quickSearchAbortControllerRef?.current?.signal
+        );
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
+        }
+
+        if (res.data.creators) {
+          setResultsCreators(res.data.creators);
+        }
+
+        if (res.data.posts) {
+          setResultsPosts(res.data.posts);
+        }
+
+        if (res.data.hashtags) {
+          setResultsHashtags(res.data.hashtags);
+        }
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsLoading(false);
+        showErrorToastPredefined(undefined);
       }
-      quickSearchAbortControllerRef.current = new AbortController();
-
-      setIsLoading(true);
-      const payload = new newnewapi.QuickSearchRequest({
-        query,
-      });
-
-      const res = await quickSearch(
-        payload,
-        quickSearchAbortControllerRef?.current?.signal
-      );
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
-      }
-
-      if (res.data.creators) {
-        setResultsCreators(res.data.creators);
-      }
-
-      if (res.data.posts) {
-        setResultsPosts(res.data.posts);
-      }
-
-      if (res.data.hashtags) {
-        setResultsHashtags(res.data.hashtags);
-      }
-
-      setIsLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsLoading(false);
-      showErrorToastPredefined(undefined);
-    }
-  }
+    },
+    [showErrorToastPredefined]
+  );
 
   const debouncedSearchValue = useDebouncedValue(searchValue, 500);
 
@@ -264,8 +263,7 @@ const SearchInput: React.FC = React.memo(() => {
       setIsResultsDropVisible(false);
       resetResults();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchValue, isMobileOrTablet]);
+  }, [debouncedSearchValue, isMobileOrTablet, getQuickSearchResult]);
 
   const closeSearch = useCallback(() => {
     handleSearchClose();
@@ -338,7 +336,65 @@ const SearchInput: React.FC = React.memo(() => {
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
           <SResultsDrop ref={resultsContainerRef}>
-            {resultsPosts.length === 0 &&
+            {
+              // eslint-disable-next-line no-nested-ternary
+              resultsPosts.length === 0 &&
+              resultsCreators.length === 0 &&
+              resultsHashtags.length === 0 ? (
+                !isLoading ? (
+                  <SNoResults>
+                    <NoResults closeDrop={handleCloseIconClick} />
+                  </SNoResults>
+                ) : (
+                  <SBlock>
+                    <Lottie
+                      width={64}
+                      height={64}
+                      options={{
+                        loop: true,
+                        autoplay: true,
+                        animationData: loadingAnimation,
+                      }}
+                    />
+                  </SBlock>
+                )
+              ) : (
+                <div>
+                  {resultsCreators.length > 0 && (
+                    <PopularCreatorsResults
+                      creators={resultsCreators}
+                      onSelect={closeSearch}
+                    />
+                  )}
+                  {resultsHashtags.length > 0 && (
+                    <PopularTagsResults
+                      hashtags={resultsHashtags}
+                      onSelect={closeSearch}
+                    />
+                  )}
+                  <SButton
+                    onClick={() => {
+                      const clearedSearchValue =
+                        getClearedSearchQuery(searchValue);
+                      if (clearedSearchValue) {
+                        handleSeeResults(clearedSearchValue);
+                      }
+                    }}
+                    view='quaternary'
+                  >
+                    {t('search.allResults')}
+                  </SButton>
+                </div>
+              )
+            }
+          </SResultsDrop>
+        )}
+      </SContainer>
+      {isMobileOrTablet && isResultsDropVisible && (
+        <SResultsDropMobile ref={resultsContainerRef}>
+          {
+            // eslint-disable-next-line no-nested-ternary
+            resultsPosts.length === 0 &&
             resultsCreators.length === 0 &&
             resultsHashtags.length === 0 ? (
               !isLoading ? (
@@ -385,59 +441,8 @@ const SearchInput: React.FC = React.memo(() => {
                   {t('search.allResults')}
                 </SButton>
               </div>
-            )}
-          </SResultsDrop>
-        )}
-      </SContainer>
-      {isMobileOrTablet && isResultsDropVisible && (
-        <SResultsDropMobile ref={resultsContainerRef}>
-          {resultsPosts.length === 0 &&
-          resultsCreators.length === 0 &&
-          resultsHashtags.length === 0 ? (
-            !isLoading ? (
-              <SNoResults>
-                <NoResults closeDrop={handleCloseIconClick} />
-              </SNoResults>
-            ) : (
-              <SBlock>
-                <Lottie
-                  width={64}
-                  height={64}
-                  options={{
-                    loop: true,
-                    autoplay: true,
-                    animationData: loadingAnimation,
-                  }}
-                />
-              </SBlock>
             )
-          ) : (
-            <div>
-              {resultsCreators.length > 0 && (
-                <PopularCreatorsResults
-                  creators={resultsCreators}
-                  onSelect={closeSearch}
-                />
-              )}
-              {resultsHashtags.length > 0 && (
-                <PopularTagsResults
-                  hashtags={resultsHashtags}
-                  onSelect={closeSearch}
-                />
-              )}
-              <SButton
-                onClick={() => {
-                  const clearedSearchValue = getClearedSearchQuery(searchValue);
-                  if (clearedSearchValue) {
-                    handleSeeResults(clearedSearchValue);
-                  }
-                }}
-                view='quaternary'
-              >
-                {t('search.allResults')}
-              </SButton>
-            </div>
-          )}
+          }
         </SResultsDropMobile>
       )}
     </>

@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable jsx-a11y/media-has-caption */
 import { newnewapi } from 'newnew-api';
 import React, { useState } from 'react';
 import styled from 'styled-components';

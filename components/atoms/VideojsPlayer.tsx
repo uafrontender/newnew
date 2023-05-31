@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-multi-assign */
 import React, {
   useRef,
@@ -54,7 +53,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
     setIsMuted(!isMuted);
   }, [isMuted]);
 
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<videojs.Player>();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -193,11 +192,9 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       const videoElement = document.createElement('video-js');
 
       videoElement.classList.add('vjs-big-play-centered');
-      // @ts-ignore
       videoRef.current?.appendChild(videoElement);
-      // @ts-ignore
       const player = (playerRef.current = videojs(videoElement, options, () => {
-        handlePlayerReady && handlePlayerReady(player);
+        handlePlayerReady?.(player);
       }));
     }
   }, [handlePlayerReady, options]);

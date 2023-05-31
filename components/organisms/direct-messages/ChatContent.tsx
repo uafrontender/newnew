@@ -140,7 +140,9 @@ const ChatContent: React.FC<IFuncProps> = ({
       });
     }
     return () => {
-      if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
+      if (chatRoom.id) {
+        removeChannel(`chat_${chatRoom.id.toString()}`);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom, isSocketConnected]);

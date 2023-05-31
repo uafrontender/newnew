@@ -270,7 +270,9 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     }, [onBlur]);
 
     useEffect(() => {
-      if (!isRoot || !newCommentContentFromUrl) return;
+      if (!isRoot || !newCommentContentFromUrl) {
+        return;
+      }
 
       if (newCommentContentFromUrl) {
         setCommentText(newCommentContentFromUrl);

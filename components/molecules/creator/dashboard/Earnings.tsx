@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -90,15 +89,15 @@ export const Earnings: React.FC<IFunctionProps> = ({
       let sum = 0;
 
       if (myEarnings.auEarnings?.usdCents) {
-        sum += myEarnings.auEarnings?.usdCents;
+        sum += myEarnings.auEarnings.usdCents;
       }
 
       if (myEarnings.mcEarnings?.usdCents) {
-        sum += myEarnings.mcEarnings?.usdCents;
+        sum += myEarnings.mcEarnings.usdCents;
       }
 
       if (myEarnings.bundleEarnings?.usdCents) {
-        sum += myEarnings.bundleEarnings?.usdCents;
+        sum += myEarnings.bundleEarnings.usdCents;
       }
 
       setTotalEarnings(sum);
@@ -254,8 +253,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <CashOut
-          nextCashOutAmount={myEarnings?.nextCashoutAmount}
-          nextCashOutDate={myEarnings?.nextCashoutDate}
+          nextCashOutAmount={myEarnings.nextCashoutAmount}
+          nextCashOutDate={myEarnings.nextCashoutDate}
         />
       ) : (
         <MakeDecision />

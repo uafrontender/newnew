@@ -422,10 +422,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
         videoElement.classList.add('vjs-big-play-centered');
         videoElement.classList.add(`video-js_${id}`);
-        // @ts-ignore
         videoRef.current?.appendChild(videoElement);
-
-        // @ts-ignore
         const player = (playerRef.current = videojs(
           videoElement,
           options,

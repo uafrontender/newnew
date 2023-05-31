@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-boolean-value */
 import React from 'react';
 import { LayoutGroup } from 'framer-motion';
 import styled from 'styled-components';

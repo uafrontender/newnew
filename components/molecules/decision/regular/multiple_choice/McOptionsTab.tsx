@@ -668,7 +668,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.mc'
-          // @ts-ignore
           components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
