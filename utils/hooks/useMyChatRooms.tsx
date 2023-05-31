@@ -5,6 +5,7 @@ import { getMyRooms } from '../../api/endpoints/chat';
 interface IUseMyChatRooms {
   roomKind?: newnewapi.ChatRoom.Kind;
   searchQuery?: string;
+  announcementsName: string;
   myRole?: newnewapi.ChatRoom.MyRole;
   limit?: number;
 }
@@ -20,6 +21,12 @@ const useMyChatRooms = (
   >,
   additionalKey?: string
 ) => {
+  // TODO: Add logic to request to show all announcements
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const addAnnouncements =
+    !!params.searchQuery &&
+    params.announcementsName.includes(params.searchQuery);
+
   const query = useInfiniteQuery(
     [
       'private',
