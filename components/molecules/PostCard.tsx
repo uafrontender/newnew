@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React, {
   useCallback,
   useContext,
@@ -506,10 +507,8 @@ export const PostCard: React.FC<ICard> = React.memo(
         <>
           {getChunks(title).map((chunk, chunkIndex) => {
             if (chunk.type === 'hashtag') {
-              // eslint-disable-next-line react/no-array-index-key
               return <SHashtag key={chunkIndex}>#{chunk.text}</SHashtag>;
             }
-            // eslint-disable-next-line react/no-array-index-key
             return <Fragment key={chunkIndex}>{chunk.text}</Fragment>;
           })}
         </>

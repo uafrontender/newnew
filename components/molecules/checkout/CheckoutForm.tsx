@@ -168,8 +168,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     if (recaptchaErrorMessage) {
       showErrorToastPredefined(recaptchaErrorMessage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recaptchaErrorMessage]);
+  }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
     () => ({

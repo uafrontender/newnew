@@ -1,4 +1,3 @@
-/* eslint-disable prefer-template */
 import React from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -23,8 +22,9 @@ const findActiveTab = (
     );
   }
 
-  let pathnameCleaned =
-    '/' + currentPathname.substring(currentPathname.indexOf('/', 6));
+  let pathnameCleaned = `/${currentPathname.substring(
+    currentPathname.indexOf('/', 6)
+  )}`;
 
   if (pathnameCleaned.includes('[username]')) {
     pathnameCleaned = '/';

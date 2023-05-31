@@ -109,7 +109,6 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                       <Trans
                         t={t}
                         i18nKey='modal.creatorsBundle.access'
-                        // @ts-ignore
                         components={[
                           <>
                             {formattedTimeLeft?.map((time, index) => (

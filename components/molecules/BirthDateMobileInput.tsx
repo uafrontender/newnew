@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -91,7 +90,11 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
       const boundingRect = daysScrollerRef.current?.getBoundingClientRect();
       for (let i = 0; i < daysRefs.current.length; i++) {
         const itemRect = daysRefs.current[i]?.getBoundingClientRect();
-        if (!itemRect) continue;
+        if (!itemRect) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
         const pos = itemRect.top - boundingRect!!.top!!;
         if (pos > 48 && pos < 72) {
           handleUpdateDay(availableDays[i].value);

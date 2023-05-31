@@ -1,4 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';

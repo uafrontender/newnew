@@ -274,13 +274,11 @@ const MyProfileSettingsIndex = () => {
     if (!loggedIn && _persist?.rehydrated) {
       router.replace('/');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, _persist?.rehydrated, router]);
 
   useEffect(() => {
     fetchMyTransactions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchMyTransactions]);
 
   return (
     <div>

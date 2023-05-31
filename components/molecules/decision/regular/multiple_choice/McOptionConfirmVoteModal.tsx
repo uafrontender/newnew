@@ -91,7 +91,6 @@ const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               <Trans
                 t={t}
                 i18nKey='mcPost.optionsTab.optionCard.confirmVoteModal.buyAnyVotes'
-                // @ts-ignore
                 components={[
                   <DisplayName
                     user={postCreator}
@@ -178,12 +177,10 @@ const McOptionConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               : t('mcPost.optionsTab.optionCard.confirmVoteModal.votes')}
           </SHeadline>
           <SCreatorsText variant={2}>
-            {/** TODO: use DisplayName component, add it using Trans, change translations to use component */}
             {parseInt(supportVotesAmount) === 1 ? (
               <Trans
                 t={t}
                 i18nKey='mcPost.optionsTab.optionCard.confirmVoteModal.buySingleVote'
-                // @ts-ignore
                 components={[
                   <DisplayName
                     user={postCreator}
