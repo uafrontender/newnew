@@ -12,11 +12,12 @@ interface IUserAvatar {
   onClick?: (
     e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>
   ) => any;
+  onLoad?: () => void;
   withClick?: boolean;
 }
 
 export const UserAvatar: React.FC<IUserAvatar> = React.memo((props) => {
-  const { avatarUrl, onClick, withClick, ...rest } = props;
+  const { avatarUrl, onClick, onLoad, withClick, ...rest } = props;
   const { resizeMode } = useAppState();
 
   const theme = useTheme();
@@ -39,7 +40,7 @@ export const UserAvatar: React.FC<IUserAvatar> = React.memo((props) => {
 
   return (
     <SContainer {...rest} onClick={onClick} withClick={withClick ?? false}>
-      <img src={avatarUrl} alt='User avatar' />
+      <img src={avatarUrl} alt='User avatar' onLoad={onLoad} />
     </SContainer>
   );
 });
