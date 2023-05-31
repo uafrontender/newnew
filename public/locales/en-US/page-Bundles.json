@@ -16,7 +16,7 @@
     "title": "Your current bundles"
   },
   "bundle": {
-    "accessExpired": "Your benefits have now expired. Buy another bundle for custom options and chat",
+    "accessExpired": "Your benefits have now expired. Buy another bundle for custom options and chat.",
     "votesLeft": "<0>{{amount}}</0> votes left",
     "access": "plus <0/> of:",
     "unitPair": "{{amount}} {{unit}}",

@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
@@ -30,6 +31,7 @@ const ChatList: React.FC<IChatList> = ({
   hidden,
   onChatRoomSelect: onChatRoomSelected,
 }) => {
+  const { t } = useTranslation('page-Chat');
   const { ref: scrollRef, inView } = useInView();
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -51,12 +53,16 @@ const ChatList: React.FC<IChatList> = ({
     useMyChatRooms({
       myRole: searchChatroom ? undefined : myRole,
       searchQuery: searchChatroom,
+      announcementsName: t('announcement.announcements'),
     });
 
-  const chatRooms = useMemo(
-    () => (data ? data.pages.map((page) => page.chatrooms).flat() : []),
-    [data]
-  );
+  const chatRooms: newnewapi.IChatRoom[] = useMemo(() => {
+    if (data) {
+      return data.pages.map((page) => page.chatrooms).flat();
+    }
+
+    return [];
+  }, [data]);
 
   const selectedChatRoomId = useMemo(() => {
     if (!router.query.roomID || Array.isArray(router.query.roomID)) {
