@@ -1,4 +1,3 @@
-/* eslint-disable react/require-default-props */
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import isBrowser from '../../utils/isBrowser';
