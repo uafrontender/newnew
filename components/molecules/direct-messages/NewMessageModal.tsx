@@ -248,17 +248,12 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                   <NewAnnouncement handleClick={openMyAnnouncement} />
                 )}
                 {chatsInAlphabetOrder.length > 0 &&
-                  chatsInAlphabetOrder.map(
-                    (section: IChatroomsSorted, index: number) => (
-                      <SSection key={section.letter}>
-                        {!searchValue && <SLetter>{section.letter}</SLetter>}
-                        {section.chats.map(renderChatItem)}
-                        {index === chatsInAlphabetOrder.length - 1 ? (
-                          <SChatSeparator />
-                        ) : null}
-                      </SSection>
-                    )
-                  )}
+                  chatsInAlphabetOrder.map((section: IChatroomsSorted) => (
+                    <SSection key={section.letter}>
+                      {!searchValue && <SLetter>{section.letter}</SLetter>}
+                      {section.chats.map(renderChatItem)}
+                    </SSection>
+                  ))}
 
                 {searchValue && chatsInAlphabetOrder.length === 0 && (
                   <NoResults text={searchValue} />

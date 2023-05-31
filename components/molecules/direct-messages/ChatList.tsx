@@ -122,7 +122,7 @@ const ChatList: React.FC<IChatList> = ({
                       !!selectedChatRoomId && chatroom.id === selectedChatRoomId
                     }
                   />
-                  <SChatSeparator />
+                  {index < chatRooms.length - 1 && <SChatSeparator />}
                 </React.Fragment>
               ))}
               {/* TODO: Remove this for dynamic section */}
