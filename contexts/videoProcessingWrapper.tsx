@@ -24,7 +24,7 @@ const VideoProcessingWrapper: React.FunctionComponent<
       const arr = new Uint8Array(data);
       const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-      if (!decoded) {
+      if (!decoded || router?.pathname?.includes('creation/')) {
         return;
       }
 
