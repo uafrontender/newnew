@@ -52,6 +52,7 @@ import { usePostCreationState } from '../../../../contexts/postCreationContext';
 import { SocketContext } from '../../../../contexts/socketContext';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import useGoBackOrRedirect from '../../../../utils/useGoBackOrRedirect';
+import isBrowser from '../../../../utils/isBrowser';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -231,9 +232,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleCloseModal = useCallback(() => {
     setIsGoingToHomepage(true);
     setShowModal(false);
-    router.push('/');
-    clearCreation();
-  }, [clearCreation, router]);
+    router.push('/').then(() => {
+      clearCreation();
+    });
+  }, [router, clearCreation]);
 
   const handleSubmit = useCallback(async () => {
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
@@ -508,10 +510,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   // However, it re renders after every letter typed anyway
   // TODO: optimize this view
   useEffect(() => {
-    let updateStartDate: any;
-
-    if (post.startsAt.type === 'right-away') {
-      updateStartDate = setInterval(() => {
+    const updateStartDate = setInterval(() => {
+      if (post.startsAt.type === 'right-away') {
         const newStartAt = {
           type: post.startsAt.type,
           date: moment().format(),
@@ -519,8 +519,27 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           'hours-format': post.startsAt['hours-format'],
         };
         setCreationStartDate(newStartAt);
-      }, 1000);
-    }
+      } else {
+        const time = moment(
+          `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+          ['hh:mm a']
+        );
+
+        const startsAt = moment(post.startsAt.date)
+          .hours(time.hours())
+          .minutes(time.minutes());
+
+        if (startsAt.startOf('minute').unix() <= moment().unix()) {
+          const newStartAt = {
+            type: 'right-away',
+            date: moment().format(),
+            time: moment().format('hh:mm'),
+            'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
+          };
+          setCreationStartDate(newStartAt);
+        }
+      }
+    }, 1000);
 
     return () => {
       clearInterval(updateStartDate);
@@ -601,6 +620,25 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Clear creation on popstate after modal was shown
+  useEffect(() => {
+    const handlePopstate = () => {
+      clearCreation();
+    };
+
+    if (isBrowser()) {
+      if (showModal) {
+        window?.addEventListener('popstate', handlePopstate);
+      } else {
+        window?.removeEventListener('popstate', handlePopstate);
+      }
+    }
+
+    return () => {
+      window?.removeEventListener('popstate', handlePopstate);
+    };
+  });
 
   if (!post.title) {
     return <LoadingView />;
