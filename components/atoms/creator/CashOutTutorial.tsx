@@ -38,14 +38,15 @@ const SContainer = styled.div`
   flex-direction: row;
   justify-content: start;
   align-items: center;
-  padding: 16px;
-
   background: ${({ theme }) => theme.colorsThemed.accent.success};
   border-radius: 16px;
-  margin-bottom: 24px;
+
+  padding: 16px;
+  margin-bottom: 16px;
 
   ${(props) => props.theme.media.tablet} {
     padding: 24px;
+    margin-bottom: 24px;
   }
 `;
 
