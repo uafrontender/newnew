@@ -41,8 +41,8 @@ function getIsDocumentHidden() {
 }
 
 export default function usePageVisibility() {
-  const [isVisible, setIsVisible] = React.useState(getIsDocumentHidden());
-  const onVisibilityChange = () => setIsVisible(getIsDocumentHidden());
+  const [isVisible, setIsVisible] = React.useState(!getIsDocumentHidden());
+  const onVisibilityChange = () => setIsVisible(!getIsDocumentHidden());
 
   React.useEffect(() => {
     const visibilityChange = getBrowserVisibilityProp();
