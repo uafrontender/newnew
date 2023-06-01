@@ -508,10 +508,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   // However, it re renders after every letter typed anyway
   // TODO: optimize this view
   useEffect(() => {
-    let updateStartDate: any;
-
-    if (post.startsAt.type === 'right-away') {
-      updateStartDate = setInterval(() => {
+    const updateStartDate = setInterval(() => {
+      if (post.startsAt.type === 'right-away') {
         const newStartAt = {
           type: post.startsAt.type,
           date: moment().format(),
@@ -519,8 +517,27 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           'hours-format': post.startsAt['hours-format'],
         };
         setCreationStartDate(newStartAt);
-      }, 1000);
-    }
+      } else {
+        const time = moment(
+          `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+          ['hh:mm a']
+        );
+
+        const startsAt = moment(post.startsAt.date)
+          .hours(time.hours())
+          .minutes(time.minutes());
+
+        if (startsAt.startOf('minute').unix() <= moment().unix()) {
+          const newStartAt = {
+            type: 'right-away',
+            date: moment().format(),
+            time: moment().format('hh:mm'),
+            'hours-format': post.startsAt['hours-format'] as 'am' | 'pm',
+          };
+          setCreationStartDate(newStartAt);
+        }
+      }
+    }, 1000);
 
     return () => {
       clearInterval(updateStartDate);
