@@ -24,6 +24,9 @@
       },
       "insights": "Insights",
       "insightsTablet": "Go to insights",
+      "cashOutTutorial": {
+        "gracePeriod": "Your balance updates every 3 days."
+      },
       "cashOut": {
         "amount": "Your Stripe earnings are",
         "amountSecondLine": "Manage your balance on Stripe.",
