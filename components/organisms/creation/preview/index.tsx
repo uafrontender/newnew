@@ -232,8 +232,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     setIsGoingToHomepage(true);
     setShowModal(false);
     router.push('/');
-    clearCreation();
-  }, [clearCreation, router]);
+  }, [router]);
 
   const handleSubmit = useCallback(async () => {
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
@@ -618,6 +617,19 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Clear creation on unmount after modal was shown
+  // eslint-disable-next-line arrow-body-style
+  useEffect(() => {
+    if (showModal) {
+      return () => {
+        clearCreation();
+      };
+    }
+
+    // No cleanup if modal is not shown
+    return () => {};
+  }, [showModal, clearCreation]);
 
   if (!post.title) {
     return <LoadingView />;
