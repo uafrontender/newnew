@@ -120,14 +120,12 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
                 : postData.multipleChoice.postUuid;
             }
 
-            router.push(url).then(() => {
-              clearCreation();
-            });
+            router.push(url);
           }
         }
       }
     },
-    [postData, router, clearCreation]
+    [postData, router]
   );
 
   const formatExpiresAtNoStartsAt = useCallback(() => {
@@ -167,6 +165,14 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Clear creation on unmount
+  // eslint-disable-next-line arrow-body-style
+  useEffect(() => {
+    return () => {
+      clearCreation();
+    };
+  }, [clearCreation]);
 
   const handlerSocketUpdated = useCallback(
     async (data: any) => {
