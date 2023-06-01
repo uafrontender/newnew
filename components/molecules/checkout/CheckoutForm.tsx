@@ -217,16 +217,17 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
             label={`${t('primaryCard')} **** ${primaryCard.last4}`}
           />
-          {!userData?.options?.isWhiteListed && (
-            <OptionCard
-              id='new-card'
-              handleClick={() =>
-                setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
-              }
-              selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
-              label={t('newCard')}
-            />
-          )}
+
+          <OptionCard
+            id='new-card'
+            handleClick={() =>
+              !userData?.options?.isWhiteListed
+                ? setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+                : {}
+            }
+            selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
+            label={t('newCard')}
+          />
         </>
       )}
 
