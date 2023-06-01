@@ -52,6 +52,7 @@ import { usePostCreationState } from '../../../../contexts/postCreationContext';
 import { SocketContext } from '../../../../contexts/socketContext';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import useGoBackOrRedirect from '../../../../utils/useGoBackOrRedirect';
+import isBrowser from '../../../../utils/isBrowser';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -619,18 +620,24 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Clear creation on unmount after modal was shown
-  // eslint-disable-next-line arrow-body-style
+  // Clear creation on popstate after modal was shown
   useEffect(() => {
-    if (showModal) {
-      return () => {
-        clearCreation();
-      };
+    const handlePopstate = () => {
+      clearCreation();
+    };
+
+    if (isBrowser()) {
+      if (showModal) {
+        window?.addEventListener('popstate', handlePopstate);
+      } else {
+        window?.removeEventListener('popstate', handlePopstate);
+      }
     }
 
-    // No cleanup if modal is not shown
-    return () => {};
-  }, [showModal, clearCreation]);
+    return () => {
+      window?.removeEventListener('popstate', handlePopstate);
+    };
+  });
 
   if (!post.title) {
     return <LoadingView />;
