@@ -232,7 +232,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     setIsGoingToHomepage(true);
     setShowModal(false);
     router.push('/');
-  }, [router]);
+    clearCreation();
+  }, [router, clearCreation]);
 
   const handleSubmit = useCallback(async () => {
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
