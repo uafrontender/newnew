@@ -232,8 +232,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleCloseModal = useCallback(() => {
     setIsGoingToHomepage(true);
     setShowModal(false);
-    router.push('/');
-    clearCreation();
+    router.push('/').then(() => {
+      clearCreation();
+    });
   }, [router, clearCreation]);
 
   const handleSubmit = useCallback(async () => {
