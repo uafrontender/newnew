@@ -17,6 +17,7 @@ import { formatNumber } from '../../../../utils/format';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import Lottie from '../../../atoms/Lottie';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import CashOutTutorial from '../../../atoms/creator/CashOutTutorial';
 
 interface IFunctionProps {
   hasMyPosts: boolean;
@@ -252,10 +253,13 @@ export const Earnings: React.FC<IFunctionProps> = ({
           }}
         />
       ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
-        <CashOut
-          nextCashOutAmount={myEarnings.nextCashoutAmount}
-          nextCashOutDate={myEarnings.nextCashoutDate}
-        />
+        <>
+          <CashOutTutorial />
+          <CashOut
+            nextCashOutAmount={myEarnings.nextCashoutAmount}
+            nextCashOutDate={myEarnings.nextCashoutDate}
+          />
+        </>
       ) : (
         <MakeDecision />
       )}

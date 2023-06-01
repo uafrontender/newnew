@@ -1219,13 +1219,12 @@ export const CreationSecondStepContent: React.FC<
           `${post.startsAt.time} ${post.startsAt['hours-format']}`,
           ['hh:mm a']
         );
+
         const startsAt = moment(post.startsAt.date)
           .hours(time.hours())
           .minutes(time.minutes());
 
-        if (
-          startsAt.startOf('minute').unix() <= moment().startOf('minute').unix()
-        ) {
+        if (startsAt.startOf('minute').unix() <= moment().unix()) {
           const newStartAt = {
             type: 'right-away',
             date: moment().format(),
