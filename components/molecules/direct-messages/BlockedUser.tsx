@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import {
@@ -14,7 +14,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import DisplayName from '../../atoms/DisplayName';
 
 interface IBlockedUser {
-  onUserBlock: () => void;
+  onUserUnblock: () => void;
   isBlocked?: boolean;
   isAnnouncement?: boolean;
   user: newnewapi.IVisavisUser;
@@ -22,13 +22,26 @@ interface IBlockedUser {
 }
 
 const BlockedUser: React.FC<IBlockedUser> = ({
-  onUserBlock,
+  onUserUnblock,
   isBlocked,
   user,
   isAnnouncement,
   variant,
 }) => {
   const { t } = useTranslation('page-Chat');
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const unblockUser = useCallback(async () => {
+    Mixpanel.track('Unblock User Button Clicked', {
+      _stage: 'Direct Messages',
+      _component: 'BlockedUser',
+      _userUuid: user.user?.uuid,
+    });
+    setIsLoading(true);
+    await onUserUnblock();
+    setIsLoading(false);
+  }, [onUserUnblock, user.user?.uuid]);
 
   return (
     <>
@@ -54,15 +67,8 @@ const BlockedUser: React.FC<IBlockedUser> = ({
             withDim
             withShrink
             view='quaternary'
-            onClick={() => {
-              Mixpanel.track('Unblock User Button Clicked', {
-                _stage: 'Direct Messages',
-                _component: 'BlockedUser',
-                _userUuid: user.user?.uuid,
-              });
-
-              onUserBlock();
-            }}
+            onClick={unblockUser}
+            loading={isLoading}
           >
             {isAnnouncement
               ? t('groupBlocked.buttonText')
