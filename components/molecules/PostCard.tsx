@@ -12,6 +12,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { useInView } from 'react-intersection-observer';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -54,7 +55,6 @@ import PostCardEllipseMenu from './PostCardEllipseMenu';
 import ReportModal, { ReportData } from './direct-messages/ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
-import useOnTouchStartOutside from '../../utils/hooks/useOnTouchStartOutside';
 import getChunks from '../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
@@ -122,7 +122,9 @@ export const PostCard: React.FC<ICard> = React.memo(
       resizeMode
     );
 
-    const wrapperRef = useRef<HTMLDivElement>();
+    const { ref: wrapperRef, inView } = useInView({
+      threshold: 0.55,
+    });
 
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
@@ -138,14 +140,6 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleSetUnhovered = () => {
       setHovered(false);
     };
-
-    const handleClickOutsideMobile = () => {
-      if (isMobile) {
-        handleSetUnhovered();
-      }
-    };
-
-    useOnTouchStartOutside(wrapperRef, handleClickOutsideMobile);
 
     const handleVideoEnded = useCallback(() => {
       if (hovered) {
@@ -525,15 +519,22 @@ export const PostCard: React.FC<ICard> = React.memo(
       setResponseCoverImage(postParsed.response?.coverImageUrl || undefined);
     }, [postParsed.response?.coverImageUrl]);
 
+    useEffect(() => {
+      if (isMobile) {
+        if (inView) {
+          handleSetHovered();
+        } else {
+          handleSetUnhovered();
+        }
+      }
+    }, [isMobile, inView]);
+
     if (type === 'inside') {
       return (
         <SWrapper
-          ref={(el) => {
-            wrapperRef.current = el!!;
-          }}
+          ref={wrapperRef}
           className={`postcard-identifier ${className || ''}`}
           onMouseEnter={() => handleSetHovered()}
-          onTouchStart={() => handleSetHovered()}
           onMouseLeave={() => handleSetUnhovered()}
           index={index}
           width={width}
@@ -668,12 +669,9 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     return (
       <SWrapperOutside
-        ref={(el) => {
-          wrapperRef.current = el!!;
-        }}
+        ref={wrapperRef}
         className={`postcard-identifier ${className || ''}`}
         onMouseEnter={() => handleSetHovered()}
-        onTouchStart={() => handleSetHovered()}
         onMouseLeave={() => handleSetUnhovered()}
         width={width}
         maxWidthTablet={maxWidthTablet ?? undefined}
