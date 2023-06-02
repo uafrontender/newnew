@@ -75,18 +75,26 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
           {t('Settings.sections.cards.myPaymentMethods')}
         </STitle>
         {/* TODO: make cards section look more real, handle WL creator adds aa card case */}
-        {cards.length > 0 && !user.userData?.options?.isWhiteListed && (
+        {cards.length > 0 && (
           <>
             <SButtonSecondaryDesktop
               view='secondary'
-              onClick={openAddCardModal}
+              onClick={
+                !user.userData?.options?.isWhiteListed
+                  ? openAddCardModal
+                  : () => {}
+              }
             >
               {t('Settings.sections.cards.button.addCard')}
             </SButtonSecondaryDesktop>
             <SButtonSecondaryMobile
               view='secondary'
               iconOnly
-              onClick={openAddCardModal}
+              onClick={
+                !user.userData?.options?.isWhiteListed
+                  ? openAddCardModal
+                  : () => {}
+              }
             >
               <InlineSVG
                 svg={addIconFilled}
