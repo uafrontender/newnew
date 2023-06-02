@@ -11,7 +11,7 @@ interface IChatEllipseModal {
   zIndex: number;
   onClose: () => void;
   userBlocked?: boolean;
-  onUserBlock: () => Promise<void>;
+  toggleUserBlock: () => Promise<void>;
   onUserReport: () => void;
   isAnnouncement?: boolean;
   visavis: newnewapi.IVisavisUser | null | undefined;
@@ -22,7 +22,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   zIndex,
   onClose,
   userBlocked,
-  onUserBlock,
+  toggleUserBlock,
   onUserReport,
   isAnnouncement,
   visavis,
@@ -30,10 +30,10 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
 
-  const blockUserHandler = useCallback(async () => {
-    await onUserBlock();
+  const toggleBlockUserHandler = useCallback(async () => {
+    await toggleUserBlock();
     onClose();
-  }, [onUserBlock, onClose]);
+  }, [toggleUserBlock, onClose]);
 
   const reportUserHandler = useCallback(() => {
     onUserReport();
@@ -52,7 +52,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
       <EllipseModalButton tone='error' onClick={reportUserHandler}>
         {!isAnnouncement ? t('ellipse.reportUser') : t('ellipse.reportGroup')}
       </EllipseModalButton>
-      <EllipseModalButton onClick={blockUserHandler}>
+      <EllipseModalButton onClick={toggleBlockUserHandler}>
         {
           // eslint-disable-next-line no-nested-ternary
           isAnnouncement
