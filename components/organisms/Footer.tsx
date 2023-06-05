@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-target-blank */
 import React, { useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { animateScroll } from 'react-scroll';

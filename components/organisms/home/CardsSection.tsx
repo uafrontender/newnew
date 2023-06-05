@@ -112,7 +112,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       if (isMobile && collection?.length > 3) {
         return false;
 
-        // TODO:temporary see more is hided
+        // TODO: temporary see more is hided
         // return true;
       }
 
@@ -200,15 +200,20 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       }
     };
 
-    // eslint-disable-next-line arrow-body-style
     const [cardWidth, setCardWidth] = useState(() => {
-      return isMobile
-        ? '100%'
-        : isTablet
-        ? '224px'
-        : isLaptop
-        ? '256px'
-        : '288px';
+      if (isMobile) {
+        return '100%';
+      }
+
+      if (isTablet) {
+        return '224px';
+      }
+
+      if (isLaptop) {
+        return '256px';
+      }
+
+      return '288px';
     });
 
     const getCardWidth = useCallback(() => {

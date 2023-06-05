@@ -49,8 +49,7 @@ const CoverImageEdit: React.FunctionComponent<ICoverImageEdit> = ({
       reader.addEventListener('load', async () => {
         if (reader.result) {
           const imageUrl = reader.result as string;
-          const properlySizedImage = await resizeImage(imageUrl, 1000);
-
+          const properlySizedImage = await resizeImage(imageUrl, 2000);
           const minHeight = isMobile ? 448 : 498;
           const minWidth = isMobile ? 252 : 280;
 

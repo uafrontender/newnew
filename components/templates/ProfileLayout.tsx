@@ -655,6 +655,7 @@ const SMobileSeeBundleButton = styled(SeeBundlesButton)`
   margin-bottom: 16px;
 `;
 
+// TODO: add hover/active effects
 const SIconButton = styled.div<{
   active: boolean;
 }>`
@@ -673,8 +674,6 @@ const SIconButton = styled.div<{
     active
       ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
       : theme.colorsThemed.background.quinary};
-
-  // TODO: add hover/active effects
 `;
 
 // const SFavoritesButton = styled(Button)`

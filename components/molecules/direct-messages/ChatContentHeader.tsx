@@ -30,6 +30,7 @@ interface IFunctionProps {
   withAvatar?: boolean;
   onUserReport: () => void;
   onUserBlock: () => Promise<void>;
+  onUserUnblock: () => Promise<void>;
   onBackButtonClick?: () => void;
 }
 
@@ -39,6 +40,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   isMoreButton,
   withAvatar,
   onUserBlock,
+  onUserUnblock,
   onUserReport,
   onBackButtonClick,
   chatRoom,
@@ -144,7 +146,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
                 isVisible={ellipseMenuOpen}
                 handleClose={handleCloseEllipseMenu}
                 userBlocked={isVisavisBlocked}
-                onUserBlock={onUserBlock}
+                toggleUserBlock={isVisavisBlocked ? onUserUnblock : onUserBlock}
                 onUserReport={onUserReport}
                 isAnnouncement={isAnnouncement}
                 anchorElement={moreButtonRef.current}
@@ -156,7 +158,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
                 zIndex={21}
                 onClose={handleCloseEllipseMenu}
                 userBlocked={isVisavisBlocked}
-                onUserBlock={onUserBlock}
+                toggleUserBlock={isVisavisBlocked ? onUserUnblock : onUserBlock}
                 onUserReport={onUserReport}
                 visavis={chatRoom.visavis}
                 isAnnouncement={isAnnouncement}

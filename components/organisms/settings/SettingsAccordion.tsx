@@ -1,7 +1,4 @@
-/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable arrow-body-style */
-/* eslint-disable padded-blocks */
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React, {
   ChangeEvent,
   useCallback,
@@ -129,12 +130,10 @@ const EditPostTitleTextArea: React.FunctionComponent<
         <SInputRenderer>
           {chunks.map((chunk, index) => {
             if (chunk.type === 'text') {
-              // eslint-disable-next-line react/no-array-index-key
               return <span key={index}>{chunk.text}</span>;
             }
 
             if (chunk.type === 'hashtag') {
-              // eslint-disable-next-line react/no-array-index-key
               return <Hashtag key={index}>#{chunk.text}</Hashtag>;
             }
 

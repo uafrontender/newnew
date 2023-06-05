@@ -120,7 +120,6 @@ const SButton = styled(Button)<ISButton>`
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
-    // TODO: Is margin needed?
     margin-left: 10px;
   }
 `;

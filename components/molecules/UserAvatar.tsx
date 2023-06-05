@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import Button from '../atoms/Button';
@@ -6,43 +6,60 @@ import InlineSVG from '../atoms/InlineSVG';
 
 import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
 import { useAppState } from '../../contexts/appStateContext';
+import GenericSkeleton from './GenericSkeleton';
 
 interface IUserAvatar {
   avatarUrl?: string;
+  withClick?: boolean;
+  withSkeleton?: boolean;
   onClick?: (
     e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>
   ) => any;
-  withClick?: boolean;
 }
 
-export const UserAvatar: React.FC<IUserAvatar> = React.memo((props) => {
-  const { avatarUrl, onClick, withClick, ...rest } = props;
-  const { resizeMode } = useAppState();
+export const UserAvatar: React.FC<IUserAvatar> = React.memo(
+  ({ avatarUrl, onClick, withSkeleton = false, withClick, ...rest }) => {
+    const { resizeMode } = useAppState();
+    const theme = useTheme();
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const theme = useTheme();
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+    const [loaded, setLoaded] = useState(!withSkeleton);
 
-  if (!avatarUrl) {
+    if (!avatarUrl) {
+      return (
+        <SButton iconOnly view='quaternary' onClick={onClick} {...rest}>
+          <InlineSVG
+            svg={userIcon}
+            fill={theme.colorsThemed.text.primary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+          />
+        </SButton>
+      );
+    }
+
     return (
-      <SButton iconOnly view='quaternary' onClick={onClick} {...rest}>
-        <InlineSVG
-          svg={userIcon}
-          fill={theme.colorsThemed.text.primary}
-          width={isMobile ? '20px' : '24px'}
-          height={isMobile ? '20px' : '24px'}
+      <SContainer {...rest} onClick={onClick} withClick={withClick ?? false}>
+        <img
+          src={avatarUrl}
+          alt='User avatar'
+          style={{ opacity: loaded ? 1 : 0 }}
+          onLoad={() => {
+            setLoaded(true);
+          }}
         />
-      </SButton>
+        {!loaded && (
+          <SAvatarSkeleton
+            bgColor={theme.colorsThemed.background.secondary}
+            highlightColor={theme.colorsThemed.background.quaternary}
+          />
+        )}
+      </SContainer>
     );
   }
-
-  return (
-    <SContainer {...rest} onClick={onClick} withClick={withClick ?? false}>
-      <img src={avatarUrl} alt='User avatar' />
-    </SContainer>
-  );
-});
+);
 
 export default UserAvatar;
 
@@ -57,12 +74,12 @@ interface ISContainer {
 }
 
 const SContainer = styled.div<ISContainer>`
+  position: relative;
   width: 36px;
   height: 36px;
-  position: relative;
-  overflow: hidden;
   min-width: 36px;
   min-height: 36px;
+  overflow: hidden;
   border-radius: 18px;
 
   img {
@@ -76,6 +93,7 @@ const SContainer = styled.div<ISContainer>`
     css`
       cursor: pointer;
     `}
+
   ${(props) => props.theme.media.tablet} {
     width: 48px;
     height: 48px;
@@ -83,6 +101,15 @@ const SContainer = styled.div<ISContainer>`
     min-height: 48px;
     border-radius: 24px;
   }
+`;
+
+const SAvatarSkeleton = styled(GenericSkeleton)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
 `;
 
 const SButton = styled(Button)`

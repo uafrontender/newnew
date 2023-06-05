@@ -48,8 +48,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
       addId,
       removeId,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [followingsIds, removeId, addId, removeId]
+    [followingsIds, isLoading, addId, removeId]
   );
 
   useEffect(() => {

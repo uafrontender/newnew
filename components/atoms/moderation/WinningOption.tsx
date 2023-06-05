@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -67,7 +66,6 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                 <Trans
                   i18nKey='postResponseTabModeration.winner.ac.optionCreator'
                   t={t}
-                  // @ts-ignore
                   components={[
                     <SDisplayName
                       user={winningOptionAc.creator}
@@ -128,7 +126,6 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                 <Trans
                   i18nKey='postResponseTabModeration.winner.mc.optionCreator'
                   t={t}
-                  // @ts-ignore
                   components={[
                     <SDisplayName
                       user={winningOptionMc.creator}

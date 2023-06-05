@@ -24,6 +24,9 @@
       },
       "insights": "Insights",
       "insightsTablet": "Go to insights",
+      "cashOutTutorial": {
+        "gracePeriod": "Your balance updates every 3 days."
+      },
       "cashOut": {
         "amount": "Your Stripe earnings are",
         "amountSecondLine": "Manage your balance on Stripe.",
@@ -219,6 +222,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "announcements": "announcements",
     "beforeName": "",
     "suffix": "'s",
     "afterName": "announcements"

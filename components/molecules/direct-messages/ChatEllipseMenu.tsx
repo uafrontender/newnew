@@ -12,7 +12,7 @@ interface IChatEllipseMenu {
   user: newnewapi.IVisavisUser;
   isVisible: boolean;
   handleClose: () => void;
-  onUserBlock: () => Promise<void>;
+  toggleUserBlock: () => Promise<void>;
   onUserReport: () => void;
   userBlocked?: boolean;
   isAnnouncement?: boolean;
@@ -24,7 +24,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   isVisible,
   handleClose,
   userBlocked,
-  onUserBlock,
+  toggleUserBlock,
   onUserReport,
   isAnnouncement,
   user,
@@ -34,7 +34,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   const { t } = useTranslation('common');
   const router = useRouter();
 
-  const blockUserHandler = useCallback(async () => {
+  const toggleBlockUserHandler = useCallback(async () => {
     Mixpanel.track(
       userBlocked ? 'Unblock User Button Clicked' : 'Block User Button Clicked',
       {
@@ -43,9 +43,9 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
         _userUuid: user.user?.uuid,
       }
     );
-    await onUserBlock();
+    await toggleUserBlock();
     handleClose();
-  }, [user.user?.uuid, userBlocked, onUserBlock, handleClose]);
+  }, [user.user?.uuid, userBlocked, toggleUserBlock, handleClose]);
 
   const reportUserHandler = () => {
     Mixpanel.track('Report Button Clicked', {
@@ -84,11 +84,11 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
         </Text>
       </EllipseMenuButton>
       {!isAnnouncement ? (
-        <EllipseMenuButton onClick={blockUserHandler}>
+        <EllipseMenuButton onClick={toggleBlockUserHandler}>
           {userBlocked ? t('ellipse.unblockUser') : t('ellipse.blockUser')}
         </EllipseMenuButton>
       ) : (
-        <EllipseMenuButton onClick={blockUserHandler}>
+        <EllipseMenuButton onClick={toggleBlockUserHandler}>
           {userBlocked ? t('ellipse.unblockGroup') : t('ellipse.blockGroup')}
         </EllipseMenuButton>
       )}
