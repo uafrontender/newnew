@@ -1,10 +1,11 @@
 // import React, { ReactElement } from 'react';
 import { createGlobalStyle } from 'styled-components';
 
+/* CSS resets */
+/* Make box-sizing: border-box default to all document */
+
 // TODO: finalize CSS resets & general light/dark mode configs
 const GlobalStyle = createGlobalStyle`
-  /* CSS resets */
-  /* Make box-sizing: border-box default to all document */
   html {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
