@@ -56,8 +56,9 @@ export const Mobile: React.FC = () => {
           >
             <a>
               <UserAvatar
-                withClick
                 avatarUrl={user.userData?.avatarUrl}
+                withClick
+                withSkeleton
                 onClick={() =>
                   Mixpanel.track('My Avatar Clicked', {
                     _target: userLoggedIn
