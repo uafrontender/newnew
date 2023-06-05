@@ -109,6 +109,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         })
         .catch((err) => {
           console.error(err);
+
           if (
             err.message !== 'Refresh token invalid' &&
             err.message !== 'No token'
@@ -219,13 +220,13 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   }, [socketConnection, userLoggedIn]);
 
   const toggleIsSellingBundles = useCallback(async () => {
-    if (busyTogglingSellingBundles || !isSellingBundlesStatusLoaded) {
-      throw new Error('Busy or status is not loaded yet');
-    }
-
-    setBusyTogglingSellingBundles(true);
-
     try {
+      if (busyTogglingSellingBundles || !isSellingBundlesStatusLoaded) {
+        throw new Error('Busy or status is not loaded yet');
+      }
+
+      setBusyTogglingSellingBundles(true);
+
       const payload = new newnewapi.SetBundleStatusRequest({
         bundleStatus: isSellingBundles
           ? newnewapi.CreatorBundleStatus.DISABLED
