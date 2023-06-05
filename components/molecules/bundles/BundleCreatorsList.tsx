@@ -139,7 +139,6 @@ const SBottomShade = styled.div<{ visible: boolean }>`
   width: 100%;
   height: 228px;
 
-  // TODO: standardize
   background: ${({ theme }) => theme.gradients.listBottom.quaternary};
   transform: matrix(1, 0, 0, -1, 0, 0);
   z-index: 2;
