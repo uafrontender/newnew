@@ -235,7 +235,7 @@ export const General: React.FC<IGeneral> = (props) => {
         />
         {hasMounted ? (
           <>
-            <SSortingContainer
+            <SortingContainer
               id='sorting-container'
               withCookie={cookies.accepted !== 'true'}
               bottomNavigationVisible={mobileNavigationVisible}
@@ -375,7 +375,7 @@ interface ISortingContainer {
   bottomNavigationVisible: boolean;
 }
 
-const SSortingContainer = styled.div<ISortingContainer>`
+const SortingContainer = styled.div<ISortingContainer>`
   left: 50%;
   bottom: ${(props) =>
     props.bottomNavigationVisible

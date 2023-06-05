@@ -67,7 +67,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       if (isMobile && collection?.length > 3) {
         return false;
 
-        // TODO:temporary see more is hided
+        // TODO: temporary see more is hided
         // return true;
       }
 
