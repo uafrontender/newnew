@@ -13,10 +13,10 @@ import {
   getMyBundles,
   setBundleStatus,
 } from '../api/endpoints/bundles';
-import { useAppSelector } from '../redux-store/store';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { loadStateLS, saveStateLS } from '../utils/localStorage';
 import { SocketContext } from './socketContext';
+import { useAppState } from './appStateContext';
 
 export const BundlesContext = createContext<{
   bundles: newnewapi.ICreatorBundle[] | undefined;
@@ -41,7 +41,7 @@ interface IBundleContextProvider {
 export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   children,
 }) => {
-  const user = useAppSelector((state) => state.user);
+  const { userLoggedIn, userIsCreator } = useAppState();
   const { socketConnection } = useContext(SocketContext);
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -102,12 +102,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
   // Load data
   useEffect(() => {
-    // Wait fo user data to load
-    if (!user._persist?.rehydrated) {
-      return;
-    }
-
-    if (user.loggedIn) {
+    if (userLoggedIn) {
       fetchBundles()
         .then((creatorBundles) => {
           setBundles(creatorBundles);
@@ -123,10 +118,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
           setBundles(undefined);
         });
 
-      if (
-        user.userData?.options?.creatorStatus !==
-        newnewapi.Me.CreatorStatus.NOT_CREATOR
-      ) {
+      if (userIsCreator) {
         fetchIsSellingBundles()
           .then((creatorIsSellingBundles) => {
             setIsSellingBundles(creatorIsSellingBundles);
@@ -174,9 +166,8 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       saveStateLS('creatorHasSoldBundles', false);
     }
   }, [
-    user._persist?.rehydrated,
-    user.loggedIn,
-    user.userData?.options?.creatorStatus,
+    userLoggedIn,
+    userIsCreator,
     fetchBundles,
     showErrorToastPredefined,
     fetchIsSellingBundles,
@@ -216,16 +207,16 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       });
     };
 
-    if (socketConnection && user.loggedIn) {
+    if (userLoggedIn && socketConnection) {
       socketConnection?.on('CreatorBundleChanged', handleBundleChanged);
     }
 
     return () => {
-      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+      if (userLoggedIn && socketConnection && socketConnection?.connected) {
         socketConnection?.off('CreatorBundleChanged', handleBundleChanged);
       }
     };
-  }, [socketConnection, user.loggedIn]);
+  }, [socketConnection, userLoggedIn]);
 
   const toggleIsSellingBundles = useCallback(async () => {
     if (busyTogglingSellingBundles || !isSellingBundlesStatusLoaded) {
