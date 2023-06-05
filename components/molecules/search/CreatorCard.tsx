@@ -43,7 +43,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     resizeMode
   );
 
-  const [avatarLoaded, setAvatarLoaded] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   // Ellipse menu
@@ -132,19 +131,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
       )}
       <SUserAvatarContainer>
         <SUserAvatarInnerContainer>
-          <SUserAvatar
-            avatarUrl={creator.avatarUrl ?? ''}
-            visible={avatarLoaded}
-            onLoad={() => {
-              setAvatarLoaded(true);
-            }}
-          />
-          {!avatarLoaded && (
-            <SAvatarSkeleton
-              bgColor={theme.colorsThemed.background.secondary}
-              highlightColor={theme.colorsThemed.background.quaternary}
-            />
-          )}
+          <UserAvatar avatarUrl={creator.avatarUrl ?? ''} withSkeleton />
         </SUserAvatarInnerContainer>
       </SUserAvatarContainer>
       <SDisplayNameContainer isVerified={!!creator.options?.isVerified}>
@@ -278,15 +265,6 @@ const SUserAvatarContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const SAvatarSkeleton = styled(GenericSkeleton)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-`;
-
 const SUserAvatarInnerContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -303,10 +281,6 @@ const SUserAvatarInnerContainer = styled.div`
     min-width: 100%;
     min-height: 100%;
   }
-`;
-
-const SUserAvatar = styled(UserAvatar)<{ visible: boolean }>`
-  opacity: ${({ visible }) => (visible ? 1 : 0)};
 `;
 
 const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
