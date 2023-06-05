@@ -93,6 +93,10 @@ export const Notifications = () => {
         _stage: 'Notifications',
       });
 
+      if (notifications.length === 0) {
+        return;
+      }
+
       const lastNotification = notifications[0];
       if (lastNotification.createdAt?.seconds) {
         setReadAllToTime((lastNotification.createdAt.seconds as number) * 1000);

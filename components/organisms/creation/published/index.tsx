@@ -24,6 +24,7 @@ import SharePanel from '../../../atoms/SharePanel';
 import { SocketContext } from '../../../../contexts/socketContext';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
+import isBrowser from '../../../../utils/isBrowser';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -76,6 +77,10 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   }, [postData]);
 
   const linkToShare = useMemo(() => {
+    if (!isBrowser()) {
+      return '';
+    }
+
     let url = `${window.location.origin}/p/`;
     if (url && postData) {
       if (postData.auction) {
@@ -101,7 +106,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (postData) {
         let url;
-        if (window) {
+        if (isBrowser()) {
           url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
