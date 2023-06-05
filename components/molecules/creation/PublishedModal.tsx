@@ -19,6 +19,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { usePostCreationState } from '../../../contexts/postCreationContext';
 import DisplayName from '../../atoms/DisplayName';
 import SharePanel from '../../atoms/SharePanel';
+import isBrowser from '../../../utils/isBrowser';
 
 const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -65,7 +66,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
       if (postData) {
         Mixpanel.track('See My Post Click');
         let url;
-        if (window) {
+        if (isBrowser()) {
           url = `${window.location.origin}/p/`;
           if (url) {
             if (postData.auction) {
@@ -125,6 +126,10 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   }, [post.expiresAt]);
 
   const linkToShare = useMemo(() => {
+    if (!isBrowser()) {
+      return '';
+    }
+
     let url = `${window.location.origin}/p/`;
     if (url && postData) {
       if (postData.auction) {

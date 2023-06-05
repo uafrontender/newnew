@@ -157,7 +157,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Firstname
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
-  // TODO: improve firstName validation
   const [firstNameError, setFirstnameError] = useState('');
   const handleFirstnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value || e.target.value.length < 1) {
@@ -178,7 +177,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
   };
 
   const [lastNameInEdit, setLastnameInEdit] = useState('');
-  // TODO: improve lastName validation
   const [lastNameError, setLastnameError] = useState('');
   const handleLastnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value || e.target.value.length < 1) {

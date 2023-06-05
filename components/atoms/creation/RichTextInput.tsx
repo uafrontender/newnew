@@ -41,7 +41,14 @@ const RichTextInput: React.FC<IRichTextInput> = ({
 
   const handleChange = useCallback(
     (e: any) => {
-      const clearedValue = clearValue(e.target.value || '');
+      // eslint-disable-next-line no-nested-ternary
+      const newValue = e?.target?.value
+        ? typeof e.target.value === 'string'
+          ? e.target.value
+          : e.target.value.toString()
+        : '';
+
+      const clearedValue = clearValue(newValue);
       onChange(id, clearedValue);
     },
     [id, clearValue, onChange]
