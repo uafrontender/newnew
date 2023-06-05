@@ -7,7 +7,6 @@ import { useTranslation } from 'next-i18next';
 import assets from '../../../constants/assets';
 
 const NoResults: React.FC = React.memo(() => {
-  // TODO: add this line from page-Creator to page-Notification for other languages as well
   const { t } = useTranslation('page-Notifications');
   const theme = useTheme();
 

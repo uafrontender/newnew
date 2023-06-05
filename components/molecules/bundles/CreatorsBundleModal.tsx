@@ -149,7 +149,6 @@ const CreatorsBundleModal: React.FC<ICreatorsBundleModal> = React.memo(
                     {t('modal.creatorsBundle.bundlesDisabled')}
                   </SNote>
                 )}
-              {/* TODO: add text   */}
             </Content>
           </SModalPaper>
         </Modal>

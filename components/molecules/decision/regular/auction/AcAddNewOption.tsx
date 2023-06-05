@@ -593,6 +593,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
 export default AcAddNewOption;
 
+// TODO: Quit using child selectors, bad practice, makes code fragile
 const SActionSection = styled.div`
   display: none;
   position: relative;
@@ -613,8 +614,6 @@ const SActionSection = styled.div`
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
-
-    // TODO: Quit using child selectors, bad practice, makes code fragile
 
     .suggestion-text-area {
       width: calc(80% - 8px) !important;
