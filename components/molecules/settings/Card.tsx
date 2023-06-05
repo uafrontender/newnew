@@ -125,16 +125,17 @@ const Card: React.FunctionComponent<ICard> = ({
             </SCardPrimaryText>
           </SLabel>
         )}
-        {!disabledForActions && (
-          <SMoreButton
-            view='quaternary'
-            iconOnly
-            onClick={() => setIsEllipseMenuOpen(true)}
-            ref={moreButtonRef as any}
-          >
-            <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
-          </SMoreButton>
-        )}
+
+        <SMoreButton
+          view='quaternary'
+          iconOnly
+          onClick={
+            !disabledForActions ? () => setIsEllipseMenuOpen(true) : () => {}
+          }
+          ref={moreButtonRef as any}
+        >
+          <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
+        </SMoreButton>
 
         {!isMobile && (
           <CardEllipseMenu

@@ -205,8 +205,9 @@ export const Tablet: React.FC = () => {
                   <Link href='/profile'>
                     <a>
                       <UserAvatar
-                        withClick
                         avatarUrl={user.userData?.avatarUrl}
+                        withClick
+                        withSkeleton
                         onClick={() => {
                           Mixpanel.track('My Avatar Clicked', {
                             _target: '/profile',

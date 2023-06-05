@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -494,7 +492,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             <div>
               {option.totalAmount?.usdCents
                 ? `$${formatNumber(
-                    option?.totalAmount?.usdCents / 100 ?? 0,
+                    option.totalAmount.usdCents / 100 ?? 0,
                     true
                   )}`
                 : '$0'}
@@ -740,7 +738,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 <Trans
                   t={t}
                   i18nKey='acPost.paymentModalFooter.body'
-                  // @ts-ignore
                   components={[<DisplayName user={postCreator} />]}
                 />
                 {' *'}
@@ -772,7 +769,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 <Trans
                   t={t}
                   i18nKey='acPost.paymentModalHeader.title'
-                  // @ts-ignore
                   components={[
                     <DisplayName
                       user={postCreator}
@@ -808,7 +804,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.ac'
-          // @ts-ignore
           components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>

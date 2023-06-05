@@ -55,7 +55,8 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   useEffect(() => {
     if (isBrowser() && isPageVisible) {
       interval.current = window.setInterval(() => {
-        setSeconds(() => (timestampSeconds - Date.now()) / 1000);
+        const newSeconds = Math.ceil((timestampSeconds - Date.now()) / 1000);
+        setSeconds(newSeconds);
       }, 1000);
     }
     return () => clearInterval(interval.current);

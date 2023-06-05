@@ -21,11 +21,13 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const { loggedIn } = useAppSelector((state) => state.user);
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const onLoadingCreatorsError = useCallback((err: any) => {
-    console.error(err);
-    showErrorToastPredefined(undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onLoadingCreatorsError = useCallback(
+    (err: any) => {
+      console.error(err);
+      showErrorToastPredefined(undefined);
+    },
+    [showErrorToastPredefined]
+  );
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useSearchCreators(

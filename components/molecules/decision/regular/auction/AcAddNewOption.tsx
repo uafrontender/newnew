@@ -516,7 +516,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 <Trans
                   t={t}
                   i18nKey='acPost.paymentModalFooter.body'
-                  // @ts-ignore
                   components={[<DisplayName user={postCreator} />]}
                 />
                 {' *'}
@@ -548,7 +547,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 <Trans
                   t={t}
                   i18nKey='acPost.paymentModalHeader.title'
-                  // @ts-ignore
                   components={[
                     <DisplayName
                       user={postCreator}
@@ -586,7 +584,6 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.ac'
-          // @ts-ignore
           components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
@@ -596,6 +593,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
 export default AcAddNewOption;
 
+// TODO: Quit using child selectors, bad practice, makes code fragile
 const SActionSection = styled.div`
   display: none;
   position: relative;
@@ -616,8 +614,6 @@ const SActionSection = styled.div`
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
-
-    // TODO: Quit using child selectors, bad practice, makes code fragile
 
     .suggestion-text-area {
       width: calc(80% - 8px) !important;

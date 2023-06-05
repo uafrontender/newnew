@@ -830,7 +830,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   <Trans
                     t={t}
                     i18nKey='mcPost.paymentModalHeader.title'
-                    // @ts-ignore
                     components={[
                       <DisplayName
                         user={postCreator}

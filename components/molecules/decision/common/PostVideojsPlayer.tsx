@@ -420,10 +420,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
         videoElement.classList.add('vjs-big-play-centered');
         videoElement.classList.add(`video-js_${id}`);
-        // @ts-ignore
         videoRef.current?.appendChild(videoElement);
-
-        // @ts-ignore
         const player = (playerRef.current = videojs(
           videoElement,
           options,
@@ -783,19 +780,21 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
               />
             </SPlayPseudoButton>
           ) : null}
-          <SMaximizeButton
-            id='maximize-button'
-            iconOnly
-            view='transparent'
-            onClick={handleEnterFullscreen}
-          >
-            <InlineSvg
-              svg={MaximizeIcon}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-              fill='#FFFFFF'
-            />
-          </SMaximizeButton>
+          {!isLoading ? (
+            <SMaximizeButton
+              id='maximize-button'
+              iconOnly
+              view='transparent'
+              onClick={handleEnterFullscreen}
+            >
+              <InlineSvg
+                svg={MaximizeIcon}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
+                fill='#FFFFFF'
+              />
+            </SMaximizeButton>
+          ) : null}
         </SVideoWrapper>
         {isLoading && !shouldShowPlayPseudoButton && (
           <SLoader>

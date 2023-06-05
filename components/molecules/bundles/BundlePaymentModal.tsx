@@ -189,7 +189,6 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
           <Trans
             t={t}
             i18nKey='modal.buyBundle.payment.header'
-            // @ts-ignore
             components={[
               <DisplayName
                 user={creator}

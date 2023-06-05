@@ -24,6 +24,9 @@
       },
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
+      "cashOutTutorial": {
+        "gracePeriod_NEED_TRANSLATION": "Your balance updates every 3 days."
+      },
       "cashOut": {
         "amount": "Tus ganancias en Stripe son",
         "amountSecondLine": "Gestiona tu saldo en Stripe.",
@@ -219,6 +222,7 @@
   },
   "announcement": {
     "comment_DO_NOT_TRANSLATE": "announcement structure: beforeName / name + suffix / afterName, where '/' is a new line",
+    "announcements": "anuncios",
     "beforeName": "El anuncios de ",
     "suffix": "",
     "afterName": ""

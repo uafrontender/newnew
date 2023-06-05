@@ -167,7 +167,7 @@
       }
     },
     "creatorsBundle": {
-      "accessExpired": "Tus beneficios han caducado. Compra otro bundle para tener opciones personalizadas y acceder al chat",
+      "accessExpired": "Tus beneficios han caducado. Compra otro bundle para tener opciones personalizadas y acceder al chat.",
       "votesLeft": "Quedan <0>{{amount}}</0> votos",
       "for": "para ",
       "access": "Quedan <0/> de:",

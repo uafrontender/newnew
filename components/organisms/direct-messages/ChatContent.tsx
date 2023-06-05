@@ -140,7 +140,9 @@ const ChatContent: React.FC<IFuncProps> = ({
       });
     }
     return () => {
-      if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
+      if (chatRoom.id) {
+        removeChannel(`chat_${chatRoom.id.toString()}`);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom, isSocketConnected]);
@@ -223,26 +225,24 @@ const ChatContent: React.FC<IFuncProps> = ({
     [chatRoom.visavis?.user?.uuid, usersBlockedMe]
   );
 
-  const onUserBlock = useCallback(async () => {
-    if (!isVisavisBlocked) {
-      if (!isConfirmBlockUserModalOpen) {
-        Mixpanel.track('Block User Modal Opened', {
-          _stage: 'Direct Messages',
-          _component: 'ChatContent',
-        });
-        setIsConfirmBlockUserModalOpen(true);
-      }
-    } else {
-      await changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
-    }
+  const handleBlockUserClick = useCallback(async () => {
+    Mixpanel.track('Block User Modal Opened', {
+      _stage: 'Direct Messages',
+      _component: 'ChatContent',
+    });
+    setIsConfirmBlockUserModalOpen(true);
+  }, []);
+
+  const blockUser = useCallback(async () => {
+    await changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, true);
     refetchChatRoom();
-  }, [
-    isVisavisBlocked,
-    isConfirmBlockUserModalOpen,
-    chatRoom.visavis?.user?.uuid,
-    changeUserBlockedStatus,
-    refetchChatRoom,
-  ]);
+    setIsConfirmBlockUserModalOpen(false);
+  }, [chatRoom.visavis?.user?.uuid, changeUserBlockedStatus, refetchChatRoom]);
+
+  const unblockUser = useCallback(async () => {
+    await changeUserBlockedStatus(chatRoom.visavis?.user?.uuid, false);
+    refetchChatRoom();
+  }, [chatRoom.visavis?.user?.uuid, changeUserBlockedStatus, refetchChatRoom]);
 
   const onUserReport = useCallback(() => {
     setConfirmReportUser(true);
@@ -352,7 +352,7 @@ const ChatContent: React.FC<IFuncProps> = ({
         <BlockedUser
           isBlocked={isVisavisBlocked}
           user={chatRoom.visavis}
-          onUserBlock={onUserBlock}
+          onUserUnblock={unblockUser}
           variant={variant}
         />
       );
@@ -388,8 +388,8 @@ const ChatContent: React.FC<IFuncProps> = ({
     chatRoom.visavis,
     chatRoom.myRole,
     isMessagingDisabled,
+    unblockUser,
     variant,
-    onUserBlock,
     renewSubscription,
   ]);
 
@@ -406,7 +406,8 @@ const ChatContent: React.FC<IFuncProps> = ({
         chatRoom={chatRoom}
         isVisavisBlocked={isVisavisBlocked}
         onUserReport={onUserReport}
-        onUserBlock={onUserBlock}
+        onUserBlock={handleBlockUserClick}
+        onUserUnblock={unblockUser}
         onBackButtonClick={onBackButtonClick}
         isBackButton={isBackButton}
         isMoreButton={isMoreButton}
@@ -488,7 +489,7 @@ const ChatContent: React.FC<IFuncProps> = ({
       {chatRoom.visavis ? (
         <BlockUserModal
           isOpen={isConfirmBlockUserModalOpen}
-          onUserBlock={onUserBlock}
+          onUserBlock={blockUser}
           user={chatRoom.visavis}
           closeModal={handleCloseConfirmBlockUserModal}
           isAnnouncement={isAnnouncement}
