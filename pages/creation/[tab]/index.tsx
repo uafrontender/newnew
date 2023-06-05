@@ -114,7 +114,7 @@ export async function getServerSideProps(
     };
   }
 
-  // TODO: remove when goals returned
+  // TODO: remove redirect if goals returned
   if (context.req.url?.includes('crowdfunding')) {
     return {
       redirect: {
