@@ -290,7 +290,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
     useEffect(() => {
       const resultContainer = resultsContainerRef.current;
-      console.log(resultContainer, 'resultContainer');
+
       if (isMobileOrTablet && isResultsDropVisible && resultContainer) {
         disableBodyScroll(resultContainer);
       }
