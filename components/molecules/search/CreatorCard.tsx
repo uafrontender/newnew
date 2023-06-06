@@ -286,6 +286,7 @@ const SUserAvatarInnerContainer = styled.div`
 const SDisplayNameContainer = styled.div<{ isVerified?: boolean }>`
   display: flex;
   flex-direction: row;
+  max-width: 100%;
   align-items: center;
   overflow: hidden;
   margin: 0 0 5px;
@@ -300,6 +301,10 @@ const SDisplayName = styled(DisplayName)`
 `;
 
 const SUserName = styled.p`
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   text-align: center;
   font-weight: 700;
   font-size: 12px;
@@ -313,6 +318,8 @@ const SButton = styled.button<{ highlighted: boolean }>`
   justify-content: center;
 
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
 
   font-size: 14px;
   line-height: 24px;
