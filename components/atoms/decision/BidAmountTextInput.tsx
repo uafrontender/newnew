@@ -34,13 +34,18 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
     const newValue =
       value.length > 0
         ? e.target.value
-            .slice(1)
+            .replaceAll('$', '')
             .split(',')
             .filter((v) => v !== ',')
             .join('')
         : e.target.value;
-    if (/[^0-9]/.test(newValue)) return;
-    if (newValue.length > 5) return;
+    console.log('new value', newValue);
+    if (/[^0-9]/.test(newValue)) {
+      return;
+    }
+    if (newValue.length > 5) {
+      return;
+    }
 
     onChange(newValue);
   };
@@ -49,7 +54,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
     const currentValue =
       value.length > 0
         ? e.target.value
-            .slice(1)
+            .replaceAll('$', '')
             .split(',')
             .filter((v) => v !== ',')
             .join('')

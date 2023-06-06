@@ -330,7 +330,6 @@ context.skip('Whitelisted Creator flow', () => {
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
       cy.dGet('#title').type(`CI post event ${testSeed}`);
-      cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
       cy.dGet('#1-hour').click();
@@ -763,7 +762,6 @@ context.skip('Whitelisted Creator flow', () => {
       // Waiting for an element to be attached to the DOM
       cy.wait(2000);
       cy.dGet('#title').type(`CI post event ${testSeed}`);
-      cy.dGet('#minimalBid').clear().type('10');
 
       cy.dGet('#expiresAt').click();
       cy.dGet('#1-hour').click();
