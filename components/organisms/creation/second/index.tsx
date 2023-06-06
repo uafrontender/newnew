@@ -112,7 +112,6 @@ export const CreationSecondStepContent: React.FC<
 
   const {
     post,
-    auction,
     fileUpload,
     fileProcessing,
     crowdfunding,
@@ -760,27 +759,6 @@ export const CreationSecondStepContent: React.FC<
             {isMobile && <SSeparator margin='16px 0' />}
           </>
         )}
-        {tab === 'auction' && !isMobile && (
-          <>
-            <SSeparator margin='16px 0' />
-            <SItemWrapper>
-              <TabletFieldBlock
-                id='minimalBid'
-                type='input'
-                value={auction.minimalBid}
-                onChange={handleItemChange}
-                formattedDescription={(appConstants.minAcBid / 100).toFixed(0)}
-                inputProps={{
-                  min: appConstants.minAcBid ? appConstants.minAcBid / 100 : 2,
-                  max: 10000,
-                  type: 'number',
-                  pattern: '[0-9]*',
-                  customPlaceholder: (appConstants.minAcBid / 100).toFixed(0),
-                }}
-              />
-            </SItemWrapper>
-          </>
-        )}
         {tab === 'crowdfunding' && !isMobile && (
           <>
             <SSeparator margin='16px 0' />
@@ -814,8 +792,6 @@ export const CreationSecondStepContent: React.FC<
       multiplechoice.choices,
       validateMcOption,
       isMobile,
-      auction.minimalBid,
-      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
     ]
@@ -826,30 +802,6 @@ export const CreationSecondStepContent: React.FC<
         {isMobile ? (
           <>
             <SListWrapper>
-              {tab === 'auction' && (
-                <SFieldWrapper>
-                  <MobileFieldBlock
-                    id='minimalBid'
-                    type='input'
-                    value={auction.minimalBid}
-                    onChange={handleItemChange}
-                    formattedDescription={(appConstants.minAcBid / 100).toFixed(
-                      0
-                    )}
-                    inputProps={{
-                      min: appConstants.minAcBid
-                        ? appConstants.minAcBid / 100
-                        : 2,
-                      max: 10000,
-                      type: 'number',
-                      pattern: '[0-9]*',
-                      customPlaceholder: (appConstants.minAcBid / 100).toFixed(
-                        0
-                      ),
-                    }}
-                  />
-                </SFieldWrapper>
-              )}
               {tab === 'crowdfunding' && (
                 <SFieldWrapper>
                   <MobileFieldBlock
@@ -935,9 +887,7 @@ export const CreationSecondStepContent: React.FC<
     [
       isMobile,
       tab,
-      auction.minimalBid,
       handleItemChange,
-      appConstants.minAcBid,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
       post.expiresAt,
@@ -1313,6 +1263,17 @@ export const CreationSecondStepContent: React.FC<
                 <TabletFieldWrapper>
                   <STabletBlockSubTitle variant={3} weight={600}>
                     {t('secondStep.block.subTitle.votesInfo')}
+                  </STabletBlockSubTitle>
+                </TabletFieldWrapper>
+              </SItemWrapper>
+            )}
+            {!isMobile && tab === 'auction' && appConstants.minAcBid && (
+              <SItemWrapper>
+                <TabletFieldWrapper>
+                  <STabletBlockSubTitle variant={3} weight={600}>
+                    {t('secondStep.block.subTitle.bidsInfo', {
+                      amount: (appConstants.minAcBid / 100).toFixed(0),
+                    })}
                   </STabletBlockSubTitle>
                 </TabletFieldWrapper>
               </SItemWrapper>
