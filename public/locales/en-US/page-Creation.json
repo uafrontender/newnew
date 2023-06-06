@@ -51,6 +51,7 @@
       },
       "subTitle": {
         "votesInfo": "People will spend a minimum of $1 to vote",
+        "bidsInfo": "People will spend a minimum of ${{amount}} to bid",
         "floating": "Upload your video to preview it here",
         "floatingProcessing": "Preview will be available after processing"
       }

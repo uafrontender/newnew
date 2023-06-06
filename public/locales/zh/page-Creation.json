@@ -51,6 +51,7 @@
       },
       "subTitle": {
         "votesInfo": "大家如要投票，需要花費至少1美元",
+        "bidsInfo": "大家如要出價，需要花費至少{{amount}}美元",
         "floating": "上傳視頻並在此預覽",
         "floatingProcessing": "預覽將在處理完成之後可用"
       }
