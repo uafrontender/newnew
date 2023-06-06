@@ -101,79 +101,84 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
   }, []);
 
   // Load data
-  useEffect(() => {
-    if (userLoggedIn) {
-      fetchBundles()
-        .then((creatorBundles) => {
-          setBundles(creatorBundles);
-        })
-        .catch((err) => {
-          console.error(err);
-
-          if (
-            err.message !== 'Refresh token invalid' &&
-            err.message !== 'No token'
-          ) {
-            showErrorToastPredefined();
-          }
-          setBundles(undefined);
-        });
-
-      if (userIsCreator) {
-        fetchIsSellingBundles()
-          .then((creatorIsSellingBundles) => {
-            setIsSellingBundles(creatorIsSellingBundles);
-            setIsSellingBundlesStatusLoaded(true);
+  useEffect(
+    () => {
+      if (userLoggedIn) {
+        fetchBundles()
+          .then((creatorBundles) => {
+            setBundles(creatorBundles);
           })
           .catch((err) => {
             console.error(err);
+
             if (
               err.message !== 'Refresh token invalid' &&
               err.message !== 'No token'
             ) {
               showErrorToastPredefined();
             }
-            setIsSellingBundles(false);
-            setIsSellingBundlesStatusLoaded(false);
+            setBundles(undefined);
           });
 
-        fetchHasSoldBundles()
-          .then((creatorHasSoldBundles) => {
-            setHasSoldBundles(creatorHasSoldBundles);
-            setIsHasSoldBundlesStatusLoaded(true);
-            saveStateLS('creatorHasSoldBundles', creatorHasSoldBundles);
-          })
-          .catch((err) => {
-            console.error(err);
-            if (
-              err.message !== 'Refresh token invalid' &&
-              err.message !== 'No token'
-            ) {
-              showErrorToastPredefined();
-            }
-            setHasSoldBundles(false);
-            saveStateLS('creatorHasSoldBundles', false);
-          });
+        if (userIsCreator) {
+          fetchIsSellingBundles()
+            .then((creatorIsSellingBundles) => {
+              setIsSellingBundles(creatorIsSellingBundles);
+              setIsSellingBundlesStatusLoaded(true);
+            })
+            .catch((err) => {
+              console.error(err);
+              if (
+                err.message !== 'Refresh token invalid' &&
+                err.message !== 'No token'
+              ) {
+                showErrorToastPredefined();
+              }
+              setIsSellingBundles(false);
+              setIsSellingBundlesStatusLoaded(false);
+            });
+
+          fetchHasSoldBundles()
+            .then((creatorHasSoldBundles) => {
+              setHasSoldBundles(creatorHasSoldBundles);
+              setIsHasSoldBundlesStatusLoaded(true);
+              saveStateLS('creatorHasSoldBundles', creatorHasSoldBundles);
+            })
+            .catch((err) => {
+              console.error(err);
+              if (
+                err.message !== 'Refresh token invalid' &&
+                err.message !== 'No token'
+              ) {
+                showErrorToastPredefined();
+              }
+              setHasSoldBundles(false);
+              saveStateLS('creatorHasSoldBundles', false);
+            });
+        } else {
+          setIsSellingBundles(false);
+          setHasSoldBundles(false);
+        }
       } else {
+        // Clear state
+        setBundles(undefined);
         setIsSellingBundles(false);
+        setIsSellingBundlesStatusLoaded(false);
         setHasSoldBundles(false);
+        saveStateLS('creatorHasSoldBundles', false);
       }
-    } else {
-      // Clear state
-      setBundles(undefined);
-      setIsSellingBundles(false);
-      setIsSellingBundlesStatusLoaded(false);
-      setHasSoldBundles(false);
-      saveStateLS('creatorHasSoldBundles', false);
-    }
-  }, [
-    userLoggedIn,
-    userIsCreator,
-    fetchBundles,
-    showErrorToastPredefined,
-    fetchIsSellingBundles,
-    fetchHasSoldBundles,
-  ]);
+    },
+    // showErrorToastPredefined causes re-render not only when locale changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      userLoggedIn,
+      userIsCreator,
+      fetchBundles,
+      // showErrorToastPredefined,
+      fetchIsSellingBundles,
+      fetchHasSoldBundles,
+    ]
+  );
 
   // Listen for socket updates
   useEffect(() => {

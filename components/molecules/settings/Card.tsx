@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -17,6 +17,7 @@ import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import useCards from '../../../utils/hooks/useCards';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useAppSelector } from '../../../redux-store/store';
 
 const getCardBrandName = (cardBrand: newnewapi.Card.CardBrand) => {
   switch (cardBrand) {
@@ -75,7 +76,7 @@ const Card: React.FunctionComponent<ICard> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
-
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
 
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -87,6 +88,11 @@ const Card: React.FunctionComponent<ICard> = ({
   const moreButtonRef = useRef<HTMLButtonElement>();
 
   const { setPrimaryCardMutation, removeCardMutation } = useCards();
+
+  const notWhitelisted = useMemo(
+    () => user._persist?.rehydrated && !user?.userData?.options?.isWhiteListed,
+    [user._persist?.rehydrated, user?.userData?.options?.isWhiteListed]
+  );
 
   const handleCloseCardEllipseMenu = useCallback(
     () => setIsEllipseMenuOpen(false),
@@ -126,16 +132,18 @@ const Card: React.FunctionComponent<ICard> = ({
           </SLabel>
         )}
 
-        <SMoreButton
-          view='quaternary'
-          iconOnly
-          onClick={
-            !disabledForActions ? () => setIsEllipseMenuOpen(true) : () => {}
-          }
-          ref={moreButtonRef as any}
-        >
-          <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
-        </SMoreButton>
+        {notWhitelisted && (
+          <SMoreButton
+            view='quaternary'
+            iconOnly
+            onClick={
+              !disabledForActions ? () => setIsEllipseMenuOpen(true) : () => {}
+            }
+            ref={moreButtonRef as any}
+          >
+            <InlineSvg svg={MoreIconFilled} width='14px' height='14px' />
+          </SMoreButton>
+        )}
 
         {!isMobile && (
           <CardEllipseMenu
