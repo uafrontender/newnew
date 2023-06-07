@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useAppSelector } from '../../redux-store/store';
 import BugIcon from '../../public/images/svg/icons/outlined/Bug.svg';
 import InlineSvg from '../atoms/InlineSVG';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface ReportBugButtonI {
   bottom: number;
@@ -15,6 +16,7 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
   ({ bottom, right, zIndex }) => {
     const { t } = useTranslation('common');
     const { user } = useAppSelector((state) => state);
+    const { userIsCreator } = useAppState();
     // Check if need to be positioned higher
 
     const handleClick = () => {
@@ -29,7 +31,7 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
     };
 
     // Show report button only to creators
-    if (!user.userData?.options?.isCreator) {
+    if (!userIsCreator) {
       return null;
     }
 

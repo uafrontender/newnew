@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { TPostType } from '../../../../utils/switchPostType';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
-import { useAppSelector } from '../../../../redux-store/store';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 
@@ -29,8 +28,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
 > = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -104,8 +102,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
         _component: 'PostSuccessOrWaitingControls',
       });
 
-      // Redirect only after the persist data is pulled
-      if (!user.loggedIn && user._persist?.rehydrated) {
+      if (!userLoggedIn) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             window.location.href
@@ -138,8 +135,7 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
     isFollowingDecision,
     postUuid,
     router,
-    user.loggedIn,
-    user._persist?.rehydrated,
+    userLoggedIn,
   ]);
 
   return (

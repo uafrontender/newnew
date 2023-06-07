@@ -35,7 +35,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
-    const { resizeMode } = useAppState();
+    const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -66,7 +66,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       {
         postUuid: post.postUuid,
         userUuid: user.userData?.userUuid,
-        loggedInUser: user.loggedIn,
+        loggedInUser: userLoggedIn,
       },
       {
         refetchOnWindowFocus: false,

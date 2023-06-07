@@ -7,7 +7,6 @@ import { useTranslation } from 'next-i18next';
 
 import isBrowser from '../../../../utils/isBrowser';
 import { markPost } from '../../../../api/endpoints/post';
-import { useAppSelector } from '../../../../redux-store/store';
 
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
@@ -36,8 +35,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   handleToggleMuted,
 }) => {
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -72,11 +70,11 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       }
     }
 
-    if (openedTab === 'response' && user.loggedIn && !responseViewed) {
+    if (openedTab === 'response' && userLoggedIn && !responseViewed) {
       markResponseAsViewed();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postUuid, user.loggedIn, responseViewed]);
+  }, [openedTab, postUuid, userLoggedIn, responseViewed]);
 
   // Adjust sound button if needed
   useEffect(() => {
