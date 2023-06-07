@@ -109,7 +109,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -376,7 +376,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       user.userTutorialsProgress.remainingMcSteps &&
       user.userTutorialsProgress.remainingMcSteps[0]
     ) {
-      if (user.loggedIn) {
+      if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
         });

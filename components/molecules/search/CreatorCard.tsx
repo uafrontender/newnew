@@ -13,7 +13,6 @@ import ReportModal, { ReportData } from '../direct-messages/ReportModal';
 import BlockUserModalProfile from '../profile/BlockUserModalProfile';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import UserEllipseModal from '../profile/UserEllipseModal';
@@ -37,8 +36,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   const { t } = useTranslation('common');
   const router = useRouter();
   const theme = useTheme();
-  const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -65,8 +63,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   );
 
   const handleClickReport = useCallback(() => {
-    // Redirect only after the persist data is pulled
-    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
+    if (!userLoggedIn) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -76,7 +73,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
     }
 
     setConfirmReportUser(true);
-  }, [currentUser, router]);
+  }, [userLoggedIn, router]);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
@@ -114,7 +111,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         <UserEllipseMenu
           isVisible={ellipseMenuOpen}
           isBlocked={isUserBlocked}
-          loggedIn={currentUser.loggedIn}
           top='48px'
           right='0px'
           handleClose={() => setEllipseMenuOpen(false)}
@@ -178,7 +174,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
           isOpen={ellipseMenuOpen}
           zIndex={10}
           isBlocked={isUserBlocked}
-          loggedIn={currentUser.loggedIn}
           onClose={() => setEllipseMenuOpen(false)}
           handleClickBlock={async () => {
             if (isUserBlocked) {

@@ -67,7 +67,9 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
-import AppStateContextProvider from '../contexts/appStateContext';
+import AppStateContextProvider, {
+  useAppState,
+} from '../contexts/appStateContext';
 import PostCreationContextProvider from '../contexts/postCreationContext';
 
 // interface for shared layouts
@@ -125,6 +127,7 @@ const MyApp = (props: IMyApp): ReactElement => {
   } = props;
   const store = useStore();
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn, userIsCreator } = useAppState();
   const { locale } = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentLocale, setCurrentLocale] = useState(locale);
@@ -193,16 +196,21 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, []);
 
   useEffect(() => {
-    if (user.loggedIn && user.userData?.username) {
+    // Requires user data to be loaded
+    if (!user._persist?.rehydrated) {
+      return;
+    }
+
+    if (userLoggedIn && user.userData?.username) {
       Mixpanel.identify(user.userData.userUuid);
       Mixpanel.people.set({
         $name: user.userData.username,
         $email: user.userData.email,
         newnewId: user.userData.userUuid,
-        isCreator: user.userData.options?.isCreator,
+        isCreator: userIsCreator,
       });
       Mixpanel.register({
-        isCreator: user.userData.options?.isCreator,
+        isCreator: userIsCreator,
         username: user.userData.username,
       });
       Mixpanel.track('Session started!');
@@ -210,7 +218,7 @@ const MyApp = (props: IMyApp): ReactElement => {
       Mixpanel.track('Guest Session started!');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+  }, [userLoggedIn, user._persist?.rehydrated]);
 
   // TODO: move to the store logic
   useEffect(() => {
