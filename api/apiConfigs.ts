@@ -3,6 +3,8 @@
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
+import jwtDecode from 'jwt-decode';
+
 import isBrowser from '../utils/isBrowser';
 
 const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
@@ -145,6 +147,19 @@ export async function fetchProtobuf<
 ): Promise<APIResponse<ResponseType>> {
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
+  // Dedicated lane for VIP users
+  const accessToken =
+    cookiesInstance.get('accessToken');
+  let decodedToken: {
+    dedicated_lane: string | undefined;
+  } = {
+    dedicated_lane: undefined,
+  }
+
+  if (accessToken) {
+    decodedToken = jwtDecode(accessToken);
+  }
+
   try {
     const buff: ArrayBuffer = await customFetch(url, {
       method,
@@ -156,6 +171,9 @@ export async function fetchProtobuf<
               'x-from': 'web',
             }
           : {}),
+        ...(decodedToken?.dedicated_lane ? {
+          'x-dedicated-lane': decodedToken.dedicated_lane,
+          } : {}),
         ...headers,
       },
       mode,
