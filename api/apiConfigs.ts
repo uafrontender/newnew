@@ -169,11 +169,11 @@ export async function fetchProtobuf<
           ? {
               // TODO: should it come from env var and be a secret?
               'x-from': 'web',
-              ...(decodedToken?.dedicated_lane ? {
-                'x-dedicated-lane': decodedToken.dedicated_lane,
-                } : {})
             }
           : {}),
+        ...(decodedToken?.dedicated_lane ? {
+          'x-dedicated-lane': decodedToken.dedicated_lane,
+          } : {}),
         ...headers,
       },
       mode,
