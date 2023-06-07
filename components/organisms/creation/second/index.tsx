@@ -693,17 +693,16 @@ export const CreationSecondStepContent: React.FC<
               id: '10-minutes',
               title: t('secondStep.field.expiresAt.options.10-minutes'),
             },
-            {
-              id: '1-hour',
-              title: t('secondStep.field.expiresAt.options.1-hour'),
-            },
-            {
-              id: '3-hours',
-              title: t('secondStep.field.expiresAt.options.3-hours'),
-            },
           ]
         : []),
-
+      {
+        id: '1-hour',
+        title: t('secondStep.field.expiresAt.options.1-hour'),
+      },
+      {
+        id: '3-hours',
+        title: t('secondStep.field.expiresAt.options.3-hours'),
+      },
       {
         id: '6-hours',
         title: t('secondStep.field.expiresAt.options.6-hours'),
