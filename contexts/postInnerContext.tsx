@@ -15,10 +15,10 @@ import {
 } from 'react-query';
 import { reportPost } from '../api/endpoints/report';
 import { ReportData } from '../components/molecules/direct-messages/ReportModal';
-import { useAppSelector } from '../redux-store/store';
 import { TUpdatePostCoverImageMutation } from '../utils/hooks/usePost';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
+import { useAppState } from './appStateContext';
 
 const PostInnerContext = createContext<{
   modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
@@ -201,14 +201,14 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   children,
 }) => {
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [reportPostOpen, setReportPostOpen] = useState(false);
 
   const handleReportOpen = useCallback(() => {
-    if (!user.loggedIn && user._persist?.rehydrated) {
+    if (!userLoggedIn) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -217,7 +217,7 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       return;
     }
     setReportPostOpen(true);
-  }, [user, router]);
+  }, [userLoggedIn, router]);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {

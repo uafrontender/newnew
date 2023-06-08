@@ -12,6 +12,10 @@ const PersistanceProvider: React.FC<{
 }> = React.memo(({ store, children }) => {
   const hasMounted = useHasMounted();
 
+  // Causes all pages to render TWICE, generates excessive load.
+  // Without it SSR does not work
+  // isBrowser causes a hydration error
+  // TODO: Remove Redux
   if (!hasMounted) {
     return <Provider store={store}>{children}</Provider>;
   }

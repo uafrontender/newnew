@@ -10,8 +10,6 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 import CommentTextArea from './CommentTextArea';
@@ -86,8 +84,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('page-Post');
-    const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppState();
+    const { resizeMode, userLoggedIn } = useAppState();
     const { showErrorToastPredefined } = useErrorToasts();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -189,7 +186,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
           const isValid = await validateTextViaAPI(commentText);
           if (isValid) {
             // Redirect only after the persist data is pulled
-            if (!user.loggedIn && user._persist?.rehydrated) {
+            if (!userLoggedIn) {
               if (!isRoot && commentId) {
                 // router.push(
                 //   `/sign-up?reason=comment&redirect=${encodeURIComponent(
@@ -234,8 +231,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       [
         validateTextViaAPI,
         commentText,
-        user.loggedIn,
-        user._persist?.rehydrated,
+        userLoggedIn,
         onSubmit,
         isRoot,
         commentId,

@@ -37,6 +37,7 @@ const CommentsBottomSection: React.FunctionComponent<
   ICommentsBottomSection
 > = ({ postUuid, postShortId, canDeleteComments, onFormFocus, onFormBlur }) => {
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
   const { showErrorToastPredefined } = useErrorToasts();
   const { resizeMode } = useAppState();
 
@@ -63,7 +64,7 @@ const CommentsBottomSection: React.FunctionComponent<
     isFetchingNextPage,
     hasNextPage,
   } = usePostComments({
-    loggedInUser: user.loggedIn,
+    loggedInUser: userLoggedIn,
     postUuid,
   });
 

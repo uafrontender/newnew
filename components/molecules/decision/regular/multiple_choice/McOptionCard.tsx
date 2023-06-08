@@ -121,7 +121,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -200,7 +200,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const handleOpenReportForm = useCallback(() => {
-    if (!user.loggedIn) {
+    if (!userLoggedIn) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -210,7 +210,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }
 
     setIsReportModalOpen(true);
-  }, [user, router]);
+  }, [userLoggedIn, router]);
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);
@@ -414,7 +414,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const setupIntent = useStripeSetupIntent({
     purpose: voteOnPostRequest,
-    isGuest: !user.loggedIn,
+    isGuest: !userLoggedIn,
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
       postShortId || postUuid
     }`,
@@ -563,7 +563,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       user.userTutorialsProgress.remainingMcSteps &&
       user.userTutorialsProgress.remainingMcSteps[0]
     ) {
-      if (user.loggedIn) {
+      if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
         });
