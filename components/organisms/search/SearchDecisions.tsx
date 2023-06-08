@@ -4,9 +4,9 @@ import { useInView } from 'react-intersection-observer';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../../../redux-store/store';
 import useSearchPosts from '../../../utils/hooks/useSearchPosts';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const PostList = dynamic(() => import('./PostList'));
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
@@ -17,7 +17,7 @@ interface ISearchDecisions {
 
 export const SearchDecisions: React.FC<ISearchDecisions> = ({ query }) => {
   const { showErrorToastPredefined } = useErrorToasts();
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
 
   const onLoadingCreatorsError = useCallback((err: any) => {
     console.error(err);
@@ -28,7 +28,7 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({ query }) => {
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useSearchPosts(
       {
-        loggedInUser: loggedIn,
+        loggedInUser: userLoggedIn,
         query,
         searchType: newnewapi.SearchPostsRequest.SearchType.HASHTAGS,
         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,

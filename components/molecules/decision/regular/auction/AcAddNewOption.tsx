@@ -96,7 +96,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   const { showErrorToastCustom } = useErrorToasts();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -122,7 +122,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
     if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
-      if (user.loggedIn) {
+      if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           acCurrentStep: currentStep,
         });
@@ -239,7 +239,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
 
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
-    isGuest: !user.loggedIn,
+    isGuest: !userLoggedIn,
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
       postShortId || postUuid
     }`,
