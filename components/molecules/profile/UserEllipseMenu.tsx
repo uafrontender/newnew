@@ -3,11 +3,11 @@ import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 
 import EllipseMenu, { EllipseMenuButton } from '../../atoms/EllipseMenu';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IUserEllipseMenu {
   isVisible: boolean;
   isBlocked: boolean;
-  loggedIn: boolean;
   top?: string;
   right?: string;
   handleClose: () => void;
@@ -20,7 +20,6 @@ interface IUserEllipseMenu {
 const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   isVisible,
   isBlocked,
-  loggedIn,
   anchorElement,
   offsetTop,
   handleClose,
@@ -28,6 +27,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   handleClickBlock,
 }) => {
   const { t } = useTranslation('common');
+  const { userLoggedIn } = useAppState();
 
   return (
     <SEllipseMenu
@@ -45,7 +45,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
       >
         {t('ellipse.report')}
       </EllipseMenuButton>
-      {loggedIn && (
+      {userLoggedIn && (
         <EllipseMenuButton
           onClick={async () => {
             await handleClickBlock();

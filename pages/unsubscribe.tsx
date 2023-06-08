@@ -76,6 +76,7 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
   }, []);
 
   // A Delay allows to cancel first request when the second full re-render happens
+  // Can be abandoned after we get rid of Redux which causes double rendering
   useEffect(() => {
     const timer = setTimeout(() => {
       handleUnsubscribe();

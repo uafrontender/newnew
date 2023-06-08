@@ -36,6 +36,7 @@ interface ISyncUserWrapper {
   children: React.ReactNode;
 }
 
+// TODO: Can be a UserDataContext
 const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   children,
 }) => {
@@ -43,6 +44,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   const dispatch = useAppDispatch();
   const { setUserLoggedIn, setUserIsCreator } = useAppState();
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
   const { socketConnection } = useContext(SocketContext);
   const [creatorDataSteps, setCreatorDataSteps] = useState(0);
   const userWasLoggedIn = useRef(false);
@@ -59,7 +61,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   useEffect(() => {
     if (
       userWasLoggedIn.current &&
-      !user.loggedIn &&
+      !userLoggedIn &&
       process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
     ) {
       setCreatorDataSteps(0);
@@ -67,10 +69,10 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       queryClient.removeQueries({ queryKey: ['private'] });
     }
 
-    if (user.loggedIn) {
+    if (userLoggedIn) {
       userWasLoggedIn.current = true;
     }
-  }, [user.loggedIn, queryClient]);
+  }, [userLoggedIn, queryClient]);
 
   useEffect(() => {
     if (creatorDataSteps === 1) {
@@ -541,7 +543,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
     const localUserTutorialsProgress = loadStateLS(
       'userTutorialsProgress'
     ) as newnewapi.IGetTutorialsStatusResponse;
-    if (user.loggedIn) {
+    if (userLoggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
       setUserTimeZone();
       syncUserData();
@@ -561,7 +563,7 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
       setUserTimezoneCookieOnly();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+  }, [userLoggedIn]);
 
   useEffect(() => {
     const handlerSocketMeUpdated = (data: any) => {
@@ -596,10 +598,10 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   }, [socketConnection]);
 
   const syncUserDataOnReturnOnTab = useCallback(() => {
-    if (user.loggedIn) {
+    if (userLoggedIn) {
       syncUserData();
     }
-  }, [user.loggedIn, syncUserData]);
+  }, [userLoggedIn, syncUserData]);
 
   useRunOnReturnOnTab(syncUserDataOnReturnOnTab);
 

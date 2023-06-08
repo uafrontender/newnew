@@ -28,6 +28,9 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
 
+  const { scrollContainerRef, onMouseDown, onMouseMove, onMouseUp } =
+    useHorizontalDraggableScroll<HTMLUListElement>();
+
   const openAddCardModal = () => {
     Mixpanel.track('Open Add Card Modal', {
       _stage: 'Settings',
@@ -65,8 +68,10 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards.length]);
 
-  const { scrollContainerRef, onMouseDown, onMouseMove, onMouseUp } =
-    useHorizontalDraggableScroll<HTMLUListElement>();
+  const notWhitelisted = useMemo(
+    () => user._persist?.rehydrated && !user?.userData?.options?.isWhiteListed,
+    [user._persist?.rehydrated, user?.userData?.options?.isWhiteListed]
+  );
 
   return (
     <SSettingsContainer>
@@ -77,16 +82,18 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         {/* TODO: make cards section look more real, handle WL creator adds aa card case */}
         {cards.length > 0 && (
           <>
-            <SButtonSecondaryDesktop
-              view='secondary'
-              onClick={
-                !user.userData?.options?.isWhiteListed
-                  ? openAddCardModal
-                  : () => {}
-              }
-            >
-              {t('Settings.sections.cards.button.addCard')}
-            </SButtonSecondaryDesktop>
+            {notWhitelisted && (
+              <SButtonSecondaryDesktop
+                view='secondary'
+                onClick={
+                  !user.userData?.options?.isWhiteListed
+                    ? openAddCardModal
+                    : () => {}
+                }
+              >
+                {t('Settings.sections.cards.button.addCard')}
+              </SButtonSecondaryDesktop>
+            )}
             <SButtonSecondaryMobile
               view='secondary'
               iconOnly
