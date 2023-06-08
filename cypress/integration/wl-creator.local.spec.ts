@@ -1387,6 +1387,7 @@ context.skip('Whitelisted Creator flow', () => {
       storage.save();
     });
 
+    // Can fail if strict mode is enabled
     it('can enter post page from creators profile', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
       cy.url().should('include', creatorUsername);
@@ -1432,6 +1433,7 @@ context.skip('Whitelisted Creator flow', () => {
 
       // Could be great to show bundle purchased modal, but we don't know which offer was acquired
 
+      // Can fail due to issues with WS event
       cy.dGet('#bundles');
 
       cy.dGet('#see-bundle-button').should('be.visible');
@@ -1915,6 +1917,7 @@ context.skip('Whitelisted Creator flow', () => {
       });
     });
 
+    // Can fail if strict mode is enabled
     it('can enter post page from creators profile', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${creatorUsername}`);
       cy.url().should('include', creatorUsername);
