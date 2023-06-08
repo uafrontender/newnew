@@ -86,6 +86,7 @@ function useBuyBundleAfterStripeRedirect(
 
   // A Delay allows to cancel first request when the second full re-render happens
   // TODO: use abortController instead?
+  // Can be abandoned after we get rid of Redux which causes double rendering
   useEffect(() => {
     const timer = setTimeout(() => {
       buyBundleAfterStripeRedirect();

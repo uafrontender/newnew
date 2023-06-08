@@ -23,6 +23,7 @@ interface IFollowingsContextProvider {
   children: React.ReactNode;
 }
 
+// TODO: Move logout logic from the context (AppStateContext?), remove Redux
 const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
   children,
 }) => {

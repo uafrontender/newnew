@@ -247,6 +247,8 @@ const MyApp = (props: IMyApp): ReactElement => {
               accessToken={accessToken}
               uaString={uaString}
             >
+              {/* TODO: Why is it above the PersistanceProvider on which it depends? */}
+              {/* GlobalTheme uses Redux store */}
               <GlobalTheme
                 initialTheme={colorMode}
                 themeFromCookie={themeFromCookie}
@@ -255,18 +257,22 @@ const MyApp = (props: IMyApp): ReactElement => {
                   <AppConstantsContextProvider>
                     <SocketContextProvider>
                       <ChannelsContextProvider>
-                        <PersistanceProvider store={store}>
-                          <SyncUserWrapper>
-                            <NotificationsProvider>
-                              <ModalNotificationsContextProvider>
-                                <PushNotificationContextProvider>
-                                  <BlockedUsersProvider>
-                                    <FollowingsContextProvider>
-                                      <BundlesContextProvider>
-                                        <ChatsUnreadMessagesProvider>
-                                          <OverlayModeProvider>
-                                            <MultipleBeforePopStateContextProvider>
-                                              <PostCreationContextProvider>
+                        <ModalNotificationsContextProvider>
+                          <PushNotificationContextProvider>
+                            <BlockedUsersProvider>
+                              <BundlesContextProvider>
+                                <ChatsUnreadMessagesProvider>
+                                  <OverlayModeProvider>
+                                    <MultipleBeforePopStateContextProvider>
+                                      <PostCreationContextProvider>
+                                        {/* PersistanceProvider causes double initial render for all components below */}
+                                        <PersistanceProvider store={store}>
+                                          {/* SyncUserWrapper uses Redux store */}
+                                          <SyncUserWrapper>
+                                            {/* NotificationsProvider uses Redux store */}
+                                            <NotificationsProvider>
+                                              {/* FollowingsContextProvider uses Redux store */}
+                                              <FollowingsContextProvider>
                                                 <>
                                                   <ToastContainer containerId='toast-container' />
                                                   <VideoProcessingWrapper>
@@ -291,18 +297,18 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                     <PushNotificationModalContainer />
                                                   </VideoProcessingWrapper>
                                                 </>
-                                              </PostCreationContextProvider>
-                                            </MultipleBeforePopStateContextProvider>
-                                          </OverlayModeProvider>
-                                        </ChatsUnreadMessagesProvider>
-                                      </BundlesContextProvider>
-                                    </FollowingsContextProvider>
-                                  </BlockedUsersProvider>
-                                </PushNotificationContextProvider>
-                              </ModalNotificationsContextProvider>
-                            </NotificationsProvider>
-                          </SyncUserWrapper>
-                        </PersistanceProvider>
+                                              </FollowingsContextProvider>
+                                            </NotificationsProvider>
+                                          </SyncUserWrapper>
+                                        </PersistanceProvider>
+                                      </PostCreationContextProvider>
+                                    </MultipleBeforePopStateContextProvider>
+                                  </OverlayModeProvider>
+                                </ChatsUnreadMessagesProvider>
+                              </BundlesContextProvider>
+                            </BlockedUsersProvider>
+                          </PushNotificationContextProvider>
+                        </ModalNotificationsContextProvider>
                       </ChannelsContextProvider>
                     </SocketContextProvider>
                   </AppConstantsContextProvider>
