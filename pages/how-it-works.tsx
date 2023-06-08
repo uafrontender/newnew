@@ -24,7 +24,7 @@ export const HowItWorks = () => {
   const { t } = useTranslation('page-HowItWorks');
   const theme = useTheme();
   const { appConstants } = useGetAppConstants();
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn, userIsCreator } = useAppState();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -138,14 +138,15 @@ export const HowItWorks = () => {
                 <SButton view='primaryGrad'>{t('exploreButton')}</SButton>
               </a>
             </Link>
-            {!user.loggedIn && (
+            {!userLoggedIn && (
               <Link href='/sign-up?to=create'>
                 <a>
                   <SButton view='secondary'>{t('createButton')}</SButton>
                 </a>
               </Link>
             )}
-            {user.loggedIn && !user.userData?.options?.isCreator &&
+            {userLoggedIn &&
+              !userIsCreator &&
               canBecomeCreator(
                 user.userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears
@@ -156,7 +157,7 @@ export const HowItWorks = () => {
                   </a>
                 </Link>
               )}
-            {user.userData?.options?.isCreator && (
+            {userIsCreator && (
               <Link href='/creation'>
                 <a>
                   <SButton view='secondary'>{t('createButton')}</SButton>

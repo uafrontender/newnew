@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAppSelector } from '../../../../redux-store/store';
 import { formatNumber } from '../../../../utils/format';
 import DisplayName from '../../../atoms/DisplayName';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IWinningMcOptionCreator {
   postCreator: newnewapi.IUser;
@@ -17,9 +18,10 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
   ({ postCreator, winningOption }) => {
     const { t } = useTranslation('page-Post');
     const user = useAppSelector((state) => state.user);
+    const { userLoggedIn } = useAppState();
 
     const userToRender = useMemo(() => {
-      if (user.loggedIn && !user.userData?.userUuid) {
+      if (userLoggedIn && !user.userData?.userUuid) {
         return null;
       }
 
@@ -45,7 +47,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
       winningOption.whitelistSupporter,
       winningOption.creator,
       winningOption.firstVoter,
-      user.loggedIn,
+      userLoggedIn,
       user.userData?.userUuid,
       winningOption.isSupportedByMe,
       postCreator?.uuid,
