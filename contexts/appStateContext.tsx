@@ -17,6 +17,7 @@ import isBrowser from '../utils/isBrowser';
 import { sizes, TResizeMode } from '../styles/media';
 import { cookiesInstance, refreshCredentials } from '../api/apiConfigs';
 
+// TODO: Add info after user being White Listed
 export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
   userLoggedIn: boolean;
