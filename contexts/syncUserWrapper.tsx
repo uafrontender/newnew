@@ -36,6 +36,7 @@ interface ISyncUserWrapper {
   children: React.ReactNode;
 }
 
+// TODO: Can be a UserDataContext
 const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
   children,
 }) => {

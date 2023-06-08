@@ -22,6 +22,7 @@ interface INotificationsProvider {
   children: React.ReactNode;
 }
 
+// TODO: add user uuid to the token, parse in AppStateContext, use instead of Redux
 export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   children,
 }) => {
