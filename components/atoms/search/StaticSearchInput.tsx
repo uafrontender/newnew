@@ -4,6 +4,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import InlineSVG from '../InlineSVG';
 
@@ -21,7 +22,6 @@ import Button from '../Button';
 import NoResults from './NoResults';
 import PopularTagsResults from './PopularTagsResults';
 import getChunks from '../../../utils/getChunks/getChunks';
-import { useOverlayMode } from '../../../contexts/overlayModeContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../Loader';
@@ -38,7 +38,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const { t } = useTranslation('common');
     const theme = useTheme();
     const dispatch = useAppDispatch();
-    const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
     const { showErrorToastPredefined } = useErrorToasts();
 
     const inputRef: any = useRef();
@@ -246,15 +245,41 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       if (clearedSearchValue?.length > 1) {
         getQuickSearchResult(clearedSearchValue);
         setIsResultsDropVisible(true);
-        document.documentElement.style.setProperty(
-          '--window-inner-height',
-          `${window.innerHeight}px`
-        );
       } else {
         setIsResultsDropVisible(false);
         resetResults();
       }
     }, [debouncedSearchValue, isMobileOrTablet, getQuickSearchResult]);
+
+    useEffect(() => {
+      document.documentElement.style.setProperty(
+        '--window-inner-height',
+        `${window.visualViewport?.height || window.innerHeight}px`
+      );
+    }, []);
+
+    useEffect(() => {
+      const handleUpdateWindowInnerHeightValue = (event: Event) => {
+        document.documentElement.style.setProperty(
+          '--window-inner-height',
+          `${(event.target as VisualViewport)?.height || window.innerHeight}px`
+        );
+      };
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener(
+          'resize',
+          handleUpdateWindowInnerHeightValue
+        );
+      }
+
+      return () => {
+        window.visualViewport?.removeEventListener(
+          'resize',
+          handleUpdateWindowInnerHeightValue
+        );
+      };
+    }, []);
 
     const closeSearch = useCallback(() => {
       handleSearchClose();
@@ -264,19 +289,18 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     }, [handleSearchClose]);
 
     useEffect(() => {
-      if (isMobileOrTablet && isResultsDropVisible) {
-        enableOverlayMode();
+      const resultContainer = resultsContainerRef.current;
+
+      if (isMobileOrTablet && isResultsDropVisible && resultContainer) {
+        disableBodyScroll(resultContainer);
       }
 
       return () => {
-        disableOverlayMode();
+        if (resultContainer) {
+          enableBodyScroll(resultContainer);
+        }
       };
-    }, [
-      isMobileOrTablet,
-      isResultsDropVisible,
-      enableOverlayMode,
-      disableOverlayMode,
-    ]);
+    }, [isMobileOrTablet, isResultsDropVisible]);
 
     return (
       <>
@@ -396,7 +420,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
                   </SBlock>
                 )
               ) : (
-                <div>
+                <SResultsDropMobileContent>
                   {resultsCreators.length > 0 && (
                     <PopularCreatorsResults
                       creators={resultsCreators}
@@ -421,7 +445,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
                   >
                     {t('search.allResults')}
                   </SButton>
-                </div>
+                </SResultsDropMobileContent>
               )
             }
           </SResultsDropMobile>
@@ -538,22 +562,23 @@ const SResultsDropMobile = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   position: fixed;
   border-radius: 0;
+  padding: 16px;
   width: 100vw;
-  height: calc(var(--window-inner-height) - 1px);
+  height: calc(var(--window-inner-height) - 40px); // 40px needs for ios
   top: 56px;
   left: 0;
-  padding: 16px;
-  overflow: auto;
-
-  @supports (-webkit-touch-callout: none) {
-    /* CSS specific to iOS devices */
-    padding-bottom: 32px;
-  }
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
 
   ${({ theme }) => theme.media.tablet} {
     padding: 16px 48px;
     top: 64px;
   }
+`;
+
+const SResultsDropMobileContent = styled.div`
+  height: auto;
 `;
 
 interface ISInputWrapper {
