@@ -28,7 +28,6 @@ const SettingsNotificationsSection = () => {
   const {
     isSubscribed,
     isPushNotificationSupported,
-    isLoading: isStateLoading,
     unsubscribe,
     requestPermission,
   } = usePushNotifications();
@@ -110,7 +109,7 @@ const SettingsNotificationsSection = () => {
 
   return (
     <SWrapper>
-      {isLoading !== false || isStateLoading ? (
+      {isLoading !== false ? (
         <Lottie
           width={64}
           height={64}
@@ -146,6 +145,8 @@ const SettingsNotificationsSection = () => {
 
               return null;
             })}
+
+          {/* TODO: add loading during for turnOnPushNotifications/turnOffPushNotification process */}
           {isPushNotificationSupported && (
             <SSubsection>
               <Text variant={2} weight={600}>

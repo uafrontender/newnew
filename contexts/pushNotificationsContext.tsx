@@ -32,7 +32,6 @@ const SESSION_TIME = 240000;
 export const PushNotificationsContext = createContext<{
   isSubscribed: boolean;
   isPermissionRequestModalOpen: boolean;
-  isLoading: boolean;
   isPushNotificationAlertShown: boolean;
   isPushNotificationSupported: boolean;
   subscribe: (callback?: () => void) => void;
@@ -46,7 +45,6 @@ export const PushNotificationsContext = createContext<{
 }>({
   isSubscribed: false,
   isPermissionRequestModalOpen: false,
-  isLoading: false,
   isPushNotificationAlertShown: false,
   isPushNotificationSupported: false,
   subscribe: () => {},
@@ -70,7 +68,6 @@ const PushNotificationsContextProvider: React.FC<
 > = ({ children }) => {
   const { userLoggedIn } = useAppState();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [isPermissionRequestModalOpen, setIsPermissionRequestModalOpen] =
     useState(false);
 
@@ -78,7 +75,6 @@ const PushNotificationsContextProvider: React.FC<
     useState(false);
 
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [publicKey, setPublicKey] = useState('');
 
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -99,26 +95,17 @@ const PushNotificationsContextProvider: React.FC<
   );
 
   // Get config
-  useEffect(() => {
-    const getWebConfig = async () => {
-      try {
-        setIsLoading(true);
-        const payload = new newnewapi.EmptyRequest({});
+  const getPublicKey = useCallback(async () => {
+    const payload = new newnewapi.EmptyRequest({});
 
-        const response = await webPushConfig(payload);
+    const response = await webPushConfig(payload);
 
-        setPublicKey(response.data?.publicKey || '');
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (userLoggedIn) {
-      getWebConfig();
+    if (!response.data?.publicKey) {
+      throw new Error('No public key');
     }
-  }, [userLoggedIn]);
+
+    return response.data?.publicKey;
+  }, []);
 
   // Get browser permission
   const getPermissionData: () => {
@@ -396,6 +383,8 @@ const PushNotificationsContextProvider: React.FC<
     async (permissionData: any, onSuccess?: () => void) => {
       try {
         if (permissionData.permission === 'default') {
+          const publicKey = await getPublicKey();
+
           (window as any).safari.pushNotification.requestPermission(
             `${process.env.NEXT_PUBLIC_BASE_URL}/web_push/safari`,
             process.env.NEXT_PUBLIC_WEB_PUSH_ID,
@@ -420,7 +409,7 @@ const PushNotificationsContextProvider: React.FC<
         }
       }
     },
-    [publicKey, openPushNotificationAlert, showErrorToastPredefined]
+    [openPushNotificationAlert, showErrorToastPredefined, getPublicKey]
   );
 
   const subscribeSafari = useCallback(
@@ -473,6 +462,8 @@ const PushNotificationsContextProvider: React.FC<
           await oldSubscription.unsubscribe();
         }
 
+        const publicKey = await getPublicKey();
+
         // subscribe
         const subscription = await swReg.pushManager.subscribe({
           userVisibleOnly: true,
@@ -488,7 +479,7 @@ const PushNotificationsContextProvider: React.FC<
         showErrorToastPredefined();
       }
     },
-    [publicKey, registerSubscriptionNonSafari, showErrorToastPredefined]
+    [getPublicKey, registerSubscriptionNonSafari, showErrorToastPredefined]
   );
 
   const subscribe = useCallback(
@@ -712,7 +703,6 @@ const PushNotificationsContextProvider: React.FC<
   const contextValue = useMemo(
     () => ({
       isSubscribed,
-      isLoading,
       isPermissionRequestModalOpen,
       isPushNotificationAlertShown,
       isPushNotificationSupported: isPushNotificationSupported.current,
@@ -727,7 +717,6 @@ const PushNotificationsContextProvider: React.FC<
     }),
     [
       isSubscribed,
-      isLoading,
       isPermissionRequestModalOpen,
       isPushNotificationAlertShown,
       requestPermission,
@@ -757,8 +746,6 @@ const PushNotificationsContextProvider: React.FC<
     ) {
       setIsPushNotificationAlertShown(false);
       setIsPermissionRequestModalOpen(false);
-      setIsLoading(false);
-      setPublicKey('');
       setIsSubscribed(false);
       pauseNotification();
     }
