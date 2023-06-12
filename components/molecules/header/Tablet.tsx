@@ -24,13 +24,14 @@ import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useUiState } from '../../../contexts/uiStateContext';
 
 export const Tablet: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useChatsUnreadMessages();
   const user = useAppSelector((state) => state.user);
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { globalSearchActive } = useUiState();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
 
   const { unreadNotificationCount } = useNotifications();

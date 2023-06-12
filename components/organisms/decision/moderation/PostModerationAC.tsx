@@ -16,7 +16,6 @@ import { useRouter } from 'next/dist/client/router';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
@@ -35,6 +34,7 @@ import PostModerationResponsesContextProvider from '../../../../contexts/postMod
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import useAcOptions from '../../../../utils/hooks/useAcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { useUiState } from '../../../../contexts/uiStateContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const ResponseTimer = dynamic(
@@ -62,7 +62,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const { locale } = useRouter();
     const { showErrorToastCustom } = useErrorToasts();
     const { user } = useAppSelector((state) => state);
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -153,8 +153,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     };
 
     const handleToggleMutedMode = useCallback(() => {
-      dispatch(toggleMutedMode(''));
-    }, [dispatch]);
+      toggleMutedMode();
+    }, [toggleMutedMode]);
 
     const {
       processedOptions: options,

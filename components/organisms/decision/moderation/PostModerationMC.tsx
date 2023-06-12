@@ -14,7 +14,6 @@ import moment from 'moment';
 import { useRouter } from 'next/dist/client/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 import switchPostType from '../../../../utils/switchPostType';
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -34,6 +33,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { useUiState } from '../../../../contexts/uiStateContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const HeroPopup = dynamic(
@@ -64,7 +64,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const { locale } = useRouter();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -147,8 +147,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     >();
 
     const handleToggleMutedMode = useCallback(() => {
-      dispatch(toggleMutedMode(''));
-    }, [dispatch]);
+      toggleMutedMode();
+    }, [toggleMutedMode]);
 
     const {
       processedOptions: options,
