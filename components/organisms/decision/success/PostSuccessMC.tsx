@@ -649,6 +649,8 @@ const SWinningOptionDetailsSeeAll = styled.button`
 const SWinningOptionDetailsTitle = styled(Headline)`
   grid-area: title;
 
+  word-break: break-word;
+
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
