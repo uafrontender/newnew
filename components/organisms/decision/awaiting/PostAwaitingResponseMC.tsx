@@ -12,8 +12,6 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 
@@ -32,6 +30,7 @@ import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import { useAppState } from '../../../../contexts/appStateContext';
 import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
 import DisplayName from '../../../atoms/DisplayName';
+import { useUiState } from '../../../../contexts/uiStateContext';
 
 const WaitingForResponseBox = dynamic(
   () => import('../../../molecules/decision/waiting/WaitingForResponseBox')
@@ -52,8 +51,7 @@ interface IPostAwaitingResponseMC {
 const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
   React.memo(({ post }) => {
     const { t } = useTranslation('page-Post');
-    const dispatch = useAppDispatch();
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -138,8 +136,8 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
     );
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
-      dispatch(toggleMutedMode(''));
-    }, [dispatch]);
+      toggleMutedMode();
+    }, [toggleMutedMode]);
 
     // Main screen vs all options
     const [openedMainSection, setOpenedMainSection] = useState<
