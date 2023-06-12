@@ -231,7 +231,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async (
 ) => {
   context.res.setHeader(
     'Cache-Control',
-    'public, s-maxage=5, stale-while-revalidate=10'
+    'public, s-maxage=1, stale-while-revalidate=5'
   );
 
   const translationContext = await serverSideTranslations(
