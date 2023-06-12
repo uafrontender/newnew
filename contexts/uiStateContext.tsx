@@ -29,7 +29,7 @@ export const UiStateContext = createContext<{
 }>({
   banner: {
     show: false,
-    title: 'Lorem ipsum',
+    title: '',
   },
   colorMode: 'auto',
   mutedMode: false,
