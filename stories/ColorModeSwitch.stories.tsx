@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { useTheme } from 'styled-components';
 
 import SettingsColorModeSwitch from '../components/molecules/profile/SettingsColorModeSwitch';
-import { useTheme } from 'styled-components';
-import { TColorMode } from '../redux-store/slices/uiStateSlice';
+import { TColorMode } from '../contexts/uiStateContext';
 
 export default {
   title: 'Components/Selection',
