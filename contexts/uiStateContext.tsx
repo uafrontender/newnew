@@ -10,7 +10,6 @@ import { cookiesInstance } from '../api/apiConfigs';
 import getColorMode from '../utils/getColorMode';
 
 export type TColorMode = 'light' | 'dark' | 'auto';
-export type TGlobalSearchActive = true | false;
 export type TBanner = {
   show: boolean;
   title: string;
@@ -20,7 +19,7 @@ export const UiStateContext = createContext<{
   banner: TBanner;
   colorMode: TColorMode;
   mutedMode: boolean;
-  globalSearchActive: TGlobalSearchActive;
+  globalSearchActive: boolean;
   setColorMode: (payload: TColorMode) => void;
   setGlobalSearchActive: (newValue: boolean) => void;
   setBanner: (newValue: TBanner) => void;
