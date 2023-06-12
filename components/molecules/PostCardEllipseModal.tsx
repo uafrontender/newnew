@@ -17,6 +17,7 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import InlineSvg from '../atoms/InlineSVG';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;
@@ -47,6 +48,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('common');
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
 
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
@@ -76,8 +78,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
         _postUuid: postUuid,
       });
 
-      // Redirect only after the persist data is pulled
-      if (!user.loggedIn && user._persist?.rehydrated) {
+      if (!userLoggedIn) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/p/${postShortId || postUuid}`
@@ -110,8 +111,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
     }
   }, [
     postUuid,
-    user.loggedIn,
-    user._persist?.rehydrated,
+    userLoggedIn,
     isFollowingDecision,
     router,
     postShortId,
@@ -143,10 +143,10 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       }
     }
 
-    if (user.loggedIn && isOpen) {
+    if (userLoggedIn && isOpen) {
       fetchIsFollowing();
     }
-  }, [user.loggedIn, postUuid, isOpen]);
+  }, [userLoggedIn, postUuid, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {

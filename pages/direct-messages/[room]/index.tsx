@@ -22,6 +22,7 @@ import ChatContainer from '../../../components/organisms/direct-messages/ChatCon
 import { ChatsProvider, useGetChats } from '../../../contexts/chatContext';
 import { ChatTypes } from '../../../constants/chat';
 import { getMyRooms } from '../../../api/endpoints/chat';
+import { useAppState } from '../../../contexts/appStateContext';
 
 // TODO: Move to utils
 const getChatRoomParamsFromUrl = (room?: string, username?: string) => {
@@ -79,6 +80,7 @@ const Chat: NextPage = () => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn, userIsCreator } = useAppState();
   const queryClient = useQueryClient();
   const { setSearchChatroom } = useGetChats();
 
@@ -112,12 +114,21 @@ const Chat: NextPage = () => {
   }, [router.query.roomID]);
 
   const initialTab = useMemo(() => {
-    if (room === 'empty' || !user.userData?.options?.isCreator) {
+    if (room === 'empty' || !user.userData?.username || !userIsCreator) {
       return undefined;
     }
 
-    return getChatRoomParamsFromUrl(room, user.userData.username)?.myRole;
-  }, [room, user.userData?.options?.isCreator, user.userData?.username]);
+    const chatRoomParams = getChatRoomParamsFromUrl(
+      room,
+      user.userData.username
+    );
+
+    if (chatRoomParams) {
+      return chatRoomParams.myRole;
+    }
+
+    return undefined;
+  }, [room, userIsCreator, user.userData?.username]);
 
   const handleChatRoomSelected = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
@@ -196,11 +207,10 @@ const Chat: NextPage = () => {
   }, [room, user.userData?.username]);
 
   useUpdateEffect(() => {
-    // Redirect only after the persist data is pulled
-    if (!user.loggedIn && user._persist?.rehydrated) {
+    if (!userLoggedIn) {
       router?.push('/sign-up');
     }
-  }, [router, user.loggedIn, user._persist?.rehydrated]);
+  }, [userLoggedIn, router]);
 
   useEffect(() => {
     if (

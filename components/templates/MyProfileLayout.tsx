@@ -75,7 +75,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const { socketConnection } = useContext(SocketContext);
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
@@ -84,7 +84,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const tabs: Tab[] = useMemo(
     () => [
-      ...(user.userData?.options?.isCreator
+      ...(userIsCreator
         ? [
             {
               nameToken: 'myposts',
@@ -109,7 +109,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         url: '/profile/favorites',
       },
     ],
-    [user.userData?.options?.isCreator]
+    [userIsCreator]
   );
 
   // Show skeleton on route change
@@ -305,11 +305,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   // Redirect to / if user is not logged in
   useUpdateEffect(() => {
-    // Redirect only after the persist data is pulled
-    if (!user.loggedIn && user._persist?.rehydrated) {
+    if (!userLoggedIn) {
       router.replace('/');
     }
-  }, [router, user]);
+  }, [router, userLoggedIn]);
 
   // Try to pre-fetch the content
   useEffect(() => {
@@ -358,16 +357,16 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       setMyLimitLeftInCents(decoded.totalSpending.usdCents);
     };
 
-    if (socketConnection && user.loggedIn) {
+    if (socketConnection && userLoggedIn) {
       socketConnection?.on('MySpendingChanged', handleMySpendingChanged);
     }
 
     return () => {
-      if (socketConnection && socketConnection?.connected && user.loggedIn) {
+      if (socketConnection && socketConnection?.connected && userLoggedIn) {
         socketConnection?.off('MySpendingChanged', handleMySpendingChanged);
       }
     };
-  }, [socketConnection, user.loggedIn]);
+  }, [socketConnection, userLoggedIn]);
 
   const myLimitLeftFormatted = useMemo(() => {
     if (myLimitLeftInCents === undefined) {

@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setCreatorData } from '../../redux-store/slices/userStateSlice';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import Loader from '../../components/atoms/Loader';
+import { useAppState } from '../../contexts/appStateContext';
 
 const DashboardSectionStripe = dynamic(
   () => import('../../components/organisms/creator/DashboardSectionStripe')
@@ -27,16 +28,20 @@ const GetPaid = () => {
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+  const { userIsCreator } = useAppState();
 
   useUpdateEffect(() => {
-    if (!user?.userData?.options?.isCreator) {
+    if (!userIsCreator) {
       router.replace('/');
     }
-  }, [user?.userData?.options?.isCreator]);
+  }, [userIsCreator]);
 
   useEffect(() => {
     async function fetchOnboardingState() {
-      if (isLoading) return;
+      if (isLoading) {
+        return;
+      }
+
       try {
         setIsLoading(true);
         const payload = new newnewapi.EmptyRequest({});
