@@ -12,8 +12,6 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
 import { quickSearch } from '../../../api/endpoints/search';
-import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
@@ -28,6 +26,7 @@ import Loader from '../Loader';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useUiState } from '../../../contexts/uiStateContext';
 
 interface IStaticSearchInput {
   width?: string;
@@ -37,7 +36,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
   ({ width }) => {
     const { t } = useTranslation('common');
     const theme = useTheme();
-    const dispatch = useAppDispatch();
     const { showErrorToastPredefined } = useErrorToasts();
 
     const inputRef: any = useRef();
@@ -56,7 +54,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       newnewapi.IHashtag[]
     >([]);
 
-    const { globalSearchActive } = useAppSelector((state) => state.ui);
+    const { globalSearchActive, setGlobalSearchActive } = useUiState();
+
     const { resizeMode } = useAppState();
     const router = useRouter();
 
@@ -77,12 +76,12 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
         if (router.asPath === path) {
           setSearchValue('');
           setIsResultsDropVisible(false);
-          dispatch(setGlobalSearchActive(false));
+          setGlobalSearchActive(false);
         } else {
           router.push(path);
         }
       },
-      [router, dispatch]
+      [router, setGlobalSearchActive]
     );
 
     const handleSeeResults = (query: string) => {
@@ -112,16 +111,16 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
     const handleSearchClick = useCallback(() => {
       Mixpanel.track('Search Clicked');
-      dispatch(setGlobalSearchActive(!globalSearchActive));
-    }, [dispatch, globalSearchActive]);
+      setGlobalSearchActive(!globalSearchActive);
+    }, [globalSearchActive, setGlobalSearchActive]);
 
     const handleSearchClose = useCallback(() => {
       Mixpanel.track('Search Closed');
 
       setSearchValue('');
       setIsResultsDropVisible(false);
-      dispatch(setGlobalSearchActive(false));
-    }, [dispatch]);
+      setGlobalSearchActive(false);
+    }, [setGlobalSearchActive]);
 
     const handleInputChange = (e: any) => {
       const onlySpacesRegex = /^\s+$/;
