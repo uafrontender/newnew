@@ -53,7 +53,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { t } = useTranslation('page-VerifyEmail');
   const { resumePushNotification } = usePushNotifications();
 
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { resizeMode, handleUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -156,9 +156,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           path: '/',
         });
 
-        // Set logged in and
-        setUserLoggedIn(true);
-        setUserIsCreator(!!data.me?.options?.isCreator);
+        handleUserLoggedIn(data.me?.options?.isCreator ?? false);
         dispatch(setSignupEmailInput(''));
         dispatch(setSignupTimerValue(0));
 
@@ -187,8 +185,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       dispatch,
       router,
       redirectUserTo,
-      setUserLoggedIn,
-      setUserIsCreator,
+      handleUserLoggedIn,
     ]
   );
 

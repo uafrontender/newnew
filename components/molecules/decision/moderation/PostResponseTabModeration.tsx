@@ -22,13 +22,12 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import EditPostTitleModal from './EditPostTitleModal';
 import InlineSvg from '../../../atoms/InlineSVG';
 import EditIconFilled from '../../../../public/images/svg/icons/filled/EditTransparent.svg';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 
 interface IPostResponseTabModeration {
   postUuid: string;
@@ -57,62 +56,61 @@ const PostResponseTabModeration: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
+  const {
+    userTutorialsProgress,
+    userTutorialsProgressSynced,
+    setUserTutorialsProgress,
+  } = useTutorialProgress();
   const { userLoggedIn } = useAppState();
-  const dispatch = useAppDispatch();
 
   const [isTutorialVisible, setIsTutorialVisible] = useState(false);
 
   const goToNextStep = useCallback(async () => {
     if (postType === 'ac') {
       if (
-        user.userTutorialsProgress.remainingAcResponseCurrentStep &&
-        user.userTutorialsProgress.remainingAcResponseCurrentStep[0]
+        userTutorialsProgress?.remainingAcResponseCurrentStep &&
+        userTutorialsProgress.remainingAcResponseCurrentStep[0]
       ) {
         if (userLoggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             acResponseCurrentStep:
-              user.userTutorialsProgress.remainingAcResponseCurrentStep[0],
+              userTutorialsProgress.remainingAcResponseCurrentStep[0],
           });
           await markTutorialStepAsCompleted(payload);
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingAcResponseCurrentStep: [
-              ...user.userTutorialsProgress.remainingAcResponseCurrentStep,
-            ].slice(1),
-          })
-        );
+        setUserTutorialsProgress({
+          remainingAcResponseCurrentStep: [
+            ...userTutorialsProgress.remainingAcResponseCurrentStep,
+          ].slice(1),
+        });
         setIsTutorialVisible(false);
       }
     } else if (postType === 'mc') {
       if (
-        user.userTutorialsProgress.remainingMcResponseCurrentStep &&
-        user.userTutorialsProgress.remainingMcResponseCurrentStep[0]
+        userTutorialsProgress?.remainingMcResponseCurrentStep &&
+        userTutorialsProgress.remainingMcResponseCurrentStep[0]
       ) {
         if (userLoggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             mcResponseCurrentStep:
-              user.userTutorialsProgress.remainingMcResponseCurrentStep[0],
+              userTutorialsProgress.remainingMcResponseCurrentStep[0],
           });
           await markTutorialStepAsCompleted(payload);
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingMcResponseCurrentStep: [
-              ...user.userTutorialsProgress.remainingMcResponseCurrentStep,
-            ].slice(1),
-          })
-        );
+        setUserTutorialsProgress({
+          remainingMcResponseCurrentStep: [
+            ...userTutorialsProgress.remainingMcResponseCurrentStep,
+          ].slice(1),
+        });
         setIsTutorialVisible(false);
       }
     }
   }, [
-    dispatch,
     postType,
     userLoggedIn,
-    user.userTutorialsProgress.remainingAcResponseCurrentStep,
-    user.userTutorialsProgress.remainingMcResponseCurrentStep,
+    userTutorialsProgress?.remainingAcResponseCurrentStep,
+    userTutorialsProgress?.remainingMcResponseCurrentStep,
+    setUserTutorialsProgress,
   ]);
 
   const {
@@ -225,12 +223,12 @@ const PostResponseTabModeration: React.FunctionComponent<
   }, [handleUploadAdditionalVideoProcessed, postUuid]);
 
   useEffect(() => {
-    if (user.userTutorialsProgressSynced) {
+    if (userTutorialsProgressSynced) {
       switch (postType) {
         case 'mc': {
           if (
-            user.userTutorialsProgress.remainingMcResponseCurrentStep &&
-            user.userTutorialsProgress.remainingMcResponseCurrentStep[0] ===
+            userTutorialsProgress?.remainingMcResponseCurrentStep &&
+            userTutorialsProgress?.remainingMcResponseCurrentStep[0] ===
               newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE
           ) {
             setIsTutorialVisible(true);
@@ -240,8 +238,8 @@ const PostResponseTabModeration: React.FunctionComponent<
         }
         default: {
           if (
-            user.userTutorialsProgress.remainingAcResponseCurrentStep &&
-            user.userTutorialsProgress.remainingAcResponseCurrentStep[0] ===
+            userTutorialsProgress?.remainingAcResponseCurrentStep &&
+            userTutorialsProgress?.remainingAcResponseCurrentStep[0] ===
               newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE
           ) {
             setIsTutorialVisible(true);
@@ -255,10 +253,10 @@ const PostResponseTabModeration: React.FunctionComponent<
     }
   }, [
     postType,
-    user.userTutorialsProgress.remainingAcResponseCurrentStep,
-    user.userTutorialsProgress.remainingMcCrCurrentStep,
-    user.userTutorialsProgress.remainingMcResponseCurrentStep,
-    user.userTutorialsProgressSynced,
+    userTutorialsProgressSynced,
+    userTutorialsProgress?.remainingAcResponseCurrentStep,
+    userTutorialsProgress?.remainingMcCrCurrentStep,
+    userTutorialsProgress?.remainingMcResponseCurrentStep,
   ]);
 
   if (postStatus === 'succeeded') {

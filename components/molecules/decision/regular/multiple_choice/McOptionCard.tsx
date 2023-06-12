@@ -7,10 +7,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '../../../../../redux-store/store';
+import { useAppSelector } from '../../../../../redux-store/store';
 import {
   deleteMcOption,
   voteWithBundleVotes,
@@ -22,7 +19,6 @@ import useStripeSetupIntent from '../../../../../utils/hooks/useStripeSetupInten
 import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
@@ -54,6 +50,7 @@ import VoteIconLight from '../../../../../public/images/decision/vote-icon-light
 import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -122,7 +119,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
   const { resizeMode, userLoggedIn } = useAppState();
-  const dispatch = useAppDispatch();
+  const { userTutorialsProgress, setUserTutorialsProgress } =
+    useTutorialProgress();
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -560,22 +558,18 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const goToNextStep = () => {
     if (
-      user.userTutorialsProgress.remainingMcSteps &&
-      user.userTutorialsProgress.remainingMcSteps[0]
+      userTutorialsProgress?.remainingMcSteps &&
+      userTutorialsProgress.remainingMcSteps[0]
     ) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+          mcCurrentStep: userTutorialsProgress.remainingMcSteps[0],
         });
         markTutorialStepAsCompleted(payload);
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingMcSteps: [
-            ...user.userTutorialsProgress.remainingMcSteps,
-          ].slice(1),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingMcSteps: [...userTutorialsProgress.remainingMcSteps].slice(1),
+      });
     }
   };
 
@@ -678,11 +672,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                     : t('mcPost.optionsTab.optionCard.raiseBidButton')}
                 </div>
               </SSupportButton>
-              {index === 0 && user?.userTutorialsProgress.remainingMcSteps && (
+              {index === 0 && userTutorialsProgress?.remainingMcSteps && (
                 <STutorialTooltipHolder>
                   <TutorialTooltip
                     isTooltipVisible={
-                      user.userTutorialsProgress.remainingMcSteps[0] ===
+                      userTutorialsProgress.remainingMcSteps[0] ===
                       newnewapi.McTutorialStep.MC_VOTE
                     }
                     closeTooltip={goToNextStep}
@@ -726,11 +720,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   ? t('mcPost.optionsTab.optionCard.supportButton')
                   : t('mcPost.optionsTab.optionCard.supportAgainButton')}
               </SSupportButtonDesktop>
-              {index === 0 && user.userTutorialsProgress.remainingMcSteps && (
+              {index === 0 && userTutorialsProgress?.remainingMcSteps && (
                 <STutorialTooltipHolder>
                   <TutorialTooltip
                     isTooltipVisible={
-                      user.userTutorialsProgress.remainingMcSteps[0] ===
+                      userTutorialsProgress.remainingMcSteps[0] ===
                       newnewapi.McTutorialStep.MC_VOTE
                     }
                     closeTooltip={goToNextStep}

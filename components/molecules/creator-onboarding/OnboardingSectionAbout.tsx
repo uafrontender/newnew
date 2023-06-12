@@ -19,10 +19,7 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
 import { updateMe } from '../../../api/endpoints/user';
-import {
-  logoutUserClearCookiesAndRedirect,
-  setUserData,
-} from '../../../redux-store/slices/userStateSlice';
+import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
@@ -68,7 +65,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode, setUserLoggedIn } = useAppState();
+  const { resizeMode, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -112,20 +109,16 @@ const OnboardingSectionAbout: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setBioError, dispatch, setUserLoggedIn]
+    [setBioError, logoutAndRedirect]
   );
 
   const validateBioViaApiDebounced = useMemo(
@@ -186,16 +179,12 @@ const OnboardingSectionAbout: React.FunctionComponent<
       console.log(err);
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
   }, [
@@ -203,7 +192,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
     dispatch,
     router,
     user.creatorData?.options?.stripeConnectStatus,
-    setUserLoggedIn,
+    logoutAndRedirect,
   ]);
 
   useEffect(() => {

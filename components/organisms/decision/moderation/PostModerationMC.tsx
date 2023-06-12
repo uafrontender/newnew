@@ -19,7 +19,6 @@ import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 import switchPostType from '../../../../utils/switchPostType';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 import PostVideoModeration from '../../../molecules/decision/moderation/PostVideoModeration';
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
@@ -34,6 +33,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import PostModerationResponsesContextProvider from '../../../../contexts/postModerationResponsesContext';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const HeroPopup = dynamic(
@@ -66,6 +66,11 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
     const { resizeMode, userLoggedIn } = useAppState();
+    const {
+      userTutorialsProgress,
+      userTutorialsProgressSynced,
+      setUserTutorialsProgress,
+    } = useTutorialProgress();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -294,38 +299,36 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
 
     const goToNextStep = () => {
       if (
-        user.userTutorialsProgress.remainingMcSteps &&
-        user.userTutorialsProgress.remainingMcSteps[0]
+        userTutorialsProgress?.remainingMcSteps &&
+        userTutorialsProgress.remainingMcSteps[0]
       ) {
         if (userLoggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+            mcCurrentStep: userTutorialsProgress?.remainingMcSteps[0],
           });
           markTutorialStepAsCompleted(payload);
         }
-        dispatch(
-          setUserTutorialsProgress({
-            remainingMcSteps: [
-              ...user.userTutorialsProgress.remainingMcSteps,
-            ].slice(1),
-          })
-        );
+        setUserTutorialsProgress({
+          remainingMcSteps: [...userTutorialsProgress.remainingMcSteps].slice(
+            1
+          ),
+        });
       }
     };
 
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     useEffect(() => {
       if (
-        user.userTutorialsProgressSynced &&
-        user.userTutorialsProgress.remainingMcSteps &&
-        user.userTutorialsProgress.remainingMcSteps[0] ===
+        userTutorialsProgressSynced &&
+        userTutorialsProgress?.remainingMcSteps &&
+        userTutorialsProgress.remainingMcSteps[0] ===
           newnewapi.McTutorialStep.MC_HERO
       ) {
         setIsPopupVisible(true);
       } else {
         setIsPopupVisible(false);
       }
-    }, [user]);
+    }, [userTutorialsProgressSynced, userTutorialsProgress?.remainingMcSteps]);
 
     // Scroll to comments if hash is present
     useEffect(() => {

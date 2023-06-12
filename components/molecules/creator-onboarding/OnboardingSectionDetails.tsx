@@ -31,7 +31,6 @@ import {
   validateUsernameTextField,
 } from '../../../api/endpoints/user';
 import {
-  logoutUserClearCookiesAndRedirect,
   setCreatorData,
   setUserData,
 } from '../../../redux-store/slices/userStateSlice';
@@ -145,7 +144,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const { t } = useTranslation('page-CreatorOnboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { resizeMode, handleBecameCreator, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -279,20 +278,16 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setUsernameError, dispatch, user.userData?.username, setUserLoggedIn]
+    [user.userData?.username, setUsernameError, logoutAndRedirect]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -337,20 +332,16 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setNicknameError, dispatch, setUserLoggedIn]
+    [setNicknameError, logoutAndRedirect]
   );
 
   const validateNicknameViaAPIDebounced = useMemo(
@@ -617,7 +608,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
           })
         );
 
-        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+        if (becomeCreatorRes.data.me?.options?.isCreator) {
+          handleBecameCreator();
+        }
 
         const acceptTermsPayload = new newnewapi.EmptyRequest({});
 
@@ -659,16 +652,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
 
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
     // We dont need router here?

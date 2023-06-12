@@ -32,7 +32,6 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
@@ -45,6 +44,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -96,6 +96,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { user } = useAppSelector((state) => state);
   const { mutedMode } = useAppSelector((state) => state.ui);
   const { resizeMode, userLoggedIn } = useAppState();
+  const {
+    userTutorialsProgress,
+    userTutorialsProgressSynced,
+    setUserTutorialsProgress,
+  } = useTutorialProgress();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -421,38 +426,34 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
 
   const goToNextStep = () => {
     if (
-      user.userTutorialsProgress.remainingMcSteps &&
-      user.userTutorialsProgress.remainingMcSteps[0]
+      userTutorialsProgress?.remainingMcSteps &&
+      userTutorialsProgress.remainingMcSteps[0]
     ) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+          mcCurrentStep: userTutorialsProgress.remainingMcSteps[0],
         });
         markTutorialStepAsCompleted(payload);
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingMcSteps: [
-            ...user.userTutorialsProgress.remainingMcSteps,
-          ].slice(1),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingMcSteps: [...userTutorialsProgress.remainingMcSteps].slice(1),
+      });
     }
   };
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   useEffect(() => {
     if (
-      user.userTutorialsProgressSynced &&
-      user.userTutorialsProgress.remainingMcSteps &&
-      user.userTutorialsProgress.remainingMcSteps[0] ===
+      userTutorialsProgressSynced &&
+      userTutorialsProgress?.remainingMcSteps &&
+      userTutorialsProgress.remainingMcSteps[0] ===
         newnewapi.McTutorialStep.MC_HERO
     ) {
       setIsPopupVisible(true);
     } else {
       setIsPopupVisible(false);
     }
-  }, [user]);
+  }, [userTutorialsProgressSynced, userTutorialsProgress?.remainingMcSteps]);
 
   // Scroll to comments if hash is present
   useEffect(() => {

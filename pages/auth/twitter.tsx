@@ -29,7 +29,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { userLoggedIn, handleUserLoggedIn } = useAppState();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -116,9 +116,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           path: '/',
         });
 
-        setUserLoggedIn(true);
-        setUserIsCreator(!!data.me?.options?.isCreator);
-
+        handleUserLoggedIn(data.me?.options?.isCreator ?? false);
         resumePushNotification();
 
         setIsLoading(false);

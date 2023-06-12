@@ -306,7 +306,7 @@ export function useBundles() {
   const context = useContext(BundlesContext);
   if (!context) {
     throw new Error(
-      'useNotifications must be used inside a `NotificationsProvider`'
+      'useBundles must be used inside a `BundlesContextProvider`'
     );
   }
 

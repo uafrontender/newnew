@@ -33,7 +33,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { userLoggedIn, handleUserLoggedIn } = useAppState();
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -117,9 +117,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           maxAge: 10 * 365 * 24 * 60 * 60,
           path: '/',
         });
-
-        setUserLoggedIn(true);
-        setUserIsCreator(!!data.me?.options?.isCreator);
+        handleUserLoggedIn(data.me?.options?.isCreator ?? false);
         dispatch(setSignupEmailInput(''));
         dispatch(setSignupTimerValue(0));
 

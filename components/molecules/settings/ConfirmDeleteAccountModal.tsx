@@ -6,9 +6,7 @@ import styled from 'styled-components';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 
-import { useAppDispatch } from '../../../redux-store/store';
 import { deleteMyAccount } from '../../../api/endpoints/user';
-import { logoutUserClearCookiesAndRedirect } from '../../../redux-store/slices/userStateSlice';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 
@@ -22,8 +20,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
   closeModal,
 }) => {
   const { t } = useTranslation('page-Profile');
-  const dispatch = useAppDispatch();
-  const { setUserLoggedIn } = useAppState();
+  const { logoutAndRedirect } = useAppState();
 
   async function deleteUser() {
     try {
@@ -32,8 +29,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
       const res = await deleteMyAccount(payload);
 
       if (!res.error) {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
     } catch (err) {
       console.error(err);

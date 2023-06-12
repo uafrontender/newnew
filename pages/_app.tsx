@@ -71,6 +71,7 @@ import AppStateContextProvider, {
   useAppState,
 } from '../contexts/appStateContext';
 import PostCreationContextProvider from '../contexts/postCreationContext';
+import { TutorialProgressContextProvider } from '../contexts/tutorialProgressContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -255,62 +256,65 @@ const MyApp = (props: IMyApp): ReactElement => {
               >
                 <LanguageWrapper>
                   <AppConstantsContextProvider>
-                    <SocketContextProvider>
-                      <ChannelsContextProvider>
-                        <ModalNotificationsContextProvider>
-                          <PushNotificationContextProvider>
-                            <BlockedUsersProvider>
-                              <BundlesContextProvider>
-                                <ChatsUnreadMessagesProvider>
-                                  <OverlayModeProvider>
-                                    <MultipleBeforePopStateContextProvider>
-                                      <PostCreationContextProvider>
-                                        {/* PersistanceProvider causes double initial render for all components below */}
-                                        <PersistanceProvider store={store}>
-                                          {/* SyncUserWrapper uses Redux store */}
-                                          <SyncUserWrapper>
-                                            {/* NotificationsProvider uses Redux store */}
-                                            <NotificationsProvider>
-                                              {/* FollowingsContextProvider uses Redux store */}
-                                              <FollowingsContextProvider>
-                                                <>
-                                                  <ToastContainer containerId='toast-container' />
-                                                  <VideoProcessingWrapper>
-                                                    {!pageProps.error ? (
-                                                      getLayout(
-                                                        <Component
-                                                          {...pageProps}
+                    <TutorialProgressContextProvider>
+                      <SocketContextProvider>
+                        <ChannelsContextProvider>
+                          <ModalNotificationsContextProvider>
+                            <PushNotificationContextProvider>
+                              <BlockedUsersProvider>
+                                <BundlesContextProvider>
+                                  <ChatsUnreadMessagesProvider>
+                                    <OverlayModeProvider>
+                                      <MultipleBeforePopStateContextProvider>
+                                        <PostCreationContextProvider>
+                                          {/* PersistanceProvider causes double initial render for all components below */}
+                                          <PersistanceProvider store={store}>
+                                            {/* SyncUserWrapper uses Redux store */}
+                                            <SyncUserWrapper>
+                                              {/* NotificationsProvider uses Redux store */}
+                                              <NotificationsProvider>
+                                                {/* FollowingsContextProvider uses Redux store */}
+                                                <FollowingsContextProvider>
+                                                  <>
+                                                    <ToastContainer containerId='toast-container' />
+                                                    <VideoProcessingWrapper>
+                                                      {!pageProps.error ? (
+                                                        getLayout(
+                                                          <Component
+                                                            {...pageProps}
+                                                          />
+                                                        )
+                                                      ) : (
+                                                        <Error
+                                                          title={
+                                                            pageProps.error
+                                                              ?.message
+                                                          }
+                                                          statusCode={
+                                                            pageProps.error
+                                                              ?.statusCode ??
+                                                            500
+                                                          }
                                                         />
-                                                      )
-                                                    ) : (
-                                                      <Error
-                                                        title={
-                                                          pageProps.error
-                                                            ?.message
-                                                        }
-                                                        statusCode={
-                                                          pageProps.error
-                                                            ?.statusCode ?? 500
-                                                        }
-                                                      />
-                                                    )}
-                                                    <PushNotificationModalContainer />
-                                                  </VideoProcessingWrapper>
-                                                </>
-                                              </FollowingsContextProvider>
-                                            </NotificationsProvider>
-                                          </SyncUserWrapper>
-                                        </PersistanceProvider>
-                                      </PostCreationContextProvider>
-                                    </MultipleBeforePopStateContextProvider>
-                                  </OverlayModeProvider>
-                                </ChatsUnreadMessagesProvider>
-                              </BundlesContextProvider>
-                            </BlockedUsersProvider>
-                          </PushNotificationContextProvider>
-                        </ModalNotificationsContextProvider>
-                      </ChannelsContextProvider>
-                    </SocketContextProvider>
+                                                      )}
+                                                      <PushNotificationModalContainer />
+                                                    </VideoProcessingWrapper>
+                                                  </>
+                                                </FollowingsContextProvider>
+                                              </NotificationsProvider>
+                                            </SyncUserWrapper>
+                                          </PersistanceProvider>
+                                        </PostCreationContextProvider>
+                                      </MultipleBeforePopStateContextProvider>
+                                    </OverlayModeProvider>
+                                  </ChatsUnreadMessagesProvider>
+                                </BundlesContextProvider>
+                              </BlockedUsersProvider>
+                            </PushNotificationContextProvider>
+                          </ModalNotificationsContextProvider>
+                        </ChannelsContextProvider>
+                      </SocketContextProvider>
+                    </TutorialProgressContextProvider>
                   </AppConstantsContextProvider>
                 </LanguageWrapper>
               </GlobalTheme>

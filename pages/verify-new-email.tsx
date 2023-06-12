@@ -25,7 +25,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { userLoggedIn, handleUserLoggedIn } = useAppState();
 
   const router = useRouter();
   const { email, retryAfter, redirect } = router.query;
@@ -73,8 +73,9 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
           })
         );
 
-        setUserLoggedIn(true);
-        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+        handleUserLoggedIn(
+          becomeCreatorRes.data.me?.options?.isCreator ?? false
+        );
       }
 
       if (redirect === 'settings') {

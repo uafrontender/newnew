@@ -16,10 +16,7 @@ import { Area, Point } from 'react-easy-crop/types';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import {
-  logoutUserClearCookiesAndRedirect,
-  setUserData,
-} from '../../redux-store/slices/userStateSlice';
+import { setUserData } from '../../redux-store/slices/userStateSlice';
 
 // Components
 import Button from '../atoms/Button';
@@ -164,7 +161,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode, userIsCreator, setUserLoggedIn } = useAppState();
+  const { resizeMode, userIsCreator, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -231,20 +228,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setFormErrors, dispatch, setUserLoggedIn]
+    [setFormErrors, logoutAndRedirect]
   );
 
   const validateUsernameViaAPIDebounced = useMemo(
@@ -327,20 +320,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setFormErrors, dispatch, setUserLoggedIn]
+    [setFormErrors, logoutAndRedirect]
   );
 
   const validateTextViaAPIDebounced = useMemo(
@@ -600,13 +589,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       } else if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       } else {
         showErrorToastPredefined(undefined);
       }
@@ -630,7 +615,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEditAnimatedExtension,
     coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
-    setUserLoggedIn,
+    logoutAndRedirect,
   ]);
 
   // Profile image editing
@@ -755,24 +740,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setUpdateProfileImageLoading(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
   }, [
     croppedAreaProfileImage,
     avatarUrlInEdit,
     handleSetStageToEditingGeneral,
-    dispatch,
-    setUserLoggedIn,
+    logoutAndRedirect,
   ]);
 
   useEffect(() => {

@@ -5,7 +5,6 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 import { AppThunk } from '../store';
 import { cookiesInstance } from '../../api/apiConfigs';
-import { loadStateLS, saveStateLS } from '../../utils/localStorage';
 
 export type TUserData = Omit<
   newnewapi.Me,
@@ -18,52 +17,18 @@ interface ICreatorData {
 }
 
 export interface IUserStateInterface {
+  // To signup context? to app state context?
   signupEmailInput: string;
   signupTimerValue: number;
+
+  // To user data context
   userData?: TUserData;
-  userTutorialsProgress: newnewapi.IGetTutorialsStatusResponse;
-  userTutorialsProgressSynced: boolean;
   creatorData?: ICreatorData;
 }
 
 const defaultUIState: IUserStateInterface = {
   signupEmailInput: '',
   signupTimerValue: 0,
-  userTutorialsProgress: {
-    // AC
-    remainingAcSteps: [
-      newnewapi.AcTutorialStep.AC_HERO,
-      newnewapi.AcTutorialStep.AC_TIMER,
-      newnewapi.AcTutorialStep.AC_ALL_BIDS,
-      newnewapi.AcTutorialStep.AC_BOOST_BID,
-      newnewapi.AcTutorialStep.AC_TEXT_FIELD,
-    ],
-    // MC
-    remainingMcSteps: [
-      newnewapi.McTutorialStep.MC_HERO,
-      newnewapi.McTutorialStep.MC_TIMER,
-      newnewapi.McTutorialStep.MC_ALL_OPTIONS,
-      newnewapi.McTutorialStep.MC_VOTE,
-      newnewapi.McTutorialStep.MC_TEXT_FIELD,
-    ],
-    // CF
-    remainingCfSteps: [
-      newnewapi.CfTutorialStep.CF_HERO,
-      newnewapi.CfTutorialStep.CF_TIMER,
-      newnewapi.CfTutorialStep.CF_GOAL_PROGRESS,
-      newnewapi.CfTutorialStep.CF_BACK_GOAL,
-    ],
-    remainingAcCrCurrentStep: [newnewapi.AcCreationTutorialStep.AC_CR_HERO],
-    remainingCfCrCurrentStep: [newnewapi.CfCreationTutorialStep.CF_CR_HERO],
-    remainingMcCrCurrentStep: [newnewapi.McCreationTutorialStep.MC_CR_HERO],
-    remainingAcResponseCurrentStep: [
-      newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
-    ],
-    remainingMcResponseCurrentStep: [
-      newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
-    ],
-  },
-  userTutorialsProgressSynced: false,
 };
 
 export const userSlice: Slice<IUserStateInterface> = createSlice({
@@ -82,18 +47,7 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setCreatorData(state, { payload }: PayloadAction<ICreatorData>) {
       state.creatorData = { ...state.creatorData, ...payload };
     },
-    setUserTutorialsProgressInner(
-      state,
-      { payload }: PayloadAction<newnewapi.IGetTutorialsStatusResponse>
-    ) {
-      state.userTutorialsProgress = {
-        ...state.userTutorialsProgress,
-        ...payload,
-      };
-    },
-    setUserTutorialsProgressSynced(state, { payload }: PayloadAction<boolean>) {
-      state.userTutorialsProgressSynced = payload;
-    },
+    // To user data context
     logoutUser(state) {
       state.userData = {
         avatarUrl: '',
@@ -118,9 +72,6 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
           stripeConnectStatus: null,
         },
       };
-      state.userTutorialsProgress = defaultUIState.userTutorialsProgress;
-      state.userTutorialsProgressSynced =
-        defaultUIState.userTutorialsProgressSynced;
     },
   },
 });
@@ -128,11 +79,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
 export const {
   setSignupEmailInput,
   setSignupTimerValue,
-  setUserTutorialsProgressInner,
   setUserData,
   setCreatorData,
   logoutUser,
-  setUserTutorialsProgressSynced,
 } = userSlice.actions;
 
 export default userSlice.reducer;
@@ -145,18 +94,4 @@ export const logoutUserClearCookiesAndRedirect =
     cookiesInstance.remove('accessToken');
     cookiesInstance.remove('refreshToken');
     router.push(redirectUrl ?? '/');
-  };
-
-export const setUserTutorialsProgress =
-  (payload: any): AppThunk =>
-  (dispatch) => {
-    dispatch(setUserTutorialsProgressInner(payload));
-
-    const localUserTutorialsProgress = loadStateLS(
-      'userTutorialsProgress'
-    ) as JSON;
-    saveStateLS('userTutorialsProgress', {
-      ...localUserTutorialsProgress,
-      ...payload,
-    });
   };

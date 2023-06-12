@@ -43,7 +43,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { userLoggedIn, handleUserLoggedIn } = useAppState();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -163,10 +163,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
           maxAge: 10 * 365 * 24 * 60 * 60,
           path: '/',
         });
-
-        setUserLoggedIn(true);
-        setUserIsCreator(!!data.me?.options?.isCreator);
-
+        handleUserLoggedIn(data.me?.options?.isCreator ?? false);
         resumePushNotification();
 
         setIsLoading(false);

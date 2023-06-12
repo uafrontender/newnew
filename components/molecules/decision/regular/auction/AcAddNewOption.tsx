@@ -12,10 +12,6 @@ import { useRouter } from 'next/router';
 import debounce from 'lodash/debounce';
 import Link from 'next/link';
 
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '../../../../../redux-store/store';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { placeBidOnAuction } from '../../../../../api/endpoints/auction';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
@@ -32,7 +28,6 @@ import PaymentSuccessModal from '../../common/PaymentSuccessModal';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 import { usePushNotifications } from '../../../../../contexts/pushNotificationsContext';
@@ -45,6 +40,7 @@ import getCustomerPaymentFee from '../../../../../utils/getCustomerPaymentFee';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -94,8 +90,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+  const { userTutorialsProgress, setUserTutorialsProgress } =
+    useTutorialProgress();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -121,20 +117,18 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   >();
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
-    if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
+    if (userTutorialsProgress?.remainingAcSteps && currentStep) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           acCurrentStep: currentStep,
         });
         markTutorialStepAsCompleted(payload);
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingAcSteps: [
-            ...user.userTutorialsProgress.remainingAcSteps,
-          ].filter((el) => el !== currentStep),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingAcSteps: [...userTutorialsProgress.remainingAcSteps].filter(
+          (el) => el !== currentStep
+        ),
+      });
     }
   };
 
@@ -382,17 +376,17 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         >
           {t('acPost.optionsTab.actionSection.placeABidButton')}
         </Button>
-        {user?.userTutorialsProgress.remainingAcSteps && (
+        {userTutorialsProgress?.remainingAcSteps && (
           <STutorialTooltipTextAreaHolder>
             <TutorialTooltip
               isTooltipVisible={
                 options.length > 0
-                  ? user.userTutorialsProgress.remainingAcSteps[0] ===
+                  ? userTutorialsProgress.remainingAcSteps[0] ===
                     newnewapi.AcTutorialStep.AC_TEXT_FIELD
-                  : user.userTutorialsProgress.remainingAcSteps.includes(
+                  : userTutorialsProgress.remainingAcSteps.includes(
                       newnewapi.AcTutorialStep.AC_TEXT_FIELD
                     ) &&
-                    !user.userTutorialsProgress.remainingAcSteps.includes(
+                    !userTutorialsProgress.remainingAcSteps.includes(
                       newnewapi.AcTutorialStep.AC_TIMER
                     )
               }
@@ -423,12 +417,12 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           >
             {t('acPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
-          {user?.userTutorialsProgress.remainingAcSteps && (
+          {userTutorialsProgress?.remainingAcSteps && (
             <STutorialTooltipHolderMobile>
               <TutorialTooltip
                 isTooltipVisible={
                   options.length > 0 &&
-                  user.userTutorialsProgress.remainingAcSteps[0] ===
+                  userTutorialsProgress.remainingAcSteps[0] ===
                     newnewapi.AcTutorialStep.AC_TEXT_FIELD
                 }
                 closeTooltip={() =>

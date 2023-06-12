@@ -44,7 +44,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const { t } = useTranslation('page-VerifyEmail');
   const user = useAppSelector((state) => state.user);
 
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { resizeMode, handleUserLoggedIn } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -131,9 +131,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
               },
             })
           );
-
-          setUserLoggedIn(true);
-          setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+          handleUserLoggedIn(
+            becomeCreatorRes.data.me?.options?.isCreator ?? false
+          );
         }
 
         setIsSignInWithEmailLoading(false);
@@ -158,8 +158,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
       redirect,
       dispatch,
       router,
-      setUserLoggedIn,
-      setUserIsCreator,
+      handleUserLoggedIn,
     ]
   );
 

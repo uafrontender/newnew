@@ -8,6 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
+import { useRouter } from 'next/router';
 import { parse } from 'next-useragent';
 import styled from 'styled-components';
 import jwtDecode from 'jwt-decode';
@@ -22,15 +23,17 @@ export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
   userLoggedIn: boolean;
   userIsCreator: boolean;
-  setUserLoggedIn: (isLoggedIn: boolean) => void;
-  setUserIsCreator: (isCreator: boolean) => void;
+  handleUserLoggedIn: (isCreator: boolean) => void;
+  handleBecameCreator: () => void;
+  logoutAndRedirect: (redirectUrl?: string) => void;
 }>({
   // Default values are irrelevant as state gets it on init
   resizeMode: 'mobile',
   userLoggedIn: false,
   userIsCreator: false,
-  setUserLoggedIn: () => {},
-  setUserIsCreator: () => {},
+  handleUserLoggedIn: () => {},
+  handleBecameCreator: () => {},
+  logoutAndRedirect: () => {},
 });
 
 interface IAppStateContextProvider {
@@ -80,6 +83,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   uaString,
   children,
 }) => {
+  const router = useRouter();
   // Should we check that token is valid or just it's presence here?
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
   const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
@@ -88,16 +92,10 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   );
   const ref: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
-  const setUserLoggedInState = useCallback((isLoggedIn: boolean) => {
-    setUserLoggedIn(isLoggedIn);
-    if (!isLoggedIn) {
-      setUserIsCreator(false);
-    }
-  }, []);
-
   const refreshTokens = useCallback(async () => {
     const refreshToken = cookiesInstance.get('refreshToken');
     if (!refreshToken) {
+      // Should it logoutAndRedirect?
       return;
     }
 
@@ -138,17 +136,28 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     );
   }, []);
 
-  const setUserIsCreatorState = useCallback(
-    async (isCreator: boolean) => {
-      setUserIsCreator((curr) => {
-        if (!curr) {
-          // Refresh token to get the one with is_creator true
-          refreshTokens();
-        }
-        return isCreator;
-      });
+  const handleUserLoggedIn = useCallback(
+    (isCreator: boolean) => {
+      setUserLoggedIn(true);
+      setUserIsCreator(isCreator);
     },
-    [refreshTokens]
+    [setUserLoggedIn, setUserIsCreator]
+  );
+
+  const handleBecameCreator = useCallback(() => {
+    setUserIsCreator(true);
+    // Refresh token to get the one with is_creator true
+    refreshTokens();
+  }, [setUserIsCreator, refreshTokens]);
+
+  const logoutAndRedirect = useCallback(
+    (redirectUrl?: string) => {
+      setUserIsCreator(false);
+      cookiesInstance.remove('accessToken');
+      cookiesInstance.remove('refreshToken');
+      router.push(redirectUrl ?? '/');
+    },
+    [router, setUserIsCreator]
   );
 
   const handleResizeObserver = useCallback(() => {
@@ -183,15 +192,17 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       userLoggedIn,
       userIsCreator,
       resizeMode,
-      setUserLoggedIn: setUserLoggedInState,
-      setUserIsCreator: setUserIsCreatorState,
+      handleUserLoggedIn,
+      handleBecameCreator,
+      logoutAndRedirect,
     }),
     [
       userLoggedIn,
       userIsCreator,
       resizeMode,
-      setUserLoggedInState,
-      setUserIsCreatorState,
+      handleUserLoggedIn,
+      handleBecameCreator,
+      logoutAndRedirect,
     ]
   );
 

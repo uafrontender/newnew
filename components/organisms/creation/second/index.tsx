@@ -42,7 +42,6 @@ import {
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import getChunks from '../../../../utils/getChunks/getChunks';
 import { Mixpanel } from '../../../../utils/mixpanel';
@@ -54,6 +53,7 @@ import RichTextInput from '../../../atoms/creation/RichTextInput';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { usePostCreationState } from '../../../../contexts/postCreationContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -122,6 +122,11 @@ export const CreationSecondStepContent: React.FC<
 
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppState();
+  const {
+    userTutorialsProgress,
+    userTutorialsProgressSynced,
+    setUserTutorialsProgress,
+  } = useTutorialProgress();
   const { overlayModeEnabled } = useOverlayMode();
   const { appConstants } = useGetAppConstants();
 
@@ -1054,12 +1059,12 @@ export const CreationSecondStepContent: React.FC<
   }, [activeTabIndex]);
 
   useEffect(() => {
-    if (user.userTutorialsProgressSynced) {
+    if (userTutorialsProgressSynced) {
       switch (tutorialType) {
         case 'MC': {
           if (
-            user.userTutorialsProgress.remainingMcCrCurrentStep &&
-            user.userTutorialsProgress.remainingMcCrCurrentStep[0] ===
+            userTutorialsProgress?.remainingMcCrCurrentStep &&
+            userTutorialsProgress.remainingMcCrCurrentStep[0] ===
               newnewapi.McCreationTutorialStep.MC_CR_HERO
           ) {
             setIsTutorialVisible(true);
@@ -1069,8 +1074,8 @@ export const CreationSecondStepContent: React.FC<
 
         case 'CF': {
           if (
-            user.userTutorialsProgress.remainingCfCrCurrentStep &&
-            user.userTutorialsProgress.remainingCfCrCurrentStep[0] ===
+            userTutorialsProgress?.remainingCfCrCurrentStep &&
+            userTutorialsProgress.remainingCfCrCurrentStep[0] ===
               newnewapi.CfCreationTutorialStep.CF_CR_HERO
           ) {
             setIsTutorialVisible(true);
@@ -1080,8 +1085,8 @@ export const CreationSecondStepContent: React.FC<
 
         default: {
           if (
-            user.userTutorialsProgress.remainingAcCrCurrentStep &&
-            user.userTutorialsProgress.remainingAcCrCurrentStep[0] ===
+            userTutorialsProgress?.remainingAcCrCurrentStep &&
+            userTutorialsProgress.remainingAcCrCurrentStep[0] ===
               newnewapi.AcCreationTutorialStep.AC_CR_HERO
           ) {
             setIsTutorialVisible(true);
@@ -1090,57 +1095,55 @@ export const CreationSecondStepContent: React.FC<
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutorialType, user.userTutorialsProgressSynced]);
+  }, [tutorialType, userTutorialsProgressSynced]);
 
   const goToNextStep = () => {
     let payload = null;
     switch (tutorialType) {
       case 'MC':
         if (
-          user.userTutorialsProgress.remainingMcCrCurrentStep &&
-          user.userTutorialsProgress.remainingMcCrCurrentStep[0]
+          userTutorialsProgress?.remainingMcCrCurrentStep &&
+          userTutorialsProgress.remainingMcCrCurrentStep[0]
         ) {
           payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCrCurrentStep:
-              user.userTutorialsProgress.remainingMcCrCurrentStep[0],
+            mcCrCurrentStep: userTutorialsProgress.remainingMcCrCurrentStep[0],
           });
+
           setUserTutorialsProgress({
             remainingMcCrCurrentStep: [
-              ...user.userTutorialsProgress.remainingMcCrCurrentStep,
+              ...userTutorialsProgress.remainingMcCrCurrentStep,
             ].slice(1),
           });
         }
         break;
       case 'CF':
         if (
-          user.userTutorialsProgress.remainingCfCrCurrentStep &&
-          user.userTutorialsProgress.remainingCfCrCurrentStep[0]
+          userTutorialsProgress?.remainingCfCrCurrentStep &&
+          userTutorialsProgress.remainingCfCrCurrentStep[0]
         ) {
           payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            cfCrCurrentStep:
-              user.userTutorialsProgress.remainingCfCrCurrentStep[0],
+            cfCrCurrentStep: userTutorialsProgress.remainingCfCrCurrentStep[0],
           });
 
           setUserTutorialsProgress({
             remainingCfCrCurrentStep: [
-              ...user.userTutorialsProgress.remainingCfCrCurrentStep,
+              ...userTutorialsProgress.remainingCfCrCurrentStep,
             ].slice(1),
           });
         }
         break;
       default:
         if (
-          user.userTutorialsProgress.remainingAcCrCurrentStep &&
-          user.userTutorialsProgress.remainingAcCrCurrentStep[0]
+          userTutorialsProgress?.remainingAcCrCurrentStep &&
+          userTutorialsProgress.remainingAcCrCurrentStep[0]
         ) {
           payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            acCrCurrentStep:
-              user.userTutorialsProgress.remainingAcCrCurrentStep[0],
+            acCrCurrentStep: userTutorialsProgress.remainingAcCrCurrentStep[0],
           });
 
           setUserTutorialsProgress({
             remainingAcCrCurrentStep: [
-              ...user.userTutorialsProgress.remainingAcCrCurrentStep,
+              ...userTutorialsProgress.remainingAcCrCurrentStep,
             ].slice(1),
           });
         }
