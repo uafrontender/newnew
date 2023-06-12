@@ -32,6 +32,7 @@ import { useGetAppConstants } from '../../contexts/appConstantsContext';
 import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContext';
 import MobileChat from '../organisms/MobileChat';
 import useHasMounted from '../../utils/hooks/useHasMounted';
+import { useUiState } from '../../contexts/uiStateContext';
 
 interface IGeneral {
   className?: string;
@@ -52,9 +53,9 @@ export const General: React.FC<IGeneral> = (props) => {
     children,
   } = props;
   const user = useAppSelector((state) => state.user);
-  const { banner, globalSearchActive } = useAppSelector((state) => state.ui);
   const { appConstants } = useGetAppConstants();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { globalSearchActive, banner } = useUiState();
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();

@@ -12,10 +12,6 @@ import { useUpdateEffect } from 'react-use';
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import {
-  setColorMode,
-  TColorMode,
-} from '../../../redux-store/slices/uiStateSlice';
-import {
   logoutUser,
   logoutUserClearCookiesAndRedirect,
   // setUserData,
@@ -46,11 +42,13 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import { TColorMode, useUiState } from '../../../contexts/uiStateContext';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
+  const { setColorMode } = useUiState();
 
   // const { showErrorToastPredefined } = useErrorToasts();
 
@@ -65,7 +63,7 @@ const MyProfileSettingsIndex = () => {
 
   const { userData } = useAppSelector((state: any) => state.user);
 
-  const { colorMode } = useAppSelector((state: any) => state.ui);
+  const { colorMode } = useUiState();
   const { resizeMode, userLoggedIn, setUserLoggedIn } = useAppState();
   // Measurements
   const isMobileOrTablet = [
@@ -89,9 +87,9 @@ const MyProfileSettingsIndex = () => {
         _stage: 'Profile Settings',
         _mode: mode,
       });
-      dispatch(setColorMode(mode));
+      setColorMode(mode);
     },
-    [dispatch]
+    [setColorMode]
   );
 
   const handleLogout = useCallback(async () => {

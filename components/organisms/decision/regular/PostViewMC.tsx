@@ -16,7 +16,6 @@ import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import {
   canCreateCustomOption,
   voteOnPost,
@@ -45,6 +44,7 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { useUiState } from '../../../../contexts/uiStateContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -94,7 +94,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { showErrorToastCustom } = useErrorToasts();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
-  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { mutedMode, toggleMutedMode } = useUiState();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -183,8 +183,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   }, [post.postUuid]);
 
   const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    toggleMutedMode();
+  }, [toggleMutedMode]);
 
   const {
     processedOptions: options,
