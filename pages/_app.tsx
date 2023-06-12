@@ -56,7 +56,6 @@ import PushNotificationContextProvider from '../contexts/pushNotificationsContex
 import assets from '../constants/assets';
 
 // Landing
-import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 import PersistanceProvider from '../contexts/PersistenceProvider';
 import ModalNotificationsContextProvider from '../contexts/modalNotificationsContext';
@@ -71,6 +70,7 @@ import AppStateContextProvider, {
   useAppState,
 } from '../contexts/appStateContext';
 import PostCreationContextProvider from '../contexts/postCreationContext';
+import UiStateContextProvider, { TColorMode } from '../contexts/uiStateContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -82,6 +82,7 @@ interface IMyApp extends AppProps {
   accessToken?: string;
   uaString: string;
   colorMode: string;
+  mutedMode: string;
   themeFromCookie?: 'light' | 'dark';
 }
 
@@ -123,6 +124,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     accessToken,
     uaString,
     colorMode,
+    mutedMode,
     themeFromCookie,
   } = props;
   const store = useStore();
@@ -143,13 +145,10 @@ const MyApp = (props: IMyApp): ReactElement => {
   const PRE_FETCHING_DELAY = 2500;
   useEffect(() => {
     setTimeout(() => {
-      const currentTheme = getColorMode(
-        // @ts-ignore:next-line
-        store.getState()?.ui?.colorMode as string
-      );
-      setPreFetchImages(currentTheme);
+      setPreFetchImages(themeFromCookie || 'light');
     }, PRE_FETCHING_DELAY);
-  }, [store]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // Imported one by one not to break import\no-dynamic-require rule
@@ -247,73 +246,77 @@ const MyApp = (props: IMyApp): ReactElement => {
               accessToken={accessToken}
               uaString={uaString}
             >
-              {/* TODO: Why is it above the PersistanceProvider on which it depends? */}
-              {/* GlobalTheme uses Redux store */}
-              <GlobalTheme
-                initialTheme={colorMode}
-                themeFromCookie={themeFromCookie}
+              <UiStateContextProvider
+                colorModeFromCookie={colorMode as TColorMode}
+                mutedModeFromCookie={mutedMode === 'true'}
               >
-                <LanguageWrapper>
-                  <AppConstantsContextProvider>
-                    <SocketContextProvider>
-                      <ChannelsContextProvider>
-                        <ModalNotificationsContextProvider>
-                          <PushNotificationContextProvider>
-                            <BlockedUsersProvider>
-                              <BundlesContextProvider>
-                                <ChatsUnreadMessagesProvider>
-                                  <OverlayModeProvider>
-                                    <MultipleBeforePopStateContextProvider>
-                                      <PostCreationContextProvider>
-                                        {/* PersistanceProvider causes double initial render for all components below */}
-                                        <PersistanceProvider store={store}>
-                                          {/* SyncUserWrapper uses Redux store */}
-                                          <SyncUserWrapper>
-                                            {/* NotificationsProvider uses Redux store */}
-                                            <NotificationsProvider>
-                                              {/* FollowingsContextProvider uses Redux store */}
-                                              <FollowingsContextProvider>
-                                                <>
-                                                  <ToastContainer containerId='toast-container' />
-                                                  <VideoProcessingWrapper>
-                                                    {!pageProps.error ? (
-                                                      getLayout(
-                                                        <Component
-                                                          {...pageProps}
+                <GlobalTheme
+                  initialTheme={colorMode}
+                  themeFromCookie={themeFromCookie}
+                >
+                  <LanguageWrapper>
+                    <AppConstantsContextProvider>
+                      <SocketContextProvider>
+                        <ChannelsContextProvider>
+                          <ModalNotificationsContextProvider>
+                            <PushNotificationContextProvider>
+                              <BlockedUsersProvider>
+                                <BundlesContextProvider>
+                                  <ChatsUnreadMessagesProvider>
+                                    <OverlayModeProvider>
+                                      <MultipleBeforePopStateContextProvider>
+                                        <PostCreationContextProvider>
+                                          {/* PersistanceProvider causes double initial render for all components below */}
+                                          <PersistanceProvider store={store}>
+                                            {/* SyncUserWrapper uses Redux store */}
+                                            <SyncUserWrapper>
+                                              {/* NotificationsProvider uses Redux store */}
+                                              <NotificationsProvider>
+                                                {/* FollowingsContextProvider uses Redux store */}
+                                                <FollowingsContextProvider>
+                                                  <>
+                                                    <ToastContainer containerId='toast-container' />
+                                                    <VideoProcessingWrapper>
+                                                      {!pageProps.error ? (
+                                                        getLayout(
+                                                          <Component
+                                                            {...pageProps}
+                                                          />
+                                                        )
+                                                      ) : (
+                                                        <Error
+                                                          title={
+                                                            pageProps.error
+                                                              ?.message
+                                                          }
+                                                          statusCode={
+                                                            pageProps.error
+                                                              ?.statusCode ??
+                                                            500
+                                                          }
                                                         />
-                                                      )
-                                                    ) : (
-                                                      <Error
-                                                        title={
-                                                          pageProps.error
-                                                            ?.message
-                                                        }
-                                                        statusCode={
-                                                          pageProps.error
-                                                            ?.statusCode ?? 500
-                                                        }
-                                                      />
-                                                    )}
-                                                    <PushNotificationModalContainer />
-                                                  </VideoProcessingWrapper>
-                                                </>
-                                              </FollowingsContextProvider>
-                                            </NotificationsProvider>
-                                          </SyncUserWrapper>
-                                        </PersistanceProvider>
-                                      </PostCreationContextProvider>
-                                    </MultipleBeforePopStateContextProvider>
-                                  </OverlayModeProvider>
-                                </ChatsUnreadMessagesProvider>
-                              </BundlesContextProvider>
-                            </BlockedUsersProvider>
-                          </PushNotificationContextProvider>
-                        </ModalNotificationsContextProvider>
-                      </ChannelsContextProvider>
-                    </SocketContextProvider>
-                  </AppConstantsContextProvider>
-                </LanguageWrapper>
-              </GlobalTheme>
+                                                      )}
+                                                      <PushNotificationModalContainer />
+                                                    </VideoProcessingWrapper>
+                                                  </>
+                                                </FollowingsContextProvider>
+                                              </NotificationsProvider>
+                                            </SyncUserWrapper>
+                                          </PersistanceProvider>
+                                        </PostCreationContextProvider>
+                                      </MultipleBeforePopStateContextProvider>
+                                    </OverlayModeProvider>
+                                  </ChatsUnreadMessagesProvider>
+                                </BundlesContextProvider>
+                              </BlockedUsersProvider>
+                            </PushNotificationContextProvider>
+                          </ModalNotificationsContextProvider>
+                        </ChannelsContextProvider>
+                      </SocketContextProvider>
+                    </AppConstantsContextProvider>
+                  </LanguageWrapper>
+                </GlobalTheme>
+              </UiStateContextProvider>
             </AppStateContextProvider>
           </ErrorBoundary>
           <ReactQueryDevtools initialIsOpen={false} />
@@ -351,7 +354,8 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
     return {
       ...appProps,
       accessToken: accessToken || undefined,
-      colorMode: appContext.ctx?.req.cookies?.colorMode ?? 'auto',
+      colorMode: appContext.ctx?.req.cookies?.colorMode || 'auto',
+      mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
       uaString: appContext.ctx?.req?.headers?.['user-agent'],
       themeFromCookie: isDayTime ? 'light' : 'dark',
     };
@@ -361,6 +365,7 @@ MyAppWithTranslationAndRecaptchaProviderAndRedux.getInitialProps = async (
     ...appProps,
     accessToken: accessToken || undefined,
     colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
+    mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
   };
 };
