@@ -13,7 +13,6 @@ import ProfileLayout from '../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../_app';
 import { getUserByUsername } from '../../api/endpoints/user';
 import useUserPosts from '../../utils/hooks/useUserPosts';
-import { useAppSelector } from '../../redux-store/store';
 
 import PostList from '../../components/organisms/see-more/PostList';
 // import InlineSvg from '../../components/atoms/InlineSVG';
@@ -30,6 +29,7 @@ import getDisplayname from '../../utils/getDisplayname';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import assets from '../../constants/assets';
 import useBuyBundleAfterStripeRedirect from '../../utils/hooks/useBuyBundleAfterStripeRedirect';
+import { useAppState } from '../../contexts/appStateContext';
 
 interface IUserPageIndex {
   user: newnewapi.IUser;
@@ -46,15 +46,15 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 }) => {
   // const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { loggedIn } = useAppSelector((state) => state.user);
+  const { userLoggedIn, userIsCreator } = useAppState();
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
   );
   // NOTE: activity is temporarily disabled
   /* const isCreator = useMemo(
-    () => !!user?.options?.isCreator,
-    [user?.options?.isCreator]
+    () => !!userIsCreator,
+    [userIsCreator]
   );
   const isActivityPrivate = useMemo(
     () => !!user?.options?.isActivityPrivate,
@@ -66,7 +66,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     useUserPosts(
       {
         userUuid: user.uuid as string,
-        loggedInUser: loggedIn,
+        loggedInUser: userLoggedIn,
         relation:
           /* isCreator
           ? */ newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
@@ -158,7 +158,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
           </SMain>
         ) : */ <SMain>
             <SCardsSection>
-              {user.options?.isCreator && posts && (
+              {userIsCreator && posts && (
                 <PostList
                   category=''
                   loading={isLoading || isFetchingNextPage}
@@ -168,20 +168,17 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                   }}
                 />
               )}
-              {user.options?.isCreator &&
-                posts &&
-                posts.length === 0 &&
-                !isLoading && (
-                  <NoContentCard>
-                    <NoContentDescription>
-                      {t('Profile.creator.noContent.description')}
-                    </NoContentDescription>
-                  </NoContentCard>
-                )}
+              {userIsCreator && posts && posts.length === 0 && !isLoading && (
+                <NoContentCard>
+                  <NoContentDescription>
+                    {t('Profile.creator.noContent.description')}
+                  </NoContentDescription>
+                </NoContentCard>
+              )}
               {
                 // NOTE: activity is temporarily disabled
                 /* user.options &&
-                !user.options.isCreator &&
+                !userIsCreator &&
                 posts &&
                 posts.length === 0 &&
                 !isLoading && (

@@ -7,8 +7,8 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
-import { useAppSelector } from '../redux-store/store';
 import useDebouncedValue from '../utils/hooks/useDebouncedValue';
+import { useAppState } from './appStateContext';
 
 interface IChatsContext {
   searchChatroom: string;
@@ -33,7 +33,7 @@ interface IChatsProvider {
 }
 
 export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
-  const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
 
   const [searchChatroom, setSearchChatroom] = useState<string>('');
 
@@ -82,14 +82,14 @@ export const ChatsProvider: React.FC<IChatsProvider> = ({ children }) => {
   const userWasLoggedIn = useRef(false);
 
   useEffect(() => {
-    if (userWasLoggedIn.current && !user.loggedIn) {
+    if (userWasLoggedIn.current && !userLoggedIn) {
       resetState();
     }
 
-    if (user.loggedIn) {
+    if (userLoggedIn) {
       userWasLoggedIn.current = true;
     }
-  }, [user.loggedIn, resetState]);
+  }, [userLoggedIn, resetState]);
 
   const searchChatroomDebounced = useDebouncedValue(searchChatroom, 500);
 

@@ -40,7 +40,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const { locale } = useRouter();
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -134,7 +134,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           user.userTutorialsProgress.remainingAcSteps &&
           user.userTutorialsProgress.remainingAcSteps[0]
         ) {
-          if (user.loggedIn) {
+          if (userLoggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
             });
@@ -153,7 +153,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           user.userTutorialsProgress.remainingCfSteps &&
           user.userTutorialsProgress.remainingCfSteps[0]
         ) {
-          if (user.loggedIn) {
+          if (userLoggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
             });
@@ -172,7 +172,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           user.userTutorialsProgress.remainingMcSteps &&
           user.userTutorialsProgress.remainingMcSteps[0]
         ) {
-          if (user.loggedIn) {
+          if (userLoggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
               mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
             });
@@ -186,7 +186,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           );
         }
     }
-    if (user.loggedIn && payload) markTutorialStepAsCompleted(payload);
+    if (userLoggedIn && payload) {
+      markTutorialStepAsCompleted(payload);
+    }
   };
 
   useEffect(() => {

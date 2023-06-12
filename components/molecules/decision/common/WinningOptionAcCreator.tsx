@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useAppSelector } from '../../../../redux-store/store';
 import { formatNumber } from '../../../../utils/format';
 import DisplayName from '../../../atoms/DisplayName';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IWinningOptionAcCreator {
   winningOption: newnewapi.Auction.IOption;
@@ -18,9 +19,10 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
 
   const userToRender = useMemo(() => {
-    if (user.loggedIn && !user.userData?.userUuid) {
+    if (userLoggedIn && !user.userData?.userUuid) {
       return null;
     }
 
@@ -40,7 +42,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
   }, [
     winningOption.whitelistSupporter,
     winningOption.creator,
-    user.loggedIn,
+    userLoggedIn,
     user.userData?.userUuid,
     winningOption.isSupportedByMe,
   ]);
