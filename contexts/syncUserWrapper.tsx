@@ -147,6 +147,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
       const { data } = await getMe(payload);
 
+      console.log(data, 'data');
+
       if (data?.me) {
         dispatch(
           setUserData({
@@ -176,6 +178,8 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
               isOfferingBundles: data.me.options?.isOfferingBundles,
               isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
               isWhiteListed: data.me.options?.isWhiteListed,
+              isEmailNotificationsEnabled:
+                data.me.options?.isEmailNotificationsEnabled,
             },
           } as TUserData)
         );

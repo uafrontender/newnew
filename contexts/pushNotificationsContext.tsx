@@ -687,7 +687,7 @@ const PushNotificationsContextProvider: React.FC<
     const permissionData = getPermissionData();
 
     if (permissionData.permission === 'granted') {
-      subscribe();
+      await subscribe();
     } else if (permissionData.permission === 'default') {
       openPermissionRequestModal();
     } else {
