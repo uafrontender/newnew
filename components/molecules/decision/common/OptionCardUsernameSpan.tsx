@@ -23,7 +23,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
     return (
       // TODO: Should it have hover effect?
       <SHighlightedDisplayName
-        user={typeof user === 'string' ? currentUser.userData : user}
+        user={currentUser.userData}
         href={userIsCreator ? '/profile/my-posts' : '/profile'}
         altName={user}
         inverted={isBlue}
