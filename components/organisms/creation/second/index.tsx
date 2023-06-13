@@ -21,7 +21,6 @@ import FileUpload from '../../../molecules/creation/FileUpload';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
 
-import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { minLength, maxLength } from '../../../../utils/validation';
@@ -279,8 +278,6 @@ export const CreationSecondStepContent: React.FC<
   const targetBackersValid =
     tab !== 'crowdfunding' ||
     (crowdfunding.targetBackerCount && crowdfunding?.targetBackerCount >= 1);
-
-  const validateTitleDebounced = useDebounce(post.title, 500);
 
   const formatStartsAt = useCallback(() => {
     const time = moment(
@@ -990,22 +987,6 @@ export const CreationSecondStepContent: React.FC<
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileProcessing.loading, videoProcessing?.targetUrls?.hlsStreamUrl]);
-
-  useEffect(() => {
-    const func = async () => {
-      if (validateTitleDebounced) {
-        setTitleError(
-          await validateT(
-            validateTitleDebounced,
-            CREATION_TITLE_MIN,
-            CREATION_TITLE_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_TITLE
-          )
-        );
-      }
-    };
-    func();
-  }, [validateT, validateTextAPI, validateTitleDebounced]);
 
   useEffect(() => {
     if (socketConnection) {
