@@ -32,7 +32,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -52,7 +52,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
   } = useMcOptions(
     {
       postUuid: post.postUuid,
-      loggedInUser: user.loggedIn,
+      loggedInUser: userLoggedIn,
       userUuid: user.userData?.userUuid,
     },
     {
