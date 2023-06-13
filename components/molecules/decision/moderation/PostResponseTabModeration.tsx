@@ -228,7 +228,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         case 'mc': {
           if (
             userTutorialsProgress?.remainingMcResponseCurrentStep &&
-            userTutorialsProgress?.remainingMcResponseCurrentStep[0] ===
+            userTutorialsProgress.remainingMcResponseCurrentStep[0] ===
               newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE
           ) {
             setIsTutorialVisible(true);
@@ -239,7 +239,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         default: {
           if (
             userTutorialsProgress?.remainingAcResponseCurrentStep &&
-            userTutorialsProgress?.remainingAcResponseCurrentStep[0] ===
+            userTutorialsProgress.remainingAcResponseCurrentStep[0] ===
               newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE
           ) {
             setIsTutorialVisible(true);
@@ -255,6 +255,7 @@ const PostResponseTabModeration: React.FunctionComponent<
     postType,
     userTutorialsProgressSynced,
     userTutorialsProgress?.remainingAcResponseCurrentStep,
+    // Why do we need this dependency? It is not used in the Effect
     userTutorialsProgress?.remainingMcCrCurrentStep,
     userTutorialsProgress?.remainingMcResponseCurrentStep,
   ]);

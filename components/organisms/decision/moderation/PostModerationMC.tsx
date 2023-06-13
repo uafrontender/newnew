@@ -303,7 +303,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       ) {
         if (userLoggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCurrentStep: userTutorialsProgress?.remainingMcSteps[0],
+            mcCurrentStep: userTutorialsProgress.remainingMcSteps[0],
           });
           markTutorialStepAsCompleted(payload);
         }

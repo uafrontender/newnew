@@ -174,7 +174,7 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
       userLoggedIn,
       userIsCreator,
       fetchBundles,
-      // showErrorToastPredefined causes re-render not only when locale changes
+      // removed as causes re-render on page change, not only when language changes
       // showErrorToastPredefined,
       fetchIsSellingBundles,
       fetchHasSoldBundles,

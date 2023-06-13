@@ -39,6 +39,7 @@ export const TutorialProgressContextProvider: React.FC<
 
   const [userTutorialsProgress, setUserTutorialsProgress] =
     useState<newnewapi.IGetTutorialsStatusResponse>();
+  // Do we need it? Or is userTutorialsProgress === undefined is enough?
   const [userTutorialsProgressSynced, setUserTutorialsProgressSynced] =
     useState(false);
 
@@ -324,9 +325,7 @@ export const TutorialProgressContextProvider: React.FC<
     } else {
       if (!localUserTutorialsProgress) {
         saveStateLS('userTutorialsProgress', userTutorialsProgress);
-      }
-
-      if (!isEqual(userTutorialsProgress, localUserTutorialsProgress)) {
+      } else if (!isEqual(userTutorialsProgress, localUserTutorialsProgress)) {
         setUserTutorialsProgress(
           localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
         );

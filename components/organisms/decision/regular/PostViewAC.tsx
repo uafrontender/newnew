@@ -369,7 +369,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     ) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          acCurrentStep: userTutorialsProgress?.remainingAcSteps[0],
+          acCurrentStep: userTutorialsProgress.remainingAcSteps[0],
         });
         markTutorialStepAsCompleted(payload);
       }
