@@ -46,7 +46,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 }) => {
   // const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { userLoggedIn, userIsCreator } = useAppState();
+  const { userLoggedIn } = useAppState();
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
@@ -158,7 +158,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
           </SMain>
         ) : */ <SMain>
             <SCardsSection>
-              {userIsCreator && posts && (
+              {user.options?.isCreator && posts && (
                 <PostList
                   category=''
                   loading={isLoading || isFetchingNextPage}
@@ -168,17 +168,20 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                   }}
                 />
               )}
-              {userIsCreator && posts && posts.length === 0 && !isLoading && (
-                <NoContentCard>
-                  <NoContentDescription>
-                    {t('Profile.creator.noContent.description')}
-                  </NoContentDescription>
-                </NoContentCard>
-              )}
+              {user.options?.isCreator &&
+                posts &&
+                posts.length === 0 &&
+                !isLoading && (
+                  <NoContentCard>
+                    <NoContentDescription>
+                      {t('Profile.creator.noContent.description')}
+                    </NoContentDescription>
+                  </NoContentCard>
+                )}
               {
                 // NOTE: activity is temporarily disabled
                 /* user.options &&
-                !userIsCreator &&
+                !user.options?.isCreator &&
                 posts &&
                 posts.length === 0 &&
                 !isLoading && (
