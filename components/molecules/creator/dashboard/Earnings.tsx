@@ -236,17 +236,18 @@ export const Earnings: React.FC<IFunctionProps> = ({ hasMyPosts }) => {
         </STotalTextWrapper>
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {initialLoad ? null : hasMyPosts && myEarnings?.nextCashoutAmount ? (
-        <>
-          <CashOutTutorial />
-          <CashOut
-            nextCashOutAmount={myEarnings.nextCashoutAmount}
-            nextCashOutDate={myEarnings.nextCashoutDate}
-          />
-        </>
-      ) : (
-        <MakeDecision />
-      )}
+      {!initialLoad &&
+        (hasMyPosts && myEarnings?.nextCashoutAmount ? (
+          <>
+            <CashOutTutorial />
+            <CashOut
+              nextCashOutAmount={myEarnings.nextCashoutAmount}
+              nextCashOutDate={myEarnings.nextCashoutDate}
+            />
+          </>
+        ) : (
+          <MakeDecision />
+        ))}
 
       {isLoading && <SLoader size='md' isStatic />}
     </SContainer>

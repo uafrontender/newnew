@@ -93,10 +93,10 @@ export const Dashboard: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    if (!expiringPostsLoaded) {
+    if (!expiringPostsLoaded && hasMyPosts) {
       fetchMyExpiringPosts();
     }
-  }, [expiringPostsLoaded, fetchMyExpiringPosts]);
+  }, [expiringPostsLoaded, hasMyPosts, fetchMyExpiringPosts]);
 
   // TODO: Need WS event to load new expiring posts
 
@@ -112,9 +112,7 @@ export const Dashboard: React.FC = React.memo(() => {
       const postsResponse = await getMyPosts(payload);
 
       if (postsResponse?.data && postsResponse.data.posts) {
-        if (postsResponse.data.posts.length > 0) {
-          setHasMyPosts(true);
-        }
+        setHasMyPosts(postsResponse.data.posts.length > 0);
       }
       setIsLoading(false);
     } catch (err) {
