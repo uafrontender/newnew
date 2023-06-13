@@ -15,8 +15,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { useAppSelector } from '../../../../redux-store/store';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
@@ -39,6 +38,7 @@ import useAcOptions from '../../../../utils/hooks/useAcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
+import { useUiState } from '../../../../contexts/uiStateContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -79,9 +79,8 @@ interface IPostViewAC {}
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
-  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { mutedMode, toggleMutedMode } = useUiState();
   const { resizeMode, userLoggedIn } = useAppState();
   const {
     userTutorialsProgress,
@@ -172,8 +171,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   );
 
   const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    toggleMutedMode();
+  }, [toggleMutedMode]);
 
   const handleRemoveOption = useCallback(
     async (optionToRemove: newnewapi.Auction.Option) => {

@@ -13,8 +13,7 @@ import { useTranslation } from 'next-i18next';
 import moment from 'moment';
 import { useRouter } from 'next/dist/client/router';
 
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { useAppSelector } from '../../../../redux-store/store';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 import switchPostType from '../../../../utils/switchPostType';
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -34,6 +33,7 @@ import PostModerationResponsesContextProvider from '../../../../contexts/postMod
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
+import { useUiState } from '../../../../contexts/uiStateContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const HeroPopup = dynamic(
@@ -62,9 +62,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
   () => {
     const { t } = useTranslation('page-Post');
     const { locale } = useRouter();
-    const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode, userLoggedIn } = useAppState();
     const {
       userTutorialsProgress,
@@ -152,8 +151,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     >();
 
     const handleToggleMutedMode = useCallback(() => {
-      dispatch(toggleMutedMode(''));
-    }, [dispatch]);
+      toggleMutedMode();
+    }, [toggleMutedMode]);
 
     const {
       processedOptions: options,

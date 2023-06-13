@@ -9,11 +9,7 @@ import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import {
-  setColorMode,
-  TColorMode,
-} from '../../../redux-store/slices/uiStateSlice';
+import { useAppSelector } from '../../../redux-store/store';
 
 // API
 import { logout /* , updateMe */ } from '../../../api/endpoints/user';
@@ -40,11 +36,13 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import { TColorMode, useUiState } from '../../../contexts/uiStateContext';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
+  const { setColorMode } = useUiState();
 
   // const { showErrorToastPredefined } = useErrorToasts();
 
@@ -52,12 +50,10 @@ const MyProfileSettingsIndex = () => {
   const { t } = useTranslation('page-Profile');
   // TEMP
   // const { t: commonT } = useTranslation('common');
-  // Redux
-  const dispatch = useAppDispatch();
 
   const { userData } = useAppSelector((state: any) => state.user);
 
-  const { colorMode } = useAppSelector((state: any) => state.ui);
+  const { colorMode } = useUiState();
   const { resizeMode, userLoggedIn, logoutAndRedirect } = useAppState();
   // Measurements
   const isMobileOrTablet = [
@@ -81,9 +77,9 @@ const MyProfileSettingsIndex = () => {
         _stage: 'Profile Settings',
         _mode: mode,
       });
-      dispatch(setColorMode(mode));
+      setColorMode(mode);
     },
-    [dispatch]
+    [setColorMode]
   );
 
   const handleLogout = useCallback(async () => {
