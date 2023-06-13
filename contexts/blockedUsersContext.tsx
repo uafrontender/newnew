@@ -7,10 +7,10 @@ import React, {
   useCallback,
 } from 'react';
 import { newnewapi } from 'newnew-api';
+import { useAppSelector } from '../redux-store/store';
 import { getMyBlockedUsers, markUser } from '../api/endpoints/user';
 import { SocketContext } from './socketContext';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
-import { useAppState } from './appStateContext';
 
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
@@ -30,7 +30,7 @@ interface IBlockedUsersProvider {
 export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   children,
 }) => {
-  const { userLoggedIn } = useAppState();
+  const user = useAppSelector((state) => state.user);
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
   const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
@@ -74,12 +74,12 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
 
   useEffect(() => {
     async function fetchBlockedUsers() {
-      if (!userLoggedIn) {
-        setUsersBlockedMe([]);
-        setUsersIBlocked([]);
-      }
+      if (!user.loggedIn || usersBlockedLoading) {
+        if (!user.loggedIn) {
+          setUsersBlockedMe([]);
+          setUsersIBlocked([]);
+        }
 
-      if (!userLoggedIn || usersBlockedLoading) {
         return;
       }
 
@@ -101,7 +101,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
       }
     }
     fetchBlockedUsers();
-  }, [userLoggedIn, usersBlockedLoading]);
+  }, [user.loggedIn, usersBlockedLoading]);
 
   useEffect(() => {
     const socketHandlerUserBlockStatusChanged = async (data: any) => {

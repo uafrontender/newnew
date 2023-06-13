@@ -18,7 +18,6 @@ import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
-import { useAppState } from '../../../contexts/appStateContext';
 
 const maxDate = new Date();
 
@@ -38,7 +37,6 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     const { showErrorToastPredefined } = useErrorToasts();
 
     const user = useAppSelector((state) => state.user);
-    const { userIsCreator } = useAppState();
     const { editEmail } = router.query;
 
     const [dateInEdit, setDateInEdit] = useState(currentDate ?? undefined);
@@ -183,7 +181,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
                   ? t(
                       `Settings.sections.personalInformation.birthDateInput.errors.${dateError}` as any,
                       {
-                        value: userIsCreator
+                        value: user.userData?.options?.isCreator
                           ? appConstants.minCreatorAgeYears
                           : appConstants.minUserAgeYears,
                       }

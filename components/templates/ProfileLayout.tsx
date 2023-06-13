@@ -64,7 +64,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const { t } = useTranslation('page-Profile');
 
   const currentUser = useAppSelector((state) => state.user);
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -127,15 +127,21 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Only if user logged in
   const isBlocked = useMemo(
     () =>
-      userLoggedIn &&
+      currentUser.loggedIn &&
       (!usersBlockedLoaded ||
         usersIBlocked.includes(user.uuid) ||
         usersBlockedMe.includes(user.uuid)),
-    [userLoggedIn, usersBlockedLoaded, usersIBlocked, user.uuid, usersBlockedMe]
+    [
+      currentUser.loggedIn,
+      usersBlockedLoaded,
+      usersIBlocked,
+      user.uuid,
+      usersBlockedMe,
+    ]
   );
   // NOTE: activity is temporarily disabled
   /* const tabs: Tab[] = useMemo(() => {
-    if (userIsCreator) {
+    if (user.options?.isCreator) {
       return [
         {
           nameToken: 'userInitial',
@@ -149,7 +155,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       ];
     }
     return [];
-  }, [userIsCreator, user]); */
+  }, [user]); */
 
   // TODO: Re-enable once new SMS service is integrated
   /* const subscription: SubscriptionToCreator = useMemo(
@@ -162,7 +168,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );  */
 
   const handleClickReport = useCallback(() => {
-    if (!userLoggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!currentUser.loggedIn && currentUser._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -172,7 +179,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
 
     setConfirmReportUser(true);
-  }, [userLoggedIn, router]);
+  }, [currentUser, router]);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
@@ -196,14 +203,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (
-      userLoggedIn &&
+      currentUser.loggedIn &&
       currentUser.userData?.userUuid?.toString() === user.uuid.toString()
     ) {
-      router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
+      router.replace(
+        currentUser.userData?.options?.isCreator
+          ? '/profile/my-posts'
+          : '/profile'
+      );
     }
   }, [
-    userLoggedIn,
-    userIsCreator,
+    currentUser.loggedIn,
+    currentUser.userData?.options?.isCreator,
     currentUser.userData?.userUuid,
     router,
     user.uuid,
@@ -246,7 +257,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SSideButtons>
             {
               // TODO: Re-enable once new SMS service is integrated
-              /* userIsCreator && !isBlocked ? (
+              /* user.options?.isCreator && !isBlocked ? (
               <SmsNotificationsButton subscription={subscription} />
             ) : ( */
               <div />
@@ -274,6 +285,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
               isBlocked={isUserBlocked}
+              loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleClickBlock={async () => {
                 if (isUserBlocked) {
@@ -404,7 +416,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             )}
           </SUserData>
           {/* Temp, all creators for now */}
-          {/* {userIsCreator && !user.options?.isPrivate */}
+          {/* {user.options?.isCreator && !user.options?.isPrivate */}
           {/* NOTE: activity is temporarily disabled */}
           {/* tabs.length > 0 && !isBlocked ? (
             <ProfileTabs pageType='othersProfile' tabs={tabs} />
@@ -418,6 +430,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           isOpen={ellipseMenuOpen}
           zIndex={10}
           isBlocked={isUserBlocked}
+          loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
           handleClickBlock={async () => {
             if (isUserBlocked) {

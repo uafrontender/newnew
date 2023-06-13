@@ -8,8 +8,8 @@ import {
 } from 'react-query';
 
 import { deleteCard, getCards, setPrimaryCard } from '../../api/endpoints/card';
+import { useAppSelector } from '../../redux-store/store';
 import useErrorToasts from './useErrorToasts';
-import { useAppState } from '../../contexts/appStateContext';
 
 interface CardsData {
   cards: newnewapi.ICard[];
@@ -29,7 +29,7 @@ interface CardsData {
 const useCards = (): CardsData => {
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
 
-  const { userLoggedIn } = useAppState();
+  const user = useAppSelector((state) => state.user);
 
   const queryClient = useQueryClient();
 
@@ -47,7 +47,7 @@ const useCards = (): CardsData => {
       return res.data.cards;
     },
     {
-      enabled: userLoggedIn,
+      enabled: user.loggedIn,
     }
   );
 

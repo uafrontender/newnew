@@ -19,7 +19,6 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import InlineSvg from '../atoms/InlineSVG';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
-import { useAppState } from '../../contexts/appStateContext';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
@@ -52,7 +51,6 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const router = useRouter();
       const { t } = useTranslation('common');
       const user = useAppSelector((state) => state.user);
-      const { userLoggedIn } = useAppState();
 
       const { promptUserWithPushNotificationsPermissionModal } =
         usePushNotifications();
@@ -80,7 +78,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
             _postUuid: postUuid,
           });
 
-          if (!userLoggedIn) {
+          // Redirect only after the persist data is pulled
+          if (!user.loggedIn && user._persist?.rehydrated) {
             router.push(
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
                 `${process.env.NEXT_PUBLIC_APP_URL}/p/${
@@ -115,7 +114,8 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
         }
       }, [
         postUuid,
-        userLoggedIn,
+        user.loggedIn,
+        user._persist?.rehydrated,
         isFollowingDecision,
         router,
         postShortId,
@@ -149,7 +149,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           }
         }
 
-        if (userLoggedIn && isVisible) {
+        if (user.loggedIn && isVisible) {
           // setTimeout used to fix the React memory leak warning
           const timer = setTimeout(() => {
             fetchIsFollowing();
@@ -158,7 +158,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
             clearTimeout(timer);
           };
         }
-      }, [userLoggedIn, postUuid, isVisible]);
+      }, [user.loggedIn, postUuid, isVisible]);
 
       useEffect(() => {
         if (!isVisible) {

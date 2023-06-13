@@ -65,7 +65,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -159,7 +159,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     } = useMcOptions({
       postUuid: post.postUuid,
       userUuid: user.userData?.userUuid,
-      loggedInUser: userLoggedIn,
+      loggedInUser: user.loggedIn,
     });
 
     const handleRemoveOption = useCallback(
@@ -297,7 +297,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         user.userTutorialsProgress.remainingMcSteps &&
         user.userTutorialsProgress.remainingMcSteps[0]
       ) {
-        if (userLoggedIn) {
+        if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
           });

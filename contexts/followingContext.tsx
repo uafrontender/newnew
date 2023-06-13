@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 
 import { getCreatorsIFollow } from '../api/endpoints/user';
-import { useAppDispatch } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
 import { useAppState } from './appStateContext';
 
@@ -23,12 +23,12 @@ interface IFollowingsContextProvider {
   children: React.ReactNode;
 }
 
-// TODO: Move logout logic from the context (AppStateContext?), remove Redux
 const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
   children,
 }) => {
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn } = useAppState();
+  const user = useAppSelector((state) => state.user);
+  const { setUserLoggedIn } = useAppState();
 
   const [followingsIds, setFollowingsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,10 +53,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
 
   useEffect(() => {
     async function fetchIds() {
-      if (!userLoggedIn) {
-        return;
-      }
-
+      if (!user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -91,7 +88,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
 
     fetchIds();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+  }, [user.loggedIn]);
 
   return (
     <FollowingsContext.Provider value={contextValue}>

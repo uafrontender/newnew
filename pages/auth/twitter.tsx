@@ -11,8 +11,11 @@ import Lottie from '../../components/atoms/Lottie';
 import { signInWithTwitter } from '../../api/endpoints/auth';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
-import { useAppDispatch } from '../../redux-store/store';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import {
+  setUserData,
+  setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 import { useAppState } from '../../contexts/appStateContext';
@@ -29,7 +32,9 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { setUserLoggedIn: setAppStateUserLoggedIn, setUserIsCreator } =
+    useAppState();
+  const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -40,7 +45,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   }, []);
 
   useUpdateEffect(() => {
-    if (userLoggedIn) {
+    if (user.loggedIn) {
       router?.push('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,10 +53,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
   useUpdateEffect(() => {
     async function handleAuth() {
-      if (isLoading || userLoggedIn) {
-        return;
-      }
-
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -116,7 +118,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           path: '/',
         });
 
-        setUserLoggedIn(true);
+        dispatch(setUserLoggedIn(true));
+        setAppStateUserLoggedIn(true);
         setUserIsCreator(!!data.me?.options?.isCreator);
 
         resumePushNotification();

@@ -28,7 +28,6 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IPostResponseTabModeration {
   postUuid: string;
@@ -58,7 +57,6 @@ const PostResponseTabModeration: React.FunctionComponent<
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { userLoggedIn } = useAppState();
   const dispatch = useAppDispatch();
 
   const [isTutorialVisible, setIsTutorialVisible] = useState(false);
@@ -69,7 +67,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         user.userTutorialsProgress.remainingAcResponseCurrentStep &&
         user.userTutorialsProgress.remainingAcResponseCurrentStep[0]
       ) {
-        if (userLoggedIn) {
+        if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             acResponseCurrentStep:
               user.userTutorialsProgress.remainingAcResponseCurrentStep[0],
@@ -90,7 +88,7 @@ const PostResponseTabModeration: React.FunctionComponent<
         user.userTutorialsProgress.remainingMcResponseCurrentStep &&
         user.userTutorialsProgress.remainingMcResponseCurrentStep[0]
       ) {
-        if (userLoggedIn) {
+        if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             mcResponseCurrentStep:
               user.userTutorialsProgress.remainingMcResponseCurrentStep[0],
@@ -110,7 +108,7 @@ const PostResponseTabModeration: React.FunctionComponent<
   }, [
     dispatch,
     postType,
-    userLoggedIn,
+    user.loggedIn,
     user.userTutorialsProgress.remainingAcResponseCurrentStep,
     user.userTutorialsProgress.remainingMcResponseCurrentStep,
   ]);

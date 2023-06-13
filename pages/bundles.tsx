@@ -6,10 +6,10 @@ import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
+import { useAppSelector } from '../redux-store/store';
 import { useBundles } from '../contexts/bundlesContext';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import useBuyBundleAfterStripeRedirect from '../utils/hooks/useBuyBundleAfterStripeRedirect';
-import { useAppState } from '../contexts/appStateContext';
 
 const Bundles = dynamic(
   () => import('../components/organisms/bundles/Bundles')
@@ -26,7 +26,7 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
 }) => {
   const router = useRouter();
   const { bundles } = useBundles();
-  const { userIsCreator } = useAppState();
+  const { user } = useAppSelector((state) => state);
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
@@ -34,14 +34,15 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
 
   useEffect(() => {
     if (
-      !userIsCreator ||
+      (!user.loggedIn && user._persist?.rehydrated) ||
       (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
     ) {
       router.replace('/');
     }
   }, [
     stripeSetupIntentClientSecretFromRedirect,
-    userIsCreator,
+    user.loggedIn,
+    user._persist?.rehydrated,
     bundles,
     router,
   ]);

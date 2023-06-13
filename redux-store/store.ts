@@ -49,7 +49,7 @@ const userPersistConfig = {
   key: 'user',
   storage,
   serializableCheck: false,
-  whitelist: ['userData'],
+  whitelist: ['loggedIn', 'userData'],
 };
 
 const reducers = {

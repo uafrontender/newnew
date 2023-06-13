@@ -25,7 +25,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { setUserLoggedIn, setUserIsCreator } = useAppState();
 
   const router = useRouter();
   const { email, retryAfter, redirect } = router.query;
@@ -35,10 +35,11 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   // Redirect if the user is not logged in
   useEffect(() => {
-    if (!userLoggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.replace('/');
     }
-  }, [userLoggedIn, router]);
+  }, [user.loggedIn, user._persist?.rehydrated, router]);
 
   // Listen to Me update event
   useEffect(() => {
@@ -113,7 +114,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         newEmail={email as string}
         redirect={redirect as 'settings' | 'dashboard'}
         canResendIn={parseInt(retryAfter as string)}
-        allowLeave={!userLoggedIn}
+        allowLeave={!user.loggedIn && user._persist?.rehydrated}
       />
     </>
   );

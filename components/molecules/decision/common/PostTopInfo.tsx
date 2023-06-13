@@ -16,6 +16,8 @@ import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
+import { useAppSelector } from '../../../../redux-store/store';
+
 import { TPostType } from '../../../../utils/switchPostType';
 
 import Text from '../../../atoms/Text';
@@ -105,7 +107,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { t: tCommon } = useTranslation('common');
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { user } = useAppSelector((state) => state);
+  const { resizeMode } = useAppState();
   // const socketConnection = useContext(SocketContext);
   // const { showErrorToastCustom } = useErrorToasts();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -233,7 +236,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         _component: 'PostTopInfo',
       });
 
-      if (!userLoggedIn) {
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             window.location.href
@@ -266,7 +270,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     isFollowingDecision,
     postUuid,
     router,
-    userLoggedIn,
+    user.loggedIn,
+    user._persist?.rehydrated,
   ]);
 
   const handleSeeNewFailedBox = useCallback(() => {
@@ -287,7 +292,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   /* const submitPhoneSmsNotificationsRequest = useCallback(
     async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
       try {
-        if (!userLoggedIn) {
+        if (!user.loggedIn) {
           const guestId = getGuestId();
 
           const res = await subscribeGuestToSmsNotifications(
@@ -351,7 +356,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         throw err;
       }
     },
-    [userLoggedIn, showErrorToastCustom, subscription.postUuid, t]
+    [user.loggedIn, showErrorToastCustom, subscription.postUuid, t]
   ); 
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
@@ -362,7 +367,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     });
 
     if (subscribedToSmsNotifications) {
-      if (!userLoggedIn) {
+      if (!user.loggedIn) {
         const guestId = getGuestId();
         const res = await unsubscribeGuestFromSmsNotifications(
           { postUuid: subscription.postUuid },
@@ -383,7 +388,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           showErrorToastCustom(tCommon('smsNotifications.error.requestFailed'));
         }
       }
-    } else if (!userLoggedIn) {
+    } else if (!user.loggedIn) {
       const countryCode = localStorage.getItem(SAVED_PHONE_COUNTRY_CODE_KEY);
       const number = localStorage.getItem(SAVED_PHONE_NUMBER_KEY);
 
@@ -428,7 +433,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }, [
     postUuid,
     subscribedToSmsNotifications,
-     userLoggedIn,
+    user.loggedIn,
     user.userData?.options?.isPhoneNumberConfirmed,
     subscription.postUuid,
     showErrorToastCustom,
@@ -437,7 +442,11 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   ]);
 
   useEffect(() => {
-    if (!userLoggedIn) {
+    if (!user._persist?.rehydrated) {
+      return () => {};
+    }
+
+    if (!user.loggedIn) {
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
         const res = await getGuestSmsNotificationsSubscriptionStatus(
@@ -487,7 +496,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
     return () => {};
   }, [
-     userLoggedIn,
+    user._persist?.rehydrated,
+    user.loggedIn,
     subscription.postUuid,
     tCommon,
   ]);
@@ -524,7 +534,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       }
     };
 
-    if (socketConnection && userLoggedIn) {
+    if (socketConnection && user.loggedIn) {
       socketConnection?.on('SmsNotificationsSubscribed', handleSubscribedToSms);
       socketConnection?.on(
         'SmsNotificationsUnsubscribed',
@@ -533,7 +543,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     return () => {
-      if (socketConnection && socketConnection?.connected && userLoggedIn) {
+      if (socketConnection && socketConnection?.connected && user.loggedIn) {
         socketConnection?.off(
           'SmsNotificationsSubscribed',
           handleSubscribedToSms
@@ -544,7 +554,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         );
       }
     };
-  }, [userLoggedIn, subscription.postUuid, socketConnection]); 
+  }, [user.loggedIn, subscription.postUuid, socketConnection]); 
 
   const notificationButtonRef: any = useRef(); */
   const moreButtonRef: any = useRef();

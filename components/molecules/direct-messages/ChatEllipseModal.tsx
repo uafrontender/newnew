@@ -3,8 +3,8 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 
+import { useAppSelector } from '../../../redux-store/store';
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
-import { useAppState } from '../../../contexts/appStateContext';
 
 interface IChatEllipseModal {
   isOpen: boolean;
@@ -28,7 +28,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   visavis,
 }) => {
   const { t } = useTranslation('common');
-  const { userIsCreator } = useAppState();
+  const user = useAppSelector((state) => state.user);
 
   const toggleBlockUserHandler = useCallback(async () => {
     await toggleUserBlock();
@@ -42,7 +42,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
 
   return (
     <EllipseModal show={isOpen} zIndex={zIndex} onClose={onClose}>
-      {userIsCreator && !isAnnouncement && visavis && (
+      {user.userData?.options?.isCreator && !isAnnouncement && visavis && (
         <Link href={`/${visavis.user?.username}`}>
           <a>
             <EllipseModalButton>{t('ellipse.view')}</EllipseModalButton>
