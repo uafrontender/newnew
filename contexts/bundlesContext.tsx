@@ -168,12 +168,13 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         saveStateLS('creatorHasSoldBundles', false);
       }
     },
-    // showErrorToastPredefined causes re-render not only when locale changes
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       userLoggedIn,
       userIsCreator,
       fetchBundles,
+      // showErrorToastPredefined causes re-render not only when locale changes
       // showErrorToastPredefined,
       fetchIsSellingBundles,
       fetchHasSoldBundles,

@@ -74,6 +74,7 @@ export const TutorialProgressContextProvider: React.FC<
             !isEqual(data, localUserTutorialsProgress) &&
             localUserTutorialsProgress
           ) {
+            // TODO: Use markTutorialStepAsCompleted once
             const syncedObj: newnewapi.IGetTutorialsStatusResponse = {
               ...data,
             };
