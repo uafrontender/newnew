@@ -44,7 +44,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
   const { t } = useTranslation('page-Post');
   const theme = useTheme();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -83,7 +83,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
       )}
       <PostVideoProcessingHolder
         holderText={
-          userLoggedIn && user.userData?.userUuid === post.postUuid
+          user.loggedIn && user.userData?.userUuid === post.postUuid
             ? 'moderation'
             : 'decision'
         }

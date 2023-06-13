@@ -14,7 +14,6 @@ import CheckmarkIcon from '../../../public/images/svg/icons/outlined/Checkmark.s
 import PlayIcon from '../../../public/images/svg/icons/filled/Play.svg';
 import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
-import { useAppState } from '../../../contexts/appStateContext';
 
 interface IEmbedLink {
   href: string;
@@ -52,7 +51,6 @@ const FaqSection = () => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const { userLoggedIn, userIsCreator } = useAppState();
   const { appConstants } = useGetAppConstants();
 
   return (
@@ -63,8 +61,8 @@ const FaqSection = () => {
           // Skip section about becoming creator for users younger then 13
           if (
             i === 1 &&
-            userLoggedIn &&
-            !userIsCreator &&
+            user.loggedIn &&
+            !user.userData?.options?.isCreator &&
             !canBecomeCreator(
               user.userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
@@ -80,15 +78,15 @@ const FaqSection = () => {
               </STitle>
               <SText variant={3} weight={600}>
                 <Trans
-                  key={`trans-${userLoggedIn}`}
+                  key={`trans-${user.loggedIn}`}
                   i18nKey={`faq.items.${i}.answer` as any}
                   t={t}
                   components={[
                     <EmbedLink
                       href={
                         // eslint-disable-next-line no-nested-ternary
-                        userLoggedIn
-                          ? userIsCreator
+                        user.loggedIn
+                          ? user.userData?.options?.isCreator
                             ? '/creator/dashboard'
                             : '/creator-onboarding'
                           : '/sign-up?to=create'

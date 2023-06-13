@@ -73,7 +73,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -98,7 +98,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
     if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
-      if (userLoggedIn) {
+      if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           acCurrentStep: currentStep,
         });

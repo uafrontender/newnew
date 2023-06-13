@@ -7,23 +7,23 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppSelector } from '../../../redux-store/store';
 import assets from '../../../constants/assets';
-import { useAppState } from '../../../contexts/appStateContext';
 
 const BecomeCreatorSection = () => {
   const { t } = useTranslation('page-Home');
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
-  const { userIsCreator } = useAppState();
+  const user = useAppSelector((state) => state.user);
 
   const handleClickCreateNow = () => {
     Mixpanel.track('Navigation Item Clicked', {
       _stage: 'Homepage',
       _button: 'Create now',
-      _target: userIsCreator ? '/creator-onboarding' : '/sign-up?to=create',
+      _target: user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create',
     });
-    router.push(userIsCreator ? '/creator-onboarding' : '/sign-up?to=create');
+    router.push(user.loggedIn ? '/creator-onboarding' : '/sign-up?to=create');
   };
 
   return (

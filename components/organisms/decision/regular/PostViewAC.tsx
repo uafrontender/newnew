@@ -82,7 +82,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { mutedMode } = useAppSelector((state) => state.ui);
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -156,13 +156,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     {
       postUuid: post.postUuid,
       userUuid: user.userData?.userUuid,
-      loggedInUser: userLoggedIn,
+      loggedInUser: user.loggedIn,
     },
     {
       onError: (err: any) => {
         showErrorToastCustom((err as Error).message);
       },
-      refetchOnWindowFocus: userLoggedIn,
+      refetchOnWindowFocus: user.loggedIn,
     }
   );
 
@@ -276,11 +276,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   useEffect(() => {
     const controller = new AbortController();
     const makeBidAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret || loadingModalOpen) {
+      if (!stripeSetupIntentClientSecret || loadingModalOpen) return;
+
+      if (!user._persist?.rehydrated) {
         return;
       }
 
-      if (!userLoggedIn) {
+      if (!user.loggedIn) {
         router.push(
           `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
         );
@@ -356,14 +358,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       controller.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user._persist?.rehydrated]);
 
   const goToNextStep = () => {
     if (
       user.userTutorialsProgress.remainingAcSteps &&
       user.userTutorialsProgress.remainingAcSteps[0]
     ) {
-      if (userLoggedIn) {
+      if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
         });

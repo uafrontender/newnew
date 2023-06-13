@@ -14,6 +14,7 @@ import PostList from '../components/organisms/see-more/PostList';
 import TitleBlock from '../components/organisms/see-more/TitleBlock';
 import HomeLayout from '../components/templates/HomeLayout';
 
+import { useAppSelector } from '../redux-store/store';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { fetchBiggestPosts, fetchForYouPosts } from '../api/endpoints/post';
 import { getMyPosts } from '../api/endpoints/user';
@@ -22,7 +23,6 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import assets from '../constants/assets';
 import { I18nNamespaces } from '../@types/i18next';
-import { useAppState } from '../contexts/appStateContext';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -42,8 +42,9 @@ interface ISearch {
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
   const { t } = useTranslation('page-SeeMore');
+  const { loggedIn, _persist } = useAppSelector((state) => state.user);
+
   const { showErrorToastPredefined } = useErrorToasts();
-  const { userLoggedIn } = useAppState();
 
   const router = useRouter();
   const categoryRef = useRef(router.query.category?.toString() ?? 'ac');
@@ -85,7 +86,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           | newnewapi.PagedAuctionsResponse
         >;
 
-        if (categoryToFetch === 'for-you' && userLoggedIn) {
+        if (categoryToFetch === 'for-you' && loggedIn) {
           const fyPayload = new newnewapi.PagedRequest({
             ...(pageToken
               ? {
@@ -290,7 +291,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setCollectionLoaded, userLoggedIn, isCollectionLoading]
+    [setCollectionLoaded, loggedIn, isCollectionLoading]
   );
 
   // Scroll to top once category changed
@@ -320,7 +321,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       }
     }
 
-    if (!userLoggedIn && category === 'for-you') {
+    // Redirect only after the persist data is pulled
+    if (category === 'for-you' && _persist?.rehydrated && !loggedIn) {
       router?.push('/sign-up');
       return;
     }
@@ -369,7 +371,8 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     isCollectionLoading,
     router.query.category,
     router.query.sort,
-    userLoggedIn,
+    _persist?.rehydrated,
+    loggedIn,
   ]);
 
   return (
@@ -422,7 +425,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       <SWrapper name={router.query.category?.toString() ?? ''}>
         <TitleBlock
           category={categoryRef.current}
-          authenticated={userLoggedIn}
+          authenticated={loggedIn}
           disabled={isCollectionLoading}
         />
         <SListContainer>

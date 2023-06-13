@@ -124,7 +124,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode } = useAppState();
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -172,7 +172,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   );
 
   const handleOpenReportForm = useCallback(() => {
-    if (!userLoggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!user.loggedIn && user._persist?.rehydrated) {
       router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
@@ -182,7 +183,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     }
 
     setIsReportModalOpen(true);
-  }, [userLoggedIn, router]);
+  }, [user, router]);
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);
@@ -321,7 +322,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   const setupIntent = useStripeSetupIntent({
     purpose: placeBidRequest,
-    isGuest: !userLoggedIn,
+    isGuest: !user.loggedIn,
     successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
       postShortId || postUuid
     }`,
@@ -412,7 +413,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       user.userTutorialsProgress.remainingAcSteps &&
       user.userTutorialsProgress.remainingAcSteps[0]
     ) {
-      if (userLoggedIn) {
+      if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
         });

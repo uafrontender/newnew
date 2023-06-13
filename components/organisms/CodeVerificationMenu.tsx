@@ -12,6 +12,7 @@ import {
   setSignupEmailInput,
   setSignupTimerValue,
   setUserData,
+  setUserLoggedIn,
 } from '../../redux-store/slices/userStateSlice';
 
 // API
@@ -53,7 +54,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { t } = useTranslation('page-VerifyEmail');
   const { resumePushNotification } = usePushNotifications();
 
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const {
+    resizeMode,
+    setUserLoggedIn: setAppStateUserLoggedIn,
+    setUserIsCreator,
+  } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -157,7 +162,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         });
 
         // Set logged in and
-        setUserLoggedIn(true);
+        dispatch(setUserLoggedIn(true));
+        setAppStateUserLoggedIn(true);
         setUserIsCreator(!!data.me?.options?.isCreator);
         dispatch(setSignupEmailInput(''));
         dispatch(setSignupTimerValue(0));
@@ -187,7 +193,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       dispatch,
       router,
       redirectUserTo,
-      setUserLoggedIn,
+      setAppStateUserLoggedIn,
       setUserIsCreator,
     ]
   );
