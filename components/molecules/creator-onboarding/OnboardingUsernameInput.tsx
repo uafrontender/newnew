@@ -33,6 +33,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
   disabled,
   onChange,
   onFocus,
+  onBlur,
   ...rest
 }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
@@ -53,6 +54,8 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
 
     if (isValid) {
       setErrorBordersShown(false);
+    } else if (!isValid && !focused) {
+      setErrorBordersShown(true);
     }
   }, [focused, isValid]);
 
@@ -73,7 +76,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
           disabled={disabled}
           errorBordersShown={errorBordersShown}
           onChange={handleOnChange}
-          onBlur={() => {
+          onBlur={(e) => {
             setIsPopupVisible(false);
             setFocused(false);
             if (!isValid && errorCaption) {
@@ -81,9 +84,10 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
             } else {
               setErrorBordersShown(false);
             }
+            onBlur?.(e);
           }}
           onFocus={(e) => {
-            if (onFocus) onFocus(e);
+            onFocus?.(e);
             setFocused(true);
             setIsPopupVisible(true);
             setErrorBordersShown(false);
