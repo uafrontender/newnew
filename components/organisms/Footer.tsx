@@ -13,21 +13,16 @@ import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
 import SettingsColorModeSwitch from '../molecules/profile/SettingsColorModeSwitch';
 
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 // import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
 // import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
 // import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
-import {
-  setColorMode,
-  TColorMode,
-} from '../../redux-store/slices/uiStateSlice';
 import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
+import { TColorMode, useUiState } from '../../contexts/uiStateContext';
 
 interface IFooter {}
 
@@ -44,8 +39,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const { t: tCommon } = useTranslation('common');
   const theme = useTheme();
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const { colorMode } = useAppSelector((state) => state.ui);
+  const { colorMode, setColorMode } = useUiState();
   const { resizeMode } = useAppState();
 
   const topItems: TItem[] = [
@@ -118,9 +112,9 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
         _component: 'Footer',
         _colorMode: mode,
       });
-      dispatch(setColorMode(mode));
+      setColorMode(mode);
     },
-    [dispatch]
+    [setColorMode]
   );
 
   const renderItem = (item: TItem) => {

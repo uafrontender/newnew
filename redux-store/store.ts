@@ -26,7 +26,6 @@ import {
 import { createWrapper } from 'next-redux-wrapper';
 
 // Import reducers
-import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
 
 import isBrowser from '../utils/isBrowser';
@@ -36,13 +35,7 @@ import isBrowser from '../utils/isBrowser';
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['ui', 'user', 'creation'],
-};
-
-const uiPersistConfig = {
-  key: 'ui',
-  storage,
-  whitelist: ['colorMode', 'mutedMode'],
+  blacklist: ['user', 'creation'],
 };
 
 const userPersistConfig = {
@@ -53,12 +46,10 @@ const userPersistConfig = {
 };
 
 const reducers = {
-  ui: persistReducer(uiPersistConfig, uiReducer),
   user: persistReducer(userPersistConfig, userReducer),
 };
 
 const combinedReducer = combineReducers({
-  ui: uiReducer,
   user: userReducer,
 });
 

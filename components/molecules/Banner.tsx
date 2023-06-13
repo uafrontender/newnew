@@ -5,32 +5,27 @@ import Text from '../atoms/Text';
 import InlineSVG from '../atoms/InlineSVG';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
-import { setBanner } from '../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 import { useAppState } from '../../contexts/appStateContext';
+import { useUiState } from '../../contexts/uiStateContext';
 
 interface IBanner {}
 
 const Banner: React.FC<IBanner> = React.memo(() => {
-  const { banner } = useAppSelector((state) => state.ui);
+  const { banner, setBanner } = useUiState();
   const { resizeMode } = useAppState();
 
   const theme = useTheme();
-  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
   const onClose = () => {
-    dispatch(
-      setBanner({
-        ...banner,
-        show: false,
-      })
-    );
+    setBanner({
+      ...banner,
+      show: false,
+    });
   };
   const handleBannerClick = () => {};
 

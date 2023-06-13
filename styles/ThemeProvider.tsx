@@ -5,10 +5,9 @@ import { ThemeProvider } from 'styled-components';
 import GlobalStyle from './globalStyles';
 
 import getColorMode from '../utils/getColorMode';
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
-import { setColorMode } from '../redux-store/slices/uiStateSlice';
 import ThemeColorTag from '../components/atoms/ThemeColorTag';
+import { useUiState } from '../contexts/uiStateContext';
 
 interface IGlobalTheme {
   initialTheme: string;
@@ -21,8 +20,7 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   themeFromCookie,
   children,
 }) => {
-  const dispatch = useAppDispatch();
-  const { colorMode } = useAppSelector((state) => state.ui);
+  const { colorMode, setColorMode } = useUiState();
   const colorModeMemo = useRef('');
 
   const [mounted, setMounted] = useState(false);
@@ -54,7 +52,7 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
   useEffect(() => {
     let timeout: any;
     const handleSwitchTheme = () => {
-      dispatch(setColorMode('auto'));
+      setColorMode('auto');
       setAutoThemeMatched(true);
     };
 

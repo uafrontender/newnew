@@ -6,8 +6,6 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
 
 // Utils
@@ -25,6 +23,7 @@ import GoBackButton from '../../../molecules/GoBackButton';
 import PostSuccessOrWaitingControls from '../../../molecules/decision/common/PostSuccessOrWaitingControls';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { useUiState } from '../../../../contexts/uiStateContext';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -42,8 +41,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
   ({ post }) => {
     const { t } = useTranslation('page-Post');
     const theme = useTheme();
-    const dispatch = useAppDispatch();
-    const { mutedMode } = useAppSelector((state) => state.ui);
+    const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -88,8 +86,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
 
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
-      dispatch(toggleMutedMode(''));
-    }, [dispatch]);
+      toggleMutedMode();
+    }, [toggleMutedMode]);
 
     // Main screen vs all bids
     const [openedMainSection, setOpenedMainSection] = useState<'main' | 'bids'>(
@@ -609,6 +607,8 @@ const SWinningOptionDetailsTitle = styled(Headline)`
   grid-area: title;
 
   text-align: center;
+  word-break: break-word;
+
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }

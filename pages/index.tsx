@@ -229,6 +229,11 @@ export default Home;
 export const getServerSideProps: GetServerSideProps<IHome> = async (
   context
 ) => {
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=1, stale-while-revalidate=5'
+  );
+
   const translationContext = await serverSideTranslations(
     context.locale!!,
     [
