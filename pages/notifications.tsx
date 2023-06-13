@@ -20,7 +20,6 @@ import {
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../contexts/notificationsContext';
 import assets from '../constants/assets';
-import { useAppSelector } from '../redux-store/store';
 import Button from '../components/atoms/Button';
 import usePagination, {
   PaginatedResponse,
@@ -28,6 +27,7 @@ import usePagination, {
 } from '../utils/hooks/usePagination';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { Mixpanel } from '../utils/mixpanel';
+import { useAppState } from '../contexts/appStateContext';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -40,7 +40,7 @@ export const Notifications = () => {
   const { t } = useTranslation('page-Notifications');
   const { ref: scrollRef, inView } = useInView();
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
   const [readAllToTime, setReadAllToTime] = useState<number | undefined>();
 
   // Used to update notification timers
@@ -126,10 +126,10 @@ export const Notifications = () => {
   }, [inView, loading, hasMore, loadMore]);
 
   useEffect(() => {
-    if (!user.loggedIn && user._persist?.rehydrated) {
+    if (!userLoggedIn) {
       router?.push('/sign-up');
     }
-  }, [user.loggedIn, user._persist?.rehydrated, router]);
+  }, [userLoggedIn, router]);
 
   useEffect(() => {
     const updateTimeInterval = setInterval(() => {

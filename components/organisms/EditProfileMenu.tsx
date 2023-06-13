@@ -164,7 +164,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { resizeMode, setUserLoggedIn } = useAppState();
+  const { resizeMode, userIsCreator, setUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -401,7 +401,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         }
       } else if (key === 'bio') {
         validateTextViaAPIDebounced(
-          user.userData?.options?.isCreator
+          userIsCreator
             ? newnewapi.ValidateTextRequest.Kind.CREATOR_BIO
             : newnewapi.ValidateTextRequest.Kind.USER_BIO,
           value as ModalMenuUserData['bio']
@@ -411,7 +411,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     [
       dataInEdit,
       user.userData?.username,
-      user.userData?.options?.isCreator,
+      userIsCreator,
       validateTextViaAPIDebounced,
       validateUsernameViaAPIDebounced,
     ]
