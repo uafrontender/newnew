@@ -5,10 +5,10 @@ import dynamic from 'next/dynamic';
 
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import useSearchCreators from '../../../utils/hooks/useSearchCreators';
+import { useAppSelector } from '../../../redux-store/store';
 
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { useAppState } from '../../../contexts/appStateContext';
 
 const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
 const CreatorsList = dynamic(() => import('./CreatorsList'));
@@ -18,7 +18,7 @@ interface IFunction {
 }
 
 export const SearchCreators: React.FC<IFunction> = ({ query }) => {
-  const { userLoggedIn } = useAppState();
+  const { loggedIn } = useAppSelector((state) => state.user);
   const { showErrorToastPredefined } = useErrorToasts();
 
   const onLoadingCreatorsError = useCallback(
@@ -32,7 +32,7 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useSearchCreators(
       {
-        loggedInUser: userLoggedIn,
+        loggedInUser: loggedIn,
         query,
       },
       {

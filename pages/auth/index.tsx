@@ -19,8 +19,11 @@ import {
 import { APIResponse } from '../../api/apiConfigs';
 import { SUPPORTED_AUTH_PROVIDERS } from '../../constants/general';
 
-import { useAppDispatch } from '../../redux-store/store';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import {
+  setUserData,
+  setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
@@ -43,7 +46,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { setUserLoggedIn: setAppStateUserLoggedIn, setUserIsCreator } =
+    useAppState();
+  const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -54,7 +59,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   }, []);
 
   useUpdateEffect(() => {
-    if (userLoggedIn) {
+    if (user.loggedIn) {
       router?.push('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,10 +67,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
   useUpdateEffect(() => {
     async function handleAuth() {
-      if (isLoading || userLoggedIn) {
-        return;
-      }
-
+      if (isLoading || user.loggedIn) return;
       try {
         setIsLoading(true);
 
@@ -164,7 +166,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
           path: '/',
         });
 
-        setUserLoggedIn(true);
+        dispatch(setUserLoggedIn(true));
+        setAppStateUserLoggedIn(true);
         setUserIsCreator(!!data.me?.options?.isCreator);
 
         resumePushNotification();

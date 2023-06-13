@@ -8,6 +8,7 @@ import { useTranslation } from 'next-i18next';
 import isBrowser from '../../../../utils/isBrowser';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import { markPost } from '../../../../api/endpoints/post';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
@@ -43,7 +44,8 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   handleToggleMuted,
 }) => {
   const { t } = useTranslation('page-Post');
-  const { resizeMode, userLoggedIn } = useAppState();
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -73,13 +75,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       }
     }
 
-    if (openedTab === 'response' && userLoggedIn && !responseViewed) {
+    if (openedTab === 'response' && user.loggedIn && !responseViewed) {
       markResponseAsViewed();
-    } else if (openedTab === 'response' && !userLoggedIn && !responseViewed) {
+    } else if (openedTab === 'response' && !user.loggedIn && !responseViewed) {
       handleSetResponseViewed(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postUuid, userLoggedIn, responseViewed]);
+  }, [openedTab, postUuid, user.loggedIn, responseViewed]);
 
   // Adjust sound button if needed
   useEffect(() => {

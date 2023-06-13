@@ -25,7 +25,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -44,7 +44,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
   } = useMcOptions(
     {
       postUuid: post.postUuid,
-      loggedInUser: userLoggedIn,
+      loggedInUser: user.loggedIn,
       userUuid: user.userData?.userUuid,
     },
     {

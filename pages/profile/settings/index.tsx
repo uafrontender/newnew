@@ -63,10 +63,12 @@ const MyProfileSettingsIndex = () => {
   // Redux
   const dispatch = useAppDispatch();
 
-  const { userData } = useAppSelector((state: any) => state.user);
+  const { userData, loggedIn, _persist } = useAppSelector(
+    (state: any) => state.user
+  );
 
   const { colorMode } = useAppSelector((state: any) => state.ui);
-  const { resizeMode, userLoggedIn, setUserLoggedIn } = useAppState();
+  const { resizeMode, setUserLoggedIn } = useAppState();
   // Measurements
   const isMobileOrTablet = [
     'mobile',
@@ -268,10 +270,11 @@ const MyProfileSettingsIndex = () => {
   ];
 
   useUpdateEffect(() => {
-    if (!userLoggedIn) {
+    // Redirect only after the persist data is pulled
+    if (!loggedIn && _persist?.rehydrated) {
       router.replace('/');
     }
-  }, [userLoggedIn, router]);
+  }, [loggedIn, _persist?.rehydrated, router]);
 
   useEffect(() => {
     fetchMyTransactions();

@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import DisplayName from '../../../atoms/DisplayName';
-import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IOptionCardUsernameSpan {
   // String used for own user case only, when we want "I", "me" or "my"
@@ -17,14 +16,17 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
   isBlue,
 }) => {
   const currentUser = useAppSelector((state) => state.user);
-  const { userIsCreator } = useAppState();
 
   if (typeof user === 'string') {
     return (
       // TODO: Should it have hover effect?
       <SHighlightedDisplayName
         user={typeof user === 'string' ? currentUser.userData : user}
-        href={userIsCreator ? '/profile/my-posts' : '/profile'}
+        href={
+          currentUser.userData?.options?.isCreator
+            ? '/profile/my-posts'
+            : '/profile'
+        }
         altName={user}
         inverted={isBlue}
         isBlue={isBlue}

@@ -9,18 +9,19 @@ import { NextPageWithLayout } from '../../_app';
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
 import isBrowser from '../../../utils/isBrowser';
 import assets from '../../../constants/assets';
-import { useAppState } from '../../../contexts/appStateContext';
+import { useAppSelector } from '../../../redux-store/store';
 
 const EditEmailPage: NextPage = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Profile');
-  const { userLoggedIn } = useAppState();
+
+  const { loggedIn, _persist } = useAppSelector((state: any) => state.user);
 
   useUpdateEffect(() => {
-    if (!userLoggedIn) {
+    if (!loggedIn && _persist?.rehydrated) {
       router.push('/');
     }
-  }, [userLoggedIn, router]);
+  }, [loggedIn, _persist?.rehydrated, router]);
 
   useEffect(() => {
     router.push('/profile/settings');

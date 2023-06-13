@@ -90,7 +90,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const router = useRouter();
     const { t } = useTranslation('page-Post');
     const user = useAppSelector((state) => state.user);
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -109,14 +109,15 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
     const isMyComment = useMemo(
-      () => userLoggedIn && user.userData?.userUuid === comment.sender?.uuid,
-      [userLoggedIn, user.userData?.userUuid, comment.sender?.uuid]
+      () => user.loggedIn && user.userData?.userUuid === comment.sender?.uuid,
+      [user.loggedIn, user.userData?.userUuid, comment.sender?.uuid]
     );
 
     const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
     const onUserReport = useCallback(() => {
-      if (!userLoggedIn) {
+      // Redirect only after the persist data is pulled
+      if (!user.loggedIn && user._persist?.rehydrated) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
             window.location.href
@@ -126,7 +127,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       }
 
       setConfirmReportUser(true);
-    }, [userLoggedIn, router]);
+    }, [user, router]);
 
     const onDeleteComment = () => {
       setConfirmDeleteComment(true);

@@ -63,7 +63,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const { showErrorToastCustom } = useErrorToasts();
     const { user } = useAppSelector((state) => state);
     const { mutedMode } = useAppSelector((state) => state.ui);
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -167,7 +167,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       {
         postUuid: post.postUuid,
         userUuid: user.userData?.userUuid,
-        loggedInUser: userLoggedIn,
+        loggedInUser: user.loggedIn,
       },
       {
         onError: (err) => {
@@ -294,7 +294,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         user.userTutorialsProgress.remainingAcSteps &&
         user.userTutorialsProgress.remainingAcSteps[0]
       ) {
-        if (userLoggedIn) {
+        if (user.loggedIn) {
           const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
             acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
           });

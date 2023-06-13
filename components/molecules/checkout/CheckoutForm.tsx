@@ -31,7 +31,6 @@ import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppState } from '../../../contexts/appStateContext';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -61,8 +60,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 }) => {
   const { t } = useTranslation('modal-PaymentModal');
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
-  const { userData } = useAppSelector((state) => state.user);
-  const { userLoggedIn } = useAppState();
+  const { loggedIn, userData } = useAppSelector((state) => state.user);
   const { appConstants } = useGetAppConstants();
   const router = useRouter();
 
@@ -99,7 +97,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         throw new Error('Stripe initialization error');
       }
 
-      if (!userLoggedIn && !email) {
+      if (!loggedIn && !email) {
         setEmailError(t('errorCaptions.emailRequired'));
         return;
       }
@@ -119,7 +117,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         selectedPaymentMethod === PaymentMethodTypes.NewCard ||
         !primaryCard
       ) {
-        if (!userLoggedIn) {
+        if (!loggedIn) {
           const { errorKey } = await setupIntent.update({
             email,
             saveCard,
@@ -236,7 +234,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       {(selectedPaymentMethod === PaymentMethodTypes.NewCard ||
         !primaryCard) && (
         <SPaymentFormWrapper isSingleForm={!primaryCard}>
-          {!userLoggedIn && isStripeReady && (
+          {!loggedIn && isStripeReady && (
             <SEmailInput
               id='email-input'
               value={email}

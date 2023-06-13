@@ -67,9 +67,7 @@ import ErrorBoundary from '../components/organisms/ErrorBoundary';
 import PushNotificationModalContainer from '../components/organisms/PushNotificationsModalContainer';
 import { BundlesContextProvider } from '../contexts/bundlesContext';
 import MultipleBeforePopStateContextProvider from '../contexts/multipleBeforePopStateContext';
-import AppStateContextProvider, {
-  useAppState,
-} from '../contexts/appStateContext';
+import AppStateContextProvider from '../contexts/appStateContext';
 import PostCreationContextProvider from '../contexts/postCreationContext';
 
 // interface for shared layouts
@@ -127,7 +125,6 @@ const MyApp = (props: IMyApp): ReactElement => {
   } = props;
   const store = useStore();
   const user = useAppSelector((state) => state.user);
-  const { userLoggedIn, userIsCreator } = useAppState();
   const { locale } = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentLocale, setCurrentLocale] = useState(locale);
@@ -196,21 +193,16 @@ const MyApp = (props: IMyApp): ReactElement => {
   }, []);
 
   useEffect(() => {
-    // Requires user data to be loaded
-    if (!user._persist?.rehydrated) {
-      return;
-    }
-
-    if (userLoggedIn && user.userData?.username) {
+    if (user.loggedIn && user.userData?.username) {
       Mixpanel.identify(user.userData.userUuid);
       Mixpanel.people.set({
         $name: user.userData.username,
         $email: user.userData.email,
         newnewId: user.userData.userUuid,
-        isCreator: userIsCreator,
+        isCreator: user.userData.options?.isCreator,
       });
       Mixpanel.register({
-        isCreator: userIsCreator,
+        isCreator: user.userData.options?.isCreator,
         username: user.userData.username,
       });
       Mixpanel.track('Session started!');
@@ -218,7 +210,7 @@ const MyApp = (props: IMyApp): ReactElement => {
       Mixpanel.track('Guest Session started!');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn, user._persist?.rehydrated]);
+  }, [user.loggedIn]);
 
   // TODO: move to the store logic
   useEffect(() => {
@@ -247,8 +239,6 @@ const MyApp = (props: IMyApp): ReactElement => {
               accessToken={accessToken}
               uaString={uaString}
             >
-              {/* TODO: Why is it above the PersistanceProvider on which it depends? */}
-              {/* GlobalTheme uses Redux store */}
               <GlobalTheme
                 initialTheme={colorMode}
                 themeFromCookie={themeFromCookie}
@@ -257,22 +247,18 @@ const MyApp = (props: IMyApp): ReactElement => {
                   <AppConstantsContextProvider>
                     <SocketContextProvider>
                       <ChannelsContextProvider>
-                        <ModalNotificationsContextProvider>
-                          <PushNotificationContextProvider>
-                            <BlockedUsersProvider>
-                              <BundlesContextProvider>
-                                <ChatsUnreadMessagesProvider>
-                                  <OverlayModeProvider>
-                                    <MultipleBeforePopStateContextProvider>
-                                      <PostCreationContextProvider>
-                                        {/* PersistanceProvider causes double initial render for all components below */}
-                                        <PersistanceProvider store={store}>
-                                          {/* SyncUserWrapper uses Redux store */}
-                                          <SyncUserWrapper>
-                                            {/* NotificationsProvider uses Redux store */}
-                                            <NotificationsProvider>
-                                              {/* FollowingsContextProvider uses Redux store */}
-                                              <FollowingsContextProvider>
+                        <PersistanceProvider store={store}>
+                          <SyncUserWrapper>
+                            <NotificationsProvider>
+                              <ModalNotificationsContextProvider>
+                                <PushNotificationContextProvider>
+                                  <BlockedUsersProvider>
+                                    <FollowingsContextProvider>
+                                      <BundlesContextProvider>
+                                        <ChatsUnreadMessagesProvider>
+                                          <OverlayModeProvider>
+                                            <MultipleBeforePopStateContextProvider>
+                                              <PostCreationContextProvider>
                                                 <>
                                                   <ToastContainer containerId='toast-container' />
                                                   <VideoProcessingWrapper>
@@ -297,18 +283,18 @@ const MyApp = (props: IMyApp): ReactElement => {
                                                     <PushNotificationModalContainer />
                                                   </VideoProcessingWrapper>
                                                 </>
-                                              </FollowingsContextProvider>
-                                            </NotificationsProvider>
-                                          </SyncUserWrapper>
-                                        </PersistanceProvider>
-                                      </PostCreationContextProvider>
-                                    </MultipleBeforePopStateContextProvider>
-                                  </OverlayModeProvider>
-                                </ChatsUnreadMessagesProvider>
-                              </BundlesContextProvider>
-                            </BlockedUsersProvider>
-                          </PushNotificationContextProvider>
-                        </ModalNotificationsContextProvider>
+                                              </PostCreationContextProvider>
+                                            </MultipleBeforePopStateContextProvider>
+                                          </OverlayModeProvider>
+                                        </ChatsUnreadMessagesProvider>
+                                      </BundlesContextProvider>
+                                    </FollowingsContextProvider>
+                                  </BlockedUsersProvider>
+                                </PushNotificationContextProvider>
+                              </ModalNotificationsContextProvider>
+                            </NotificationsProvider>
+                          </SyncUserWrapper>
+                        </PersistanceProvider>
                       </ChannelsContextProvider>
                     </SocketContextProvider>
                   </AppConstantsContextProvider>
