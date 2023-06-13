@@ -18,11 +18,11 @@ import {
   webPushUnRegister,
 } from '../api/endpoints/web_push';
 import { cookiesInstance } from '../api/apiConfigs';
+import { useAppSelector } from '../redux-store/store';
 import isSafari from '../utils/isSafari';
 import isIOS from '../utils/isIOS';
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import isBrowser from '../utils/isBrowser';
-import { useAppState } from './appStateContext';
 
 const WEB_PUSH_PROMPT_KEY =
   'isUserPromptedWithPushNotificationsPermissionModal';
@@ -68,7 +68,7 @@ interface IPushNotificationsContextProvider {
 const PushNotificationsContextProvider: React.FC<
   IPushNotificationsContextProvider
 > = ({ children }) => {
-  const { userLoggedIn } = useAppState();
+  const user = useAppSelector((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPermissionRequestModalOpen, setIsPermissionRequestModalOpen] =
@@ -115,10 +115,10 @@ const PushNotificationsContextProvider: React.FC<
       }
     };
 
-    if (userLoggedIn) {
+    if (user.loggedIn) {
       getWebConfig();
     }
-  }, [userLoggedIn]);
+  }, [user.loggedIn]);
 
   // Get browser permission
   const getPermissionData: () => {
@@ -297,7 +297,7 @@ const PushNotificationsContextProvider: React.FC<
   ]);
 
   const checkSubscription = useCallback(async () => {
-    if (!userLoggedIn) {
+    if (!user.loggedIn) {
       return;
     }
 
@@ -314,7 +314,7 @@ const PushNotificationsContextProvider: React.FC<
     }
 
     setIsSubscribed(isSubscribedValue);
-  }, [userLoggedIn, checkSubscriptionSafari, checkSubscriptionNonSafari]);
+  }, [checkSubscriptionSafari, checkSubscriptionNonSafari, user.loggedIn]);
 
   useEffect(() => {
     checkSubscription();
@@ -334,12 +334,12 @@ const PushNotificationsContextProvider: React.FC<
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
       isPushNotificationSupported.current &&
       getPermissionData().permission === 'default' &&
-      userLoggedIn
+      user.loggedIn
     ) {
       localStorage.setItem(WEB_PUSH_PROMPT_KEY, 'true');
       openPermissionRequestModal();
     }
-  }, [userLoggedIn, openPermissionRequestModal, getPermissionData]);
+  }, [openPermissionRequestModal, user.loggedIn, getPermissionData]);
 
   // Prompt user after 4 min session on site
   useEffect(() => {
@@ -347,7 +347,7 @@ const PushNotificationsContextProvider: React.FC<
 
     const shouldShowModal =
       localStorage.getItem(WEB_PUSH_PROMPT_KEY) !== 'true' &&
-      userLoggedIn &&
+      user.loggedIn &&
       isPushNotificationSupported.current &&
       getPermissionData().permission === 'default';
 
@@ -378,7 +378,7 @@ const PushNotificationsContextProvider: React.FC<
     };
   }, [
     promptUserWithPushNotificationsPermissionModal,
-    userLoggedIn,
+    user.loggedIn,
     getPermissionData,
   ]);
 
@@ -741,17 +741,17 @@ const PushNotificationsContextProvider: React.FC<
     ]
   );
 
-  const isUserWasLoggedIn = useRef(userLoggedIn);
+  const isUserWasLoggedIn = useRef(user.loggedIn);
 
   useEffect(() => {
-    if (userLoggedIn) {
+    if (user.loggedIn) {
       isUserWasLoggedIn.current = true;
     }
-  }, [userLoggedIn]);
+  }, [user.loggedIn]);
 
   useEffect(() => {
     if (
-      !userLoggedIn &&
+      !user.loggedIn &&
       isUserWasLoggedIn.current &&
       isPushNotificationSupported.current
     ) {
@@ -762,7 +762,7 @@ const PushNotificationsContextProvider: React.FC<
       setIsSubscribed(false);
       pauseNotification();
     }
-  }, [userLoggedIn, pauseNotification]);
+  }, [user.loggedIn, pauseNotification]);
 
   return (
     <PushNotificationsContext.Provider value={contextValue}>

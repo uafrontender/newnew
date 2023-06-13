@@ -2,12 +2,12 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 
 import EllipseModal, { EllipseModalButton } from '../../atoms/EllipseModal';
-import { useAppState } from '../../../contexts/appStateContext';
 
 interface IUserEllipseModal {
   isOpen: boolean;
   zIndex: number;
   isBlocked: boolean;
+  loggedIn: boolean;
   onClose: () => void;
   handleClickReport: () => void;
   handleClickBlock: () => Promise<void>;
@@ -17,12 +17,12 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
   isOpen,
   zIndex,
   isBlocked,
+  loggedIn,
   onClose,
   handleClickReport,
   handleClickBlock,
 }) => {
   const { t } = useTranslation('common');
-  const { userLoggedIn } = useAppState();
 
   const blockHandler = useCallback(async () => {
     await handleClickBlock();
@@ -39,7 +39,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
       <EllipseModalButton tone='error' onClick={reportUserHandler}>
         {t('ellipse.report')}
       </EllipseModalButton>
-      {userLoggedIn && (
+      {loggedIn && (
         <EllipseModalButton onClick={blockHandler}>
           {!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}
         </EllipseModalButton>

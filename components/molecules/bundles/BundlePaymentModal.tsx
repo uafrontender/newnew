@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { buyCreatorsBundle } from '../../../api/endpoints/bundles';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
+import { useAppSelector } from '../../../redux-store/store';
 import { formatNumber } from '../../../utils/format';
 import getCustomerPaymentFee from '../../../utils/getCustomerPaymentFee';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
@@ -17,7 +18,6 @@ import PaymentModal from '../checkout/PaymentModal';
 import LoadingModal from '../LoadingModal';
 import BulletLine from './BulletLine';
 import BundlePaymentSuccessModal from './BundlePaymentSuccessModal';
-import { useAppState } from '../../../contexts/appStateContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.BuyCreatorsBundleResponse.Status
@@ -57,8 +57,8 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
   const { t: tPost } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
   const router = useRouter();
-  const { userLoggedIn } = useAppState();
   const { appConstants } = useGetAppConstants();
+  const user = useAppSelector((state) => state.user);
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
@@ -101,7 +101,7 @@ const BundlePaymentModal: React.FC<IBundlePaymentModal> = ({
 
   const setupIntent = useStripeSetupIntent({
     purpose: buyCreatorsBundleRequest,
-    isGuest: !userLoggedIn,
+    isGuest: !user.loggedIn,
     successUrl,
   });
 

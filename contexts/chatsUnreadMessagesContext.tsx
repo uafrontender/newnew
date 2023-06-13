@@ -8,10 +8,10 @@ import React, {
   useRef,
 } from 'react';
 import { newnewapi } from 'newnew-api';
+import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 import { getTotalUnreadMessageCounts } from '../api/endpoints/chat';
 import { useBundles } from './bundlesContext';
-import { useAppState } from './appStateContext';
 
 interface IChatsUnreadMessagesContext {
   unreadCountForUser: number;
@@ -32,7 +32,7 @@ interface IChatsUnreadMessagesProvider {
 export const ChatsUnreadMessagesProvider: React.FC<
   IChatsUnreadMessagesProvider
 > = ({ children }) => {
-  const { userLoggedIn } = useAppState();
+  const user = useAppSelector((state) => state.user);
   const { bundles } = useBundles();
 
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
@@ -51,7 +51,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
     const controller = new AbortController();
 
     async function getUnread() {
-      if (!userLoggedIn) {
+      if (!user.loggedIn) {
         return;
       }
 
@@ -79,7 +79,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
       }
     };
     // Need dependency on bundles to refetch data on bundles changed
-  }, [userLoggedIn, setData, bundles?.length]);
+  }, [user.loggedIn, setData, bundles?.length]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = async (data: any) => {
@@ -93,7 +93,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
       setData(decoded.chatUnreadCounts as newnewapi.TotalUnreadMessageCounts);
     };
 
-    if (userLoggedIn && socketConnection) {
+    if (user.loggedIn && socketConnection) {
       socketConnection?.on(
         'ChatUnreadCountsChanged',
         socketHandlerMessageCreated
@@ -108,7 +108,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
         );
       }
     };
-  }, [socketConnection, userLoggedIn, setData]);
+  }, [socketConnection, user.loggedIn, setData]);
 
   const resetState = useCallback(() => {
     setUnreadCountForUser(0);
@@ -119,14 +119,14 @@ export const ChatsUnreadMessagesProvider: React.FC<
   const userWasLoggedIn = useRef(false);
 
   useEffect(() => {
-    if (userWasLoggedIn.current && !userLoggedIn) {
+    if (userWasLoggedIn.current && !user.loggedIn) {
       resetState();
     }
 
-    if (userLoggedIn) {
+    if (user.loggedIn) {
       userWasLoggedIn.current = true;
     }
-  }, [userLoggedIn, resetState]);
+  }, [user.loggedIn, resetState]);
 
   const contextValue = useMemo(
     () => ({

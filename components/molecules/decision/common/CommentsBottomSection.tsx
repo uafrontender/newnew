@@ -22,7 +22,6 @@ import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import usePostComments from '../../../../utils/hooks/usePostComments';
 import Comments, { SScrollContainer } from './Comments';
 import { APIResponse } from '../../../../api/apiConfigs';
-import { useAppState } from '../../../../contexts/appStateContext';
 
 interface ICommentsBottomSection {
   postUuid: string;
@@ -44,7 +43,6 @@ const CommentsBottomSection: React.FunctionComponent<
   onFormBlur,
 }) => {
   const user = useAppSelector((state) => state.user);
-  const { userLoggedIn } = useAppState();
   const { showErrorToastPredefined } = useErrorToasts();
 
   // Socket
@@ -64,7 +62,7 @@ const CommentsBottomSection: React.FunctionComponent<
     isFetchingNextPage,
     hasNextPage,
   } = usePostComments({
-    loggedInUser: userLoggedIn,
+    loggedInUser: user.loggedIn,
     commentsRoomId,
   });
 

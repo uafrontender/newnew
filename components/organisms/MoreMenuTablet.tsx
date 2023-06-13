@@ -13,7 +13,6 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import { useAppSelector } from '../../redux-store/store';
 import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
 import { Mixpanel } from '../../utils/mixpanel';
-import { useAppState } from '../../contexts/appStateContext';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -28,7 +27,6 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   const containerRef = useRef<HTMLDivElement>();
 
   const user = useAppSelector((state) => state.user);
-  const { userIsCreator } = useAppState();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -75,13 +73,21 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <Link href={userIsCreator ? '/profile/my-posts' : '/profile'}>
+          <Link
+            href={
+              user.userData?.options?.isCreator
+                ? '/profile/my-posts'
+                : '/profile'
+            }
+          >
             <SLink>
               <SButton
                 onClick={() => {
                   Mixpanel.track('My Avatar Clicked', {
                     _component: 'MoreMenuTablet',
-                    _target: userIsCreator ? '/profile/my-posts' : '/profile',
+                    _target: user.userData?.options?.isCreator
+                      ? '/profile/my-posts'
+                      : '/profile',
                   });
                 }}
               >

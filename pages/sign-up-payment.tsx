@@ -9,7 +9,7 @@ import Lottie from '../components/atoms/Lottie';
 
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { sendVerificationEmail } from '../api/endpoints/auth';
-import { useAppDispatch } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import {
   setSignupEmailInput,
   setSignupTimerValue,
@@ -17,7 +17,6 @@ import {
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import useGoBackOrRedirect from '../utils/useGoBackOrRedirect';
-import { useAppState } from '../contexts/appStateContext';
 
 interface IEmailAuthRedirectPage {
   stripe_setup_intent_client_secret: string;
@@ -31,11 +30,12 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const dispatch = useAppDispatch();
 
   const { showErrorToastPredefined } = useErrorToasts();
-  const { userLoggedIn } = useAppState();
+
+  const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (userLoggedIn) {
+    if (user.loggedIn) {
       router.replace('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

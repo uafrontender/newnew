@@ -95,7 +95,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { mutedMode } = useAppSelector((state) => state.ui);
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -195,14 +195,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   } = useMcOptions(
     {
       postUuid: post.postUuid,
-      loggedInUser: userLoggedIn,
+      loggedInUser: user.loggedIn,
       userUuid: user.userData?.userUuid,
     },
     {
       onError: (err) => {
         showErrorToastCustom((err as Error).message);
       },
-      refetchOnWindowFocus: userLoggedIn,
+      refetchOnWindowFocus: user.loggedIn,
     }
   );
 
@@ -265,14 +265,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     }
 
-    if (userLoggedIn && creatorsBundle) {
+    if (user.loggedIn && creatorsBundle) {
       checkCanAddCustomOption();
     }
 
     return () => {
       controller.abort();
     };
-  }, [post.postUuid, userLoggedIn, creatorsBundle]);
+  }, [post.postUuid, user.loggedIn, creatorsBundle]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
@@ -339,7 +339,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         return;
       }
 
-      if (!userLoggedIn) {
+      if (!user._persist?.rehydrated) {
+        return;
+      }
+
+      if (!user.loggedIn) {
         router.push(
           `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
         );
@@ -417,14 +421,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       controller.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user._persist?.rehydrated]);
 
   const goToNextStep = () => {
     if (
       user.userTutorialsProgress.remainingMcSteps &&
       user.userTutorialsProgress.remainingMcSteps[0]
     ) {
-      if (userLoggedIn) {
+      if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
         });

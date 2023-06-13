@@ -11,6 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 
 import { createStripeSetupIntent } from '../../../api/endpoints/payments';
+import { useAppSelector } from '../../../redux-store/store';
 import StripeElements from '../../../HOC/StripeElementsWithClientSecret';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
@@ -26,7 +27,6 @@ import CardSetupCompleteModal from '../../organisms/settings/CardSetupCompleteMo
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppState } from '../../../contexts/appStateContext';
 
 interface IAddCardForm {
   onCancel: () => void;
@@ -169,10 +169,11 @@ interface IAddCardModal {
 
 const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
   const { t } = useTranslation('page-Profile');
-  const { userLoggedIn } = useAppState();
 
   const [stripeSecret, setStripeSecret] = useState('');
   const [isStripeSecretLoading, setIsStripeSecretLoading] = useState(false);
+
+  const { loggedIn } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const creteSetupIntent = async () => {
@@ -199,10 +200,10 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
       }
     };
 
-    if (userLoggedIn && show) {
+    if (loggedIn && show) {
       creteSetupIntent();
     }
-  }, [userLoggedIn, show]);
+  }, [loggedIn, show]);
 
   const handleClose = () => {
     setStripeSecret('');
@@ -223,7 +224,7 @@ const AddCardModal: React.FC<IAddCardModal> = ({ show, closeModal }) => {
     setStripeSetupIntent(setupIntentValue);
   };
 
-  if (!userLoggedIn) {
+  if (!loggedIn) {
     return null;
   }
 
