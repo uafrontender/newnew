@@ -89,6 +89,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       onError: (error) => {
         console.error(error);
       },
+      enabled: showModal,
     }
   );
 
