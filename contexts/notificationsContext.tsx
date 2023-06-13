@@ -10,6 +10,7 @@ import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { getUnreadNotificationCount } from '../api/endpoints/notification';
 import { SocketContext } from './socketContext';
+import { useAppState } from './appStateContext';
 
 const NotificationsContext = createContext({
   unreadNotificationCount: 0,
@@ -21,17 +22,19 @@ interface INotificationsProvider {
   children: React.ReactNode;
 }
 
+// TODO: add user uuid to the token, parse in AppStateContext, use instead of Redux
 export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   children,
 }) => {
   const user = useAppSelector((state) => state.user);
+  const { userLoggedIn } = useAppState();
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
   const [notificationsDataLoaded, setNotificationsDataLoaded] = useState(false);
   const { socketConnection } = useContext(SocketContext);
 
   const fetchNotificationCount = useCallback(async () => {
-    if (!user.loggedIn) {
+    if (!userLoggedIn) {
       return;
     }
 
@@ -55,7 +58,7 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
       console.error(err);
       setUnreadNotificationCount(0);
     }
-  }, [user.loggedIn]);
+  }, [userLoggedIn]);
 
   useEffect(() => {
     fetchNotificationCount();

@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { buyCreatorsBundle } from '../../api/endpoints/bundles';
-import { useAppSelector } from '../../redux-store/store';
 import { Mixpanel } from '../mixpanel';
 import useErrorToasts from './useErrorToasts';
+import { useAppState } from '../../contexts/appStateContext';
 
 function useBuyBundleAfterStripeRedirect(
   stripeSetupIntentClientSecretFromRedirect?: string,
@@ -14,7 +14,7 @@ function useBuyBundleAfterStripeRedirect(
 ) {
   const router = useRouter();
   const { t } = useTranslation('common');
-  const { user } = useAppSelector((state) => state);
+  const { userLoggedIn } = useAppState();
   const { showErrorToastCustom } = useErrorToasts();
 
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
@@ -28,11 +28,7 @@ function useBuyBundleAfterStripeRedirect(
       return;
     }
 
-    if (!user._persist?.rehydrated) {
-      return;
-    }
-
-    if (!user.loggedIn) {
+    if (!userLoggedIn) {
       router.push(
         `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
       );
@@ -80,8 +76,7 @@ function useBuyBundleAfterStripeRedirect(
     }
   }, [
     stripeSetupIntentClientSecret,
-    user._persist?.rehydrated,
-    user.loggedIn,
+    userLoggedIn,
     router,
     saveCard,
     t,
@@ -91,6 +86,7 @@ function useBuyBundleAfterStripeRedirect(
 
   // A Delay allows to cancel first request when the second full re-render happens
   // TODO: use abortController instead?
+  // Can be abandoned after we get rid of Redux which causes double rendering
   useEffect(() => {
     const timer = setTimeout(() => {
       buyBundleAfterStripeRedirect();

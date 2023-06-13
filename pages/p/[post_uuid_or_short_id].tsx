@@ -85,7 +85,7 @@ const PostPage: NextPage<IPostPage> = ({
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-Post');
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
   const { showErrorToastPredefined } = useErrorToasts();
@@ -139,7 +139,7 @@ const PostPage: NextPage<IPostPage> = ({
     updatePostMutation,
   } = usePost(
     {
-      loggedInUser: user.loggedIn,
+      loggedInUser: userLoggedIn,
       postUuid: postUuidOrShortId,
     },
     {
@@ -258,8 +258,7 @@ const PostPage: NextPage<IPostPage> = ({
         _postUuid: postParsed?.postUuid,
       });
 
-      // Redirect only after the persist data is pulled
-      if (!user.loggedIn && user._persist?.rehydrated) {
+      if (!userLoggedIn) {
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -285,17 +284,15 @@ const PostPage: NextPage<IPostPage> = ({
     }
   }, [
     postParsed?.postUuid,
-    user.loggedIn,
-    user._persist?.rehydrated,
+    userLoggedIn,
     isFollowingDecision,
     router,
     promptUserWithPushNotificationsPermissionModal,
   ]);
 
   const isMyPost = useMemo(
-    () =>
-      user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
-    [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
+    () => userLoggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
+    [userLoggedIn, user.userData?.userUuid, postParsed?.creator?.uuid]
   );
 
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
@@ -518,11 +515,11 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Refetch Post if user authenticated
   useEffect(() => {
-    if (user.loggedIn) {
+    if (userLoggedIn) {
       refetchPost();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+  }, [userLoggedIn]);
 
   useEffect(() => {
     setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
@@ -550,7 +547,7 @@ const PostPage: NextPage<IPostPage> = ({
     async function markAsViewed() {
       if (
         !postParsed?.postUuid ||
-        !user.loggedIn ||
+        !userLoggedIn ||
         user.userData?.userUuid === postParsed?.creator?.uuid
       ) {
         return;
@@ -578,7 +575,7 @@ const PostPage: NextPage<IPostPage> = ({
     post,
     postParsed?.postUuid,
     postParsed?.creator?.uuid,
-    user.loggedIn,
+    userLoggedIn,
     user.userData?.userUuid,
   ]);
 

@@ -20,6 +20,7 @@ import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import canBecomeCreator from '../utils/canBecomeCreator';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
+import { useAppState } from '../contexts/appStateContext';
 
 const OnboardingSectionDetails = dynamic(
   () =>
@@ -46,6 +47,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
   const { appConstants } = useGetAppConstants();
+  const { userIsCreator } = useAppState();
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -65,7 +67,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 
   // Redirect if onboarded or underaged
   useEffect(() => {
-    if (user.userData?.options?.isCreator) {
+    if (userIsCreator) {
       router.replace('/creator/dashboard');
     }
 
@@ -78,7 +80,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
       router.replace('/');
     }
   }, [
-    user.userData?.options?.isCreator,
+    userIsCreator,
     user.userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
     router,

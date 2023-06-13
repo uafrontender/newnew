@@ -11,10 +11,9 @@ import Lottie from '../../components/atoms/Lottie';
 import { signInWithEmail } from '../../api/endpoints/auth';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppDispatch } from '../../redux-store/store';
 import {
   setUserData,
-  setUserLoggedIn,
   setSignupEmailInput,
   setSignupTimerValue,
 } from '../../redux-store/slices/userStateSlice';
@@ -34,9 +33,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const router = useRouter();
   const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
-  const { setUserLoggedIn: setAppStateUserLoggedIn, setUserIsCreator } =
-    useAppState();
-  const user = useAppSelector((state) => state.user);
+  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -48,7 +45,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   }, []);
 
   useUpdateEffect(() => {
-    if (user.loggedIn) router?.push('/');
+    if (userLoggedIn) {
+      router?.push('/');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
@@ -119,8 +118,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           path: '/',
         });
 
-        dispatch(setUserLoggedIn(true));
-        setAppStateUserLoggedIn(true);
+        setUserLoggedIn(true);
         setUserIsCreator(!!data.me?.options?.isCreator);
         dispatch(setSignupEmailInput(''));
         dispatch(setSignupTimerValue(0));

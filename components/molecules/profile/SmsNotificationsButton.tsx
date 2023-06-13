@@ -51,7 +51,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   const theme = useTheme();
   const { socketConnection } = useContext(SocketContext);
   const currentUser = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -71,7 +71,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   const submitPhoneSmsNotificationsRequest = useCallback(
     async (phoneNumber: newnewapi.PhoneNumber): Promise<string> => {
       try {
-        if (!currentUser.loggedIn) {
+        if (!userLoggedIn) {
           const guestId = getGuestId();
 
           const res = await subscribeGuestToSmsNotifications(
@@ -135,12 +135,12 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         throw err;
       }
     },
-    [currentUser.loggedIn, showErrorToastCustom, subscription.userId, t]
+    [userLoggedIn, showErrorToastCustom, subscription.userId, t]
   );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     if (subscribedToSmsNotifications) {
-      if (!currentUser.loggedIn) {
+      if (!userLoggedIn) {
         const guestId = getGuestId();
         const res = await unsubscribeGuestFromSmsNotifications(
           { creatorUuid: subscription.userId },
@@ -161,7 +161,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
           showErrorToastCustom(t('smsNotifications.error.requestFailed'));
         }
       }
-    } else if (!currentUser.loggedIn) {
+    } else if (!userLoggedIn) {
       const countryCode = localStorage.getItem(SAVED_PHONE_COUNTRY_CODE_KEY);
       const number = localStorage.getItem(SAVED_PHONE_NUMBER_KEY);
 
@@ -205,7 +205,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     }
   }, [
     subscribedToSmsNotifications,
-    currentUser.loggedIn,
+    userLoggedIn,
     currentUser.userData?.options?.isPhoneNumberConfirmed,
     subscription.userId,
     showErrorToastCustom,
@@ -214,11 +214,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   ]);
 
   useEffect(() => {
-    if (!currentUser._persist?.rehydrated) {
-      return () => {};
-    }
-
-    if (!currentUser.loggedIn) {
+    if (!userLoggedIn) {
       const pollGuestSmsSubscriptionStatus = async () => {
         const guestId = getGuestId();
         const res = await getGuestSmsNotificationsSubscriptionStatus(
@@ -267,12 +263,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     }
 
     return () => {};
-  }, [
-    currentUser._persist?.rehydrated,
-    currentUser.loggedIn,
-    subscription.userId,
-    t,
-  ]);
+  }, [userLoggedIn, subscription.userId, t]);
 
   useEffect(() => {
     const handleSubscribedToSms = async (data: any) => {
@@ -306,7 +297,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
       }
     };
 
-    if (socketConnection && currentUser.loggedIn) {
+    if (socketConnection && userLoggedIn) {
       socketConnection?.on('SmsNotificationsSubscribed', handleSubscribedToSms);
       socketConnection?.on(
         'SmsNotificationsUnsubscribed',
@@ -315,11 +306,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
     }
 
     return () => {
-      if (
-        socketConnection &&
-        socketConnection?.connected &&
-        currentUser.loggedIn
-      ) {
+      if (socketConnection && socketConnection?.connected && userLoggedIn) {
         socketConnection?.off(
           'SmsNotificationsSubscribed',
           handleSubscribedToSms
@@ -330,7 +317,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
         );
       }
     };
-  }, [currentUser.loggedIn, subscription.userId, socketConnection]);
+  }, [userLoggedIn, subscription.userId, socketConnection]);
 
   return (
     <>
