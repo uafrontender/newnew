@@ -14,14 +14,12 @@ import MakeDecision from '../../../atoms/creator/MakeDecision';
 import { getMyEarnings } from '../../../../api/endpoints/payments';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { formatNumber } from '../../../../utils/format';
-import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import Lottie from '../../../atoms/Lottie';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import CashOutTutorial from '../../../atoms/creator/CashOutTutorial';
+import Loader from '../../../atoms/Loader';
 
 interface IFunctionProps {
   hasMyPosts: boolean;
-  earnings: newnewapi.GetMyEarningsResponse | undefined;
 }
 
 const EARNINGS_FILTER_TYPES = [
@@ -34,10 +32,7 @@ const EARNINGS_FILTER_TYPES = [
 ] as const;
 type EarningsFilterType = typeof EARNINGS_FILTER_TYPES[number];
 
-export const Earnings: React.FC<IFunctionProps> = ({
-  hasMyPosts,
-  earnings,
-}) => {
+export const Earnings: React.FC<IFunctionProps> = ({ hasMyPosts }) => {
   const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState<EarningsFilterType>('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
@@ -50,6 +45,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   useEffect(() => {
     async function fetchMyEarnings() {
       try {
+        setIsLoading(true);
         const payload = new newnewapi.GetMyEarningsRequest({
           beginDate: dateToTimestamp(
             moment()
@@ -72,18 +68,16 @@ export const Earnings: React.FC<IFunctionProps> = ({
         setIsLoading(false);
       } catch (err) {
         console.error(err);
-        setIsLoading(null);
+        setIsLoading(false);
+      } finally {
+        setInitialLoad(false);
       }
     }
-    if (isLoading === null) {
+
+    if (hasMyPosts) {
       fetchMyEarnings();
     }
-    if (initialLoad) {
-      setMyEarnings(earnings);
-      setInitialLoad(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [filter, hasMyPosts]);
 
   useEffect(() => {
     if (myEarnings) {
@@ -205,7 +199,6 @@ export const Earnings: React.FC<IFunctionProps> = ({
     });
 
     if (filter !== e) {
-      setIsLoading(null);
       setFilter(e);
     }
   };
@@ -218,6 +211,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
       `dashboard.earnings.units.${arr[1]}` as any
     )}`;
   };
+
   /* eslint-disable no-nested-ternary */
   return (
     <SContainer>
@@ -242,17 +236,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         </STotalTextWrapper>
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {isLoading || initialLoad ? (
-        <Lottie
-          width={64}
-          height={64}
-          options={{
-            loop: true,
-            autoplay: true,
-            animationData: loadingAnimation,
-          }}
-        />
-      ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
+      {initialLoad ? null : hasMyPosts && myEarnings?.nextCashoutAmount ? (
         <>
           <CashOutTutorial />
           <CashOut
@@ -263,6 +247,8 @@ export const Earnings: React.FC<IFunctionProps> = ({
       ) : (
         <MakeDecision />
       )}
+
+      {isLoading && <SLoader size='md' isStatic />}
     </SContainer>
   );
 };
@@ -382,6 +368,10 @@ const SListItemTitle = styled(Caption)`
     text-overflow: ellipsis;
     margin-bottom: 12px;
   }
+`;
+
+const SLoader = styled(Loader)`
+  align-self: center;
 `;
 
 const SListItemValue = styled(Headline)``;
