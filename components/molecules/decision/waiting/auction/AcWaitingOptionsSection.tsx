@@ -29,7 +29,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
   const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppState();
+  const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -45,7 +45,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
     {
       postUuid: post.postUuid,
       userUuid: user.userData?.userUuid,
-      loggedInUser: user.loggedIn,
+      loggedInUser: userLoggedIn,
     },
     {
       refetchOnWindowFocus: false,

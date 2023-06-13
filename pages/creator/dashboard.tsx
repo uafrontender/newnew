@@ -13,18 +13,18 @@ import { NextPageWithLayout } from '../_app';
 import assets from '../../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import General from '../../components/templates/General';
-import { useAppSelector } from '../../redux-store/store';
+import { useAppState } from '../../contexts/appStateContext';
 
 export const Dashboard = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Creator');
-  const { userData } = useAppSelector((state) => state.user);
+  const { userIsCreator } = useAppState();
 
   useUpdateEffect(() => {
-    if (!userData?.options?.isCreator) {
+    if (!userIsCreator) {
       router.replace('/');
     }
-  }, [userData?.options?.isCreator]);
+  }, [userIsCreator]);
 
   return (
     <>

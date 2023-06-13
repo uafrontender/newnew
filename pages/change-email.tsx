@@ -8,10 +8,11 @@ import Lottie from '../components/atoms/Lottie';
 
 import { setMyEmail } from '../api/endpoints/user';
 
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { useAppDispatch } from '../redux-store/store';
 import { setUserData } from '../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../public/animations/logo-loading-blue.json';
+import { useAppState } from '../contexts/appStateContext';
 
 interface IEmailUpdateRedirectPage {
   email_address: string;
@@ -24,7 +25,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { userIsCreator } = useAppState();
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
 
@@ -54,7 +55,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
           throw new Error('Request failed');
         }
 
-        if (user.loggedIn) {
+        if (userIsCreator) {
           dispatch(
             setUserData({
               email: email_address,

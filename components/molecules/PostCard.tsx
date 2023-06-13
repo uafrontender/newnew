@@ -117,7 +117,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const theme = useTheme();
     const router = useRouter();
     const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppState();
+    const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -250,8 +250,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     const handleReportOpen = useCallback(() => {
-      // Redirect only after the persist data is pulled
-      if (!user.loggedIn && user._persist?.rehydrated) {
+      if (!userLoggedIn) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/p/${
@@ -264,13 +263,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         return;
       }
       setIsReportModalOpen(true);
-    }, [
-      user.loggedIn,
-      user._persist?.rehydrated,
-      router,
-      postParsed.postShortId,
-      postParsed.postUuid,
-    ]);
+    }, [userLoggedIn, router, postParsed.postShortId, postParsed.postUuid]);
 
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);

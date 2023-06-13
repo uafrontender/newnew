@@ -18,7 +18,6 @@ interface ICreatorData {
 }
 
 export interface IUserStateInterface {
-  loggedIn: boolean;
   signupEmailInput: string;
   signupTimerValue: number;
   userData?: TUserData;
@@ -28,7 +27,6 @@ export interface IUserStateInterface {
 }
 
 const defaultUIState: IUserStateInterface = {
-  loggedIn: false,
   signupEmailInput: '',
   signupTimerValue: 0,
   userTutorialsProgress: {
@@ -72,9 +70,6 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
   name: 'userState',
   initialState: defaultUIState,
   reducers: {
-    setUserLoggedIn(state, { payload }: PayloadAction<boolean>) {
-      state.loggedIn = payload;
-    },
     setSignupEmailInput(state, { payload }: PayloadAction<string>) {
       state.signupEmailInput = payload;
     },
@@ -100,7 +95,6 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
       state.userTutorialsProgressSynced = payload;
     },
     logoutUser(state) {
-      state.loggedIn = false;
       state.userData = {
         avatarUrl: '',
         userUuid: '',
@@ -132,7 +126,6 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
 });
 
 export const {
-  setUserLoggedIn,
   setSignupEmailInput,
   setSignupTimerValue,
   setUserTutorialsProgressInner,
