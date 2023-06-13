@@ -107,7 +107,7 @@ const useAcOptions = (
 
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getAcOptions', params],
-    async ({ pageParam }) => {
+    async ({ pageParam, signal }) => {
       const payload = new newnewapi.GetAcOptionsRequest({
         postUuid: params.postUuid,
         paging: {
@@ -115,7 +115,7 @@ const useAcOptions = (
         },
       });
 
-      const optionsResponse = await fetchCurrentBidsForPost(payload);
+      const optionsResponse = await fetchCurrentBidsForPost(payload, signal);
 
       if (!optionsResponse?.data || optionsResponse.error) {
         throw new Error('Request failed');

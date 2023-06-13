@@ -147,8 +147,6 @@ const SyncUserWrapper: React.FunctionComponent<ISyncUserWrapper> = ({
 
       const { data } = await getMe(payload);
 
-      console.log(data, 'data');
-
       if (data?.me) {
         dispatch(
           setUserData({
