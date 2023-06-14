@@ -10,6 +10,7 @@ import React, {
   useState,
 } from 'react';
 import { useQueryClient } from 'react-query';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
 import {
   getMe,
@@ -65,9 +66,7 @@ export const UserDataContextProvider: React.FunctionComponent<
   const [, setCookie] = useCookies();
 
   // Get initial state from LS
-  const [userData, setUserData] = useState<TUserData | undefined>(
-    loadStateLS(USER_DATA_KEY) as TUserData | undefined
-  );
+  const [userData, setUserData] = useState<TUserData | undefined>();
   const [userTimezone, setUserTimezone] = useState<string | undefined>();
   const [creatorData, setCreatorData] = useState<
     newnewapi.IGetMyOnboardingStateResponse | undefined
@@ -75,7 +74,7 @@ export const UserDataContextProvider: React.FunctionComponent<
   const [creatorDataLoaded, setCreatorDataLoaded] = useState(false);
   const userWasLoggedIn = useRef(false);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     // Can't load on first render as it breaks hydration (server has no access to LS for SSR)
     if (isBrowser()) {
       const savedUserDate = loadStateLS(USER_DATA_KEY) as TUserData | undefined;
