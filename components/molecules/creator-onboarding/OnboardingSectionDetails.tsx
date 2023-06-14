@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
 import isEqual from 'lodash/isEqual';
-import debounce from 'lodash/debounce';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -204,8 +203,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const handleUpdateUsername = (value: string) => {
     const newValue = value.replace('@', '');
     setUsernameInEdit(newValue);
-
-    validateUsernameViaAPIDebounced(newValue);
   };
 
   // Nickname
@@ -219,18 +216,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
     } else {
       setNicknameInEdit(e.target.value);
     }
-
-    if (e.target.value.trim() !== e.target.value) {
-      setNicknameError('sideSpacesForbidden');
-      return;
-    }
-
-    if (e.target.value.length > NAME_LENGTH_LIMIT) {
-      setNicknameError('tooLong');
-      return;
-    }
-
-    validateNicknameViaAPIDebounced(e.target.value);
   };
 
   const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
@@ -241,13 +226,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
     AbortController | undefined
   >();
   const validateUsernameViaAPI = useCallback(
-    async (text: string) => {
+    async (e: React.FocusEvent<HTMLInputElement, Element>) => {
       setIsAPIValidateLoading(true);
       if (validateUsernameAbortControllerRef.current) {
         validateUsernameAbortControllerRef.current?.abort();
       }
       validateUsernameAbortControllerRef.current = new AbortController();
       try {
+        let text = e.target.value;
+
+        if (text.length === 0) {
+          setUsernameError('');
+          return;
+        }
+
+        text = text.replace('@', '');
+
         // skip validation if username is equal to current username
         if (text === user.userData?.username) {
           setUsernameError('');
@@ -295,17 +289,25 @@ const OnboardingSectionDetails: React.FunctionComponent<
     [setUsernameError, dispatch, user.userData?.username, setUserLoggedIn]
   );
 
-  const validateUsernameViaAPIDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateUsernameViaAPI(text);
-      }, 250),
-    [validateUsernameViaAPI]
-  );
-
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateNicknameViaAPI = useCallback(
-    async (text: string) => {
+    async (e: React.FocusEvent<HTMLInputElement, Element>) => {
+      if (e.target.value.trim() !== e.target.value) {
+        setNicknameError('sideSpacesForbidden');
+        return;
+      }
+
+      if (e.target.value.length > NAME_LENGTH_LIMIT) {
+        setNicknameError('tooLong');
+        return;
+      }
+
+      const text = e.target.value?.trim();
+      if (!text) {
+        setNicknameError('');
+        return;
+      }
+
       if (validateTextAbortControllerRef.current) {
         validateTextAbortControllerRef.current?.abort();
       }
@@ -351,14 +353,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
     },
     [setNicknameError, dispatch, setUserLoggedIn]
-  );
-
-  const validateNicknameViaAPIDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateNicknameViaAPI(text);
-      }, 250),
-    [validateNicknameViaAPI]
   );
 
   // Email
@@ -909,6 +903,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               placeholder={t('detailsSection.form.username.placeholder')}
               isValid={usernameError === ''}
               onChange={handleUpdateUsername}
+              onBlur={validateUsernameViaAPI}
+              onFocus={() => setUsernameError('')}
             />
             <OnboardingSectionNicknameInput
               type='text'
@@ -920,6 +916,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               )}
               isValid={nicknameError === ''}
               onChange={handleUpdateNickname}
+              onBlur={validateNicknameViaAPI}
+              onFocus={() => setNicknameError('')}
             />
           </SFieldPairContainer>
           <SFieldPairContainer marginBottom={34}>
