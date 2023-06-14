@@ -66,6 +66,12 @@ export const TutorialProgressContextProvider: React.FC<
     async function syncUserTutorialsProgress(
       localUserTutorialsProgress: newnewapi.IGetTutorialsStatusResponse
     ) {
+      if (!isEqual(userTutorialsProgress, localUserTutorialsProgress)) {
+        setUserTutorialsProgress(
+          localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
+        );
+      }
+
       try {
         const payload = new newnewapi.EmptyRequest({});
         const { data } = await getTutorialsStatus(payload);
