@@ -303,7 +303,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
           // Fullscreen
           p?.on('fullscreenchange', (e) => {
-            setIsFullscreen(p?.isFullscreen());
+            if (isSafari()) {
+              setIsFullscreen(!!document.fullscreenElement);
+            } else {
+              setIsFullscreen(p?.isFullscreen());
+            }
           });
 
           if (!isSafari()) {
