@@ -13,7 +13,7 @@ type TOnboardingSectionNicknameInput =
 
 const OnboardingSectionNicknameInput: React.FunctionComponent<
   TOnboardingSectionNicknameInput
-> = ({ value, isValid, errorCaption, onChange, onFocus, ...rest }) => {
+> = ({ value, isValid, errorCaption, onChange, onFocus, onBlur, ...rest }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
   const [focused, setFocused] = useState(false);
 
@@ -24,6 +24,8 @@ const OnboardingSectionNicknameInput: React.FunctionComponent<
 
     if (isValid) {
       setErrorBordersShown(false);
+    } else if (!isValid && !focused) {
+      setErrorBordersShown(true);
     }
   }, [focused, isValid]);
 
@@ -34,16 +36,17 @@ const OnboardingSectionNicknameInput: React.FunctionComponent<
         id='nickname_input'
         errorBordersShown={errorBordersShown}
         onChange={onChange}
-        onBlur={() => {
+        onBlur={(e) => {
           setFocused(false);
           if (!isValid) {
             setErrorBordersShown(true);
           } else {
             setErrorBordersShown(false);
           }
+          onBlur?.(e);
         }}
         onFocus={(e) => {
-          if (onFocus) onFocus(e);
+          onFocus?.(e);
           setFocused(true);
           setErrorBordersShown(false);
         }}

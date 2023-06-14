@@ -1,14 +1,7 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import debounce from 'lodash/debounce';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -82,13 +75,19 @@ const OnboardingSectionAbout: React.FunctionComponent<
 
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateBioViaApi = useCallback(
-    async (text: string) => {
+    async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (validateTextAbortControllerRef.current) {
         validateTextAbortControllerRef.current?.abort();
       }
       validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
+        const text = e.target.value;
+
+        if (text.length === 0) {
+          return;
+        }
+
         const payload = new newnewapi.ValidateTextRequest({
           kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
           text,
@@ -128,17 +127,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
     [setBioError, dispatch, setUserLoggedIn]
   );
 
-  const validateBioViaApiDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateBioViaApi(text.trim());
-      }, 250),
-    [validateBioViaApi]
-  );
-
   const handleUpdateBioInEdit = (value: string) => {
     setBioInEdit(value);
-    validateBioViaApiDebounced(value);
   };
 
   // Is form valid
@@ -153,6 +143,25 @@ const OnboardingSectionAbout: React.FunctionComponent<
       });
 
       setLoadingModalOpen(true);
+
+      // Validate text
+      const payload = new newnewapi.ValidateTextRequest({
+        kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
+        text: bioInEdit,
+      });
+
+      const res = await validateText(
+        payload,
+        validateTextAbortControllerRef?.current?.signal
+      );
+
+      if (!res.data?.status) throw new Error('An error occurred');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setBioError(errorSwitch(res.data?.status));
+        setLoadingModalOpen(false);
+        return;
+      }
 
       const updateBioPayload = new newnewapi.UpdateMeRequest({
         bio: bioInEdit.trim(),
@@ -252,8 +261,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
               placeholder={t('aboutSection.bio.placeholder')}
               maxChars={150}
               onChange={(e) => handleUpdateBioInEdit(e.target.value)}
-              // onFocus={handleFocus}
-              // onBlur={handleBlur}
+              onBlur={validateBioViaApi}
+              onFocus={() => setBioError('')}
             />
           </SFormItemContainer>
         </STopContainer>
