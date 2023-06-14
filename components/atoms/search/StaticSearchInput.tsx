@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { useQueryClient } from 'react-query';
 
 import InlineSVG from '../InlineSVG';
 
@@ -37,6 +38,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const { t } = useTranslation('common');
     const theme = useTheme();
     const { showErrorToastPredefined } = useErrorToasts();
+    const queryClient = useQueryClient();
 
     const inputRef: any = useRef();
     const inputContainerRef: any = useRef();
@@ -56,7 +58,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
     const { globalSearchActive, setGlobalSearchActive } = useUiState();
 
-    const { resizeMode } = useAppState();
+    const { resizeMode, userLoggedIn } = useAppState();
     const router = useRouter();
 
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -84,6 +86,40 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       [router, setGlobalSearchActive]
     );
 
+    const resetPostsSearchResultOnSearchPage = useCallback(
+      (query: string) => {
+        if (router.asPath === `/search?query=${query}&tab=posts`) {
+          queryClient.resetQueries([
+            userLoggedIn ? 'private' : 'public',
+            'getSearchPosts',
+            {
+              loggedInUser: userLoggedIn,
+              query,
+              searchType: newnewapi.SearchPostsRequest.SearchType.HASHTAGS,
+              sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+            },
+          ]);
+        }
+      },
+      [router.asPath, userLoggedIn, queryClient]
+    );
+
+    const resetCreatorSearchResultOnSearchPage = useCallback(
+      (query: string) => {
+        if (router.asPath === `/search?query=${query}&tab=creators`) {
+          queryClient.resetQueries([
+            userLoggedIn ? 'private' : 'public',
+            'getSearchCreators',
+            {
+              loggedInUser: userLoggedIn,
+              query,
+            },
+          ]);
+        }
+      },
+      [router.asPath, userLoggedIn, queryClient]
+    );
+
     const handleSeeResults = (query: string) => {
       Mixpanel.track('Search All Results Clicked', {
         _query: query,
@@ -98,13 +134,17 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
       if (isHashtag) {
         pushRouteOrClose(`/search?query=${firstChunk.text}&tab=posts`);
+        resetPostsSearchResultOnSearchPage(firstChunk.text);
       } else {
         const noHashQuery = clearedQuery.replace('#', '');
         const encodedQuery = encodeURIComponent(noHashQuery);
         if (resultsPosts.length === 0 && resultsCreators.length > 0) {
           pushRouteOrClose(`/search?query=${encodedQuery}&tab=creators`);
+          resetCreatorSearchResultOnSearchPage(encodedQuery);
         } else {
           pushRouteOrClose(`/search?query=${encodedQuery}&tab=posts`);
+
+          resetPostsSearchResultOnSearchPage(firstChunk.text);
         }
       }
     };
