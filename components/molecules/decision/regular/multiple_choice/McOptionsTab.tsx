@@ -12,7 +12,6 @@ import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import debounce from 'lodash/debounce';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
 import {
@@ -260,23 +259,27 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     }
   }, []);
 
-  const validateTextViaAPIDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateTextViaAPI(text);
-      }, 250),
-    [validateTextViaAPI]
-  );
-
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setNewOptionText(e.target.value.trim() ? e.target.value : '');
+    },
+    [setNewOptionText]
+  );
 
+  const handleBlurNewOptionText = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
       if (e.target.value.length > 0) {
-        validateTextViaAPIDebounced(e.target.value);
+        validateTextViaAPI(e.target.value);
       }
     },
-    [setNewOptionText, validateTextViaAPIDebounced]
+    [validateTextViaAPI]
+  );
+
+  const handleFocusNewOptionText = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
+      setNewOptionTextValid(true);
+    },
+    []
   );
 
   const handleSuggestNewOptionModalClosed = useCallback(() => {
@@ -337,7 +340,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [newOptionText, options]
   );
 
-  const handleAddOptionButtonClicked = useCallback(() => {
+  const handleAddOptionButtonClicked = useCallback(async () => {
+    const validationResult = await validateTextViaAPI(newOptionText);
+    if (!validationResult) {
+      return;
+    }
     if (canAddCustomOption) {
       setConfirmCustomOptionModalOpen(true);
     } else {
@@ -345,10 +352,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         return;
       }
 
-      // Make sure user can add the option before selling a bundle
-      validateTextViaAPI(newOptionText).then(() => {
-        setBuyBundleModalOpen(true);
-      });
+      setBuyBundleModalOpen(true);
     }
   }, [
     customOptionExists,
@@ -574,6 +578,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   lastValidatedNewOptionText === newOptionText
                 }
                 onChange={handleUpdateNewOptionText}
+                onBlur={handleBlurNewOptionText}
+                onFocus={handleFocusNewOptionText}
               />
               <SAddOptionButton
                 size='sm'
@@ -626,6 +632,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                   lastValidatedNewOptionText === newOptionText
                 }
                 onChange={handleUpdateNewOptionText}
+                onBlur={handleBlurNewOptionText}
+                onFocus={handleFocusNewOptionText}
               />
               <SAddOptionButton
                 id='add-option-submit'

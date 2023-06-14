@@ -9,7 +9,6 @@ import styled, { useTheme } from 'styled-components';
 import { Trans, useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import debounce from 'lodash/debounce';
 import Link from 'next/link';
 
 import {
@@ -139,15 +138,16 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
   };
 
   // Handlers
-  const handleTogglePaymentModalOpen = () => {
-    if (isAPIValidateLoading) {
-      return;
+  const handleTogglePaymentModalOpen = async () => {
+    const validationResult = await validateTextViaAPI(newBidText);
+    if (validationResult) {
+      setPaymentModalOpen(true);
     }
-    setPaymentModalOpen(true);
   };
 
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateTextViaAPI = useCallback(async (text: string) => {
+    let result = false;
     setIsAPIValidateLoading(true);
     if (validateTextAbortControllerRef.current) {
       validateTextAbortControllerRef.current?.abort();
@@ -175,32 +175,39 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         setNewBidTextValid(false);
       } else {
         setNewBidTextValid(true);
+        result = true;
       }
 
       setIsAPIValidateLoading(false);
+      return result;
     } catch (err) {
       console.error(err);
       setIsAPIValidateLoading(false);
+      return result;
     }
   }, []);
-
-  const validateTextViaAPIDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateTextViaAPI(text);
-      }, 250),
-    [validateTextViaAPI]
-  );
 
   const handleUpdateNewOptionText = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setNewBidText(e.target.value.trim() ? e.target.value : '');
+    },
+    [setNewBidText]
+  );
 
+  const handleBlurNewOptionText = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
       if (e.target.value.length > 0) {
-        validateTextViaAPIDebounced(e.target.value);
+        validateTextViaAPI(e.target.value);
       }
     },
-    [setNewBidText, validateTextViaAPIDebounced]
+    [validateTextViaAPI]
+  );
+
+  const handleFocusNewOptionText = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
+      setNewBidTextValid(true);
+    },
+    []
   );
 
   const paymentAmountInCents = useMemo(
@@ -343,6 +350,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
           )}
           invalid={!newBidTextValid && lastValidatedNewBidText === newBidText}
           onChange={handleUpdateNewOptionText}
+          onBlur={handleBlurNewOptionText}
+          onFocus={handleFocusNewOptionText}
         />
         <BidAmountTextInput
           id='bid-input'
@@ -462,6 +471,8 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
                 !newBidTextValid && lastValidatedNewBidText === newBidText
               }
               onChange={handleUpdateNewOptionText}
+              onBlur={handleBlurNewOptionText}
+              onFocus={handleFocusNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
