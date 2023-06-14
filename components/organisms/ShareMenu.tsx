@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 import SharePanel from '../atoms/SharePanel';
 
 interface IShareMenu {
@@ -19,12 +19,13 @@ const ShareMenu: React.FC<IShareMenu> = ({
   absolute,
   className,
 }) => {
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
+  // TODO: construct link separately, what if userData is not present yet?
   return (
     <AnimatePresence>
       <SContainer
@@ -38,7 +39,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
         exit={{ opacity: 0 }}
       >
         <SSharePanel
-          linkToShare={`${window.location.origin}/${user.userData?.username}`}
+          linkToShare={`${window.location.origin}/${userData?.username}`}
           onCopyLink={handleClose}
         />
       </SContainer>

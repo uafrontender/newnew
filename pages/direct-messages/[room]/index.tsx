@@ -15,7 +15,7 @@ import { useRouter } from 'next/router';
 import { useUpdateEffect } from 'react-use';
 
 import { NextPageWithLayout } from '../../_app';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import ChatLayout from '../../../components/templates/ChatLayout';
 import ChatContainer from '../../../components/organisms/direct-messages/ChatContainer';
@@ -79,7 +79,7 @@ const getChatRoomParamsFromUrl = (room?: string, username?: string) => {
 const Chat: NextPage = () => {
   const { t } = useTranslation('page-Chat');
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn, userIsCreator } = useAppState();
   const queryClient = useQueryClient();
   const { setSearchChatroom } = useGetChats();
@@ -114,29 +114,24 @@ const Chat: NextPage = () => {
   }, [router.query.roomID]);
 
   const initialTab = useMemo(() => {
-    if (room === 'empty' || !user.userData?.username || !userIsCreator) {
+    if (room === 'empty' || !userData?.username || !userIsCreator) {
       return undefined;
     }
 
-    const chatRoomParams = getChatRoomParamsFromUrl(
-      room,
-      user.userData.username
-    );
+    const chatRoomParams = getChatRoomParamsFromUrl(room, userData.username);
 
     if (chatRoomParams) {
       return chatRoomParams.myRole;
     }
 
     return undefined;
-  }, [room, userIsCreator, user.userData?.username]);
+  }, [room, userIsCreator, userData?.username]);
 
   const handleChatRoomSelected = useCallback(
     (chatRoom: newnewapi.IChatRoom) => {
       setSearchChatroom('');
 
-      let route = `${
-        chatRoom.visavis?.user?.username || user.userData?.username
-      }`;
+      let route = `${chatRoom.visavis?.user?.username || userData?.username}`;
 
       if (chatRoom.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE) {
         route += '-announcement';
@@ -150,7 +145,7 @@ const Chat: NextPage = () => {
         { shallow: true }
       );
     },
-    [router, user.userData?.username, setSearchChatroom]
+    [router, userData?.username, setSearchChatroom]
   );
 
   const findLoadedChatRoom = useCallback(
@@ -183,10 +178,7 @@ const Chat: NextPage = () => {
       return undefined;
     }
 
-    const chatRoomParams = getChatRoomParamsFromUrl(
-      room,
-      user.userData?.username
-    );
+    const chatRoomParams = getChatRoomParamsFromUrl(room, userData?.username);
 
     const chatRoomPayload = new newnewapi.GetMyRoomsRequest(chatRoomParams);
     const chatroomResponse = await getMyRooms(chatRoomPayload);
@@ -204,7 +196,7 @@ const Chat: NextPage = () => {
     }
 
     return chatRoom;
-  }, [room, user.userData?.username]);
+  }, [room, userData?.username]);
 
   useUpdateEffect(() => {
     if (!userLoggedIn) {
@@ -217,11 +209,11 @@ const Chat: NextPage = () => {
       room &&
       !room.includes('-') &&
       // prevent user from opening chat with himself
-      room === user.userData?.username
+      room === userData?.username
     ) {
       router.replace('/direct-messages');
     }
-  }, [router, room, user.userData?.username]);
+  }, [router, room, userData?.username]);
 
   useEffect(() => {
     const getChatRoom = async () => {

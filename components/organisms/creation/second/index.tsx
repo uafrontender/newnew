@@ -25,7 +25,7 @@ import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { minLength, maxLength } from '../../../../utils/validation';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import {
   getVideoUploadUrl,
@@ -120,7 +120,7 @@ export const CreationSecondStepContent: React.FC<
     customCoverImageUrl,
   } = useMemo(() => postInCreation, [postInCreation]);
 
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode } = useAppState();
   const {
     userTutorialsProgress,
@@ -1352,10 +1352,10 @@ export const CreationSecondStepContent: React.FC<
                         />
                       </SFloatingSubSectionPlayer>
                       <SFloatingSubSectionUser>
-                        <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
+                        <SUserAvatar avatarUrl={userData?.avatarUrl} />
                         <SUserTitleContainer>
                           <SUserTitle variant={3} weight={600}>
-                            <DisplayName user={user.userData} />
+                            <DisplayName user={userData} />
                           </SUserTitle>
                         </SUserTitleContainer>
                         <SCaption variant={2} weight={700}>

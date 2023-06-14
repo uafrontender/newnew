@@ -15,7 +15,7 @@ import { useRouter } from 'next/dist/client/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
@@ -60,7 +60,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const { t } = useTranslation('page-Post');
     const { locale } = useRouter();
     const { showErrorToastCustom } = useErrorToasts();
-    const { user } = useAppSelector((state) => state);
+    const { userData } = useUserData();
     const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode, userLoggedIn } = useAppState();
     const {
@@ -170,7 +170,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     } = useAcOptions(
       {
         postUuid: post.postUuid,
-        userUuid: user.userData?.userUuid,
+        userUuid: userData?.userUuid,
         loggedInUser: userLoggedIn,
       },
       {
@@ -291,7 +291,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, postStatus, user.userData?.userUuid]);
+    }, [socketConnection, post, postStatus, userData?.userUuid]);
 
     const goToNextStep = () => {
       if (

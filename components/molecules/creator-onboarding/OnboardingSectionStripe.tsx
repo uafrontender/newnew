@@ -4,7 +4,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { fetchSetStripeLinkCreator } from '../../../api/endpoints/payments';
 
@@ -51,7 +51,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   // const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { creatorData } = useUserData();
   const { t } = useTranslation('page-CreatorOnboarding');
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -60,7 +60,7 @@ const OnboardingSectionStripe: React.FunctionComponent = () => {
 
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const { stripeConnectStatus } = user.creatorData?.options || {};
+  const { stripeConnectStatus } = creatorData || {};
 
   const [stripeProcessing, setStripeProcessing] = useState(false);
   const [isConnectedToStripe, setIsConnectedToStripe] = useState(false);

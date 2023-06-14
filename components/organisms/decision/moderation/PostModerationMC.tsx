@@ -13,7 +13,7 @@ import { useTranslation } from 'next-i18next';
 import moment from 'moment';
 import { useRouter } from 'next/dist/client/router';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 import switchPostType from '../../../../utils/switchPostType';
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -62,7 +62,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
   () => {
     const { t } = useTranslation('page-Post');
     const { locale } = useRouter();
-    const { user } = useAppSelector((state) => state);
+    const { userData } = useUserData();
     const { mutedMode, toggleMutedMode } = useUiState();
     const { resizeMode, userLoggedIn } = useAppState();
     const {
@@ -162,7 +162,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       removeMcOptionMutation,
     } = useMcOptions({
       postUuid: post.postUuid,
-      userUuid: user.userData?.userUuid,
+      userUuid: userData?.userUuid,
       loggedInUser: userLoggedIn,
     });
 
@@ -294,7 +294,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, user?.userData?.userUuid]);
+    }, [socketConnection, post, userData?.userUuid]);
 
     const goToNextStep = () => {
       if (

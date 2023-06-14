@@ -42,7 +42,6 @@ interface IAppStateContextProvider {
   children: React.ReactNode;
 }
 
-// TODO: clear redux store
 function getResizeMode(uaString: string): TResizeMode {
   const ua = parse(
     uaString || (isBrowser() ? window?.navigator?.userAgent : '')
@@ -145,9 +144,13 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   );
 
   const handleBecameCreator = useCallback(() => {
-    setUserIsCreator(true);
-    // Refresh token to get the one with is_creator true
-    refreshTokens();
+    setUserIsCreator((curr) => {
+      if (!curr) {
+        // Refresh token to get the one with is_creator true
+        refreshTokens();
+      }
+      return true;
+    });
   }, [setUserIsCreator, refreshTokens]);
 
   const logoutAndRedirect = useCallback(

@@ -5,7 +5,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 
 import Text from '../../../atoms/Text';
 import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
@@ -43,7 +43,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
 > = ({ variant }) => {
   const { t } = useTranslation('page-Post');
   const theme = useTheme();
-  const { user } = useAppSelector((state) => state);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -83,7 +83,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
       )}
       <PostVideoProcessingHolder
         holderText={
-          userLoggedIn && user.userData?.userUuid === post.postUuid
+          userLoggedIn && userData?.userUuid === post.postUuid
             ? 'moderation'
             : 'decision'
         }

@@ -15,7 +15,7 @@ import { useInView } from 'react-intersection-observer';
 import debounce from 'lodash/debounce';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
@@ -104,7 +104,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
   const { userTutorialsProgress, setUserTutorialsProgress } =
     useTutorialProgress();
@@ -187,11 +187,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const optionCreatedByMe = useMemo(
-    () =>
-      options.find(
-        (option) => option.creator?.uuid === user.userData?.userUuid
-      ),
-    [options, user.userData?.userUuid]
+    () => options.find((option) => option.creator?.uuid === userData?.userUuid),
+    [options, userData?.userUuid]
   );
 
   const mainContainer = useRef<HTMLDivElement>();

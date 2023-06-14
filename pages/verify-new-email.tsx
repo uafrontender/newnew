@@ -6,13 +6,12 @@ import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
 import CodeVerificationMenuNewEmail from '../components/organisms/CodeVerificationMenuNewEmail';
 import { SocketContext } from '../contexts/socketContext';
-import { setUserData } from '../redux-store/slices/userStateSlice';
+import { useUserData } from '../contexts/userDataContext';
 import { becomeCreator } from '../api/endpoints/user';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
@@ -23,8 +22,7 @@ interface IVerifyNewEmail {}
 const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   const { t } = useTranslation('page-VerifyEmail');
 
-  const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+  const { updateUserData } = useUserData();
   const { userLoggedIn, handleUserLoggedIn } = useAppState();
 
   const router = useRouter();
@@ -60,18 +58,15 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         }
 
         // TODO: ideally we want it happen in syncUserWrapper as well
-        dispatch(
-          setUserData({
-            options: {
-              ...user.userData?.options,
-              isActivityPrivate:
-                becomeCreatorRes.data.me?.options?.isActivityPrivate,
-              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-            },
-          })
-        );
+        updateUserData({
+          options: {
+            isActivityPrivate:
+              becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+          },
+        });
 
         handleUserLoggedIn(
           becomeCreatorRes.data.me?.options?.isCreator ?? false

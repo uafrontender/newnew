@@ -12,7 +12,7 @@ import React, {
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
@@ -122,7 +122,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode, userLoggedIn } = useAppState();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userTutorialsProgress, setUserTutorialsProgress } =
     useTutorialProgress();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -141,10 +141,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     [option.isSupportedByMe]
   );
   const isMyBid = useMemo(
-    () =>
-      !!option.creator?.uuid &&
-      option.creator?.uuid === user.userData?.userUuid,
-    [option.creator?.uuid, user.userData?.userUuid]
+    () => !!option.creator?.uuid && option.creator?.uuid === userData?.userUuid,
+    [option.creator?.uuid, userData?.userUuid]
   );
   const isBlue = useMemo(
     () => isSupportedByMe || isMyBid,
@@ -497,7 +495,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
             {/* TODO: add logic that accepts option and returns users (me) to show */}
             {!option.whitelistSupporter ||
-            option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
+            option.whitelistSupporter?.uuid === userData?.userUuid ? (
               isMyBid ? (
                 <OptionCardUsernameSpan
                   user={option.supporterCount > 1 ? t('me') : t('my')}
@@ -518,7 +516,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {(isSupportedByMe && !isMyBid) ||
             (isSupportedByMe &&
               !!option.whitelistSupporter &&
-              option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
+              option.whitelistSupporter?.uuid !== userData?.userUuid) ? (
               <OptionCardUsernameSpan user={`, ${t('me')}`} isBlue={isBlue} />
             ) : null}
             {option.supporterCount >

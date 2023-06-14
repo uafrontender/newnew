@@ -8,8 +8,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
 
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 // API
 import { logout /* , updateMe */ } from '../../../api/endpoints/user';
@@ -51,7 +50,7 @@ const MyProfileSettingsIndex = () => {
   // TEMP
   // const { t: commonT } = useTranslation('common');
 
-  const { userData } = useAppSelector((state: any) => state.user);
+  const { userData } = useUserData();
 
   const { colorMode } = useUiState();
   const { resizeMode, userLoggedIn, logoutAndRedirect } = useAppState();
@@ -134,6 +133,7 @@ const MyProfileSettingsIndex = () => {
 
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
+      // CHANGE TO CONTEXT
       dispatch(
         setUserData({
           options: {

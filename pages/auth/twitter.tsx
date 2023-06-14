@@ -11,11 +11,9 @@ import Lottie from '../../components/atoms/Lottie';
 import { signInWithTwitter } from '../../api/endpoints/auth';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
-import { useAppDispatch } from '../../redux-store/store';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
-
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 import { useAppState } from '../../contexts/appStateContext';
+import { useUserData } from '../../contexts/userDataContext';
 
 interface ITwitterAuthRedirectPage {
   oauth_token: string;
@@ -28,8 +26,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 }) => {
   const router = useRouter();
   const [, setCookie] = useCookies();
-  const dispatch = useAppDispatch();
   const { userLoggedIn, handleUserLoggedIn } = useAppState();
+  const { updateUserData } = useUserData();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -76,29 +74,27 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           throw new Error('No data');
         }
 
-        dispatch(
-          setUserData({
-            username: data.me?.username,
-            nickname: data.me?.nickname,
-            email: data.me?.email,
-            avatarUrl: data.me?.avatarUrl,
-            coverUrl: data.me?.coverUrl,
-            userUuid: data.me?.userUuid,
-            bio: data.me?.bio,
-            dateOfBirth: {
-              day: data.me?.dateOfBirth?.day,
-              month: data.me?.dateOfBirth?.month,
-              year: data.me?.dateOfBirth?.year,
-            },
-            countryCode: data.me?.countryCode,
-            options: {
-              isActivityPrivate: data.me?.options?.isActivityPrivate,
-              isCreator: data.me?.options?.isCreator,
-              isVerified: data.me?.options?.isVerified,
-              creatorStatus: data.me?.options?.creatorStatus,
-            },
-          })
-        );
+        updateUserData({
+          username: data.me?.username ?? undefined,
+          nickname: data.me?.nickname,
+          email: data.me?.email,
+          avatarUrl: data.me?.avatarUrl ?? undefined,
+          coverUrl: data.me?.coverUrl ?? undefined,
+          userUuid: data.me?.userUuid ?? undefined,
+          bio: data.me?.bio,
+          dateOfBirth: {
+            day: data.me?.dateOfBirth?.day,
+            month: data.me?.dateOfBirth?.month,
+            year: data.me?.dateOfBirth?.year,
+          },
+          countryCode: data.me?.countryCode,
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
+          },
+        });
 
         // Set credential cookies
         if (data.credential?.expiresAt?.seconds) {

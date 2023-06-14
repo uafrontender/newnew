@@ -11,21 +11,19 @@ import { newnewapi } from 'newnew-api';
 import debounce from 'lodash/debounce';
 import styled from 'styled-components';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-
 import LoadingModal from '../LoadingModal';
 import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
 import { updateMe } from '../../../api/endpoints/user';
-import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import { useUserData } from '../../../contexts/userDataContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -63,8 +61,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { userData, creatorData, updateUserData } = useUserData();
   const { resizeMode, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -73,7 +70,7 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Bio
-  const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
+  const [bioInEdit, setBioInEdit] = useState(userData?.bio ?? '');
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
@@ -157,15 +154,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
         throw new Error(updateMeRes?.error?.message ?? 'Request failed');
       }
 
-      dispatch(
-        setUserData({
-          bio: updateMeRes.data.me?.bio,
-        })
-      );
+      updateUserData({
+        bio: updateMeRes.data.me?.bio,
+      });
 
       // redirect user to dashboard if Stripe is already connected
       if (
-        user.creatorData?.options?.stripeConnectStatus ===
+        creatorData?.stripeConnectStatus ===
         newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
           .CONNECTED_ALL_GOOD
       ) {
@@ -189,10 +184,10 @@ const OnboardingSectionAbout: React.FunctionComponent<
     }
   }, [
     bioInEdit,
-    dispatch,
     router,
-    user.creatorData?.options?.stripeConnectStatus,
+    creatorData?.stripeConnectStatus,
     logoutAndRedirect,
+    updateUserData,
   ]);
 
   useEffect(() => {

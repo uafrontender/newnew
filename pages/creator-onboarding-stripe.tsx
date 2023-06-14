@@ -12,8 +12,7 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import { getMyOnboardingState } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { setCreatorData } from '../redux-store/slices/userStateSlice';
+import { useUserData } from '../contexts/userDataContext';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 
@@ -26,8 +25,7 @@ const CreatorOnboardingStripe = () => {
   const { t } = useTranslation('page-CreatorOnboarding');
 
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { updateCreatorData } = useUserData();
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -37,14 +35,7 @@ const CreatorOnboardingStripe = () => {
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
         if (res.data) {
-          dispatch(
-            setCreatorData({
-              options: {
-                ...user.creatorData?.options,
-                ...res.data,
-              },
-            })
-          );
+          updateCreatorData(res.data);
         }
 
         setIsLoading(false);

@@ -15,7 +15,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
@@ -79,7 +79,7 @@ interface IPostViewAC {}
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { user } = useAppSelector((state) => state);
+  const { userData } = useUserData();
   const { mutedMode, toggleMutedMode } = useUiState();
   const { resizeMode, userLoggedIn } = useAppState();
   const {
@@ -159,7 +159,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   } = useAcOptions(
     {
       postUuid: post.postUuid,
-      userUuid: user.userData?.userUuid,
+      userUuid: userData?.userUuid,
       loggedInUser: userLoggedIn,
     },
     {
@@ -273,7 +273,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid]);
+  }, [socketConnection, post, userData?.userUuid]);
 
   const isBidMadeAfterRedirect = useRef(false);
 

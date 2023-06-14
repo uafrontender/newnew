@@ -54,6 +54,7 @@ export const TutorialProgressContextProvider: React.FC<
       const localUserTutorialsProgress = loadStateLS(
         'userTutorialsProgress'
       ) as JSON;
+
       saveStateLS('userTutorialsProgress', {
         ...localUserTutorialsProgress,
         ...payload,

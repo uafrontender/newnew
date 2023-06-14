@@ -7,7 +7,7 @@ import { Trans, useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import {
   deleteMcOption,
   voteWithBundleVotes,
@@ -121,7 +121,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const { resizeMode, userLoggedIn } = useAppState();
   const { userTutorialsProgress, setUserTutorialsProgress } =
     useTutorialProgress();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -132,8 +132,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     () =>
       !isCreatorsBid &&
       !!option.creator?.uuid &&
-      option.creator?.uuid === user.userData?.userUuid,
-    [option.creator?.uuid, user.userData?.userUuid, isCreatorsBid]
+      option.creator?.uuid === userData?.userUuid,
+    [option.creator?.uuid, userData?.userUuid, isCreatorsBid]
   );
 
   const isBlue = useMemo(

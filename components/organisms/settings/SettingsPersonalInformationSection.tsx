@@ -12,8 +12,7 @@ import SettingsEmail from '../../molecules/profile/SettingsEmail';
 import EditEmailModal from '../../molecules/settings/EditEmailModal';
 
 import { updateMe } from '../../../api/endpoints/user';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { setUserData } from '../../../redux-store/slices/userStateSlice';
+import { useUserData } from '../../../contexts/userDataContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
@@ -31,13 +30,12 @@ type TSettingsPersonalInformationSection = {
 const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPersonalInformationSection> =
   React.memo(({ currentEmail, currentDate, isMobile }) => {
     const { appConstants } = useGetAppConstants();
-    const dispatch = useAppDispatch();
     const router = useRouter();
     const { goBackOrRedirect } = useGoBackOrRedirect();
     const { t } = useTranslation('page-Profile');
     const { showErrorToastPredefined } = useErrorToasts();
 
-    const user = useAppSelector((state) => state.user);
+    const { userData, updateUserData } = useUserData();
     const { userIsCreator } = useAppState();
     const { editEmail } = router.query;
 
@@ -104,20 +102,17 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             throw new Error('Date update error');
           }
 
-          dispatch(
-            setUserData({
-              options: {
-                ...user.userData?.options,
-                birthDateUpdatesLeft:
-                  updateDateResponse.data.me?.options?.birthDateUpdatesLeft,
-              },
-              dateOfBirth: {
-                day: updateDateResponse.data.me?.dateOfBirth?.day,
-                month: updateDateResponse.data.me?.dateOfBirth?.month,
-                year: updateDateResponse.data.me?.dateOfBirth?.year,
-              },
-            })
-          );
+          updateUserData({
+            options: {
+              birthDateUpdatesLeft:
+                updateDateResponse.data.me?.options?.birthDateUpdatesLeft,
+            },
+            dateOfBirth: {
+              day: updateDateResponse.data.me?.dateOfBirth?.day,
+              month: updateDateResponse.data.me?.dateOfBirth?.month,
+              year: updateDateResponse.data.me?.dateOfBirth?.year,
+            },
+          });
         }
         setIsLoading(false);
       } catch (err) {
@@ -174,8 +169,8 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
             maxDate={maxDate}
             locale={router.locale}
             disabled={
-              !user.userData?.options?.birthDateUpdatesLeft ||
-              user.userData.options.birthDateUpdatesLeft <= 0
+              !userData?.options?.birthDateUpdatesLeft ||
+              userData.options.birthDateUpdatesLeft <= 0
             }
             submitError={
               dateError
