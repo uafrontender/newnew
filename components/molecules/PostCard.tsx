@@ -128,6 +128,7 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
+    const thumbnailHolderRef = useRef<HTMLImageElement>();
 
     const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
 
@@ -502,6 +503,13 @@ export const PostCard: React.FC<ICard> = React.memo(
       );
     }
 
+    // Covers a case when thumbnail is loaded right away
+    useEffect(() => {
+      if (thumbnailHolderRef.current?.complete) {
+        setThumbnailLoaded(true);
+      }
+    }, []);
+
     useEffect(() => {
       setAnnouncementCoverImage(
         postParsed.announcement?.coverImageUrl || undefined
@@ -554,6 +562,11 @@ export const PostCard: React.FC<ICard> = React.memo(
                 highlightColor={theme.colorsThemed.background.quaternary}
               />
               <SThumbnailHolder
+                ref={(e) => {
+                  if (e) {
+                    thumbnailHolderRef.current = e;
+                  }
+                }}
                 className='thumnailHolder'
                 visible={thumbnailLoaded}
                 src={
@@ -682,6 +695,11 @@ export const PostCard: React.FC<ICard> = React.memo(
               highlightColor={theme.colorsThemed.background.quaternary}
             />
             <SThumbnailHolder
+              ref={(e) => {
+                if (e) {
+                  thumbnailHolderRef.current = e;
+                }
+              }}
               className='thumnailHolder'
               visible={thumbnailLoaded}
               src={
