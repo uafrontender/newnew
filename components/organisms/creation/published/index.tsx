@@ -14,7 +14,7 @@ import Headline from '../../../atoms/Headline';
 import LoadingView from '../../../atoms/ScrollRestorationAnimationContainer';
 import UserAvatar from '../../../molecules/UserAvatar';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 
 import PostTitleContent from '../../../atoms/PostTitleContent';
 import { useAppState } from '../../../../contexts/appStateContext';
@@ -35,7 +35,7 @@ interface IPublishedContent {}
 export const PublishedContent: React.FC<IPublishedContent> = () => {
   const { t } = useTranslation('page-Creation');
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode } = useAppState();
 
   const { showErrorToastPredefined } = useErrorToasts();
@@ -269,10 +269,10 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           )}
         </SPlayerWrapper>
         <SUserBlock>
-          <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
+          <SUserAvatar avatarUrl={userData?.avatarUrl} />
           <SUserTitleContainer>
             <SUserTitle variant={3} weight={600}>
-              <DisplayName user={user.userData} />
+              <DisplayName user={userData} />
             </SUserTitle>
           </SUserTitleContainer>
           <SCaption variant={2} weight={700}>

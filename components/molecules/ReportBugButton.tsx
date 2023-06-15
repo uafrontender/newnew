@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 import BugIcon from '../../public/images/svg/icons/outlined/Bug.svg';
 import InlineSvg from '../atoms/InlineSVG';
 import { useAppState } from '../../contexts/appStateContext';
@@ -15,7 +15,7 @@ interface ReportBugButtonI {
 const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
   ({ bottom, right, zIndex }) => {
     const { t } = useTranslation('common');
-    const { user } = useAppSelector((state) => state);
+    const { userData } = useUserData();
     const { userIsCreator } = useAppState();
     // Check if need to be positioned higher
 
@@ -23,8 +23,8 @@ const ReportBugButton: React.FC<ReportBugButtonI> = React.memo(
       const userSnapApi = (window as any).Usersnap;
       if (userSnapApi) {
         userSnapApi.on('open', (event: any) => {
-          event.api.setValue('visitor', user.userData?.email);
-          event.api.setValue('custom', { username: user.userData?.username });
+          event.api.setValue('visitor', userData?.email);
+          event.api.setValue('custom', { username: userData?.username });
         });
         userSnapApi.logEvent('show_bug_report');
       }

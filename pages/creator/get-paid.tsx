@@ -12,8 +12,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { getMyOnboardingState } from '../../api/endpoints/user';
 import CreatorStripeLayout from '../../components/templates/CreatorStripeLayout';
 import { NextPageWithLayout } from '../_app';
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setCreatorData } from '../../redux-store/slices/userStateSlice';
+import { useUserData } from '../../contexts/userDataContext';
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 import Loader from '../../components/atoms/Loader';
 import { useAppState } from '../../contexts/appStateContext';
@@ -26,8 +25,7 @@ const GetPaid = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Creator');
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { updateCreatorData } = useUserData();
   const { userIsCreator } = useAppState();
 
   useUpdateEffect(() => {
@@ -47,14 +45,7 @@ const GetPaid = () => {
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
         if (res.data) {
-          dispatch(
-            setCreatorData({
-              options: {
-                ...user.creatorData?.options,
-                ...res.data,
-              },
-            })
-          );
+          updateCreatorData(res.data);
         }
 
         setIsLoading(false);

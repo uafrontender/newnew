@@ -13,7 +13,7 @@ import SharePanel from '../atoms/SharePanel';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
 import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import switchPostType, { TPostType } from '../../utils/switchPostType';
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 import { Mixpanel } from '../../utils/mixpanel';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
@@ -51,7 +51,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
       const theme = useTheme();
       const router = useRouter();
       const { t } = useTranslation('common');
-      const user = useAppSelector((state) => state.user);
+      const { userData } = useUserData();
       const { userLoggedIn } = useAppState();
 
       const { promptUserWithPushNotificationsPermissionModal } =
@@ -194,7 +194,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
                   wrapperType='span'
                 />
               </SEllipseMenuButton>
-              {postCreator.uuid !== user.userData?.userUuid && (
+              {postCreator.uuid !== userData?.userUuid && (
                 <>
                   {!isFollowingLoading ? (
                     <SEllipseMenuButton

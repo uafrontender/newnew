@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 
 import { SChatItemInfo, SChatItemLine, SChatItemText } from './styles';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import DisplayName from '../DisplayName';
 
 interface IChatName {
@@ -11,15 +11,15 @@ interface IChatName {
 }
 const ChatName: React.FC<IChatName> = ({ chat }) => {
   const { t } = useTranslation('page-Chat');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   const chatUser = useMemo(
     () =>
       chat.kind === newnewapi.ChatRoom.Kind.CREATOR_MASS_UPDATE &&
       chat.myRole === newnewapi.ChatRoom.MyRole.CREATOR
-        ? user.userData
+        ? userData
         : chat.visavis?.user,
-    [chat, user.userData]
+    [chat, userData]
   );
 
   const beforeName =

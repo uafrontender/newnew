@@ -3,14 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { DefaultTheme, keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 
-import { TColorMode } from '../../../redux-store/slices/uiStateSlice';
-
 import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import IconLight from '../../../public/images/svg/icons/filled/Light.svg';
 import IconDark from '../../../public/images/svg/icons/filled/Dark.svg';
 import IconAuto from '../../../public/images/svg/icons/filled/AutoMode.svg';
+import { TColorMode } from '../../../contexts/uiStateContext';
 
 const optionsIcons = {
   light: IconLight,
@@ -80,9 +79,14 @@ const SettingsColorModeSwitch: React.FunctionComponent<
 
   useEffect(() => {
     const currentButtonRef = buttonsRef.current[activeIcon];
-    const container = containerRef.current;
+    if (!currentButtonRef) {
+      return;
+    }
 
-    if (!container) return;
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
 
     const updatedIndicatorStyle = {
       x:

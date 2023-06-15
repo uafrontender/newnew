@@ -2,7 +2,7 @@ import React from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useAppState } from '../../../../contexts/appStateContext';
 
@@ -16,14 +16,14 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
   user,
   isBlue,
 }) => {
-  const currentUser = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userIsCreator } = useAppState();
 
   if (typeof user === 'string') {
     return (
       // TODO: Should it have hover effect?
       <SHighlightedDisplayName
-        user={typeof user === 'string' ? currentUser.userData : user}
+        user={userData}
         href={userIsCreator ? '/profile/my-posts' : '/profile'}
         altName={user}
         inverted={isBlue}

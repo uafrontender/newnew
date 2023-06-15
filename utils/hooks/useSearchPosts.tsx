@@ -7,7 +7,7 @@ interface IUseSearchPosts {
   loggedInUser: boolean;
   query: string;
   searchType: newnewapi.SearchPostsRequest.SearchType;
-  filters: newnewapi.Post.Filter[];
+  filters?: newnewapi.Post.Filter[];
   sorting: newnewapi.PostSorting;
   limit?: number;
 }
@@ -52,6 +52,7 @@ const useSearchPosts = (
       onError: (error) => {
         console.error(error);
       },
+      refetchOnWindowFocus: false,
       ...(options || {}),
     } as Omit<
       UseInfiniteQueryOptions<{

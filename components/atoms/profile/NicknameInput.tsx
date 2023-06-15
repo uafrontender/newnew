@@ -16,6 +16,7 @@ const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
   errorCaption,
   onChange,
   onFocus,
+  onBlur,
   ...rest
 }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
@@ -23,13 +24,14 @@ const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
 
   useEffect(() => {
     if (focused) {
+      setErrorBordersShown(false);
       return;
     }
     if (isValid) {
       setErrorBordersShown(false);
     }
 
-    if (!isValid && errorCaption) {
+    if (!isValid && errorCaption && !focused) {
       setErrorBordersShown(true);
     }
   }, [focused, isValid, errorCaption]);
@@ -40,11 +42,12 @@ const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
         value={value}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
-        onBlur={() => {
+        onBlur={(e) => {
           setFocused(false);
+          onBlur?.(e);
         }}
         onFocus={(e) => {
-          if (onFocus) onFocus(e);
+          onFocus?.(e);
           setFocused(true);
           setErrorBordersShown(false);
         }}

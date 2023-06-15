@@ -10,6 +10,8 @@ interface ISuggestionTextArea {
   invalid?: boolean;
   autofocus?: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onBlur: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+  onFocus: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
 }
 
 const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
@@ -21,6 +23,8 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   autofocus,
   invalid,
   onChange,
+  onBlur,
+  onFocus,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>();
 
@@ -72,6 +76,8 @@ const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
           }
         }}
         onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
     </SWrapper>
   );

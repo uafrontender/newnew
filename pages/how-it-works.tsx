@@ -14,7 +14,7 @@ import Headline from '../components/atoms/Headline';
 import Text from '../components/atoms/Text';
 import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
-import { useAppSelector } from '../redux-store/store';
+import { useUserData } from '../contexts/userDataContext';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { useAppState } from '../contexts/appStateContext';
 import canBecomeCreator from '../utils/canBecomeCreator';
@@ -25,7 +25,7 @@ export const HowItWorks = () => {
   const theme = useTheme();
   const { appConstants } = useGetAppConstants();
   const { resizeMode, userLoggedIn, userIsCreator } = useAppState();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -148,7 +148,7 @@ export const HowItWorks = () => {
             {userLoggedIn &&
               !userIsCreator &&
               canBecomeCreator(
-                user.userData?.dateOfBirth,
+                userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears
               ) && (
                 <Link href='/creator-onboarding'>

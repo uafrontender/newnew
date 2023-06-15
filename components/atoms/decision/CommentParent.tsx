@@ -20,7 +20,6 @@ import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 
-import { useAppSelector } from '../../../redux-store/store';
 import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
@@ -35,6 +34,7 @@ import { deleteComment, sendComment } from '../../../api/endpoints/comments';
 import { SocketContext } from '../../../contexts/socketContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import Loader from '../Loader';
+import { useUserData } from '../../../contexts/userDataContext';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -101,8 +101,8 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('page-Post');
-    const user = useAppSelector((state) => state.user);
-    const { resizeMode } = useAppState();
+    const { userData } = useUserData();
+    const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -123,8 +123,8 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
     const isMyComment = useMemo(
-      () => user.loggedIn && user.userData?.userUuid === comment.sender?.uuid,
-      [user.loggedIn, user.userData?.userUuid, comment.sender?.uuid]
+      () => userLoggedIn && userData?.userUuid === comment.sender?.uuid,
+      [userLoggedIn, userData?.userUuid, comment.sender?.uuid]
     );
 
     const {
@@ -137,7 +137,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       hasNextPage,
     } = usePostComments(
       {
-        loggedInUser: user.loggedIn,
+        loggedInUser: userLoggedIn,
         postUuid,
         parentCommentId: comment.id as number,
       },
@@ -203,7 +203,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
 
     const onUserReport = useCallback(() => {
       // Redirect only after the persist data is pulled
-      if (!user.loggedIn && user._persist?.rehydrated) {
+      if (!userLoggedIn) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
             window.location.href
@@ -213,7 +213,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       }
 
       setConfirmReportUser(true);
-    }, [user, router]);
+    }, [userLoggedIn, router]);
 
     const onDeleteComment = () => {
       setConfirmDeleteComment(true);
@@ -274,7 +274,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         const decoded = newnewapi.CommentMessageCreated.decode(arr);
         if (
           decoded?.newComment &&
-          decoded.newComment!!.sender?.uuid !== user.userData?.userUuid &&
+          decoded.newComment!!.sender?.uuid !== userData?.userUuid &&
           decoded.newComment?.parentCommentId &&
           decoded.newComment.parentCommentId === comment.id
         ) {
@@ -318,7 +318,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, comment?.id, user.userData?.userUuid]);
+    }, [socketConnection, comment?.id, userData?.userUuid]);
 
     const moreButtonRef: any = useRef<HTMLButtonElement>();
 
@@ -336,10 +336,10 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         >
           {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
             comment.sender?.options?.isVerified ||
-            comment.sender?.uuid === user.userData?.userUuid ? (
+            comment.sender?.uuid === userData?.userUuid ? (
               <Link
                 href={
-                  comment.sender?.uuid === user.userData?.userUuid
+                  comment.sender?.uuid === userData?.userUuid
                     ? '/profile'
                     : `/${comment.sender?.username}`
                 }
@@ -362,16 +362,16 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               {!comment.isDeleted ? (
                 <>
                   {comment.sender?.options?.isVerified ||
-                  comment.sender?.uuid === user.userData?.userUuid ? (
+                  comment.sender?.uuid === userData?.userUuid ? (
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === user.userData?.userUuid
+                        comment.sender?.uuid === userData?.userUuid
                           ? t('comments.me')
                           : undefined
                       }
                       href={
-                        comment.sender?.uuid === user.userData?.userUuid
+                        comment.sender?.uuid === userData?.userUuid
                           ? '/profile'
                           : `/${comment.sender?.username}`
                       }
@@ -380,7 +380,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === user.userData?.userUuid
+                        comment.sender?.uuid === userData?.userUuid
                           ? t('comments.me')
                           : undefined
                       }

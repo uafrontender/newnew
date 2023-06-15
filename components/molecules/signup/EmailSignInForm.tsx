@@ -4,23 +4,14 @@ import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import isEmail from 'validator/lib/isEmail';
 
-// Redux
-import { useAppSelector } from '../../../redux-store/store';
-
-// API
-
-// Components
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import InlineSvg from '../../atoms/InlineSVG';
 import SignInTextInput from '../../atoms/SignInTextInput';
 import EmailSignInButton from './EmailSignInButton';
-
-// Icons
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-
-// Utils
 import { Mixpanel } from '../../../utils/mixpanel';
 import { I18nNamespaces } from '../../../@types/i18next';
+import { useSignup } from '../../../contexts/signUpContext';
 
 export interface IEmailSignInForm {
   animationVariants: Variants;
@@ -33,7 +24,7 @@ const EmailSignInForm: React.FunctionComponent<IEmailSignInForm> = ({
 }) => {
   const { t } = useTranslation('page-SignUp');
 
-  const { signupEmailInput } = useAppSelector((state) => state.user);
+  const { signupEmailInput } = useSignup();
 
   // Email input
   const [emailInput, setEmailInput] = useState(signupEmailInput ?? '');
