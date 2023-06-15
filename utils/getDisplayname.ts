@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { TUserData } from '../redux-store/slices/userStateSlice';
+import { TUserData } from '../contexts/userDataContext';
 
 const getDisplayname = (
   user: newnewapi.IUser | newnewapi.ITinyUser | TUserData | null | undefined

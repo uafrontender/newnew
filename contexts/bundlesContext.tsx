@@ -168,12 +168,13 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
         saveStateLS('creatorHasSoldBundles', false);
       }
     },
-    // showErrorToastPredefined causes re-render not only when locale changes
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       userLoggedIn,
       userIsCreator,
       fetchBundles,
+      // removed as causes re-render on page change, not only when language changes
       // showErrorToastPredefined,
       fetchIsSellingBundles,
       fetchHasSoldBundles,
@@ -306,7 +307,7 @@ export function useBundles() {
   const context = useContext(BundlesContext);
   if (!context) {
     throw new Error(
-      'useNotifications must be used inside a `NotificationsProvider`'
+      'useBundles must be used inside a `BundlesContextProvider`'
     );
   }
 

@@ -17,7 +17,7 @@ import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import useCards from '../../../utils/hooks/useCards';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 const getCardBrandName = (cardBrand: newnewapi.Card.CardBrand) => {
   switch (cardBrand) {
@@ -76,7 +76,7 @@ const Card: React.FunctionComponent<ICard> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const { showErrorToastCustom } = useErrorToasts();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode } = useAppState();
 
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -90,8 +90,8 @@ const Card: React.FunctionComponent<ICard> = ({
   const { setPrimaryCardMutation, removeCardMutation } = useCards();
 
   const notWhitelisted = useMemo(
-    () => user._persist?.rehydrated && !user?.userData?.options?.isWhiteListed,
-    [user._persist?.rehydrated, user?.userData?.options?.isWhiteListed]
+    () => userData && !userData?.options?.isWhiteListed,
+    [userData]
   );
 
   const handleCloseCardEllipseMenu = useCallback(

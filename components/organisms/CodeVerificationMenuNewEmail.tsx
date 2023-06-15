@@ -5,10 +5,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 
-// Redux
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
-
 // API
 import {
   setMyEmail,
@@ -27,6 +23,7 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { useAppState } from '../../contexts/appStateContext';
 import VerificationCodeResend from '../atoms/VerificationCodeResend';
+import { useUserData } from '../../contexts/userDataContext';
 
 const AnimatedPresence = dynamic(() => import('../atoms/AnimatedPresence'));
 
@@ -42,9 +39,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 > = ({ newEmail, canResendIn, redirect, allowLeave }) => {
   const router = useRouter();
   const { t } = useTranslation('page-VerifyEmail');
-  const user = useAppSelector((state) => state.user);
+  const { updateUserData } = useUserData();
 
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { resizeMode, handleUserLoggedIn } = useAppState();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -52,9 +49,6 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
     'mobileL',
     'tablet',
   ].includes(resizeMode);
-
-  // const { signupEmailInput } = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
 
   // isSuccess - no bottom sections
   const [isSuccess, setIsSuccess] = useState(false);
@@ -102,11 +96,9 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         }
 
         if (redirect === 'settings') {
-          dispatch(
-            setUserData({
-              email: newEmail,
-            })
-          );
+          updateUserData({
+            email: newEmail,
+          });
         }
 
         if (redirect === 'dashboard') {
@@ -118,22 +110,20 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
             throw new Error('Become creator failed');
           }
 
-          dispatch(
-            setUserData({
-              email: newEmail,
-              options: {
-                ...user.userData?.options,
-                isActivityPrivate:
-                  becomeCreatorRes.data.me?.options?.isActivityPrivate,
-                isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-                isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-                creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-              },
-            })
-          );
+          updateUserData({
+            email: newEmail,
+            options: {
+              isActivityPrivate:
+                becomeCreatorRes.data.me?.options?.isActivityPrivate,
+              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+            },
+          });
 
-          setUserLoggedIn(true);
-          setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+          handleUserLoggedIn(
+            becomeCreatorRes.data.me?.options?.isCreator ?? false
+          );
         }
 
         setIsSignInWithEmailLoading(false);
@@ -151,15 +141,13 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
       }
     },
     [
-      setIsSignInWithEmailLoading,
-      setSubmitError,
-      user.userData?.options,
       newEmail,
       redirect,
-      dispatch,
       router,
-      setUserLoggedIn,
-      setUserIsCreator,
+      setIsSignInWithEmailLoading,
+      setSubmitError,
+      handleUserLoggedIn,
+      updateUserData,
     ]
   );
 

@@ -396,7 +396,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       } else {
         setSmsNotificationModalOpen(true);
       }
-    } else if (user.userData?.options?.isPhoneNumberConfirmed) {
+    } else if (userData?.options?.isPhoneNumberConfirmed) {
       try {
         const res = await subscribeToSmsNotifications({
           postUuid: subscription.postUuid,
@@ -429,7 +429,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     postUuid,
     subscribedToSmsNotifications,
      userLoggedIn,
-    user.userData?.options?.isPhoneNumberConfirmed,
+    userData?.options?.isPhoneNumberConfirmed,
     subscription.postUuid,
     showErrorToastCustom,
     tCommon,

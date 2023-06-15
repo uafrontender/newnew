@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import GoBackButton from '../../../GoBackButton';
 import useMcOptions, {
   TMcOptionWithHighestField,
@@ -31,7 +31,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { user } = useAppSelector((state) => state);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -53,7 +53,7 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
     {
       postUuid: post.postUuid,
       loggedInUser: userLoggedIn,
-      userUuid: user.userData?.userUuid,
+      userUuid: userData?.userUuid,
     },
     {
       refetchOnWindowFocus: false,

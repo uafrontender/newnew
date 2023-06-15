@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useUpdateEffect } from 'react-use';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 
 import Text from '../atoms/Text';
 import Modal from '../organisms/Modal';
@@ -74,7 +74,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const { socketConnection } = useContext(SocketContext);
   const router = useRouter();
@@ -128,7 +128,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleCopyLink = useCallback(() => {
     if (window) {
-      const url = `${window.location.origin}/${user.userData?.username}`;
+      // TODO: What if data is not loaded yet
+      const url = `${window.location.origin}/${userData?.username}`;
 
       copyToClipboard(url)
         .then(() => {
@@ -141,7 +142,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           console.log(err);
         });
     }
-  }, [user.userData?.username]);
+  }, [userData?.username]);
 
   // Filter
   const [postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter] =
@@ -323,7 +324,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   >();
 
   useEffect(() => {
-    if (user.userData?.options?.isWhiteListed) {
+    if (userData?.options?.isWhiteListed) {
       (async () => {
         try {
           const payload = new newnewapi.GetMySpendingRequest();
@@ -340,7 +341,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         }
       })();
     }
-  }, [user.userData?.options?.isWhiteListed]);
+  }, [userData?.options?.isWhiteListed]);
 
   // Test WS events, had a bug with the event data coming from finalized transactions only
   useEffect(() => {
@@ -391,7 +392,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       <SMyProfileLayout>
         <ProfileBackground
           // Temp
-          pictureURL={user?.userData?.coverUrl ?? mockProfileBg.src}
+          pictureURL={userData?.coverUrl ?? mockProfileBg.src}
         >
           <SButton
             view='transparent'
@@ -454,17 +455,17 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         >
           <InlineSvg svg={BackButtonIcon} width='24px' height='24px' />
         </SButtonBack>
-        <ProfileImage src={user.userData?.avatarUrl} />
+        <ProfileImage src={userData?.avatarUrl} />
         <SUserData>
           <SUsernameWrapper>
             <SUsername variant={4}>
-              <DisplayName user={user.userData} />
+              <DisplayName user={userData} />
             </SUsername>
-            {isGenderPronounsDefined(user.userData?.genderPronouns) && (
+            {isGenderPronounsDefined(userData?.genderPronouns) && (
               <SGenderPronouns variant={2}>
                 {t(
                   `genderPronouns.${
-                    getGenderPronouns(user.userData?.genderPronouns!!).name
+                    getGenderPronouns(userData?.genderPronouns!!).name
                   }` as any
                 )}
               </SGenderPronouns>
@@ -484,14 +485,14 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             >
               <SUsernameButtonText>
                 @{/* Temp! */}
-                {user.userData?.username && user.userData?.username.length > 12
-                  ? `${user.userData?.username.substring(
+                {userData?.username && userData?.username.length > 12
+                  ? `${userData?.username.substring(
                       0,
                       6
-                    )}...${user.userData?.username.substring(
-                      (user.userData?.username.length || 0) - 3
+                    )}...${userData?.username.substring(
+                      (userData?.username.length || 0) - 3
                     )}`
-                  : user.userData?.username}
+                  : userData?.username}
               </SUsernameButtonText>
             </SUsernameButton>
             <SShareButton
@@ -520,8 +521,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               )}
             </SShareButton>
           </SShareDiv>
-          {user.userData?.bio ? (
-            <SBioText variant={3}>{user.userData?.bio}</SBioText>
+          {userData?.bio ? (
+            <SBioText variant={3}>{userData?.bio}</SBioText>
           ) : null}
         </SUserData>
         <ProfileTabs pageType='myProfile' tabs={tabs} />

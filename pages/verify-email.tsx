@@ -12,9 +12,9 @@ import AuthLayout, {
 } from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 import assets from '../constants/assets';
-import { useAppSelector } from '../redux-store/store';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { SignupReason, signupReasons } from '../utils/signUpReasons';
+import { useSignup } from '../contexts/signUpContext';
 
 interface IVerifyEmail {
   reason?: SignupReason;
@@ -26,7 +26,7 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
   const { t } = useTranslation('page-VerifyEmail');
   const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
-  const { signupEmailInput } = useAppSelector((state) => state.user);
+  const { signupEmailInput } = useSignup();
 
   useEffect(() => {
     if (!signupEmailInput) {

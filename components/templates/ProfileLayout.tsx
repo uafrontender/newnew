@@ -10,7 +10,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -63,7 +63,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
 
-  const currentUser = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -197,17 +197,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   useEffect(() => {
     if (
       userLoggedIn &&
-      currentUser.userData?.userUuid?.toString() === user.uuid.toString()
+      userData?.userUuid?.toString() === user.uuid.toString()
     ) {
       router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
     }
-  }, [
-    userLoggedIn,
-    userIsCreator,
-    currentUser.userData?.userUuid,
-    router,
-    user.uuid,
-  ]);
+  }, [userLoggedIn, userIsCreator, userData?.userUuid, router, user.uuid]);
 
   const moreButtonRef = useRef() as any;
 

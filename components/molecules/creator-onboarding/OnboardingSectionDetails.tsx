@@ -13,7 +13,7 @@ import isEqual from 'lodash/isEqual';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 import Headline from '../../atoms/Headline';
 import OnboardingInput from './OnboardingInput';
@@ -29,11 +29,6 @@ import {
   updateMe,
   validateUsernameTextField,
 } from '../../../api/endpoints/user';
-import {
-  logoutUserClearCookiesAndRedirect,
-  setCreatorData,
-  setUserData,
-} from '../../../redux-store/slices/userStateSlice';
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import Button from '../../atoms/Button';
 import isBrowser from '../../../utils/isBrowser';
@@ -142,9 +137,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { userData, updateUserData, setCreatorDataLoaded } = useUserData();
+  const { resizeMode, handleBecameCreator, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -197,7 +191,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Username
   const [usernameInEdit, setUsernameInEdit] = useState(
-    user.userData?.username ?? ''
+    userData?.username ?? ''
   );
   const [usernameError, setUsernameError] = useState('');
   const handleUpdateUsername = (value: string) => {
@@ -207,7 +201,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Nickname
   const [nicknameInEdit, setNicknameInEdit] = useState(
-    user.userData?.nickname ?? ''
+    userData?.nickname ?? ''
   );
   const [nicknameError, setNicknameError] = useState('');
   const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,7 +237,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         text = text.replace('@', '');
 
         // skip validation if username is equal to current username
-        if (text === user.userData?.username) {
+        if (text === userData?.username) {
           setUsernameError('');
 
           return;
@@ -273,20 +267,16 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setUsernameError, dispatch, user.userData?.username, setUserLoggedIn]
+    [userData?.username, setUsernameError, logoutAndRedirect]
   );
 
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
@@ -339,24 +329,20 @@ const OnboardingSectionDetails: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setNicknameError, dispatch, setUserLoggedIn]
+    [setNicknameError, logoutAndRedirect]
   );
 
   // Email
-  const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
+  const [emailInEdit, setEmailInEdit] = useState(userData?.email ?? '');
   const [emailError, setEmailError] = useState('');
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (emailError) setEmailError('');
@@ -372,8 +358,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Birthdate
   const [dateInEdit, setDateInEdit] = useState<newnewapi.IDateComponents>(
-    user?.userData?.dateOfBirth
-      ? user?.userData?.dateOfBirth
+    userData?.dateOfBirth
+      ? userData?.dateOfBirth
       : {
           day: undefined,
           month: undefined,
@@ -393,7 +379,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
   // Determine whether or not the profile image is generic
   const [imageInEdit, setImageInEdit] = useState(
-    user.userData?.avatarUrl && isAvatarCustom ? user.userData?.avatarUrl : ''
+    userData?.avatarUrl && isAvatarCustom ? userData?.avatarUrl : ''
   );
 
   // Terms of service
@@ -404,7 +390,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const [fieldsToBeUpdated, setFieldsToBeUpdated] =
     useState<TFieldsToBeUpdated>({
       ...(!emailInEdit
-        ? // || (emailInEdit && !user.userData?.options?.isEmailVerified)
+        ? // || (emailInEdit && !userData?.options?.isEmailVerified)
           { email: true }
         : {}),
       countryOfResidence: true,
@@ -535,7 +521,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
             }
           : {}),
         ...(fieldsToBeUpdated.dateOfBirth &&
-        !isEqual(user.userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
+        !isEqual(userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
           ? {
               dateOfBirth: dateInEdit,
             }
@@ -552,17 +538,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
         throw new Error(updateMeRes?.error?.message || 'Request failed');
       }
 
-      // Update Redux state
-      dispatch(
-        setUserData({
-          ...user.userData,
-          username: updateMeRes.data.me?.username,
-          nickname: updateMeRes.data.me?.nickname,
-          avatarUrl: updateMeRes.data.me?.avatarUrl,
-          countryCode: updateMeRes.data.me?.countryCode,
-          dateOfBirth: updateMeRes.data.me?.dateOfBirth,
-        })
-      );
+      updateUserData({
+        username: updateMeRes.data.me?.username ?? undefined,
+        nickname: updateMeRes.data.me?.nickname ?? undefined,
+        avatarUrl: updateMeRes.data.me?.avatarUrl ?? undefined,
+        countryCode: updateMeRes.data.me?.countryCode ?? undefined,
+        dateOfBirth: updateMeRes.data.me?.dateOfBirth ?? undefined,
+      });
 
       if (fieldsToBeUpdated.email) {
         const sendVerificationCodePayload =
@@ -598,20 +580,19 @@ const OnboardingSectionDetails: React.FunctionComponent<
           throw new Error('Become creator failed');
         }
 
-        dispatch(
-          setUserData({
-            options: {
-              ...user.userData?.options,
-              isActivityPrivate:
-                becomeCreatorRes.data.me?.options?.isActivityPrivate,
-              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-            },
-          })
-        );
+        updateUserData({
+          options: {
+            isActivityPrivate:
+              becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+          },
+        });
 
-        setUserIsCreator(!!becomeCreatorRes.data.me?.options?.isCreator);
+        if (becomeCreatorRes.data.me?.options?.isCreator) {
+          handleBecameCreator();
+        }
 
         const acceptTermsPayload = new newnewapi.EmptyRequest({});
 
@@ -621,11 +602,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
           throw new Error(res.error?.message || 'Request failed');
         }
 
-        dispatch(
-          setCreatorData({
-            isLoaded: true,
-          })
-        );
+        setCreatorDataLoaded(true);
         router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
     } catch (err) {
@@ -653,16 +630,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
       }
 
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
     // We dont need router here?
@@ -676,11 +649,12 @@ const OnboardingSectionDetails: React.FunctionComponent<
     nicknameInEdit,
     usernameInEdit,
     emailInEdit,
-    user.userData,
+    userData,
     imageToSave,
-    dispatch,
     isAPIValidateLoading,
     setLoadingModalOpen,
+    updateUserData,
+    setCreatorDataLoaded,
   ]);
 
   // Update image to be saved
@@ -694,7 +668,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   // Update what fields should be updated
   // Firstname
   useUpdateEffect(() => {
-    if (firstNameInEdit !== user.userData?.firstName) {
+    if (firstNameInEdit !== userData?.firstName) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
         working.firstName = true;
@@ -711,7 +685,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Lastname
   useUpdateEffect(() => {
-    if (lastNameInEdit !== user.userData?.lastName) {
+    if (lastNameInEdit !== userData?.lastName) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
         working.lastName = true;
@@ -728,7 +702,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Username
   useUpdateEffect(() => {
-    if (usernameInEdit !== user.userData?.username) {
+    if (usernameInEdit !== userData?.username) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
         working.username = true;
@@ -744,7 +718,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   }, [usernameInEdit, setFieldsToBeUpdated]);
   // Nickname
   useUpdateEffect(() => {
-    if (nicknameInEdit !== user.userData?.nickname) {
+    if (nicknameInEdit !== userData?.nickname) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
         working.nickname = true;
@@ -760,7 +734,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   }, [nicknameInEdit, setFieldsToBeUpdated]);
   // Email
   useUpdateEffect(() => {
-    if (emailInEdit !== user.userData?.email) {
+    if (emailInEdit !== userData?.email) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
         working.email = true;
@@ -776,7 +750,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   }, [emailInEdit, setFieldsToBeUpdated]);
   // Date of birth
   useUpdateEffect(() => {
-    if (!isEqual(user.userData?.dateOfBirth, dateInEdit)) {
+    if (!isEqual(userData?.dateOfBirth, dateInEdit)) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
         working.dateOfBirth = true;
@@ -792,7 +766,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   }, [dateInEdit, setFieldsToBeUpdated]);
   // Image
   useUpdateEffect(() => {
-    if (imageInEdit !== user.userData?.avatarUrl) {
+    if (imageInEdit !== userData?.avatarUrl) {
       setFieldsToBeUpdated((curr) => {
         const working = { ...curr };
         working.image = true;
@@ -937,7 +911,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
                   : t('detailsSection.form.email.errors.invalidEmail')
               }
               onChange={handleEmailInput}
-              readOnly={!!user.userData?.email}
+              readOnly={!!userData?.email}
             />
             <OnboardingCountrySelect
               width='100%'
@@ -953,8 +927,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
             maxDate={maxDate}
             locale={router.locale}
             disabled={
-              user?.userData?.dateOfBirth
-                ? Object.values(user?.userData?.dateOfBirth).every(
+              userData?.dateOfBirth
+                ? Object.values(userData?.dateOfBirth).every(
                     (dateOfBirthEl) => !!dateOfBirthEl
                   )
                 : false
