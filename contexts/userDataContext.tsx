@@ -351,6 +351,7 @@ export const UserDataContextProvider: React.FunctionComponent<
     }
   }, [userLoggedIn, syncUserData]);
 
+  // TODO: Do we need it?
   useRunOnReturnOnTab(syncUserDataOnReturnOnTab);
 
   const contextValue = useMemo(
