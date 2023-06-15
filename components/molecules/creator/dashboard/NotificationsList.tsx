@@ -12,7 +12,7 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import {
   getMyNotifications,
   markAllAsRead,
@@ -38,7 +38,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 }) => {
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { locale } = useRouter();
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
@@ -251,7 +251,7 @@ export const NotificationsList: React.FC<IFunction> = ({
                 markNotificationAsRead(item.id as number);
               }}
             >
-              {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+              {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
                 <SNotificationItemAvatar
                   withClick
                   avatarUrl={
@@ -292,7 +292,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       );
     },
     [
-      user.userData?.userUuid,
+      userData?.userUuid,
       locale,
       unreadNotifications,
       getEnrichedNotificationMessage,

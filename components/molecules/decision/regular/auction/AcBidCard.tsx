@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 
 interface IAcBidCard {
   bid: newnewapi.Auction.Bid;
@@ -13,7 +13,7 @@ interface IAcBidCard {
 const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
   const router = useRouter();
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const createdAtParsed = new Date((bid.createdAt?.seconds as number) * 1000);
 
   const handleRedirectToUser = () => {
@@ -51,7 +51,7 @@ const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
         </SAvatar>
         <SBidInfo>
           <SUsernameSpan onClick={() => handleRedirectToUser()}>
-            {bid.bidder?.uuid !== user.userData?.userUuid
+            {bid.bidder?.uuid !== userData?.userUuid
               ? bid.bidder?.username
               : t('me')}
           </SUsernameSpan>

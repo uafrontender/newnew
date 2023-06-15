@@ -8,7 +8,7 @@ import getDisplayname from '../../utils/getDisplayname';
 import InlineSvg from './InlineSVG';
 import VerificationCheckmark from '../../public/images/svg/icons/filled/Verification.svg';
 import VerificationCheckmarkInverted from '../../public/images/svg/icons/filled/VerificationInverted.svg';
-import { TUserData } from '../../redux-store/slices/userStateSlice';
+import { TUserData } from '../../contexts/userDataContext';
 
 export interface IDisplayName {
   className?: string;

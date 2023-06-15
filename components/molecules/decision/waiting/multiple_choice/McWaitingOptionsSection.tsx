@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import useMcOptions, {
   TMcOptionWithHighestField,
 } from '../../../../../utils/hooks/useMcOptions';
@@ -24,7 +24,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
   IMcWaitingOptionsSection
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
-  const { user } = useAppSelector((state) => state);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -45,7 +45,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
     {
       postUuid: post.postUuid,
       loggedInUser: userLoggedIn,
-      userUuid: user.userData?.userUuid,
+      userUuid: userData?.userUuid,
     },
     {
       refetchOnWindowFocus: false,

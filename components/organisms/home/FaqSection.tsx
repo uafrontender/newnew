@@ -7,7 +7,7 @@ import Headline from '../../atoms/Headline';
 import Text from '../../atoms/Text';
 import InlineSvg from '../../atoms/InlineSVG';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import assets from '../../../constants/assets';
 
 import CheckmarkIcon from '../../../public/images/svg/icons/outlined/Checkmark.svg';
@@ -51,7 +51,7 @@ const Point = ({ children, variant }: IPoint) => (
 const FaqSection = () => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn, userIsCreator } = useAppState();
   const { appConstants } = useGetAppConstants();
 
@@ -66,7 +66,7 @@ const FaqSection = () => {
             userLoggedIn &&
             !userIsCreator &&
             !canBecomeCreator(
-              user.userData?.dateOfBirth,
+              userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
             )
           ) {

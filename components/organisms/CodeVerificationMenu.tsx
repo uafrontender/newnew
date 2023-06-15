@@ -6,14 +6,6 @@ import { useTranslation } from 'next-i18next';
 import { useCookies } from 'react-cookie';
 import { motion } from 'framer-motion';
 
-// Redux
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import {
-  setSignupEmailInput,
-  setSignupTimerValue,
-  setUserData,
-} from '../../redux-store/slices/userStateSlice';
-
 // API
 import {
   sendVerificationEmail,
@@ -37,6 +29,8 @@ import useErrorToasts from '../../utils/hooks/useErrorToasts';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { useAppState } from '../../contexts/appStateContext';
+import { useSignup } from '../../contexts/signUpContext';
+import { useUserData } from '../../contexts/userDataContext';
 
 export interface ICodeVerificationMenu {
   allowLeave: boolean;
@@ -53,16 +47,19 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { t } = useTranslation('page-VerifyEmail');
   const { resumePushNotification } = usePushNotifications();
 
-  const { resizeMode, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { resizeMode, handleUserLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const { signupEmailInput, signupTimerValue } = useAppSelector(
-    (state) => state.user
-  );
-  const dispatch = useAppDispatch();
+  const { updateUserData } = useUserData();
+  const {
+    signupEmailInput,
+    signupTimerValue,
+    setSignupEmailInput,
+    setSignupTimerValue,
+  } = useSignup();
   const { showErrorToastPredefined } = useErrorToasts();
 
   // useCookies
@@ -120,25 +117,23 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         ) {
           throw new Error(error?.message ?? 'Request failed');
         }
-        dispatch(
-          setUserData({
-            username: data.me?.username,
-            nickname: data.me?.nickname,
-            email: data.me?.email,
-            avatarUrl: data.me?.avatarUrl,
-            coverUrl: data.me?.coverUrl,
-            userUuid: data.me?.userUuid,
-            bio: data.me?.bio,
-            dateOfBirth: data.me?.dateOfBirth,
-            countryCode: data.me?.countryCode,
-            options: {
-              isActivityPrivate: data.me?.options?.isActivityPrivate,
-              isCreator: data.me?.options?.isCreator,
-              isVerified: data.me?.options?.isVerified,
-              creatorStatus: data.me?.options?.creatorStatus,
-            },
-          })
-        );
+        updateUserData({
+          username: data.me?.username ?? undefined,
+          nickname: data.me?.nickname,
+          email: data.me?.email,
+          avatarUrl: data.me?.avatarUrl ?? undefined,
+          coverUrl: data.me?.coverUrl,
+          userUuid: data.me?.userUuid ?? undefined,
+          bio: data.me?.bio,
+          dateOfBirth: data.me?.dateOfBirth,
+          countryCode: data.me?.countryCode,
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
+          },
+        });
 
         // Set credential cookies
         if (data.credential?.expiresAt?.seconds) {
@@ -156,11 +151,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           path: '/',
         });
 
-        // Set logged in and
-        setUserLoggedIn(true);
-        setUserIsCreator(!!data.me?.options?.isCreator);
-        dispatch(setSignupEmailInput(''));
-        dispatch(setSignupTimerValue(0));
+        handleUserLoggedIn(data.me?.options?.isCreator ?? false);
+        setSignupEmailInput('');
+        setSignupTimerValue(0);
 
         setIsSuccess(true);
 
@@ -180,15 +173,16 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       }
     },
     [
+      signupEmailInput,
+      router,
+      redirectUserTo,
+      handleUserLoggedIn,
       setSubmitError,
       setCookie,
       resumePushNotification,
-      signupEmailInput,
-      dispatch,
-      router,
-      redirectUserTo,
-      setUserLoggedIn,
-      setUserIsCreator,
+      updateUserData,
+      setSignupEmailInput,
+      setSignupTimerValue,
     ]
   );
 

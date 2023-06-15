@@ -9,7 +9,7 @@ import Text from '../../atoms/Text';
 import UserAvatar from '../UserAvatar';
 import NavigationItem from '../NavigationItem';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 import { useNotifications } from '../../../contexts/notificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -24,7 +24,7 @@ import ShareMenu from '../../organisms/ShareMenu';
 
 export const Desktop: React.FC = () => {
   const { t } = useTranslation();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const theme = useTheme();
   const { appConstants } = useGetAppConstants();
@@ -169,7 +169,7 @@ export const Desktop: React.FC = () => {
                   <Link href='/profile/my-posts'>
                     <a>
                       <UserAvatar
-                        avatarUrl={user.userData?.avatarUrl}
+                        avatarUrl={userData?.avatarUrl}
                         withClick
                         withSkeleton
                         onClick={() => {
@@ -186,7 +186,7 @@ export const Desktop: React.FC = () => {
             {!userIsCreator && (
               <>
                 {canBecomeCreator(
-                  user.userData?.dateOfBirth,
+                  userData?.dateOfBirth,
                   appConstants.minCreatorAgeYears
                 ) && (
                   <SItemWithMargin>
@@ -214,7 +214,7 @@ export const Desktop: React.FC = () => {
                   <Link href='/profile'>
                     <a id='profile-link'>
                       <UserAvatar
-                        avatarUrl={user.userData?.avatarUrl}
+                        avatarUrl={userData?.avatarUrl}
                         withClick
                         withSkeleton
                         onClick={() => {

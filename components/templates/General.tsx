@@ -16,7 +16,7 @@ import BottomNavigation from '../organisms/BottomNavigation';
 import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
@@ -52,7 +52,7 @@ export const General: React.FC<IGeneral> = (props) => {
     noPaddingMobile,
     children,
   } = props;
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { appConstants } = useGetAppConstants();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const { globalSearchActive, banner } = useUiState();
@@ -124,7 +124,7 @@ export const General: React.FC<IGeneral> = (props) => {
         )
           .concat(
             canBecomeCreator(
-              user.userData?.dateOfBirth,
+              userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
             )
               ? [
@@ -157,7 +157,7 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [
     userLoggedIn,
     unreadNotificationCount,
-    user.userData?.dateOfBirth,
+    userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
     userIsCreator,
     unreadCount,

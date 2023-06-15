@@ -12,10 +12,7 @@ import React, {
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
 
 import Text from '../../../../atoms/Text';
@@ -40,7 +37,6 @@ import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 // Utils
 import { formatNumber } from '../../../../../utils/format';
 import { Mixpanel } from '../../../../../utils/mixpanel';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import {
@@ -61,6 +57,7 @@ import CancelIcon from '../../../../../public/images/svg/icons/outlined/Close.sv
 import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -125,8 +122,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
   const { resizeMode, userLoggedIn } = useAppState();
-  const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+  const { userData } = useUserData();
+  const { userTutorialsProgress, setUserTutorialsProgress } =
+    useTutorialProgress();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -143,10 +141,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     [option.isSupportedByMe]
   );
   const isMyBid = useMemo(
-    () =>
-      !!option.creator?.uuid &&
-      option.creator?.uuid === user.userData?.userUuid,
-    [option.creator?.uuid, user.userData?.userUuid]
+    () => !!option.creator?.uuid && option.creator?.uuid === userData?.userUuid,
+    [option.creator?.uuid, userData?.userUuid]
   );
   const isBlue = useMemo(
     () => isSupportedByMe || isMyBid,
@@ -409,23 +405,19 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // eslint-disable-next-line consistent-return
   const goToNextStep = () => {
     if (
-      user.userTutorialsProgress.remainingAcSteps &&
-      user.userTutorialsProgress.remainingAcSteps[0]
+      userTutorialsProgress?.remainingAcSteps &&
+      userTutorialsProgress.remainingAcSteps[0]
     ) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+          acCurrentStep: userTutorialsProgress.remainingAcSteps[0],
         });
         markTutorialStepAsCompleted(payload);
       }
 
-      dispatch(
-        setUserTutorialsProgress({
-          remainingAcSteps: [
-            ...user.userTutorialsProgress.remainingAcSteps,
-          ].slice(1),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingAcSteps: [...userTutorialsProgress.remainingAcSteps].slice(1),
+      });
     }
   };
 
@@ -503,7 +495,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
             {/* TODO: add logic that accepts option and returns users (me) to show */}
             {!option.whitelistSupporter ||
-            option.whitelistSupporter?.uuid === user.userData?.userUuid ? (
+            option.whitelistSupporter?.uuid === userData?.userUuid ? (
               isMyBid ? (
                 <OptionCardUsernameSpan
                   user={option.supporterCount > 1 ? t('me') : t('my')}
@@ -524,7 +516,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {(isSupportedByMe && !isMyBid) ||
             (isSupportedByMe &&
               !!option.whitelistSupporter &&
-              option.whitelistSupporter?.uuid !== user.userData?.userUuid) ? (
+              option.whitelistSupporter?.uuid !== userData?.userUuid) ? (
               <OptionCardUsernameSpan user={`, ${t('me')}`} isBlue={isBlue} />
             ) : null}
             {option.supporterCount >
@@ -608,12 +600,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         )}
         {index === 0 &&
           !isMyBid &&
-          user?.userTutorialsProgress.remainingAcSteps &&
+          userTutorialsProgress?.remainingAcSteps &&
           votingAllowed && (
             <STutorialTooltipHolder>
               <TutorialTooltip
                 isTooltipVisible={
-                  user.userTutorialsProgress.remainingAcSteps[0] ===
+                  userTutorialsProgress.remainingAcSteps[0] ===
                   newnewapi.AcTutorialStep.AC_BOOST_BID
                 }
                 closeTooltip={goToNextStep}

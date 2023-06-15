@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 import { Mixpanel } from '../../../utils/mixpanel';
 import DisplayName from '../DisplayName';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -18,7 +18,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({
   onSelect,
 }) => {
   const { t } = useTranslation('common');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   return (
     <SContainer>
@@ -26,7 +26,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({
       {creators.map((creator) => (
         <Link
           href={
-            creator.uuid === user.userData?.userUuid
+            creator.uuid === userData?.userUuid
               ? '/profile'
               : `/${creator.username}`
           }

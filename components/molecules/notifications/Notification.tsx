@@ -12,7 +12,7 @@ import { InlineSvg } from '../../atoms/InlineSVG';
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import PostTitleContent from '../../atoms/PostTitleContent';
@@ -51,7 +51,7 @@ const Notification: React.FC<INotification> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const [url, setUrl] = useState('/direct-messages');
 
   const [isUnread, setIsUnread] = useState(!isRead);
@@ -142,7 +142,7 @@ const Notification: React.FC<INotification> = ({
 
     if (
       content.relatedUser &&
-      content.relatedUser.uuid !== user.userData?.userUuid
+      content.relatedUser.uuid !== userData?.userUuid
     ) {
       return (
         <>
@@ -162,7 +162,7 @@ const Notification: React.FC<INotification> = ({
     }
 
     return <STitleText>{t('title.newMessage')}</STitleText>;
-  }, [content, user.userData?.userUuid, t]);
+  }, [content, userData?.userUuid, t]);
 
   return (
     <Link href={url}>
@@ -177,7 +177,7 @@ const Notification: React.FC<INotification> = ({
             markNotificationAsRead();
           }}
         >
-          {content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+          {content?.relatedUser?.uuid !== userData?.userUuid ? (
             <SAvatarHolder>
               <SUserAvatar
                 avatarUrl={

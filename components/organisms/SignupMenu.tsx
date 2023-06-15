@@ -7,13 +7,6 @@ import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 // import Skeleton from 'react-loading-skeleton';
 
-// Redux
-import { useAppDispatch } from '../../redux-store/store';
-import {
-  setSignupEmailInput,
-  setSignupTimerValue,
-} from '../../redux-store/slices/userStateSlice';
-
 // API
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
 
@@ -46,6 +39,7 @@ import { useAppState } from '../../contexts/appStateContext';
 import { useGetAppConstants } from '../../contexts/appConstantsContext';
 import EmailSignInForm from '../molecules/signup/EmailSignInForm';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
+import { useSignup } from '../../contexts/signUpContext';
 
 export interface ISignupMenu {
   goal?: string;
@@ -100,7 +94,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     resizeMode
   );
   // const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const dispatch = useAppDispatch();
+
+  const { setSignupEmailInput, setSignupTimerValue } = useSignup();
 
   const [textWidth, setTextWidth] = useState<number | undefined>();
 
@@ -141,8 +136,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       throw new Error('Request failed');
     }
 
-    dispatch(setSignupEmailInput(emailInput));
-    dispatch(setSignupTimerValue(data.retryAfter));
+    setSignupEmailInput(emailInput);
+    setSignupTimerValue(data.retryAfter);
 
     authLayoutContext.setShouldHeroUnmount(true);
 

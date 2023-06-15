@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -40,7 +40,7 @@ const AboutBundles = dynamic(
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userData, creatorData, creatorDataLoaded } = useUserData();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -70,16 +70,16 @@ export const Dashboard: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (
-      user.creatorData?.isLoaded &&
-      user.userData?.bio &&
-      user.userData?.bio.length > 0 &&
-      user.creatorData?.options?.isCreatorConnectedToStripe
+      creatorDataLoaded &&
+      userData?.bio &&
+      userData?.bio.length > 0 &&
+      creatorData?.isCreatorConnectedToStripe
     ) {
       setIsToDosCompleted(true);
-    } else if (user.creatorData?.isLoaded) {
+    } else if (creatorDataLoaded) {
       setIsToDosCompleted(false);
     }
-  }, [user.creatorData, user.userData?.bio]);
+  }, [creatorDataLoaded, creatorData, userData?.bio]);
 
   const fetchMyExpiringPosts = useCallback(async () => {
     try {
@@ -202,8 +202,8 @@ export const Dashboard: React.FC = React.memo(() => {
           </SBlock>
         )}
 
-        {user.creatorData?.options.stripeConnectStatus &&
-          user.creatorData.options.stripeConnectStatus ===
+        {creatorData?.stripeConnectStatus &&
+          creatorData?.stripeConnectStatus ===
             newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
               .CONNECTED_NEEDS_ATTENTION && (
             <SBlock>
@@ -211,7 +211,7 @@ export const Dashboard: React.FC = React.memo(() => {
             </SBlock>
           )}
 
-        {!user.creatorData?.isLoaded ? (
+        {!creatorDataLoaded ? (
           <SBlock>
             <Lottie
               width={64}
@@ -226,14 +226,14 @@ export const Dashboard: React.FC = React.memo(() => {
         ) : (
           !isToDosCompleted &&
           // TODO: This should not require special logic. isCreatorConnectedToStripe should be true for WL creators
-          !user.userData?.options?.isWhiteListed && (
+          !userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
               <YourToDos />
             </SBlock>
           )
         )}
         {/* TODO: Why can't we show earnings for a case when WL creators "earns" something on the stream? */}
-        {!user.userData?.options?.isWhiteListed && (
+        {!userData?.options?.isWhiteListed && (
           <SBlock>
             {!isEarningsLoading &&
               (isToDosCompleted ? (

@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 
 import CommentForm from '../../../atoms/decision/CommentForm';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
@@ -43,7 +43,7 @@ const CommentsBottomSection: React.FunctionComponent<
   onFormFocus,
   onFormBlur,
 }) => {
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn } = useAppState();
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -148,7 +148,7 @@ const CommentsBottomSection: React.FunctionComponent<
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (
         decoded?.newMessage &&
-        decoded.newMessage!!.sender?.uuid !== user.userData?.userUuid
+        decoded.newMessage!!.sender?.uuid !== userData?.userUuid
       ) {
         addCommentMutation?.mutate(decoded.newMessage);
       }
@@ -180,7 +180,7 @@ const CommentsBottomSection: React.FunctionComponent<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, user.userData?.userUuid]);
+  }, [socketConnection, userData?.userUuid]);
 
   // Cleanup
   useEffect(
