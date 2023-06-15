@@ -14,7 +14,7 @@ import {
   sendVerificationNewEmail,
   confirmMyEmail,
 } from '../../../api/endpoints/user';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -27,7 +27,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const theme = useTheme();
   const { t } = useTranslation('page-VerifyEmail');
 
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -60,7 +60,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
     try {
       const sendVerificationCodePayload =
         new newnewapi.SendVerificationEmailRequest({
-          emailAddress: user.userData?.email,
+          emailAddress: userData?.email,
           useCase:
             newnewapi.SendVerificationEmailRequest.UseCase.CONFIRM_MY_EMAIL,
         });
@@ -88,7 +88,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
       setIsCodeLoading(false);
       console.error(err);
     }
-  }, [isCodeLoading, user.userData?.email]);
+  }, [isCodeLoading, userData?.email]);
 
   const resendVerificationCode = async () => {
     Mixpanel.track('Resend Verification Code', {
@@ -109,7 +109,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
       try {
         Mixpanel.track('Confirm My Current Email', {
           _stage: 'Settings',
-          _currentEmail: user.userData?.email,
+          _currentEmail: userData?.email,
         });
 
         setIsSubmitting(true);
@@ -141,7 +141,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         setIsSubmitting(false);
       }
     },
-    [onComplete, t, user.userData?.email]
+    [onComplete, t, userData?.email]
   );
 
   const handleTryAgain = () => {
@@ -165,7 +165,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
       />
       <SHeadline variant={4}>{t('heading.mainHeading')}</SHeadline>
       <SText variant={2}>
-        {`${t('heading.subHeading')} ${user.userData?.email}`}
+        {`${t('heading.subHeading')} ${userData?.email}`}
       </SText>
       <VerificationCodeInput
         initialValue={code}

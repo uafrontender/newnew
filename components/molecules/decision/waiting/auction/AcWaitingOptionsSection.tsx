@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import useAcOptions, {
   TAcOptionWithHighestField,
 } from '../../../../../utils/hooks/useAcOptions';
@@ -28,7 +28,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
   IAcWaitingOptionsSection
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
-  const { user } = useAppSelector((state) => state);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -44,7 +44,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<
   } = useAcOptions(
     {
       postUuid: post.postUuid,
-      userUuid: user.userData?.userUuid,
+      userUuid: userData?.userUuid,
       loggedInUser: userLoggedIn,
     },
     {

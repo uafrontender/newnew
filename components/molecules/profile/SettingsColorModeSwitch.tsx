@@ -79,9 +79,14 @@ const SettingsColorModeSwitch: React.FunctionComponent<
 
   useEffect(() => {
     const currentButtonRef = buttonsRef.current[activeIcon];
-    const container = containerRef.current;
+    if (!currentButtonRef) {
+      return;
+    }
 
-    if (!container) return;
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
 
     const updatedIndicatorStyle = {
       x:

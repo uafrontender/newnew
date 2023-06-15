@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import { formatNumber } from '../../../../utils/format';
 import DisplayName from '../../../atoms/DisplayName';
 import { useAppState } from '../../../../contexts/appStateContext';
@@ -18,11 +18,11 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
   winningOption,
 }) => {
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn } = useAppState();
 
   const userToRender = useMemo(() => {
-    if (userLoggedIn && !user.userData?.userUuid) {
+    if (userLoggedIn && !userData?.userUuid) {
       return null;
     }
 
@@ -43,7 +43,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
     winningOption.whitelistSupporter,
     winningOption.creator,
     userLoggedIn,
-    user.userData?.userUuid,
+    userData?.userUuid,
     winningOption.isSupportedByMe,
   ]);
 
@@ -61,11 +61,11 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
 
   const avatarSrc: string = useMemo(() => {
     if (userToRender === 'me') {
-      return user.userData?.avatarUrl ?? '';
+      return userData?.avatarUrl ?? '';
     }
 
     return userToRender?.avatarUrl ?? '';
-  }, [userToRender, user.userData?.avatarUrl]);
+  }, [userToRender, userData?.avatarUrl]);
 
   return (
     <SWinningBidCreator>
@@ -79,7 +79,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
         )}
         <SWinningBidCreatorText>
           <SDisplayName
-            user={userToRender === 'me' ? user.userData : userToRender}
+            user={userToRender === 'me' ? userData : userToRender}
             href={href}
             altName={
               // eslint-disable-next-line no-nested-ternary

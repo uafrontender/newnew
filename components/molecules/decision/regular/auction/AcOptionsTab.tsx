@@ -7,13 +7,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '../../../../../redux-store/store';
-
 import { TAcOptionWithHighestField } from '../../../../../utils/hooks/useAcOptions';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
@@ -32,6 +26,7 @@ import AcOptionCard from './AcOptionCard';
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
 import loadingAnimation from '../../../../../public/animations/logo-loading-blue.json';
 import { useAppState } from '../../../../../contexts/appStateContext';
+import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
 
 interface IAcOptionsTab {
   postUuid: string;
@@ -71,8 +66,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleRemoveOption,
 }) => {
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
+  const { userTutorialsProgress, setUserTutorialsProgress } =
+    useTutorialProgress();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -97,20 +92,18 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
   const goToNextStep = (currentStep: newnewapi.AcTutorialStep) => {
-    if (user.userTutorialsProgress.remainingAcSteps && currentStep) {
+    if (userTutorialsProgress?.remainingAcSteps && currentStep) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
           acCurrentStep: currentStep,
         });
         markTutorialStepAsCompleted(payload);
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingAcSteps: [
-            ...user.userTutorialsProgress.remainingAcSteps,
-          ].filter((el) => el !== currentStep),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingAcSteps: [...userTutorialsProgress.remainingAcSteps].filter(
+          (el) => el !== currentStep
+        ),
+      });
     }
   };
 
@@ -268,24 +261,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             )
           ) : null}
         </SBidsContainer>
-        {user?.userTutorialsProgress.remainingAcSteps &&
-          postStatus === 'voting' && (
-            <STutorialTooltipHolder>
-              <TutorialTooltip
-                isTooltipVisible={
-                  options.length > 0 &&
-                  user.userTutorialsProgress.remainingAcSteps[0] ===
-                    newnewapi.AcTutorialStep.AC_ALL_BIDS
-                }
-                closeTooltip={() =>
-                  goToNextStep(newnewapi.AcTutorialStep.AC_ALL_BIDS)
-                }
-                title={t('tutorials.ac.peopleBids.title')}
-                text={t('tutorials.ac.peopleBids.text')}
-                dotPosition={DotPositionEnum.BottomLeft}
-              />
-            </STutorialTooltipHolder>
-          )}
+        {userTutorialsProgress?.remainingAcSteps && postStatus === 'voting' && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={
+                options.length > 0 &&
+                userTutorialsProgress.remainingAcSteps[0] ===
+                  newnewapi.AcTutorialStep.AC_ALL_BIDS
+              }
+              closeTooltip={() =>
+                goToNextStep(newnewapi.AcTutorialStep.AC_ALL_BIDS)
+              }
+              title={t('tutorials.ac.peopleBids.title')}
+              text={t('tutorials.ac.peopleBids.text')}
+              dotPosition={DotPositionEnum.BottomLeft}
+            />
+          </STutorialTooltipHolder>
+        )}
       </STabContainer>
     </>
   );

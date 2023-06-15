@@ -14,10 +14,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '../../../../../redux-store/store';
+import { useUserData } from '../../../../../contexts/userDataContext';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
@@ -35,7 +32,6 @@ import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../../atoms/decision/TutorialTooltip';
-import { setUserTutorialsProgress } from '../../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../../api/endpoints/user';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import BuyBundleModal from '../../../bundles/BuyBundleModal';
@@ -52,6 +48,7 @@ import useBuyBundleAfterStripeRedirect from '../../../../../utils/hooks/useBuyBu
 import { usePostInnerState } from '../../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
 
 const addOptionErrorMessage = (
   status?: newnewapi.CreateCustomMcOptionResponse.Status
@@ -106,9 +103,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
+  const { userTutorialsProgress, setUserTutorialsProgress } =
+    useTutorialProgress();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -188,11 +186,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const optionCreatedByMe = useMemo(
-    () =>
-      options.find(
-        (option) => option.creator?.uuid === user.userData?.userUuid
-      ),
-    [options, user.userData?.userUuid]
+    () => options.find((option) => option.creator?.uuid === userData?.userUuid),
+    [options, userData?.userUuid]
   );
 
   const mainContainer = useRef<HTMLDivElement>();
@@ -377,22 +372,18 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const goToNextStep = () => {
     if (
-      user.userTutorialsProgress.remainingMcSteps &&
-      user.userTutorialsProgress.remainingMcSteps[0]
+      userTutorialsProgress?.remainingMcSteps &&
+      userTutorialsProgress.remainingMcSteps[0]
     ) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+          mcCurrentStep: userTutorialsProgress.remainingMcSteps[0],
         });
         markTutorialStepAsCompleted(payload);
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingMcSteps: [
-            ...user.userTutorialsProgress.remainingMcSteps,
-          ].slice(1),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingMcSteps: [...userTutorialsProgress.remainingMcSteps].slice(1),
+      });
     }
   };
 
@@ -498,21 +489,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             )
           ) : null}
         </SBidsContainer>
-        {user.userTutorialsProgress.remainingMcSteps &&
-          postStatus === 'voting' && (
-            <STutorialTooltipHolder>
-              <TutorialTooltip
-                isTooltipVisible={
-                  user.userTutorialsProgress.remainingMcSteps[0] ===
-                  newnewapi.McTutorialStep.MC_ALL_OPTIONS
-                }
-                closeTooltip={goToNextStep}
-                title={t('tutorials.mc.peopleBids.title')}
-                text={t('tutorials.mc.peopleBids.text')}
-                dotPosition={DotPositionEnum.BottomLeft}
-              />
-            </STutorialTooltipHolder>
-          )}
+        {userTutorialsProgress?.remainingMcSteps && postStatus === 'voting' && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={
+                userTutorialsProgress.remainingMcSteps[0] ===
+                newnewapi.McTutorialStep.MC_ALL_OPTIONS
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.mc.peopleBids.title')}
+              text={t('tutorials.mc.peopleBids.text')}
+              dotPosition={DotPositionEnum.BottomLeft}
+            />
+          </STutorialTooltipHolder>
+        )}
       </STabContainer>
       {/* Suggest new form */}
       {!optionCreatedByMe &&
@@ -538,11 +528,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
               {t('mcPost.optionsTab.actionSection.suggestionPlaceholder')}
             </SAddOptionButtonDesktop>
-            {user.userTutorialsProgress.remainingMcSteps && (
+            {userTutorialsProgress?.remainingMcSteps && (
               <STutorialTooltipTextAreaHolder>
                 <TutorialTooltip
                   isTooltipVisible={
-                    user.userTutorialsProgress.remainingMcSteps[0] ===
+                    userTutorialsProgress.remainingMcSteps[0] ===
                     newnewapi.McTutorialStep.MC_TEXT_FIELD
                   }
                   closeTooltip={goToNextStep}
@@ -700,11 +690,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           >
             {t('mcPost.floatingActionButton.suggestNewButton')}
           </SActionButton>
-          {user.userTutorialsProgress.remainingMcSteps && (
+          {userTutorialsProgress?.remainingMcSteps && (
             <STutorialTooltipHolderMobile>
               <TutorialTooltip
                 isTooltipVisible={
-                  user.userTutorialsProgress.remainingMcSteps[0] ===
+                  userTutorialsProgress.remainingMcSteps[0] ===
                   newnewapi.McTutorialStep.MC_TEXT_FIELD
                 }
                 closeTooltip={goToNextStep}

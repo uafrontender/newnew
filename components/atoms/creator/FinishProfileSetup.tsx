@@ -6,13 +6,13 @@ import Button from '../Button';
 import Text from '../Text';
 import money from '../../../public/images/svg/icons/filled/Money.svg';
 import InlineSVG from '../InlineSVG';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 export const FinishProfileSetup = () => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const { userData, creatorData, creatorDataLoaded } = useUserData();
 
   const [isAccountDetailsCompleted, setAccountDetailsCompleted] =
     useState(false);
@@ -20,23 +20,18 @@ export const FinishProfileSetup = () => {
     useState(false);
 
   useEffect(() => {
-    if (user.creatorData?.isLoaded) {
-      const detailsCompleted =
-        !!user.userData?.bio && user.userData?.bio.length > 0;
+    if (creatorDataLoaded) {
+      const detailsCompleted = !!userData?.bio && userData?.bio.length > 0;
       setAccountDetailsCompleted(detailsCompleted);
     }
-  }, [user.creatorData?.isLoaded, user.userData?.bio]);
+  }, [creatorDataLoaded, userData?.bio]);
 
   useEffect(() => {
-    if (user.creatorData?.isLoaded) {
-      const isConnectedToStripe =
-        !!user.creatorData?.options?.isCreatorConnectedToStripe;
+    if (creatorDataLoaded) {
+      const isConnectedToStripe = !!creatorData?.isCreatorConnectedToStripe;
       setIisCreatorConnectedToStripe(isConnectedToStripe);
     }
-  }, [
-    user.creatorData?.options?.isCreatorConnectedToStripe,
-    user.creatorData?.isLoaded,
-  ]);
+  }, [creatorData?.isCreatorConnectedToStripe, creatorDataLoaded]);
 
   const getString = useCallback(() => {
     if (!isAccountDetailsCompleted && !isCreatorConnectedToStripe) {

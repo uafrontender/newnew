@@ -12,7 +12,7 @@ import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../UserAvatar';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -34,7 +34,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const router = useRouter();
   const { t } = useTranslation('page-Creation');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { postInCreation, clearCreation } = usePostCreationState();
   const { post, videoProcessing, fileProcessing, postData } = useMemo(
     () => postInCreation,
@@ -172,10 +172,10 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             ) : null}
           </SPlayerWrapper>
           <SUserBlock>
-            <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
+            <SUserAvatar avatarUrl={userData?.avatarUrl} />
             <SUserTitleContainer>
               <SUserTitle variant={3} weight={600}>
-                <DisplayName user={user.userData} />
+                <DisplayName user={userData} />
               </SUserTitle>
             </SUserTitleContainer>
             <SCaption variant={2} weight={700}>

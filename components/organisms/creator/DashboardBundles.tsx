@@ -14,7 +14,7 @@ import Loader from '../../atoms/Loader';
 import { useBundles } from '../../../contexts/bundlesContext';
 import { useAppState } from '../../../contexts/appStateContext';
 import { ChatsProvider } from '../../../contexts/chatContext';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import TurnBundleModal from '../../molecules/creator/dashboard/TurnBundleModal';
 import SuccessBundleModal from '../../molecules/creator/dashboard/SuccessBundleModal';
 
@@ -31,7 +31,7 @@ const SuperpollBundle = dynamic(
 
 export const DashboardBundles: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode } = useAppState();
   const { appConstants } = useGetAppConstants();
   const { isSellingBundles, isBundleDataLoaded, toggleIsSellingBundles } =
@@ -80,8 +80,8 @@ export const DashboardBundles: React.FC = React.memo(() => {
   );
 
   const notWhitelisted = useMemo(
-    () => user._persist?.rehydrated && !user?.userData?.options?.isWhiteListed,
-    [user._persist?.rehydrated, user?.userData?.options?.isWhiteListed]
+    () => userData && !userData?.options?.isWhiteListed,
+    [userData]
   );
 
   return (

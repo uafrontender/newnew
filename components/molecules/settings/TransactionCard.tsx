@@ -10,7 +10,7 @@ import Text from '../../atoms/Text';
 // Icons
 // import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
 import Caption from '../../atoms/Caption';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { formatNumber } from '../../../utils/format';
 
 type ITransactionCard = {
@@ -22,12 +22,12 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
 }) => {
   const { t } = useTranslation('page-Profile');
   const { locale } = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   return (
     <STransactionCard>
       <SAvatar>
-        <img alt={user.userData?.username} src={user.userData?.avatarUrl} />
+        <img alt={userData?.username} src={userData?.avatarUrl} />
       </SAvatar>
       <SActor variant={3} weight={600}>
         {t('Settings.sections.transactions.you')}
