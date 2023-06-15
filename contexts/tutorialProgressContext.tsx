@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useCallback,
   useState,
+  useRef,
 } from 'react';
 import { isEqual } from 'lodash';
 import {
@@ -32,6 +33,43 @@ interface ITutorialProgressContextProvider {
   children: React.ReactNode;
 }
 
+const USER_TUTORIAL_PROGRESS_LS_KEY = 'userTutorialsProgress';
+
+const defaultState = {
+  // AC
+  remainingAcSteps: [
+    newnewapi.AcTutorialStep.AC_HERO,
+    newnewapi.AcTutorialStep.AC_TIMER,
+    newnewapi.AcTutorialStep.AC_ALL_BIDS,
+    newnewapi.AcTutorialStep.AC_BOOST_BID,
+    newnewapi.AcTutorialStep.AC_TEXT_FIELD,
+  ],
+  // MC
+  remainingMcSteps: [
+    newnewapi.McTutorialStep.MC_HERO,
+    newnewapi.McTutorialStep.MC_TIMER,
+    newnewapi.McTutorialStep.MC_ALL_OPTIONS,
+    newnewapi.McTutorialStep.MC_VOTE,
+    newnewapi.McTutorialStep.MC_TEXT_FIELD,
+  ],
+  // CF
+  remainingCfSteps: [
+    newnewapi.CfTutorialStep.CF_HERO,
+    newnewapi.CfTutorialStep.CF_TIMER,
+    newnewapi.CfTutorialStep.CF_GOAL_PROGRESS,
+    newnewapi.CfTutorialStep.CF_BACK_GOAL,
+  ],
+  remainingAcCrCurrentStep: [newnewapi.AcCreationTutorialStep.AC_CR_HERO],
+  remainingCfCrCurrentStep: [newnewapi.CfCreationTutorialStep.CF_CR_HERO],
+  remainingMcCrCurrentStep: [newnewapi.McCreationTutorialStep.MC_CR_HERO],
+  remainingAcResponseCurrentStep: [
+    newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
+  ],
+  remainingMcResponseCurrentStep: [
+    newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
+  ],
+};
+
 export const TutorialProgressContextProvider: React.FC<
   ITutorialProgressContextProvider
 > = ({ children }) => {
@@ -42,6 +80,7 @@ export const TutorialProgressContextProvider: React.FC<
   // Do we need it? Or is userTutorialsProgress === undefined is enough?
   const [userTutorialsProgressSynced, setUserTutorialsProgressSynced] =
     useState(false);
+  const userWasLoggedIn = useRef(false);
 
   // What if it is called before the initial sync?
   const setUserTutorialsProgressState = useCallback(
@@ -52,15 +91,33 @@ export const TutorialProgressContextProvider: React.FC<
       }));
 
       const localUserTutorialsProgress = loadStateLS(
-        'userTutorialsProgress'
+        USER_TUTORIAL_PROGRESS_LS_KEY
       ) as JSON;
-      saveStateLS('userTutorialsProgress', {
+      saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, {
         ...localUserTutorialsProgress,
         ...payload,
       });
     },
     []
   );
+
+  useEffect(() => {
+    if (
+      userWasLoggedIn.current &&
+      !userLoggedIn &&
+      // Don't clean local storage in tests
+      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
+    ) {
+      setUserTutorialsProgress(defaultState);
+      userWasLoggedIn.current = false;
+      // TODO: should we clear tutorial progress on logout?
+      // removeStateLS(USER_TUTORIAL_PROGRESS_LS_KEY);
+    }
+
+    if (userLoggedIn) {
+      userWasLoggedIn.current = true;
+    }
+  }, [userLoggedIn]);
 
   useEffect(() => {
     async function syncUserTutorialsProgress(
@@ -75,7 +132,6 @@ export const TutorialProgressContextProvider: React.FC<
       try {
         const payload = new newnewapi.EmptyRequest({});
         const { data } = await getTutorialsStatus(payload);
-
         if (data) {
           if (
             !isEqual(data, localUserTutorialsProgress) &&
@@ -302,9 +358,8 @@ export const TutorialProgressContextProvider: React.FC<
                 await markTutorialStepAsCompleted(payloadSetData);
               }
             }
-
             setUserTutorialsProgress(syncedObj);
-            saveStateLS('userTutorialsProgress', syncedObj);
+            saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, syncedObj);
           } else {
             setUserTutorialsProgress(data);
           }
@@ -324,14 +379,15 @@ export const TutorialProgressContextProvider: React.FC<
     }
 
     const localUserTutorialsProgress = loadStateLS(
-      'userTutorialsProgress'
+      USER_TUTORIAL_PROGRESS_LS_KEY
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (userLoggedIn) {
       syncUserTutorialsProgress(localUserTutorialsProgress);
     } else {
       if (!localUserTutorialsProgress) {
-        saveStateLS('userTutorialsProgress', userTutorialsProgress);
-      } else if (!isEqual(userTutorialsProgress, localUserTutorialsProgress)) {
+        saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, defaultState);
+        setUserTutorialsProgress(defaultState);
+      } else {
         setUserTutorialsProgress(
           localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
         );
