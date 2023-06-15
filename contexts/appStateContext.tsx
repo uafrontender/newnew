@@ -155,6 +155,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
 
   const logoutAndRedirect = useCallback(
     (redirectUrl?: string) => {
+      setUserLoggedIn(false);
       setUserIsCreator(false);
       cookiesInstance.remove('accessToken');
       cookiesInstance.remove('refreshToken');
