@@ -23,76 +23,67 @@ function useBuyBundleAfterStripeRedirect(
     () => saveCardFromRedirect ?? undefined
   );
 
-  const buyBundleAfterStripeRedirect = useCallback(async () => {
-    if (!stripeSetupIntentClientSecret) {
-      return;
-    }
-
-    if (!userLoggedIn) {
-      router.push(
-        `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-      );
-      return;
-    }
-
-    // TODO: Questionable event, probably unnecessary as it is a business data
-    Mixpanel.track('Buy Bundle After Stripe Redirect');
-
-    try {
-      const stripeContributionRequest = new newnewapi.StripeContributionRequest(
-        {
-          stripeSetupIntentClientSecret,
-          saveCard,
-        }
-      );
-
-      // Reset
-      setStripeSetupIntentClientSecret(undefined);
-      setSaveCard(undefined);
-
-      const res = await buyCreatorsBundle(stripeContributionRequest);
-
-      if (
-        !res?.data ||
-        res.error ||
-        res.data.status !== newnewapi.BuyCreatorsBundleResponse.Status.SUCCESS
-      ) {
-        throw new Error(
-          res?.error?.message ?? t('modal.buyBundle.error.requestFailed')
+  const buyBundleAfterStripeRedirect = useCallback(
+    async (setupIntentClientSecret: string) => {
+      if (!userLoggedIn) {
+        router.push(
+          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${setupIntentClientSecret}`
         );
+        return;
       }
 
-      if (onSuccess) {
-        onSuccess();
+      // TODO: Questionable event, probably unnecessary as it is a business data
+      Mixpanel.track('Buy Bundle After Stripe Redirect');
+
+      try {
+        const stripeContributionRequest =
+          new newnewapi.StripeContributionRequest({
+            stripeSetupIntentClientSecret: setupIntentClientSecret,
+            saveCard,
+          });
+
+        // Reset
+        setStripeSetupIntentClientSecret(undefined);
+        setSaveCard(undefined);
+
+        const res = await buyCreatorsBundle(stripeContributionRequest);
+
+        if (
+          !res?.data ||
+          res.error ||
+          res.data.status !== newnewapi.BuyCreatorsBundleResponse.Status.SUCCESS
+        ) {
+          throw new Error(
+            res?.error?.message ?? t('modal.buyBundle.error.requestFailed')
+          );
+        }
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } catch (err: any) {
+        console.error(err);
+        showErrorToastCustom(err.message);
+      } finally {
+        // Clear stripeSecret from query to avoid same request on page reload
+        // Removes all query parameters. Change in case you need any
+        const path = router.asPath.split('?')[0];
+        router.replace(path);
       }
-    } catch (err: any) {
-      console.error(err);
-      showErrorToastCustom(err.message);
-    } finally {
-      // Clear stripeSecret from query to avoid same request on page reload
-      // Removes all query parameters. Change in case you need any
-      const path = router.asPath.split('?')[0];
-      router.replace(path);
-    }
-  }, [
-    stripeSetupIntentClientSecret,
-    userLoggedIn,
-    router,
-    saveCard,
-    t,
-    onSuccess,
-    showErrorToastCustom,
-  ]);
+    },
+    [userLoggedIn, router, saveCard, t, onSuccess, showErrorToastCustom]
+  );
 
   // A Delay allows to cancel first request when the second full re-render happens
   // TODO: use abortController instead?
   // Can be abandoned after we get rid of Redux which causes double rendering
   useEffect(() => {
-    const timer = setTimeout(() => {
-      buyBundleAfterStripeRedirect();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [buyBundleAfterStripeRedirect]);
+    if (!stripeSetupIntentClientSecret) {
+      return;
+    }
+
+    buyBundleAfterStripeRedirect(stripeSetupIntentClientSecret);
+  }, [stripeSetupIntentClientSecret, buyBundleAfterStripeRedirect]);
 }
 
 export default useBuyBundleAfterStripeRedirect;

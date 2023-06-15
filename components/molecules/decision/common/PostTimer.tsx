@@ -10,14 +10,13 @@ import { useUpdateEffect } from 'react-use';
 import styled, { css } from 'styled-components';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useAppState } from '../../../../contexts/appStateContext';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import useHasMounted from '../../../../utils/hooks/useHasMounted';
 import usePageVisibility from '../../../../utils/hooks/usePageVisibility';
 import isBrowser from '../../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../../utils/secondsToDHMS';
 import { TPostType } from '../../../../utils/switchPostType';
 import { DotPositionEnum } from '../../../atoms/decision/TutorialTooltip';
+import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 
 const TutorialTooltip = dynamic(
   () => import('../../../atoms/decision/TutorialTooltip')
@@ -38,9 +37,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const { locale } = useRouter();
-  const { user } = useAppSelector((state) => state);
-  const dispatch = useAppDispatch();
   const { resizeMode, userLoggedIn } = useAppState();
+  const { userTutorialsProgress, setUserTutorialsProgress } =
+    useTutorialProgress();
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -84,8 +83,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       switch (postType) {
         case 'ac':
           if (
-            user.userTutorialsProgress.remainingAcSteps &&
-            user.userTutorialsProgress.remainingAcSteps[0] ===
+            userTutorialsProgress?.remainingAcSteps &&
+            userTutorialsProgress.remainingAcSteps[0] ===
               newnewapi.AcTutorialStep.AC_TIMER
           ) {
             setIsTooltipVisible(true);
@@ -96,8 +95,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           break;
         case 'cf':
           if (
-            user.userTutorialsProgress.remainingCfSteps &&
-            user.userTutorialsProgress.remainingCfSteps[0] ===
+            userTutorialsProgress?.remainingCfSteps &&
+            userTutorialsProgress.remainingCfSteps[0] ===
               newnewapi.CfTutorialStep.CF_TIMER
           ) {
             setIsTooltipVisible(true);
@@ -108,8 +107,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           break;
         case 'mc':
           if (
-            user.userTutorialsProgress.remainingMcSteps &&
-            user.userTutorialsProgress.remainingMcSteps[0] ===
+            userTutorialsProgress?.remainingMcSteps &&
+            userTutorialsProgress.remainingMcSteps[0] ===
               newnewapi.McTutorialStep.MC_TIMER
           ) {
             setIsTooltipVisible(true);
@@ -123,7 +122,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postType, user.userTutorialsProgress, isTutorialVisible]);
+  }, [postType, userTutorialsProgress, isTutorialVisible]);
 
   const goToNextStep = () => {
     setIsTooltipVisible(false);
@@ -131,59 +130,53 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     switch (postType) {
       case 'ac':
         if (
-          user.userTutorialsProgress.remainingAcSteps &&
-          user.userTutorialsProgress.remainingAcSteps[0]
+          userTutorialsProgress?.remainingAcSteps &&
+          userTutorialsProgress.remainingAcSteps[0]
         ) {
           if (userLoggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-              acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+              acCurrentStep: userTutorialsProgress.remainingAcSteps[0],
             });
           }
-          dispatch(
-            setUserTutorialsProgress({
-              remainingAcSteps: [
-                ...user.userTutorialsProgress.remainingAcSteps,
-              ].slice(1),
-            })
-          );
+          setUserTutorialsProgress({
+            remainingAcSteps: [...userTutorialsProgress.remainingAcSteps].slice(
+              1
+            ),
+          });
         }
         break;
       case 'cf':
         if (
-          user.userTutorialsProgress.remainingCfSteps &&
-          user.userTutorialsProgress.remainingCfSteps[0]
+          userTutorialsProgress?.remainingCfSteps &&
+          userTutorialsProgress.remainingCfSteps[0]
         ) {
           if (userLoggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-              cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+              cfCurrentStep: userTutorialsProgress.remainingCfSteps[0],
             });
           }
-          dispatch(
-            setUserTutorialsProgress({
-              remainingCfSteps: [
-                ...user.userTutorialsProgress.remainingCfSteps,
-              ].slice(1),
-            })
-          );
+          setUserTutorialsProgress({
+            remainingCfSteps: [...userTutorialsProgress.remainingCfSteps].slice(
+              1
+            ),
+          });
         }
         break;
       default:
         if (
-          user.userTutorialsProgress.remainingMcSteps &&
-          user.userTutorialsProgress.remainingMcSteps[0]
+          userTutorialsProgress?.remainingMcSteps &&
+          userTutorialsProgress.remainingMcSteps[0]
         ) {
           if (userLoggedIn) {
             payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-              mcCurrentStep: user.userTutorialsProgress.remainingMcSteps[0],
+              mcCurrentStep: userTutorialsProgress.remainingMcSteps[0],
             });
           }
-          dispatch(
-            setUserTutorialsProgress({
-              remainingMcSteps: [
-                ...user.userTutorialsProgress.remainingMcSteps,
-              ].slice(1),
-            })
-          );
+          setUserTutorialsProgress({
+            remainingMcSteps: [...userTutorialsProgress.remainingMcSteps].slice(
+              1
+            ),
+          });
         }
     }
     if (userLoggedIn && payload) {

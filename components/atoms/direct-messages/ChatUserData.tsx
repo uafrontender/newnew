@@ -4,7 +4,7 @@ import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { SUserAlias } from './styles';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import DisplayName from '../DisplayName';
 
 interface IFunctionProps {
@@ -19,11 +19,11 @@ const ChatUserData: React.FC<IFunctionProps> = ({
   chatRoom,
 }) => {
   const { t } = useTranslation('page-Chat');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   const chatUser = useMemo(
-    () => (isMyAnnouncement ? user.userData : chatRoom.visavis?.user),
-    [isMyAnnouncement, user.userData, chatRoom.visavis?.user]
+    () => (isMyAnnouncement ? userData : chatRoom.visavis?.user),
+    [isMyAnnouncement, userData, chatRoom.visavis?.user]
   );
 
   return (

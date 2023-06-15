@@ -13,12 +13,7 @@ import isEqual from 'lodash/isEqual';
 import validator from 'validator';
 import { Area, Point } from 'react-easy-crop/types';
 
-// Redux
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import {
-  logoutUserClearCookiesAndRedirect,
-  setUserData,
-} from '../../redux-store/slices/userStateSlice';
+import { useUserData } from '../../contexts/userDataContext';
 
 // Components
 import Button from '../atoms/Button';
@@ -161,9 +156,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const { t } = useTranslation('page-Profile');
   const { showErrorToastPredefined } = useErrorToasts();
 
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
-  const { resizeMode, userIsCreator, setUserLoggedIn } = useAppState();
+  const { userData, updateUserData } = useUserData();
+  const { resizeMode, userIsCreator, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -173,11 +167,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Textual data
   const [dataInEdit, setDataInEdit] = useState<ModalMenuUserData>({
-    nickname: user.userData?.nickname ?? '',
-    username: user.userData?.username ?? '',
-    bio: user.userData?.bio ?? '',
-    genderPronouns: user.userData?.genderPronouns
-      ? getGenderPronouns(user.userData?.genderPronouns).value
+    nickname: userData?.nickname ?? '',
+    username: userData?.username ?? '',
+    bio: userData?.bio ?? '',
+    genderPronouns: userData?.genderPronouns
+      ? getGenderPronouns(userData?.genderPronouns).value
       : undefined,
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -234,22 +228,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
 
         return result;
       }
     },
-    [setFormErrors, dispatch, setUserLoggedIn]
+    [setFormErrors, logoutAndRedirect]
   );
 
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
@@ -351,21 +341,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
         return result;
       }
     },
-    [setFormErrors, dispatch, setUserLoggedIn]
+    [setFormErrors, logoutAndRedirect]
   );
 
   const handleUpdateDataInEdit = useCallback(
@@ -379,7 +365,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setDataInEdit({ ...workingData });
 
       if (key === 'username') {
-        if (value === user.userData?.username) {
+        if (value === userData?.username) {
           // reset error if username equal to initial username
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -389,7 +375,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         }
       }
     },
-    [dataInEdit, user.userData?.username]
+    [dataInEdit, userData?.username]
   );
 
   const handleBlurNickname = useCallback(
@@ -421,7 +407,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const { value } = e.target;
       const valueRefined = value.length > 0 ? value.replace('@', '') : value;
 
-      if (valueRefined === user.userData?.username) {
+      if (valueRefined === userData?.username) {
         // reset error if username equal to initial username
         setFormErrors((errors) => {
           const errorsWorking = { ...errors };
@@ -432,7 +418,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       }
       validateUsernameViaAPI(valueRefined);
     },
-    [user.userData?.username, validateUsernameViaAPI]
+    [userData?.username, validateUsernameViaAPI]
   );
 
   const handleFocusNickname = useCallback(
@@ -470,7 +456,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
 
   // Cover image
-  const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
+  const [coverUrlInEdit, setCoverUrlInEdit] = useState(userData?.coverUrl);
   const [coverUrlInEditAnimated, setCoverUrlInEditAnimated] = useState(false);
   const [coverUrlInEditAnimatedExtension, setCoverUrlInEditAnimatedExtension] =
     useState('');
@@ -575,7 +561,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         dataInEdit.bio
       );
 
-      if (dataInEdit.username !== user.userData?.username) {
+      if (dataInEdit.username !== userData?.username) {
         usernameValid = await validateUsernameViaAPI(dataInEdit.username);
       }
 
@@ -588,7 +574,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       let croppedCoverImage: File;
       let newCoverImgURL;
 
-      if (coverUrlInEdit && coverUrlInEdit !== user.userData?.coverUrl) {
+      if (coverUrlInEdit && coverUrlInEdit !== userData?.coverUrl) {
         croppedCoverImage = !coverUrlInEditAnimated
           ? await getCroppedImg(
               coverUrlInEdit,
@@ -632,11 +618,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         nickname: dataInEdit.nickname,
         bio: dataInEdit.bio.trim(),
         // Update avatar
-        ...(avatarUrlInEdit && avatarUrlInEdit !== user.userData?.avatarUrl
+        ...(avatarUrlInEdit && avatarUrlInEdit !== userData?.avatarUrl
           ? { avatarUrl: avatarUrlInEdit }
           : {}),
         // Send username only if it was updated
-        ...(dataInEdit.username !== user.userData?.username
+        ...(dataInEdit.username !== userData?.username
           ? { username: dataInEdit.username }
           : {}),
         // Update cover image, if it was updated
@@ -654,19 +640,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         throw new Error('Request failed');
       }
 
-      dispatch(
-        setUserData({
-          username: res.data.me?.username,
-          nickname: res.data.me?.nickname,
-          avatarUrl: res.data.me?.avatarUrl,
-          bio: res.data.me?.bio,
-          coverUrl: res.data.me?.coverUrl,
-          genderPronouns: res.data.me?.genderPronouns,
-          options: {
-            ...user.userData?.options,
-          },
-        })
-      );
+      updateUserData({
+        username: res.data.me?.username ?? undefined,
+        nickname: res.data.me?.nickname,
+        avatarUrl: res.data.me?.avatarUrl ?? undefined,
+        bio: res.data.me?.bio,
+        coverUrl: res.data.me?.coverUrl,
+        genderPronouns: res.data.me?.genderPronouns,
+        options: {
+          ...userData?.options,
+        },
+      });
 
       setIsLoading(false);
       handleClose();
@@ -674,13 +658,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       } else if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       } else {
         showErrorToastPredefined(undefined);
       }
@@ -694,19 +674,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     userIsCreator,
     validateUsernameViaAPI,
     coverUrlInEdit,
-    user.userData?.coverUrl,
-    user.userData?.avatarUrl,
-    user.userData?.username,
-    user.userData?.options,
+    userData?.coverUrl,
+    userData?.avatarUrl,
+    userData?.username,
+    userData?.options,
     avatarUrlInEdit,
-    dispatch,
-    handleClose,
     coverUrlInEditAnimated,
     croppedAreaCoverImage,
     coverUrlInEditAnimatedExtension,
     coverUrlInEditAnimatedMimeType,
-    setUserLoggedIn,
     showErrorToastPredefined,
+    logoutAndRedirect,
+    updateUserData,
+    handleClose,
   ]);
 
   // Profile image editing
@@ -831,24 +811,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setUpdateProfileImageLoading(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
   }, [
     croppedAreaProfileImage,
     avatarUrlInEdit,
     handleSetStageToEditingGeneral,
-    dispatch,
-    setUserLoggedIn,
+    logoutAndRedirect,
   ]);
 
   useEffect(() => {
@@ -877,22 +852,21 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   useEffect(() => {
     // Temp
     const initialData: ModalMenuUserData = {
-      nickname: user.userData?.nickname ?? '',
-      username: user.userData?.username ?? '',
-      bio: user.userData?.bio ?? '',
-      genderPronouns: user.userData?.genderPronouns
-        ? getGenderPronouns(user.userData?.genderPronouns).value
+      nickname: userData?.nickname ?? '',
+      username: userData?.username ?? '',
+      bio: userData?.bio ?? '',
+      genderPronouns: userData?.genderPronouns
+        ? getGenderPronouns(userData?.genderPronouns).value
         : undefined,
     };
 
     if (
-      (!avatarUrlInEdit ||
-        isEqual(avatarUrlInEdit, user.userData?.avatarUrl)) &&
+      (!avatarUrlInEdit || isEqual(avatarUrlInEdit, userData?.avatarUrl)) &&
       dataInEdit.bio.trim() === initialData.bio &&
       dataInEdit.genderPronouns === initialData.genderPronouns &&
       dataInEdit.nickname.trim() === initialData.nickname &&
       dataInEdit.username.trim() === initialData.username &&
-      isEqual(coverUrlInEdit, user.userData?.coverUrl)
+      isEqual(coverUrlInEdit, userData?.coverUrl)
     ) {
       handleSetWasModified(false);
     } else {
@@ -901,7 +875,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   }, [
     avatarUrlInEdit,
     dataInEdit,
-    user.userData,
+    userData,
     handleSetWasModified,
     coverUrlInEdit,
   ]);
@@ -921,11 +895,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       }
 
       // Return true if we have no initial values (should not happen often)
-      if (!user.userData) {
+      if (!userData) {
         return true;
       }
 
-      const initialValue = user.userData[typedKey] ?? '';
+      const initialValue = userData[typedKey] ?? '';
 
       if (value === initialValue) {
         return false;
@@ -945,7 +919,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
 
     setIsDataValid(true);
-  }, [formErrors, dataInEdit, user.userData]);
+  }, [formErrors, dataInEdit, userData]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -997,7 +971,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             <ProfileGeneralContent>
               <SImageInputsWrapper>
                 <ProfileBackgroundInput
-                  originalPictureUrl={user?.userData?.coverUrl ?? ''}
+                  originalPictureUrl={userData?.coverUrl ?? ''}
                   pictureInEditUrl={coverUrlInEdit ?? ''}
                   coverUrlInEditAnimated={coverUrlInEditAnimated}
                   crop={cropCoverImage}
@@ -1011,7 +985,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   onZoomChange={setZoomCoverImage}
                 />
                 <ProfileImageInput
-                  publicUrl={avatarUrlInEdit || user.userData?.avatarUrl!!}
+                  publicUrl={avatarUrlInEdit || userData?.avatarUrl!!}
                   disabled={isLoading}
                   handleImageInputChange={handleSetProfilePictureInEdit}
                 />
@@ -1136,8 +1110,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 withShadow
                 disabled={
                   (!wasModified &&
-                    ((!user.userData?.bio && dataInEdit.bio === '') ||
-                      dataInEdit.bio === user.userData?.bio)) ||
+                    ((!userData?.bio && dataInEdit.bio === '') ||
+                      dataInEdit.bio === userData?.bio)) ||
                   !isDataValid ||
                   isLoading ||
                   !coverUrlInEdit
@@ -1147,7 +1121,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 }}
                 onClick={() => {
                   // If trimmable spaces were added, allow to click the button and close modal
-                  if (!wasModified && dataInEdit.bio !== user.userData?.bio) {
+                  if (!wasModified && dataInEdit.bio !== userData?.bio) {
                     handleClose();
                   } else {
                     handleUpdateUserData();
