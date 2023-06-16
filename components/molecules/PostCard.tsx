@@ -128,8 +128,8 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
-    const thumbnailHolderRef = useRef<HTMLImageElement>();
 
+    const thumbnailHolderRef = useRef<HTMLImageElement>();
     const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
 
     // Hovered state
@@ -503,7 +503,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       );
     }
 
-    // Covers a case when thumbnail is loaded right away
+    // Covers a case when image is loaded right away (SSR)
     useEffect(() => {
       if (thumbnailHolderRef.current?.complete) {
         setThumbnailLoaded(true);
