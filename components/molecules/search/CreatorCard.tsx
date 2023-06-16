@@ -153,11 +153,15 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         </SButton>
       )}
       <SBackground>
+        {/* Can't pass ref NextJs is below 13.0.6 */}
         <SImage
           src={creator.coverUrl ?? ''}
           layout='fill'
           visible={backgroundLoaded}
           onLoad={() => {
+            setBackgroundLoaded(true);
+          }}
+          onLoadingComplete={(e) => {
             setBackgroundLoaded(true);
           }}
         />

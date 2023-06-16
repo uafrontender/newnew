@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import Button from '../atoms/Button';
@@ -25,7 +25,15 @@ export const UserAvatar: React.FC<IUserAvatar> = React.memo(
       resizeMode
     );
 
+    const imageRef = useRef<HTMLImageElement>();
     const [loaded, setLoaded] = useState(!withSkeleton);
+
+    // Covers a case when image is loaded right away (SSR)
+    useEffect(() => {
+      if (imageRef.current?.complete) {
+        setLoaded(true);
+      }
+    }, []);
 
     if (!avatarUrl) {
       return (
@@ -43,6 +51,11 @@ export const UserAvatar: React.FC<IUserAvatar> = React.memo(
     return (
       <SContainer {...rest} onClick={onClick} withClick={withClick ?? false}>
         <img
+          ref={(e) => {
+            if (e) {
+              imageRef.current = e;
+            }
+          }}
           src={avatarUrl}
           alt='User avatar'
           style={{ opacity: loaded ? 1 : 0 }}
