@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
-import { useUserData } from '../../../contexts/userDataContext';
+import { TUserData, useUserData } from '../../../contexts/userDataContext';
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -37,6 +37,23 @@ const AboutBundles = dynamic(
   () => import('../../molecules/creator/dashboard/AboutBundles')
 );
 
+function getIsToDosCompleted(
+  userData: TUserData | undefined,
+  creatorData: newnewapi.IGetMyOnboardingStateResponse | undefined
+): boolean | undefined {
+  if (!userData || !creatorData) {
+    return undefined;
+  }
+  if (
+    userData?.bio &&
+    userData?.bio.length > 0 &&
+    creatorData?.isCreatorConnectedToStripe
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
@@ -49,7 +66,7 @@ export const Dashboard: React.FC = React.memo(() => {
     usePushNotifications();
 
   const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
-    undefined
+    getIsToDosCompleted(userData, creatorData)
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
@@ -69,17 +86,11 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [promptUserWithPushNotificationsPermissionModal, router]);
 
   useEffect(() => {
-    if (
-      creatorDataLoaded &&
-      userData?.bio &&
-      userData?.bio.length > 0 &&
-      creatorData?.isCreatorConnectedToStripe
-    ) {
-      setIsToDosCompleted(true);
-    } else if (creatorDataLoaded) {
-      setIsToDosCompleted(false);
+    if (creatorDataLoaded) {
+      const toDoCompletionStatus = getIsToDosCompleted(userData, creatorData);
+      setIsToDosCompleted(toDoCompletionStatus);
     }
-  }, [creatorDataLoaded, creatorData, userData?.bio]);
+  }, [creatorDataLoaded, userData, creatorData]);
 
   const fetchMyExpiringPosts = useCallback(async () => {
     try {
