@@ -32,7 +32,6 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({ query }) => {
         query,
         searchType: newnewapi.SearchPostsRequest.SearchType.HASHTAGS,
         sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
-        filters: [],
       },
       {
         onError: onLoadingCreatorsError,

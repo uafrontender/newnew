@@ -49,7 +49,7 @@ const UnsubscribeMenu: React.FC<IUnsubscribeMenu> = ({
 };
 
 export default UnsubscribeMenu;
-
+// 368px = 448px (height)/2 - 80px (header)
 const SUnsubscribeMenu = styled.div`
   position: absolute;
   top: 0;
@@ -76,8 +76,8 @@ const SUnsubscribeMenu = styled.div`
 
   ${({ theme }) => theme.media.laptopL} {
     /* top: calc(50% - 224px); */
-    left: calc(50% - 304px);
-    margin-top: calc(50vh - 305px);
+    left: calc(50% - 244px);
+    margin-top: calc(50vh - 368px);
 
     width: 608px;
     height: 448px;
@@ -91,8 +91,12 @@ const SUnsubscribeMenu = styled.div`
 `;
 
 const SAnimationWrapper = styled.div`
-  margin-top: 35px;
   position: relative;
+  margin-top: calc(50vh - 320px);
+
+  ${({ theme }) => theme.media.laptopL} {
+    margin-top: 35px;
+  }
 `;
 
 const SHeadline = styled(Headline)`

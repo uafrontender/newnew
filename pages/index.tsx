@@ -17,7 +17,7 @@ import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
-import { useAppSelector } from '../redux-store/store';
+import { useUserData } from '../contexts/userDataContext';
 import { getCuratedPosts } from '../api/endpoints/post';
 import canBecomeCreator from '../utils/canBecomeCreator';
 import { useGetAppConstants } from '../contexts/appConstantsContext';
@@ -50,7 +50,7 @@ const Home: NextPage<IHome> = ({
 }) => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { appConstants } = useGetAppConstants();
   const { userLoggedIn, userIsCreator } = useAppState();
 
@@ -168,7 +168,7 @@ const Home: NextPage<IHome> = ({
 
       {!userIsCreator &&
         canBecomeCreator(
-          user.userData?.dateOfBirth,
+          userData?.dateOfBirth,
           appConstants.minCreatorAgeYears
         ) && <BecomeCreatorSection />}
     </>
@@ -229,6 +229,11 @@ export default Home;
 export const getServerSideProps: GetServerSideProps<IHome> = async (
   context
 ) => {
+  context.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=1, stale-while-revalidate=5'
+  );
+
   const translationContext = await serverSideTranslations(
     context.locale!!,
     [

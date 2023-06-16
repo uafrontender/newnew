@@ -12,7 +12,7 @@ import NavigationItem from '../NavigationItem';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
 
 import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
@@ -24,13 +24,14 @@ import VoteIconDark from '../../../public/images/decision/vote-icon-dark.png';
 import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useUiState } from '../../../contexts/uiStateContext';
 
 export const Tablet: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useChatsUnreadMessages();
-  const user = useAppSelector((state) => state.user);
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { userData } = useUserData();
+  const { globalSearchActive } = useUiState();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
 
   const { unreadNotificationCount } = useNotifications();
@@ -179,7 +180,7 @@ export const Tablet: React.FC = () => {
             {!userIsCreator && (
               <>
                 {canBecomeCreator(
-                  user.userData?.dateOfBirth,
+                  userData?.dateOfBirth,
                   appConstants.minCreatorAgeYears
                 ) && (
                   <SItemWithMargin>
@@ -205,7 +206,7 @@ export const Tablet: React.FC = () => {
                   <Link href='/profile'>
                     <a>
                       <UserAvatar
-                        avatarUrl={user.userData?.avatarUrl}
+                        avatarUrl={userData?.avatarUrl}
                         withClick
                         withSkeleton
                         onClick={() => {

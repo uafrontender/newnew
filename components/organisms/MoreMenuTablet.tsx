@@ -10,7 +10,7 @@ import InlineSvg from '../atoms/InlineSVG';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
@@ -27,7 +27,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userIsCreator } = useAppState();
 
   useOnClickEsc(containerRef, handleClose);
@@ -45,7 +45,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
 
   const handlerCopy = useCallback(() => {
     if (window) {
-      const url = `${window.location.origin}/${user.userData?.username}`;
+      const url = `${window.location.origin}/${userData?.username}`;
 
       Mixpanel.track('Copy My Link', {
         _component: 'MoreMenuTablet',
@@ -62,7 +62,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           console.log(err);
         });
     }
-  }, [user.userData?.username, copyPostUrlToClipboard]);
+  }, [userData?.username, copyPostUrlToClipboard]);
 
   return (
     <AnimatePresence>
@@ -87,8 +87,8 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               >
                 <SAvatar>
                   <img
-                    src={user?.userData?.avatarUrl ?? ''}
-                    alt={user?.userData?.username ?? ''}
+                    src={userData?.avatarUrl ?? ''}
+                    alt={userData?.username ?? ''}
                     draggable={false}
                   />
                 </SAvatar>
@@ -96,7 +96,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               </SButton>
             </SLink>
           </Link>
-          {user.userData?.options?.isOfferingBundles && (
+          {userData?.options?.isOfferingBundles && (
             <SMyLinkButton onClick={handlerCopy}>
               <InlineSvg svg={copyIcon} width='24px' height='24px' />
               {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}

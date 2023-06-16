@@ -124,6 +124,7 @@ const useMcOptions = (
       onError: (error) => {
         console.error(error);
       },
+      refetchOnWindowFocus: false,
       ...(options || {}),
     } as Omit<
       UseInfiniteQueryOptions<{

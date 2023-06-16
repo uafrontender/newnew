@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 
 import Logo from '../Logo';
 import UserAvatar from '../UserAvatar';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Button from '../../atoms/Button';
 import StaticSearchInput from '../../atoms/search/StaticSearchInput';
@@ -16,7 +16,7 @@ import canBecomeCreator from '../../../utils/canBecomeCreator';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 export const Mobile: React.FC = () => {
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { t } = useTranslation();
   const { appConstants } = useGetAppConstants();
 
@@ -56,7 +56,7 @@ export const Mobile: React.FC = () => {
           >
             <a>
               <UserAvatar
-                avatarUrl={user.userData?.avatarUrl}
+                avatarUrl={userData?.avatarUrl}
                 withClick
                 withSkeleton
                 onClick={() =>
@@ -98,7 +98,7 @@ export const Mobile: React.FC = () => {
             )}
             {!userIsCreator &&
               canBecomeCreator(
-                user.userData?.dateOfBirth,
+                userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears
               ) && (
                 <SItemWithMargin>

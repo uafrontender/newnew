@@ -9,15 +9,11 @@ import Lottie from '../components/atoms/Lottie';
 
 import useErrorToasts from '../utils/hooks/useErrorToasts';
 import { sendVerificationEmail } from '../api/endpoints/auth';
-import { useAppDispatch } from '../redux-store/store';
-import {
-  setSignupEmailInput,
-  setSignupTimerValue,
-} from '../redux-store/slices/userStateSlice';
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import useGoBackOrRedirect from '../utils/useGoBackOrRedirect';
 import { useAppState } from '../contexts/appStateContext';
+import { useSignup } from '../contexts/signUpContext';
 
 interface IEmailAuthRedirectPage {
   stripe_setup_intent_client_secret: string;
@@ -28,7 +24,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 }) => {
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
-  const dispatch = useAppDispatch();
+  const { setSignupEmailInput, setSignupTimerValue } = useSignup();
 
   const { showErrorToastPredefined } = useErrorToasts();
   const { userLoggedIn } = useAppState();
@@ -79,8 +75,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           throw new Error('No data');
         }
 
-        dispatch(setSignupEmailInput(data.emailAddress));
-        dispatch(setSignupTimerValue(data.retryAfter));
+        setSignupEmailInput(data.emailAddress);
+        setSignupTimerValue(data.retryAfter);
 
         setIsLoading(false);
         router.replace('/verify-email');

@@ -7,7 +7,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { useUserData } from '../contexts/userDataContext';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
@@ -15,7 +15,6 @@ import useLeavePageConfirm from '../utils/hooks/useLeavePageConfirm';
 import { getSupportedCreatorCountries } from '../api/endpoints/payments';
 import { getMyOnboardingState } from '../api/endpoints/user';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import { setCreatorData } from '../redux-store/slices/userStateSlice';
 import assets from '../constants/assets';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import canBecomeCreator from '../utils/canBecomeCreator';
@@ -50,14 +49,10 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   const { userIsCreator } = useAppState();
 
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
+  const { userData, creatorData, updateCreatorData } = useUserData();
 
   useLeavePageConfirm(
-    canBecomeCreator(
-      user.userData?.dateOfBirth,
-      appConstants.minCreatorAgeYears
-    ),
+    canBecomeCreator(userData?.dateOfBirth, appConstants.minCreatorAgeYears),
     t('detailsSection.leaveMsg'),
     ['/creator/dashboard', '/verify-new-email']
   );
@@ -72,16 +67,13 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
     }
 
     if (
-      !canBecomeCreator(
-        user.userData?.dateOfBirth,
-        appConstants.minCreatorAgeYears
-      )
+      !canBecomeCreator(userData?.dateOfBirth, appConstants.minCreatorAgeYears)
     ) {
       router.replace('/');
     }
   }, [
     userIsCreator,
-    user.userData?.dateOfBirth,
+    userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
     router,
   ]);
@@ -100,14 +92,10 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 
         if (res.data) {
           setOnboardingState(res.data);
-          dispatch(
-            setCreatorData({
-              options: {
-                ...user.creatorData?.options,
-                ...res.data,
-              },
-            })
-          );
+          updateCreatorData({
+            ...creatorData,
+            ...res.data,
+          });
         }
       } catch (err) {
         console.error(err);

@@ -1,17 +1,8 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import debounce from 'lodash/debounce';
 import styled from 'styled-components';
-
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import LoadingModal from '../LoadingModal';
 import GoBackButton from '../GoBackButton';
@@ -19,16 +10,13 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
 import { updateMe } from '../../../api/endpoints/user';
-import {
-  logoutUserClearCookiesAndRedirect,
-  setUserData,
-} from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 import validateInputText from '../../../utils/validateMessageText';
 import { I18nNamespaces } from '../../../@types/i18next';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import { useUserData } from '../../../contexts/userDataContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -66,9 +54,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-CreatorOnboarding');
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
-  const { resizeMode, setUserLoggedIn } = useAppState();
+  const { userData, creatorData, updateUserData } = useUserData();
+  const { resizeMode, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -76,19 +63,25 @@ const OnboardingSectionAbout: React.FunctionComponent<
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Bio
-  const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
+  const [bioInEdit, setBioInEdit] = useState(userData?.bio ?? '');
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
   const validateBioViaApi = useCallback(
-    async (text: string) => {
+    async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (validateTextAbortControllerRef.current) {
         validateTextAbortControllerRef.current?.abort();
       }
       validateTextAbortControllerRef.current = new AbortController();
       setIsAPIValidateLoading(true);
       try {
+        const text = e.target.value;
+
+        if (text.length === 0) {
+          return;
+        }
+
         const payload = new newnewapi.ValidateTextRequest({
           kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
           text,
@@ -112,33 +105,20 @@ const OnboardingSectionAbout: React.FunctionComponent<
         console.error(err);
         setIsAPIValidateLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     },
-    [setBioError, dispatch, setUserLoggedIn]
-  );
-
-  const validateBioViaApiDebounced = useMemo(
-    () =>
-      debounce((text: string) => {
-        validateBioViaApi(text.trim());
-      }, 250),
-    [validateBioViaApi]
+    [setBioError, logoutAndRedirect]
   );
 
   const handleUpdateBioInEdit = (value: string) => {
     setBioInEdit(value);
-    validateBioViaApiDebounced(value);
   };
 
   // Is form valid
@@ -154,6 +134,25 @@ const OnboardingSectionAbout: React.FunctionComponent<
 
       setLoadingModalOpen(true);
 
+      // Validate text
+      const payload = new newnewapi.ValidateTextRequest({
+        kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
+        text: bioInEdit,
+      });
+
+      const res = await validateText(
+        payload,
+        validateTextAbortControllerRef?.current?.signal
+      );
+
+      if (!res.data?.status) throw new Error('An error occurred');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setBioError(errorSwitch(res.data?.status));
+        setLoadingModalOpen(false);
+        return;
+      }
+
       const updateBioPayload = new newnewapi.UpdateMeRequest({
         bio: bioInEdit.trim(),
       });
@@ -164,15 +163,13 @@ const OnboardingSectionAbout: React.FunctionComponent<
         throw new Error(updateMeRes?.error?.message ?? 'Request failed');
       }
 
-      dispatch(
-        setUserData({
-          bio: updateMeRes.data.me?.bio,
-        })
-      );
+      updateUserData({
+        bio: updateMeRes.data.me?.bio,
+      });
 
       // redirect user to dashboard if Stripe is already connected
       if (
-        user.creatorData?.options?.stripeConnectStatus ===
+        creatorData?.stripeConnectStatus ===
         newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
           .CONNECTED_ALL_GOOD
       ) {
@@ -186,24 +183,20 @@ const OnboardingSectionAbout: React.FunctionComponent<
       console.log(err);
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
   }, [
     bioInEdit,
-    dispatch,
     router,
-    user.creatorData?.options?.stripeConnectStatus,
-    setUserLoggedIn,
+    creatorData?.stripeConnectStatus,
+    logoutAndRedirect,
+    updateUserData,
   ]);
 
   useEffect(() => {
@@ -252,8 +245,8 @@ const OnboardingSectionAbout: React.FunctionComponent<
               placeholder={t('aboutSection.bio.placeholder')}
               maxChars={150}
               onChange={(e) => handleUpdateBioInEdit(e.target.value)}
-              // onFocus={handleFocus}
-              // onBlur={handleBlur}
+              onBlur={validateBioViaApi}
+              onFocus={() => setBioError('')}
             />
           </SFormItemContainer>
         </STopContainer>

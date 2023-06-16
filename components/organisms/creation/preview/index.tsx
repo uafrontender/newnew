@@ -27,7 +27,7 @@ import PostTitleContent from '../../../atoms/PostTitleContent';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 
 import {
   CREATION_TITLE_MIN,
@@ -99,7 +99,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     customCoverImageUrl,
   } = useMemo(() => postInCreation, [postInCreation]);
 
-  const { userData } = useAppSelector((state) => state.user);
+  const { userData, userTimezone } = useUserData();
 
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
@@ -400,10 +400,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     }
   }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
-  const userTimezone = useMemo(() => {
+  const timezone = useMemo(() => {
     if (userData?.countryCode) {
       if (userData?.countryCode.toLocaleLowerCase() === 'us') {
-        if (!userData.timeZone || !userData.timeZone.includes('America')) {
+        if (!userTimezone || !userTimezone.includes('America')) {
           return '';
         }
       }
@@ -413,7 +413,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       .toLocaleString('en', { timeZoneName: 'short' })
       .split(' ')
       .pop();
-  }, [userData]);
+  }, [userData, userTimezone]);
 
   const disabled =
     isSubmitting ||
@@ -437,13 +437,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           key: 'startsAt',
           value: `${formatStartsAt()
             .locale(router.locale || 'en-US')
-            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${timezone}`,
         },
         {
           key: 'expiresAt',
           value: `${formatExpiresAt(false)
             .locale(router.locale || 'en-US')
-            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${userTimezone}`,
+            .format(`MMM DD YYYY[${t('at')}]hh:mm A`)} ${timezone}`,
         },
         {
           key: 'comments',
@@ -471,7 +471,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       userData?.options?.isOfferingBundles,
       router.locale,
       formatExpiresAt,
-      userTimezone,
+      timezone,
     ]
   );
   const handleGoBack = useCallback(() => {

@@ -14,7 +14,7 @@ import addIconFilled from '../../../public/images/svg/icons/filled/Create.svg';
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import assets from '../../../constants/assets';
 import useCards from '../../../utils/hooks/useCards';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import useHorizontalDraggableScroll from '../../../utils/hooks/useHorizontalDraggableScroll';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -24,7 +24,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   const { t } = useTranslation('page-Profile');
   const theme = useTheme();
   const { cards, isCardsLoading } = useCards();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   const [isAddCardModal, setIsAddCardModal] = useState(false);
 
@@ -69,8 +69,8 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
   }, [cards.length]);
 
   const notWhitelisted = useMemo(
-    () => user._persist?.rehydrated && !user?.userData?.options?.isWhiteListed,
-    [user._persist?.rehydrated, user?.userData?.options?.isWhiteListed]
+    () => userData && !userData?.options?.isWhiteListed,
+    [userData]
   );
 
   return (
@@ -86,7 +86,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
               <SButtonSecondaryDesktop
                 view='secondary'
                 onClick={
-                  !user.userData?.options?.isWhiteListed
+                  !userData?.options?.isWhiteListed
                     ? openAddCardModal
                     : () => {}
                 }
@@ -98,9 +98,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
               view='secondary'
               iconOnly
               onClick={
-                !user.userData?.options?.isWhiteListed
-                  ? openAddCardModal
-                  : () => {}
+                !userData?.options?.isWhiteListed ? openAddCardModal : () => {}
               }
             >
               <InlineSVG
@@ -169,7 +167,7 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
                       index % assets.cards.background.length
                     ]
                   }
-                  disabledForActions={!!user.userData?.options?.isWhiteListed}
+                  disabledForActions={!!userData?.options?.isWhiteListed}
                 />
               </SCardListItem>
             ))}

@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 import Button from '../../atoms/Button';
 import ChatUserData from '../../atoms/direct-messages/ChatUserData';
@@ -46,7 +46,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   chatRoom,
 }) => {
   const theme = useTheme();
-  const { user } = useAppSelector((state) => state);
+  const { userData } = useUserData();
   const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -107,7 +107,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
         )}
         {withAvatar &&
           (chatRoom?.kind === 4 ? (
-            <SUserAvatar avatarUrl={user?.userData?.avatarUrl ?? ''} />
+            <SUserAvatar avatarUrl={userData?.avatarUrl ?? ''} />
           ) : (
             <SUserAvatar
               withClick

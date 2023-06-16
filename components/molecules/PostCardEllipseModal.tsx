@@ -8,7 +8,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import switchPostType, { TPostType } from '../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../api/endpoints/post';
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 import EllipseModal, { EllipseModalButton } from '../atoms/EllipseModal';
 import SharePanel from '../atoms/SharePanel';
 import { Mixpanel } from '../../utils/mixpanel';
@@ -47,7 +47,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('common');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn } = useAppState();
 
   const { promptUserWithPushNotificationsPermissionModal } =
@@ -175,7 +175,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
               wrapperType='span'
             />
           </EllipseModalButton>
-          {postCreator.uuid !== user.userData?.userUuid && (
+          {postCreator.uuid !== userData?.userUuid && (
             <EllipseModalButton onClick={handleFollowDecision}>
               {
                 // eslint-disable-next-line no-nested-ternary
@@ -197,7 +197,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
               }
             </EllipseModalButton>
           )}
-          {postCreator.uuid !== user.userData?.userUuid && (
+          {postCreator.uuid !== userData?.userUuid && (
             <EllipseModalButton
               tone='error'
               onClick={() => {
