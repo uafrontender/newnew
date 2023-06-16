@@ -14,11 +14,10 @@ import {
   setMyEmail,
   sendVerificationNewEmail,
 } from '../../../api/endpoints/user';
-import { setUserData } from '../../../redux-store/slices/userStateSlice';
 
 import Logo from '../../../public/images/svg/mobile-logo.svg';
-import { useAppDispatch } from '../../../redux-store/store';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useUserData } from '../../../contexts/userDataContext';
 
 interface IEditEmailStepThreeModal {
   newEmail: string;
@@ -34,7 +33,7 @@ const EditEmailStepThreeModal = ({
   const { t } = useTranslation('page-Profile');
   const { t: tVerifyEmail } = useTranslation('page-VerifyEmail');
   const theme = useTheme();
-  const dispatch = useAppDispatch();
+  const { updateUserData } = useUserData();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -133,11 +132,9 @@ const EditEmailStepThreeModal = ({
           throw new Error('Request failed');
         }
 
-        dispatch(
-          setUserData({
-            email: data?.me?.email,
-          })
-        );
+        updateUserData({
+          email: data?.me?.email,
+        });
         onComplete();
       } catch (err) {
         console.error(err);
@@ -145,7 +142,7 @@ const EditEmailStepThreeModal = ({
         setIsSubmitting(false);
       }
     },
-    [onComplete, newEmail, dispatch, tVerifyEmail]
+    [newEmail, updateUserData, onComplete, tVerifyEmail]
   );
 
   const handleTryAgain = () => {

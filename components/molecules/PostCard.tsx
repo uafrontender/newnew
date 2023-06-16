@@ -21,7 +21,7 @@ import UserAvatar from './UserAvatar';
 import Loader from '../atoms/Loader';
 
 import { formatNumber } from '../../utils/format';
-import { useAppSelector } from '../../redux-store/store';
+import { useUserData } from '../../contexts/userDataContext';
 
 import iconLight1 from '../../public/images/svg/numbers/1_light.svg';
 import iconLight2 from '../../public/images/svg/numbers/2_light.svg';
@@ -116,7 +116,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const { t: tCommon } = useTranslation('common');
     const theme = useTheme();
     const router = useRouter();
-    const user = useAppSelector((state) => state.user);
+    const { userData } = useUserData();
     const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -129,6 +129,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
 
+    const thumbnailHolderRef = useRef<HTMLImageElement>();
     const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
 
     // Hovered state
@@ -502,6 +503,13 @@ export const PostCard: React.FC<ICard> = React.memo(
       );
     }
 
+    // Covers a case when image is loaded right away (SSR)
+    useEffect(() => {
+      if (thumbnailHolderRef.current?.complete) {
+        setThumbnailLoaded(true);
+      }
+    }, []);
+
     useEffect(() => {
       setAnnouncementCoverImage(
         postParsed.announcement?.coverImageUrl || undefined
@@ -554,6 +562,11 @@ export const PostCard: React.FC<ICard> = React.memo(
                 highlightColor={theme.colorsThemed.background.quaternary}
               />
               <SThumbnailHolder
+                ref={(e) => {
+                  if (e) {
+                    thumbnailHolderRef.current = e;
+                  }
+                }}
                 className='thumnailHolder'
                 visible={thumbnailLoaded}
                 src={
@@ -682,6 +695,11 @@ export const PostCard: React.FC<ICard> = React.memo(
               highlightColor={theme.colorsThemed.background.quaternary}
             />
             <SThumbnailHolder
+              ref={(e) => {
+                if (e) {
+                  thumbnailHolderRef.current = e;
+                }
+              }}
               className='thumnailHolder'
               visible={thumbnailLoaded}
               src={
@@ -840,7 +858,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               ) : (
                 <SButtonFirst withShrink onClick={handleBidClick}>
                   {postStatus === 'voting' &&
-                  postParsed.creator?.uuid !== user.userData?.userUuid
+                  postParsed.creator?.uuid !== userData?.userUuid
                     ? t(`button.withoutActivity.${typeOfPost}`)
                     : t(`button.seeResults.${typeOfPost}`)}
                 </SButtonFirst>

@@ -11,12 +11,8 @@ import Lottie from '../../components/atoms/Lottie';
 import { signInWithEmail } from '../../api/endpoints/auth';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
-import { useAppDispatch } from '../../redux-store/store';
-import {
-  setUserData,
-  setSignupEmailInput,
-  setSignupTimerValue,
-} from '../../redux-store/slices/userStateSlice';
+import { useSignup } from '../../contexts/signUpContext';
+import { useUserData } from '../../contexts/userDataContext';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 import { useAppState } from '../../contexts/appStateContext';
@@ -32,8 +28,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 }) => {
   const router = useRouter();
   const [, setCookie] = useCookies();
-  const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn, setUserIsCreator } = useAppState();
+  const { userLoggedIn, handleUserLoggedIn } = useAppState();
+  const { updateUserData } = useUserData();
+  const { setSignupEmailInput, setSignupTimerValue } = useSignup();
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -78,29 +75,27 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           throw new Error('No data');
         }
 
-        dispatch(
-          setUserData({
-            username: data.me?.username,
-            nickname: data.me?.nickname,
-            email: data.me?.email,
-            avatarUrl: data.me?.avatarUrl,
-            coverUrl: data.me?.coverUrl,
-            userUuid: data.me?.userUuid,
-            bio: data.me?.bio,
-            dateOfBirth: {
-              day: data.me?.dateOfBirth?.day,
-              month: data.me?.dateOfBirth?.month,
-              year: data.me?.dateOfBirth?.year,
-            },
-            countryCode: data.me?.countryCode,
-            options: {
-              isActivityPrivate: data.me?.options?.isActivityPrivate,
-              isCreator: data.me?.options?.isCreator,
-              isVerified: data.me?.options?.isVerified,
-              creatorStatus: data.me?.options?.creatorStatus,
-            },
-          })
-        );
+        updateUserData({
+          username: data.me?.username ?? undefined,
+          nickname: data.me?.nickname,
+          email: data.me?.email,
+          avatarUrl: data.me?.avatarUrl ?? undefined,
+          coverUrl: data.me?.coverUrl,
+          userUuid: data.me?.userUuid ?? undefined,
+          bio: data.me?.bio,
+          dateOfBirth: {
+            day: data.me?.dateOfBirth?.day,
+            month: data.me?.dateOfBirth?.month,
+            year: data.me?.dateOfBirth?.year,
+          },
+          countryCode: data.me?.countryCode,
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
+          },
+        });
 
         // Set credential cookies
         if (data.credential?.expiresAt?.seconds) {
@@ -117,11 +112,9 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           maxAge: 10 * 365 * 24 * 60 * 60,
           path: '/',
         });
-
-        setUserLoggedIn(true);
-        setUserIsCreator(!!data.me?.options?.isCreator);
-        dispatch(setSignupEmailInput(''));
-        dispatch(setSignupTimerValue(0));
+        handleUserLoggedIn(data.me?.options?.isCreator ?? false);
+        setSignupEmailInput('');
+        setSignupTimerValue(0);
 
         resumePushNotification();
 

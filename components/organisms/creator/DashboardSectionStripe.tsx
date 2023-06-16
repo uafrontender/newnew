@@ -5,7 +5,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 
 import { fetchSetStripeLinkCreator } from '../../../api/endpoints/payments';
 
@@ -52,14 +52,14 @@ const getStripeButtonTextKey = (
 const DashboardSectionStripe: React.FC = React.memo(() => {
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const { creatorData } = useUserData();
   const { t } = useTranslation('page-Creator');
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const { stripeConnectStatus } = user.creatorData?.options || {};
+  const { stripeConnectStatus } = creatorData || {};
 
   const [stripeProcessing, setStripeProcessing] = useState(false);
   const [isConnectedToStripe, setIsConnectedToStripe] = useState(false);

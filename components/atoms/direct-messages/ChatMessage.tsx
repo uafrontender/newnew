@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import Text from '../Text';
 
 const UserAvatar = dynamic(() => import('../../molecules/UserAvatar'));
@@ -28,14 +28,14 @@ const ChatMessage: React.FC<IChatMessage> = ({
   variant,
 }) => {
   const { t } = useTranslation('page-Chat');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   const nextElDate = (nextElement?.createdAt?.seconds as number) * 1000;
   const prevElDate = (prevElement?.createdAt?.seconds as number) * 1000;
   const itemElDate = (item.createdAt?.seconds as number) * 1000;
   const prevSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
   const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
-  const isMine = item.sender?.uuid === user.userData?.userUuid;
+  const isMine = item.sender?.uuid === userData?.userUuid;
 
   const prevSameDay =
     !!prevElement?.createdAt &&
@@ -57,10 +57,7 @@ const ChatMessage: React.FC<IChatMessage> = ({
       {withAvatar &&
         (!prevSameUser || !prevSameDay) &&
         (isMine ? (
-          <SUserAvatar
-            mine={isMine}
-            avatarUrl={user.userData?.avatarUrl ?? ''}
-          />
+          <SUserAvatar mine={isMine} avatarUrl={userData?.avatarUrl ?? ''} />
         ) : (
           <Link href={`/${chatRoom?.visavis?.user?.username}`}>
             <a>

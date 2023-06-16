@@ -79,6 +79,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
       }
     };
     // Need dependency on bundles to refetch data on bundles changed
+    // CHECK THAT CALLED ONLY ONCE
   }, [userLoggedIn, setData, bundles?.length]);
 
   useEffect(() => {

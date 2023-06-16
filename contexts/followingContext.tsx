@@ -8,8 +8,6 @@ import React, {
 } from 'react';
 
 import { getCreatorsIFollow } from '../api/endpoints/user';
-import { useAppDispatch } from '../redux-store/store';
-import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
 import { useAppState } from './appStateContext';
 
 export const FollowingsContext = createContext({
@@ -23,12 +21,10 @@ interface IFollowingsContextProvider {
   children: React.ReactNode;
 }
 
-// TODO: Move logout logic from the context (AppStateContext?), remove Redux
 const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
   children,
 }) => {
-  const dispatch = useAppDispatch();
-  const { userLoggedIn, setUserLoggedIn } = useAppState();
+  const { userLoggedIn, logoutAndRedirect } = useAppState();
 
   const [followingsIds, setFollowingsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,16 +71,12 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
         console.error(err);
         setIsLoading(false);
         if ((err as Error).message === 'No token') {
-          setUserLoggedIn(false);
-          dispatch(logoutUserClearCookiesAndRedirect());
+          logoutAndRedirect();
         }
         // Refresh token was present, session probably expired
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
-          setUserLoggedIn(false);
-          dispatch(
-            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-          );
+          logoutAndRedirect('/sign-up?reason=session_expired');
         }
       }
     }

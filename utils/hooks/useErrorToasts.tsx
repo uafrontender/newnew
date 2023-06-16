@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { toast, ToastOptions } from 'react-toastify';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line no-shadow
 export enum ErrorToastPredefinedMessage {
@@ -23,6 +24,7 @@ interface IUseErrorToasts {
 }
 
 export default function useErrorToasts(): IUseErrorToasts {
+  const { locale } = useRouter();
   const { t } = useTranslation('common');
 
   const showErrorToastPredefined = useCallback(
@@ -36,7 +38,11 @@ export default function useErrorToasts(): IUseErrorToasts {
         toast.error(t(`toastErrors.${messageEnum}`), options ?? undefined);
       }
     },
-    [t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      locale,
+      // t - removed as common is present everywhere, we need update on language changed
+    ]
   );
 
   const showErrorToastCustom = useCallback(

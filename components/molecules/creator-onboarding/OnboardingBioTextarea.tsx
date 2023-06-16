@@ -14,7 +14,16 @@ type TOnboardingBioTextarea = React.ComponentPropsWithoutRef<'textarea'> & {
 
 const OnboardingBioTextarea: React.FunctionComponent<
   TOnboardingBioTextarea
-> = ({ maxChars, value, isValid, errorCaption, onChange, ...rest }) => {
+> = ({
+  maxChars,
+  value,
+  isValid,
+  errorCaption,
+  onChange,
+  onFocus,
+  onBlur,
+  ...rest
+}) => {
   const { t } = useTranslation('page-CreatorOnboarding');
   const [charCounter, setCharCounter] = useState((value as string).length);
 
@@ -22,8 +31,14 @@ const OnboardingBioTextarea: React.FunctionComponent<
   const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      return;
+    }
+    if (isValid) {
+      setErrorBordersShown(false);
+    } else if (!isValid && !focused) {
+      setErrorBordersShown(true);
+    }
   }, [focused, isValid]);
 
   useEffect(() => {
@@ -55,17 +70,19 @@ const OnboardingBioTextarea: React.FunctionComponent<
               e.preventDefault();
             }
           }}
-          onBlur={() => {
+          onBlur={(e) => {
             setFocused(false);
             if (!isValid) {
               setErrorBordersShown(true);
             } else {
               setErrorBordersShown(false);
             }
+            onBlur?.(e);
           }}
-          onFocus={() => {
+          onFocus={(e) => {
             setFocused(true);
             setErrorBordersShown(false);
+            onFocus?.(e);
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && (value as string)?.length > 0) {

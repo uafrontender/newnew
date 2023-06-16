@@ -11,8 +11,6 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
 import { quickSearch } from '../../../api/endpoints/search';
-import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
@@ -29,11 +27,11 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useUiState } from '../../../contexts/uiStateContext';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
   const theme = useTheme();
-  const dispatch = useAppDispatch();
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
   const { showErrorToastPredefined } = useErrorToasts();
 
@@ -51,7 +49,7 @@ const SearchInput: React.FC = React.memo(() => {
     []
   );
 
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { globalSearchActive, setGlobalSearchActive } = useUiState();
   const { resizeMode } = useAppState();
   const router = useRouter();
 
@@ -73,12 +71,12 @@ const SearchInput: React.FC = React.memo(() => {
       if (router.asPath === path) {
         setSearchValue('');
         setIsResultsDropVisible(false);
-        dispatch(setGlobalSearchActive(false));
+        setGlobalSearchActive(false);
       } else {
         router.push(path);
       }
     },
-    [router, dispatch]
+    [router, setGlobalSearchActive]
   );
 
   const handleSeeResults = (query: string) => {
@@ -107,16 +105,16 @@ const SearchInput: React.FC = React.memo(() => {
 
   const handleSearchClick = useCallback(() => {
     Mixpanel.track('Search Clicked');
-    dispatch(setGlobalSearchActive(!globalSearchActive));
-  }, [dispatch, globalSearchActive]);
+    setGlobalSearchActive(!globalSearchActive);
+  }, [globalSearchActive, setGlobalSearchActive]);
 
   const handleSearchClose = useCallback(() => {
     Mixpanel.track('Search Closed');
 
     setSearchValue('');
     setIsResultsDropVisible(false);
-    dispatch(setGlobalSearchActive(false));
-  }, [dispatch]);
+    setGlobalSearchActive(false);
+  }, [setGlobalSearchActive]);
 
   const handleInputChange = (e: any) => {
     // TODO: create util for spaces handle

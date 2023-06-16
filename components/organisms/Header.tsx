@@ -9,8 +9,8 @@ import Banner from '../molecules/Banner';
 import Desktop from '../molecules/header/Desktop';
 import Container from '../atoms/Grid/Container';
 
-import { useAppSelector } from '../../redux-store/store';
 import { useAppState } from '../../contexts/appStateContext';
+import { useUiState } from '../../contexts/uiStateContext';
 
 interface IHeader {
   visible: boolean;
@@ -18,7 +18,7 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
-  const { banner } = useAppSelector((state) => state.ui);
+  const { banner } = useUiState();
   const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(

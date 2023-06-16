@@ -28,14 +28,13 @@ import MinimizeIcon from '../../../../public/images/svg/icons/outlined/Minimize.
 import PlayerScrubber, { TPlayerScrubber } from '../../../atoms/PlayerScrubber';
 import { useAppState } from '../../../../contexts/appStateContext';
 import Button from '../../../atoms/Button';
-import { setMutedMode } from '../../../../redux-store/slices/uiStateSlice';
-import { useAppDispatch } from '../../../../redux-store/store';
 import isSafari from '../../../../utils/isSafari';
 import isBrowser from '../../../../utils/isBrowser';
 import PostVideoFullscreenControls, {
   TPostVideoFullscreenControls,
 } from './PostVideoFullscreenControls';
 import isIOS from '../../../../utils/isIOS';
+import { useUiState } from '../../../../contexts/uiStateContext';
 
 interface IPostVideojsPlayer {
   id: string;
@@ -70,7 +69,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     onPlaybackFinished,
     onPlaybackProgress,
   }) => {
-    const dispatch = useAppDispatch();
     const { resizeMode } = useAppState();
     const isMobileOrTablet = [
       'mobile',
@@ -79,6 +77,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       'mobileL',
       'tablet',
     ].includes(resizeMode);
+
+    const { setMutedMode } = useUiState();
 
     const videoRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<videojs.Player>();
@@ -232,7 +232,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                     console.warn('Autoplay is not allowed');
                     // Autoplay was prevented.
                     // Try to mute and start over, catch with displaying pause button
-                    dispatch(setMutedMode(true));
+                    setMutedMode(true);
                     setTimeout(() => {
                       playerRef.current?.play()?.catch((e) => {
                         handleSetIsPaused(true);
@@ -303,16 +303,20 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
           // Fullscreen
           p?.on('fullscreenchange', (e) => {
-            setIsFullscreen(p?.isFullscreen());
+            if (isSafari()) {
+              setIsFullscreen(!!document.fullscreenElement);
+            } else {
+              setIsFullscreen(p?.isFullscreen());
+            }
           });
 
           if (!isSafari()) {
             p?.on('volumechange', (e) => {
               setCurrentVolume(p?.volume());
               if (p?.volume() === 0 || p?.muted()) {
-                dispatch(setMutedMode(true));
+                setMutedMode(true);
               } else {
-                dispatch(setMutedMode(false));
+                setMutedMode(false);
               }
             });
           }
@@ -478,9 +482,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           (e.target as TSafariHtmlPlayer).volume === 0 ||
           (e.target as TSafariHtmlPlayer).muted
         ) {
-          dispatch(setMutedMode(true));
+          setMutedMode(true);
         } else {
-          dispatch(setMutedMode(false));
+          setMutedMode(false);
         }
       };
 
@@ -657,7 +661,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                 // Autoplay was prevented.
                 // Try to mute and start over, catch with displaying pause button
                 console.warn('Autoplay is not allowed');
-                dispatch(setMutedMode(true));
+                setMutedMode(true);
                 setTimeout(() => {
                   playerRef.current?.play()?.catch((e) => {
                     handleSetIsPaused(true);
@@ -865,7 +869,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                 handleChangeTime={handlePlayerScrubberChangeTime}
                 isMuted={!!muted}
                 handleToggleMuted={(newValue: boolean) =>
-                  dispatch(setMutedMode(newValue))
+                  setMutedMode(newValue)
                 }
                 currentVolume={currentVolume}
                 handleChangeVolume={handlePlayerVolumeChange}
