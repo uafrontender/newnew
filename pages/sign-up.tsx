@@ -114,12 +114,13 @@ export const getServerSideProps: GetServerSideProps<ISignUp> = async (
   const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';
   const goal = to && !Array.isArray(to) ? to : '';
 
-  if (!goal.length) {
-    context.res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=10, stale-while-revalidate=20'
-    );
-  }
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // if (!goal.length) {
+  //   context.res.setHeader(
+  //     'Cache-Control',
+  //     'public, s-maxage=10, stale-while-revalidate=20'
+  //   );
+  // }
 
   if (
     reason &&
