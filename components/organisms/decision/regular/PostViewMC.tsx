@@ -394,7 +394,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        await fetchPostLatestData();
+        fetchPostLatestData();
 
         setLoadingModalOpen(false);
         setPaymentSuccessModalOpen(true);
