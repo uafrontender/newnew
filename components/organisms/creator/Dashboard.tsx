@@ -4,21 +4,17 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import moment from 'moment';
 
 import { TUserData, useUserData } from '../../../contexts/userDataContext';
-import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { getMyPosts } from '../../../api/endpoints/user';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
 import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
-import { getMyEarnings } from '../../../api/endpoints/payments';
-import dateToTimestamp from '../../../utils/dateToTimestamp';
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBanner';
 import { useAppState } from '../../../contexts/appStateContext';
 import { ChatsProvider } from '../../../contexts/chatContext';
+import Loader from '../../atoms/Loader';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -37,21 +33,28 @@ const AboutBundles = dynamic(
   () => import('../../molecules/creator/dashboard/AboutBundles')
 );
 
+// eslint-disable-next-line no-shadow
+enum ToDosStatus {
+  idle = 'idle',
+  stepsLeft = 'stepsLeft',
+  completed = 'completed',
+}
+
 function getIsToDosCompleted(
   userData: TUserData | undefined,
   creatorData: newnewapi.IGetMyOnboardingStateResponse | undefined
-): boolean | undefined {
+): ToDosStatus {
   if (!userData || !creatorData) {
-    return undefined;
+    return ToDosStatus.idle;
   }
   if (
     userData?.bio &&
     userData?.bio.length > 0 &&
     creatorData?.isCreatorConnectedToStripe
   ) {
-    return true;
+    return ToDosStatus.completed;
   }
-  return false;
+  return ToDosStatus.stepsLeft;
 }
 
 export const Dashboard: React.FC = React.memo(() => {
@@ -65,16 +68,12 @@ export const Dashboard: React.FC = React.memo(() => {
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
-  const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
+  const [toDosStatus, setToDosStatus] = useState<ToDosStatus>(
     getIsToDosCompleted(userData, creatorData)
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
-  const filter = '7_days';
-  const [myEarnings, setMyEarnings] = useState<
-    newnewapi.GetMyEarningsResponse | undefined
-  >();
+
   const [expiringPostsLoaded, setExpiringPostsLoaded] = useState(false);
   const [hasMyPosts, setHasMyPosts] = useState(false);
 
@@ -88,7 +87,7 @@ export const Dashboard: React.FC = React.memo(() => {
   useEffect(() => {
     if (creatorDataLoaded) {
       const toDoCompletionStatus = getIsToDosCompleted(userData, creatorData);
-      setIsToDosCompleted(toDoCompletionStatus);
+      setToDosStatus(toDoCompletionStatus);
     }
   }, [creatorDataLoaded, userData, creatorData]);
 
@@ -112,15 +111,18 @@ export const Dashboard: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    if (!expiringPostsLoaded) {
+    if (!expiringPostsLoaded && hasMyPosts) {
       fetchMyExpiringPosts();
     }
-  }, [expiringPostsLoaded, fetchMyExpiringPosts]);
+  }, [expiringPostsLoaded, hasMyPosts, fetchMyExpiringPosts]);
 
   // TODO: Need WS event to load new expiring posts
 
   const loadMyPosts = useCallback(async () => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
+
     try {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
@@ -128,9 +130,7 @@ export const Dashboard: React.FC = React.memo(() => {
       const postsResponse = await getMyPosts(payload);
 
       if (postsResponse?.data && postsResponse.data.posts) {
-        if (postsResponse.data.posts.length > 0) {
-          setHasMyPosts(true);
-        }
+        setHasMyPosts(postsResponse.data.posts.length > 0);
       }
       setIsLoading(false);
     } catch (err) {
@@ -147,39 +147,6 @@ export const Dashboard: React.FC = React.memo(() => {
     }
   }, [isLoading, hasMyPosts, loadMyPosts]);
 
-  const fetchMyEarnings = useCallback(async () => {
-    try {
-      const payload = new newnewapi.GetMyEarningsRequest({
-        beginDate: dateToTimestamp(
-          moment()
-            .subtract(
-              filter.split('_')[0],
-              filter.split('_')[1] as moment.unitOfTime.DurationConstructor
-            )
-            .startOf('day')
-        ),
-        endDate: dateToTimestamp(new Date()),
-      });
-      const res = await getMyEarnings(payload);
-
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
-      }
-
-      setMyEarnings(res.data);
-      setIsEarningsLoading(false);
-    } catch (err) {
-      setIsEarningsLoading(false);
-      console.error(err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isEarningsLoading) {
-      fetchMyEarnings();
-    }
-  }, [isEarningsLoading, fetchMyEarnings]);
-
   return (
     <SContainer>
       {!isMobile && <Navigation />}
@@ -193,24 +160,20 @@ export const Dashboard: React.FC = React.memo(() => {
           )}
         </STitleBlock>
 
-        {expiringPostsLoaded ? (
-          expirationPosts.length > 0 && (
-            <SBlock>
-              <ExpirationPosts expirationPosts={expirationPosts} />
-            </SBlock>
-          )
-        ) : (
-          <SBlock>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SBlock>
+        {hasMyPosts && (
+          <>
+            {expiringPostsLoaded ? (
+              expirationPosts.length > 0 && (
+                <SBlock>
+                  <ExpirationPosts expirationPosts={expirationPosts} />
+                </SBlock>
+              )
+            ) : (
+              <SBlock>
+                <SLoader size='md' />
+              </SBlock>
+            )}
+          </>
         )}
 
         {creatorData?.stripeConnectStatus &&
@@ -224,18 +187,10 @@ export const Dashboard: React.FC = React.memo(() => {
 
         {!creatorDataLoaded ? (
           <SBlock>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
+            <SLoader size='md' />
           </SBlock>
         ) : (
-          !isToDosCompleted &&
+          toDosStatus === ToDosStatus.stepsLeft &&
           // TODO: This should not require special logic. isCreatorConnectedToStripe should be true for WL creators
           !userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
@@ -246,25 +201,13 @@ export const Dashboard: React.FC = React.memo(() => {
         {/* TODO: Why can't we show earnings for a case when WL creators "earns" something on the stream? */}
         {!userData?.options?.isWhiteListed && (
           <SBlock>
-            {!isEarningsLoading &&
-              (isToDosCompleted ? (
-                <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
-              ) : (
-                <FinishProfileSetup />
-              ))}
+            {toDosStatus === ToDosStatus.completed && (
+              <Earnings hasMyPosts={hasMyPosts} />
+            )}
+            {toDosStatus === ToDosStatus.stepsLeft && <FinishProfileSetup />}
 
             {/* Loader */}
-            {(isEarningsLoading || isToDosCompleted === undefined) && (
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            )}
+            {toDosStatus === ToDosStatus.idle && <SLoader size='md' />}
           </SBlock>
         )}
         <SBlock noMargin>
@@ -336,4 +279,8 @@ const STitleBlock = styled.section`
   margin-bottom: 24px;
   flex-direction: row;
   justify-content: space-between;
+`;
+
+const SLoader = styled(Loader)`
+  margin: 0 auto;
 `;
