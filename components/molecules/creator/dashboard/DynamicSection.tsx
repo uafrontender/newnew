@@ -426,11 +426,12 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
               </SSectionTopLineButtons>
             </SSectionTopLine>
             <SSectionContent isSmallPadding={tab === 'chat'}>
-              {tab === 'notifications' ? (
+              {tab === 'notifications' && (
                 <NotificationsList
                   markReadNotifications={markReadNotifications}
                 />
-              ) : (
+              )}
+              {(tab === 'chat' || tab === 'direct-messages') && (
                 <ChatList
                   myRole={newnewapi.ChatRoom.MyRole.CREATOR}
                   onChatRoomSelect={handleChatRoomSelect}
