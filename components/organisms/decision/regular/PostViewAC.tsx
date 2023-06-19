@@ -15,8 +15,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { toggleMutedMode } from '../../../../redux-store/slices/uiStateSlice';
+import { useUserData } from '../../../../contexts/userDataContext';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
@@ -26,7 +25,6 @@ import PostTimerEnded from '../../../molecules/decision/common/PostTimerEnded';
 
 // Utils
 import switchPostType from '../../../../utils/switchPostType';
-import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import CommentsBottomSection from '../../../molecules/decision/common/CommentsBottomSection';
 import Headline from '../../../atoms/Headline';
@@ -39,6 +37,8 @@ import { usePushNotifications } from '../../../../contexts/pushNotificationsCont
 import useAcOptions from '../../../../utils/hooks/useAcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
+import { useUiState } from '../../../../contexts/uiStateContext';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -79,10 +79,14 @@ interface IPostViewAC {}
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { userData } = useUserData();
+  const { mutedMode, toggleMutedMode } = useUiState();
   const { resizeMode, userLoggedIn } = useAppState();
+  const {
+    userTutorialsProgress,
+    userTutorialsProgressSynced,
+    setUserTutorialsProgress,
+  } = useTutorialProgress();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -155,7 +159,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   } = useAcOptions(
     {
       postUuid: post.postUuid,
-      userUuid: user.userData?.userUuid,
+      userUuid: userData?.userUuid,
       loggedInUser: userLoggedIn,
     },
     {
@@ -167,8 +171,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   );
 
   const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    toggleMutedMode();
+  }, [toggleMutedMode]);
 
   const handleRemoveOption = useCallback(
     async (optionToRemove: newnewapi.Auction.Option) => {
@@ -269,7 +273,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid]);
+  }, [socketConnection, post, userData?.userUuid]);
 
   const isBidMadeAfterRedirect = useRef(false);
 
@@ -296,6 +300,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       isBidMadeAfterRedirect.current = true;
 
       try {
+        setLoadingModalOpen(true);
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             stripeSetupIntentClientSecret,
@@ -328,7 +334,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        await fetchPostLatestData();
+        fetchPostLatestData();
 
         setLoadingModalOpen(false);
         setPaymentSuccessModalOpen(true);
@@ -360,38 +366,34 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
 
   const goToNextStep = () => {
     if (
-      user.userTutorialsProgress.remainingAcSteps &&
-      user.userTutorialsProgress.remainingAcSteps[0]
+      userTutorialsProgress?.remainingAcSteps &&
+      userTutorialsProgress.remainingAcSteps[0]
     ) {
       if (userLoggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+          acCurrentStep: userTutorialsProgress.remainingAcSteps[0],
         });
         markTutorialStepAsCompleted(payload);
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingAcSteps: [
-            ...user.userTutorialsProgress.remainingAcSteps,
-          ].slice(1),
-        })
-      );
+      setUserTutorialsProgress({
+        remainingAcSteps: [...userTutorialsProgress.remainingAcSteps].slice(1),
+      });
     }
   };
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   useEffect(() => {
     if (
-      user.userTutorialsProgressSynced &&
-      user.userTutorialsProgress.remainingAcSteps &&
-      user.userTutorialsProgress.remainingAcSteps[0] ===
+      userTutorialsProgressSynced &&
+      userTutorialsProgress?.remainingAcSteps &&
+      userTutorialsProgress.remainingAcSteps[0] ===
         newnewapi.AcTutorialStep.AC_HERO
     ) {
       setIsPopupVisible(true);
     } else {
       setIsPopupVisible(false);
     }
-  }, [user]);
+  }, [userTutorialsProgressSynced, userTutorialsProgress?.remainingAcSteps]);
 
   // Scroll to comments if hash is present
   useEffect(() => {

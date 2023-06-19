@@ -33,7 +33,17 @@ export const ChatsUnreadMessagesProvider: React.FC<
   IChatsUnreadMessagesProvider
 > = ({ children }) => {
   const { userLoggedIn } = useAppState();
-  const { bundles } = useBundles();
+  const { bundles, hasSoldBundles } = useBundles();
+
+  const chatsWithCreatorsAvailable = useMemo(
+    () => bundles && bundles.length > 0,
+    [bundles]
+  );
+
+  const chatsWithBundleOwnersAvailable = useMemo(
+    () => hasSoldBundles,
+    [hasSoldBundles]
+  );
 
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
   const [unreadCountForCreator, setUnreadCountForCreator] = useState<number>(0);
@@ -71,15 +81,22 @@ export const ChatsUnreadMessagesProvider: React.FC<
         console.error(err);
       }
     }
-    getUnread();
+
+    if (chatsWithCreatorsAvailable || chatsWithBundleOwnersAvailable) {
+      getUnread();
+    }
 
     return () => {
       if (controller) {
         controller.abort();
       }
     };
-    // Need dependency on bundles to refetch data on bundles changed
-  }, [userLoggedIn, setData, bundles?.length]);
+  }, [
+    userLoggedIn,
+    setData,
+    chatsWithCreatorsAvailable,
+    chatsWithBundleOwnersAvailable,
+  ]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = async (data: any) => {

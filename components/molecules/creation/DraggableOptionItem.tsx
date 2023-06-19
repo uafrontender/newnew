@@ -8,8 +8,6 @@ import { Reorder, useMotionValue, useDragControls } from 'framer-motion';
 import InlineSVG from '../../atoms/InlineSVG';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-import useDebounce from '../../../utils/hooks/useDebounce';
-
 import trashIcon from '../../../public/images/svg/icons/filled/Trash.svg';
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import changeOrderIcon from '../../../public/images/svg/icons/outlined/ChangeOrder.svg';
@@ -40,7 +38,6 @@ interface IOptionItem {
 
 const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const { id, item, index, withDelete, validation, handleChange } = props;
-  const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const y = useMotionValue(0);
@@ -58,7 +55,6 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
 
   const handleInputChange = (e: any) => {
     const clearedValue = clearValue(e.target.value);
-    setValue(clearedValue);
     handleChange(index, {
       ...item,
       text: clearedValue,
@@ -103,28 +99,6 @@ const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     dragControls.start(event);
     setIsDragging(true);
   };
-
-  const validateTitleDebounced = useDebounce(value, 500);
-
-  useEffect(() => {
-    const func = async () => {
-      if (validateTitleDebounced) {
-        const trimmedTitle = (validateTitleDebounced as string).trim();
-
-        setError(
-          await validation(
-            trimmedTitle,
-            OPTION_LENGTH_MIN,
-            OPTION_LENGTH_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_OPTION,
-            index
-          )
-        );
-      }
-    };
-
-    func();
-  }, [validation, index, validateTitleDebounced]);
 
   useEffect(() => {
     if (isDragging) {

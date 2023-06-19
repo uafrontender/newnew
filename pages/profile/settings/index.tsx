@@ -3,23 +3,12 @@ import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useUpdateEffect } from 'react-use';
 
-// Redux
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import {
-  setColorMode,
-  TColorMode,
-} from '../../../redux-store/slices/uiStateSlice';
-import {
-  logoutUser,
-  logoutUserClearCookiesAndRedirect,
-  // setUserData,
-} from '../../../redux-store/slices/userStateSlice';
+import { useUserData } from '../../../contexts/userDataContext';
 
 // API
 import { logout /* , updateMe */ } from '../../../api/endpoints/user';
@@ -46,11 +35,13 @@ import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import { TColorMode, useUiState } from '../../../contexts/uiStateContext';
 
 const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
+  const { setColorMode } = useUiState();
 
   // const { showErrorToastPredefined } = useErrorToasts();
 
@@ -58,15 +49,11 @@ const MyProfileSettingsIndex = () => {
   const { t } = useTranslation('page-Profile');
   // TEMP
   // const { t: commonT } = useTranslation('common');
-  // useCookies
-  const [, , removeCookie] = useCookies();
-  // Redux
-  const dispatch = useAppDispatch();
 
-  const { userData } = useAppSelector((state: any) => state.user);
+  const { userData } = useUserData();
 
-  const { colorMode } = useAppSelector((state: any) => state.ui);
-  const { resizeMode, userLoggedIn, setUserLoggedIn } = useAppState();
+  const { colorMode } = useUiState();
+  const { resizeMode, userLoggedIn, logoutAndRedirect } = useAppState();
   // Measurements
   const isMobileOrTablet = [
     'mobile',
@@ -89,9 +76,9 @@ const MyProfileSettingsIndex = () => {
         _stage: 'Profile Settings',
         _mode: mode,
       });
-      dispatch(setColorMode(mode));
+      setColorMode(mode);
     },
-    [dispatch]
+    [setColorMode]
   );
 
   const handleLogout = useCallback(async () => {
@@ -109,37 +96,22 @@ const MyProfileSettingsIndex = () => {
         throw new Error(res?.error?.message ?? 'Log out failed');
       }
 
-      setUserLoggedIn(false);
-      dispatch(logoutUser(''));
-
-      // Unset credential cookies
-      removeCookie('accessToken', {
-        path: '/',
-      });
-
-      removeCookie('refreshToken', {
-        path: '/',
-      });
-
+      logoutAndRedirect();
       setIsLogoutLoading(false);
     } catch (err) {
       console.error(err);
       setIsLogoutLoading(false);
       if ((err as Error).message === 'No token') {
-        setUserLoggedIn(false);
-        dispatch(logoutUserClearCookiesAndRedirect());
+        logoutAndRedirect();
       }
 
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        setUserLoggedIn(false);
-        dispatch(
-          logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
-        );
+        logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
-  }, [dispatch, setIsLogoutLoading, removeCookie, setUserLoggedIn]);
+  }, [setIsLogoutLoading, logoutAndRedirect]);
 
   const [spendingHidden, setSpendingHidden] = useState(false);
 
@@ -161,6 +133,7 @@ const MyProfileSettingsIndex = () => {
 
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
+      // CHANGE TO CONTEXT
       dispatch(
         setUserData({
           options: {

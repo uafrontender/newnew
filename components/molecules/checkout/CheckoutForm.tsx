@@ -25,7 +25,7 @@ import ReCaptchaV2 from '../../atoms/ReCaptchaV2';
 
 import { formatNumber } from '../../../utils/format';
 import useCards from '../../../utils/hooks/useCards';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { ISetupIntent } from '../../../utils/hooks/useStripeSetupIntent';
 import useRecaptcha from '../../../utils/hooks/useRecaptcha';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
@@ -61,7 +61,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 }) => {
   const { t } = useTranslation('modal-PaymentModal');
   const { showErrorToastCustom, showErrorToastPredefined } = useErrorToasts();
-  const { userData } = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { userLoggedIn } = useAppState();
   const { appConstants } = useGetAppConstants();
   const router = useRouter();

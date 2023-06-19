@@ -28,6 +28,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   disabled,
   onChange,
   onFocus,
+  onBlur,
   ...rest
 }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
@@ -50,10 +51,15 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   };
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      setErrorBordersShown(false);
+      return;
+    }
+    if (isValid) {
+      setErrorBordersShown(false);
+    }
 
-    if (!isValid && errorCaption) {
+    if (!isValid && errorCaption && !focused) {
       setErrorBordersShown(true);
     }
   }, [focused, isValid, errorCaption]);
@@ -66,13 +72,14 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
           disabled={disabled}
           errorBordersShown={errorBordersShown}
           onChange={handleOnChange}
-          onBlur={() => {
+          onBlur={(e) => {
             setIsPopupVisible(false);
             setFocused(false);
+            onBlur?.(e);
           }}
           onFocus={(e) => {
             e.stopPropagation();
-            if (onFocus) onFocus(e);
+            onFocus?.(e);
             setFocused(true);
             setIsPopupVisible(true);
             setErrorBordersShown(false);

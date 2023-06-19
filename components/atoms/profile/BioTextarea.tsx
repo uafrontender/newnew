@@ -17,6 +17,8 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
   isValid,
   errorCaption,
   onChange,
+  onFocus,
+  onBlur,
   ...rest
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>();
@@ -26,10 +28,15 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
   const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
+    if (focused) {
+      setErrorBordersShown(false);
+      return;
+    }
+    if (isValid) {
+      setErrorBordersShown(false);
+    }
 
-    if (!isValid && errorCaption) {
+    if (!isValid && errorCaption && !focused) {
       setErrorBordersShown(true);
     }
   }, [focused, isValid, errorCaption]);
@@ -78,10 +85,12 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
               e.preventDefault();
             }
           }}
-          onBlur={() => {
+          onBlur={(e) => {
             setFocused(false);
+            onBlur?.(e);
           }}
-          onFocus={() => {
+          onFocus={(e) => {
+            onFocus?.(e);
             setFocused(true);
             setErrorBordersShown(false);
           }}

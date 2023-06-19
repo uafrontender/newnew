@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { useQueryClient } from 'react-query';
 
 import InlineSVG from '../InlineSVG';
 
@@ -12,8 +13,6 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
 import { quickSearch } from '../../../api/endpoints/search';
-import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
@@ -28,6 +27,7 @@ import Loader from '../Loader';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
+import { useUiState } from '../../../contexts/uiStateContext';
 
 interface IStaticSearchInput {
   width?: string;
@@ -37,8 +37,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
   ({ width }) => {
     const { t } = useTranslation('common');
     const theme = useTheme();
-    const dispatch = useAppDispatch();
     const { showErrorToastPredefined } = useErrorToasts();
+    const queryClient = useQueryClient();
 
     const inputRef: any = useRef();
     const inputContainerRef: any = useRef();
@@ -56,8 +56,9 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       newnewapi.IHashtag[]
     >([]);
 
-    const { globalSearchActive } = useAppSelector((state) => state.ui);
-    const { resizeMode } = useAppState();
+    const { globalSearchActive, setGlobalSearchActive } = useUiState();
+
+    const { resizeMode, userLoggedIn } = useAppState();
     const router = useRouter();
 
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -77,12 +78,46 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
         if (router.asPath === path) {
           setSearchValue('');
           setIsResultsDropVisible(false);
-          dispatch(setGlobalSearchActive(false));
+          setGlobalSearchActive(false);
         } else {
           router.push(path);
         }
       },
-      [router, dispatch]
+      [router, setGlobalSearchActive]
+    );
+
+    const resetPostsSearchResultOnSearchPage = useCallback(
+      (query: string) => {
+        if (router.asPath === `/search?query=${query}&tab=posts`) {
+          queryClient.resetQueries([
+            userLoggedIn ? 'private' : 'public',
+            'getSearchPosts',
+            {
+              loggedInUser: userLoggedIn,
+              query,
+              searchType: newnewapi.SearchPostsRequest.SearchType.HASHTAGS,
+              sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+            },
+          ]);
+        }
+      },
+      [router.asPath, userLoggedIn, queryClient]
+    );
+
+    const resetCreatorSearchResultOnSearchPage = useCallback(
+      (query: string) => {
+        if (router.asPath === `/search?query=${query}&tab=creators`) {
+          queryClient.resetQueries([
+            userLoggedIn ? 'private' : 'public',
+            'getSearchCreators',
+            {
+              loggedInUser: userLoggedIn,
+              query,
+            },
+          ]);
+        }
+      },
+      [router.asPath, userLoggedIn, queryClient]
     );
 
     const handleSeeResults = (query: string) => {
@@ -99,29 +134,33 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
       if (isHashtag) {
         pushRouteOrClose(`/search?query=${firstChunk.text}&tab=posts`);
+        resetPostsSearchResultOnSearchPage(firstChunk.text);
       } else {
         const noHashQuery = clearedQuery.replace('#', '');
         const encodedQuery = encodeURIComponent(noHashQuery);
         if (resultsPosts.length === 0 && resultsCreators.length > 0) {
           pushRouteOrClose(`/search?query=${encodedQuery}&tab=creators`);
+          resetCreatorSearchResultOnSearchPage(encodedQuery);
         } else {
           pushRouteOrClose(`/search?query=${encodedQuery}&tab=posts`);
+
+          resetPostsSearchResultOnSearchPage(firstChunk.text);
         }
       }
     };
 
     const handleSearchClick = useCallback(() => {
       Mixpanel.track('Search Clicked');
-      dispatch(setGlobalSearchActive(!globalSearchActive));
-    }, [dispatch, globalSearchActive]);
+      setGlobalSearchActive(!globalSearchActive);
+    }, [globalSearchActive, setGlobalSearchActive]);
 
     const handleSearchClose = useCallback(() => {
       Mixpanel.track('Search Closed');
 
       setSearchValue('');
       setIsResultsDropVisible(false);
-      dispatch(setGlobalSearchActive(false));
-    }, [dispatch]);
+      setGlobalSearchActive(false);
+    }, [setGlobalSearchActive]);
 
     const handleInputChange = (e: any) => {
       const onlySpacesRegex = /^\s+$/;

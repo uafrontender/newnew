@@ -12,7 +12,7 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 import {
   getMyNotifications,
   markAllAsRead,
@@ -28,6 +28,7 @@ import usePagination, {
 } from '../../../../utils/hooks/usePagination';
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
+import Loader from '../../../atoms/Loader';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -38,7 +39,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 }) => {
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { locale } = useRouter();
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
@@ -251,7 +252,7 @@ export const NotificationsList: React.FC<IFunction> = ({
                 markNotificationAsRead(item.id as number);
               }}
             >
-              {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+              {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
                 <SNotificationItemAvatar
                   withClick
                   avatarUrl={
@@ -292,7 +293,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       );
     },
     [
-      user.userData?.userUuid,
+      userData?.userUuid,
       locale,
       unreadNotifications,
       getEnrichedNotificationMessage,
@@ -310,15 +311,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       {
         // eslint-disable-next-line no-nested-ternary
         !notifications?.length && (loading || !initialLoadDone) ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
+          <Loader size='md' isStatic />
         ) : notifications && notifications.length < 1 ? (
           <NoResults />
         ) : (

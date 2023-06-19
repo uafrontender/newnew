@@ -75,14 +75,8 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // A Delay allows to cancel first request when the second full re-render happens
-  // Can be abandoned after we get rid of Redux which causes double rendering
   useEffect(() => {
-    const timer = setTimeout(() => {
-      handleUnsubscribe();
-    }, 100);
-
-    return () => clearTimeout(timer);
+    handleUnsubscribe();
   }, [handleUnsubscribe]);
 
   return (
@@ -94,13 +88,14 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
         <motion.div
           initial={{
             x: isMobile ? 0 : 500,
-            y: 1,
+            // 80px compensates Header
+            y: 80,
             opacity: 0,
           }}
           animate={{
             x: 0,
-            // With 0 it bumps up the content in the end
-            y: 1,
+            // 80px compensates Header
+            y: 80,
             opacity: 1,
             transition: {
               duration: isMobile ? 1.7 : 1,

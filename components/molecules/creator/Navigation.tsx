@@ -14,7 +14,7 @@ import bundlesOutlinedIcon from '../../../public/images/svg/icons/outlined/Bundl
 import myPostsOutlinedIcon from '../../../public/images/svg/icons/outlined/MyPosts.svg';
 import myPostsFilledIcon from '../../../public/images/svg/icons/filled/MyPosts.svg';
 import Button from '../../atoms/Button';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface NavigationItem {
@@ -29,7 +29,7 @@ export const Navigation = () => {
   const theme = useTheme();
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
-  const user = useAppSelector((state) => state.user);
+  const { userData, creatorData } = useUserData();
 
   const collection: NavigationItem[] = useMemo(
     () => [
@@ -52,12 +52,12 @@ export const Navigation = () => {
         iconFilled: bundlesFilledIcon,
         iconOutlined: bundlesOutlinedIcon,
       },
-      ...(!user.userData?.options?.isWhiteListed
+      ...(!userData?.options?.isWhiteListed
         ? [
             {
               url: '/creator/get-paid',
               label:
-                user.creatorData?.options?.isCreatorConnectedToStripe === true
+                creatorData?.isCreatorConnectedToStripe === true
                   ? t('navigation.getPaidEdit')
                   : t('navigation.getPaid'),
               iconFilled: walletFilledIcon,
@@ -68,8 +68,8 @@ export const Navigation = () => {
     ],
     [
       t,
-      user.creatorData?.options?.isCreatorConnectedToStripe,
-      user.userData?.options?.isWhiteListed,
+      creatorData?.isCreatorConnectedToStripe,
+      userData?.options?.isWhiteListed,
     ]
   );
 

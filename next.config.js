@@ -27,7 +27,6 @@ const moduleExports = {
       'contexts',
       'HOC',
       'pages',
-      'redux-store',
       'styles',
       'utils',
     ],

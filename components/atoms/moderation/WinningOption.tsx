@@ -8,7 +8,7 @@ import Headline from '../Headline';
 import Text from '../Text';
 import GenericSkeleton from '../../molecules/GenericSkeleton';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import { TPostType } from '../../../utils/switchPostType';
 import { formatNumber } from '../../../utils/format';
 import DisplayName from '../DisplayName';
@@ -25,7 +25,7 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
   winningOptionMc,
 }) => {
   const { t } = useTranslation('page-Post');
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const theme = useTheme();
 
   if (postType === 'ac' && winningOptionAc) {
@@ -107,7 +107,7 @@ const WinningOption: React.FunctionComponent<IWinningOption> = ({
                 })}
           </SSpan>{' '}
           {winningOptionMc.creator &&
-          winningOptionMc?.creator?.uuid !== user.userData?.userUuid ? (
+          winningOptionMc?.creator?.uuid !== userData?.userUuid ? (
             <>
               {winningOptionMc.creator.options?.isVerified ? (
                 <Link href={`/${winningOptionMc.creator?.username}`}>

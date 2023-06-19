@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import GenericSkeleton from '../GenericSkeleton';
 
@@ -8,7 +8,16 @@ interface IProfileImage {
 
 const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => {
   const theme = useTheme();
+
+  const imageRef = useRef<HTMLImageElement>();
   const [loaded, setLoaded] = useState(false);
+
+  // Covers a case when image is loaded right away (SSR)
+  useEffect(() => {
+    if (imageRef.current?.complete) {
+      setLoaded(true);
+    }
+  }, []);
 
   return (
     <SProfileImage>
@@ -18,6 +27,11 @@ const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => {
         highlightColor={theme.colorsThemed.background.quaternary}
       />
       <SImg
+        ref={(e) => {
+          if (e) {
+            imageRef.current = e;
+          }
+        }}
         visible={loaded}
         src={src}
         alt='User avatar'

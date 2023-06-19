@@ -41,7 +41,7 @@ import getLocalizedMonth from '../../../utils/getMonth';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import getDateFormatForTimeZone from '../../../utils/getDateFormatForTimeZone';
 import { useAppState } from '../../../contexts/appStateContext';
 import isBrowser from '../../../utils/isBrowser';
@@ -105,7 +105,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     }) => {
       const theme = useTheme();
       const { resizeMode } = useAppState();
-      const user = useAppSelector((state) => state.user);
+      const { userTimezone } = useUserData();
 
       const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
         resizeMode
@@ -193,7 +193,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 
           const parsedDate = moment(
             inputData?.toString(),
-            getDateFormatForTimeZone(user.userData?.timeZone)
+            getDateFormatForTimeZone(userTimezone)
           ).toDate();
 
           if (
@@ -330,12 +330,9 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               disabled={disabled}
               selected={value ?? undefined}
               placeholderText={getDateFormatForTimeZone(
-                user.userData?.timeZone
+                userTimezone
               ).toUpperCase()}
-              dateFormat={getDateFormatForTimeZone(
-                user.userData?.timeZone,
-                true
-              )}
+              dateFormat={getDateFormatForTimeZone(userTimezone, true)}
               minDate={minDate}
               maxDate={maxDate}
               shouldCloseOnSelect={false}

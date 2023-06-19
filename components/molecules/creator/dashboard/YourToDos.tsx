@@ -8,7 +8,7 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useUserData } from '../../../../contexts/userDataContext';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -23,7 +23,7 @@ interface ToDoItem {
 export const YourToDos = () => {
   const { t } = useTranslation('page-Creator');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const { userData, creatorData } = useUserData();
 
   const collection: ToDoItem[] = useMemo(
     () => [
@@ -35,18 +35,18 @@ export const YourToDos = () => {
       {
         id: 'complete-profile',
         title: t('dashboard.toDos.completeProfile'),
-        completed: !!user.userData?.bio && user.userData?.bio.length > 0,
+        completed: !!userData?.bio && userData?.bio.length > 0,
       },
       {
         id: 'add-cash-out-method',
         title: t('dashboard.toDos.addCashOutMethod'),
         completed:
-          user.creatorData?.options?.stripeConnectStatus ===
+          creatorData?.stripeConnectStatus ===
           newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
             .CONNECTED_ALL_GOOD,
       },
     ],
-    [t, user.creatorData, user.userData]
+    [t, creatorData, userData]
   );
 
   const renderItem = useCallback(
