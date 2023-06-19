@@ -33,21 +33,28 @@ const AboutBundles = dynamic(
   () => import('../../molecules/creator/dashboard/AboutBundles')
 );
 
+// eslint-disable-next-line no-shadow
+enum ToDosStatus {
+  idle = 'idle',
+  stepsLeft = 'stepsLeft',
+  completed = 'completed',
+}
+
 function getIsToDosCompleted(
   userData: TUserData | undefined,
   creatorData: newnewapi.IGetMyOnboardingStateResponse | undefined
-): boolean | undefined {
+): ToDosStatus {
   if (!userData || !creatorData) {
-    return undefined;
+    return ToDosStatus.idle;
   }
   if (
     userData?.bio &&
     userData?.bio.length > 0 &&
     creatorData?.isCreatorConnectedToStripe
   ) {
-    return true;
+    return ToDosStatus.completed;
   }
-  return false;
+  return ToDosStatus.stepsLeft;
 }
 
 export const Dashboard: React.FC = React.memo(() => {
@@ -61,7 +68,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
 
-  const [isToDosCompleted, setIsToDosCompleted] = useState<boolean | undefined>(
+  const [toDosStatus, setToDosStatus] = useState<ToDosStatus>(
     getIsToDosCompleted(userData, creatorData)
   );
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +87,7 @@ export const Dashboard: React.FC = React.memo(() => {
   useEffect(() => {
     if (creatorDataLoaded) {
       const toDoCompletionStatus = getIsToDosCompleted(userData, creatorData);
-      setIsToDosCompleted(toDoCompletionStatus);
+      setToDosStatus(toDoCompletionStatus);
     }
   }, [creatorDataLoaded, userData, creatorData]);
 
@@ -153,16 +160,20 @@ export const Dashboard: React.FC = React.memo(() => {
           )}
         </STitleBlock>
 
-        {expiringPostsLoaded ? (
-          expirationPosts.length > 0 && (
-            <SBlock>
-              <ExpirationPosts expirationPosts={expirationPosts} />
-            </SBlock>
-          )
-        ) : (
-          <SBlock>
-            <SLoader size='md' />
-          </SBlock>
+        {hasMyPosts && (
+          <>
+            {expiringPostsLoaded ? (
+              expirationPosts.length > 0 && (
+                <SBlock>
+                  <ExpirationPosts expirationPosts={expirationPosts} />
+                </SBlock>
+              )
+            ) : (
+              <SBlock>
+                <SLoader size='md' />
+              </SBlock>
+            )}
+          </>
         )}
 
         {creatorData?.stripeConnectStatus &&
@@ -179,7 +190,7 @@ export const Dashboard: React.FC = React.memo(() => {
             <SLoader size='md' />
           </SBlock>
         ) : (
-          !isToDosCompleted &&
+          toDosStatus === ToDosStatus.stepsLeft &&
           // TODO: This should not require special logic. isCreatorConnectedToStripe should be true for WL creators
           !userData?.options?.isWhiteListed && (
             <SBlock name='your-todos'>
@@ -190,11 +201,13 @@ export const Dashboard: React.FC = React.memo(() => {
         {/* TODO: Why can't we show earnings for a case when WL creators "earns" something on the stream? */}
         {!userData?.options?.isWhiteListed && (
           <SBlock>
-            {isToDosCompleted === true && <Earnings hasMyPosts={hasMyPosts} />}
-            {isToDosCompleted === false && <FinishProfileSetup />}
+            {toDosStatus === ToDosStatus.completed && (
+              <Earnings hasMyPosts={hasMyPosts} />
+            )}
+            {toDosStatus === ToDosStatus.stepsLeft && <FinishProfileSetup />}
 
             {/* Loader */}
-            {isToDosCompleted === undefined && <SLoader size='md' />}
+            {toDosStatus === ToDosStatus.idle && <SLoader size='md' />}
           </SBlock>
         )}
         <SBlock noMargin>
