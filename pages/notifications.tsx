@@ -238,10 +238,12 @@ export const Notifications = () => {
 export default Notifications;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=50, stale-while-revalidate=60'
-  );
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // context.res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=50, stale-while-revalidate=60'
+  // );
+
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-Notifications'],

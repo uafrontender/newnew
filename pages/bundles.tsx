@@ -58,10 +58,11 @@ export default BundlesPage;
 export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
   context
 ) => {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=30, stale-while-revalidate=35'
-  );
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // context.res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=30, stale-while-revalidate=35'
+  // );
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-Bundles', 'modal-PaymentModal', 'page-Post'],
