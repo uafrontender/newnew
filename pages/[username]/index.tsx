@@ -226,10 +226,12 @@ export default UserPageIndex;
 export const getServerSideProps: GetServerSideProps<
   Partial<IUserPageIndex>
 > = async (context) => {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=15, stale-while-revalidate=20, stale-if-error=5'
-  );
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // context.res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=15, stale-while-revalidate=20, stale-if-error=5'
+  // );
+
   try {
     // eslint-disable-next-line camelcase
     const { username, setup_intent_client_secret, save_card } = context.query;
