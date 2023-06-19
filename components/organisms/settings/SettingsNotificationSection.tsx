@@ -10,24 +10,24 @@ import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 
 import { usePushNotifications } from '../../../contexts/pushNotificationsContext';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppSelector } from '../../../redux-store/store';
 import Loader from '../../atoms/Loader';
+import { useUserData } from '../../../contexts/userDataContext';
 
 const SettingsNotificationsSection = () => {
   const { t } = useTranslation('page-Profile');
   const { showErrorToastPredefined } = useErrorToasts();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
 
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(
-    user.userData?.options?.isEmailNotificationsEnabled ?? false
+    userData?.options?.isEmailNotificationsEnabled ?? false
   );
   const [isEmailLoading, setIsEmailLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setIsEmailNotificationEnabled(
-      user.userData?.options?.isEmailNotificationsEnabled ?? false
+      userData?.options?.isEmailNotificationsEnabled ?? false
     );
-  }, [user.userData?.options?.isEmailNotificationsEnabled]);
+  }, [userData?.options?.isEmailNotificationsEnabled]);
 
   const {
     isSubscribed,

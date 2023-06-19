@@ -19,7 +19,7 @@ import {
   unsubscribeFromSmsNotifications,
   unsubscribeGuestFromSmsNotifications,
 } from '../../../api/endpoints/phone';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import getGuestId from '../../../utils/getGuestId';
 import { useAppState } from '../../../contexts/appStateContext';
@@ -50,7 +50,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   const { showErrorToastCustom } = useErrorToasts();
   const theme = useTheme();
   const { socketConnection } = useContext(SocketContext);
-  const currentUser = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const { resizeMode, userLoggedIn } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -174,7 +174,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
       } else {
         setSmsNotificationModalOpen(true);
       }
-    } else if (currentUser.userData?.options?.isPhoneNumberConfirmed) {
+    } else if (userData?.options?.isPhoneNumberConfirmed) {
       try {
         const res = await subscribeToSmsNotifications({
           creatorUuid: subscription.userId,
@@ -206,7 +206,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
   }, [
     subscribedToSmsNotifications,
     userLoggedIn,
-    currentUser.userData?.options?.isPhoneNumberConfirmed,
+    userData?.options?.isPhoneNumberConfirmed,
     subscription.userId,
     showErrorToastCustom,
     t,

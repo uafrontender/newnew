@@ -17,7 +17,7 @@ import {
 } from '../../atoms/direct-messages/styles';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import GradientMask from '../../atoms/GradientMask';
-import { useAppSelector } from '../../../redux-store/store';
+import { useUserData } from '../../../contexts/userDataContext';
 import InlineSVG from '../../atoms/InlineSVG';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import Modal from '../../organisms/Modal';
@@ -64,7 +64,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const theme = useTheme();
   const scrollRef: any = useRef();
   const { resizeMode } = useAppState();
-  const user = useAppSelector((state) => state.user);
+  const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -245,7 +245,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           <SWrapper>
             {!isLoading && (
               <SSectionContent ref={scrollRef}>
-                {user.userData?.options?.isOfferingBundles && !searchValue && (
+                {userData?.options?.isOfferingBundles && !searchValue && (
                   <NewAnnouncement handleClick={openMyAnnouncement} />
                 )}
                 {chatsInAlphabetOrder.length > 0 &&
