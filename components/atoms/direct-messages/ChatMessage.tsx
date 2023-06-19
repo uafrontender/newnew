@@ -204,6 +204,7 @@ interface ISMessageContent {
 }
 
 const SMessageContent = styled.div<ISMessageContent>`
+  max-width: 100%;
   padding: ${(props) => (props.type === 'info' ? '12px 0 0' : '12px 16px')};
   background: ${(props) => {
     if (props.type === 'info') {
