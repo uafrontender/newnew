@@ -1385,7 +1385,7 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ active }) =>
     active
       ? css`
-          color: ${({ theme }) => theme.colors.dark};
+          color: ${({ theme }) => theme.colorsThemed.background.primary};
           background: #ffffff;
         `
       : null}
