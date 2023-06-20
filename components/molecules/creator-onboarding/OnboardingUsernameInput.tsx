@@ -95,6 +95,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
           {...rest}
         />
         <SStyledButton
+          tabIndex={-1}
           disabled={disabled}
           onClick={() => setIsPopupVisible((curr) => !curr)}
         >
