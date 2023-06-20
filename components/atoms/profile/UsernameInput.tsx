@@ -44,9 +44,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   useOnClickOutside(containerRef, closePopup);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue =
-      e.target.value[0] === '@' ? e.target.value.slice(1) : e.target.value;
-
+    const newValue = e.target.value.replaceAll('@', '');
     onChange(newValue);
   };
 
