@@ -27,16 +27,14 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
   const router = useRouter();
   const { bundles } = useBundles();
   const { userIsCreator } = useAppState();
+  // Can't really be reached at the moment (no redirect to this page)
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
   );
 
   useEffect(() => {
-    if (
-      !userIsCreator ||
-      (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
-    ) {
+    if (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect) {
       router.replace('/');
     }
   }, [
