@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { newnewapi } from 'newnew-api';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 // NB! We have to import these twice due to package issues
@@ -756,12 +756,9 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         id={`sContent_${id}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        bg={resources?.thumbnailImageUrl ?? ''}
       >
-        <SImageBG
-          src={resources?.thumbnailImageUrl ?? ''}
-          withBackDropFilter={!isFullscreen}
-        />
-        <SVideoWrapper data-vjs-player withBackDropFilter={!isFullscreen}>
+        <SVideoWrapper data-vjs-player>
           <SWrapper
             id={id}
             onClick={
@@ -892,20 +889,34 @@ PostVideojsPlayer.defaultProps = {
   showPlayButton: false,
 };
 
-const SContent = styled.div`
+const SContent = styled.div<{
+  bg: string;
+}>`
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
+
+  &::before {
+    content: '';
+    margin: -35px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    filter: blur(32px);
+    background-image: ${({ bg }) => `url(${bg})`};
+    background-position: center;
+    background-size: cover;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     border-radius: 16px;
   }
 `;
 
-const SVideoWrapper = styled.div<{
-  withBackDropFilter: boolean;
-}>`
+const SVideoWrapper = styled.div`
   top: 0;
   left: 0;
   width: 100%;
@@ -915,15 +926,6 @@ const SVideoWrapper = styled.div<{
   min-width: 100%;
   min-height: 100%;
   background: transparent;
-
-  ${({ withBackDropFilter }) =>
-    // Otherwise, Safari fullscreen breaks
-    withBackDropFilter
-      ? css`
-          backdrop-filter: blur(32px);
-          -webkit-backdrop-filter: blur(32px);
-        `
-      : null};
 
   ${({ theme }) => theme.media.tablet} {
     border-radius: 16px;
@@ -1007,27 +1009,6 @@ const SWrapper = styled.div<{
   .vjs-big-play-button {
     display: none;
   }
-`;
-
-const SImageBG = styled.img<{
-  withBackDropFilter: boolean;
-}>`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.1);
-
-  ${({ withBackDropFilter }) =>
-    // Otherwise, Safari fullscreen breaks
-    withBackDropFilter
-      ? css`
-          @supports not (
-            (-webkit-backdrop-filter: none) or (backdrop-filter: none)
-          ) {
-            filter: blur(32px);
-          }
-        `
-      : null};
 `;
 
 const SLoader = styled.div`

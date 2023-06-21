@@ -331,42 +331,42 @@ const SButton = styled.button<ISButton>`
       props.theme.colorsThemed.button.active[props.view ?? 'primary']};
   }
 
-  &:focus:enabled {
-    outline: none;
+  @media only screen and (any-hover: hover) {
+    &:focus:enabled {
+      outline: none;
 
-    ${(props) => {
-      switch (props.view) {
-        case 'primaryGrad': {
-          return css`
-            // for gradient button background animation on hover
-            :after {
-              opacity: 1;
-            }
-          `;
+      ${(props) => {
+        switch (props.view) {
+          case 'primaryGrad': {
+            return css`
+              // for gradient button background animation on hover
+              :after {
+                opacity: 1;
+              }
+            `;
+          }
+          case 'common': {
+            return css`
+              color: ${({ theme }) => theme.colors.white};
+              background: ${props.theme.colorsThemed.button.hover.common};
+            `;
+          }
+          default: {
+            return css`
+              background: ${props.theme.colorsThemed.button.hover[
+                props.view ?? 'primary'
+              ]};
+            `;
+          }
         }
-        case 'common': {
-          return css`
-            color: ${({ theme }) => theme.colors.white};
-            background: ${props.theme.colorsThemed.button.hover[
-              props.view ?? 'primary'
-            ]};
-          `;
-        }
-        default: {
-          return css`
-            background: ${props.theme.colorsThemed.button.hover[
-              props.view ?? 'primary'
-            ]};
-          `;
-        }
-      }
-    }}
+      }}
 
-    ${(props) =>
-      props.withShadow &&
-      css`
-        box-shadow: ${props.theme.shadows.intenseBlue};
-      `}
+      ${(props) =>
+        props.withShadow &&
+        css`
+          box-shadow: ${props.theme.shadows.intenseBlue};
+        `}
+    }
   }
 
   &:hover:enabled {
