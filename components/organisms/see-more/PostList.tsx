@@ -57,17 +57,19 @@ export const PostList: React.FC<IList> = ({
         });
       }}
     >
-      <SItemWrapper id={`post-card-${switchPostType(item)[0].postShortId}`}>
-        <PostCard
-          item={item}
-          index={index + 1}
-          width='100%'
-          height={isMobile ? '564px' : '336px'}
-          handleRemovePostFromState={() =>
-            handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
-          }
-        />
-      </SItemWrapper>
+      <a>
+        <SItemWrapper id={`post-card-${switchPostType(item)[0].postShortId}`}>
+          <PostCard
+            item={item}
+            index={index + 1}
+            width='100%'
+            height={isMobile ? '564px' : '336px'}
+            handleRemovePostFromState={() =>
+              handleRemovePostFromState?.(switchPostType(item)[0].postUuid)
+            }
+          />
+        </SItemWrapper>
+      </a>
     </Link>
   );
 

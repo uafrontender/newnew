@@ -267,42 +267,44 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
                   : switchPostType(item)[0].postUuid
               }`}
             >
-              <SItemWrapper
-                name={`cards-section-${category}-${
-                  tutorialCard !== undefined ? index + 1 : index
-                }`}
-                onClick={(e) => {
-                  if (isDragging) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  } else {
-                    Mixpanel.track('Open Post', {
-                      _stage: 'Post Card',
-                      _postUuid: switchPostType(item)[0].postUuid,
-                      _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-                        switchPostType(item)[0].postShortId ||
-                        switchPostType(item)[0].postUuid
-                      }`,
-                    });
-                  }
-                }}
-              >
-                <PostCard
-                  item={item}
-                  index={tutorialCard !== undefined ? index + 1 : index}
-                  width={
-                    isMobile
-                      ? '100%'
-                      : isTablet
-                      ? '224px'
-                      : isLaptop
-                      ? '256px'
-                      : '288px'
-                  }
-                  height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
-                  maxWidthTablet='224px'
-                />
-              </SItemWrapper>
+              <a>
+                <SItemWrapper
+                  name={`cards-section-${category}-${
+                    tutorialCard !== undefined ? index + 1 : index
+                  }`}
+                  onClick={(e) => {
+                    if (isDragging) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    } else {
+                      Mixpanel.track('Open Post', {
+                        _stage: 'Post Card',
+                        _postUuid: switchPostType(item)[0].postUuid,
+                        _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                          switchPostType(item)[0].postShortId ||
+                          switchPostType(item)[0].postUuid
+                        }`,
+                      });
+                    }
+                  }}
+                >
+                  <PostCard
+                    item={item}
+                    index={tutorialCard !== undefined ? index + 1 : index}
+                    width={
+                      isMobile
+                        ? '100%'
+                        : isTablet
+                        ? '224px'
+                        : isLaptop
+                        ? '256px'
+                        : '288px'
+                    }
+                    height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
+                    maxWidthTablet='224px'
+                  />
+                </SItemWrapper>
+              </a>
             </Link>
           </React.Fragment>
         );
@@ -317,34 +319,36 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
           }`}
           key={switchPostType(item)[0].postUuid}
         >
-          <SItemWrapper
-            name={`cards-section-${category}-${
-              tutorialCard !== undefined ? index + 1 : index
-            }`}
-            onClick={(e) => {
-              if (isDragging) {
-                e.preventDefault();
-                e.stopPropagation();
-              } else {
-                Mixpanel.track('Open Post', {
-                  _stage: 'Post Card',
-                  _postUuid: switchPostType(item)[0].postUuid,
-                  _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-                    switchPostType(item)[0].postShortId ||
-                    switchPostType(item)[0].postUuid
-                  }`,
-                });
-              }
-            }}
-          >
-            <PostCard
-              item={item}
-              index={tutorialCard !== undefined ? index + 1 : index}
-              width={cardWidth}
-              height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
-              maxWidthTablet={`${cardWidth}px`}
-            />
-          </SItemWrapper>
+          <a>
+            <SItemWrapper
+              name={`cards-section-${category}-${
+                tutorialCard !== undefined ? index + 1 : index
+              }`}
+              onClick={(e) => {
+                if (isDragging) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                } else {
+                  Mixpanel.track('Open Post', {
+                    _stage: 'Post Card',
+                    _postUuid: switchPostType(item)[0].postUuid,
+                    _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                      switchPostType(item)[0].postShortId ||
+                      switchPostType(item)[0].postUuid
+                    }`,
+                  });
+                }
+              }}
+            >
+              <PostCard
+                item={item}
+                index={tutorialCard !== undefined ? index + 1 : index}
+                width={cardWidth}
+                height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
+                maxWidthTablet={`${cardWidth}px`}
+              />
+            </SItemWrapper>
+          </a>
         </Link>
       );
     };

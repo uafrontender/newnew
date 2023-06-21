@@ -61,14 +61,16 @@ const PostTypeSection = ({
         });
       }}
     >
-      <SItemWrapper index={index}>
-        <PostCard
-          item={post}
-          index={index}
-          width={isDesktop ? '204px' : '100%'}
-          maxWidthTablet='100%'
-        />
-      </SItemWrapper>
+      <a>
+        <SItemWrapper index={index}>
+          <PostCard
+            item={post}
+            index={index}
+            width={isDesktop ? '204px' : '100%'}
+            maxWidthTablet='100%'
+          />
+        </SItemWrapper>
+      </a>
     </Link>
   );
 
