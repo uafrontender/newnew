@@ -21,7 +21,7 @@ import {
 import { SocketContext } from './socketContext';
 import useRunOnReturnOnTab from '../utils/hooks/useRunOnReturnOnTab';
 import { useAppState } from './appStateContext';
-import { loadStateLS, saveStateLS } from '../utils/localStorage';
+import { loadStateLS, saveStateLS, removeStateLS } from '../utils/localStorage';
 import isBrowser from '../utils/isBrowser';
 
 const USER_DATA_KEY = 'userData';
@@ -76,11 +76,30 @@ export const UserDataContextProvider: React.FunctionComponent<
 
   useIsomorphicLayoutEffect(() => {
     // Can't load on first render as it breaks hydration (server has no access to LS for SSR)
-    if (isBrowser()) {
+    if (!isBrowser) {
+      return;
+    }
+
+    if (userLoggedIn) {
       const savedUserDate = loadStateLS(USER_DATA_KEY) as TUserData | undefined;
       setUserData(savedUserDate);
+    } else {
+      setUserData(undefined);
+      setCreatorData(undefined);
+      setCreatorDataLoaded(false);
+      // If we don't remove it here, it can get loaded on next login (even if there will be other account)
+      removeStateLS(USER_DATA_KEY);
     }
-  }, []);
+  }, [userLoggedIn]);
+
+  useEffect(() => {
+    if (userLoggedIn) {
+      userWasLoggedIn.current = true;
+    } else if (userWasLoggedIn.current) {
+      queryClient.removeQueries({ queryKey: ['private'] });
+      userWasLoggedIn.current = false;
+    }
+  }, [userLoggedIn, queryClient]);
 
   const updateUserData = useCallback((data: Partial<TUserData>) => {
     setUserData((curr) => {
@@ -112,26 +131,6 @@ export const UserDataContextProvider: React.FunctionComponent<
     },
     []
   );
-
-  // When user logs out, clear the state
-  // Don't clean local storage in tests
-  useEffect(() => {
-    if (
-      userWasLoggedIn.current &&
-      !userLoggedIn &&
-      process.env.NEXT_PUBLIC_ENVIRONMENT !== 'test'
-    ) {
-      setUserData(undefined);
-      setCreatorData(undefined);
-      setCreatorDataLoaded(false);
-      userWasLoggedIn.current = false;
-      queryClient.removeQueries({ queryKey: ['private'] });
-    }
-
-    if (userLoggedIn) {
-      userWasLoggedIn.current = true;
-    }
-  }, [userLoggedIn, queryClient]);
 
   // eslint-disable-next-line consistent-return
   useEffect(() => {
