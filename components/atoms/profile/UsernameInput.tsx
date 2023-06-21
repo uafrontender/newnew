@@ -294,17 +294,19 @@ const SErrorDiv = styled.div`
 `;
 
 const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  display: block;
 
   margin-top: 6px;
   margin-bottom: 16px;
 
-  text-align: center;
+  text-align: start;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
