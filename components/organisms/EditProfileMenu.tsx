@@ -494,7 +494,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       nicknameValid = await validateTextViaAPI(
         newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-        dataInEdit.username
+        dataInEdit.nickname
       );
 
       bioValid = await validateTextViaAPI(
