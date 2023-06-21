@@ -197,8 +197,10 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   font-size: 16px;
   line-height: 24px;
 
-  padding: 12px 40px 12px 20px;
-  padding-right: 32px;
+  padding-top: 12px;
+  padding-right: 48px;
+  padding-bottom: 12px;
+  padding-left: 20px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
