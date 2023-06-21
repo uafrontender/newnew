@@ -41,8 +41,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
   const [focused, setFocused] = useState(false);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue =
-      e.target.value[0] === '@' ? e.target.value.slice(1) : e.target.value;
+    const newValue = e.target.value.replaceAll('@', '');
 
     onChange(newValue);
   };
@@ -95,6 +94,7 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<
           {...rest}
         />
         <SStyledButton
+          tabIndex={-1}
           disabled={disabled}
           onClick={() => setIsPopupVisible((curr) => !curr)}
         >
