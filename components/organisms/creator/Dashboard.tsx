@@ -160,20 +160,10 @@ export const Dashboard: React.FC = React.memo(() => {
           )}
         </STitleBlock>
 
-        {hasMyPosts && (
-          <>
-            {expiringPostsLoaded ? (
-              expirationPosts.length > 0 && (
-                <SBlock>
-                  <ExpirationPosts expirationPosts={expirationPosts} />
-                </SBlock>
-              )
-            ) : (
-              <SBlock>
-                <SLoader size='md' />
-              </SBlock>
-            )}
-          </>
+        {expiringPostsLoaded && expirationPosts.length > 0 && (
+          <SBlock>
+            <ExpirationPosts expirationPosts={expirationPosts} />
+          </SBlock>
         )}
 
         {creatorData?.stripeConnectStatus &&
