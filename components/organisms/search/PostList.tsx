@@ -58,16 +58,14 @@ export const PostList: React.FC<IList> = ({
         });
       }}
     >
-      <a>
-        <SItemWrapper>
-          <PostCard
-            item={item}
-            index={index + 1}
-            width='100%'
-            height={isMobile ? '564px' : '336px'}
-          />
-        </SItemWrapper>
-      </a>
+      <SItemWrapper>
+        <PostCard
+          item={item}
+          index={index + 1}
+          width='100%'
+          height={isMobile ? '564px' : '336px'}
+        />
+      </SItemWrapper>
     </Link>
   );
 
