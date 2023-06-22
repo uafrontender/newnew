@@ -300,6 +300,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       isBidMadeAfterRedirect.current = true;
 
       try {
+        setLoadingModalOpen(true);
+
         const stripeContributionRequest =
           new newnewapi.StripeContributionRequest({
             stripeSetupIntentClientSecret,
@@ -332,7 +334,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        await fetchPostLatestData();
+        fetchPostLatestData();
 
         setLoadingModalOpen(false);
         setPaymentSuccessModalOpen(true);

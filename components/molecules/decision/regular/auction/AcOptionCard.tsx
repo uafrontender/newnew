@@ -1097,7 +1097,8 @@ const SSupportButtonDesktop = styled(Button)<{
   ${({ isBlue }) =>
     isBlue
       ? css`
-          border-left: ${({ theme }) => theme.colors.dark} 1.5px solid;
+          border-left: ${({ theme }) => theme.colorsThemed.background.primary}
+            1.5px solid;
         `
       : null}
 `;

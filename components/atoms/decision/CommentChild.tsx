@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -57,7 +58,7 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
     const router = useRouter();
     const { t } = useTranslation('page-Post');
     const { userData } = useUserData();
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode, userLoggedIn, userIsCreator } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -115,7 +116,9 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
                 <Link
                   href={
                     comment.sender?.uuid === userData?.userUuid
-                      ? '/profile'
+                      ? userIsCreator
+                        ? '/profile/my-posts'
+                        : '/profile'
                       : `/${comment.sender?.username}`
                   }
                 >
@@ -148,7 +151,9 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
                       }
                       href={
                         comment.sender?.uuid === userData?.userUuid
-                          ? '/profile'
+                          ? userIsCreator
+                            ? '/profile/my-posts'
+                            : '/profile'
                           : `/${comment.sender?.username}`
                       }
                     />

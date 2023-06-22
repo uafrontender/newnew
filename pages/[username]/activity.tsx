@@ -174,10 +174,12 @@ export default UserPageActivity;
 export const getServerSideProps: GetServerSideProps<
   Partial<IUserPageActivity>
 > = async (context) => {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=15, stale-while-revalidate=20, stale-if-error=5'
-  );
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // context.res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=15, stale-while-revalidate=20, stale-if-error=5'
+  // );
+
   try {
     const { username } = context.query;
     /* const translationContext = await serverSideTranslations(

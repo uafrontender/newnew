@@ -28,6 +28,7 @@ import usePagination, {
 } from '../../../../utils/hooks/usePagination';
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
+import Loader from '../../../atoms/Loader';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -310,15 +311,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       {
         // eslint-disable-next-line no-nested-ternary
         !notifications?.length && (loading || !initialLoadDone) ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
+          <Loader size='md' isStatic />
         ) : notifications && notifications.length < 1 ? (
           <NoResults />
         ) : (

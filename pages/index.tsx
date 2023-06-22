@@ -4,7 +4,6 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
-import dynamic from 'next/dynamic';
 import styled, { useTheme } from 'styled-components';
 
 import { NextPageWithLayout } from './_app';
@@ -15,6 +14,8 @@ import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSect
 import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
+import CardsSection from '../components/organisms/home/CuratedCardsSection';
+import HeroSection from '../components/organisms/home/HeroSection';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { useUserData } from '../contexts/userDataContext';
@@ -26,13 +27,6 @@ import assets from '../constants/assets';
 import { SocketContext } from '../contexts/socketContext';
 import { ChannelsContext } from '../contexts/channelsContext';
 import { useAppState } from '../contexts/appStateContext';
-
-const HeroSection = dynamic(
-  () => import('../components/organisms/home/HeroSection')
-);
-const CardsSection = dynamic(
-  () => import('../components/organisms/home/CuratedCardsSection')
-);
 
 interface IHome {
   top10posts?: newnewapi.NonPagedPostsResponse;
@@ -229,10 +223,11 @@ export default Home;
 export const getServerSideProps: GetServerSideProps<IHome> = async (
   context
 ) => {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=1, stale-while-revalidate=5'
-  );
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // context.res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=1, stale-while-revalidate=5'
+  // );
 
   const translationContext = await serverSideTranslations(
     context.locale!!,

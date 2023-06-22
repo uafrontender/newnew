@@ -204,6 +204,8 @@ interface ISMessageContent {
 }
 
 const SMessageContent = styled.div<ISMessageContent>`
+  max-width: 80%;
+
   padding: ${(props) => (props.type === 'info' ? '12px 0 0' : '12px 16px')};
   background: ${(props) => {
     if (props.type === 'info') {
@@ -221,6 +223,7 @@ const SMessageContent = styled.div<ISMessageContent>`
 
     return props.theme.colorsThemed.background.tertiary;
   }};
+
   ${(props) => {
     if (props.mine) {
       if (props.prevSameUser && props.prevSameDay) {
@@ -338,9 +341,9 @@ interface ISMessageText {
 
 const SMessageText = styled(Text)<ISMessageText>`
   line-height: 20px;
-  max-width: 80vw;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -352,10 +355,6 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
-
-  ${({ theme }) => theme.media.tablet} {
-    max-width: 412px;
-  }
 `;
 
 interface ISUserAvatar {

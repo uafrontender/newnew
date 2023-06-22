@@ -27,16 +27,14 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
   const router = useRouter();
   const { bundles } = useBundles();
   const { userIsCreator } = useAppState();
+  // Can't really be reached at the moment (no redirect to this page)
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
     saveCardFromRedirect
   );
 
   useEffect(() => {
-    if (
-      !userIsCreator ||
-      (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect)
-    ) {
+    if (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect) {
       router.replace('/');
     }
   }, [
@@ -58,10 +56,11 @@ export default BundlesPage;
 export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
   context
 ) => {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=30, stale-while-revalidate=35'
-  );
+  // TODO: implement granular cache-control (likely in newer version of Next.js)
+  // context.res.setHeader(
+  //   'Cache-Control',
+  //   'public, s-maxage=30, stale-while-revalidate=35'
+  // );
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'page-Bundles', 'modal-PaymentModal', 'page-Post'],

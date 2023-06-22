@@ -994,13 +994,14 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         };
       }
 
-      if (!context.req.cookies?.accessToken) {
-        // cache the response only if the post is found and no redirect applies
-        context.res.setHeader(
-          'Cache-Control',
-          'public, s-maxage=5, stale-while-revalidate=10'
-        );
-      }
+      // TODO: implement granular cache-control (likely in newer version of Next.js)
+      // if (!context.req.cookies?.accessToken) {
+      //   // cache the response only if the post is found and no redirect applies
+      //   context.res.setHeader(
+      //     'Cache-Control',
+      //     'public, s-maxage=5, stale-while-revalidate=10'
+      //   );
+      // }
 
       return {
         props: {
