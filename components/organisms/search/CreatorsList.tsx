@@ -35,7 +35,7 @@ export const CreatorsList: React.FC<IList> = ({
     const handleItemClick = () => {
       if (creator) {
         if (creator.uuid === userData?.userUuid) {
-          router.push('/profile');
+          router.push('/profile/my-posts');
         } else {
           router.push(`/${creator.username}`);
         }
