@@ -1,10 +1,15 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, {
+  JSXElementConstructor,
+  ReactElement,
+  useEffect,
+  useRef,
+} from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import isBrowser from '../../utils/isBrowser';
-import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 const MODAL_TYPES = ['initial', 'covered', 'following'] as const;
 export type ModalType = typeof MODAL_TYPES[number];
@@ -19,7 +24,7 @@ interface IModal {
   transitionspeed?: number;
   additionalz?: number;
   custombackdropfiltervalue?: number;
-  children: ReactNode;
+  children: ReactElement<any, string | JSXElementConstructor<any>>;
   onClose?: () => void;
   onEnterKeyUp?: () => void;
 }
@@ -36,17 +41,22 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     onClose,
     onEnterKeyUp,
   } = props;
-  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    if (show) {
-      enableOverlayMode();
+    const container = containerRef.current;
+
+    if (show && container) {
+      disableBodyScroll(container);
     }
 
     return () => {
-      disableOverlayMode();
+      if (container) {
+        enableBodyScroll(container);
+      }
     };
-  }, [show, enableOverlayMode, disableOverlayMode]);
+  }, [show]);
 
   useEffect(() => {
     const blurredBody = document.getElementById('__next');
@@ -100,7 +110,9 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        {children}
+        {React.cloneElement(children, {
+          ref: containerRef,
+        })}
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
