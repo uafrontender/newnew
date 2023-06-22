@@ -64,12 +64,10 @@ export const Earnings: React.FC<IFunctionProps> = ({ hasMyPosts }) => {
         }
 
         setMyEarnings(res.data);
-
-        setIsLoading(false);
       } catch (err) {
         console.error(err);
-        setIsLoading(false);
       } finally {
+        setIsLoading(false);
         setInitialLoad(false);
       }
     }
@@ -225,30 +223,33 @@ export const Earnings: React.FC<IFunctionProps> = ({ hasMyPosts }) => {
           />
         </STotalInsights>
       </SHeaderLine>
-      <STotalLine>
-        <STotalTextWrapper>
-          <STotal id='total-earnings' variant={4}>
-            {totalEarnings
-              ? `$${formatNumber(totalEarnings / 100 ?? 0, false)}`
-              : '$0.00'}
-          </STotal>
-          <STotalText weight={600}>{splitPeriod()}</STotalText>
-        </STotalTextWrapper>
-      </STotalLine>
-      <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {!initialLoad &&
-        (hasMyPosts && myEarnings?.nextCashoutAmount ? (
-          <>
-            <CashOutTutorial />
-            <CashOut
-              nextCashOutAmount={myEarnings.nextCashoutAmount}
-              nextCashOutDate={myEarnings.nextCashoutDate}
-            />
-          </>
-        ) : (
-          <MakeDecision />
-        ))}
-
+      {!isLoading && (
+        <>
+          <STotalLine>
+            <STotalTextWrapper>
+              <STotal id='total-earnings' variant={4}>
+                {totalEarnings
+                  ? `$${formatNumber(totalEarnings / 100 ?? 0, false)}`
+                  : '$0.00'}
+              </STotal>
+              <STotalText weight={600}>{splitPeriod()}</STotalText>
+            </STotalTextWrapper>
+          </STotalLine>
+          <SListHolder>{collection.map(renderListItem)}</SListHolder>
+          {!initialLoad &&
+            (hasMyPosts && myEarnings?.nextCashoutAmount ? (
+              <>
+                <CashOutTutorial />
+                <CashOut
+                  nextCashOutAmount={myEarnings.nextCashoutAmount}
+                  nextCashOutDate={myEarnings.nextCashoutDate}
+                />
+              </>
+            ) : (
+              <MakeDecision />
+            ))}
+        </>
+      )}
       {isLoading && <SLoader size='md' isStatic />}
     </SContainer>
   );
@@ -259,6 +260,7 @@ export default Earnings;
 const SContainer = styled.div`
   left: -16px;
   width: calc(100% + 32px);
+  min-height: 250px;
   padding: 16px;
   display: flex;
   position: relative;
