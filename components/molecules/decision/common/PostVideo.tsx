@@ -115,6 +115,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         }
       }
 
+      handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
 

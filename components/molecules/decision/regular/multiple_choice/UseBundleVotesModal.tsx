@@ -137,6 +137,8 @@ const SVotesAvailable = styled.h2`
   font-weight: 700;
 
   margin-bottom: 16px;
+
+  text-align: center;
 `;
 
 const VotesNumberSpan = styled.span`
