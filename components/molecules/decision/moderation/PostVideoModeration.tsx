@@ -50,9 +50,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const { postStatus, handleUpdatePostCoverImage } = usePostInnerState();
   const {
     coreResponse,
+    additionalResponseUploading,
     openedTab,
     handleVideoDelete,
-    additionalResponseUploading,
     readyToUploadAdditionalResponse,
     responseFileUploadLoading,
     uploadedResponseVideoUrl,
@@ -190,7 +190,12 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobile, postUuid]);
+  }, [
+    isMobile,
+    postUuid,
+    responseFileUploadLoading,
+    responseFileProcessingLoading,
+  ]);
 
   return (
     <>
