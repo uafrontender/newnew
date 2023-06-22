@@ -15,7 +15,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useUserData } from '../../../../contexts/userDataContext';
 import {
   canCreateCustomOption,
   voteOnPost,
@@ -92,9 +91,8 @@ interface IPostViewMC {}
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { userData } = useUserData();
   const { mutedMode, toggleMutedMode } = useUiState();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const {
     userTutorialsProgress,
     userTutorialsProgressSynced,
@@ -200,7 +198,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     {
       postUuid: post.postUuid,
       loggedInUser: userLoggedIn,
-      userUuid: userData?.userUuid,
+      userUuid,
     },
     {
       onError: (err) => {
@@ -332,7 +330,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, userData?.userUuid]);
+  }, [socketConnection, post, userUuid]);
 
   const isVoteMadeAfterRedirect = useRef(false);
 

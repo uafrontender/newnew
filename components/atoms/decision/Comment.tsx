@@ -19,7 +19,6 @@ import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 
-import { useUserData } from '../../../contexts/userDataContext';
 import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
@@ -90,8 +89,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('page-Post');
-    const { userData } = useUserData();
-    const { resizeMode, userLoggedIn, userIsCreator } = useAppState();
+    const { resizeMode, userUuid, userLoggedIn, userIsCreator } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -110,8 +108,8 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
     const isMyComment = useMemo(
-      () => userLoggedIn && userData?.userUuid === comment.sender?.uuid,
-      [userLoggedIn, userData?.userUuid, comment.sender?.uuid]
+      () => userLoggedIn && userUuid === comment.sender?.uuid,
+      [userLoggedIn, userUuid, comment.sender?.uuid]
     );
 
     const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
@@ -206,10 +204,10 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
             // eslint-disable-next-line no-nested-ternary
             !comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
               comment.sender?.options?.isVerified ||
-              comment.sender?.uuid === userData?.userUuid ? (
+              comment.sender?.uuid === userUuid ? (
                 <Link
                   href={
-                    comment.sender?.uuid === userData?.userUuid
+                    comment.sender?.uuid === userUuid
                       ? userIsCreator
                         ? '/profile/my-posts'
                         : '/profile'
@@ -235,16 +233,16 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
               {!comment.isDeleted ? (
                 <>
                   {comment.sender?.options?.isVerified ||
-                  comment.sender?.uuid === userData?.userUuid ? (
+                  comment.sender?.uuid === userUuid ? (
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === userData?.userUuid
+                        comment.sender?.uuid === userUuid
                           ? t('comments.me')
                           : undefined
                       }
                       href={
-                        comment.sender?.uuid === userData?.userUuid
+                        comment.sender?.uuid === userUuid
                           ? userIsCreator
                             ? '/profile/my-posts'
                             : '/profile'
@@ -255,7 +253,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === userData?.userUuid
+                        comment.sender?.uuid === userUuid
                           ? t('comments.me')
                           : undefined
                       }

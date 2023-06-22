@@ -11,7 +11,6 @@ import { motion } from 'framer-motion';
 
 import CommentForm from '../../../atoms/decision/CommentForm';
 
-import { useUserData } from '../../../../contexts/userDataContext';
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
@@ -43,8 +42,7 @@ const CommentsBottomSection: React.FunctionComponent<
   onFormFocus,
   onFormBlur,
 }) => {
-  const { userData } = useUserData();
-  const { userLoggedIn } = useAppState();
+  const { userUuid, userLoggedIn } = useAppState();
   const { showErrorToastPredefined } = useErrorToasts();
 
   // Socket
@@ -148,7 +146,7 @@ const CommentsBottomSection: React.FunctionComponent<
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (
         decoded?.newMessage &&
-        decoded.newMessage!!.sender?.uuid !== userData?.userUuid
+        decoded.newMessage!!.sender?.uuid !== userUuid
       ) {
         addCommentMutation?.mutate(decoded.newMessage);
       }
@@ -180,7 +178,7 @@ const CommentsBottomSection: React.FunctionComponent<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, userData?.userUuid]);
+  }, [socketConnection, userUuid]);
 
   // Cleanup
   useEffect(

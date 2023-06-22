@@ -6,7 +6,6 @@ import { newnewapi } from 'newnew-api';
 
 import assets from '../../../constants/assets';
 import GoBackButton from '../../molecules/GoBackButton';
-import { useUserData } from '../../../contexts/userDataContext';
 import InlineSvg from '../../atoms/InlineSVG';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
@@ -33,8 +32,7 @@ export const Bundles: React.FC = React.memo(() => {
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-Bundles');
   const theme = useTheme();
-  const { userData } = useUserData();
-  const { resizeMode } = useAppState();
+  const { resizeMode, userUuid } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -55,7 +53,7 @@ export const Bundles: React.FC = React.memo(() => {
 
   const loadCreatorsData = useCallback(
     async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
-      if (!userData?.userUuid) {
+      if (!userUuid) {
         return {
           nextData: [],
           nextPageToken: undefined,
@@ -77,7 +75,7 @@ export const Bundles: React.FC = React.memo(() => {
 
       // Do not pass data about creator themselves to pagination controller
       const filteredData = res.data.creators.filter(
-        (creator) => creator.uuid !== userData?.userUuid
+        (creator) => creator.uuid !== userUuid
       );
 
       return {
@@ -86,7 +84,7 @@ export const Bundles: React.FC = React.memo(() => {
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, userData?.userUuid]
+    [searchValue, userUuid]
   );
 
   const paginatedCreators = usePagination(loadCreatorsData, 10);

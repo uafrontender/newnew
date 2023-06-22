@@ -15,7 +15,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useUserData } from '../../../../contexts/userDataContext';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
@@ -79,9 +78,8 @@ interface IPostViewAC {}
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { userData } = useUserData();
   const { mutedMode, toggleMutedMode } = useUiState();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const {
     userTutorialsProgress,
     userTutorialsProgressSynced,
@@ -159,7 +157,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   } = useAcOptions(
     {
       postUuid: post.postUuid,
-      userUuid: userData?.userUuid,
+      userUuid,
       loggedInUser: userLoggedIn,
     },
     {
@@ -273,7 +271,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, userData?.userUuid]);
+  }, [socketConnection, post, userUuid]);
 
   const isBidMadeAfterRedirect = useRef(false);
 

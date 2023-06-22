@@ -12,7 +12,6 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
-import { useUserData } from '../../../../contexts/userDataContext';
 import {
   getMyNotifications,
   markAllAsRead,
@@ -29,6 +28,7 @@ import usePagination, {
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import Loader from '../../../atoms/Loader';
+import { useAppState } from '../../../../contexts/appStateContext';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -39,7 +39,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 }) => {
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
-  const { userData } = useUserData();
+  const { userUuid } = useAppState();
   const { locale } = useRouter();
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
@@ -252,7 +252,7 @@ export const NotificationsList: React.FC<IFunction> = ({
                 markNotificationAsRead(item.id as number);
               }}
             >
-              {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
+              {item.content?.relatedUser?.uuid !== userUuid ? (
                 <SNotificationItemAvatar
                   withClick
                   avatarUrl={
@@ -293,7 +293,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       );
     },
     [
-      userData?.userUuid,
+      userUuid,
       locale,
       unreadNotifications,
       getEnrichedNotificationMessage,

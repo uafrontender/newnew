@@ -21,6 +21,7 @@ import { cookiesInstance, refreshCredentials } from '../api/apiConfigs';
 // TODO: Add info after user being White Listed
 export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
+  userUuid: string | undefined;
   userLoggedIn: boolean;
   userIsCreator: boolean;
   handleUserLoggedIn: (isCreator: boolean) => void;
@@ -29,6 +30,7 @@ export const AppStateContext = createContext<{
 }>({
   // Default values are irrelevant as state gets it on init
   resizeMode: 'mobile',
+  userUuid: undefined,
   userLoggedIn: false,
   userIsCreator: false,
   handleUserLoggedIn: () => {},
@@ -70,11 +72,32 @@ function getIsCreator(accessToken: string | undefined): boolean {
       exp: number;
       aud: string;
       iss: string;
+      uuid: string;
     } = jwtDecode(accessToken);
 
     return decodedToken.is_creator || false;
   }
   return false;
+}
+
+function getUserUuid(accessToken: string | undefined): string | undefined {
+  if (accessToken) {
+    const decodedToken: {
+      account_id: string;
+      account_type: string;
+      date: string;
+      is_creator: boolean;
+      iat: number;
+      exp: number;
+      aud: string;
+      iss: string;
+      uuid: string;
+    } = jwtDecode(accessToken);
+
+    return decodedToken.uuid || undefined;
+  }
+
+  return undefined;
 }
 
 const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
@@ -84,6 +107,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
 }) => {
   const router = useRouter();
   // Should we check that token is valid or just it's presence here?
+  const [userUuid, setUserUuid] = useState(getUserUuid(accessToken));
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
   const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
   const [resizeMode, setResizeMode] = useState<TResizeMode>(
@@ -155,6 +179,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
 
   const logoutAndRedirect = useCallback(
     (redirectUrl?: string) => {
+      setUserUuid(undefined);
       setUserLoggedIn(false);
       setUserIsCreator(false);
       cookiesInstance.remove('accessToken');
@@ -179,6 +204,27 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   }, []);
 
   useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+
+    const decodedToken: {
+      account_id: string;
+      account_type: string;
+      date: string;
+      is_creator: boolean;
+      iat: number;
+      exp: number;
+      aud: string;
+      iss: string;
+      uuid: string;
+    } = jwtDecode(accessToken);
+
+    setUserIsCreator(decodedToken.is_creator);
+    setUserUuid(decodedToken.uuid);
+  }, [accessToken]);
+
+  useEffect(() => {
     if (!ref.current) {
       return () => {};
     }
@@ -193,17 +239,19 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
 
   const contextValue = useMemo(
     () => ({
+      resizeMode,
+      userUuid,
       userLoggedIn,
       userIsCreator,
-      resizeMode,
       handleUserLoggedIn,
       handleBecameCreator,
       logoutAndRedirect,
     }),
     [
+      resizeMode,
+      userUuid,
       userLoggedIn,
       userIsCreator,
-      resizeMode,
       handleUserLoggedIn,
       handleBecameCreator,
       logoutAndRedirect,

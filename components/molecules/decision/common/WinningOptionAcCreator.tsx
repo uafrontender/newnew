@@ -19,10 +19,10 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const { userData } = useUserData();
-  const { userLoggedIn, userIsCreator } = useAppState();
+  const { userLoggedIn, userUuid, userIsCreator } = useAppState();
 
   const userToRender = useMemo(() => {
-    if (userLoggedIn && !userData?.userUuid) {
+    if (userLoggedIn && !userUuid) {
       return null;
     }
 
@@ -43,7 +43,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
     winningOption.whitelistSupporter,
     winningOption.creator,
     userLoggedIn,
-    userData?.userUuid,
+    userUuid,
     winningOption.isSupportedByMe,
   ]);
 

@@ -10,8 +10,6 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import { useUserData } from '../../contexts/userDataContext';
-
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
 import CustomLink from '../atoms/CustomLink';
@@ -62,9 +60,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-
-  const { userData } = useUserData();
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { userUuid, userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -195,13 +191,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
-    if (
-      userLoggedIn &&
-      userData?.userUuid?.toString() === user.uuid.toString()
-    ) {
+    if (userLoggedIn && userUuid?.toString() === user.uuid.toString()) {
       router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
     }
-  }, [userLoggedIn, userIsCreator, userData?.userUuid, router, user.uuid]);
+  }, [userLoggedIn, userIsCreator, userUuid, router, user.uuid]);
 
   const moreButtonRef = useRef() as any;
 

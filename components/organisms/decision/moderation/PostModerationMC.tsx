@@ -13,7 +13,6 @@ import { useTranslation } from 'next-i18next';
 import moment from 'moment';
 import { useRouter } from 'next/dist/client/router';
 
-import { useUserData } from '../../../../contexts/userDataContext';
 import { getMcOption } from '../../../../api/endpoints/multiple_choice';
 import switchPostType from '../../../../utils/switchPostType';
 import { SocketContext } from '../../../../contexts/socketContext';
@@ -62,9 +61,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
   () => {
     const { t } = useTranslation('page-Post');
     const { locale } = useRouter();
-    const { userData } = useUserData();
     const { mutedMode, toggleMutedMode } = useUiState();
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode, userUuid, userLoggedIn } = useAppState();
     const {
       userTutorialsProgress,
       userTutorialsProgressSynced,
@@ -162,7 +160,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       removeMcOptionMutation,
     } = useMcOptions({
       postUuid: post.postUuid,
-      userUuid: userData?.userUuid,
+      userUuid,
       loggedInUser: userLoggedIn,
     });
 
@@ -294,7 +292,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, userData?.userUuid]);
+    }, [socketConnection, post, userUuid]);
 
     const goToNextStep = () => {
       if (
