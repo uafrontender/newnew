@@ -624,6 +624,8 @@ const SUserData = styled.div`
 `;
 
 const SUsernameWrapper = styled.div`
+  margin-left: 16px;
+  margin-right: 16px;
   margin-bottom: 12px;
 `;
 
