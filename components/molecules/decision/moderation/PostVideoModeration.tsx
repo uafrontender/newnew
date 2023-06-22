@@ -178,6 +178,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           setUiOffset(undefined);
         }
       }
+
       handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
