@@ -111,6 +111,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     resizeMode
   );
 
+  const [addOptionBusy, setAddOptionBusy] = useState(false);
+
   const {
     saveCard,
     bundleStripeSetupIntentClientSecret,
@@ -336,10 +338,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const handleAddOptionButtonClicked = useCallback(async () => {
+    setAddOptionBusy(true);
     const validationResult = await validateTextViaAPI(newOptionText);
+
     if (!validationResult) {
+      setAddOptionBusy(false);
       return;
     }
+
     if (canAddCustomOption) {
       setConfirmCustomOptionModalOpen(true);
     } else {
@@ -349,6 +355,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
       setBuyBundleModalOpen(true);
     }
+
+    setAddOptionBusy(false);
   }, [
     customOptionExists,
     canAddCustomOption,
@@ -574,7 +582,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               <SAddOptionButton
                 size='sm'
                 disabled={
-                  !newOptionText || !newOptionTextValid || customOptionExists
+                  !newOptionText ||
+                  !newOptionTextValid ||
+                  customOptionExists ||
+                  addOptionBusy
                 }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
@@ -629,7 +640,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 id='add-option-submit'
                 size='sm'
                 disabled={
-                  !newOptionText || !newOptionTextValid || customOptionExists
+                  !newOptionText ||
+                  !newOptionTextValid ||
+                  customOptionExists ||
+                  addOptionBusy
                 }
                 style={{
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
