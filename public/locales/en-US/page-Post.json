@@ -819,6 +819,7 @@
     "cfCancelled": "Goal is cancelled",
     "cfFinished": "Goal is finished already",
     "cfNotStarted": "Goal is not started yet",
-    "requestFailed": "Request failed"
+    "requestFailed": "Request failed",
+    "inappropriate": "Inappropriate content is not allowed on NewNew"
   }
 }

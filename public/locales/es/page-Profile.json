@@ -171,6 +171,9 @@
           "inappropriate": "Las palabras ofensivas no están permitidas",
           "linksForbidden": "Los enlaces no están permitidos en la biografía"
         }
+      },
+      "avatar": {
+        "inappropriate": "No se puede utilizar la imagen cargada"
       }
     }
   },

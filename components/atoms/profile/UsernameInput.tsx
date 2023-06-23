@@ -44,9 +44,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   useOnClickOutside(containerRef, closePopup);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue =
-      e.target.value[0] === '@' ? e.target.value.slice(1) : e.target.value;
-
+    const newValue = e.target.value.replaceAll('@', '');
     onChange(newValue);
   };
 
@@ -199,8 +197,10 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   font-size: 16px;
   line-height: 24px;
 
-  padding: 12px 40px 12px 20px;
-  padding-right: 32px;
+  padding-top: 12px;
+  padding-right: 48px;
+  padding-bottom: 12px;
+  padding-left: 20px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
@@ -296,17 +296,19 @@ const SErrorDiv = styled.div`
 `;
 
 const SPreviewDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  display: block;
 
   margin-top: 6px;
   margin-bottom: 16px;
 
-  text-align: center;
+  text-align: start;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 

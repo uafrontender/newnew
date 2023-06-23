@@ -74,7 +74,7 @@ const SContainer = styled.div`
   border-radius: 16px;
   padding: 16px;
   width: 190px;
-  z-index: 1000;
+  z-index: 10;
   text-align: left !important;
 `;
 
