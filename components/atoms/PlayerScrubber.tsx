@@ -201,8 +201,8 @@ const SContainer = styled.div<{
       bottom: -5px;
       overflow: hidden;
       height: 0px;
-      background-color: rgba(0, 0, 0, 0.62);
-      box-shadow: 0px -18px 18px 4px rgba(0, 0, 0, 0.62);
+      background-color: rgba(0, 0, 0, 0.52);
+      box-shadow: -2px -18px 8px 6px rgba(0, 0, 0, 0.52);
       transition: opacity linear 0.3s;
     }
 

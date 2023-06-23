@@ -955,9 +955,6 @@ const SWrapper = styled.div<{
   }
 
   video {
-    /* Otherwise borders are straight on Safari */
-    border-radius: 16px;
-
     /* Fix background image flickering through */
     width: calc(100% + 1px) !important;
     height: 100% !important;
@@ -967,6 +964,11 @@ const SWrapper = styled.div<{
 
     &:focus-visible {
       outline: none !important;
+    }
+
+    /* Otherwise borders are straight on Safari */
+    ${({ theme }) => theme.media.tablet} {
+      border-radius: 16px;
     }
   }
 
