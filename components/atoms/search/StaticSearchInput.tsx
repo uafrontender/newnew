@@ -443,50 +443,52 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           )}
         </SContainer>
         {isMobileOrTablet && isResultsDropVisible && (
-          <SResultsDropMobile ref={resultsContainerRef}>
-            {
-              // eslint-disable-next-line no-nested-ternary
-              resultsPosts.length === 0 &&
-              resultsCreators.length === 0 &&
-              resultsHashtags.length === 0 ? (
-                !isLoading ? (
-                  <SNoResults>
-                    <NoResults closeDrop={handleCloseIconClick} />
-                  </SNoResults>
+          <SResultsDropMobile>
+            <SResultsDropMobileContentWrapper ref={resultsContainerRef}>
+              {
+                // eslint-disable-next-line no-nested-ternary
+                resultsPosts.length === 0 &&
+                resultsCreators.length === 0 &&
+                resultsHashtags.length === 0 ? (
+                  !isLoading ? (
+                    <SNoResults>
+                      <NoResults closeDrop={handleCloseIconClick} />
+                    </SNoResults>
+                  ) : (
+                    <SBlock>
+                      <Loader size='md' />
+                    </SBlock>
+                  )
                 ) : (
-                  <SBlock>
-                    <Loader size='md' />
-                  </SBlock>
+                  <SResultsDropMobileContent>
+                    {resultsCreators.length > 0 && (
+                      <PopularCreatorsResults
+                        creators={resultsCreators}
+                        onSelect={closeSearch}
+                      />
+                    )}
+                    {resultsHashtags.length > 0 && (
+                      <PopularTagsResults
+                        hashtags={resultsHashtags}
+                        onSelect={closeSearch}
+                      />
+                    )}
+                    <SButton
+                      onClick={() => {
+                        const clearedSearchValue =
+                          getClearedSearchQuery(searchValue);
+                        if (clearedSearchValue) {
+                          handleSeeResults(clearedSearchValue);
+                        }
+                      }}
+                      view='quaternary'
+                    >
+                      {t('search.allResults')}
+                    </SButton>
+                  </SResultsDropMobileContent>
                 )
-              ) : (
-                <SResultsDropMobileContent>
-                  {resultsCreators.length > 0 && (
-                    <PopularCreatorsResults
-                      creators={resultsCreators}
-                      onSelect={closeSearch}
-                    />
-                  )}
-                  {resultsHashtags.length > 0 && (
-                    <PopularTagsResults
-                      hashtags={resultsHashtags}
-                      onSelect={closeSearch}
-                    />
-                  )}
-                  <SButton
-                    onClick={() => {
-                      const clearedSearchValue =
-                        getClearedSearchQuery(searchValue);
-                      if (clearedSearchValue) {
-                        handleSeeResults(clearedSearchValue);
-                      }
-                    }}
-                    view='quaternary'
-                  >
-                    {t('search.allResults')}
-                  </SButton>
-                </SResultsDropMobileContent>
-              )
-            }
+              }
+            </SResultsDropMobileContentWrapper>
           </SResultsDropMobile>
         )}
       </>
@@ -601,18 +603,27 @@ const SResultsDropMobile = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   position: fixed;
   border-radius: 0;
-  padding: 16px;
   width: 100vw;
-  height: calc(var(--window-inner-height) - 40px); // 40px needs for ios
+  height: 100vh;
   top: 56px;
   left: 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    top: 64px;
+  }
+`;
+
+const SResultsDropMobileContentWrapper = styled.div`
+  padding: 16px;
+  max-height: calc(var(--window-inner-height) - 40px); // 40px needs for ios
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
 
+  transition: max-height 0.2s ease-out;
+
   ${({ theme }) => theme.media.tablet} {
     padding: 16px 48px;
-    top: 64px;
   }
 `;
 
