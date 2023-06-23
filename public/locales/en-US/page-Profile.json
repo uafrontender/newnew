@@ -171,6 +171,9 @@
           "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "No links allowed in bio"
         }
+      },
+      "avatar": {
+        "inappropriate": "Uploaded image cannot be used"
       }
     }
   },
