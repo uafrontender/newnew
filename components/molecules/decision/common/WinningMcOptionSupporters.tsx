@@ -18,7 +18,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
   ({ postCreator, winningOption }) => {
     const { t } = useTranslation('page-Post');
     const { userData } = useUserData();
-    const { userLoggedIn } = useAppState();
+    const { userLoggedIn, userIsCreator } = useAppState();
 
     const userToRender = useMemo(() => {
       if (userLoggedIn && !userData?.userUuid) {
@@ -55,6 +55,10 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
 
     const href: string | undefined = useMemo(() => {
       if (userToRender === 'me') {
+        if (userIsCreator) {
+          return '/profile/my-posts';
+        }
+
         return '/profile';
       }
 
@@ -63,7 +67,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
       }
 
       return undefined;
-    }, [userToRender]);
+    }, [userToRender, userIsCreator]);
 
     const avatarSrc: string = useMemo(() => {
       if (userToRender === 'me') {

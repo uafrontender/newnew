@@ -19,7 +19,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
 }) => {
   const { t } = useTranslation('page-Post');
   const { userData } = useUserData();
-  const { userLoggedIn } = useAppState();
+  const { userLoggedIn, userIsCreator } = useAppState();
 
   const userToRender = useMemo(() => {
     if (userLoggedIn && !userData?.userUuid) {
@@ -49,6 +49,10 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
 
   const href: string | undefined = useMemo(() => {
     if (userToRender === 'me') {
+      if (userIsCreator) {
+        return '/profile/my-posts';
+      }
+
       return '/profile';
     }
 
@@ -57,7 +61,7 @@ const WinningOptionAcCreator: React.FC<IWinningOptionAcCreator> = ({
     }
 
     return undefined;
-  }, [userToRender]);
+  }, [userToRender, userIsCreator]);
 
   const avatarSrc: string = useMemo(() => {
     if (userToRender === 'me') {
