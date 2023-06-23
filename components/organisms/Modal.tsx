@@ -1,9 +1,4 @@
-import React, {
-  JSXElementConstructor,
-  ReactElement,
-  useEffect,
-  useRef,
-} from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -24,7 +19,7 @@ interface IModal {
   transitionspeed?: number;
   additionalz?: number;
   custombackdropfiltervalue?: number;
-  children: ReactElement<any, string | JSXElementConstructor<any>>;
+  children: ReactNode;
   onClose?: () => void;
   onEnterKeyUp?: () => void;
 }
@@ -110,9 +105,11 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        {React.cloneElement(children, {
-          ref: containerRef,
-        })}
+        {React.isValidElement(children)
+          ? React.cloneElement(children as React.ReactElement<any>, {
+              ref: containerRef,
+            })
+          : children}
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement

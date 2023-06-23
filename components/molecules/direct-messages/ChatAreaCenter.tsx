@@ -18,6 +18,7 @@ import isIOS from '../../../utils/isIOS';
 import { SocketContext } from '../../../contexts/socketContext';
 import Loader from '../../atoms/Loader';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
+import NoAnnouncementMessagesYet from './NoAnnouncmentMessagesYet';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -115,6 +116,15 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [messages, isAnnouncement, isLoading, chatRoom]
   );
 
+  const hasNoAnnouncementMessagesYet = useMemo(
+    () =>
+      messages.length === 0 &&
+      isAnnouncement &&
+      !isLoading &&
+      chatRoom.myRole === 1,
+    [messages, isAnnouncement, isLoading, chatRoom]
+  );
+
   const selectedChatRoomId = useMemo(() => {
     if (!router.query.roomID || Array.isArray(router.query.roomID)) {
       return undefined;
@@ -163,6 +173,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     >
       {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
       {hasNoMessagesYet && <NoMessagesYet />}
+      {hasNoAnnouncementMessagesYet && <NoAnnouncementMessagesYet />}
 
       {messages.map((item, index) => (
         <ChatMessage

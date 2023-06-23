@@ -19,7 +19,7 @@ import {
   markAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
+import mobileLogo from '../../../../public/images/svg/MobileLogo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import usePagination, {

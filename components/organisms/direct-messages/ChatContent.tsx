@@ -390,6 +390,7 @@ const ChatContent: React.FC<IFuncProps> = ({
         />
       );
     }
+
     return null;
   }, [
     isVisavisBlocked,

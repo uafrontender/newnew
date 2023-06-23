@@ -16,7 +16,7 @@ import {
 } from '../../../api/endpoints/user';
 import { useUserData } from '../../../contexts/userDataContext';
 
-import Logo from '../../../public/images/svg/mobile-logo.svg';
+import Logo from '../../../public/images/svg/MobileLogo.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
 
 interface IEditEmailStepOneModal {
