@@ -148,7 +148,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
   const { userData, updateUserData } = useUserData();
   const { resizeMode, userIsCreator, logoutAndRedirect } = useAppState();
@@ -580,7 +580,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const res = await updateMe(payload);
 
       if (!res?.data || res.error) {
-        throw new Error('Request failed');
+        throw new Error(res.error?.message || 'Request failed');
       }
 
       updateUserData({
@@ -598,12 +598,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       handleClose();
     } catch (err) {
-      console.error(err);
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         logoutAndRedirect();
       } else if ((err as Error).message === 'Refresh token invalid') {
         logoutAndRedirect('/sign-up?reason=session_expired');
+      } else if (
+        (err as Error).message &&
+        (err as Error).message.includes('Uploaded image')
+      ) {
+        showErrorToastCustom(t('editProfileMenu.inputs.avatar.inappropriate'));
       } else {
         showErrorToastPredefined(undefined);
       }
@@ -627,6 +631,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEditAnimatedExtension,
     coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
+    showErrorToastCustom,
+    t,
     logoutAndRedirect,
     updateUserData,
     handleClose,
