@@ -37,6 +37,8 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
     resizeMode
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { handleUpdatePostTitle, isUpdateTitleLoading, postParsed } =
     usePostInnerState();
 
@@ -149,9 +151,12 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
   );
 
   const handleConfirmNewPostTitle = useCallback(async () => {
-    if (isAPIValidateLoading || isUpdateTitleLoading) return;
+    if (isAPIValidateLoading || isUpdateTitleLoading) {
+      return;
+    }
 
     try {
+      setIsLoading(true);
       const validationResult = await validateTitleViaAPI(titleInEdit);
       if (!validationResult) {
         return;
@@ -160,6 +165,8 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
       closeModal();
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   }, [
     closeModal,
@@ -233,6 +240,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
             isValid={isTitleValid}
             errorCaption={titleValidationError}
             onChange={handleUpdateNewTitleText}
+            disabled={isLoading}
           />
           <SControlsDiv>
             <SCancelButton
@@ -247,6 +255,7 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
               view='primaryGrad'
               size='sm'
               disabled={isDisabled}
+              loading={isLoading}
               onClick={handleConfirmNewPostTitle}
             >
               {t('saveBtn')}

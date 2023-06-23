@@ -46,7 +46,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
@@ -159,6 +159,14 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
         );
 
         if (
+          updateCoverImageRes?.data?.status ===
+          newnewapi.SetPostCoverImageResponse.SetPostCoverImageStatus
+            .UNSAFE_POST_THUMBNAIL
+        ) {
+          throw new Error('Inappropriate Content');
+        }
+
+        if (
           updateCoverImageRes.error ||
           updateCoverImageRes?.data?.status !==
             newnewapi.SetPostCoverImageResponse.SetPostCoverImageStatus.OK
@@ -188,8 +196,11 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
         handleSubmit(undefined);
       }
     } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
+      if ((err as Error).message === 'Inappropriate Content') {
+        showErrorToastCustom(t('errors.inappropriate'));
+      } else {
+        showErrorToastPredefined(undefined);
+      }
     } finally {
       setUpdateCoverImageLoading(false);
     }

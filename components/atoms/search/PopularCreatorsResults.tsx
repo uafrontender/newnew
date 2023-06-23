@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import UserAvatar from '../../molecules/UserAvatar';
 import { Mixpanel } from '../../../utils/mixpanel';
 import DisplayName from '../DisplayName';
 import { useUserData } from '../../../contexts/userDataContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IFunction {
   creators: newnewapi.IUser[];
@@ -18,6 +20,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({
   onSelect,
 }) => {
   const { t } = useTranslation('common');
+  const { userIsCreator } = useAppState();
   const { userData } = useUserData();
 
   return (
@@ -27,7 +30,9 @@ const PopularCreatorsResults: React.FC<IFunction> = ({
         <Link
           href={
             creator.uuid === userData?.userUuid
-              ? '/profile'
+              ? userIsCreator
+                ? '/profile/my-posts'
+                : '/profile'
               : `/${creator.username}`
           }
           key={creator.uuid}
