@@ -333,7 +333,7 @@ const SContent = styled.div<ISContent>`
 
   &::before {
     content: '';
-    margin: -35px;
+    margin: -10px; // to prevent gaps
     position: absolute;
     top: 0;
     right: 0;
@@ -343,6 +343,10 @@ const SContent = styled.div<ISContent>`
     background-image: ${({ bg }) => `url(${bg})`};
     background-position: center;
     background-size: cover;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    border-radius: 16px;
   }
 `;
 

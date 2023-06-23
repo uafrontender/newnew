@@ -4,7 +4,6 @@ import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { useQueryClient } from 'react-query';
 
 import InlineSVG from '../InlineSVG';
@@ -28,6 +27,7 @@ import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 interface IStaticSearchInput {
   width?: string;
@@ -40,9 +40,13 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const { showErrorToastPredefined } = useErrorToasts();
     const queryClient = useQueryClient();
 
+    const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
     const inputRef: any = useRef();
     const inputContainerRef: any = useRef();
-    const resultsContainerRef: any = useRef();
+
+    const resultsContainerRef = useRef(null);
+
     const [searchValue, setSearchValue] = useState('');
     const [inputRightPosition, setInputRightPosition] = useState(0);
     const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
@@ -329,17 +333,21 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
     useEffect(() => {
       const resultContainer = resultsContainerRef.current;
-
       if (isMobileOrTablet && isResultsDropVisible && resultContainer) {
-        disableBodyScroll(resultContainer);
+        enableOverlayMode(resultContainer);
       }
 
       return () => {
         if (resultContainer) {
-          enableBodyScroll(resultContainer);
+          disableOverlayMode(resultContainer);
         }
       };
-    }, [isMobileOrTablet, isResultsDropVisible]);
+    }, [
+      isMobileOrTablet,
+      isResultsDropVisible,
+      enableOverlayMode,
+      disableOverlayMode,
+    ]);
 
     return (
       <>

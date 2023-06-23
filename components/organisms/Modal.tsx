@@ -2,9 +2,9 @@ import React, { ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import isBrowser from '../../utils/isBrowser';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 const MODAL_TYPES = ['initial', 'covered', 'following'] as const;
 export type ModalType = typeof MODAL_TYPES[number];
@@ -37,21 +37,23 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     onEnterKeyUp,
   } = props;
 
-  const containerRef = useRef(null);
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
+  const elementRef = useRef(null);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const elementContainer = elementRef.current;
 
-    if (show && container) {
-      disableBodyScroll(container);
+    if (show && elementContainer) {
+      enableOverlayMode(elementContainer);
     }
 
     return () => {
-      if (container) {
-        enableBodyScroll(container);
+      if (elementContainer) {
+        disableOverlayMode(elementContainer);
       }
     };
-  }, [show]);
+  }, [show, enableOverlayMode, disableOverlayMode]);
 
   useEffect(() => {
     const blurredBody = document.getElementById('__next');
@@ -107,7 +109,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
         />
         {React.isValidElement(children)
           ? React.cloneElement(children as React.ReactElement<any>, {
-              ref: containerRef,
+              ref: elementRef,
             })
           : children}
       </StyledModalOverlay>
