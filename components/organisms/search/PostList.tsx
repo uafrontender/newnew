@@ -160,10 +160,6 @@ const SListWrapper = styled.div`
       width: calc(20% - 32px);
     }
 
-    ${(props) => props.theme.media.desktop} {
-      width: calc(16.65% - 32px);
-    }
-
     div {
       .skeletonSpan {
         display: block;
@@ -194,10 +190,6 @@ const SItemWrapper = styled.div`
 
   ${(props) => props.theme.media.laptopL} {
     width: calc(20% - 32px);
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: calc(16.65% - 32px);
   }
 `;
 

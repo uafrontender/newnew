@@ -965,6 +965,11 @@ const SWrapper = styled.div<{
     &:focus-visible {
       outline: none !important;
     }
+
+    /* Otherwise borders are straight on Safari */
+    ${({ theme }) => theme.media.tablet} {
+      border-radius: 16px;
+    }
   }
 
   /* Mostly useless, added just in case */
