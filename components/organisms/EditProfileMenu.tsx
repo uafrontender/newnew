@@ -75,12 +75,6 @@ type ModalMenuUserData = {
   genderPronouns?: newnewapi.User.GenderPronouns;
 };
 
-type TFormErrors = {
-  nicknameError?: string;
-  usernameError?: string;
-  bioError?: string;
-};
-
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
 
@@ -154,7 +148,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
   const { userData, updateUserData } = useUserData();
   const { resizeMode, userIsCreator, logoutAndRedirect } = useAppState();
@@ -177,11 +171,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [isDataValid, setIsDataValid] = useState(false);
-  const [formErrors, setFormErrors] = useState<TFormErrors>({
-    nicknameError: '',
-    usernameError: '',
-    bioError: '',
-  });
+  const [nicknameError, setNicknameError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [bioError, setBioError] = useState('');
 
   const validateUsernameAbortControllerRef = useRef<
     AbortController | undefined
@@ -204,21 +196,15 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           validateUsernameAbortControllerRef.current?.signal
         );
 
-        if (!res.data?.status) throw new Error('An error occurred');
+        if (!res.data?.status) {
+          throw new Error('An error occurred');
+        }
+
         if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.usernameError = errorSwitchUsername(
-              res.data?.status!!
-            );
-            return errorsWorking;
-          });
+          const error = errorSwitchUsername(res.data?.status!!);
+          setUsernameError(error);
         } else {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.usernameError = '';
-            return errorsWorking;
-          });
+          setUsernameError('');
           result = true;
         }
 
@@ -239,7 +225,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         return result;
       }
     },
-    [setFormErrors, logoutAndRedirect]
+    [logoutAndRedirect]
   );
 
   const validateTextAbortControllerRef = useRef<AbortController | undefined>();
@@ -256,20 +242,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsAPIValidateLoading(true);
       try {
         if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
-          if (text.trim() !== text) {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.nicknameError = 'sideSpacesForbidden';
-              return errorsWorking;
-            });
+          if (text.length === 0 && userData?.nickname) {
+            setNicknameError('tooShort');
             return result;
           }
+
+          if (text.trim() !== text) {
+            setNicknameError('sideSpacesForbidden');
+            return result;
+          }
+
           if (text.length > NAME_LENGTH_LIMIT) {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.nicknameError = 'tooLong';
-              return errorsWorking;
-            });
+            setNicknameError('tooLong');
             return result;
           }
         }
@@ -290,47 +274,26 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.nicknameError = errorSwitch(res.data?.status!!);
-              return errorsWorking;
-            });
+            const error = errorSwitch(res.data?.status!!);
+            setNicknameError(error);
           } else {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.nicknameError = '';
-              return errorsWorking;
-            });
+            setNicknameError('');
             result = true;
           }
         } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.bioError = errorSwitch(res.data?.status!!);
-              return errorsWorking;
-            });
+            const error = errorSwitch(res.data?.status!!);
+            setBioError(error);
           } else {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.bioError = '';
-              return errorsWorking;
-            });
+            setBioError('');
             result = true;
           }
         } else if (kind === newnewapi.ValidateTextRequest.Kind.CREATOR_BIO) {
           if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.bioError = errorSwitch(res.data?.status!!);
-              return errorsWorking;
-            });
+            const error = errorSwitch(res.data?.status!!);
+            setBioError(error);
           } else {
-            setFormErrors((errors) => {
-              const errorsWorking = { ...errors };
-              errorsWorking.bioError = '';
-              return errorsWorking;
-            });
+            setBioError('');
             result = true;
           }
         }
@@ -351,7 +314,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         return result;
       }
     },
-    [setFormErrors, logoutAndRedirect]
+    [userData?.nickname, logoutAndRedirect]
   );
 
   const handleUpdateDataInEdit = useCallback(
@@ -367,11 +330,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       if (key === 'username') {
         if (value === userData?.username) {
           // reset error if username equal to initial username
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.usernameError = '';
-            return errorsWorking;
-          });
+          setUsernameError('');
         }
       }
     },
@@ -409,11 +368,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (valueRefined === userData?.username) {
         // reset error if username equal to initial username
-        setFormErrors((errors) => {
-          const errorsWorking = { ...errors };
-          errorsWorking.usernameError = '';
-          return errorsWorking;
-        });
+        setUsernameError('');
         return;
       }
       validateUsernameViaAPI(valueRefined);
@@ -423,31 +378,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   const handleFocusNickname = useCallback(
     (e: React.FocusEvent<HTMLInputElement, Element>) => {
-      setFormErrors((errors) => {
-        const errorsWorking = { ...errors };
-        errorsWorking.nicknameError = '';
-        return errorsWorking;
-      });
+      setNicknameError('');
     },
     []
   );
   const handleFocusUsername = useCallback(
     (e: React.FocusEvent<HTMLInputElement, Element>) => {
-      setFormErrors((errors) => {
-        const errorsWorking = { ...errors };
-        errorsWorking.usernameError = '';
-        return errorsWorking;
-      });
+      setUsernameError('');
     },
     []
   );
   const handleFocusBio = useCallback(
     (e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
-      setFormErrors((errors) => {
-        const errorsWorking = { ...errors };
-        errorsWorking.bioError = '';
-        return errorsWorking;
-      });
+      setBioError('');
     },
     []
   );
@@ -551,7 +494,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       nicknameValid = await validateTextViaAPI(
         newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-        dataInEdit.username
+        dataInEdit.nickname
       );
 
       bioValid = await validateTextViaAPI(
@@ -637,7 +580,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const res = await updateMe(payload);
 
       if (!res?.data || res.error) {
-        throw new Error('Request failed');
+        throw new Error(res.error?.message || 'Request failed');
       }
 
       updateUserData({
@@ -655,12 +598,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
       handleClose();
     } catch (err) {
-      console.error(err);
       setIsLoading(false);
       if ((err as Error).message === 'No token') {
         logoutAndRedirect();
       } else if ((err as Error).message === 'Refresh token invalid') {
         logoutAndRedirect('/sign-up?reason=session_expired');
+      } else if (
+        (err as Error).message &&
+        (err as Error).message.includes('Uploaded image')
+      ) {
+        showErrorToastCustom(t('editProfileMenu.inputs.avatar.inappropriate'));
       } else {
         showErrorToastPredefined(undefined);
       }
@@ -684,6 +631,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     coverUrlInEditAnimatedExtension,
     coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
+    showErrorToastCustom,
+    t,
     logoutAndRedirect,
     updateUserData,
     handleClose,
@@ -900,7 +849,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       }
 
       const initialValue = userData[typedKey] ?? '';
-
       if (value === initialValue) {
         return false;
       }
@@ -913,13 +861,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       return;
     }
 
-    if (Object.values(formErrors).some((v) => v !== '')) {
+    if (nicknameError || usernameError || bioError) {
       setIsDataValid(false);
       return;
     }
 
     setIsDataValid(true);
-  }, [formErrors, dataInEdit, userData]);
+  }, [nicknameError, usernameError, bioError, dataInEdit, userData]);
 
   // Gender Pronouns
   const genderOptions: TDropdownSelectItem<number>[] = useMemo(
@@ -998,10 +946,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   placeholder={t('editProfileMenu.inputs.nickname.placeholder')}
                   errorCaption={t(
                     `editProfileMenu.inputs.nickname.errors.${
-                      formErrors.nicknameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['nickname']['errors']
+                      nicknameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['nickname']['errors']
                     }`
                   )}
-                  isValid={!formErrors.nicknameError}
+                  isValid={!nicknameError}
                   onChange={(e) =>
                     handleUpdateDataInEdit('nickname', e.target.value)
                   }
@@ -1039,11 +987,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   }
                   errorCaption={t(
                     `editProfileMenu.inputs.username.errors.${
-                      formErrors.usernameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['username']['errors']
+                      usernameError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['username']['errors']
                     }`
                   )}
                   placeholder={t('editProfileMenu.inputs.username.placeholder')}
-                  isValid={!formErrors.usernameError}
+                  isValid={!usernameError}
                   onChange={(value: any) => {
                     handleUpdateDataInEdit('username', value as string);
                   }}
@@ -1079,10 +1027,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   placeholder={t('editProfileMenu.inputs.bio.placeholder')}
                   errorCaption={t(
                     `editProfileMenu.inputs.bio.errors.${
-                      formErrors.bioError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['bio']['errors']
+                      bioError as keyof I18nNamespaces['page-Profile']['editProfileMenu']['inputs']['bio']['errors']
                     }`
                   )}
-                  isValid={!formErrors.bioError}
+                  isValid={!bioError}
                   onChange={(e) =>
                     handleUpdateDataInEdit('bio', e.target.value)
                   }

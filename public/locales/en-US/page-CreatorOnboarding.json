@@ -20,9 +20,9 @@
         "placeholder": "First name",
         "errors": {
           "generic": "Please check input",
-          "tooLong": "Firstname is too long",
-          "tooShort": "Firstname is too short",
-          "invalidChar": "Firstname has invalid characters",
+          "tooLong": "First name is too long",
+          "tooShort": "First name is too short",
+          "invalidChar": "First name has invalid characters",
           "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed",
           "sideSpacesForbidden": "Leading and trailing spaces aren't allowed"
@@ -32,9 +32,9 @@
         "placeholder": "Last name",
         "errors": {
           "generic": "Please check input",
-          "tooLong": "Lastname is too long",
-          "tooShort": "Lastname is too short",
-          "invalidChar": "Lastname has invalid characters",
+          "tooLong": "Last name is too long",
+          "tooShort": "Last name is too short",
+          "invalidChar": "Last name has invalid characters",
           "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "Links not allowed",
           "sideSpacesForbidden": "Leading and trailing spaces aren't allowed"

@@ -22,7 +22,7 @@ const NoCashOut: React.FC = () => {
       </SBlockLeft>
 
       <SBlockRight>
-        <a
+        <SLink
           href='https://creatorpayouts.newnew.co/'
           target='_blank'
           rel='noreferrer'
@@ -39,7 +39,7 @@ const NoCashOut: React.FC = () => {
           >
             {t('dashboard.earnings.cashOut.submit')}
           </SButton>
-        </a>
+        </SLink>
       </SBlockRight>
     </SContainer>
   );
@@ -89,13 +89,10 @@ const SDescription = styled(Text)`
 const SButton = styled(Button)`
   width: 100%;
   padding: 16px 20px;
-  margin-top: 16px;
 
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
-    margin-top: unset;
-    margin-left: 16px;
   }
 `;
 
@@ -107,5 +104,14 @@ const SInlineSVG = styled(InlineSVG)`
 
   ${(props) => props.theme.media.tablet} {
     margin-right: 12px;
+  }
+`;
+
+const SLink = styled.a`
+  margin-top: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: unset;
+    margin-left: 16px;
   }
 `;

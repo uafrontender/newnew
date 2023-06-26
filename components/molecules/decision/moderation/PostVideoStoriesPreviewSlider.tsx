@@ -1,9 +1,8 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import isBrowser from '../../../../utils/isBrowser';
 import { usePostModerationResponsesContext } from '../../../../contexts/postModerationResponsesContext';
 
 import PostVideoThumbnailItem from './PostVideoThumbnailItem';
@@ -44,18 +43,6 @@ const PostVideoStoriesPreviewSlider: React.FunctionComponent<
     usePostModerationResponsesContext();
 
   const containerRef = useRef<HTMLDivElement>();
-
-  useEffect(() => {
-    if (currentActive !== undefined && isBrowser()) {
-      document
-        ?.getElementById(`postVideoThumbnailItem_${currentActive}`)
-        ?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'center',
-        });
-    }
-  }, [currentActive]);
 
   return (
     <SWrapper
@@ -149,4 +136,5 @@ const SContainer = styled.div`
   position: relative;
 
   scroll-snap-type: x mandatory;
+  scroll-padding: 8px;
 `;

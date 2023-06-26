@@ -106,8 +106,6 @@ const FileUpload: React.FC<IFileUpload> = ({
 
   const [showFullPreview, setShowFullPreview] = useState(false);
 
-  const [showPlayButton, setShowPlayButton] = useState(false);
-
   const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Select File Clicked', { _stage: 'Creation' });
     inputRef.current?.click();
@@ -122,9 +120,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseFullPreviewClick = useCallback(() => {
     Mixpanel.track('Close Full Preview', { _stage: 'Creation' });
     setShowFullPreview(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
+    playerRef.current.play();
   }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
@@ -136,9 +132,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseCoverImageEditClick = useCallback(() => {
     Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
     setCoverImageModalOpen(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
+    playerRef.current.play();
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
@@ -150,9 +144,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseDeleteVideoClick = useCallback(() => {
     Mixpanel.track('Close Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
+    playerRef.current.play();
   }, []);
 
   const handleDeleteVideo = useCallback(() => {
@@ -481,23 +473,22 @@ const FileUpload: React.FC<IFileUpload> = ({
             }}
           />
           <SPlayerWrapper>
-            {customCoverImageUrl && (
-              <SThumbnailHolder
-                className='thumnailHolder'
-                src={customCoverImageUrl ?? ''}
-                alt='Post preview'
-                draggable={false}
-              />
-            )}
             <VideojsPlayer
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
               borderRadius='8px'
-              showPlayButton={showPlayButton}
               playButtonSize='small'
             />
           </SPlayerWrapper>
+          {customCoverImageUrl && (
+            <SThumbnailHolder
+              className='thumnailHolder'
+              src={customCoverImageUrl ?? ''}
+              alt='Post preview'
+              draggable={false}
+            />
+          )}
           <SButtonsContainer>
             <SButtonsContainerLeft>
               <SVideoButton
@@ -549,7 +540,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     handleRetryVideoUpload,
     customCoverImageUrl,
     value,
-    showPlayButton,
     coverImageModalOpen,
     handleDeleteVideoShow,
     isDesktop,
@@ -657,6 +647,8 @@ const SPlayerWrapper = styled.div`
   overflow: hidden;
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
+  flex-shrink: 0;
+
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
     height: 124px;
@@ -664,19 +656,28 @@ const SPlayerWrapper = styled.div`
 `;
 
 const SThumbnailHolder = styled.img`
-  position: absolute;
-  width: 100%;
-  height: 100%;
   transition: linear 0.3s;
   z-index: 1;
 
+  margin-left: 8px;
+
+  width: 64px;
+  height: 108px;
+  overflow: hidden;
   border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  flex-shrink: 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 72px;
+    height: 124px;
+  }
 `;
 
 const SButtonsContainer = styled.div`
   width: calc(100% - 64px);
   display: flex;
-  padding-left: 16px;
+  padding-left: 8px;
   flex-direction: row;
   justify-content: space-between;
 `;
