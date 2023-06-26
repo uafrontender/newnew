@@ -100,6 +100,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const [localFile, setLocalFile] = useState<File | null>(null);
 
   const [showVideoDelete, setShowVideoDelete] = useState(false);
+  const [isVideoDeleting, setIsVideoDeleting] = useState(false);
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
@@ -126,13 +127,11 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
     setCoverImageModalOpen(true);
-    playerRef.current.pause();
   }, []);
 
   const handleCloseCoverImageEditClick = useCallback(() => {
     Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
     setCoverImageModalOpen(false);
-    playerRef.current.play();
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
@@ -147,13 +146,15 @@ const FileUpload: React.FC<IFileUpload> = ({
     playerRef.current.play();
   }, []);
 
-  const handleDeleteVideo = useCallback(() => {
+  const handleDeleteVideo = useCallback(async () => {
     Mixpanel.track('Delete Video Clicked', { _stage: 'Creation' });
-    handleCloseDeleteVideoClick();
+    setIsVideoDeleting(true);
     setLocalFile(null);
-    onChange(id, null);
+    await onChange(id, null);
     unsetCustomCoverImageUrl();
-  }, [handleCloseDeleteVideoClick, id, onChange, unsetCustomCoverImageUrl]);
+    setShowVideoDelete(false);
+    setIsVideoDeleting(false);
+  }, [id, onChange, unsetCustomCoverImageUrl]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -551,6 +552,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     <SWrapper>
       <DeleteVideo
         open={showVideoDelete}
+        isLoading={isVideoDeleting}
         handleClose={handleCloseDeleteVideoClick}
         handleSubmit={handleDeleteVideo}
       />
