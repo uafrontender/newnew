@@ -43,7 +43,7 @@ export default function useErrorToasts(): IUseErrorToasts {
         return {
           amount:
             appConstants.announcementVideoLimits?.minLengthSeconds?.toString() ??
-            '30',
+            '15',
         };
       }
 
@@ -59,7 +59,7 @@ export default function useErrorToasts(): IUseErrorToasts {
         return {
           amount:
             appConstants.responseVideoLimits?.minLengthSeconds?.toString() ??
-            '15',
+            '30',
         };
       }
 
@@ -75,7 +75,7 @@ export default function useErrorToasts(): IUseErrorToasts {
         return {
           amount:
             appConstants.responseVideoLimits?.minLengthSeconds?.toString() ??
-            '15',
+            '30',
         };
       }
 
