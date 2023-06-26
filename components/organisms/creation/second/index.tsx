@@ -529,6 +529,31 @@ export const CreationSecondStepContent: React.FC<
           throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
 
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_TOO_SHORT
+        ) {
+          throw new Error('VideoTooShort');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_TOO_LONG
+        ) {
+          throw new Error('VideoTooLong');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_QUOTA_REACHED
+        ) {
+          throw new Error('Processing limit reached');
+        }
+
+        if (resProcessing.data.videoUploadError) {
+          throw new Error('An error occurred');
+        }
+
         setCreationVideoProcessing({
           taskUuid: resProcessing.data.taskUuid,
           targetUrls: {
@@ -550,9 +575,16 @@ export const CreationSecondStepContent: React.FC<
         setCreationVideo(res.data.publicUrl ?? '');
         xhrRef.current = undefined;
       } catch (error: any) {
+        // TODO: Change this overcomplicated approach
         if (error.message === 'Upload failed') {
           setCreationFileUploadError(true);
           showErrorToastPredefined(undefined);
+        } else if (error.message === 'VideoTooShort') {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(ErrorToastPredefinedMessage.VideoTooShort);
+        } else if (error.message === 'VideoTooLong') {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(ErrorToastPredefinedMessage.VideoTooLong);
         } else if (error.message === 'Processing limit reached') {
           setCreationFileUploadError(true);
           showErrorToastPredefined(

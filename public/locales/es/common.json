@@ -237,7 +237,9 @@
     "generic": "Se ha producido un error, inténtalo de nuevo más tarde",
     "serverError": "Se ha producido un error en el servidor, inténtalo de nuevo más tarde.",
     "recaptchaError": "El recaptcha ha fallado, por favor inténtalo más tarde",
-    "usupportedImageFormatError": "Formato de imagen no soportado, por favor intenta con otra imagen",
+    "videoTooShort_NEEDS_TRANSLATION": "Video must be at least {{amount}} seconds long",
+    "videoTooLong_NEEDS_TRANSLATION": "Video must be shorted then {{amount}} seconds",
+    "unsupportedImageFormatError": "Formato de imagen no soportado, por favor intenta con otra imagen",
     "processingLimitReachedError": "Por favor, espera hasta que puedas subir más vídeos",
     "invalidDateError": "Comprueba la fecha y la hora"
   },

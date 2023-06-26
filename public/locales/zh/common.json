@@ -238,7 +238,9 @@
     "generic": "發生錯誤，請稍後再試",
     "serverError": "發生伺服器端錯誤，請稍後再試",
     "recaptchaError": "Recaptcha失敗，請稍後再試",
-    "usupportedImageFormatError": "圖片格式不支援，請嘗試其他圖片",
+    "videoTooShort_NEEDS_TRANSLATION": "Video must be at least {{amount}} seconds long",
+    "videoTooLong_NEEDS_TRANSLATION": "Video must be shorted then {{amount}} seconds",
+    "unsupportedImageFormatError": "圖片格式不支援，請嘗試其他圖片",
     "processingLimitReachedError": "請等待，直到可以上傳更多的視頻",
     "invalidDateError": "請檢查日期和時間"
   },
