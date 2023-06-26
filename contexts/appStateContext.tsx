@@ -140,7 +140,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       setUserLoggedIn(true);
       setUserIsCreator(isCreator);
     },
-    [setUserLoggedIn, setUserIsCreator]
+    [setUserLoggedIn]
   );
 
   const handleBecameCreator = useCallback(() => {
@@ -151,7 +151,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       }
       return true;
     });
-  }, [setUserIsCreator, refreshTokens]);
+  }, [refreshTokens]);
 
   const logoutAndRedirect = useCallback(
     (redirectUrl?: string) => {
@@ -161,7 +161,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       cookiesInstance.remove('refreshToken');
       router.push(redirectUrl ?? '/');
     },
-    [router, setUserIsCreator]
+    [router]
   );
 
   const handleResizeObserver = useCallback(() => {
