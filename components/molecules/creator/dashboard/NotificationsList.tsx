@@ -239,6 +239,20 @@ export const NotificationsList: React.FC<IFunction> = ({
     []
   );
 
+  useEffect(() => {
+    const listContainer = scrollRef.current;
+
+    const handleContextMenu = (event: PointerEvent) => {
+      event.preventDefault();
+    };
+
+    listContainer.addEventListener('contextmenu', handleContextMenu);
+
+    return () => {
+      listContainer.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification, itemCurrentTime: number) => {
       const message = getEnrichedNotificationMessage(item);
