@@ -9,8 +9,12 @@ export enum ErrorToastPredefinedMessage {
   ServerError = 'serverError',
   RecaptchaError = 'recaptchaError',
   UnsupportedImageFormatError = 'unsupportedImageFormatError',
-  VideoTooShort = 'videoTooShort',
-  VideoTooLong = 'videoTooLong',
+  AnnouncementTooShort = 'announcementTooShort',
+  AnnouncementTooLong = 'announcementTooLong',
+  InitialResponseTooShort = 'initialResponseTooShort',
+  InitialResponseTooLong = 'initialResponseTooLong',
+  AdditionalResponseTooShort = 'additionalResponseTooShort',
+  AdditionalResponseTooLong = 'additionalResponseTooLong',
   ProcessingLimitReachedError = 'processingLimitReachedError',
   InvalidDateError = 'invalidDateError',
 }
@@ -35,15 +39,51 @@ export default function useErrorToasts(): IUseErrorToasts {
     (
       error: ErrorToastPredefinedMessage
     ): { [key: string]: string } | undefined => {
-      if (error === ErrorToastPredefinedMessage.VideoTooShort) {
+      if (error === ErrorToastPredefinedMessage.AnnouncementTooShort) {
         return {
-          amount: appConstants.minVideoLengthInSeconds?.toString() ?? '10',
+          amount:
+            appConstants.announcementVideoLimits?.minLengthSeconds?.toString() ??
+            '30',
         };
       }
 
-      if (error === ErrorToastPredefinedMessage.VideoTooLong) {
+      if (error === ErrorToastPredefinedMessage.AnnouncementTooLong) {
         return {
-          amount: appConstants.maxVideoLengthInSeconds?.toString() ?? '3600',
+          amount:
+            appConstants.announcementVideoLimits?.maxLengthSeconds?.toString() ??
+            '3600',
+        };
+      }
+
+      if (error === ErrorToastPredefinedMessage.InitialResponseTooShort) {
+        return {
+          amount:
+            appConstants.responseVideoLimits?.minLengthSeconds?.toString() ??
+            '15',
+        };
+      }
+
+      if (error === ErrorToastPredefinedMessage.InitialResponseTooLong) {
+        return {
+          amount:
+            appConstants.responseVideoLimits?.maxLengthSeconds?.toString() ??
+            '3600',
+        };
+      }
+
+      if (error === ErrorToastPredefinedMessage.AdditionalResponseTooShort) {
+        return {
+          amount:
+            appConstants.responseVideoLimits?.minLengthSeconds?.toString() ??
+            '15',
+        };
+      }
+
+      if (error === ErrorToastPredefinedMessage.AdditionalResponseTooLong) {
+        return {
+          amount:
+            appConstants.responseVideoLimits?.maxLengthSeconds?.toString() ??
+            '3600',
         };
       }
 

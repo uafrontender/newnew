@@ -453,7 +453,7 @@ export const CreationSecondStepContent: React.FC<
     videoProcessing?.taskUuid,
   ]);
 
-  const handleVideoUpload = useCallback(
+  const handleAnnouncementVideoUpload = useCallback(
     async (value: File) => {
       Mixpanel.track('Video Uploading', {
         _stage: 'Creation',
@@ -581,10 +581,14 @@ export const CreationSecondStepContent: React.FC<
           showErrorToastPredefined(undefined);
         } else if (error.message === 'VideoTooShort') {
           setCreationFileUploadError(true);
-          showErrorToastPredefined(ErrorToastPredefinedMessage.VideoTooShort);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.AnnouncementTooShort
+          );
         } else if (error.message === 'VideoTooLong') {
           setCreationFileUploadError(true);
-          showErrorToastPredefined(ErrorToastPredefinedMessage.VideoTooLong);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.AnnouncementTooLong
+          );
         } else if (error.message === 'Processing limit reached') {
           setCreationFileUploadError(true);
           showErrorToastPredefined(
@@ -638,7 +642,7 @@ export const CreationSecondStepContent: React.FC<
     [validateT]
   );
 
-  const handleItemChange = useCallback(
+  const handleAnnouncementItemChange = useCallback(
     async (key: string, value: any) => {
       if (key === 'title') {
         // Mixpanel.track('Post Title Change', {
@@ -684,7 +688,7 @@ export const CreationSecondStepContent: React.FC<
         setCreationChoices(value);
       } else if (key === 'video') {
         if (value) {
-          await handleVideoUpload(value);
+          await handleAnnouncementVideoUpload(value);
         } else {
           await handleVideoDelete();
         }
@@ -700,7 +704,7 @@ export const CreationSecondStepContent: React.FC<
       setCreationStartDate,
       setCreationTargetBackerCount,
       setCreationChoices,
-      handleVideoUpload,
+      handleAnnouncementVideoUpload,
       handleVideoDelete,
       setCreationVideoThumbnails,
     ]
@@ -775,7 +779,7 @@ export const CreationSecondStepContent: React.FC<
             error={titleError}
             onBlur={handleItemBlur}
             onFocus={handleItemFocus}
-            onChange={handleItemChange}
+            onChange={handleAnnouncementItemChange}
             placeholder={t('secondStep.input.placeholder')}
           />
         </SItemWrapper>
@@ -786,7 +790,7 @@ export const CreationSecondStepContent: React.FC<
               id='choices'
               min={2}
               options={multiplechoice.choices}
-              onChange={handleItemChange}
+              onChange={handleAnnouncementItemChange}
               validation={validateMcOption}
             />
             {isMobile && <SSeparator margin='16px 0' />}
@@ -800,7 +804,7 @@ export const CreationSecondStepContent: React.FC<
                 id='targetBackerCount'
                 type='input'
                 value={crowdfunding.targetBackerCount}
-                onChange={handleItemChange}
+                onChange={handleAnnouncementItemChange}
                 formattedDescription={cfFormattedDescription}
                 inputProps={{
                   min: 1,
@@ -819,7 +823,7 @@ export const CreationSecondStepContent: React.FC<
       titleError,
       handleItemBlur,
       handleItemFocus,
-      handleItemChange,
+      handleAnnouncementItemChange,
       t,
       tab,
       multiplechoice.choices,
@@ -841,7 +845,7 @@ export const CreationSecondStepContent: React.FC<
                     id='targetBackerCount'
                     type='input'
                     value={crowdfunding.targetBackerCount}
-                    onChange={handleItemChange}
+                    onChange={handleAnnouncementItemChange}
                     formattedDescription={cfFormattedDescription}
                     inputProps={{
                       min: 1,
@@ -857,7 +861,7 @@ export const CreationSecondStepContent: React.FC<
                   type='select'
                   value={post.expiresAt}
                   options={expireOptions}
-                  onChange={handleItemChange}
+                  onChange={handleAnnouncementItemChange}
                   formattedValue={t(
                     `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
@@ -871,7 +875,7 @@ export const CreationSecondStepContent: React.FC<
                   id='startsAt'
                   type='date'
                   value={post.startsAt}
-                  onChange={handleItemChange}
+                  onChange={handleAnnouncementItemChange}
                   formattedValue={t(
                     `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
@@ -892,7 +896,7 @@ export const CreationSecondStepContent: React.FC<
                 value={post.expiresAt}
                 options={expireOptions}
                 maxItems={5}
-                onChange={handleItemChange}
+                onChange={handleAnnouncementItemChange}
                 formattedValue={t(
                   `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
@@ -904,7 +908,7 @@ export const CreationSecondStepContent: React.FC<
             <TabletStartDate
               id='startsAt'
               value={post.startsAt}
-              onChange={handleItemChange}
+              onChange={handleAnnouncementItemChange}
             />
             <SSeparator margin='16px 0' />
           </>
@@ -913,14 +917,14 @@ export const CreationSecondStepContent: React.FC<
           id='comments'
           type='toggle'
           value={post.options.commentsEnabled}
-          onChange={handleItemChange}
+          onChange={handleAnnouncementItemChange}
         />
       </>
     ),
     [
       isMobile,
       tab,
-      handleItemChange,
+      handleAnnouncementItemChange,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
       post.expiresAt,
@@ -1257,7 +1261,7 @@ export const CreationSecondStepContent: React.FC<
                 errorProcessing={fileProcessing.error}
                 loadingProcessing={fileProcessing.loading}
                 progressProcessing={fileProcessing.progress}
-                onChange={handleItemChange}
+                onChange={handleAnnouncementItemChange}
                 handleCancelVideoUpload={() => xhrRef.current?.abort()}
               />
             </SItemWrapper>
