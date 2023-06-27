@@ -128,14 +128,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     [showErrorToastCustom, t, handleResponseItemChange, id]
   );
 
-  const handleRetryVideoUpload = useCallback(() => {
+  const handleRetryVideoUpload = useCallback(async () => {
     handleResponseItemChange(id, localFile, 'initial');
-  }, [id, localFile, handleResponseItemChange]);
+  }, [handleResponseItemChange, id, localFile]);
 
-  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+  const handleCancelUploadAndClearLocalFile = useCallback(async () => {
     handleCancelVideoUpload();
     setLocalFile(null);
-  }, [handleCancelVideoUpload]);
+    await handleResponseItemChange(id, null, 'initial');
+  }, [handleCancelVideoUpload, handleResponseItemChange, id]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
     setIsVideoDeleting(true);

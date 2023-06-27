@@ -102,6 +102,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
+  const [isVideoDeleting, setIsVideoDeleting] = useState(false);
 
   const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Post Additional Video Response Upload', {
@@ -185,13 +186,20 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleResponseItemChange(id, localFile, 'additional');
   }, [id, localFile, handleResponseItemChange]);
 
-  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+  const handleCancelUploadAndClearLocalFile = useCallback(async () => {
     handleCancelVideoUpload();
     setLocalFile(null);
+    await handleResponseItemChange(id, null, 'initial');
     handleSetCurrentAdditionalResponseStep('regular');
-  }, [handleCancelVideoUpload, handleSetCurrentAdditionalResponseStep]);
+  }, [
+    handleCancelVideoUpload,
+    handleResponseItemChange,
+    handleSetCurrentAdditionalResponseStep,
+    id,
+  ]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
+    setIsVideoDeleting(true);
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
@@ -219,8 +227,10 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
       handleSetCurrentAdditionalResponseStep('regular');
+      setIsVideoDeleting(false);
     } catch (err) {
       console.error(err);
+      setIsVideoDeleting(false);
     }
   }, [
     videoProcessing?.targetUrls?.originalVideoUrl,
@@ -315,6 +325,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
             <SErrorBottomBlock>
               <SLoadingBottomBlockButton
                 view='secondary'
+                disabled={isVideoDeleting}
                 onClick={handleCancelVideoProcessing}
               >
                 {t('postVideo.uploadResponseForm.button.cancel')}
@@ -350,17 +361,18 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
     return content;
   }, [
-    t,
     responseFileUploadLoading,
     responseFileUploadError,
     responseFileProcessingError,
     responseFileProcessingLoading,
+    localFile,
     responseFileUploadETA,
+    t,
     responseFileUploadProgress,
+    handleCancelUploadAndClearLocalFile,
+    isVideoDeleting,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    handleCancelUploadAndClearLocalFile,
-    localFile,
   ]);
 
   const thumbnailButtonBottomOverriden = useMemo(
