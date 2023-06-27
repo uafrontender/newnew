@@ -44,14 +44,12 @@ const Modal: React.FC<IModal> = React.memo((props) => {
   useEffect(() => {
     const elementContainer = elementRef.current;
 
-    if (show && elementContainer) {
+    if (show) {
       enableOverlayMode(elementContainer);
     }
 
     return () => {
-      if (elementContainer) {
-        disableOverlayMode(elementContainer);
-      }
+      disableOverlayMode(elementContainer);
     };
   }, [show, enableOverlayMode, disableOverlayMode]);
 
