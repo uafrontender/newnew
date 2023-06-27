@@ -188,7 +188,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const [isDeletingAdditionalResponse, setIsDeletingAdditionalResponse] =
     useState(false);
 
-  const handleAddAdditonalResponse = useCallback(
+  const handleAddAdditionalResponse = useCallback(
     (newVideo: newnewapi.IVideoUrls) => {
       setAdditionalResponses((curr) => [...curr, newVideo]);
     },
@@ -353,6 +353,19 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
 
+        setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
+        setVideoProcessing({
+          taskUuid: resProcessing.data.taskUuid,
+          targetUrls: {
+            thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+            hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+            dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
+            originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
+            thumbnailImageUrl:
+              resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+          },
+        });
+
         if (
           resProcessing.data.videoUploadError ===
           newnewapi.VideoUploadError.VIDEO_TOO_SHORT
@@ -381,25 +394,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           throw new Error('VideoFormatError');
         }
 
-        if (
-          resProcessing.data.videoUploadError ||
-          !resProcessing.data.taskUuid ||
-          !resProcessing.data.targetUrls
-        ) {
+        if (resProcessing.data.videoUploadError) {
           throw new Error('An error occurred');
         }
-
-        setVideoProcessing({
-          taskUuid: resProcessing.data.taskUuid,
-          targetUrls: {
-            thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-            hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-            dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-            originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
-            thumbnailImageUrl:
-              resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-          },
-        });
 
         setResponseFileUploadLoading(false);
 
@@ -407,7 +404,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         setResponseFileProcessingETA(80);
         setResponseFileProcessingLoading(true);
         setResponseFileProcessingError(false);
-        setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
         xhrRef.current = undefined;
       } catch (error: any) {
         // TODO: Change this overcomplicated approach
@@ -422,18 +418,18 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
             );
           } else {
             showErrorToastPredefined(
-              ErrorToastPredefinedMessage.AdditionalResponseTooLong
+              ErrorToastPredefinedMessage.AdditionalResponseTooShort
             );
           }
         } else if (error.message === 'VideoTooLong') {
           setResponseFileUploadError(true);
           if (type === 'initial') {
             showErrorToastPredefined(
-              ErrorToastPredefinedMessage.InitialResponseTooShort
+              ErrorToastPredefinedMessage.InitialResponseTooLong
             );
           } else {
             showErrorToastPredefined(
-              ErrorToastPredefinedMessage.AdditionalResponseTooShort
+              ErrorToastPredefinedMessage.AdditionalResponseTooLong
             );
           }
         } else if (error.message === 'Processing limit reached') {
@@ -683,7 +679,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         const videoUrlsToAdd =
           additionalResponsesFromBe[additionalResponsesFromBe.length - 1];
 
-        handleAddAdditonalResponse(videoUrlsToAdd);
+        handleAddAdditionalResponse(videoUrlsToAdd);
         setUploadedResponseVideoUrl('');
 
         setResponseFileUploadError(false);
@@ -708,7 +704,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       setUploadingAdditionalResponse(false);
     }
   }, [
-    handleAddAdditonalResponse,
+    handleAddAdditionalResponse,
     postUuid,
     showErrorToastPredefined,
     uploadedResponseVideoUrl,

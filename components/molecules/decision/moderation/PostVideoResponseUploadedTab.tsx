@@ -391,7 +391,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
   return (
     <SContainer>
-      {!responseFileUploadLoading && !responseFileProcessingLoading ? (
+      {!responseFileUploadLoading &&
+      !responseFileProcessingLoading &&
+      !responseFileUploadError ? (
         <PostVideoResponseUploaded
           isMuted={isMuted}
           isEditingStories={isEditingStories}
@@ -567,7 +569,7 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0;
+  padding: 0 10px;
 
   background: transparent;
 

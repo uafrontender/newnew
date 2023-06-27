@@ -531,6 +531,19 @@ export const CreationSecondStepContent: React.FC<
           throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
 
+        setCreationVideo(res.data.publicUrl ?? '');
+        setCreationVideoProcessing({
+          taskUuid: resProcessing.data.taskUuid,
+          targetUrls: {
+            thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+            hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+            dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
+            originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
+            thumbnailImageUrl:
+              resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+          },
+        });
+
         if (
           resProcessing.data.videoUploadError ===
           newnewapi.VideoUploadError.VIDEO_TOO_SHORT
@@ -559,25 +572,9 @@ export const CreationSecondStepContent: React.FC<
           throw new Error('VideoFormatError');
         }
 
-        if (
-          resProcessing.data.videoUploadError ||
-          !resProcessing.data.taskUuid ||
-          !resProcessing.data.targetUrls
-        ) {
+        if (resProcessing.data.videoUploadError) {
           throw new Error('An error occurred');
         }
-
-        setCreationVideoProcessing({
-          taskUuid: resProcessing.data.taskUuid,
-          targetUrls: {
-            thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-            hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-            dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-            originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
-            thumbnailImageUrl:
-              resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-          },
-        });
 
         setCreationFileUploadLoading(false);
 
@@ -585,7 +582,6 @@ export const CreationSecondStepContent: React.FC<
         setCreationFileProcessingETA(80);
         setCreationFileProcessingLoading(true);
         setCreationFileProcessingError(false);
-        setCreationVideo(res.data.publicUrl ?? '');
         xhrRef.current = undefined;
       } catch (error: any) {
         // TODO: Change this overcomplicated approach

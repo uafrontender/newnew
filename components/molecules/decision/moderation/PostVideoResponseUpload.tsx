@@ -655,7 +655,7 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0px 2px;
+  padding: 0 10px;
 
   background: transparent;
 
