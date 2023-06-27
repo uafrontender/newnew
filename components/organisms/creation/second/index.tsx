@@ -553,6 +553,13 @@ export const CreationSecondStepContent: React.FC<
         }
 
         if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_FORMAT_ERROR
+        ) {
+          throw new Error('VideoFormatError');
+        }
+
+        if (
           resProcessing.data.videoUploadError ||
           !resProcessing.data.taskUuid ||
           !resProcessing.data.targetUrls
@@ -599,6 +606,11 @@ export const CreationSecondStepContent: React.FC<
           setCreationFileUploadError(true);
           showErrorToastPredefined(
             ErrorToastPredefinedMessage.ProcessingLimitReachedError
+          );
+        } else if (error.message === 'VideoFormatError') {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.VideoFormatError
           );
         } else {
           console.log('Upload aborted');

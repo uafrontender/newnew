@@ -246,6 +246,7 @@
     "additionalResponseTooLong": "Video must be shorted then {{amount}} seconds",
     "unsupportedImageFormatError": "Image format not supported, please try another image",
     "processingLimitReachedError": "Please wait until you can upload more videos",
+    "videoFormatError": "Video format not supported, please try another video",
     "invalidDateError": "Please check date and time"
   },
   "smsNotifications": {

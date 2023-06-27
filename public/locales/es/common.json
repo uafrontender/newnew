@@ -245,6 +245,7 @@
     "additionalResponseTooLong_NEEDS_TRANSLATION": "Video must be shorted then {{amount}} seconds",
     "unsupportedImageFormatError": "Formato de imagen no soportado, por favor intenta con otra imagen",
     "processingLimitReachedError": "Por favor, espera hasta que puedas subir más vídeos",
+    "videoFormatError_NEEDS_TRANSLATION": "Video format not supported, please try another video",
     "invalidDateError": "Comprueba la fecha y la hora"
   },
   "smsNotifications": {

@@ -16,6 +16,7 @@ export enum ErrorToastPredefinedMessage {
   AdditionalResponseTooShort = 'additionalResponseTooShort',
   AdditionalResponseTooLong = 'additionalResponseTooLong',
   ProcessingLimitReachedError = 'processingLimitReachedError',
+  VideoFormatError = 'videoFormatError',
   InvalidDateError = 'invalidDateError',
 }
 

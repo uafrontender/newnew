@@ -375,6 +375,13 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         }
 
         if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_FORMAT_ERROR
+        ) {
+          throw new Error('VideoFormatError');
+        }
+
+        if (
           resProcessing.data.videoUploadError ||
           !resProcessing.data.taskUuid ||
           !resProcessing.data.targetUrls
@@ -433,6 +440,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           setResponseFileUploadError(true);
           showErrorToastPredefined(
             ErrorToastPredefinedMessage.ProcessingLimitReachedError
+          );
+        } else if (error.message === 'VideoFormatError') {
+          setResponseFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.VideoFormatError
           );
         } else {
           console.log('Upload aborted');
