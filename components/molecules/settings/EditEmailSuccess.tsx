@@ -6,7 +6,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import Headline from '../../atoms/Headline';
 import Button from '../../atoms/Button';
 
-import Logo from '../../../public/images/svg/mobile-logo.svg';
+import Logo from '../../../public/images/svg/MobileLogo.svg';
 
 interface IEditEmailSuccessModal {
   onComplete: () => void;

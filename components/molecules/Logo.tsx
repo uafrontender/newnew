@@ -9,7 +9,7 @@ import InlineSVG from '../atoms/InlineSVG';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
-import logoText from '../../public/images/svg/logo_text.svg';
+import logoText from '../../public/images/svg/LogoText.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';

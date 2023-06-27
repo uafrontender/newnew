@@ -36,6 +36,7 @@ const SWelcomeMessage = styled.div`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   p {
     margin: 12px 0 0;
+    font-weight: 600;
   }
 `;
 const SWelcomeMessageInner = styled.div`
