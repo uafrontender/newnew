@@ -206,6 +206,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       _stage: 'Creation',
       _publicUrl: post?.announcementVideoUrl,
     });
+    setIsVideoDeleting(true);
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: post?.announcementVideoUrl,
@@ -238,9 +239,11 @@ const FileUpload: React.FC<IFileUpload> = ({
       setCreationFileProcessingLoading(false);
       setCreationFileProcessingProgress(0);
       unsetCustomCoverImageUrl();
+      setIsVideoDeleting(false);
     } catch (err) {
       console.error(err);
       showErrorToastPredefined(undefined);
+      setIsVideoDeleting(false);
     }
   }, [
     id,
@@ -431,6 +434,7 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SErrorBottomBlock>
             <SLoadingBottomBlockButton
               view='secondary'
+              disabled={isVideoDeleting}
               onClick={handleCancelVideoProcessing}
             >
               {t('secondStep.button.cancel')}
@@ -524,12 +528,13 @@ const FileUpload: React.FC<IFileUpload> = ({
     isTablet,
     t,
     handleUploadButtonClick,
+    localFile,
+    value,
     loadingUpload,
     errorUpload,
     errorProcessing,
     loadingProcessing,
     progressProcessing,
-    localFile,
     handleOnDragOver,
     handleOnDragLeave,
     handleOnDrop,
@@ -537,10 +542,10 @@ const FileUpload: React.FC<IFileUpload> = ({
     etaUpload,
     progressUpload,
     handleCancelUploadAndClearLocalFile,
+    isVideoDeleting,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     customCoverImageUrl,
-    value,
     coverImageModalOpen,
     handleDeleteVideoShow,
     isDesktop,
