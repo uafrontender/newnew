@@ -75,7 +75,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingError,
     responseFileProcessingLoading,
     responseFileProcessingProgress,
-    handleItemChange,
+    handleResponseItemChange,
     handleCancelVideoUpload,
     handleResetVideoUploadAndProcessingState,
     handleSetUploadingAdditionalResponse,
@@ -123,7 +123,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       }
 
       setLocalFile(null);
-      await handleItemChange(id, null);
+      await handleResponseItemChange(id, null, 'additional');
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
     } catch (err) {
@@ -131,8 +131,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     }
   }, [
     videoProcessing?.targetUrls?.originalVideoUrl,
-    handleItemChange,
     id,
+    handleResponseItemChange,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
   ]);
@@ -166,7 +166,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         );
       } else {
         setLocalFile(file);
-        handleItemChange(id, file);
+        handleResponseItemChange(id, file, 'additional');
         handleSetCurrentAdditionalResponseStep('editing');
       }
     },
@@ -175,15 +175,15 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       handleDeleteLocalFile,
       showErrorToastCustom,
       t,
-      handleItemChange,
       id,
+      handleResponseItemChange,
       handleSetCurrentAdditionalResponseStep,
     ]
   );
 
   const handleRetryVideoUpload = useCallback(() => {
-    handleItemChange(id, localFile);
-  }, [id, localFile, handleItemChange]);
+    handleResponseItemChange(id, localFile, 'additional');
+  }, [id, localFile, handleResponseItemChange]);
 
   const handleCancelUploadAndClearLocalFile = useCallback(() => {
     handleCancelVideoUpload();
@@ -214,7 +214,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       }
 
       setLocalFile(null);
-      handleItemChange(id, null);
+      handleResponseItemChange(id, null, 'additional');
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
@@ -225,8 +225,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
   }, [
     videoProcessing?.targetUrls?.originalVideoUrl,
     videoProcessing?.taskUuid,
-    handleItemChange,
     id,
+    handleResponseItemChange,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
     handleResetVideoUploadAndProcessingState,
@@ -391,7 +391,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
   return (
     <SContainer>
-      {!responseFileUploadLoading && !responseFileProcessingLoading ? (
+      {!responseFileUploadLoading &&
+      !responseFileProcessingLoading &&
+      !responseFileUploadError ? (
         <PostVideoResponseUploaded
           isMuted={isMuted}
           isEditingStories={isEditingStories}
@@ -567,7 +569,7 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0;
+  padding: 0 10px;
 
   background: transparent;
 

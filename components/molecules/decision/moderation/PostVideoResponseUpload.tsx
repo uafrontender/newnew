@@ -59,7 +59,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     responseFileProcessingError,
     responseFileProcessingLoading,
     responseFileProcessingProgress,
-    handleItemChange,
+    handleResponseItemChange,
     handleCancelVideoUpload,
     handleResetVideoUploadAndProcessingState,
   } = usePostModerationResponsesContext();
@@ -97,8 +97,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     });
     handleCloseDeleteVideoClick();
     setLocalFile(null);
-    handleItemChange(id, null);
-  }, [handleCloseDeleteVideoClick, id, handleItemChange]);
+    handleResponseItemChange(id, null, 'initial');
+  }, [handleCloseDeleteVideoClick, id, handleResponseItemChange]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,15 +116,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
         );
       } else {
         setLocalFile(file);
-        handleItemChange(id, file);
+        handleResponseItemChange(id, file, 'initial');
       }
     },
-    [showErrorToastCustom, t, handleItemChange, id]
+    [showErrorToastCustom, t, handleResponseItemChange, id]
   );
 
   const handleRetryVideoUpload = useCallback(() => {
-    handleItemChange(id, localFile);
-  }, [id, localFile, handleItemChange]);
+    handleResponseItemChange(id, localFile, 'initial');
+  }, [id, localFile, handleResponseItemChange]);
 
   const handleCancelUploadAndClearLocalFile = useCallback(() => {
     handleCancelVideoUpload();
@@ -154,15 +154,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       }
 
       setLocalFile(null);
-      handleItemChange(id, null);
+      handleResponseItemChange(id, null, 'initial');
       handleResetVideoUploadAndProcessingState();
     } catch (err) {
       console.error(err);
     }
   }, [
     id,
-    handleItemChange,
     videoProcessing,
+    handleResponseItemChange,
     handleResetVideoUploadAndProcessingState,
   ]);
 
@@ -212,12 +212,12 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
         });
 
         setLocalFile(file);
-        handleItemChange(id, file);
+        handleResponseItemChange(id, file, 'initial');
       }
 
       setDropZoneHighlighted(false);
     },
-    [handleItemChange, id, showErrorToastCustom, t]
+    [handleResponseItemChange, id, showErrorToastCustom, t]
   );
 
   const renderContent = useCallback(() => {
@@ -655,7 +655,7 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0;
+  padding: 0 10px;
 
   background: transparent;
 
