@@ -97,12 +97,19 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
           res = await signInWithFacebook(requestPayload);
         } else if (provider === 'apple') {
-          if (!body) throw new Error('No body receieved');
+          if (!body) {
+            throw new Error('No body receieved');
+          }
 
           const { id_token, sub, state } = body;
 
-          if (!id_token || Array.isArray(id_token)) throw new Error('No code');
-          if (!sub || Array.isArray(sub)) throw new Error('No user id');
+          if (!id_token || Array.isArray(id_token)) {
+            throw new Error('No code');
+          }
+
+          if (!sub || Array.isArray(sub)) {
+            throw new Error('No user id');
+          }
 
           const requestPayload = new newnewapi.AppleSignInRequest({
             identityToken: id_token,

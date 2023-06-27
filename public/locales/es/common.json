@@ -237,8 +237,15 @@
     "generic": "Se ha producido un error, inténtalo de nuevo más tarde",
     "serverError": "Se ha producido un error en el servidor, inténtalo de nuevo más tarde.",
     "recaptchaError": "El recaptcha ha fallado, por favor inténtalo más tarde",
-    "usupportedImageFormatError": "Formato de imagen no soportado, por favor intenta con otra imagen",
+    "announcementTooShort_NEEDS_TRANSLATION": "Video must be at least {{amount}} seconds long",
+    "announcementTooLong_NEEDS_TRANSLATION": "Video must be shorter than {{amount}} seconds",
+    "initialResponseTooShort_NEEDS_TRANSLATION": "Video must be at least {{amount}} seconds long",
+    "initialResponseTooLong_NEEDS_TRANSLATION": "Video must be shorter than {{amount}} seconds",
+    "additionalResponseTooShort_NEEDS_TRANSLATION": "Video must be at least {{amount}} seconds long",
+    "additionalResponseTooLong_NEEDS_TRANSLATION": "Video must be shorter than {{amount}} seconds",
+    "unsupportedImageFormatError": "Formato de imagen no soportado, por favor intenta con otra imagen",
     "processingLimitReachedError": "Por favor, espera hasta que puedas subir más vídeos",
+    "videoFormatError_NEEDS_TRANSLATION": "Video format not supported, please try another video",
     "invalidDateError": "Comprueba la fecha y la hora"
   },
   "smsNotifications": {
