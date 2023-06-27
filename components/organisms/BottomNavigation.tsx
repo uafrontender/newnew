@@ -60,10 +60,11 @@ interface ISContainer {
   isCreator: boolean;
 }
 
+// NOTE: 'transform: translateZ(0);' and '-1px' needed to fix mobile Safari issue with transparent line under navigation bar
 const SContainer = styled.nav<ISContainer>`
   left: 0;
   width: 100vw;
-  bottom: ${(props) => (props.visible ? 0 : '-60px')};
+  bottom: ${(props) => (props.visible ? '-1px' : '-60px')};
   z-index: 10;
   padding: 0 2px;
   display: flex;
@@ -73,4 +74,5 @@ const SContainer = styled.nav<ISContainer>`
   justify-content: ${({ isCreator }) =>
     isCreator ? 'space-around' : 'center'};
   background-color: ${(props) => props.theme.colorsThemed.background.primary};
+  transform: translateZ(0);
 `;
