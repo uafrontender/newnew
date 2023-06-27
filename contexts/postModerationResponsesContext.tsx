@@ -340,6 +340,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
         const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
           publicUrl: res.data.publicUrl,
+          videoUsageIntent:
+            type === 'initial'
+              ? newnewapi.StartVideoProcessingRequest.VideoUsageIntent.RESPONSE
+              : newnewapi.StartVideoProcessingRequest.VideoUsageIntent
+                  .ADDITIONAL_RESPONSE,
         });
 
         const resProcessing = await startVideoProcessing(payloadProcessing);
@@ -369,7 +374,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
           throw new Error('Processing limit reached');
         }
 
-        if (resProcessing.data.videoUploadError) {
+        if (
+          resProcessing.data.videoUploadError ||
+          !resProcessing.data.taskUuid ||
+          !resProcessing.data.targetUrls
+        ) {
           throw new Error('An error occurred');
         }
 

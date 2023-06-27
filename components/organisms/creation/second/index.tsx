@@ -521,6 +521,8 @@ export const CreationSecondStepContent: React.FC<
 
         const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
           publicUrl: res.data.publicUrl,
+          videoUsageIntent:
+            newnewapi.StartVideoProcessingRequest.VideoUsageIntent.ANNOUNCEMENT,
         });
 
         const resProcessing = await startVideoProcessing(payloadProcessing);
@@ -550,7 +552,11 @@ export const CreationSecondStepContent: React.FC<
           throw new Error('Processing limit reached');
         }
 
-        if (resProcessing.data.videoUploadError) {
+        if (
+          resProcessing.data.videoUploadError ||
+          !resProcessing.data.taskUuid ||
+          !resProcessing.data.targetUrls
+        ) {
           throw new Error('An error occurred');
         }
 
