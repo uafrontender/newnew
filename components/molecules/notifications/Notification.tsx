@@ -13,7 +13,7 @@ import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
 import { useUserData } from '../../../contexts/userDataContext';
-import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+import mobileLogo from '../../../public/images/svg/MobileLogo.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';

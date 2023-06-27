@@ -85,6 +85,8 @@ const ChatContent: React.FC<IFuncProps> = ({
   const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
+  const chatContentRef = useRef<HTMLDivElement | null>(null);
+
   const { data, refetch: refetchChatRoom } = useMyChatRoom(
     initialChatRoom.id as number,
     {
@@ -119,7 +121,6 @@ const ChatContent: React.FC<IFuncProps> = ({
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
     useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
 
   const [bottomPartRef, { height: bottomPartHeight }] =
     useMeasure<HTMLDivElement>();
@@ -278,6 +279,13 @@ const ChatContent: React.FC<IFuncProps> = ({
           refetchChatRoom();
           setSendingMessage(false);
 
+          if (chatContentRef.current) {
+            chatContentRef.current.scrollTo(
+              0,
+              chatContentRef.current.scrollHeight
+            );
+          }
+
           if (chatRoom.id) {
             removeInputValueFromChatsDraft(chatRoom.id);
           }
@@ -382,6 +390,7 @@ const ChatContent: React.FC<IFuncProps> = ({
         />
       );
     }
+
     return null;
   }, [
     isVisavisBlocked,
@@ -392,10 +401,6 @@ const ChatContent: React.FC<IFuncProps> = ({
     variant,
     renewSubscription,
   ]);
-
-  const handleTextareaFocused = useCallback(() => {
-    setTextareaFocused(true);
-  }, []);
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
@@ -415,9 +420,9 @@ const ChatContent: React.FC<IFuncProps> = ({
       />
 
       <SChatAreaCenter
+        forwardRef={chatContentRef}
         chatRoom={chatRoom}
         isAnnouncement={isAnnouncement}
-        textareaFocused={textareaFocused}
         withAvatars={withChatMessageAvatars}
         variant={variant}
         bottomOffset={isBottomPartElementVisible ? bottomPartHeight : 0}
@@ -438,7 +443,6 @@ const ChatContent: React.FC<IFuncProps> = ({
                     onChange={handleChange}
                     placeholder={t('chat.placeholder')}
                     gotMaxLength={handleSubmit}
-                    setTextareaFocused={handleTextareaFocused}
                     variant={variant}
                   />
                 </STextArea>

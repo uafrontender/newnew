@@ -13,7 +13,7 @@ import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
 import SettingsColorModeSwitch from '../molecules/profile/SettingsColorModeSwitch';
 
-import mobileLogo from '../../public/images/svg/mobile-logo.svg';
+import mobileLogo from '../../public/images/svg/MobileLogo.svg';
 // import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
 // import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
 // import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';

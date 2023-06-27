@@ -47,9 +47,7 @@ const ChatToolbar: React.FC<IChatToolbar> = ({ onChatRoomSelect }) => {
   }, [goBackOrRedirect]);
 
   const handleChatRoomSelect = useCallback(
-    (chatRoom: newnewapi.IChatRoom) => {
-      onChatRoomSelect(chatRoom);
-    },
+    (chatRoom: newnewapi.IChatRoom) => onChatRoomSelect(chatRoom),
     [onChatRoomSelect]
   );
 
