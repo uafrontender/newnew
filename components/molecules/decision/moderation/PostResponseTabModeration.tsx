@@ -121,6 +121,8 @@ const PostResponseTabModeration: React.FunctionComponent<
     responseFileUploadLoading,
     uploadedResponseVideoUrl,
     responseFileProcessingLoading,
+    responseFileUploadError,
+    responseFileProcessingError,
     handleUploadVideoProcessed,
     handleUploadAdditionalVideoProcessed,
   } = usePostModerationResponsesContext();
@@ -129,9 +131,13 @@ const PostResponseTabModeration: React.FunctionComponent<
     () =>
       !!uploadedResponseVideoUrl &&
       !responseFileUploadLoading &&
-      !responseFileProcessingLoading,
+      !responseFileProcessingLoading &&
+      !responseFileUploadError &&
+      !responseFileProcessingError,
     [
+      responseFileProcessingError,
       responseFileProcessingLoading,
+      responseFileUploadError,
       responseFileUploadLoading,
       uploadedResponseVideoUrl,
     ]

@@ -9,12 +9,13 @@ import Headline from '../../atoms/Headline';
 
 interface IDeleteVideo {
   open: boolean;
+  isLoading: boolean;
   handleClose: () => void;
   handleSubmit: () => void;
 }
 
 const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
-  const { open, handleClose, handleSubmit } = props;
+  const { open, isLoading, handleClose, handleSubmit } = props;
   const { t } = useTranslation('page-Creation');
 
   const preventCLick = (e: any) => {
@@ -30,10 +31,10 @@ const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
           {t('secondStep.modal.deleteFile.description')}
         </SDescription>
         <SButtonsHolder>
-          <Button view='secondary' onClick={handleClose}>
+          <Button view='secondary' disabled={isLoading} onClick={handleClose}>
             {t('secondStep.button.cancel')}
           </Button>
-          <Button view='danger' onClick={handleSubmit}>
+          <Button view='danger' disabled={isLoading} onClick={handleSubmit}>
             {t('secondStep.button.delete')}
           </Button>
         </SButtonsHolder>
