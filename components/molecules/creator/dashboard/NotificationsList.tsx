@@ -19,7 +19,7 @@ import {
   markAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
-import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
+import mobileLogo from '../../../../public/images/svg/MobileLogo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
 import usePagination, {
@@ -107,30 +107,33 @@ export const NotificationsList: React.FC<IFunction> = ({
     }
   }, []);
 
-  const markNotificationAsRead = useCallback(async (notificationId: number) => {
-    if (!notificationId) {
-      return;
-    }
-
-    try {
-      const payload = new newnewapi.MarkAsReadRequest({
-        notificationIds: [notificationId],
-      });
-      const res = await markAsRead(payload);
-
-      if (res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+  const markNotificationAsRead = useCallback(
+    async (notification: newnewapi.INotification) => {
+      if (!notification || notification.isRead) {
+        return;
       }
 
-      setUnreadNotifications((curr) => {
-        const arr = curr ? [...curr] : [];
-        const result = arr.filter((item) => item !== notificationId);
-        return result;
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+      try {
+        const payload = new newnewapi.MarkAsReadRequest({
+          notificationIds: [notification.id as number],
+        });
+        const res = await markAsRead(payload);
+
+        if (res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+
+        setUnreadNotifications((curr) => {
+          const arr = curr ? [...curr] : [];
+          const result = arr.filter((item) => item !== notification.id);
+          return result;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (markReadNotifications) {
@@ -249,7 +252,10 @@ export const NotificationsList: React.FC<IFunction> = ({
             <SNotificationItem
               key={`notification-item-${item.id}`}
               onClick={() => {
-                markNotificationAsRead(item.id as number);
+                markNotificationAsRead(item);
+              }}
+              onContextMenu={() => {
+                markNotificationAsRead(item);
               }}
             >
               {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
