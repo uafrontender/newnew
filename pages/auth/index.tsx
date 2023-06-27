@@ -75,7 +75,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         if (provider === 'google') {
           const { code, state } = router.query;
 
-          if (!code || Array.isArray(code)) throw new Error('No code');
+          if (!code || Array.isArray(code)) {
+            throw new Error('No code');
+          }
 
           const requestPayload = new newnewapi.GoogleSignInRequest({
             code,
@@ -167,6 +169,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
           maxAge: 10 * 365 * 24 * 60 * 60,
           path: '/',
         });
+
         handleUserLoggedIn(data.me?.options?.isCreator ?? false);
         resumePushNotification();
 

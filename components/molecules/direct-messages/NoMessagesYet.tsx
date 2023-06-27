@@ -39,6 +39,7 @@ const SWelcomeMessage = styled.div`
   }
   p {
     margin: 0;
+    font-weight: 600;
   }
 `;
 export default NoMessagesYet;

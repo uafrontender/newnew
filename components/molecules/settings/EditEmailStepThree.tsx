@@ -15,7 +15,7 @@ import {
   sendVerificationNewEmail,
 } from '../../../api/endpoints/user';
 
-import Logo from '../../../public/images/svg/mobile-logo.svg';
+import Logo from '../../../public/images/svg/MobileLogo.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useUserData } from '../../../contexts/userDataContext';
 
