@@ -140,7 +140,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       setUserLoggedIn(true);
       setUserIsCreator(isCreator);
     },
-    [setUserLoggedIn, setUserIsCreator]
+    [setUserLoggedIn]
   );
 
   const handleBecameCreator = useCallback(() => {
@@ -151,7 +151,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       }
       return true;
     });
-  }, [setUserIsCreator, refreshTokens]);
+  }, [refreshTokens]);
 
   const logoutAndRedirect = useCallback(
     (redirectUrl?: string) => {
@@ -161,7 +161,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       cookiesInstance.remove('refreshToken');
       router.push(redirectUrl ?? '/');
     },
-    [router, setUserIsCreator]
+    [router]
   );
 
   const handleResizeObserver = useCallback(() => {
@@ -176,6 +176,21 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     if (newResizeMode) {
       setResizeMode(newResizeMode);
     }
+  }, []);
+
+  useEffect(() => {
+    const cookiesListener = (options: { name: string; value?: string }) => {
+      if (options.name === 'accessToken' && !options.value) {
+        setUserLoggedIn(false);
+        setUserIsCreator(false);
+      }
+    };
+
+    cookiesInstance.addChangeListener(cookiesListener);
+
+    return () => {
+      cookiesInstance.removeChangeListener(cookiesListener);
+    };
   }, []);
 
   useEffect(() => {
