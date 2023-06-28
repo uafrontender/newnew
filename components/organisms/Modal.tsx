@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -36,15 +36,20 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     onClose,
     onEnterKeyUp,
   } = props;
+
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
+  const elementRef = useRef(null);
+
   useEffect(() => {
+    const elementContainer = elementRef.current;
+
     if (show) {
-      enableOverlayMode();
+      enableOverlayMode(elementContainer);
     }
 
     return () => {
-      disableOverlayMode();
+      disableOverlayMode(elementContainer);
     };
   }, [show, enableOverlayMode, disableOverlayMode]);
 
@@ -100,7 +105,11 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        {children}
+        {React.isValidElement(children)
+          ? React.cloneElement(children as React.ReactElement<any>, {
+              ref: elementRef,
+            })
+          : children}
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement

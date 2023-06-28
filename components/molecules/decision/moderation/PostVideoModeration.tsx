@@ -58,6 +58,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     uploadedResponseVideoUrl,
     videoProcessing,
     responseFileProcessingLoading,
+    responseFileUploadError,
     customCoverImageUrlResponse,
     handleUpdateCustomCoverImageUrl,
   } = usePostModerationResponsesContext();
@@ -225,7 +226,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         ) : uploadedResponseVideoUrl &&
           videoProcessing?.targetUrls &&
           !responseFileUploadLoading &&
-          !responseFileProcessingLoading ? (
+          !responseFileProcessingLoading &&
+          !responseFileUploadError ? (
           <>
             <PostVideojsPlayer
               id={postUuid}

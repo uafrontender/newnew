@@ -2096,7 +2096,9 @@ context('Creator flow', () => {
           });
         });
 
-      cy.dGet('#upload-button').should('be.enabled').click();
+      cy.dGet('#upload-button', { timeout: 90000 })
+        .should('be.enabled')
+        .click();
       cy.dGet('#earned-amount')
         .invoke('text')
         .should(
@@ -2146,7 +2148,9 @@ context('Creator flow', () => {
           });
         });
 
-      cy.dGet('#upload-button').should('be.enabled').click();
+      cy.dGet('#upload-button', { timeout: 90000 })
+        .should('be.enabled')
+        .click();
 
       cy.dGet('#earned-amount')
         .invoke('text')

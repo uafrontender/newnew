@@ -128,7 +128,7 @@ const Chat: NextPage = () => {
   }, [room, userIsCreator, userData?.username]);
 
   const handleChatRoomSelected = useCallback(
-    (chatRoom: newnewapi.IChatRoom) => {
+    async (chatRoom: newnewapi.IChatRoom) => {
       setSearchChatroom('');
 
       let route = `${chatRoom.visavis?.user?.username || userData?.username}`;
@@ -139,7 +139,7 @@ const Chat: NextPage = () => {
         route += '-bundle';
       }
 
-      router.replace(
+      await router.replace(
         `${route}?roomID=${chatRoom.id}&myRole=${chatRoom.myRole}`,
         route,
         { shallow: true }

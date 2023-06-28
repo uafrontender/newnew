@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useMemo, useCallback } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useCallback,
+  RefObject,
+} from 'react';
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled, { css } from 'styled-components';
@@ -12,6 +18,7 @@ import isIOS from '../../../utils/isIOS';
 import { SocketContext } from '../../../contexts/socketContext';
 import Loader from '../../atoms/Loader';
 import { markRoomAsRead } from '../../../api/endpoints/chat';
+import NoAnnouncementMessagesYet from './NoAnnouncmentMessagesYet';
 
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
@@ -22,19 +29,20 @@ const ChatMessage = dynamic(
 interface IChatAreaCenter {
   chatRoom: newnewapi.IChatRoom;
   isAnnouncement?: boolean;
-  textareaFocused: boolean;
   withAvatars?: boolean;
   variant?: 'primary' | 'secondary';
   className?: string;
+  forwardRef?: RefObject<HTMLDivElement>;
 }
 
 const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   chatRoom,
   isAnnouncement,
   withAvatars,
-  textareaFocused,
   variant,
   className,
+  // because ChatAreaCenter is imported dynamically
+  forwardRef,
 }) => {
   const { ref: loadingRef, inView } = useInView();
   const { socketConnection } = useContext(SocketContext);
@@ -108,6 +116,15 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     [messages, isAnnouncement, isLoading, chatRoom]
   );
 
+  const hasNoAnnouncementMessagesYet = useMemo(
+    () =>
+      messages.length === 0 &&
+      isAnnouncement &&
+      !isLoading &&
+      chatRoom.myRole === 1,
+    [messages, isAnnouncement, isLoading, chatRoom]
+  );
+
   const selectedChatRoomId = useMemo(() => {
     if (!router.query.roomID || Array.isArray(router.query.roomID)) {
       return undefined;
@@ -150,12 +167,13 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 
   return (
     <SContainer
-      textareaFocused={textareaFocused}
       className={className}
       isAnnouncement={isAnnouncement}
+      ref={forwardRef}
     >
       {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
       {hasNoMessagesYet && <NoMessagesYet />}
+      {hasNoAnnouncementMessagesYet && <NoAnnouncementMessagesYet />}
 
       {messages.map((item, index) => (
         <ChatMessage
@@ -170,6 +188,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       ))}
       {messages.length === 0 && isLoading && <Loader isStatic size='md' />}
       {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
+      {messages.length > 0 && isFetchingNextPage && <SPageLoader size='xs' />}
     </SContainer>
   );
 };
@@ -177,7 +196,6 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 export default ChatAreaCenter;
 
 interface ISContainer {
-  textareaFocused: boolean;
   isAnnouncement?: boolean;
 }
 const SContainer = styled.div<ISContainer>`
@@ -221,4 +239,8 @@ const SRef = styled.span`
   height: 10px;
   overflow: hidden;
   margin-bottom: -20px;
+`;
+
+const SPageLoader = styled(Loader)`
+  margin: 8px auto;
 `;
