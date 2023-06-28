@@ -59,13 +59,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     responseFileProcessingError,
     responseFileProcessingLoading,
     responseFileProcessingProgress,
-    handleItemChange,
+    handleResponseItemChange,
     handleCancelVideoUpload,
     handleResetVideoUploadAndProcessingState,
   } = usePostModerationResponsesContext();
   const value = useMemo(() => videoProcessing?.targetUrls, [videoProcessing]);
 
   const [showVideoDelete, setShowVideoDelete] = useState(false);
+  const [isVideoDeleting, setIsVideoDeleting] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState<File | null>(null);
@@ -91,14 +93,18 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     setShowPlayButton(true);
   }, []);
 
-  const handleDeleteVideo = useCallback(() => {
+  const handleDeleteVideo = useCallback(async () => {
     Mixpanel.track('Post Video Response Delete', {
       _stage: 'Post',
     });
+    setIsVideoDeleting(true);
+
     handleCloseDeleteVideoClick();
     setLocalFile(null);
-    handleItemChange(id, null);
-  }, [handleCloseDeleteVideoClick, id, handleItemChange]);
+    await handleResponseItemChange(id, null, 'initial');
+
+    setIsVideoDeleting(false);
+  }, [handleCloseDeleteVideoClick, id, handleResponseItemChange]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,22 +122,24 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
         );
       } else {
         setLocalFile(file);
-        handleItemChange(id, file);
+        handleResponseItemChange(id, file, 'initial');
       }
     },
-    [showErrorToastCustom, t, handleItemChange, id]
+    [showErrorToastCustom, t, handleResponseItemChange, id]
   );
 
-  const handleRetryVideoUpload = useCallback(() => {
-    handleItemChange(id, localFile);
-  }, [id, localFile, handleItemChange]);
+  const handleRetryVideoUpload = useCallback(async () => {
+    handleResponseItemChange(id, localFile, 'initial');
+  }, [handleResponseItemChange, id, localFile]);
 
-  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+  const handleCancelUploadAndClearLocalFile = useCallback(async () => {
     handleCancelVideoUpload();
     setLocalFile(null);
-  }, [handleCancelVideoUpload]);
+    await handleResponseItemChange(id, null, 'initial');
+  }, [handleCancelVideoUpload, handleResponseItemChange, id]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
+    setIsVideoDeleting(true);
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
@@ -154,15 +162,17 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       }
 
       setLocalFile(null);
-      handleItemChange(id, null);
+      handleResponseItemChange(id, null, 'initial');
       handleResetVideoUploadAndProcessingState();
+      setIsVideoDeleting(false);
     } catch (err) {
       console.error(err);
+      setIsVideoDeleting(false);
     }
   }, [
     id,
-    handleItemChange,
     videoProcessing,
+    handleResponseItemChange,
     handleResetVideoUploadAndProcessingState,
   ]);
 
@@ -212,12 +222,12 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
         });
 
         setLocalFile(file);
-        handleItemChange(id, file);
+        handleResponseItemChange(id, file, 'initial');
       }
 
       setDropZoneHighlighted(false);
     },
-    [handleItemChange, id, showErrorToastCustom, t]
+    [handleResponseItemChange, id, showErrorToastCustom, t]
   );
 
   const renderContent = useCallback(() => {
@@ -349,6 +359,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           <SErrorBottomBlock>
             <SLoadingBottomBlockButton
               view='secondary'
+              disabled={isVideoDeleting}
               onClick={handleCancelVideoProcessing}
             >
               {t('postVideo.uploadResponseForm.button.cancel')}
@@ -430,8 +441,8 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     return content;
   }, [
     dropZoneHighlighted,
-    t,
     isMobileOrTablet,
+    t,
     handleButtonClick,
     responseFileUploadLoading,
     responseFileUploadError,
@@ -447,6 +458,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     responseFileUploadETA,
     responseFileUploadProgress,
     handleCancelUploadAndClearLocalFile,
+    isVideoDeleting,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     value,
@@ -458,6 +470,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     <SWrapper>
       <DeleteVideo
         open={showVideoDelete}
+        isLoading={isVideoDeleting}
         handleClose={handleCloseDeleteVideoClick}
         handleSubmit={handleDeleteVideo}
       />
@@ -655,7 +668,7 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0;
+  padding: 0 10px;
 
   background: transparent;
 

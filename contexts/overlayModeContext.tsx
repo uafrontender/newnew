@@ -11,8 +11,14 @@ import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 export const OverlayModeContext = createContext<{
   overlayModeEnabled: boolean;
-  enableOverlayMode: (id: string, elementContainer?: HTMLElement) => void;
-  disableOverlayMode: (id: string, elementContainer?: HTMLElement) => void;
+  enableOverlayMode: (
+    id: string,
+    elementContainer?: HTMLElement | null
+  ) => void;
+  disableOverlayMode: (
+    id: string,
+    elementContainer?: HTMLElement | null
+  ) => void;
 }>({
   overlayModeEnabled: false,
   enableOverlayMode: (id: string) => {},
@@ -29,7 +35,7 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
   const [requests, setRequests] = useState<string[]>([]);
 
   const enableOverlayMode = useCallback(
-    (id: string, elementContainer?: HTMLElement) => {
+    (id: string, elementContainer?: HTMLElement | null) => {
       setRequests((curr) => {
         if (curr.includes(id)) {
           return curr;
@@ -45,12 +51,16 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
   );
 
   const disableOverlayMode = useCallback(
-    (id: string, elementContainer?: HTMLElement) => {
-      setRequests((curr) => curr.filter((request) => request !== id));
+    (id: string, elementContainer?: HTMLElement | null) => {
+      setRequests((curr) => {
+        const newRequests = curr.filter((request) => request !== id);
 
-      if (elementContainer) {
-        enableBodyScroll(elementContainer);
-      }
+        if (newRequests.length === 0 && elementContainer) {
+          enableBodyScroll(elementContainer);
+        }
+
+        return newRequests;
+      });
     },
     []
   );
@@ -84,7 +94,7 @@ export function useOverlayMode() {
   // Adding context to deps results in infinite loop
 
   const enable = useCallback(
-    (elementContainer?: HTMLElement) =>
+    (elementContainer?: HTMLElement | null) =>
       context.enableOverlayMode(id.current, elementContainer),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -93,7 +103,7 @@ export function useOverlayMode() {
   // Adding context to deps results in infinite loop
 
   const disable = useCallback(
-    (elementContainer?: HTMLElement) =>
+    (elementContainer?: HTMLElement | null) =>
       context.disableOverlayMode(id.current, elementContainer),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []

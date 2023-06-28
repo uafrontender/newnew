@@ -179,6 +179,21 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   }, []);
 
   useEffect(() => {
+    const cookiesListener = (options: { name: string; value?: string }) => {
+      if (options.name === 'accessToken' && !options.value) {
+        setUserLoggedIn(false);
+        setUserIsCreator(false);
+      }
+    };
+
+    cookiesInstance.addChangeListener(cookiesListener);
+
+    return () => {
+      cookiesInstance.removeChangeListener(cookiesListener);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ref.current) {
       return () => {};
     }
