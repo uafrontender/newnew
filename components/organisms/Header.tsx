@@ -62,10 +62,12 @@ interface ISWrapper {
   withBanner: boolean;
 }
 
+// NOTE: 'transform: translateZ(0);' and '-41px' needed to fix mobile Safari issue with transparent line above header
 const SWrapper = styled.header<ISWrapper>`
   top: ${(props) =>
-    props.visible ? `${props.withBanner ? 0 : '-40px'}` : '-96px'};
+    props.visible ? `${props.withBanner ? 0 : '-41px'}` : '-96px'};
   left: 0;
+  transform: translateZ(0);
   width: 100vw;
   z-index: 11;
   position: fixed;
