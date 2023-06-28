@@ -165,6 +165,7 @@
         "description": "Hubo un error y tu archivo no pudo ser cargado. ¿Quieres volver a intentarlo?."
       },
       "setThumbnail": "Establecer miniatura",
+      "changeThumbnail": "Cambiar miniatura",
       "thumbnailEllipseMenu": {
         "uploadImageButton": "Subir una imagen"
       },
