@@ -61,8 +61,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const [isPaused, setIsPaused] = useState(false);
 
-  // delay cannot be less than 100 because handlePlayerScrubberChangeTime function has timeout 100
-  const debouncedSetIsPaused = debounce(setIsPaused, 120);
+  const debouncedSetIsPaused = debounce(setIsPaused, 100);
 
   const handleSetIsPaused = useCallback(
     (stateValue: boolean) => {
@@ -80,8 +79,17 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
   const playerScrubberRef = useRef<TPlayerScrubber>(null);
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
+  const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasVideoPlayingBeforeScrubberChangeTimeRef = useRef(false);
+
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      } else {
+        wasVideoPlayingBeforeScrubberChangeTimeRef.current = !isPaused;
+      }
+
       if (!isPaused) {
         // Pause the player when scrubbing
         // to avoid double playback start
@@ -89,16 +97,24 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
         playerRef.current?.pause();
         playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
-
-        setTimeout(() => {
-          setIsScrubberTimeChanging(false);
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
-        }, 100);
       } else {
         playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
+      }
+
+      if (wasVideoPlayingBeforeScrubberChangeTimeRef.current) {
+        timeoutIdRef.current = setTimeout(() => {
+          playerRef.current
+            ?.play()
+            ?.then(() => {
+              timeoutIdRef.current = null;
+              // setTimeout is needed to prevent the play button from flashing
+              setTimeout(() => setIsScrubberTimeChanging(false), 100);
+            })
+            .catch(() => {
+              handleSetIsPaused(true);
+            });
+        }, 100);
       }
     },
     [handleSetIsPaused, isPaused]
