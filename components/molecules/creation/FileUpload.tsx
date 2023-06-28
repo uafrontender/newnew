@@ -501,7 +501,9 @@ const FileUpload: React.FC<IFileUpload> = ({
                 active={coverImageModalOpen}
                 onClick={() => handleOpenEditCoverImageMenu()}
               >
-                {t('secondStep.video.setThumbnail')}
+                {customCoverImageUrl
+                  ? t('secondStep.video.changeThumbnail')
+                  : t('secondStep.video.setThumbnail')}
               </SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
                 {t('secondStep.video.deleteFile')}
