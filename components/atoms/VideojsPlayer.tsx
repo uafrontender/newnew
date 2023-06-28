@@ -10,6 +10,7 @@ import styled, { css, useTheme } from 'styled-components';
 import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
+import debounce from 'lodash/debounce';
 
 import Button from './Button';
 import Lottie from './Lottie';
@@ -60,9 +61,15 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const [isPaused, setIsPaused] = useState(false);
 
-  const handleSetIsPaused = useCallback((stateValue: boolean) => {
-    setIsPaused(stateValue);
-  }, []);
+  // delay cannot be less than 100 because handlePlayerScrubberChangeTime function has timeout 100
+  const debouncedSetIsPaused = debounce(setIsPaused, 120);
+
+  const handleSetIsPaused = useCallback(
+    (stateValue: boolean) => {
+      debouncedSetIsPaused(stateValue);
+    },
+    [debouncedSetIsPaused]
+  );
 
   const [videoOrientation, setVideoOrientation] = useState<
     'vertical' | 'horizontal'

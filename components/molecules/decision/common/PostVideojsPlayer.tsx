@@ -17,6 +17,7 @@ import 'videojs-contrib-quality-levels';
 // eslint-disable-next-line import/no-duplicates
 import { QualityLevel, QualityLevelList } from 'videojs-contrib-quality-levels';
 // NB! We have to import these twice due to package issues
+import debounce from 'lodash/debounce';
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -87,9 +88,16 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     const [isLoading, setIsLoading] = useState(false);
 
     const [isPaused, setIsPaused] = useState(false);
-    const handleSetIsPaused = useCallback((stateValue: boolean) => {
-      setIsPaused(stateValue);
-    }, []);
+
+    // delay cannot be less than 100 because handlePlayerScrubberChangeTime function has timeout 100
+    const debouncedSetIsPaused = debounce(setIsPaused, 120);
+
+    const handleSetIsPaused = useCallback(
+      (stateValue: boolean) => {
+        debouncedSetIsPaused(stateValue);
+      },
+      [debouncedSetIsPaused]
+    );
 
     // Fullscren
     const [isFullscreen, setIsFullscreen] = useState(false);
