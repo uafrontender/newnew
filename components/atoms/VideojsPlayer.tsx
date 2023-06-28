@@ -385,6 +385,14 @@ const SWrapper = styled.div<{
   min-height: 100% !important;
   background: transparent !important;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   &:before {
     display: none !important;
   }
