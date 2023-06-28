@@ -167,6 +167,9 @@ export default WinningOption;
 
 const SText = styled(Text)`
   margin-top: 24px;
+  max-width: 100%;
+
+  text-align: center;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   &:first-child {
@@ -177,6 +180,7 @@ const SText = styled(Text)`
 const SSpan = styled.span`
   display: inline-flex;
   white-space: pre;
+  max-width: 100%;
 `;
 
 const SUserAvatar = styled.img`
