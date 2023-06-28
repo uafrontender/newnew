@@ -124,8 +124,9 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   max-height: 100%;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 
-  padding: 12px;
+  padding: 10px 12px;
   z-index: 200;
 
   transition: all ease 0.5s;
@@ -170,6 +171,7 @@ const SInput = styled.input`
   background: transparent;
   font-weight: 500;
   line-height: 24px;
+  min-height: 24px;
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
