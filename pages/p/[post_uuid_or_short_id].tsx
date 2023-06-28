@@ -348,10 +348,12 @@ const PostPage: NextPage<IPostPage> = ({
         });
         setIsDeletingPost(false);
         handleCloseDeletePostModal();
+
         if (document?.documentElement) {
           setTimeout(() => {
+            // top: 5 instead of top: 0 because of issues on iOS
             document?.documentElement?.scrollTo({
-              top: 0,
+              top: 5,
             });
           }, 100);
         }
