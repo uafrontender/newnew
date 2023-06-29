@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -24,10 +24,19 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   const { locale } = useRouter();
   const { userData } = useUserData();
 
+  // Preserve avatar for logout case
+  const [avatar, setAvatar] = useState(userData?.avatarUrl);
+
+  useEffect(() => {
+    if (userData?.avatarUrl) {
+      setAvatar(userData.avatarUrl);
+    }
+  }, [userData?.avatarUrl]);
+
   return (
     <STransactionCard>
       <SAvatar>
-        <img alt={userData?.username} src={userData?.avatarUrl} />
+        <img alt={userData?.username} src={avatar} />
       </SAvatar>
       <SActor variant={3} weight={600}>
         {t('Settings.sections.transactions.you')}
