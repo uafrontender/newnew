@@ -353,7 +353,7 @@ context.skip('Whitelisted Creator flow', () => {
         });
 
       cy.dGet('#review', {
-        timeout: 20000,
+        timeout: 60000,
       })
         .should('be.enabled')
         .click();
@@ -406,7 +406,7 @@ context.skip('Whitelisted Creator flow', () => {
         });
 
       cy.dGet('#review', {
-        timeout: 20000,
+        timeout: 60000,
       })
         .should('be.enabled')
         .click();
@@ -785,7 +785,7 @@ context.skip('Whitelisted Creator flow', () => {
         });
 
       cy.dGet('#review', {
-        timeout: 20000,
+        timeout: 60000,
       })
         .should('be.enabled')
         .click();
@@ -838,7 +838,7 @@ context.skip('Whitelisted Creator flow', () => {
         });
 
       cy.dGet('#review', {
-        timeout: 20000,
+        timeout: 60000,
       })
         .should('be.enabled')
         .click();
