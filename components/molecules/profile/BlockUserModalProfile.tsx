@@ -23,10 +23,12 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   const { t } = useTranslation('page-Profile');
 
   const { changeUserBlockedStatus } = useGetBlockedUsers();
+
   const handleConfirmClick = () => {
     changeUserBlockedStatus(user.uuid, true);
     closeModal();
   };
+
   return (
     <Modal show={confirmBlockUser} onClose={closeModal}>
       <SContainer onClick={preventParentClick()}>

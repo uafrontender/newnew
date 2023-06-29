@@ -3,8 +3,6 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 
-import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -13,7 +11,7 @@ import DisplayName from '../../atoms/DisplayName';
 interface IBlockUserModal {
   user: newnewapi.IVisavisUser;
   isOpen: boolean;
-  onUserBlock?: () => void;
+  onUserBlock: () => void;
   closeModal: () => void;
   isAnnouncement?: boolean;
 }
@@ -27,18 +25,15 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
 
-  const { changeUserBlockedStatus } = useGetBlockedUsers();
-
   const handleConfirmClick = useCallback(async () => {
     Mixpanel.track('Confirm Block User Button Clicked', {
       _stage: 'Direct Messages',
       _component: 'BlockUserModal',
       _userUuid: user.user?.uuid,
     });
-    await changeUserBlockedStatus(user.user?.uuid, true);
-    onUserBlock?.();
+    onUserBlock();
     closeModal();
-  }, [changeUserBlockedStatus, closeModal, onUserBlock, user.user?.uuid]);
+  }, [closeModal, onUserBlock, user.user?.uuid]);
 
   return (
     <Modal show={isOpen} onClose={closeModal} additionalz={1000}>

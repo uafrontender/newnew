@@ -267,10 +267,16 @@ export const BundlesContextProvider: React.FC<IBundleContextProvider> = ({
 
   const isBundleDataLoaded = useMemo(
     () =>
-      bundles !== undefined &&
-      isSellingBundlesStatusLoaded &&
+      (!userLoggedIn || bundles !== undefined) &&
+      (!userIsCreator ||
+        (isSellingBundlesStatusLoaded && isHasSoldBundlesStatusLoaded)),
+    [
+      userLoggedIn,
+      bundles,
+      userIsCreator,
+      isSellingBundlesStatusLoaded,
       isHasSoldBundlesStatusLoaded,
-    [bundles, isSellingBundlesStatusLoaded, isHasSoldBundlesStatusLoaded]
+    ]
   );
 
   const contextValue = useMemo(
