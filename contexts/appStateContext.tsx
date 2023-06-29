@@ -8,7 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { parse } from 'next-useragent';
 import styled from 'styled-components';
 import jwtDecode from 'jwt-decode';
@@ -82,7 +82,6 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   uaString,
   children,
 }) => {
-  const router = useRouter();
   // Should we check that token is valid or just it's presence here?
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
   const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
@@ -153,16 +152,13 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     });
   }, [refreshTokens]);
 
-  const logoutAndRedirect = useCallback(
-    (redirectUrl?: string) => {
-      setUserLoggedIn(false);
-      setUserIsCreator(false);
-      cookiesInstance.remove('accessToken');
-      cookiesInstance.remove('refreshToken');
-      router.push(redirectUrl ?? '/');
-    },
-    [router]
-  );
+  const logoutAndRedirect = useCallback((redirectUrl?: string) => {
+    setUserLoggedIn(false);
+    setUserIsCreator(false);
+    cookiesInstance.remove('accessToken');
+    cookiesInstance.remove('refreshToken');
+    Router.push(redirectUrl ?? '/');
+  }, []);
 
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: TResizeMode | undefined;
