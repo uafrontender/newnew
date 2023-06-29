@@ -110,66 +110,76 @@ export const UserDataContextProvider: React.FunctionComponent<
     []
   );
 
-  const syncUserData = useCallback(async () => {
-    try {
-      const payload = new newnewapi.EmptyRequest({});
+  const syncUserData = useCallback(
+    async (retry?: boolean) => {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
 
-      const { data } = await getMe(payload);
+        const { data } = await getMe(payload);
 
-      if (data?.me) {
-        // Why do we need this constructing
-        const newUserData = {
-          username: data.me?.username,
-          nickname: data.me?.nickname,
-          email: data.me?.email,
-          avatarUrl: data.me?.avatarUrl,
-          coverUrl: data.me?.coverUrl,
-          userUuid: data.me?.userUuid,
-          bio: data.me?.bio,
-          dateOfBirth: {
-            day: data.me?.dateOfBirth?.day,
-            month: data.me?.dateOfBirth?.month,
-            year: data.me?.dateOfBirth?.year,
-          },
-          countryCode: data.me?.countryCode,
-          usernameChangedAt: data.me.usernameChangedAt,
-          genderPronouns: data.me.genderPronouns,
-          phoneNumber: data.me.phoneNumber,
+        if (data?.me) {
+          // Why do we need this constructing
+          const newUserData = {
+            username: data.me?.username,
+            nickname: data.me?.nickname,
+            email: data.me?.email,
+            avatarUrl: data.me?.avatarUrl,
+            coverUrl: data.me?.coverUrl,
+            userUuid: data.me?.userUuid,
+            bio: data.me?.bio,
+            dateOfBirth: {
+              day: data.me?.dateOfBirth?.day,
+              month: data.me?.dateOfBirth?.month,
+              year: data.me?.dateOfBirth?.year,
+            },
+            countryCode: data.me?.countryCode,
+            usernameChangedAt: data.me.usernameChangedAt,
+            genderPronouns: data.me.genderPronouns,
+            phoneNumber: data.me.phoneNumber,
 
-          options: {
-            isActivityPrivate: data.me?.options?.isActivityPrivate,
-            isCreator: data.me?.options?.isCreator,
-            isVerified: data.me?.options?.isVerified,
-            creatorStatus: data.me?.options?.creatorStatus,
-            birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
-            isOfferingBundles: data.me.options?.isOfferingBundles,
-            isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
-            isWhiteListed: data.me.options?.isWhiteListed,
-          },
-        } as TUserData;
+            options: {
+              isActivityPrivate: data.me?.options?.isActivityPrivate,
+              isCreator: data.me?.options?.isCreator,
+              isVerified: data.me?.options?.isVerified,
+              creatorStatus: data.me?.options?.creatorStatus,
+              birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
+              isOfferingBundles: data.me.options?.isOfferingBundles,
+              isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
+              isWhiteListed: data.me.options?.isWhiteListed,
+            },
+          } as TUserData;
 
-        saveStateLS(USER_DATA_KEY, newUserData);
-        setUserData(newUserData);
+          saveStateLS(USER_DATA_KEY, newUserData);
+          setUserData(newUserData);
+        }
+
+        if (data?.me?.options?.isCreator) {
+          handleBecameCreator();
+        }
+      } catch (err) {
+        console.error(err);
+        if ((err as Error).message === 'No token') {
+          logoutAndRedirect();
+        }
+
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          logoutAndRedirect('/sign-up?reason=session_expired');
+        }
+
+        // Retry once if loading failed for some other reason
+        if (!retry) {
+          syncUserData(true);
+        } else {
+          logoutAndRedirect();
+        }
       }
+    },
+    [handleBecameCreator, logoutAndRedirect]
+  );
 
-      if (data?.me?.options?.isCreator) {
-        handleBecameCreator();
-      }
-    } catch (err) {
-      console.error(err);
-      if ((err as Error).message === 'No token') {
-        logoutAndRedirect();
-      }
-
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
-        logoutAndRedirect('/sign-up?reason=session_expired');
-      }
-    }
-  }, [handleBecameCreator, logoutAndRedirect]);
-
-  const syncCreatorData = useCallback(async () => {
+  const syncCreatorData = useCallback(async (retry?: boolean) => {
     try {
       const getMyOnboardingStatePayload = new newnewapi.EmptyRequest({});
       const res = await getMyOnboardingState(getMyOnboardingStatePayload);
@@ -183,7 +193,12 @@ export const UserDataContextProvider: React.FunctionComponent<
       }
       setCreatorDataLoaded(true);
     } catch (err) {
-      console.error(err);
+      // Retry once if loading failed
+      if (!retry) {
+        await syncCreatorData(true).catch((e) => {
+          console.error(e);
+        });
+      }
       setCreatorDataLoaded(true);
     }
   }, []);
