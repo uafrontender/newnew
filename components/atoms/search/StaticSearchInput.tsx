@@ -338,9 +338,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
 
       return () => {
-        if (resultContainer) {
-          disableOverlayMode(resultContainer);
-        }
+        disableOverlayMode();
       };
     }, [
       isMobileOrTablet,
@@ -613,17 +611,17 @@ const SResultsDropMobile = styled.div`
   border-radius: 0;
   width: 100vw;
   height: 100vh;
-  top: 56px;
+  top: 96px;
   left: 0;
 
   ${({ theme }) => theme.media.tablet} {
-    top: 64px;
+    top: 112px;
   }
 `;
 
 const SResultsDropMobileContentWrapper = styled.div`
   padding: 16px;
-  max-height: calc(var(--window-inner-height) - 40px); // 40px needs for ios
+  max-height: calc(var(--window-inner-height) - 50px); // 50px needs for ios
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;

@@ -50,10 +50,10 @@ import DisplayName from '../../../atoms/DisplayName';
   subscribeToSmsNotifications,
   unsubscribeFromSmsNotifications,
   unsubscribeGuestFromSmsNotifications,
-} from '../../../../api/endpoints/phone'; 
+} from '../../../../api/endpoints/phone';
 import SmsNotificationModal, {
   SubscriptionToPost,
-} from '../../profile/SmsNotificationModal'; 
+} from '../../profile/SmsNotificationModal';
 import { SocketContext } from '../../../../contexts/socketContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import Tooltip from '../../../atoms/Tooltip';
@@ -352,7 +352,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       }
     },
     [userLoggedIn, showErrorToastCustom, subscription.postUuid, t]
-  ); 
+  );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     Mixpanel.track('Open SMS Notification Menu', {
@@ -510,7 +510,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.SmsNotificationsUnsubscribed.decode(arr);
 
-      if (!decoded){ 
+      if (!decoded){
         return;
       }
 
@@ -544,7 +544,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         );
       }
     };
-  }, [userLoggedIn, subscription.postUuid, socketConnection]); 
+  }, [userLoggedIn, subscription.postUuid, socketConnection]);
 
   const notificationButtonRef: any = useRef(); */
   const moreButtonRef: any = useRef();
@@ -588,7 +588,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             </a>
           </Link>
           <Link href={`/${creator.username}`}>
-            <a
+            <SLink
               href={`/${creator.username}`}
               onClickCapture={() => {
                 Mixpanel.track('Click on creator username', {
@@ -601,7 +601,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               <SUserInfo>
                 <SDisplayName user={creator} />
               </SUserInfo>
-            </a>
+            </SLink>
           </Link>
         </SCreatorCard>
         <SActionsDiv>
@@ -873,6 +873,10 @@ const SAvatarArea = styled.div`
     width: 24px;
     height: 24px;
   }
+`;
+
+const SLink = styled.a`
+  overflow: hidden;
 `;
 
 const SUserInfo = styled.div`
