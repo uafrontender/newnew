@@ -25,13 +25,13 @@
       "insights": "深入瞭解",
       "insightsTablet": "轉至深入瞭解",
       "cashOutTutorial": {
-        "gracePeriod_NEED_TRANSLATION": "Your balance updates every 3 days."
+        "gracePeriod": "餘額每3天更新一次。"
       },
       "cashOut": {
         "amount": "你的Stripe收入為",
         "amountSecondLine": "在Stripe上管理你的餘額。",
         "stripeButton": "轉至Stripe",
-        "date_NEED_TRANSLATION": "Your payment will automatically be sent on {{date}}.",
+        "date": "你的付款將在{{日期}}自動發送。",
         "submit": "瞭解更多",
         "noPayouts": "沒有任何即將支付的款項",
         "nextPayout": "你的下一筆付款 ${{amount}} 將在 {{date}} 自動發送。"
@@ -41,7 +41,7 @@
         "textBio": "添加個人簡介和銀行資訊以支取你的收入",
         "textBank": "添加個人簡介和銀行資訊以支取你的收入",
         "button": "添加",
-        "stripeIssue_NEED_TRANSLATION": "There is a problem with your Stripe account or its setup is unfinished",
+        "stripeIssue": "你的Stripe帳戶有問題或其設置未完成",
         "stripeIssueButton": "查看Stripe帳戶"
       },
       "makeDecision": {

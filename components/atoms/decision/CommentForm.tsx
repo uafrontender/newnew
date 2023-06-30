@@ -264,17 +264,24 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       if (onBlur !== undefined) onBlur();
     }, [onBlur]);
 
-    useEffect(() => {
-      if (!isRoot || !newCommentContentFromUrl) {
-        return;
-      }
+    useEffect(
+      () => {
+        if (!isRoot || !newCommentContentFromUrl) {
+          return;
+        }
 
-      if (newCommentContentFromUrl) {
-        setCommentText(newCommentContentFromUrl);
-        handleResetNewCommentContentFromUrl?.();
-      }
+        if (newCommentContentFromUrl) {
+          setCommentText(newCommentContentFromUrl);
+          handleResetNewCommentContentFromUrl?.();
+        }
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [newCommentContentFromUrl]);
+      [
+        newCommentContentFromUrl,
+        // isRoot, - reason unknown
+        // handleResetNewCommentContentFromUrl - reason unknown
+      ]
+    );
 
     return (
       <SCommentsForm
