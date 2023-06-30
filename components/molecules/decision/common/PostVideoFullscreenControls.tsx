@@ -135,9 +135,12 @@ const PostVideoFullscreenControls = React.forwardRef<
           handleToggleMuted(false);
         } else {
           handleToggleMuted(true);
+          if (isMobileOrTablet) {
+            setIsSoundControlsHovered(false);
+          }
         }
       },
-      [handleChangeVolume, handleToggleMuted]
+      [handleChangeVolume, handleToggleMuted, isMobileOrTablet]
     );
 
     const handleToggleMutedInner = useCallback(
@@ -246,7 +249,11 @@ const PostVideoFullscreenControls = React.forwardRef<
             size='sm'
             view='transparent'
             onClick={() => {
-              handleToggleMutedInner(!isMuted ? 0 : 1);
+              const valueToSet = !isMuted ? 0 : 1;
+              handleToggleMutedInner(valueToSet);
+              if (isMobileOrTablet && valueToSet === 0) {
+                setIsSoundControlsHovered(false);
+              }
             }}
           >
             <InlineSvg

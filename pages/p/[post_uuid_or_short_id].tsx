@@ -37,6 +37,7 @@ import { useUserData } from '../../contexts/userDataContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
 import CommentFromUrlContextProvider from '../../contexts/commentFromUrlContext';
+import ResponseNumberFromUrlContextProvider from '../../contexts/responseNumberFromUrlContext';
 import PostInnerContextProvider from '../../contexts/postInnerContext';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
@@ -65,6 +66,7 @@ interface IPostPage {
   comment_content?: string;
   custom_option_text?: string;
   save_card?: boolean;
+  response_number_from_url?: string;
   isServerSide?: boolean;
 }
 
@@ -77,6 +79,7 @@ const PostPage: NextPage<IPostPage> = ({
   comment_id,
   comment_content,
   save_card,
+  response_number_from_url,
   isServerSide,
 }) => {
   const router = useRouter();
@@ -113,6 +116,11 @@ const PostPage: NextPage<IPostPage> = ({
   const commentContentFromUrl = useMemo(
     () => comment_content,
     [comment_content]
+  );
+
+  const responseNumberFromUrl = useMemo(
+    () => response_number_from_url,
+    [response_number_from_url]
   );
 
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
@@ -311,9 +319,6 @@ const PostPage: NextPage<IPostPage> = ({
     () => saveCardFromRedirect ?? undefined
   );
 
-  // const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
-  //   useContext(CommentFromUrlContext);
-
   const [deletePostOpen, setDeletePostOpen] = useState(false);
 
   const handleOpenDeletePostModal = useCallback(
@@ -346,10 +351,12 @@ const PostPage: NextPage<IPostPage> = ({
         });
         setIsDeletingPost(false);
         handleCloseDeletePostModal();
+
         if (document?.documentElement) {
           setTimeout(() => {
+            // top: 5 instead of top: 0 because of issues on iOS
             document?.documentElement?.scrollTo({
-              top: 0,
+              top: 5,
             });
           }, 100);
         }
@@ -525,11 +532,15 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Comment ID from URL
   useEffect(() => {
-    if (commentContentFromUrl || commentIdFromUrl) {
+    const shouldReplace =
+      !!commentIdFromUrl || !!commentContentFromUrl || !!responseNumberFromUrl;
+
+    if (shouldReplace) {
       router.replace(`/p/${postUuidOrShortId}`, undefined, {
         shallow: true,
       });
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, commentContentFromUrl]);
 
@@ -876,11 +887,20 @@ export default PostPage;
       commentIdFromUrl={page?.props?.comment_id || undefined}
       commentContentFromUrl={page?.props?.comment_content || undefined}
     >
-      <AnimatePresence>
-        <React.Fragment key={page.props.postUuidOrShortId}>
-          {page}
-        </React.Fragment>
-      </AnimatePresence>
+      <ResponseNumberFromUrlContextProvider
+        responseFromUrlInitial={
+          page?.props?.response_number_from_url &&
+          !Number.isNaN(parseInt(page?.props?.response_number_from_url))
+            ? page?.props?.response_number_from_url
+            : undefined
+        }
+      >
+        <AnimatePresence>
+          <React.Fragment key={page.props.postUuidOrShortId}>
+            {page}
+          </React.Fragment>
+        </AnimatePresence>
+      </ResponseNumberFromUrlContextProvider>
     </CommentFromUrlContextProvider>
   </GeneralLayout>
 );
@@ -897,6 +917,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       save_card,
       bundle,
       custom_option_text,
+      response_number,
     } = context.query;
     const translationContext = await serverSideTranslations(
       context.locale!!,
@@ -976,6 +997,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
+          ...(response_number && !Array.isArray(response_number)
+            ? { response_number_from_url: response_number }
+            : {}),
         };
 
         if (Object.keys(queryObject).length !== 0) {
@@ -1036,6 +1060,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
+          ...(response_number && !Array.isArray(response_number)
+            ? { response_number_from_url: response_number }
+            : {}),
           ...translationContext,
         },
       };
@@ -1072,6 +1099,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           : {}),
         ...(custom_option_text && !Array.isArray(custom_option_text)
           ? { custom_option_text }
+          : {}),
+        ...(response_number && !Array.isArray(response_number)
+          ? { response_number_from_url: response_number }
           : {}),
         ...translationContext,
       },

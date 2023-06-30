@@ -100,13 +100,12 @@ const FileUpload: React.FC<IFileUpload> = ({
   const [localFile, setLocalFile] = useState<File | null>(null);
 
   const [showVideoDelete, setShowVideoDelete] = useState(false);
+  const [isVideoDeleting, setIsVideoDeleting] = useState(false);
 
   const ellipseButtonRef = useRef<HTMLButtonElement>();
   const [coverImageModalOpen, setCoverImageModalOpen] = useState(false);
 
   const [showFullPreview, setShowFullPreview] = useState(false);
-
-  const [showPlayButton, setShowPlayButton] = useState(false);
 
   const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Select File Clicked', { _stage: 'Creation' });
@@ -122,23 +121,17 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseFullPreviewClick = useCallback(() => {
     Mixpanel.track('Close Full Preview', { _stage: 'Creation' });
     setShowFullPreview(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
+    playerRef.current.play();
   }, []);
 
   const handleOpenEditCoverImageMenu = useCallback(() => {
     Mixpanel.track('Edit Cover Image', { _stage: 'Creation' });
     setCoverImageModalOpen(true);
-    playerRef.current.pause();
   }, []);
 
   const handleCloseCoverImageEditClick = useCallback(() => {
     Mixpanel.track('Close Cover Image Edit Dialog', { _stage: 'Creation' });
     setCoverImageModalOpen(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
   }, []);
 
   const handleDeleteVideoShow = useCallback(() => {
@@ -150,18 +143,18 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleCloseDeleteVideoClick = useCallback(() => {
     Mixpanel.track('Close Delete Video Dialog', { _stage: 'Creation' });
     setShowVideoDelete(false);
-    playerRef.current.play().catch(() => {
-      setShowPlayButton(true);
-    });
+    playerRef.current.play();
   }, []);
 
-  const handleDeleteVideo = useCallback(() => {
+  const handleDeleteVideo = useCallback(async () => {
     Mixpanel.track('Delete Video Clicked', { _stage: 'Creation' });
-    handleCloseDeleteVideoClick();
+    setIsVideoDeleting(true);
     setLocalFile(null);
-    onChange(id, null);
+    await onChange(id, null);
     unsetCustomCoverImageUrl();
-  }, [handleCloseDeleteVideoClick, id, onChange, unsetCustomCoverImageUrl]);
+    setShowVideoDelete(false);
+    setIsVideoDeleting(false);
+  }, [id, onChange, unsetCustomCoverImageUrl]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,6 +206,7 @@ const FileUpload: React.FC<IFileUpload> = ({
       _stage: 'Creation',
       _publicUrl: post?.announcementVideoUrl,
     });
+    setIsVideoDeleting(true);
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: post?.announcementVideoUrl,
@@ -245,9 +239,11 @@ const FileUpload: React.FC<IFileUpload> = ({
       setCreationFileProcessingLoading(false);
       setCreationFileProcessingProgress(0);
       unsetCustomCoverImageUrl();
+      setIsVideoDeleting(false);
     } catch (err) {
       console.error(err);
       showErrorToastPredefined(undefined);
+      setIsVideoDeleting(false);
     }
   }, [
     id,
@@ -438,6 +434,7 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SErrorBottomBlock>
             <SLoadingBottomBlockButton
               view='secondary'
+              disabled={isVideoDeleting}
               onClick={handleCancelVideoProcessing}
             >
               {t('secondStep.button.cancel')}
@@ -481,23 +478,22 @@ const FileUpload: React.FC<IFileUpload> = ({
             }}
           />
           <SPlayerWrapper>
-            {customCoverImageUrl && (
-              <SThumbnailHolder
-                className='thumnailHolder'
-                src={customCoverImageUrl ?? ''}
-                alt='Post preview'
-                draggable={false}
-              />
-            )}
             <VideojsPlayer
               id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
               borderRadius='8px'
-              showPlayButton={showPlayButton}
               playButtonSize='small'
             />
           </SPlayerWrapper>
+          {customCoverImageUrl && (
+            <SThumbnailHolder
+              className='thumnailHolder'
+              src={customCoverImageUrl ?? ''}
+              alt='Post preview'
+              draggable={false}
+            />
+          )}
           <SButtonsContainer>
             <SButtonsContainerLeft>
               <SVideoButton
@@ -505,7 +501,9 @@ const FileUpload: React.FC<IFileUpload> = ({
                 active={coverImageModalOpen}
                 onClick={() => handleOpenEditCoverImageMenu()}
               >
-                {t('secondStep.video.setThumbnail')}
+                {customCoverImageUrl
+                  ? t('secondStep.video.changeThumbnail')
+                  : t('secondStep.video.setThumbnail')}
               </SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
                 {t('secondStep.video.deleteFile')}
@@ -532,12 +530,13 @@ const FileUpload: React.FC<IFileUpload> = ({
     isTablet,
     t,
     handleUploadButtonClick,
+    localFile,
+    value,
     loadingUpload,
     errorUpload,
     errorProcessing,
     loadingProcessing,
     progressProcessing,
-    localFile,
     handleOnDragOver,
     handleOnDragLeave,
     handleOnDrop,
@@ -545,11 +544,10 @@ const FileUpload: React.FC<IFileUpload> = ({
     etaUpload,
     progressUpload,
     handleCancelUploadAndClearLocalFile,
+    isVideoDeleting,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
     customCoverImageUrl,
-    value,
-    showPlayButton,
     coverImageModalOpen,
     handleDeleteVideoShow,
     isDesktop,
@@ -561,6 +559,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     <SWrapper>
       <DeleteVideo
         open={showVideoDelete}
+        isLoading={isVideoDeleting}
         handleClose={handleCloseDeleteVideoClick}
         handleSubmit={handleDeleteVideo}
       />
@@ -657,6 +656,8 @@ const SPlayerWrapper = styled.div`
   overflow: hidden;
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
+  flex-shrink: 0;
+
   ${({ theme }) => theme.media.tablet} {
     width: 72px;
     height: 124px;
@@ -664,19 +665,28 @@ const SPlayerWrapper = styled.div`
 `;
 
 const SThumbnailHolder = styled.img`
-  position: absolute;
-  width: 100%;
-  height: 100%;
   transition: linear 0.3s;
   z-index: 1;
 
+  margin-left: 8px;
+
+  width: 64px;
+  height: 108px;
+  overflow: hidden;
   border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  flex-shrink: 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 72px;
+    height: 124px;
+  }
 `;
 
 const SButtonsContainer = styled.div`
   width: calc(100% - 64px);
   display: flex;
-  padding-left: 16px;
+  padding-left: 8px;
   flex-direction: row;
   justify-content: space-between;
 `;

@@ -165,6 +165,7 @@
         "description": "發生錯誤，檔案無法上傳，想再試一次嗎？"
       },
       "setThumbnail": "設置縮略圖",
+      "changeThumbnail": "改變縮略圖",
       "thumbnailEllipseMenu": {
         "uploadImageButton": "上傳圖片"
       },

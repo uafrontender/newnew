@@ -8,7 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { parse } from 'next-useragent';
 import styled from 'styled-components';
 import jwtDecode from 'jwt-decode';
@@ -82,7 +82,6 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   uaString,
   children,
 }) => {
-  const router = useRouter();
   // Should we check that token is valid or just it's presence here?
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
   const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
@@ -140,7 +139,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       setUserLoggedIn(true);
       setUserIsCreator(isCreator);
     },
-    [setUserLoggedIn, setUserIsCreator]
+    [setUserLoggedIn]
   );
 
   const handleBecameCreator = useCallback(() => {
@@ -151,18 +150,15 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       }
       return true;
     });
-  }, [setUserIsCreator, refreshTokens]);
+  }, [refreshTokens]);
 
-  const logoutAndRedirect = useCallback(
-    (redirectUrl?: string) => {
-      setUserLoggedIn(false);
-      setUserIsCreator(false);
-      cookiesInstance.remove('accessToken');
-      cookiesInstance.remove('refreshToken');
-      router.push(redirectUrl ?? '/');
-    },
-    [router, setUserIsCreator]
-  );
+  const logoutAndRedirect = useCallback((redirectUrl?: string) => {
+    setUserLoggedIn(false);
+    setUserIsCreator(false);
+    cookiesInstance.remove('accessToken');
+    cookiesInstance.remove('refreshToken');
+    Router.push(redirectUrl ?? '/');
+  }, []);
 
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: TResizeMode | undefined;
@@ -176,6 +172,21 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     if (newResizeMode) {
       setResizeMode(newResizeMode);
     }
+  }, []);
+
+  useEffect(() => {
+    const cookiesListener = (options: { name: string; value?: string }) => {
+      if (options.name === 'accessToken' && !options.value) {
+        setUserLoggedIn(false);
+        setUserIsCreator(false);
+      }
+    };
+
+    cookiesInstance.addChangeListener(cookiesListener);
+
+    return () => {
+      cookiesInstance.removeChangeListener(cookiesListener);
+    };
   }, []);
 
   useEffect(() => {

@@ -8,16 +8,15 @@ import { useUserData } from '../../../contexts/userDataContext';
 import Button from '../../atoms/Button';
 import ChatUserData from '../../atoms/direct-messages/ChatUserData';
 import InlineSVG from '../../atoms/InlineSVG';
+import GoBackButton from '../../atoms/direct-messages/GoBackButton';
+import UserAvatar from '../UserAvatar';
+
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../contexts/appStateContext';
 import { Mixpanel } from '../../../utils/mixpanel';
 
-const GoBackButton = dynamic(
-  () => import('../../atoms/direct-messages/GoBackButton')
-);
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
-const UserAvatar = dynamic(() => import('../UserAvatar'));
 const AnnouncementHeader = dynamic(
   () => import('../../atoms/direct-messages/AnnouncementHeader')
 );

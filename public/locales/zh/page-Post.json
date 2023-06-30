@@ -819,6 +819,7 @@
     "cfCancelled": "Goal被取消",
     "cfFinished": "Goal已經完成",
     "cfNotStarted": "Goal尚未開始",
-    "requestFailed": "請求失敗"
+    "requestFailed": "請求失敗",
+    "inappropriate": "NewNew不允許不良內容"
   }
 }

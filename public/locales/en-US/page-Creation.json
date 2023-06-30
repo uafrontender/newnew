@@ -168,6 +168,7 @@
         "description": "There was an error and your file could not be uploaded. Would you like to try again."
       },
       "setThumbnail": "Set a thumbnail",
+      "changeThumbnail": "Change thumbnail",
       "thumbnailEllipseMenu": {
         "uploadImageButton": "Upload an image"
       },

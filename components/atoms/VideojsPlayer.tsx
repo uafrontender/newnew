@@ -10,6 +10,7 @@ import styled, { css, useTheme } from 'styled-components';
 import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
+import debounce from 'lodash/debounce';
 
 import Button from './Button';
 import Lottie from './Lottie';
@@ -60,9 +61,14 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const [isPaused, setIsPaused] = useState(false);
 
-  const handleSetIsPaused = useCallback((stateValue: boolean) => {
-    setIsPaused(stateValue);
-  }, []);
+  const debouncedSetIsPaused = debounce(setIsPaused, 100);
+
+  const handleSetIsPaused = useCallback(
+    (stateValue: boolean) => {
+      debouncedSetIsPaused(stateValue);
+    },
+    [debouncedSetIsPaused]
+  );
 
   const [videoOrientation, setVideoOrientation] = useState<
     'vertical' | 'horizontal'
@@ -73,8 +79,17 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
   const playerScrubberRef = useRef<TPlayerScrubber>(null);
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
+  const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasVideoPlayingBeforeScrubberChangeTimeRef = useRef(false);
+
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      } else {
+        wasVideoPlayingBeforeScrubberChangeTimeRef.current = !isPaused;
+      }
+
       if (!isPaused) {
         // Pause the player when scrubbing
         // to avoid double playback start
@@ -82,16 +97,24 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
         playerRef.current?.pause();
         playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
-
-        setTimeout(() => {
-          setIsScrubberTimeChanging(false);
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
-        }, 100);
       } else {
         playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
+      }
+
+      if (wasVideoPlayingBeforeScrubberChangeTimeRef.current) {
+        timeoutIdRef.current = setTimeout(() => {
+          playerRef.current
+            ?.play()
+            ?.then(() => {
+              timeoutIdRef.current = null;
+              // setTimeout is needed to prevent the play button from flashing
+              setTimeout(() => setIsScrubberTimeChanging(false), 100);
+            })
+            .catch(() => {
+              handleSetIsPaused(true);
+            });
+        }, 100);
       }
     },
     [handleSetIsPaused, isPaused]
@@ -182,7 +205,11 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused, innerRef]
+    [
+      handleSetIsPaused,
+      // resources, - reason unknown
+      innerRef,
+    ]
   );
 
   useEffect(() => {
@@ -224,8 +251,8 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       borderRadius={borderRadius}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      bg={resources.thumbnailImageUrl ?? ''}
     >
-      <SImageBG src={resources.thumbnailImageUrl} />
       <SVideoWrapper borderRadius={borderRadius}>
         <SWrapper
           id={id}
@@ -321,6 +348,7 @@ VideojsPlayer.defaultProps = {
 
 interface ISContent {
   borderRadius?: string;
+  bg: string;
 }
 
 const SContent = styled.div<ISContent>`
@@ -329,6 +357,24 @@ const SContent = styled.div<ISContent>`
   position: relative;
   overflow: hidden;
   border-radius: ${(props) => props.borderRadius};
+
+  &::before {
+    content: '';
+    margin: -10px; // to prevent gaps
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    filter: blur(32px);
+    background-image: ${({ bg }) => `url(${bg})`};
+    background-position: center;
+    background-size: cover;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    border-radius: 16px;
+  }
 `;
 
 interface ISVideoWrapper {
@@ -346,8 +392,6 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
   min-height: 100%;
   background: transparent;
   border-radius: ${(props) => props.borderRadius};
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
 `;
 
 const SWrapper = styled.div<{
@@ -360,6 +404,14 @@ const SWrapper = styled.div<{
   min-width: 100% !important;
   min-height: 100% !important;
   background: transparent !important;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   &:before {
     display: none !important;
@@ -398,17 +450,6 @@ const SWrapper = styled.div<{
   }
   .vjs-big-play-button {
     display: none;
-  }
-`;
-
-const SImageBG = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.1);
-
-  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-    filter: blur(32px);
   }
 `;
 

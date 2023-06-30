@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -12,6 +12,7 @@ import { markPost } from '../../../../api/endpoints/post';
 import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
 
 const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
   ssr: false,
@@ -51,6 +52,16 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  const { responseFromUrl } = useResponseNumberFromUrl();
+
+  const responseWithAdditionalVideos = useMemo(() => {
+    if (additionalResponses && Array.isArray(additionalResponses)) {
+      return [response, ...additionalResponses] as newnewapi.IVideoUrls[];
+    }
+
+    return [response] as newnewapi.IVideoUrls[];
+  }, [additionalResponses, response]);
 
   // Show controls on shorter screens
   const [uiOffset, setUiOffset] = useState<number | undefined>(undefined);
@@ -133,6 +144,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         }
       }
 
+      handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
 
@@ -161,11 +173,17 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           ) : (
             <PostVideoResponsesSlider
               isDeletingAdditionalResponse={false}
-              videos={[response, ...additionalResponses]}
+              videos={responseWithAdditionalVideos}
               isMuted={isMuted}
               uiOffset={uiOffset}
               videoDurationWithTime
               autoscroll
+              initialVideoFromUrl={
+                responseFromUrl &&
+                parseInt(responseFromUrl) <= responseWithAdditionalVideos.length
+                  ? responseFromUrl
+                  : undefined
+              }
             />
           )}
           <PostVideoSoundButton

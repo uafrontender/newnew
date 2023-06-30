@@ -457,10 +457,11 @@ const SConformationModal = styled(ModalPaper)`
 `;
 
 const SConformationTitle = styled.strong`
+  margin-bottom: 16px;
+
   font-weight: 700;
   font-size: 20px;
   line-height: 28px;
-  margin-bottom: 16px;
 
   ${(props) => props.theme.media.tablet} {
     font-size: 24px;
