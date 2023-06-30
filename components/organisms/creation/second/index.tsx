@@ -490,22 +490,30 @@ export const CreationSecondStepContent: React.FC<
               );
               const factor = secondsPassed / uploadProgress;
               const eta = Math.round(factor * percentageLeft);
+              console.log(uploadProgress);
+              console.log(eta);
               setCreationFileUploadProgress(uploadProgress);
               setCreationFileUploadETA(eta);
             }
           });
           xhr.addEventListener('loadstart', (event) => {
+            console.log('File upload started');
             uploadStartTimestamp = event.timeStamp;
           });
           xhr.addEventListener('loadend', () => {
+            console.log('File upload ended');
             setCreationFileUploadProgress(100);
             resolve(xhr.readyState === 4 && xhr.status === 200);
           });
           xhr.addEventListener('error', () => {
+            console.log('File upload error');
+
             setCreationFileUploadProgress(0);
             reject(new Error('Upload failed'));
           });
           xhr.addEventListener('abort', () => {
+            console.log('File upload aborted');
+
             // console.log('Aborted');
             setCreationFileUploadProgress(0);
             reject(new Error('Upload aborted'));
