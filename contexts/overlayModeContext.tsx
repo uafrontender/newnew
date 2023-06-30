@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 export const OverlayModeContext = createContext<{
   overlayModeEnabled: boolean;
@@ -42,7 +42,16 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
         }
 
         if (elementContainer) {
-          disableBodyScroll(elementContainer);
+          disableBodyScroll(elementContainer, {
+            // Allow scroll for child elements
+            allowTouchMove: (el) => {
+              if (el && el !== document.body && elementContainer.contains(el)) {
+                return true;
+              }
+
+              return false;
+            },
+          });
         }
         return [...curr, id];
       });
@@ -50,20 +59,17 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
     []
   );
 
-  const disableOverlayMode = useCallback(
-    (id: string, elementContainer?: HTMLElement | null) => {
-      setRequests((curr) => {
-        const newRequests = curr.filter((request) => request !== id);
+  const disableOverlayMode = useCallback((id: string) => {
+    setRequests((curr) => {
+      const newRequests = curr.filter((request) => request !== id);
 
-        if (newRequests.length === 0 && elementContainer) {
-          enableBodyScroll(elementContainer);
-        }
+      if (newRequests.length === 0) {
+        clearAllBodyScrollLocks();
+      }
 
-        return newRequests;
-      });
-    },
-    []
-  );
+      return newRequests;
+    });
+  }, []);
 
   const contextValue = useMemo(
     () => ({
@@ -91,22 +97,21 @@ export function useOverlayMode() {
     );
   }
 
-  // Adding context to deps results in infinite loop
-
   const enable = useCallback(
     (elementContainer?: HTMLElement | null) =>
       context.enableOverlayMode(id.current, elementContainer),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // context, - causes infinite loop
+    ]
   );
 
-  // Adding context to deps results in infinite loop
-
   const disable = useCallback(
-    (elementContainer?: HTMLElement | null) =>
-      context.disableOverlayMode(id.current, elementContainer),
+    () => context.disableOverlayMode(id.current),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // context, - causes infinite loop
+    ]
   );
 
   return {

@@ -174,6 +174,8 @@ const SModalTitleFullScreen = styled.strong`
 `;
 
 const SModalTitle = styled.strong`
-  font-size: 20px;
+  max-width: 100%;
   margin-bottom: 16px;
+
+  font-size: 20px;
 `;
