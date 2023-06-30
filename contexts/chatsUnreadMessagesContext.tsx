@@ -36,13 +36,18 @@ export const ChatsUnreadMessagesProvider: React.FC<
   const { bundles, hasSoldBundles } = useBundles();
 
   const chatsWithCreatorsAvailable = useMemo(
-    () => bundles && bundles.length > 0,
+    () => !!bundles && bundles.length > 0,
     [bundles]
   );
 
   const chatsWithBundleOwnersAvailable = useMemo(
     () => hasSoldBundles,
     [hasSoldBundles]
+  );
+
+  const isChatAvailable = useMemo(
+    () => chatsWithCreatorsAvailable || chatsWithBundleOwnersAvailable,
+    [chatsWithCreatorsAvailable, chatsWithBundleOwnersAvailable]
   );
 
   const [unreadCountForUser, setUnreadCountForUser] = useState<number>(0);
@@ -82,7 +87,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
       }
     }
 
-    if (chatsWithCreatorsAvailable || chatsWithBundleOwnersAvailable) {
+    if (isChatAvailable) {
       getUnread();
     }
 
@@ -91,12 +96,7 @@ export const ChatsUnreadMessagesProvider: React.FC<
         controller.abort();
       }
     };
-  }, [
-    userLoggedIn,
-    setData,
-    chatsWithCreatorsAvailable,
-    chatsWithBundleOwnersAvailable,
-  ]);
+  }, [userLoggedIn, isChatAvailable, setData]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = async (data: any) => {
