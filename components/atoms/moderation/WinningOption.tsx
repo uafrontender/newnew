@@ -175,6 +175,10 @@ const SText = styled(Text)`
   &:first-child {
     margin-top: 0;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
 `;
 
 const SSpan = styled.span`
@@ -207,6 +211,12 @@ const SDisplayName = styled(DisplayName)<{ href?: string }>`
 const SHeadline = styled(Headline)`
   white-space: pre-wrap;
   word-break: break-word;
+
+  text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
 `;
 
 const SSkeletonContainer = styled.div`

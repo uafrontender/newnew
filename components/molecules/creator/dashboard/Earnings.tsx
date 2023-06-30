@@ -35,7 +35,7 @@ type EarningsFilterType = typeof EARNINGS_FILTER_TYPES[number];
 export const Earnings: React.FC<IFunctionProps> = ({ hasMyPosts }) => {
   const { t } = useTranslation('page-Creator');
   const [filter, setFilter] = useState<EarningsFilterType>('7_days');
-  const [isLoading, setIsLoading] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [myEarnings, setMyEarnings] = useState<
     newnewapi.GetMyEarningsResponse | undefined
   >();

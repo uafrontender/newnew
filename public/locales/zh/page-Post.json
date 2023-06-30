@@ -820,6 +820,6 @@
     "cfFinished": "Goal已經完成",
     "cfNotStarted": "Goal尚未開始",
     "requestFailed": "請求失敗",
-    "inappropriate_NEED_TRANSLATION": "Inappropriate content is not allowed on NewNew"
+    "inappropriate": "NewNew不允許不良內容"
   }
 }

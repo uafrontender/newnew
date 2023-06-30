@@ -83,20 +83,28 @@ export const useCuratedListSubscription = ({
   const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  useEffect(() => {
-    if (isSocketConnected) {
-      addChannel(curatedListType.toString(), {
-        curatedListUpdates: {
-          type: curatedListType,
-        },
-      });
-    }
+  useEffect(
+    () => {
+      if (isSocketConnected) {
+        addChannel(curatedListType.toString(), {
+          curatedListUpdates: {
+            type: curatedListType,
+          },
+        });
+      }
 
-    return () => {
-      removeChannel(curatedListType.toString());
-    };
+      return () => {
+        removeChannel(curatedListType.toString());
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSocketConnected]);
+    [
+      isSocketConnected,
+      // curatedListType - reason unknown
+      // addChannel - reason unknown
+      // removeChannel - reason unknown
+    ]
+  );
 
   useEffect(() => {
     const handlerSocketCuratedListUpdated = (data: any) => {

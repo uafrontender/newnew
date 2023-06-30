@@ -45,6 +45,28 @@ ESLint - runs in pre-commit sequence. Will find issues with the code style, whic
 
 We should improve our tools and their configuration over time. For example we can add more rules to eslint.
 
+#### Disabling eslint exhaustive-deps rule
+
+Whenever you need some dependencies omitted please consider following rules
+
+- Try re-writing the code to avoid the need in having dependency all together (with a use of `useRef` to store initial value for example)
+- Never disable exhaustive-deps check for the whole file
+- Provide a comment why you did disable certain dependencies
+- Keep disabled dependencies in the list of dependencies commented out, don't delete them
+- If you modify the effect/callback/memo with exhaustive-deps rule disabled, remove the rule and run linter to check if new dependencies need to be added to support your change. Some disabled dependencies might need to be removed if they are not needed after your changes.
+- Due to legacy reasons some dependencies might be disabled for unknown reason. These should be marked with `- reason unknown` and investigated and fixed later.
+
+Following format is recommended
+
+```
+// eslint-disable-next-line react-hooks/exhaustive-deps
+[
+    locale,
+    // t, - 'common' list of translations is present everywhere, we need update on language changed
+    getErrorToastPredefinedData,
+]
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -98,3 +120,10 @@ In order to free the phone number you can send `RM` text command to the Twilio n
 This will remove it from our DB, thus you can re-run the flow on any account.
 Then you can use it again. In case nothing comes, try sending `YES` message to Twilio number.
 In case you replied with `STOP` you have to reply with `START` before proceeding
+
+## Contexts
+
+In Contexts it is vital to check dependencies and ensure that no additional data is loaded. So below are some rules and practices that can help with that.
+
+- Use `Router` instead of `useRouter` hook whenever possible, as it does not cause effects and callbacks to be re-evaluated on page changed
+- Check the initialization and flow of the context with a help of `console.log` statements in every effect and callback. Avoid excessive calls.

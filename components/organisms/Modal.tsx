@@ -49,7 +49,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     }
 
     return () => {
-      disableOverlayMode(elementContainer);
+      disableOverlayMode();
     };
   }, [show, enableOverlayMode, disableOverlayMode]);
 

@@ -205,7 +205,11 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused, innerRef]
+    [
+      handleSetIsPaused,
+      // resources, - reason unknown
+      innerRef,
+    ]
   );
 
   useEffect(() => {
