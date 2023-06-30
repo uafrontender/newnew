@@ -175,6 +175,10 @@ const SText = styled(Text)`
   &:first-child {
     margin-top: 0;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
 `;
 
 const SSpan = styled.span`

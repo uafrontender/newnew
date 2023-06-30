@@ -96,11 +96,13 @@ const SPost = styled.div`
 
 const SLeftSide = styled.div`
   display: flex;
+  max-width: 100%;
 `;
 
 const SPostData = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const CreatorData = styled.div`

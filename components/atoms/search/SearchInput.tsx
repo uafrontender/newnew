@@ -536,7 +536,7 @@ const SResultsDropMobile = styled.div`
   border-radius: 0;
   width: 100vw;
   height: fill-available;
-  top: 56px;
+  top: 96px;
   left: 0;
   overflow: auto;
   padding: 16px;
