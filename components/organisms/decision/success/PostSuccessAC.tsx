@@ -24,6 +24,7 @@ import PostSuccessOrWaitingControls from '../../../molecules/decision/common/Pos
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -51,6 +52,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
 
     const { refetchPost, handleGoBackInsidePost } = usePostInnerState();
 
+    const { responseFromUrl } = useResponseNumberFromUrl();
+
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
       newnewapi.Auction.Option | undefined
@@ -59,7 +62,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     // Video
     // Open video tab
     const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
-      'announcement'
+      responseFromUrl ? 'response' : 'announcement'
     );
 
     // Response viewed
