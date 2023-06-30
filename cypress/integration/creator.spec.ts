@@ -271,6 +271,7 @@ context('Creator flow', () => {
 
     it('can create an event', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
+      cy.wait(2000);
       cy.url().should('include', '/creation');
 
       // Waiting for an element to be attached to the DOM
@@ -323,6 +324,7 @@ context('Creator flow', () => {
 
     it('can create a superpoll', () => {
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creation`);
+      cy.wait(2000);
       cy.url().should('include', '/creation');
 
       // Waiting for an element to be attached to the DOM
