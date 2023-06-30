@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { toast, ToastOptions } from 'react-toastify';
 import { useRouter } from 'next/router';
@@ -36,6 +36,8 @@ export default function useErrorToasts(): IUseErrorToasts {
   const { locale } = useRouter();
   const { t } = useTranslation('common');
 
+  const appConstantsRef = useRef(appConstants);
+
   const getErrorToastPredefinedData = useCallback(
     (
       error: ErrorToastPredefinedMessage
@@ -43,7 +45,7 @@ export default function useErrorToasts(): IUseErrorToasts {
       if (error === ErrorToastPredefinedMessage.AnnouncementTooShort) {
         return {
           amount:
-            appConstants.announcementVideoLimits?.minLengthSeconds?.toString() ??
+            appConstantsRef.current.announcementVideoLimits?.minLengthSeconds?.toString() ??
             '15',
         };
       }
@@ -51,7 +53,7 @@ export default function useErrorToasts(): IUseErrorToasts {
       if (error === ErrorToastPredefinedMessage.AnnouncementTooLong) {
         return {
           amount:
-            appConstants.announcementVideoLimits?.maxLengthSeconds?.toString() ??
+            appConstantsRef.current.announcementVideoLimits?.maxLengthSeconds?.toString() ??
             '3600',
         };
       }
@@ -59,7 +61,7 @@ export default function useErrorToasts(): IUseErrorToasts {
       if (error === ErrorToastPredefinedMessage.InitialResponseTooShort) {
         return {
           amount:
-            appConstants.responseVideoLimits?.minLengthSeconds?.toString() ??
+            appConstantsRef.current.responseVideoLimits?.minLengthSeconds?.toString() ??
             '30',
         };
       }
@@ -67,7 +69,7 @@ export default function useErrorToasts(): IUseErrorToasts {
       if (error === ErrorToastPredefinedMessage.InitialResponseTooLong) {
         return {
           amount:
-            appConstants.responseVideoLimits?.maxLengthSeconds?.toString() ??
+            appConstantsRef.current.responseVideoLimits?.maxLengthSeconds?.toString() ??
             '3600',
         };
       }
@@ -75,7 +77,7 @@ export default function useErrorToasts(): IUseErrorToasts {
       if (error === ErrorToastPredefinedMessage.AdditionalResponseTooShort) {
         return {
           amount:
-            appConstants.responseVideoLimits?.minLengthSeconds?.toString() ??
+            appConstantsRef.current.responseVideoLimits?.minLengthSeconds?.toString() ??
             '30',
         };
       }
@@ -83,14 +85,14 @@ export default function useErrorToasts(): IUseErrorToasts {
       if (error === ErrorToastPredefinedMessage.AdditionalResponseTooLong) {
         return {
           amount:
-            appConstants.responseVideoLimits?.maxLengthSeconds?.toString() ??
+            appConstantsRef.current.responseVideoLimits?.maxLengthSeconds?.toString() ??
             '3600',
         };
       }
 
       return undefined;
     },
-    [appConstants]
+    []
   );
 
   const showErrorToastPredefined = useCallback(
@@ -122,6 +124,10 @@ export default function useErrorToasts(): IUseErrorToasts {
     },
     []
   );
+
+  useEffect(() => {
+    appConstantsRef.current = appConstants;
+  }, [appConstants]);
 
   const value = useMemo(
     () => ({
