@@ -20,6 +20,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import SimplifiedSlider from '../../../atoms/SimplifiedSlider';
+import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
@@ -28,6 +29,7 @@ interface IPostVideoResponsesSlider {
   isEditingStories?: boolean;
   isDeletingAdditionalResponse: boolean;
   videoDurationWithTime?: boolean;
+  initialVideoFromUrl?: string;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
   handleDeleteUnUploadedAdditionalResponse?: () => void;
   autoscroll?: boolean;
@@ -42,6 +44,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   isEditingStories,
   isDeletingAdditionalResponse,
   videoDurationWithTime,
+  initialVideoFromUrl,
   handleDeleteAdditionalVideo,
   handleDeleteUnUploadedAdditionalResponse,
   autoscroll,
@@ -57,6 +60,8 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  const { handleResetResponseFromUrl } = useResponseNumberFromUrl();
 
   const wrapperRef = useRef<HTMLDivElement>();
 
@@ -166,6 +171,17 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadedFile]);
+
+  useEffect(() => {
+    if (initialVideoFromUrl) {
+      setCurrentVideo(parseInt(initialVideoFromUrl));
+      handleResetResponseFromUrl?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    initialVideoFromUrl,
+    // handleResetResponseFromUrl, - reason: Not needed because simply sets state to `undefined`
+  ]);
 
   return (
     <SWrapper
