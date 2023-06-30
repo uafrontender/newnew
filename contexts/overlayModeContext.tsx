@@ -88,21 +88,21 @@ export function useOverlayMode() {
     );
   }
 
-  // Adding context to deps results in infinite loop
-
   const enable = useCallback(
     (elementContainer?: HTMLElement | null) =>
       context.enableOverlayMode(id.current, elementContainer),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // context, - causes infinite loop
+    ]
   );
-
-  // Adding context to deps results in infinite loop
 
   const disable = useCallback(
     () => context.disableOverlayMode(id.current),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // context, - causes infinite loop
+    ]
   );
 
   return {

@@ -82,8 +82,7 @@ const FollowingsContextProvider: React.FC<IFollowingsContextProvider> = ({
     }
 
     fetchIds();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+  }, [userLoggedIn, logoutAndRedirect]);
 
   return (
     <FollowingsContext.Provider value={contextValue}>

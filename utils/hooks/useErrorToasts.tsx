@@ -111,7 +111,7 @@ export default function useErrorToasts(): IUseErrorToasts {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       locale,
-      // t - removed as common is present everywhere, we need update on language changed
+      // t - 'common' list of translations is present everywhere, we need update on language changed
       getErrorToastPredefinedData,
     ]
   );
