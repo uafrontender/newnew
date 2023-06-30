@@ -42,7 +42,16 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
         }
 
         if (elementContainer) {
-          disableBodyScroll(elementContainer);
+          disableBodyScroll(elementContainer, {
+            // Allow scroll for child elements
+            allowTouchMove: (el) => {
+              if (el && el !== document.body && elementContainer.contains(el)) {
+                return true;
+              }
+
+              return false;
+            },
+          });
         }
         return [...curr, id];
       });
