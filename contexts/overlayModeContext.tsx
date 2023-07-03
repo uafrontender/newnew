@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 export const OverlayModeContext = createContext<{
   overlayModeEnabled: boolean;
@@ -34,38 +33,19 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
 }) => {
   const [requests, setRequests] = useState<string[]>([]);
 
-  const enableOverlayMode = useCallback(
-    (id: string, elementContainer?: HTMLElement | null) => {
-      setRequests((curr) => {
-        if (curr.includes(id)) {
-          return curr;
-        }
+  const enableOverlayMode = useCallback((id: string) => {
+    setRequests((curr) => {
+      if (curr.includes(id)) {
+        return curr;
+      }
 
-        if (elementContainer) {
-          disableBodyScroll(elementContainer, {
-            // Allow scroll for child elements
-            allowTouchMove: (el) => {
-              if (el && el !== document.body && elementContainer.contains(el)) {
-                return true;
-              }
-
-              return false;
-            },
-          });
-        }
-        return [...curr, id];
-      });
-    },
-    []
-  );
+      return [...curr, id];
+    });
+  }, []);
 
   const disableOverlayMode = useCallback((id: string) => {
     setRequests((curr) => {
       const newRequests = curr.filter((request) => request !== id);
-
-      if (newRequests.length === 0) {
-        clearAllBodyScrollLocks();
-      }
 
       return newRequests;
     });
@@ -98,8 +78,7 @@ export function useOverlayMode() {
   }
 
   const enable = useCallback(
-    (elementContainer?: HTMLElement | null) =>
-      context.enableOverlayMode(id.current, elementContainer),
+    () => context.enableOverlayMode(id.current),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       // context, - causes infinite loop
