@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useQueryClient } from 'react-query';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import InlineSVG from '../InlineSVG';
 
@@ -27,7 +28,6 @@ import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
-import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 interface IStaticSearchInput {
   width?: string;
@@ -39,8 +39,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const theme = useTheme();
     const { showErrorToastPredefined } = useErrorToasts();
     const queryClient = useQueryClient();
-
-    const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
     const inputRef: any = useRef();
     const inputContainerRef: any = useRef();
@@ -333,19 +331,17 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
 
     useEffect(() => {
       const resultContainer = resultsContainerRef.current;
+
       if (isMobileOrTablet && isResultsDropVisible && resultContainer) {
-        enableOverlayMode(resultContainer);
+        disableBodyScroll(resultContainer);
       }
 
       return () => {
-        disableOverlayMode();
+        if (resultContainer) {
+          enableBodyScroll(resultContainer);
+        }
       };
-    }, [
-      isMobileOrTablet,
-      isResultsDropVisible,
-      enableOverlayMode,
-      disableOverlayMode,
-    ]);
+    }, [isMobileOrTablet, isResultsDropVisible]);
 
     return (
       <>

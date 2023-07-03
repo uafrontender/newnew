@@ -42,10 +42,8 @@ const Modal: React.FC<IModal> = React.memo((props) => {
   const elementRef = useRef(null);
 
   useEffect(() => {
-    const elementContainer = elementRef.current;
-
     if (show) {
-      enableOverlayMode(elementContainer);
+      enableOverlayMode();
     }
 
     return () => {
