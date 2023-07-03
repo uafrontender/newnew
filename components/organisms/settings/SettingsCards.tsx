@@ -82,18 +82,12 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
         {/* TODO: make cards section look more real, handle WL creator adds aa card case */}
         {cards.length > 0 && (
           <>
-            {notWhitelisted && (
-              <SButtonSecondaryDesktop
-                view='secondary'
-                onClick={
-                  !userData?.options?.isWhiteListed
-                    ? openAddCardModal
-                    : () => {}
-                }
-              >
-                {t('Settings.sections.cards.button.addCard')}
-              </SButtonSecondaryDesktop>
-            )}
+            <SButtonSecondaryDesktop
+              view='secondary'
+              onClick={notWhitelisted ? openAddCardModal : () => {}}
+            >
+              {t('Settings.sections.cards.button.addCard')}
+            </SButtonSecondaryDesktop>
             <SButtonSecondaryMobile
               view='secondary'
               iconOnly

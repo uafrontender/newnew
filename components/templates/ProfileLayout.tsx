@@ -74,7 +74,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
-  const { bundles } = useBundles();
+  const { bundles, isBundleDataLoaded } = useBundles();
   const creatorsBundle = useMemo(
     () => bundles?.find((bundle) => bundle.creator?.uuid === user.uuid),
     [bundles, user.uuid]
@@ -247,7 +247,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               /* ) */
             }
             <RightSideButtons>
-              {!isMobile && !isUserBlocked && (
+              {!isMobile && !isUserBlocked && isBundleDataLoaded && (
                 <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
               )}
               <SIconButton
@@ -390,7 +390,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               ) : null
             }
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-            {isMobile && !isUserBlocked && (
+            {isMobile && !isUserBlocked && isBundleDataLoaded && (
               <SMobileSeeBundleButton
                 user={user}
                 creatorBundle={creatorsBundle}

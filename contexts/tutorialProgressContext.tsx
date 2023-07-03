@@ -121,236 +121,246 @@ export const TutorialProgressContextProvider: React.FC<
     }
   }, [userLoggedIn]);
 
-  useEffect(() => {
-    async function syncUserTutorialsProgress(
-      localUserTutorialsProgress: newnewapi.IGetTutorialsStatusResponse
-    ) {
-      if (!isEqual(userTutorialsProgress, localUserTutorialsProgress)) {
-        setUserTutorialsProgress(
-          localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
-        );
-      }
+  useEffect(
+    () => {
+      async function syncUserTutorialsProgress(
+        localUserTutorialsProgress: newnewapi.IGetTutorialsStatusResponse
+      ) {
+        if (!isEqual(userTutorialsProgress, localUserTutorialsProgress)) {
+          setUserTutorialsProgress(
+            localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
+          );
+        }
 
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const { data } = await getTutorialsStatus(payload);
-        if (data) {
-          if (
-            !isEqual(data, localUserTutorialsProgress) &&
-            localUserTutorialsProgress
-          ) {
-            // TODO: Use markTutorialStepAsCompleted once
-            const syncedObj: newnewapi.IGetTutorialsStatusResponse = {
-              ...data,
-            };
-
+        try {
+          const payload = new newnewapi.EmptyRequest({});
+          const { data } = await getTutorialsStatus(payload);
+          if (data) {
             if (
-              isTutorialNotSynced(
-                syncedObj.remainingAcSteps,
-                localUserTutorialsProgress.remainingAcSteps
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingAcSteps,
-                newnewapi.AcTutorialStep.AC_TEXT_FIELD
-              )
+              !isEqual(data, localUserTutorialsProgress) &&
+              localUserTutorialsProgress
             ) {
-              syncedObj.remainingAcSteps =
-                localUserTutorialsProgress.remainingAcSteps;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  acCurrentStep:
-                    localUserTutorialsProgress.remainingAcSteps?.[0] ||
-                    newnewapi.AcTutorialStep.AC_TEXT_FIELD,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              // TODO: Use markTutorialStepAsCompleted once
+              const syncedObj: newnewapi.IGetTutorialsStatusResponse = {
+                ...data,
+              };
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingMcSteps,
-                localUserTutorialsProgress.remainingMcSteps
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingMcSteps,
-                newnewapi.McTutorialStep.MC_TEXT_FIELD
-              )
-            ) {
-              syncedObj.remainingMcSteps =
-                localUserTutorialsProgress.remainingMcSteps;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  mcCurrentStep:
-                    localUserTutorialsProgress.remainingMcSteps?.[0] ||
-                    newnewapi.McTutorialStep.MC_TEXT_FIELD,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingAcSteps,
+                  localUserTutorialsProgress.remainingAcSteps
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingAcSteps,
+                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                )
+              ) {
+                syncedObj.remainingAcSteps =
+                  localUserTutorialsProgress.remainingAcSteps;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    acCurrentStep:
+                      localUserTutorialsProgress.remainingAcSteps?.[0] ||
+                      newnewapi.AcTutorialStep.AC_TEXT_FIELD,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingCfSteps,
-                localUserTutorialsProgress.remainingCfSteps
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingCfSteps,
-                newnewapi.CfTutorialStep.CF_BACK_GOAL
-              )
-            ) {
-              syncedObj.remainingCfSteps =
-                localUserTutorialsProgress.remainingCfSteps;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  cfCurrentStep:
-                    localUserTutorialsProgress.remainingCfSteps?.[0] ||
-                    newnewapi.CfTutorialStep.CF_BACK_GOAL,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingMcSteps,
+                  localUserTutorialsProgress.remainingMcSteps
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingMcSteps,
+                  newnewapi.McTutorialStep.MC_TEXT_FIELD
+                )
+              ) {
+                syncedObj.remainingMcSteps =
+                  localUserTutorialsProgress.remainingMcSteps;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    mcCurrentStep:
+                      localUserTutorialsProgress.remainingMcSteps?.[0] ||
+                      newnewapi.McTutorialStep.MC_TEXT_FIELD,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingAcCrCurrentStep,
-                localUserTutorialsProgress.remainingAcCrCurrentStep
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingAcCrCurrentStep,
-                newnewapi.AcCreationTutorialStep.AC_CR_HERO
-              )
-            ) {
-              syncedObj.remainingAcCrCurrentStep =
-                localUserTutorialsProgress.remainingAcCrCurrentStep;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  acCrCurrentStep:
-                    localUserTutorialsProgress.remainingAcCrCurrentStep?.[0] ||
-                    newnewapi.AcCreationTutorialStep.AC_CR_HERO,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingCfSteps,
+                  localUserTutorialsProgress.remainingCfSteps
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingCfSteps,
+                  newnewapi.CfTutorialStep.CF_BACK_GOAL
+                )
+              ) {
+                syncedObj.remainingCfSteps =
+                  localUserTutorialsProgress.remainingCfSteps;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    cfCurrentStep:
+                      localUserTutorialsProgress.remainingCfSteps?.[0] ||
+                      newnewapi.CfTutorialStep.CF_BACK_GOAL,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingCfCrCurrentStep,
-                localUserTutorialsProgress.remainingCfCrCurrentStep
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingCfCrCurrentStep,
-                newnewapi.CfCreationTutorialStep.CF_CR_HERO
-              )
-            ) {
-              syncedObj.remainingCfCrCurrentStep =
-                localUserTutorialsProgress.remainingCfCrCurrentStep;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  cfCrCurrentStep:
-                    localUserTutorialsProgress.remainingCfCrCurrentStep?.[0] ||
-                    newnewapi.CfCreationTutorialStep.CF_CR_HERO,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingAcCrCurrentStep,
+                  localUserTutorialsProgress.remainingAcCrCurrentStep
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingAcCrCurrentStep,
+                  newnewapi.AcCreationTutorialStep.AC_CR_HERO
+                )
+              ) {
+                syncedObj.remainingAcCrCurrentStep =
+                  localUserTutorialsProgress.remainingAcCrCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    acCrCurrentStep:
+                      localUserTutorialsProgress
+                        .remainingAcCrCurrentStep?.[0] ||
+                      newnewapi.AcCreationTutorialStep.AC_CR_HERO,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingMcCrCurrentStep,
-                localUserTutorialsProgress.remainingMcCrCurrentStep
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingMcCrCurrentStep,
-                newnewapi.McCreationTutorialStep.MC_CR_HERO
-              )
-            ) {
-              syncedObj.remainingMcCrCurrentStep =
-                localUserTutorialsProgress.remainingMcCrCurrentStep;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  mcCrCurrentStep:
-                    localUserTutorialsProgress.remainingMcCrCurrentStep?.[0] ||
-                    newnewapi.McCreationTutorialStep.MC_CR_HERO,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingCfCrCurrentStep,
+                  localUserTutorialsProgress.remainingCfCrCurrentStep
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingCfCrCurrentStep,
+                  newnewapi.CfCreationTutorialStep.CF_CR_HERO
+                )
+              ) {
+                syncedObj.remainingCfCrCurrentStep =
+                  localUserTutorialsProgress.remainingCfCrCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    cfCrCurrentStep:
+                      localUserTutorialsProgress
+                        .remainingCfCrCurrentStep?.[0] ||
+                      newnewapi.CfCreationTutorialStep.CF_CR_HERO,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingAcResponseCurrentStep,
-                localUserTutorialsProgress.remainingAcResponseCurrentStep
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingAcResponseCurrentStep,
-                newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE
-              )
-            ) {
-              syncedObj.remainingAcResponseCurrentStep =
-                localUserTutorialsProgress.remainingAcResponseCurrentStep;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  acResponseCurrentStep:
-                    localUserTutorialsProgress
-                      .remainingAcResponseCurrentStep?.[0] ||
-                    newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
-            }
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingMcCrCurrentStep,
+                  localUserTutorialsProgress.remainingMcCrCurrentStep
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingMcCrCurrentStep,
+                  newnewapi.McCreationTutorialStep.MC_CR_HERO
+                )
+              ) {
+                syncedObj.remainingMcCrCurrentStep =
+                  localUserTutorialsProgress.remainingMcCrCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    mcCrCurrentStep:
+                      localUserTutorialsProgress
+                        .remainingMcCrCurrentStep?.[0] ||
+                      newnewapi.McCreationTutorialStep.MC_CR_HERO,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
 
-            if (
-              isTutorialNotSynced(
-                syncedObj.remainingMcResponseCurrentStep,
-                localUserTutorialsProgress.remainingMcResponseCurrentStep
-              ) &&
-              !isTutorialInvalid(
-                localUserTutorialsProgress.remainingMcResponseCurrentStep,
-                newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE
-              )
-            ) {
-              syncedObj.remainingMcResponseCurrentStep =
-                localUserTutorialsProgress.remainingMcResponseCurrentStep;
-              const payloadSetData =
-                new newnewapi.MarkTutorialStepAsCompletedRequest({
-                  mcResponseCurrentStep:
-                    localUserTutorialsProgress
-                      .remainingMcResponseCurrentStep?.[0] ||
-                    newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
-                });
-              await markTutorialStepAsCompleted(payloadSetData);
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingAcResponseCurrentStep,
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep,
+                  newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE
+                )
+              ) {
+                syncedObj.remainingAcResponseCurrentStep =
+                  localUserTutorialsProgress.remainingAcResponseCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    acResponseCurrentStep:
+                      localUserTutorialsProgress
+                        .remainingAcResponseCurrentStep?.[0] ||
+                      newnewapi.AcResponseTutorialStep.AC_CHANGE_TITLE,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
+
+              if (
+                isTutorialNotSynced(
+                  syncedObj.remainingMcResponseCurrentStep,
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep
+                ) &&
+                !isTutorialInvalid(
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep,
+                  newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE
+                )
+              ) {
+                syncedObj.remainingMcResponseCurrentStep =
+                  localUserTutorialsProgress.remainingMcResponseCurrentStep;
+                const payloadSetData =
+                  new newnewapi.MarkTutorialStepAsCompletedRequest({
+                    mcResponseCurrentStep:
+                      localUserTutorialsProgress
+                        .remainingMcResponseCurrentStep?.[0] ||
+                      newnewapi.McResponseTutorialStep.MC_CHANGE_TITLE,
+                  });
+                await markTutorialStepAsCompleted(payloadSetData);
+              }
+              setUserTutorialsProgress(syncedObj);
+              saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, syncedObj);
+            } else {
+              setUserTutorialsProgress(data);
             }
-            setUserTutorialsProgress(syncedObj);
-            saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, syncedObj);
-          } else {
-            setUserTutorialsProgress(data);
+          }
+          setUserTutorialsProgressSynced(true);
+        } catch (err) {
+          console.error(err);
+          if ((err as Error).message === 'No token') {
+            logoutAndRedirect();
+          }
+          // Refresh token was present, session probably expired
+          // Redirect to sign up page
+          if ((err as Error).message === 'Refresh token invalid') {
+            logoutAndRedirect('/sign-up?reason=session_expired');
           }
         }
-        setUserTutorialsProgressSynced(true);
-      } catch (err) {
-        console.error(err);
-        if ((err as Error).message === 'No token') {
-          logoutAndRedirect();
-        }
-        // Refresh token was present, session probably expired
-        // Redirect to sign up page
-        if ((err as Error).message === 'Refresh token invalid') {
-          logoutAndRedirect('/sign-up?reason=session_expired');
-        }
       }
-    }
 
-    const localUserTutorialsProgress = loadStateLS(
-      USER_TUTORIAL_PROGRESS_LS_KEY
-    ) as newnewapi.IGetTutorialsStatusResponse;
-    if (userLoggedIn) {
-      syncUserTutorialsProgress(localUserTutorialsProgress);
-    } else {
-      if (!localUserTutorialsProgress) {
-        saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, defaultState);
-        setUserTutorialsProgress(defaultState);
+      const localUserTutorialsProgress = loadStateLS(
+        USER_TUTORIAL_PROGRESS_LS_KEY
+      ) as newnewapi.IGetTutorialsStatusResponse;
+      if (userLoggedIn) {
+        syncUserTutorialsProgress(localUserTutorialsProgress);
       } else {
-        setUserTutorialsProgress(
-          localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
-        );
+        if (!localUserTutorialsProgress) {
+          saveStateLS(USER_TUTORIAL_PROGRESS_LS_KEY, defaultState);
+          setUserTutorialsProgress(defaultState);
+        } else {
+          setUserTutorialsProgress(
+            localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
+          );
+        }
+        setUserTutorialsProgressSynced(true);
       }
-      setUserTutorialsProgressSynced(true);
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+    [
+      userLoggedIn,
+      // userTutorialsProgress, - reason unknown, dangerous
+      logoutAndRedirect,
+    ]
+  );
 
   const contextValue = useMemo(
     () => ({

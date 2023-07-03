@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -36,11 +36,16 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     onClose,
     onEnterKeyUp,
   } = props;
+
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
+  const elementRef = useRef(null);
+
   useEffect(() => {
+    const elementContainer = elementRef.current;
+
     if (show) {
-      enableOverlayMode();
+      enableOverlayMode(elementContainer);
     }
 
     return () => {
@@ -100,7 +105,11 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        {children}
+        {React.isValidElement(children)
+          ? React.cloneElement(children as React.ReactElement<any>, {
+              ref: elementRef,
+            })
+          : children}
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
@@ -115,14 +124,19 @@ interface IStyledModalOverlay {
   custombackdropfiltervalue?: number;
 }
 
+// NOTE: 'transform: translateZ(0);', ' height: calc(100% + 2px);',  'top: -1px;' and 'bottom: -1px;' needed to fix mobile Safari issue with transparent line above
 const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
-  left: 0;
-  width: 100vw;
-  height: 100%;
-  bottom: 0;
-  z-index: ${({ additionalz }) => additionalz ?? 10};
-  overflow: hidden;
   position: fixed;
+  left: 0;
+  bottom: -1px;
+  top: -1px;
+
+  width: 100vw;
+  height: calc(100% + 2px);
+  transform: translateZ(0);
+  overflow: hidden;
+  z-index: ${({ additionalz }) => additionalz ?? 10};
+
   backdrop-filter: ${({ custombackdropfiltervalue, nodimming }) =>
     // eslint-disable-next-line no-nested-ternary
     nodimming === 'true'

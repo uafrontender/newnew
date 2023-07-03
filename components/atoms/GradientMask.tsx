@@ -71,18 +71,18 @@ const SGradientMask = styled.div<IGradientMask>`
     `}
 
   ${(props) => props.theme.media.tablet} {
-    height: ${(props) => (props.active ? props.height || '60px' : 0)};
+    height: ${(props) => (props.active ? props.height || '62px' : 0)};
 
     ${(props) => {
       if (props.positionTop) {
         return `top: ${isNumber(props.positionTop) ? props.positionTop : 0}px`;
       }
-      return `bottom: ${props.positionBottom ?? 0}px`;
+      return `bottom: ${(props.positionBottom ?? 0) - 2}px`; // -2px is needed to prevent gap in Safari
     }}
   }
 
   ${(props) => props.theme.media.laptopL} {
-    height: ${(props) => (props.active ? props.height || '80px' : 0)};
+    height: ${(props) => (props.active ? props.height || '82px' : 0)};
   }
 `;
 

@@ -259,8 +259,10 @@ const SContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 35px;
 
   ${({ theme }) => theme.media.laptop} {
     max-width: 401px;
+    padding: 0;
   }
 `;
