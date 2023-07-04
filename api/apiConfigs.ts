@@ -4,6 +4,7 @@ import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
 import jwtDecode from 'jwt-decode';
+import { v4 as uuidv4 } from 'uuid';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -164,6 +165,7 @@ export async function fetchProtobuf<
       method,
       headers: {
         'Content-type': 'application/x-protobuf',
+        'x-request-uuid': uuidv4(),
         ...(!isBrowser() || process.env.NEXT_PUBLIC_ENVIRONMENT === 'test'
           ? {
               // TODO: should it come from env var and be a secret?
