@@ -117,6 +117,76 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
 };
 
 /**
+ * Log request
+ */
+const logRequest = <
+RequestType = keyof NewnewapiType,
+ResponseType = keyof NewnewapiType
+>(reqT: EncDec<RequestType>,
+  resT: EncDec<ResponseType>,
+  payload: RequestType | undefined,
+  data: ResponseType & JsonConvertible
+  ) => {
+    console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
+    console.debug(
+      `
+    %c Payload Type: %c ${reqT?.name}
+    %c Payload: %c ${JSON.stringify(payload, null, 2)}
+    `,
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;',
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;'
+    );
+    console.debug(
+      `
+    %c Response Type: %c ${resT?.name}
+    %c Response: %c ${JSON.stringify(data, null, 2)}
+    `,
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;',
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;'
+    );
+    console.groupEnd();
+}
+
+/**
+ * Log request error
+ */
+const logRequestError = <
+RequestType = keyof NewnewapiType,
+ResponseType = keyof NewnewapiType
+>(reqT: EncDec<RequestType>,
+  resT: EncDec<ResponseType>,
+  payload: RequestType | undefined,
+  err: unknown,
+  ) => {
+    console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
+    console.debug(
+      `
+    %c Payload Type: %c ${reqT?.name}
+    %c Payload: %c ${JSON.stringify(payload, null, 2)}
+    `,
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;',
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;'
+    );
+    console.debug(
+      `
+    %c Response Type: %c ${resT?.name}
+    %c Error: %c ${err}
+    `,
+      'font-size: 14px; color: blue;',
+      'font-size: 12px; color: black;',
+      'font-size: 14px; color: red;',
+      'font-size: 12px; color: black;'
+    );
+    console.groupEnd();
+}
+
+/**
  * This function is a typed wrapper around the browser `fetch` method,
  * aimed at sending and receiving protobuf messages, defined in `newnew-api`.
  * Not for standalone use, its purpose is to construct functions for concrete
@@ -193,28 +263,7 @@ export async function fetchProtobuf<
     const data = resT.decode(new Uint8Array(buff));
 
     if (logsOn) {
-      console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
-      console.debug(
-        `
-      %c Payload Type: %c ${reqT?.name}
-      %c Payload: %c ${JSON.stringify(payload, null, 2)}
-      `,
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;',
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;'
-      );
-      console.debug(
-        `
-      %c Response Type: %c ${resT?.name}
-      %c Response: %c ${JSON.stringify(data, null, 2)}
-      `,
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;',
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;'
-      );
-      console.groupEnd();
+      logRequest(reqT, resT, payload, data);
     }
 
     return {
@@ -222,28 +271,7 @@ export async function fetchProtobuf<
     };
   } catch (err) {
     if (logsOn) {
-      console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
-      console.debug(
-        `
-      %c Payload Type: %c ${reqT?.name}
-      %c Payload: %c ${JSON.stringify(payload, null, 2)}
-      `,
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;',
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;'
-      );
-      console.debug(
-        `
-      %c Response Type: %c ${resT?.name}
-      %c Error: %c ${err}
-      `,
-        'font-size: 14px; color: blue;',
-        'font-size: 12px; color: black;',
-        'font-size: 14px; color: red;',
-        'font-size: 12px; color: black;'
-      );
-      console.groupEnd();
+      logRequestError(reqT, resT, payload, err);
     }
 
     return {
