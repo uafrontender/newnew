@@ -59,24 +59,32 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
   const { isCardsLoading } = useCards();
 
-  useEffect(() => {
-    const getSetupIntent = async () => {
-      setIsLoadingSetupIntent(true);
+  useEffect(
+    () => {
+      const getSetupIntent = async () => {
+        setIsLoadingSetupIntent(true);
 
-      const { errorKey } = await setupIntent.init();
+        const { errorKey } = await setupIntent.init();
 
-      if (errorKey) {
-        showErrorToastCustom(t(errorKey as any));
+        if (errorKey) {
+          showErrorToastCustom(t(errorKey as any));
+        }
+
+        setIsLoadingSetupIntent(false);
+      };
+
+      if (!setupIntent.setupIntentClientSecret && setupIntent) {
+        getSetupIntent();
       }
-
-      setIsLoadingSetupIntent(false);
-    };
-
-    if (!setupIntent.setupIntentClientSecret && setupIntent) {
-      getSetupIntent();
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setupIntent, setupIntent.setupIntentClientSecret, t]);
+    [
+      setupIntent,
+      setupIntent.setupIntentClientSecret,
+      showErrorToastCustom,
+      // t, - needs to be checked
+    ]
+  );
 
   return (
     <Modal show={isOpen} modalType={modalType} additionalz={zIndex}>

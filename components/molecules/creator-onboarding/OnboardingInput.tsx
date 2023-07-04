@@ -55,6 +55,7 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
           value={value}
           readOnly={readOnly}
           errorBordersShown={errorBordersShown}
+          withIcon={readOnly ?? false}
           onChange={onChange}
           style={{
             ...(readOnly
@@ -131,7 +132,8 @@ const SReadonlyCaption = styled.div`
 `;
 
 interface ISOnboardingInput {
-  errorBordersShown?: boolean;
+  errorBordersShown: boolean;
+  withIcon: boolean;
 }
 
 const SOnboardingInput = styled.input<ISOnboardingInput>`
@@ -143,8 +145,12 @@ const SOnboardingInput = styled.input<ISOnboardingInput>`
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
+  text-overflow: ellipsis;
 
-  padding: 12px 20px 12px 20px;
+  padding-top: 12px;
+  padding-right: ${({ withIcon }) => (withIcon ? '48px' : '20px')};
+  padding-bottom: 12px;
+  padding-left: 20px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
