@@ -39,7 +39,7 @@ const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
             .filter((v) => v !== ',')
             .join('')
         : e.target.value;
-    console.log('new value', newValue);
+
     if (/[^0-9]/.test(newValue)) {
       return;
     }

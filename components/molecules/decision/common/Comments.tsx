@@ -90,7 +90,10 @@ const Comments: React.FunctionComponent<IComments> = ({
       setIsDeletingComment(false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [postUuid]
+    [
+      postUuid,
+      // onCommentDelete, - reason unknown
+    ]
   );
 
   useEffect(() => {
@@ -128,18 +131,28 @@ const Comments: React.FunctionComponent<IComments> = ({
 
   const commentItems = commentsVirtualizer.getVirtualItems();
 
-  useEffect(() => {
-    const [lastItem] = [...commentItems].reverse();
+  useEffect(
+    () => {
+      const [lastItem] = [...commentItems].reverse();
 
-    if (!lastItem || isMobile) {
-      return;
-    }
+      if (!lastItem || isMobile) {
+        return;
+      }
 
-    if (lastItem.index >= comments.length - 1 && hasNextPage && !isLoading) {
-      fetchNextPage();
-    }
+      if (lastItem.index >= comments.length - 1 && hasNextPage && !isLoading) {
+        fetchNextPage();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasNextPage, fetchNextPage, comments.length, isLoading, commentItems]);
+    [
+      hasNextPage,
+      comments.length,
+      isLoading,
+      commentItems,
+      // isMobile, - reason unknown
+      fetchNextPage,
+    ]
+  );
 
   const [commentsReplies, setCommentsReplies] = useState<
     Record<number, { isOpen: boolean; text: string }>
@@ -174,80 +187,94 @@ const Comments: React.FunctionComponent<IComments> = ({
   );
 
   // Scroll to comment
-  useEffect(() => {
-    async function findComment() {
-      const flat: TCommentWithReplies[] = [];
-      for (let i = 0; i < comments.length; i++) {
-        if (
-          comments[i].replies &&
-          Array.isArray(comments[i].replies) &&
-          comments[i].replies!!.length > 0
-        ) {
-          flat.push(
-            ...[
-              { ...comments[i], index: i } as TCommentWithReplies,
-              ...comments[i].replies!!,
-            ]
-          );
+  useEffect(
+    () => {
+      async function findComment() {
+        const flat: TCommentWithReplies[] = [];
+        for (let i = 0; i < comments.length; i++) {
+          if (
+            comments[i].replies &&
+            Array.isArray(comments[i].replies) &&
+            comments[i].replies!!.length > 0
+          ) {
+            flat.push(
+              ...[
+                { ...comments[i], index: i } as TCommentWithReplies,
+                ...comments[i].replies!!,
+              ]
+            );
+          }
+          flat.push({ ...comments[i], index: i } as TCommentWithReplies);
         }
-        flat.push({ ...comments[i], index: i } as TCommentWithReplies);
-      }
 
-      const idx = flat.findIndex(
-        (comment) => comment.id === parseInt(commentIdFromUrl as string)
-      );
+        const idx = flat.findIndex(
+          (comment) => comment.id === parseInt(commentIdFromUrl as string)
+        );
 
-      if (idx === -1) {
-        scrollRef.current?.scrollIntoView();
+        if (idx === -1) {
+          scrollRef.current?.scrollIntoView();
 
-        if (isMobile && hasNextPage && !isLoading) {
-          await fetchNextPage();
+          if (isMobile && hasNextPage && !isLoading) {
+            await fetchNextPage();
+          } else {
+            scrollRef.current?.scrollBy({
+              top: scrollRef.current.scrollHeight,
+            });
+          }
         } else {
-          scrollRef.current?.scrollBy({
-            top: scrollRef.current.scrollHeight,
-          });
-        }
-      } else {
-        if (!flat[idx].parentId || flat[idx].parentId === 0) {
-          commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
-            align: 'center',
-          });
-
-          flashCommentOnScroll(`comment_id_${flat[idx].id}`);
-        } else if (flat[idx].parentId) {
-          const parentIdx = comments.findIndex(
-            (c) => c.id === flat[idx].parentId
-          );
-
-          if (parentIdx !== -1) {
-            commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
+          if (!flat[idx].parentId || flat[idx].parentId === 0) {
+            commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
               align: 'center',
             });
 
-            openCommentProgrammatically(parentIdx);
+            flashCommentOnScroll(`comment_id_${flat[idx].id}`);
+          } else if (flat[idx].parentId) {
+            const parentIdx = comments.findIndex(
+              (c) => c.id === flat[idx].parentId
+            );
 
-            setTimeout(() => {
-              document
-                ?.getElementById(`comment_id_${flat[idx].id}`)
-                ?.scrollIntoView({
-                  block: 'end',
-                  inline: 'nearest',
-                });
-            }, 200);
+            if (parentIdx !== -1) {
+              commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
+                align: 'center',
+              });
 
-            flashCommentOnScroll(`comment_id_${flat[idx].id}`, 300);
+              openCommentProgrammatically(parentIdx);
+
+              setTimeout(() => {
+                document
+                  ?.getElementById(`comment_id_${flat[idx].id}`)
+                  ?.scrollIntoView({
+                    block: 'end',
+                    inline: 'nearest',
+                  });
+              }, 200);
+
+              flashCommentOnScroll(`comment_id_${flat[idx].id}`, 300);
+            }
           }
+
+          handleResetCommentIdFromUrl?.();
         }
-
-        handleResetCommentIdFromUrl?.();
       }
-    }
 
-    if (commentIdFromUrl) {
-      findComment();
-    }
+      if (commentIdFromUrl) {
+        findComment();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, comments, isMobile, isLoading]);
+    [
+      commentIdFromUrl,
+      comments,
+      isMobile,
+      isLoading,
+      flashCommentOnScroll,
+      // commentsVirtualizer, - reason unknown
+      // fetchNextPage, - reason unknown
+      // handleResetCommentIdFromUrl, - reason unknown
+      // hasNextPage, - reason unknown
+      // openCommentProgrammatically - reason unknown
+    ]
+  );
 
   return (
     <>
