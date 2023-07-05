@@ -406,6 +406,8 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         setResponseFileProcessingError(false);
         xhrRef.current = undefined;
       } catch (error: any) {
+        console.log(error);
+        console.log(error.message);
         // TODO: Change this overcomplicated approach
         if (error.message === 'Upload failed') {
           setResponseFileUploadError(true);
