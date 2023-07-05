@@ -253,6 +253,7 @@ const SProgress = styled.div<ISProgress>`
 const SButton = styled.button<ISButton>`
   position: relative;
   overflow: hidden;
+  height: 48px;
 
   /* Fix Safari bug */
   z-index: 0;
