@@ -3,7 +3,7 @@ image: node:latest
 stages:
   - test
 
-# Cache using branch name
+# Cache using dependencies
 cache:
   - key:
       files:
