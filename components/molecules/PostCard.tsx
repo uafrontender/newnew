@@ -285,105 +285,129 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     // Increment channel subs after mounting
     // Decrement when unmounting
-    useEffect(() => {
-      if (isSocketConnected) {
-        addChannel(postParsed.postUuid, {
-          postUpdates: {
-            postUuid: postParsed.postUuid,
-          },
-        });
-      }
+    useEffect(
+      () => {
+        if (isSocketConnected) {
+          addChannel(postParsed.postUuid, {
+            postUpdates: {
+              postUuid: postParsed.postUuid,
+            },
+          });
+        }
 
-      return () => {
-        removeChannel(postParsed.postUuid);
-      };
+        return () => {
+          removeChannel(postParsed.postUuid);
+        };
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isSocketConnected]);
+      [
+        isSocketConnected,
+        // addChannel, - reason unknown
+        // postParsed.postUuid, - reason unknown
+        // removeChannel, - reason unknown
+      ]
+    );
 
     // Subscribe to post updates event
-    useEffect(() => {
-      const handlerSocketPostUpdated = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostUpdated.decode(arr);
+    useEffect(
+      () => {
+        const handlerSocketPostUpdated = (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.PostUpdated.decode(arr);
 
-        if (!decoded) {
-          return;
-        }
-        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-        if (decodedParsed.postUuid === postParsed.postUuid) {
-          if (
-            typeOfPost === 'ac' &&
-            decoded.post?.auction?.totalAmount?.usdCents
-          ) {
-            setTotalAmount(decoded.post.auction.totalAmount?.usdCents);
+          if (!decoded) {
+            return;
           }
-          if (
-            typeOfPost === 'cf' &&
-            decoded.post?.crowdfunding?.currentBackerCount
-          ) {
-            setCurrentBackerCount(decoded.post.crowdfunding.currentBackerCount);
+          const [decodedParsed] = switchPostType(
+            decoded.post as newnewapi.IPost
+          );
+          if (decodedParsed.postUuid === postParsed.postUuid) {
+            if (
+              typeOfPost === 'ac' &&
+              decoded.post?.auction?.totalAmount?.usdCents
+            ) {
+              setTotalAmount(decoded.post.auction.totalAmount?.usdCents);
+            }
+            if (
+              typeOfPost === 'cf' &&
+              decoded.post?.crowdfunding?.currentBackerCount
+            ) {
+              setCurrentBackerCount(
+                decoded.post.crowdfunding.currentBackerCount
+              );
+            }
+            if (
+              typeOfPost === 'mc' &&
+              decoded.post?.multipleChoice?.totalVotes
+            ) {
+              setTotalVotes(decoded.post.multipleChoice.totalVotes);
+            }
           }
-          if (typeOfPost === 'mc' && decoded.post?.multipleChoice?.totalVotes) {
-            setTotalVotes(decoded.post.multipleChoice.totalVotes);
+        };
+
+        const handlerSocketPostCoverImageUpdated = (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
+
+          if (decoded.postUuid !== postParsed.postUuid) {
+            return;
           }
-        }
-      };
 
-      const handlerSocketPostCoverImageUpdated = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostCoverImageUpdated.decode(arr);
-
-        if (decoded.postUuid !== postParsed.postUuid) {
-          return;
-        }
-
-        if (decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED) {
           if (
-            decoded.videoTargetType ===
-              newnewapi.VideoTargetType.ANNOUNCEMENT &&
-            decoded.coverImageUrl
+            decoded.action === newnewapi.PostCoverImageUpdated.Action.UPDATED
           ) {
-            setAnnouncementCoverImage(decoded.coverImageUrl);
+            if (
+              decoded.videoTargetType ===
+                newnewapi.VideoTargetType.ANNOUNCEMENT &&
+              decoded.coverImageUrl
+            ) {
+              setAnnouncementCoverImage(decoded.coverImageUrl);
+            } else if (
+              decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE &&
+              decoded.coverImageUrl
+            ) {
+              setResponseCoverImage(decoded.coverImageUrl);
+            }
           } else if (
-            decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE &&
-            decoded.coverImageUrl
+            decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
           ) {
-            setResponseCoverImage(decoded.coverImageUrl);
+            if (
+              decoded.videoTargetType === newnewapi.VideoTargetType.ANNOUNCEMENT
+            ) {
+              setAnnouncementCoverImage(undefined);
+            } else if (
+              decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE
+            ) {
+              setResponseCoverImage(undefined);
+            }
           }
-        } else if (
-          decoded.action === newnewapi.PostCoverImageUpdated.Action.DELETED
-        ) {
-          if (
-            decoded.videoTargetType === newnewapi.VideoTargetType.ANNOUNCEMENT
-          ) {
-            setAnnouncementCoverImage(undefined);
-          } else if (
-            decoded.videoTargetType === newnewapi.VideoTargetType.RESPONSE
-          ) {
-            setResponseCoverImage(undefined);
-          }
-        }
-      };
+        };
 
-      if (socketConnection) {
-        socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
-        socketConnection.on(
-          'PostCoverImageUpdated',
-          handlerSocketPostCoverImageUpdated
-        );
-      }
-
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
-          socketConnection.off(
+        if (socketConnection) {
+          socketConnection?.on('PostUpdated', handlerSocketPostUpdated);
+          socketConnection.on(
             'PostCoverImageUpdated',
             handlerSocketPostCoverImageUpdated
           );
         }
-      };
+
+        return () => {
+          if (socketConnection && socketConnection?.connected) {
+            socketConnection?.off('PostUpdated', handlerSocketPostUpdated);
+            socketConnection.off(
+              'PostCoverImageUpdated',
+              handlerSocketPostCoverImageUpdated
+            );
+          }
+        };
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, postParsed]);
+      [
+        socketConnection,
+        postParsed,
+        // typeOfPost, - reason unknown
+      ]
+    );
 
     useEffect(() => {
       const [parsedItem] = switchPostType(item);
@@ -476,16 +500,23 @@ export const PostCard: React.FC<ICard> = React.memo(
       postParsed?.response?.thumbnailUrl,
     ]);
 
-    useEffect(() => {
-      router.prefetch(
-        `/p/${
-          switchPostType(item)[0].postShortId
-            ? switchPostType(item)[0].postShortId
-            : switchPostType(item)[0].postUuid
-        }`
-      );
+    useEffect(
+      () => {
+        router.prefetch(
+          `/p/${
+            switchPostType(item)[0].postShortId
+              ? switchPostType(item)[0].postShortId
+              : switchPostType(item)[0].postUuid
+          }`
+        );
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      [
+        // TODO: use Router instead?
+        // router, - disabled as router hook causes effect to re-fire
+        // item, - reason unknown
+      ]
+    );
 
     const moreButtonInsideRef: any = useRef();
     const moreButtonRef: any = useRef();
