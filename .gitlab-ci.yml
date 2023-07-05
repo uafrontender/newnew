@@ -3,7 +3,7 @@ image: node:latest
 stages:
   - test
 
-# Cache using dependencies
+# Cache using dependencies list
 cache:
   - key:
       files:
