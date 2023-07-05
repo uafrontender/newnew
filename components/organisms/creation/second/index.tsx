@@ -585,9 +585,6 @@ export const CreationSecondStepContent: React.FC<
         xhrRef.current = undefined;
       } catch (error: any) {
         // TODO: Change this overcomplicated approach
-        // TODO: remove
-        console.log(error);
-        console.log(error.message);
         if (error.message === 'Upload failed') {
           setCreationFileUploadError(true);
           showErrorToastPredefined(undefined);
