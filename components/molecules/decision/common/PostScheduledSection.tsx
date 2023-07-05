@@ -91,16 +91,22 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     handleScroll();
   }, [handleScroll]);
 
-  useEffect(() => {
-    async function refetchOnHasEnded() {
-      await refetchPost();
-    }
+  useEffect(
+    () => {
+      async function refetchOnHasEnded() {
+        await refetchPost();
+      }
 
-    if (hasEnded) {
-      refetchOnHasEnded();
-    }
+      if (hasEnded) {
+        refetchOnHasEnded();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasEnded]);
+    [
+      hasEnded,
+      // refetchPost, - reason unknown
+    ]
+  );
 
   if (isScrolledDown === undefined) {
     return null;

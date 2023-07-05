@@ -5,11 +5,14 @@ stages:
 
 # Cache using branch name
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - node_modules
-    - .next
-    - /root/.cache/Cypress
+  - key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules
+  - key: cache-$CI_COMMIT_REF_SLUG
+    paths:
+      - /root/.cache/Cypress
 
 # A set of quick tests
 quick-test:

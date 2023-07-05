@@ -104,7 +104,7 @@ If you want to know what use cases are covered and what exactly tests do:
 - In order to avoid time constraints of the post life cycle, on dev server creator can finish own post with an API Protobuf call to `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid={shortPostId}` with `EmptyRequest` payload, `x-auth-token` header with a value of creators access token. Post ends in a natural way (as if its time ran out)
 - In order to avoid tests being blocked by bot protection, all bot protection features has been disabled on dev server and FE server used during the test.
 - Tutorials ahs been disabled during the test using a manipulation with `userTutorialsProgress` field in localStorage.
-- In order to simplify payment card with a number of `5200828282828210` can be used on dev server without any restrictions, beside the number itself, all data provided can be any valid value.
+- In order to simplify payment card with a number of `4242424242424242` can be used on dev server without any restrictions, beside the number itself, all data provided can be any valid value.
 
 ## Sms Notifications
 
