@@ -303,10 +303,10 @@ context('Creator flow', () => {
           });
         });
 
-      cy.dGet('#review', {
-        timeout: 60000,
-      })
-        .should('be.enabled')
+      cy.dGet('#review')
+        .should('be.enabled', {
+          timeout: 60000,
+        })
         .click();
       cy.url().should('include', '/creation/auction/preview');
 
@@ -356,10 +356,10 @@ context('Creator flow', () => {
           });
         });
 
-      cy.dGet('#review', {
-        timeout: 60000,
-      })
-        .should('be.enabled')
+      cy.dGet('#review')
+        .should('be.enabled', {
+          timeout: 60000,
+        })
         .click();
       cy.url().should('include', '/creation/multiple-choice/preview');
 
