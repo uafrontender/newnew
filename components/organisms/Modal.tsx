@@ -39,11 +39,11 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
-  const elementRef = useRef(null);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (show) {
-      enableOverlayMode();
+      enableOverlayMode(elementRef.current);
     }
 
     return () => {
@@ -103,11 +103,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        {React.isValidElement(children)
-          ? React.cloneElement(children as React.ReactElement<any>, {
-              ref: elementRef,
-            })
-          : children}
+        <SContent ref={elementRef}>{children}</SContent>
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
@@ -177,6 +173,10 @@ const SClickableDiv = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
+`;
+
+const SContent = styled.div`
+  display: contents;
 `;
 
 export default Modal;

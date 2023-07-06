@@ -916,7 +916,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <ProfileGeneralContent>
+            <ProfileGeneralContent data-body-scroll-lock-ignore>
               <SImageInputsWrapper>
                 <ProfileBackgroundInput
                   originalPictureUrl={userData?.coverUrl ?? ''}

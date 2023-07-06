@@ -59,6 +59,7 @@ const AllBundlesModal: React.FC<IAllBundlesModal> = React.memo(
           onClick={preventParentClick()}
           isCloseButton
           isMobileFullScreen={isMobile}
+          data-body-scroll-lock-ignore
         >
           {isMobile && <SMobileTitle>{t('bundlesModal.title')}</SMobileTitle>}
           {setsOfBundles.map((set, setIndex) => (

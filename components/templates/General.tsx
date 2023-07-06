@@ -59,6 +59,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
+
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
