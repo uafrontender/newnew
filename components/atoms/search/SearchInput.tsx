@@ -28,6 +28,7 @@ import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -117,10 +118,7 @@ const SearchInput: React.FC = React.memo(() => {
   }, [setGlobalSearchActive]);
 
   const handleInputChange = (e: any) => {
-    // TODO: create util for spaces handle
-    const onlySpacesRegex = /^\s+$/;
-
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setSearchValue('');
     } else {
       setSearchValue(e.target.value);

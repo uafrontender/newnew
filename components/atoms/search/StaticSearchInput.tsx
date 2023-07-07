@@ -28,6 +28,7 @@ import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 interface IStaticSearchInput {
   width?: string;
@@ -165,9 +166,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     }, [setGlobalSearchActive]);
 
     const handleInputChange = (e: any) => {
-      const onlySpacesRegex = /^\s+$/;
-
-      if (onlySpacesRegex.test(e.target.value)) {
+      if (isStringEmpty(e.target.value)) {
         setSearchValue('');
       } else {
         setSearchValue(e.target.value);
