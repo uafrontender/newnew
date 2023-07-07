@@ -476,12 +476,13 @@ const SContainer = styled.div`
   height: 100%;
 `;
 
+// TODO: Needs to be responsive to accommodate for different languages
 const SUploadVideoButton = styled.button`
   position: absolute;
   top: 16px;
-  left: calc(50% - 60px);
+  left: calc(50% - 65px);
 
-  width: 120px;
+  width: 130px;
 
   color: ${({ theme }) => theme.colors.dark};
   background: #ffffff;
