@@ -41,7 +41,10 @@ const ResponseNumberFromUrlContextProvider: React.FC<
       handleResetCommentIdFromUrl,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // responseNumber, - reason unknown, we need initial only? extremely dangerous here
+      handleResetCommentIdFromUrl,
+    ]
   );
 
   return (
