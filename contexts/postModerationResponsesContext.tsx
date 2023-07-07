@@ -449,8 +449,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         setResponseFileUploadLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [showErrorToastCustom, showErrorToastPredefined]
   );
 
   const handleVideoDelete = useCallback(async () => {
@@ -493,8 +492,11 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     } catch (error: any) {
       showErrorToastCustom(error?.message);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedResponseVideoUrl, videoProcessing?.taskUuid]);
+  }, [
+    uploadedResponseVideoUrl,
+    videoProcessing?.taskUuid,
+    showErrorToastCustom,
+  ]);
 
   const handleResponseItemChange = useCallback(
     async (
@@ -794,7 +796,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
   // Video processing fallback
@@ -820,16 +821,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     ) {
       videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     responseFileProcessingLoading,
     videoProcessing?.targetUrls?.hlsStreamUrl,
+    showErrorToastPredefined,
   ]);
 
   useEffect(() => {
     handleSetIsConfirmToClosePost(cannotLeavePage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cannotLeavePage]);
+  }, [cannotLeavePage, handleSetIsConfirmToClosePost]);
 
   const contextValue = useMemo<IPostModerationResponsesContext>(
     () => ({
