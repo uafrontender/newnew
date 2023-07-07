@@ -40,52 +40,62 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   const [isCanDeleteOptionLoading, setIsCanDeleteOptionLoading] =
     useState(isMyOption);
 
-  useEffect(() => {
-    async function fetchCanDelete() {
-      setIsCanDeleteOptionLoading(true);
-      try {
-        let canDelete = false;
-        if (optionType === 'ac') {
-          const payload = new newnewapi.CanDeleteAcOptionRequest({
-            optionId,
-          });
+  useEffect(
+    () => {
+      async function fetchCanDelete() {
+        setIsCanDeleteOptionLoading(true);
+        try {
+          let canDelete = false;
+          if (optionType === 'ac') {
+            const payload = new newnewapi.CanDeleteAcOptionRequest({
+              optionId,
+            });
 
-          const res = await checkCanDeleteAcOption(payload);
+            const res = await checkCanDeleteAcOption(payload);
 
-          if (res.data) {
-            canDelete = res.data.canDelete;
+            if (res.data) {
+              canDelete = res.data.canDelete;
+            }
+          } else {
+            const payload = new newnewapi.CanDeleteMcOptionRequest({
+              optionId,
+            });
+
+            const res = await checkCanDeleteMcOption(payload);
+
+            if (res.data) {
+              canDelete = res.data.canDelete;
+            }
           }
-        } else {
-          const payload = new newnewapi.CanDeleteMcOptionRequest({
-            optionId,
-          });
 
-          const res = await checkCanDeleteMcOption(payload);
+          setCanDeleteOption(canDelete);
 
-          if (res.data) {
-            canDelete = res.data.canDelete;
+          // In this case, close without showing
+          if (!canDelete && isMyOption) {
+            handleClose();
+          } else {
+            setIsCanDeleteOptionLoading(false);
           }
-        }
-
-        setCanDeleteOption(canDelete);
-
-        // In this case, close without showing
-        if (!canDelete && isMyOption) {
-          handleClose();
-        } else {
+        } catch (err) {
           setIsCanDeleteOptionLoading(false);
+          console.error(err);
         }
-      } catch (err) {
-        setIsCanDeleteOptionLoading(false);
-        console.error(err);
       }
-    }
 
-    if (isVisible && isMyOption) {
-      fetchCanDelete();
-    }
+      if (isVisible && isMyOption) {
+        fetchCanDelete();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible, isMyOption, optionType, optionId, optionCreatorUuid]);
+    [
+      isVisible,
+      isMyOption,
+      optionType,
+      optionId,
+      optionCreatorUuid,
+      // handleClose, - not needed here, can be wrapped into useCallback in parent component
+    ]
+  );
 
   if (!isVisible || (isMyOption && isCanDeleteOptionLoading)) {
     return null;
