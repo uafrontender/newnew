@@ -43,33 +43,44 @@ const GlobalTheme: React.FunctionComponent<IGlobalTheme> = ({
     [autoThemeMatched, colorMode, initialTheme, mounted, themeFromCookie]
   );
 
-  useEffect(() => {
-    colorModeMemo.current = colorMode;
-    setMounted(true);
+  useEffect(
+    () => {
+      colorModeMemo.current = colorMode;
+      setMounted(true);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // colorMode, - reason unknown
+    ]
+  );
 
-  useEffect(() => {
-    let timeout: any;
-    const handleSwitchTheme = () => {
-      setColorMode('auto');
-      setAutoThemeMatched(true);
-    };
+  useEffect(
+    () => {
+      let timeout: any;
+      const handleSwitchTheme = () => {
+        setColorMode('auto');
+        setAutoThemeMatched(true);
+      };
 
-    if (!autoThemeMatched) {
-      timeout = setTimeout(() => {
-        handleSwitchTheme();
-      }, 1500);
-    } else {
-      clearTimeout(timeout);
-    }
+      if (!autoThemeMatched) {
+        timeout = setTimeout(() => {
+          handleSwitchTheme();
+        }, 1500);
+      } else {
+        clearTimeout(timeout);
+      }
 
-    return () => {
-      clearTimeout(timeout);
-    };
-
+      return () => {
+        clearTimeout(timeout);
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoThemeMatched]);
+    [
+      autoThemeMatched,
+      // colorMode, - reason unknown
+      // setColorMode, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     if (colorModeMemo.current !== colorMode) {
