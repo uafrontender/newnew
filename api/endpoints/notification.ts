@@ -1,9 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  fetchProtobuf,
-  fetchProtobufProtectedIntercepted,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 export const BASE_URL_NOTIFICATION = `${BASE_URL}/notification`;
 
@@ -11,97 +7,85 @@ export const getMyNotifications = (
   payload: newnewapi.GetMyNotificationsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetMyNotificationsRequest,
     newnewapi.GetMyNotificationsResponse
-  >(
-    newnewapi.GetMyNotificationsRequest,
-    newnewapi.GetMyNotificationsResponse,
-    `${BASE_URL_NOTIFICATION}/get_my_notifications`,
-    'post',
+  >({
+    reqT: newnewapi.GetMyNotificationsRequest,
+    resT: newnewapi.GetMyNotificationsResponse,
+    url: `${BASE_URL_NOTIFICATION}/get_my_notifications`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const markAsRead = (
   payload: newnewapi.MarkAsReadRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.MarkAsReadRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.MarkAsReadRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_NOTIFICATION}/mark_as_read`,
-    'post',
+  fetchProtobuf<newnewapi.MarkAsReadRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.MarkAsReadRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_NOTIFICATION}/mark_as_read`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const markAllAsRead = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.EmptyRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_NOTIFICATION}/mark_all_as_read`,
-    'post',
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_NOTIFICATION}/mark_all_as_read`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getUnreadNotificationCount = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.EmptyRequest,
     newnewapi.GetUnreadNotificationCountResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.GetUnreadNotificationCountResponse,
-    `${BASE_URL_NOTIFICATION}/get_unread_notification_count`,
-    'post',
+  >({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.GetUnreadNotificationCountResponse,
+    url: `${BASE_URL_NOTIFICATION}/get_unread_notification_count`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMyNotificationsState = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.EmptyRequest,
     newnewapi.GetMyNotificationsStateResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.GetMyNotificationsStateResponse,
-    `${BASE_URL_NOTIFICATION}/get_my_notifications_state`,
-    'post',
+  >({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.GetMyNotificationsStateResponse,
+    url: `${BASE_URL_NOTIFICATION}/get_my_notifications_state`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const updateMyNotificationsState = (
   payload: newnewapi.UpdateMyNotificationsStateRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.UpdateMyNotificationsStateRequest,
     newnewapi.EmptyResponse
-  >(
-    newnewapi.UpdateMyNotificationsStateRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_NOTIFICATION}/update_my_notifications_state`,
-    'post',
+  >({
+    reqT: newnewapi.UpdateMyNotificationsStateRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_NOTIFICATION}/update_my_notifications_state`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const unsubscribeFromEmailNotifications = (
   payload: newnewapi.UnsubscribeFromEmailNotificationsRequest,
@@ -110,11 +94,10 @@ export const unsubscribeFromEmailNotifications = (
   fetchProtobuf<
     newnewapi.UnsubscribeFromEmailNotificationsRequest,
     newnewapi.EmptyResponse
-  >(
-    newnewapi.UnsubscribeFromEmailNotificationsRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_NOTIFICATION}/unsubscribe_from_email_notifications`,
-    'post',
+  >({
+    reqT: newnewapi.UnsubscribeFromEmailNotificationsRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_NOTIFICATION}/unsubscribe_from_email_notifications`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });

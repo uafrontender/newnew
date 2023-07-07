@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_CHAT = `${BASE_URL}/reporting`;
 
@@ -7,17 +7,13 @@ const reportContent = (
   payload: newnewapi.ReportContentRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.ReportContentRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.ReportContentRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_CHAT}/report_content`,
-    'post',
+  fetchProtobuf<newnewapi.ReportContentRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.ReportContentRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_CHAT}/report_content`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const reportUser = (
   userId: string,

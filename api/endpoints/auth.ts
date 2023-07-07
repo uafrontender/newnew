@@ -21,17 +21,13 @@ export const sendVerificationEmail = (
   fetchProtobuf<
     newnewapi.SendVerificationEmailRequest,
     newnewapi.SendVerificationEmailResponse
-  >(
-    newnewapi.SendVerificationEmailRequest,
-    newnewapi.SendVerificationEmailResponse,
-    `${BASE_URL_AUTH}/send_verification_email`,
-    'post',
+  >({
+    reqT: newnewapi.SendVerificationEmailRequest,
+    resT: newnewapi.SendVerificationEmailResponse,
+    url: `${BASE_URL_AUTH}/send_verification_email`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 /**
  * Called from the Code Verification page.
@@ -42,17 +38,13 @@ export const signInWithEmail = (
   payload: newnewapi.EmailSignInRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.EmailSignInRequest, newnewapi.SignInResponse>(
-    newnewapi.EmailSignInRequest,
-    newnewapi.SignInResponse,
-    `${BASE_URL_AUTH}/sign_in_with_email`,
-    'post',
+  fetchProtobuf<newnewapi.EmailSignInRequest, newnewapi.SignInResponse>({
+    reqT: newnewapi.EmailSignInRequest,
+    resT: newnewapi.SignInResponse,
+    url: `${BASE_URL_AUTH}/sign_in_with_email`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 // One-click sign up
 /*
@@ -65,62 +57,46 @@ export const signInWithApple = (
   payload: newnewapi.AppleSignInRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.AppleSignInRequest, newnewapi.SignInResponse>(
-    newnewapi.AppleSignInRequest,
-    newnewapi.SignInResponse,
-    `${BASE_URL_AUTH}/sign_in_with_apple`,
-    'post',
+  fetchProtobuf<newnewapi.AppleSignInRequest, newnewapi.SignInResponse>({
+    reqT: newnewapi.AppleSignInRequest,
+    resT: newnewapi.SignInResponse,
+    url: `${BASE_URL_AUTH}/sign_in_with_apple`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const signInWithGoogle = (
   payload: newnewapi.GoogleSignInRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.GoogleSignInRequest, newnewapi.SignInResponse>(
-    newnewapi.GoogleSignInRequest,
-    newnewapi.SignInResponse,
-    `${BASE_URL_AUTH}/sign_in_with_google`,
-    'post',
+  fetchProtobuf<newnewapi.GoogleSignInRequest, newnewapi.SignInResponse>({
+    reqT: newnewapi.GoogleSignInRequest,
+    resT: newnewapi.SignInResponse,
+    url: `${BASE_URL_AUTH}/sign_in_with_google`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const signInWithFacebook = (
   payload: newnewapi.FacebookSignInRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.FacebookSignInRequest, newnewapi.SignInResponse>(
-    newnewapi.FacebookSignInRequest,
-    newnewapi.SignInResponse,
-    `${BASE_URL_AUTH}/sign_in_with_facebook`,
-    'post',
+  fetchProtobuf<newnewapi.FacebookSignInRequest, newnewapi.SignInResponse>({
+    reqT: newnewapi.FacebookSignInRequest,
+    resT: newnewapi.SignInResponse,
+    url: `${BASE_URL_AUTH}/sign_in_with_facebook`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const signInWithTwitter = (
   payload: newnewapi.TwitterSignInRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.TwitterSignInRequest, newnewapi.SignInResponse>(
-    newnewapi.TwitterSignInRequest,
-    newnewapi.SignInResponse,
-    `${BASE_URL_AUTH}/sign_in_with_twitter`,
-    'post',
+  fetchProtobuf<newnewapi.TwitterSignInRequest, newnewapi.SignInResponse>({
+    reqT: newnewapi.TwitterSignInRequest,
+    resT: newnewapi.SignInResponse,
+    url: `${BASE_URL_AUTH}/sign_in_with_twitter`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });

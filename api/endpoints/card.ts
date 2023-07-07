@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_CARDS = `${BASE_URL}/card`;
 
@@ -7,62 +7,49 @@ export const getCards = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.EmptyRequest,
-    newnewapi.NonPagedCardsResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.NonPagedCardsResponse,
-    `${BASE_URL_CARDS}/get_cards`,
-    'post',
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedCardsResponse>({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.NonPagedCardsResponse,
+    url: `${BASE_URL_CARDS}/get_cards`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const setPrimaryCard = (
   payload: newnewapi.SetPrimaryCardRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.SetPrimaryCardRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.SetPrimaryCardRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_CARDS}/set_primary_card`,
-    'post',
+  fetchProtobuf<newnewapi.SetPrimaryCardRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.SetPrimaryCardRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_CARDS}/set_primary_card`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const deleteCard = (
   payload: newnewapi.DeleteCardRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.DeleteCardRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.DeleteCardRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_CARDS}/delete_card`,
-    'post',
+  fetchProtobuf<newnewapi.DeleteCardRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.DeleteCardRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_CARDS}/delete_card`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const checkCardStatus = (
   payload: newnewapi.CheckCardStatusRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.CheckCardStatusRequest,
     newnewapi.CheckCardStatusResponse
-  >(
-    newnewapi.CheckCardStatusRequest,
-    newnewapi.CheckCardStatusResponse,
-    `${BASE_URL_CARDS}/check_card_status`,
-    'post',
+  >({
+    reqT: newnewapi.CheckCardStatusRequest,
+    resT: newnewapi.CheckCardStatusResponse,
+    url: `${BASE_URL_CARDS}/check_card_status`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });

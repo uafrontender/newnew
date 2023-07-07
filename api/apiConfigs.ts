@@ -120,70 +120,87 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
  * Log request
  */
 const logRequest = <
-RequestType = keyof NewnewapiType,
-ResponseType = keyof NewnewapiType
->(reqT: EncDec<RequestType>,
+  RequestType = keyof NewnewapiType,
+  ResponseType = keyof NewnewapiType
+>(
+  reqT: EncDec<RequestType>,
   resT: EncDec<ResponseType>,
   payload: RequestType | undefined,
   data: ResponseType & JsonConvertible
-  ) => {
-    console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
-    console.debug(
-      `
+) => {
+  console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
+  console.debug(
+    `
     %c Payload Type: %c ${reqT?.name}
     %c Payload: %c ${JSON.stringify(payload, null, 2)}
     `,
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;',
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;'
-    );
-    console.debug(
-      `
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;',
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;'
+  );
+  console.debug(
+    `
     %c Response Type: %c ${resT?.name}
     %c Response: %c ${JSON.stringify(data, null, 2)}
     `,
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;',
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;'
-    );
-    console.groupEnd();
-}
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;',
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;'
+  );
+  console.groupEnd();
+};
 
 /**
  * Log request error
  */
 const logRequestError = <
-RequestType = keyof NewnewapiType,
-ResponseType = keyof NewnewapiType
->(reqT: EncDec<RequestType>,
+  RequestType = keyof NewnewapiType,
+  ResponseType = keyof NewnewapiType
+>(
+  reqT: EncDec<RequestType>,
   resT: EncDec<ResponseType>,
   payload: RequestType | undefined,
-  err: unknown,
-  ) => {
-    console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
-    console.debug(
-      `
+  err: unknown
+) => {
+  console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
+  console.debug(
+    `
     %c Payload Type: %c ${reqT?.name}
     %c Payload: %c ${JSON.stringify(payload, null, 2)}
     `,
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;',
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;'
-    );
-    console.debug(
-      `
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;',
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;'
+  );
+  console.debug(
+    `
     %c Response Type: %c ${resT?.name}
     %c Error: %c ${err}
     `,
-      'font-size: 14px; color: blue;',
-      'font-size: 12px; color: black;',
-      'font-size: 14px; color: red;',
-      'font-size: 12px; color: black;'
-    );
-    console.groupEnd();
+    'font-size: 14px; color: blue;',
+    'font-size: 12px; color: black;',
+    'font-size: 14px; color: red;',
+    'font-size: 12px; color: black;'
+  );
+  console.groupEnd();
+};
+
+interface IFetchProtobufInner<
+  RequestType = keyof NewnewapiType,
+  ResponseType = keyof NewnewapiType
+> {
+  reqT: EncDec<RequestType>;
+  resT: EncDec<ResponseType>;
+  url: string;
+  method?: Request['method'];
+  payload?: RequestType;
+  headers?: any;
+  mode?: Request['mode'];
+  credentials?: Request['credentials'];
+  signal?: RequestInit['signal'];
 }
 
 /**
@@ -202,20 +219,22 @@ ResponseType = keyof NewnewapiType
  * @param mode cors mode
  * @param credentials a string indicating whether credentials will be sent with the request
  */
-export async function fetchProtobuf<
+async function _fetchProtobuf<
   RequestType = keyof NewnewapiType,
   ResponseType = keyof NewnewapiType
->(
-  reqT: EncDec<RequestType>,
-  resT: EncDec<ResponseType>,
-  url: string,
-  method: Request['method'],
-  payload?: RequestType,
-  headers: any = {},
-  mode: Request['mode'] = 'cors',
-  credentials: Request['credentials'] = 'same-origin',
-  signal: RequestInit['signal'] = undefined
-): Promise<APIResponse<ResponseType>> {
+>({
+  reqT,
+  resT,
+  url,
+  method = 'post',
+  payload,
+  headers = {},
+  mode = 'cors',
+  credentials = 'same-origin',
+  signal = undefined,
+}: IFetchProtobufInner<RequestType, ResponseType>): Promise<
+  APIResponse<ResponseType>
+> {
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
   // Dedicated lane for VIP users
@@ -284,16 +303,16 @@ export async function fetchProtobuf<
 export const refreshCredentials = (
   payload: newnewapi.RefreshCredentialRequest
 ) =>
-  fetchProtobuf<
+  _fetchProtobuf<
     newnewapi.RefreshCredentialRequest,
     newnewapi.RefreshCredentialResponse
-  >(
-    newnewapi.RefreshCredentialRequest,
-    newnewapi.RefreshCredentialResponse,
-    `${BASE_URL}/auth/refresh_credential`,
-    'post',
-    payload
-  );
+  >({
+    reqT: newnewapi.RefreshCredentialRequest,
+    resT: newnewapi.RefreshCredentialResponse,
+    url: `${BASE_URL}/auth/refresh_credential`,
+    method: 'post',
+    payload,
+  });
 
 export type TTokenCookie = {
   name: string;
@@ -301,6 +320,23 @@ export type TTokenCookie = {
   expires?: string;
   maxAge?: string;
 };
+
+interface IFetchProtobuf<
+  RequestType = keyof NewnewapiType,
+  ResponseType = keyof NewnewapiType
+> {
+  reqT: EncDec<RequestType>;
+  resT: EncDec<ResponseType>;
+  url: string;
+  method?: Request['method'];
+  payload?: RequestType;
+  signal?: RequestInit['signal'];
+  serverSideTokens?: {
+    accessToken: string;
+    refreshToken: string;
+  };
+  updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void;
+}
 
 /**
  * This function is wrapper around `fetchProtobuf` function,
@@ -318,52 +354,58 @@ export type TTokenCookie = {
  * @param serverSideTokens access and refresh tokens, when used server-side
  * @param updateCookieServerSideCallback used to update cookies server-side
  */
-export async function fetchProtobufProtectedIntercepted<
+export async function fetchProtobuf<
   RequestType = keyof NewnewapiType,
   ResponseType = keyof NewnewapiType
->(
-  reqT: EncDec<RequestType>,
-  resT: EncDec<ResponseType>,
-  url: string,
-  method: Request['method'],
-  payload?: RequestType,
-  signal?: RequestInit['signal'],
-  serverSideTokens?: {
-    accessToken: string;
-    refreshToken: string;
-  },
-  updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void
-): Promise<APIResponse<ResponseType>> {
+>({
+  reqT,
+  resT,
+  url,
+  method,
+  payload,
+  signal,
+  serverSideTokens,
+  updateCookieServerSideCallback,
+}: IFetchProtobuf<RequestType, ResponseType>): Promise<
+  APIResponse<ResponseType>
+> {
   // Declare response
   let res: APIResponse<ResponseType>;
   // Try to get tokens - from react-cookie instance or from passed params
   const accessToken =
-    serverSideTokens?.accessToken ?? cookiesInstance.get('accessToken');
+    serverSideTokens?.accessToken || cookiesInstance.get('accessToken');
   const refreshToken =
-    serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
+    serverSideTokens?.refreshToken || cookiesInstance.get('refreshToken');
 
   try {
-    if (!accessToken && !refreshToken) {
-      throw new Error('No token');
-    }
-    if (!accessToken && refreshToken) {
-      throw new Error('Access token invalid');
-    }
+    // No need as tokens will be sent with any request if present
+    // if (!accessToken && !refreshToken) {
+    //   throw new Error('No token');
+    // }
+    // if (!accessToken && refreshToken) {
+    //   throw new Error('Access token invalid');
+    // }
 
     // Try to make request if access and refresh tokens are present
-    res = await fetchProtobuf<RequestType, ResponseType>(
+    res = await _fetchProtobuf<RequestType, ResponseType>({
       reqT,
       resT,
       url,
       method,
       payload,
-      {
-        'x-auth-token': accessToken,
-      },
-      'cors',
-      'same-origin',
-      signal ?? undefined
-    );
+      ...(accessToken
+        ? {
+            headers: {
+              'x-auth-token': accessToken,
+            },
+          }
+        : {}),
+      ...(signal
+        ? {
+            signal,
+          }
+        : {}),
+    });
 
     // Throw an error if the access token was invalid
     if (!res?.data && res.error?.message === 'Access token invalid') {
@@ -431,16 +473,16 @@ export async function fetchProtobufProtectedIntercepted<
           ]);
         }
         // Try request again with new credentials
-        res = await fetchProtobuf<RequestType, ResponseType>(
+        res = await _fetchProtobuf<RequestType, ResponseType>({
           reqT,
           resT,
           url,
           method,
           payload,
-          {
+          headers: {
             'x-auth-token': resRefresh.data.credential?.accessToken,
-          }
-        );
+          },
+        });
         return res;
       } catch (errSecondAttempt) {
         cookiesInstance.remove('accessToken');

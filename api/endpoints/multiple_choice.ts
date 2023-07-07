@@ -1,10 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  cookiesInstance,
-  fetchProtobuf,
-  fetchProtobufProtectedIntercepted,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_MULTICHOICE = `${BASE_URL}/multiple_choice`;
 
@@ -15,152 +10,118 @@ export const fetchTopMultipleChoices = (
   fetchProtobuf<
     newnewapi.PagedMultipleChoicesRequest,
     newnewapi.PagedMultipleChoicesResponse
-  >(
-    newnewapi.PagedMultipleChoicesRequest,
-    newnewapi.PagedMultipleChoicesResponse,
-    `${BASE_URL_MULTICHOICE}/get_top_multiple_choices`,
-    'post',
+  >({
+    reqT: newnewapi.PagedMultipleChoicesRequest,
+    resT: newnewapi.PagedMultipleChoicesResponse,
+    url: `${BASE_URL_MULTICHOICE}/get_top_multiple_choices`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const fetchCurrentOptionsForMCPost = (
   payload: newnewapi.GetMcOptionsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.GetMcOptionsRequest, newnewapi.GetMcOptionsResponse>(
-    newnewapi.GetMcOptionsRequest,
-    newnewapi.GetMcOptionsResponse,
-    `${BASE_URL_MULTICHOICE}/get_mc_options`,
-    'post',
+  fetchProtobuf<newnewapi.GetMcOptionsRequest, newnewapi.GetMcOptionsResponse>({
+    reqT: newnewapi.GetMcOptionsRequest,
+    resT: newnewapi.GetMcOptionsResponse,
+    url: `${BASE_URL_MULTICHOICE}/get_mc_options`,
     payload,
-    // Optional authentication to get individualized list of options
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMcOption = (
   payload: newnewapi.GetMcOptionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.GetMcOptionRequest, newnewapi.GetMcOptionResponse>(
-    newnewapi.GetMcOptionRequest,
-    newnewapi.GetMcOptionResponse,
-    `${BASE_URL_MULTICHOICE}/get_mc_option`,
-    'post',
+  fetchProtobuf<newnewapi.GetMcOptionRequest, newnewapi.GetMcOptionResponse>({
+    reqT: newnewapi.GetMcOptionRequest,
+    resT: newnewapi.GetMcOptionResponse,
+    url: `${BASE_URL_MULTICHOICE}/get_mc_option`,
     payload,
-    // Optional authentication to get individualized list of options
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const voteOnPost = (
   payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.StripeContributionRequest,
     newnewapi.VoteOnPostResponse
-  >(
-    newnewapi.StripeContributionRequest,
-    newnewapi.VoteOnPostResponse,
-    `${BASE_URL_MULTICHOICE}/vote_on_post`,
-    'post',
+  >({
+    reqT: newnewapi.StripeContributionRequest,
+    resT: newnewapi.VoteOnPostResponse,
+    url: `${BASE_URL_MULTICHOICE}/vote_on_post`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const createCustomOption = (
   payload: newnewapi.CreateCustomMcOptionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.CreateCustomMcOptionRequest,
     newnewapi.CreateCustomMcOptionResponse
-  >(
-    newnewapi.CreateCustomMcOptionRequest,
-    newnewapi.CreateCustomMcOptionResponse,
-    `${BASE_URL_MULTICHOICE}/create_custom_mc_option`,
-    'post',
+  >({
+    reqT: newnewapi.CreateCustomMcOptionRequest,
+    resT: newnewapi.CreateCustomMcOptionResponse,
+    url: `${BASE_URL_MULTICHOICE}/create_custom_mc_option`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const canCreateCustomOption = (
   payload: newnewapi.CanCreateCustomMcOptionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.CanCreateCustomMcOptionRequest,
     newnewapi.CanCreateCustomMcOptionResponse
-  >(
-    newnewapi.CanCreateCustomMcOptionRequest,
-    newnewapi.CanCreateCustomMcOptionResponse,
-    `${BASE_URL_MULTICHOICE}/can_create_custom_mc_option`,
-    'post',
+  >({
+    reqT: newnewapi.CanCreateCustomMcOptionRequest,
+    resT: newnewapi.CanCreateCustomMcOptionResponse,
+    url: `${BASE_URL_MULTICHOICE}/can_create_custom_mc_option`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const voteWithBundleVotes = (
   payload: newnewapi.VoteOnPostRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.VoteOnPostRequest,
-    newnewapi.VoteOnPostResponse
-  >(
-    newnewapi.VoteOnPostRequest,
-    newnewapi.VoteOnPostResponse,
-    `${BASE_URL_MULTICHOICE}/use_bundle_votes_on_post`,
-    'post',
+  fetchProtobuf<newnewapi.VoteOnPostRequest, newnewapi.VoteOnPostResponse>({
+    reqT: newnewapi.VoteOnPostRequest,
+    resT: newnewapi.VoteOnPostResponse,
+    url: `${BASE_URL_MULTICHOICE}/use_bundle_votes_on_post`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const deleteMcOption = (
   payload: newnewapi.DeleteMcOptionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.DeleteMcOptionRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.DeleteMcOptionRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_MULTICHOICE}/delete_mc_option`,
-    'post',
+  fetchProtobuf<newnewapi.DeleteMcOptionRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.DeleteMcOptionRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_MULTICHOICE}/delete_mc_option`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const checkCanDeleteMcOption = (
   payload: newnewapi.CanDeleteMcOptionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.CanDeleteMcOptionRequest,
     newnewapi.CanDeleteMcOptionResponse
-  >(
-    newnewapi.CanDeleteMcOptionRequest,
-    newnewapi.CanDeleteMcOptionResponse,
-    `${BASE_URL_MULTICHOICE}/can_delete_mc_option`,
-    'post',
+  >({
+    reqT: newnewapi.CanDeleteMcOptionRequest,
+    resT: newnewapi.CanDeleteMcOptionResponse,
+    url: `${BASE_URL_MULTICHOICE}/can_delete_mc_option`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });

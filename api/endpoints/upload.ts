@@ -1,93 +1,91 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_UPLOAD = `${BASE_URL}/upload`;
 
 export const getImageUploadUrl = (
-  payload: newnewapi.GetImageUploadUrlRequest, signal?: RequestInit['signal']
+  payload: newnewapi.GetImageUploadUrlRequest,
+  signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetImageUploadUrlRequest,
     newnewapi.GetImageUploadUrlResponse
-  >(
-    newnewapi.GetImageUploadUrlRequest,
-    newnewapi.GetImageUploadUrlResponse,
-    `${BASE_URL_UPLOAD}/get_image_upload_url`,
-    'post',
+  >({
+    reqT: newnewapi.GetImageUploadUrlRequest,
+    resT: newnewapi.GetImageUploadUrlResponse,
+    url: `${BASE_URL_UPLOAD}/get_image_upload_url`,
     payload,
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getVideoUploadUrl = (
-  payload: newnewapi.GetVideoUploadUrlRequest, signal?: RequestInit['signal']
+  payload: newnewapi.GetVideoUploadUrlRequest,
+  signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetVideoUploadUrlRequest,
     newnewapi.GetVideoUploadUrlResponse
-  >(
-    newnewapi.GetVideoUploadUrlRequest,
-    newnewapi.GetVideoUploadUrlResponse,
-    `${BASE_URL_UPLOAD}/get_video_upload_url`,
-    'post',
+  >({
+    reqT: newnewapi.GetVideoUploadUrlRequest,
+    resT: newnewapi.GetVideoUploadUrlResponse,
+    url: `${BASE_URL_UPLOAD}/get_video_upload_url`,
     payload,
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const removeUploadedFile = (
-  payload: newnewapi.RemoveUploadedFileRequest, signal?: RequestInit['signal']
+  payload: newnewapi.RemoveUploadedFileRequest,
+  signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.RemoveUploadedFileRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.RemoveUploadedFileRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_UPLOAD}/remove_uploaded_file`,
-    'post',
+  fetchProtobuf<newnewapi.RemoveUploadedFileRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.RemoveUploadedFileRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_UPLOAD}/remove_uploaded_file`,
     payload,
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const startVideoProcessing = (
-  payload: newnewapi.StartVideoProcessingRequest, signal?: RequestInit['signal']
+  payload: newnewapi.StartVideoProcessingRequest,
+  signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.StartVideoProcessingRequest,
     newnewapi.StartVideoProcessingResponse
-  >(
-    newnewapi.StartVideoProcessingRequest,
-    newnewapi.StartVideoProcessingResponse,
-    `${BASE_URL_UPLOAD}/start_video_processing`,
-    'post',
+  >({
+    reqT: newnewapi.StartVideoProcessingRequest,
+    resT: newnewapi.StartVideoProcessingResponse,
+    url: `${BASE_URL_UPLOAD}/start_video_processing`,
     payload,
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const stopVideoProcessing = (
-  payload: newnewapi.StopVideoProcessingRequest, signal?: RequestInit['signal']
+  payload: newnewapi.StopVideoProcessingRequest,
+  signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.StopVideoProcessingRequest,
     newnewapi.StopVideoProcessingResponse
-  >(
-    newnewapi.StopVideoProcessingRequest,
-    newnewapi.StopVideoProcessingResponse,
-    `${BASE_URL_UPLOAD}/stop_video_processing`,
-    'post',
+  >({
+    reqT: newnewapi.StopVideoProcessingRequest,
+    resT: newnewapi.StopVideoProcessingResponse,
+    url: `${BASE_URL_UPLOAD}/stop_video_processing`,
     payload,
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getCoverImageUploadUrl = (
-  payload: newnewapi.GetCoverImageUploadUrlRequest
+  payload: newnewapi.GetCoverImageUploadUrlRequest,
+  signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetCoverImageUploadUrlRequest,
     newnewapi.GetCoverImageUploadUrlResponse
-  >(
-    newnewapi.GetCoverImageUploadUrlRequest,
-    newnewapi.GetCoverImageUploadUrlResponse,
-    `${BASE_URL_UPLOAD}/get_cover_image_upload_url`,
-    'post',
-    payload
-  );
+  >({
+    reqT: newnewapi.GetCoverImageUploadUrlRequest,
+    resT: newnewapi.GetCoverImageUploadUrlResponse,
+    url: `${BASE_URL_UPLOAD}/get_cover_image_upload_url`,
+    payload,
+    ...(signal ? { signal } : {}),
+  });

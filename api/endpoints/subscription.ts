@@ -1,10 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  cookiesInstance,
-  fetchProtobuf,
-  fetchProtobufProtectedIntercepted,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_SUBSCRIPTIONS = `${BASE_URL}/subscription`;
 
@@ -12,33 +7,31 @@ export const subscribeToCreator = (
   payload: newnewapi.StripeContributionRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.StripeContributionRequest,
     newnewapi.SubscribeToCreatorResponse
-  >(
-    newnewapi.StripeContributionRequest,
-    newnewapi.SubscribeToCreatorResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/subscribe_to_creator`,
-    'post',
+  >({
+    reqT: newnewapi.StripeContributionRequest,
+    resT: newnewapi.SubscribeToCreatorResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/subscribe_to_creator`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const unsubscribeFromCreator = (
   payload: newnewapi.UnsubscribeFromCreatorRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.UnsubscribeFromCreatorRequest,
     newnewapi.UnsubscribeFromCreatorResponse
-  >(
-    newnewapi.UnsubscribeFromCreatorRequest,
-    newnewapi.UnsubscribeFromCreatorResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/unsubscribe_from_creator`,
-    'post',
+  >({
+    reqT: newnewapi.UnsubscribeFromCreatorRequest,
+    resT: newnewapi.UnsubscribeFromCreatorResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/unsubscribe_from_creator`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 // NB! Will be with optional authentication
 export const getSubscriptionStatus = (
@@ -48,54 +41,43 @@ export const getSubscriptionStatus = (
   fetchProtobuf<
     newnewapi.SubscriptionStatusRequest,
     newnewapi.SubscriptionStatusResponse
-  >(
-    newnewapi.SubscriptionStatusRequest,
-    newnewapi.SubscriptionStatusResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/get_subscription_status`,
-    'post',
+  >({
+    reqT: newnewapi.SubscriptionStatusRequest,
+    resT: newnewapi.SubscriptionStatusResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/get_subscription_status`,
     payload,
-    // Optional authentication
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMySubscribers = (
   payload: newnewapi.GetMySubscribersRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetMySubscribersRequest,
     newnewapi.GetMySubscribersResponse
-  >(
-    newnewapi.GetMySubscribersRequest,
-    newnewapi.GetMySubscribersResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/get_my_subscribers`,
-    'post',
+  >({
+    reqT: newnewapi.GetMySubscribersRequest,
+    resT: newnewapi.GetMySubscribersResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/get_my_subscribers`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getCreatorsImSubscribedTo = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.EmptyRequest,
     newnewapi.GetCreatorsImSubscribedToResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.GetCreatorsImSubscribedToResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/get_creators_im_subscribed_to`,
-    'post',
+  >({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.GetCreatorsImSubscribedToResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/get_creators_im_subscribed_to`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 // Setting subscription rates
 export const getStandardSubscriptionProducts = (
@@ -103,45 +85,41 @@ export const getStandardSubscriptionProducts = (
   signal?: RequestInit['signal']
 ) =>
   fetchProtobuf<newnewapi.EmptyRequest, newnewapi.StandardSubscriptionProducts>(
-    newnewapi.EmptyRequest,
-    newnewapi.StandardSubscriptionProducts,
-    `${BASE_URL_SUBSCRIPTIONS}/get_standard_subscription_products`,
-    'post',
-    payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
+    {
+      reqT: newnewapi.EmptyRequest,
+      resT: newnewapi.StandardSubscriptionProducts,
+      url: `${BASE_URL_SUBSCRIPTIONS}/get_standard_subscription_products`,
+      payload,
+      ...(signal ? { signal } : {}),
+    }
   );
 
 export const getMySubscriptionProduct = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.EmptyRequest,
     newnewapi.GetMySubscriptionProductResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.GetMySubscriptionProductResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/get_my_subscription_product`,
-    'post',
+  >({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.GetMySubscriptionProductResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/get_my_subscription_product`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const setMySubscriptionProduct = (
   payload: newnewapi.SetMySubscriptionProductRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.SetMySubscriptionProductRequest,
     newnewapi.EmptyResponse
-  >(
-    newnewapi.SetMySubscriptionProductRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_SUBSCRIPTIONS}/set_my_subscription_product`,
-    'post',
+  >({
+    reqT: newnewapi.SetMySubscriptionProductRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_SUBSCRIPTIONS}/set_my_subscription_product`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });

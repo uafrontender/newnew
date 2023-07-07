@@ -1,10 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  cookiesInstance,
-  fetchProtobuf,
-  fetchProtobufProtectedIntercepted,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_PAYMENTS = `${BASE_URL}/payments`;
 
@@ -15,33 +10,25 @@ export const getSupportedCreatorCountries = (
   fetchProtobuf<
     newnewapi.EmptyRequest,
     newnewapi.GetSupportedCreatorCountriesResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.GetSupportedCreatorCountriesResponse,
-    `${BASE_URL_PAYMENTS}/get_supported_creator_countries`,
-    'post',
+  >({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.GetSupportedCreatorCountriesResponse,
+    url: `${BASE_URL_PAYMENTS}/get_supported_creator_countries`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getStripeCustomer = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetStripeCustomerResponse>(
-    newnewapi.EmptyRequest,
-    newnewapi.GetStripeCustomerResponse,
-    `${BASE_URL_PAYMENTS}/get_stripe_customer`,
-    'post',
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetStripeCustomerResponse>({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.GetStripeCustomerResponse,
+    url: `${BASE_URL_PAYMENTS}/get_stripe_customer`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const createStripeSetupIntent = (
   payload: newnewapi.CreateStripeSetupIntentRequest,
@@ -50,22 +37,13 @@ export const createStripeSetupIntent = (
   fetchProtobuf<
     newnewapi.CreateStripeSetupIntentRequest,
     newnewapi.CreateStripeSetupIntentResponse
-  >(
-    newnewapi.CreateStripeSetupIntentRequest,
-    newnewapi.CreateStripeSetupIntentResponse,
-    `${BASE_URL_PAYMENTS}/create_stripe_setup_intent`,
-    'post',
+  >({
+    reqT: newnewapi.CreateStripeSetupIntentRequest,
+    resT: newnewapi.CreateStripeSetupIntentResponse,
+    url: `${BASE_URL_PAYMENTS}/create_stripe_setup_intent`,
     payload,
-    // Optional authentication
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const updateStripeSetupIntent = (
   payload: newnewapi.UpdateStripeSetupIntentRequest,
@@ -74,100 +52,86 @@ export const updateStripeSetupIntent = (
   fetchProtobuf<
     newnewapi.UpdateStripeSetupIntentRequest,
     newnewapi.UpdateStripeSetupIntentResponse
-  >(
-    newnewapi.UpdateStripeSetupIntentRequest,
-    newnewapi.UpdateStripeSetupIntentResponse,
-    `${BASE_URL_PAYMENTS}/update_stripe_setup_intent`,
-    'post',
+  >({
+    reqT: newnewapi.UpdateStripeSetupIntentRequest,
+    resT: newnewapi.UpdateStripeSetupIntentResponse,
+    url: `${BASE_URL_PAYMENTS}/update_stripe_setup_intent`,
     payload,
-    // Optional authentication
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 // Set up Stripe creator account
 export const fetchSetStripeLinkCreator = (
   payload: newnewapi.SetupStripeCreatorAccountRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.SetupStripeCreatorAccountRequest,
     newnewapi.SetupStripeCreatorAccountResponse
-  >(
-    newnewapi.SetupStripeCreatorAccountRequest,
-    newnewapi.SetupStripeCreatorAccountResponse,
-    `${BASE_URL_PAYMENTS}/setup_stripe_creator_account`,
-    'post',
+  >({
+    reqT: newnewapi.SetupStripeCreatorAccountRequest,
+    resT: newnewapi.SetupStripeCreatorAccountResponse,
+    url: `${BASE_URL_PAYMENTS}/setup_stripe_creator_account`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMyEarnings = (
   payload: newnewapi.GetMyEarningsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetMyEarningsRequest,
     newnewapi.GetMyEarningsResponse
-  >(
-    newnewapi.GetMyEarningsRequest,
-    newnewapi.GetMyEarningsResponse,
-    `${BASE_URL_PAYMENTS}/get_my_earnings`,
-    'post',
+  >({
+    reqT: newnewapi.GetMyEarningsRequest,
+    resT: newnewapi.GetMyEarningsResponse,
+    url: `${BASE_URL_PAYMENTS}/get_my_earnings`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMyTransactions = (
   payload: newnewapi.GetMyTransactionsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetMyTransactionsRequest,
     newnewapi.GetMyTransactionsResponse
-  >(
-    newnewapi.GetMyTransactionsRequest,
-    newnewapi.GetMyTransactionsResponse,
-    `${BASE_URL_PAYMENTS}/get_my_transactions`,
-    'post',
+  >({
+    reqT: newnewapi.GetMyTransactionsRequest,
+    resT: newnewapi.GetMyTransactionsResponse,
+    url: `${BASE_URL_PAYMENTS}/get_my_transactions`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMyEarningsByPosts = (
   payload: newnewapi.GetMyEarningsByPostsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetMyEarningsByPostsRequest,
     newnewapi.GetMyEarningsByPostsResponse
-  >(
-    newnewapi.GetMyEarningsByPostsRequest,
-    newnewapi.GetMyEarningsByPostsResponse,
-    `${BASE_URL_PAYMENTS}/get_my_earnings_by_posts`,
-    'post',
+  >({
+    reqT: newnewapi.GetMyEarningsByPostsRequest,
+    resT: newnewapi.GetMyEarningsByPostsResponse,
+    url: `${BASE_URL_PAYMENTS}/get_my_earnings_by_posts`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const getMySpending = (
   payload: newnewapi.GetMySpendingRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
+  fetchProtobuf<
     newnewapi.GetMySpendingRequest,
     newnewapi.GetMySpendingResponse
-  >(
-    newnewapi.GetMySpendingRequest,
-    newnewapi.GetMySpendingResponse,
-    `${BASE_URL_PAYMENTS}/get_my_spending`,
-    'post',
+  >({
+    reqT: newnewapi.GetMySpendingRequest,
+    resT: newnewapi.GetMySpendingResponse,
+    url: `${BASE_URL_PAYMENTS}/get_my_spending`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });

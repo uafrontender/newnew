@@ -3,44 +3,41 @@ import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_CHAT = `${BASE_URL}/search`;
 
-export const quickSearch = (payload: newnewapi.QuickSearchRequest, signal?: RequestInit['signal']) =>
-  fetchProtobuf<newnewapi.QuickSearchRequest, newnewapi.QuickSearchResponse>(
-    newnewapi.QuickSearchRequest,
-    newnewapi.QuickSearchResponse,
-    `${BASE_URL_CHAT}/quick_search`,
-    'post',
+export const quickSearch = (
+  payload: newnewapi.QuickSearchRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<newnewapi.QuickSearchRequest, newnewapi.QuickSearchResponse>({
+    reqT: newnewapi.QuickSearchRequest,
+    resT: newnewapi.QuickSearchResponse,
+    url: `${BASE_URL_CHAT}/quick_search`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
-export const searchPosts = (payload: newnewapi.SearchPostsRequest, signal?: RequestInit['signal']) =>
-  fetchProtobuf<newnewapi.SearchPostsRequest, newnewapi.PagedPostsResponse>(
-    newnewapi.SearchPostsRequest,
-    newnewapi.PagedPostsResponse,
-    `${BASE_URL_CHAT}/search_posts`,
-    'post',
+export const searchPosts = (
+  payload: newnewapi.SearchPostsRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<newnewapi.SearchPostsRequest, newnewapi.PagedPostsResponse>({
+    reqT: newnewapi.SearchPostsRequest,
+    resT: newnewapi.PagedPostsResponse,
+    url: `${BASE_URL_CHAT}/search_posts`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });
 
-export const searchCreators = (payload: newnewapi.SearchCreatorsRequest, signal?: RequestInit['signal']) =>
+export const searchCreators = (
+  payload: newnewapi.SearchCreatorsRequest,
+  signal?: RequestInit['signal']
+) =>
   fetchProtobuf<
     newnewapi.SearchCreatorsRequest,
     newnewapi.SearchCreatorsResponse
-  >(
-    newnewapi.SearchCreatorsRequest,
-    newnewapi.SearchCreatorsResponse,
-    `${BASE_URL_CHAT}/search_creators`,
-    'post',
+  >({
+    reqT: newnewapi.SearchCreatorsRequest,
+    resT: newnewapi.SearchCreatorsResponse,
+    url: `${BASE_URL_CHAT}/search_creators`,
     payload,
-    {},
-    'cors',
-    'same-origin',
-    signal ?? undefined,
-  );
+    ...(signal ? { signal } : {}),
+  });

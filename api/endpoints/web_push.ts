@@ -1,9 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  fetchProtobufProtectedIntercepted,
-  fetchProtobuf,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_WEB_PUSH = `${BASE_URL}/web_push`;
 
@@ -11,107 +7,88 @@ export const webPush = (
   payload: newnewapi.WebPushRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.WebPushRequest,
-    newnewapi.WebPushResponse
-  >(
-    newnewapi.WebPushRequest,
-    newnewapi.WebPushResponse,
-    `${BASE_URL_WEB_PUSH}/`,
-    'post',
+  fetchProtobuf<newnewapi.WebPushRequest, newnewapi.WebPushResponse>({
+    reqT: newnewapi.WebPushRequest,
+    resT: newnewapi.WebPushResponse,
+    url: `${BASE_URL_WEB_PUSH}/`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const webPushRegister = (
   payload: newnewapi.RegisterForWebPushRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.RegisterForWebPushRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.RegisterForWebPushRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_WEB_PUSH}/register`,
-    'put',
+  fetchProtobuf<newnewapi.RegisterForWebPushRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.RegisterForWebPushRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_WEB_PUSH}/register`,
+    method: 'put',
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const webPushUnRegister = (
   payload: newnewapi.UnRegisterForWebPushRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.UnRegisterForWebPushRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.UnRegisterForWebPushRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_WEB_PUSH}/unregister`,
-    'delete',
-    payload,
-    signal ?? undefined
+  fetchProtobuf<newnewapi.UnRegisterForWebPushRequest, newnewapi.EmptyResponse>(
+    {
+      reqT: newnewapi.UnRegisterForWebPushRequest,
+      resT: newnewapi.EmptyResponse,
+      url: `${BASE_URL_WEB_PUSH}/unregister`,
+      method: 'delete',
+      payload,
+      ...(signal ? { signal } : {}),
+    }
   );
 
 export const webPushConfig = (
   payload: newnewapi.EmptyRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.EmptyRequest,
-    newnewapi.ConfigForWebPushResponse
-  >(
-    newnewapi.EmptyRequest,
-    newnewapi.ConfigForWebPushResponse,
-    `${BASE_URL_WEB_PUSH}/config`,
-    'post',
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.ConfigForWebPushResponse>({
+    reqT: newnewapi.EmptyRequest,
+    resT: newnewapi.ConfigForWebPushResponse,
+    url: `${BASE_URL_WEB_PUSH}/config`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const webPushCheck = (
   payload: newnewapi.WebPushCheckRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.WebPushCheckRequest,
-    newnewapi.WebPushCheckResponse
-  >(
-    newnewapi.WebPushCheckRequest,
-    newnewapi.WebPushCheckResponse,
-    `${BASE_URL_WEB_PUSH}/check`,
-    'post',
+  fetchProtobuf<newnewapi.WebPushCheckRequest, newnewapi.WebPushCheckResponse>({
+    reqT: newnewapi.WebPushCheckRequest,
+    resT: newnewapi.WebPushCheckResponse,
+    url: `${BASE_URL_WEB_PUSH}/check`,
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const webPushPause = (
   payload: newnewapi.WebPushPauseRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.WebPushPauseRequest, newnewapi.EmptyResponse>(
-    newnewapi.WebPushPauseRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_WEB_PUSH}/pause`,
-    'put',
+  fetchProtobuf<newnewapi.WebPushPauseRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.WebPushPauseRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_WEB_PUSH}/pause`,
+    method: 'put',
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
 
 export const webPushResume = (
   payload: newnewapi.WebPushResumeRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.WebPushResumeRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.WebPushResumeRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_WEB_PUSH}/resume`,
-    'put',
+  fetchProtobuf<newnewapi.WebPushResumeRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.WebPushResumeRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_WEB_PUSH}/resume`,
+    method: 'put',
     payload,
-    signal ?? undefined
-  );
+    ...(signal ? { signal } : {}),
+  });
