@@ -923,7 +923,7 @@ const SContent = styled.div<{
 
   &::before {
     content: '';
-    margin: -10px; // to prevent gaps
+    margin: -10%; // to prevent gaps
     position: absolute;
     top: 0;
     right: 0;
