@@ -38,15 +38,17 @@ const BecomeCreatorSection = () => {
   );
 };
 
+// Ignores max width, always occupies whole width
 const SContainer = styled.section`
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: calc(100% + 96 * 2);
+  width: 100vw;
+  left: calc(50% - 50vw);
   padding: 22px 0;
-  margin: 20px -16px 0;
+  margin-top: 20px;
 
   overflow: hidden;
   background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
@@ -67,13 +69,13 @@ const SContainer = styled.section`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    margin: 40px -32px 0;
+    margin-top: 40px;
     padding: 35px 0;
   }
 
   ${({ theme }) => theme.media.laptop} {
     padding: 60px 0;
-    margin: 30px -96px 0;
+    margin-top: 30px;
   }
 `;
 

@@ -73,8 +73,8 @@ const VideoProcessingWrapper: React.FunctionComponent<
         });
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router]
+
+    [router, showErrorToastCustom]
   );
 
   useEffect(() => {
@@ -91,7 +91,6 @@ const VideoProcessingWrapper: React.FunctionComponent<
         socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated, userLoggedIn]);
 
   return <>{children}</>;

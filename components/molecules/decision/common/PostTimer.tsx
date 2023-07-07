@@ -121,8 +121,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           setIsTooltipVisible(false);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postType, userTutorialsProgress, isTutorialVisible]);
+  }, [postType, userTutorialsProgress, isTutorialVisible, t]);
 
   const goToNextStep = () => {
     setIsTooltipVisible(false);
