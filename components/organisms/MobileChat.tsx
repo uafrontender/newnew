@@ -157,7 +157,7 @@ const SContainer = styled.div`
 
   padding: 0 10px;
   overflow: hidden;
-  height: 100vh;
+  height: var(--window-inner-height);
 
   ${(props) => props.theme.media.laptop} {
     position: relative;

@@ -12,7 +12,6 @@ import { SChatSeparator } from '../../atoms/direct-messages/styles';
 import { useGetChats } from '../../../contexts/chatContext';
 import Loader from '../../atoms/Loader';
 import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
-import { useAppState } from '../../../contexts/appStateContext';
 import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 
 const NoResults = dynamic(
@@ -33,14 +32,6 @@ const ChatList: React.FC<IChatList> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
   const { ref: scrollRef, inView } = useInView();
-  const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
 
   const router = useRouter();
 
@@ -125,13 +116,6 @@ const ChatList: React.FC<IChatList> = ({
                   {index < chatRooms.length - 1 && <SChatSeparator />}
                 </React.Fragment>
               ))}
-              {/* TODO: Remove this for dynamic section */}
-              {isMobileOrTablet && (
-                <>
-                  <SChatItemFakeContainer />
-                  <SChatItemFakeContainer />
-                </>
-              )}
             </>
           )}
 
@@ -156,7 +140,7 @@ const SChatList = styled.div`
   overflow-y: auto;
   flex-direction: column;
   overscroll-behavior: contain;
-  height: calc(100vh - 124px);
+  height: calc(var(--window-inner-height) - 70px); // 70px height
 
   /* Hide scrollbar */
   ::-webkit-scrollbar {
@@ -170,9 +154,4 @@ const SRef = styled.span`
   text-indent: -9999px;
   height: 0;
   overflow: hidden;
-`;
-
-const SChatItemFakeContainer = styled.div`
-  min-height: 72px;
-  flex: 1;
 `;
