@@ -9,7 +9,7 @@ import React, {
   Fragment,
 } from 'react';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -115,7 +115,6 @@ export const PostCard: React.FC<ICard> = React.memo(
     const { t } = useTranslation('component-PostCard');
     const { t: tCommon } = useTranslation('common');
     const theme = useTheme();
-    const router = useRouter();
     const { userData } = useUserData();
     const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -217,13 +216,16 @@ export const PostCard: React.FC<ICard> = React.memo(
       [announcementCoverImage, responseCoverImage]
     );
 
-    const handleUserClick = (username: string) => {
-      Mixpanel.track('Go To Creator Profile', {
-        _stage: 'Post Card',
-        _postUuid: switchPostType(item)[0].postUuid,
-      });
-      router.push(`/${username}`);
-    };
+    const handleUserClick = useCallback(
+      (username: string) => {
+        Mixpanel.track('Go To Creator Profile', {
+          _stage: 'Post Card',
+          _postUuid: switchPostType(item)[0].postUuid,
+        });
+        Router.push(`/${username}`);
+      },
+      [item]
+    );
 
     // Ellipse menu
     const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -252,7 +254,7 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     const handleReportOpen = useCallback(() => {
       if (!userLoggedIn) {
-        router.push(
+        Router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/p/${
               postParsed.postShortId
@@ -264,7 +266,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         return;
       }
       setIsReportModalOpen(true);
-    }, [userLoggedIn, router, postParsed.postShortId, postParsed.postUuid]);
+    }, [userLoggedIn, postParsed.postShortId, postParsed.postUuid]);
 
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
@@ -502,7 +504,7 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     useEffect(
       () => {
-        router.prefetch(
+        Router.prefetch(
           `/p/${
             switchPostType(item)[0].postShortId
               ? switchPostType(item)[0].postShortId
@@ -512,8 +514,6 @@ export const PostCard: React.FC<ICard> = React.memo(
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [
-        // TODO: use Router instead?
-        // router, - disabled as router hook causes effect to re-fire
         // item, - reason unknown
       ]
     );

@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useUpdateEffect } from 'react-use';
 
@@ -77,7 +77,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const { userData } = useUserData();
   const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
   const { socketConnection } = useContext(SocketContext);
-  const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
@@ -243,6 +242,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     [setWasModified]
   );
 
+  const handleSettingsClicked = useCallback(() => {
+    Router.push('/profile/settings');
+  }, []);
+
   const handleCloseEditProfileMenu = useCallback(
     (preventGoBack = false) => {
       if (isBrowser() && !preventGoBack) {
@@ -307,14 +310,13 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // Redirect to / if user is not logged in
   useUpdateEffect(() => {
     if (!userLoggedIn) {
-      router.replace('/');
+      Router.replace('/');
     }
-  }, [router, userLoggedIn]);
+  }, [userLoggedIn]);
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch('/profile/settings');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Router.prefetch('/profile/settings');
   }, []);
 
   // Spending limit
@@ -420,7 +422,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             withDim
             withShrink
             iconOnly={isMobileOrTablet}
-            onClick={() => router.push('/profile/settings')}
+            onClick={handleSettingsClicked}
             onClickCapture={() => {
               Mixpanel.track('Click Settings Button', {
                 _stage: 'MyProfile',
