@@ -127,3 +127,10 @@ In Contexts it is vital to check dependencies and ensure that no additional data
 
 - Use `Router` instead of `useRouter` hook whenever possible, as it does not cause effects and callbacks to be re-evaluated on page changed
 - Check the initialization and flow of the context with a help of `console.log` statements in every effect and callback. Avoid excessive calls.
+
+## overlayMode
+
+To prevent scrolling on iOS devices, the `overlayModeContext` utilizes the `body-scroll-lock` package, which is only applied when an element ref is provided.
+The `body-scroll-lock` package requires the reference of the element that should remain scrollable; otherwise, scrolling will be completely disabled on iOS devices, as `body-scroll-lock` disables the `touchMove` event.
+
+Since the `enableOverlayMode` is called within the `Modal` component, it becomes challenging to provide a scrollable element reference for all modals. So to allow scrolling inside a modal , the scrollable element should have a data attribute `data-body-scroll-lock-ignore`.

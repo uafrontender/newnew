@@ -39,15 +39,16 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
-  const elementRef = useRef<HTMLDivElement>(null);
+  const modalContentContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const modalContentContainer = modalContentContainerRef.current;
     if (show) {
-      enableOverlayMode(elementRef.current);
+      enableOverlayMode(modalContentContainer);
     }
 
     return () => {
-      disableOverlayMode();
+      disableOverlayMode(modalContentContainer);
     };
   }, [show, enableOverlayMode, disableOverlayMode]);
 
@@ -103,7 +104,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        <SContent ref={elementRef}>{children}</SContent>
+        <SContent ref={modalContentContainerRef}>{children}</SContent>
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
@@ -129,7 +130,7 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
   height: calc(100% + 2px);
   transform: translateZ(0);
   overflow: hidden;
-  z-index: ${({ additionalz }) => additionalz ?? 10};
+  z-index: ${({ additionalz }) => additionalz ?? 12};
 
   backdrop-filter: ${({ custombackdropfiltervalue, nodimming }) =>
     // eslint-disable-next-line no-nested-ternary
