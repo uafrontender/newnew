@@ -775,27 +775,33 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     logoutAndRedirect,
   ]);
 
-  useEffect(() => {
-    const verify = () => {
-      if (!isBrowser()) {
-        return;
-      }
+  useEffect(
+    () => {
+      const verify = () => {
+        if (!isBrowser()) {
+          return;
+        }
 
-      const { stage: currStage } = window.history.state;
+        const { stage: currStage } = window.history.state;
 
-      if (!currStage) {
-        handleClose(true);
-      } else if (currStage === 'edit-general') {
-        setUpdateProfileImageLoading(false);
-        handleSetStageToEditingGeneral();
-      }
-    };
+        if (!currStage) {
+          handleClose(true);
+        } else if (currStage === 'edit-general') {
+          setUpdateProfileImageLoading(false);
+          handleSetStageToEditingGeneral();
+        }
+      };
 
-    window.addEventListener('popstate', verify);
+      window.addEventListener('popstate', verify);
 
-    return () => window.removeEventListener('popstate', verify);
+      return () => window.removeEventListener('popstate', verify);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // handleClose, - reason unknown
+      // handleSetStageToEditingGeneral, - reason unknown
+    ]
+  );
 
   // Check if data was modified
   useEffect(() => {
