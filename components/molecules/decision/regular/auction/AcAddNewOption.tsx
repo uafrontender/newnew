@@ -707,6 +707,7 @@ const SPaymentModalHeadingPostSymbol = styled.div`
   background: ${({ theme }) => theme.colorsThemed.background.quaternary};
 
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
 
@@ -725,6 +726,8 @@ const SPaymentModalHeadingPostSymbolImg = styled.img`
 
 const SPaymentModalHeadingPostCreator = styled(Text)`
   display: flex;
+  flex-shrink: 1;
+  overflow: hidden;
   flex-direction: row;
   align-items: center;
   white-space: pre;
