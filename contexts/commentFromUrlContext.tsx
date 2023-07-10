@@ -40,7 +40,6 @@ const CommentFromUrlContextProvider: React.FC<
       handleSetNewCommentContentFromUrl: (newValue: string) =>
         setNewCommentContent(newValue),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [commentId, newCommentContent]
   );
 
