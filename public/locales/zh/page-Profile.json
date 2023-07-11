@@ -119,6 +119,7 @@
     "button": {
       "backToProfile": "編輯個人資料",
       "backToImage": "編輯個人資料圖片",
+      "backToCover": "編輯封面圖片",
       "save": "保存更改",
       "cancel": "取消"
     },

@@ -270,6 +270,18 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     setIsEditProfileMenuOpen(true);
   };
 
+  const handleSetStageToEditingCoverPicture = () => {
+    if (isBrowser()) {
+      syncedHistoryPushState(
+        {
+          stage: 'edit-profile-cover',
+        },
+        window.location.href
+      );
+    }
+    setEditingStage('edit-profile-cover');
+  };
+
   const handleSetStageToEditingProfilePicture = () => {
     if (isBrowser()) {
       syncedHistoryPushState(
@@ -546,6 +558,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               handleClosePreventDiscarding={handleClosePreventDiscarding}
               handleSetStageToEditingProfilePicture={
                 handleSetStageToEditingProfilePicture
+              }
+              handleSetStageToEditingCoverPicture={
+                handleSetStageToEditingCoverPicture
               }
               handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
             />

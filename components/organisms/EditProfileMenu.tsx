@@ -23,7 +23,7 @@ import BioTextarea from '../atoms/profile/BioTextarea';
 import UsernameInput from '../atoms/profile/UsernameInput';
 import NicknameInput from '../atoms/profile/NicknameInput';
 import ProfileImageInput from '../molecules/profile/ProfileImageInput';
-import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
+import ProfileCoverImage from '../molecules/profile/ProfileCoverImage';
 import DropdownSelect, { TDropdownSelectItem } from '../atoms/DropdownSelect';
 import HelperText from '../atoms/HelperText';
 
@@ -34,16 +34,13 @@ import ZoomInIcon from '../../public/images/svg/icons/outlined/Plus.svg';
 
 // Utils
 import isImage from '../../utils/isImage';
-import urlToFile from '../../utils/urlToFile';
 import getCroppedImg from '../../utils/cropImage';
 import ProfileImageCropper from '../molecules/profile/ProfileImageCropper';
-import ProfileImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
+import ImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
 import { updateMe, validateUsernameTextField } from '../../api/endpoints/user';
 import { validateText } from '../../api/endpoints/infrastructure';
 import { getImageUploadUrl } from '../../api/endpoints/upload';
-import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper';
 import isBrowser from '../../utils/isBrowser';
-import isAnimatedImage from '../../utils/isAnimatedImage';
 import resizeImage from '../../utils/resizeImage';
 import genderPronouns from '../../constants/genderPronouns';
 import getGenderPronouns from '../../utils/genderPronouns';
@@ -55,8 +52,12 @@ import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import { NAME_LENGTH_LIMIT } from '../../utils/consts';
+import ProfileCoverImageCropper from '../molecules/profile/ProfileCoverImageCropper';
 
-export type TEditingStage = 'edit-general' | 'edit-profile-picture';
+export type TEditingStage =
+  | 'edit-general'
+  | 'edit-profile-picture'
+  | 'edit-profile-cover';
 
 interface IEditProfileMenu {
   stage: TEditingStage;
@@ -65,6 +66,7 @@ interface IEditProfileMenu {
   handleSetWasModified: (newState: boolean) => void;
   handleClosePreventDiscarding: () => void;
   handleSetStageToEditingProfilePicture: () => void;
+  handleSetStageToEditingCoverPicture: () => void;
   handleSetStageToEditingGeneral: () => void;
 }
 
@@ -137,6 +139,7 @@ const errorSwitchUsername = (
   return errorMsg;
 };
 
+// TODO: Refactor to separate out components
 const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   stage,
   wasModified,
@@ -144,12 +147,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   handleSetWasModified,
   handleClosePreventDiscarding,
   handleSetStageToEditingProfilePicture,
+  handleSetStageToEditingCoverPicture,
   handleSetStageToEditingGeneral,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
-
   const { userData, updateUserData } = useUserData();
   const { resizeMode, userIsCreator, logoutAndRedirect } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -395,23 +398,32 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     []
   );
 
-  // Avatar
+  // Avatar image
   const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
+  const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
+  const [cropProfileImage, setCropProfileImage] = useState<Point>({
+    x: 0,
+    y: 0,
+  });
+  const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
+    useState<Area>();
+  const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
+  const [updateProfileImageLoading, setUpdateProfileImageLoading] =
+    useState(false);
 
-  // Cover image
-  const [coverUrlInEdit, setCoverUrlInEdit] = useState(userData?.coverUrl);
-  const [coverUrlInEditAnimated, setCoverUrlInEditAnimated] = useState(false);
-  const [coverUrlInEditAnimatedExtension, setCoverUrlInEditAnimatedExtension] =
-    useState('');
-  const [coverUrlInEditAnimatedMimeType, setCoverUrlInEditAnimatedMimeType] =
-    useState('');
-  const [coverImageInitialObjectFit, setCoverImageInitialObjectFit] =
-    useState<CropperObjectFit>('horizontal-cover');
+  // Profile cover image
+  const [coverUrlInEdit, setCoverUrlInEdit] = useState(
+    userData?.coverUrl ?? ''
+  );
+  const [originalCoverImageWidth, setOriginalCoverImageWidth] = useState(0);
   const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
+  const [minZoomCoverImage, setMinZoomCoverImage] = useState(1);
+  const [updateCoverImageLoading, setUpdateCoverImageLoading] = useState(false);
 
-  const handleSetBackgroundPictureInEdit = async (files: FileList | null) => {
+  const handleSetProfileCoverImageInEdit = async (files: FileList | null) => {
     if (files?.length === 1) {
       const file = files[0];
 
@@ -429,42 +441,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const reader = new FileReader();
       const img = new Image();
       reader.readAsDataURL(file);
+
       reader.addEventListener('load', async () => {
         if (reader.result) {
           const imageUrl = reader.result as string;
           const properlySizedImage = await resizeImage(imageUrl, 2000);
           img.src = properlySizedImage.url;
+          setOriginalCoverImageWidth(properlySizedImage.width);
 
-          // eslint-disable-next-line func-names
-          img.addEventListener('load', async function () {
-            // eslint-disable-next-line react/no-this-in-sfc
-            if (this.width < this.height * 2.5) {
-              setCoverImageInitialObjectFit('horizontal-cover');
-              setZoomCoverImage(1);
-              // eslint-disable-next-line react/no-this-in-sfc
-            } else if (this.width < this.height * 5) {
-              setCoverImageInitialObjectFit('horizontal-cover');
-              setZoomCoverImage(2);
-            } else {
-              setCoverImageInitialObjectFit('vertical-cover');
-              setZoomCoverImage(1);
-            }
-
-            setCropCoverImage({ x: 0, y: 0 });
-            setCoverUrlInEdit(properlySizedImage.url);
-
-            const imageMeta = await isAnimatedImage(file);
-
-            if (imageMeta && imageMeta.animated) {
-              setCoverUrlInEditAnimated(imageMeta.animated);
-              setCoverUrlInEditAnimatedExtension(imageMeta.ext);
-              setCoverUrlInEditAnimatedMimeType(imageMeta.mime);
-            } else {
-              setCoverUrlInEditAnimated(false);
-              setCoverUrlInEditAnimatedExtension('');
-              setCoverUrlInEditAnimatedMimeType('');
-            }
-          });
+          setMinZoomCoverImage(1);
+          setZoomCoverImage(1);
+          setCoverUrlInEdit(properlySizedImage.url);
+          handleSetStageToEditingCoverPicture();
         }
       });
     }
@@ -472,8 +460,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   const handleUnsetPictureInEdit = () => setCoverUrlInEdit('');
 
-  const handleCoverImageCropChange = (location: Point) => {
-    setCropCoverImage(location);
+  const handleZoomOutCoverImage = () => {
+    setZoomCoverImage((z) => Math.max(z - 0.2, minZoomCoverImage));
+  };
+
+  const handleZoomInCoverImage = () => {
+    setZoomCoverImage((z) => Math.min(z + 0.2, minZoomCoverImage + 2));
   };
 
   const onCropCompleteCoverImage = useCallback(
@@ -482,6 +474,62 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     },
     []
   );
+
+  const completeCoverImageCropAndSave = useCallback(async () => {
+    try {
+      setUpdateCoverImageLoading(true);
+      const croppedImage = await getCroppedImg(
+        coverUrlInEdit,
+        croppedAreaCoverImage!!,
+        0,
+        'coverImage.jpeg'
+      );
+
+      // Get upload and public URLs
+      const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+        filename: croppedImage.name,
+      });
+
+      const res = await getImageUploadUrl(imageUrlPayload);
+
+      if (!res?.data || res.error) {
+        throw new Error(res?.error?.message ?? 'An error occurred');
+      }
+
+      const uploadResponse = await fetch(res.data.uploadUrl, {
+        method: 'PUT',
+        body: croppedImage,
+        headers: {
+          'Content-Type': 'image/png',
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Upload failed');
+      }
+
+      setCoverUrlInEdit(res.data.publicUrl);
+
+      setUpdateCoverImageLoading(false);
+      handleSetStageToEditingGeneral();
+    } catch (err) {
+      console.error(err);
+      setUpdateCoverImageLoading(false);
+      if ((err as Error).message === 'No token') {
+        logoutAndRedirect();
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        logoutAndRedirect('/sign-up?reason=session_expired');
+      }
+    }
+  }, [
+    croppedAreaCoverImage,
+    coverUrlInEdit,
+    handleSetStageToEditingGeneral,
+    logoutAndRedirect,
+  ]);
 
   const handleUpdateUserData = useCallback(async () => {
     try {
@@ -513,50 +561,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         return;
       }
 
-      // In case cover image was updated
-      let croppedCoverImage: File;
-      let newCoverImgURL;
-
-      if (coverUrlInEdit && coverUrlInEdit !== userData?.coverUrl) {
-        croppedCoverImage = !coverUrlInEditAnimated
-          ? await getCroppedImg(
-              coverUrlInEdit,
-              croppedAreaCoverImage!!,
-              0,
-              'coverImage.jpeg'
-            )
-          : await urlToFile(
-              coverUrlInEdit,
-              `coverImage.${coverUrlInEditAnimatedExtension}`,
-              coverUrlInEditAnimatedMimeType
-            );
-
-        // API request would be here
-        const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
-          filename: croppedCoverImage.name,
-        });
-
-        const res = await getImageUploadUrl(imageUrlPayload);
-
-        if (!res?.data || res.error) {
-          throw new Error(res?.error?.message ?? 'An error occurred');
-        }
-
-        const uploadResponse = await fetch(res.data.uploadUrl, {
-          method: 'PUT',
-          body: croppedCoverImage,
-          headers: {
-            'Content-Type': 'image/png',
-          },
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Upload failed');
-        }
-
-        newCoverImgURL = res.data.publicUrl;
-      }
-
       const payload = new newnewapi.UpdateMeRequest({
         nickname: dataInEdit.nickname,
         bio: dataInEdit.bio.trim(),
@@ -569,7 +573,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           ? { username: dataInEdit.username }
           : {}),
         // Update cover image, if it was updated
-        ...(newCoverImgURL ? { coverUrl: newCoverImgURL } : {}),
+        ...(coverUrlInEdit && coverUrlInEdit !== userData?.coverUrl
+          ? { coverUrl: coverUrlInEdit }
+          : {}),
         // Delete cover image, if it was deleted and no new image provided
         ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
         ...(dataInEdit.genderPronouns
@@ -626,10 +632,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     userData?.username,
     userData?.options,
     avatarUrlInEdit,
-    coverUrlInEditAnimated,
-    croppedAreaCoverImage,
-    coverUrlInEditAnimatedExtension,
-    coverUrlInEditAnimatedMimeType,
     showErrorToastPredefined,
     showErrorToastCustom,
     t,
@@ -637,19 +639,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     updateUserData,
     handleClose,
   ]);
-
-  // Profile image editing
-  const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
-  const [cropProfileImage, setCropProfileImage] = useState<Point>({
-    x: 0,
-    y: 0,
-  });
-  const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
-    useState<Area>();
-  const [zoomProfileImage, setZoomProfileImage] = useState(1);
-  const [minZoomProfileImage, setMinZoomProfileImage] = useState(1);
-  const [updateProfileImageLoading, setUpdateProfileImageLoading] =
-    useState(false);
 
   // Profile picture
   const handleSetProfilePictureInEdit = (
@@ -699,9 +688,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const handleSetStageToEditingGeneralUnsetPicture = () => {
     setUpdateProfileImageLoading(false);
     handleSetStageToEditingGeneral();
+
     setAvatarUrlInEdit('');
     setZoomProfileImage(1);
     setMinZoomProfileImage(1);
+
+    setCoverUrlInEdit('');
+    setZoomCoverImage(1);
+    setMinZoomCoverImage(1);
   };
 
   const handleZoomOutProfileImage = () => {
@@ -900,7 +894,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       onClick={(e) => e.stopPropagation()}
     >
       <AnimatePresence>
-        {stage === 'edit-general' ? (
+        {stage === 'edit-general' && (
           <SEditProfileGeneral
             key='edit-general'
             initial={{ opacity: 0 }}
@@ -924,19 +918,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             )}
             <ProfileGeneralContent>
               <SImageInputsWrapper>
-                <ProfileBackgroundInput
-                  originalPictureUrl={userData?.coverUrl ?? ''}
+                <ProfileCoverImage
                   pictureInEditUrl={coverUrlInEdit ?? ''}
-                  coverUrlInEditAnimated={coverUrlInEditAnimated}
-                  crop={cropCoverImage}
-                  zoom={zoomCoverImage}
-                  initialObjectFit={coverImageInitialObjectFit}
                   disabled={isLoading}
-                  handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
+                  handleSetPictureInEdit={handleSetProfileCoverImageInEdit}
                   handleUnsetPictureInEdit={handleUnsetPictureInEdit}
-                  onCropChange={handleCoverImageCropChange}
-                  onCropComplete={onCropCompleteCoverImage}
-                  onZoomChange={setZoomCoverImage}
                 />
                 <ProfileImageInput
                   publicUrl={avatarUrlInEdit || userData?.avatarUrl!!}
@@ -1067,8 +1053,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     ((!userData?.bio && dataInEdit.bio === '') ||
                       dataInEdit.bio === userData?.bio)) ||
                   !isDataValid ||
-                  isLoading ||
-                  !coverUrlInEdit
+                  isLoading
                 }
                 style={{
                   width: isMobile ? '100%' : 'initial',
@@ -1092,8 +1077,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               </Button>
             </SControlsWrapper>
           </SEditProfileGeneral>
-        ) : (
-          <SEditProfilePicture
+        )}
+
+        {stage === 'edit-profile-picture' && (
+          <SEditPicture
             key='edit-picture'
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
@@ -1118,7 +1105,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <ProfilePictureContent>
+            <PictureContent>
               <ProfileImageCropper
                 crop={cropProfileImage}
                 zoom={zoomProfileImage}
@@ -1131,7 +1118,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 onCropComplete={onCropCompleteProfileImage}
                 onZoomChange={setZoomProfileImage}
               />
-            </ProfilePictureContent>
+            </PictureContent>
             <SSliderWrapper>
               <Button
                 iconOnly
@@ -1150,7 +1137,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   height='24px'
                 />
               </Button>
-              <ProfileImageZoomSlider
+              <ImageZoomSlider
                 value={zoomProfileImage}
                 min={minZoomProfileImage}
                 max={minZoomProfileImage + 2}
@@ -1209,7 +1196,126 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 {t('editProfileMenu.button.save')}
               </Button>
             </SControlsWrapperPicture>
-          </SEditProfilePicture>
+          </SEditPicture>
+        )}
+
+        {stage === 'edit-profile-cover' && (
+          <SEditPicture
+            key='edit-profile-cover'
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
+            exit={{ x: 300, opacity: 0, transition: { duration: 0 } }}
+          >
+            {isMobile ? (
+              <SGoBackButtonMobile
+                onClick={handleSetStageToEditingGeneralUnsetPicture}
+              >
+                {t('editProfileMenu.button.backToCover')}
+              </SGoBackButtonMobile>
+            ) : (
+              <SGoBackButtonDesktop
+                onClick={handleSetStageToEditingGeneralUnsetPicture}
+              >
+                <div> {t('editProfileMenu.button.backToCover')}</div>
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </SGoBackButtonDesktop>
+            )}
+            <PictureContent>
+              <ProfileCoverImageCropper
+                crop={cropCoverImage}
+                zoom={zoomCoverImage}
+                minZoom={minZoomCoverImage}
+                maxZoom={minZoomCoverImage + 2}
+                profileCoverUrlInEdit={coverUrlInEdit}
+                originalImageWidth={originalCoverImageWidth}
+                disabled={updateCoverImageLoading}
+                onCropChange={setCropCoverImage}
+                onCropComplete={onCropCompleteCoverImage}
+                onZoomChange={setZoomCoverImage}
+              />
+            </PictureContent>
+            <SSliderWrapper>
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomCoverImage <= minZoomCoverImage || updateCoverImageLoading
+                }
+                onClick={handleZoomOutCoverImage}
+              >
+                <InlineSvg
+                  svg={ZoomOutIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+              <ImageZoomSlider
+                value={zoomCoverImage}
+                min={minZoomCoverImage}
+                max={minZoomCoverImage + 2}
+                step={0.1}
+                ariaLabel='Zoom'
+                disabled={updateCoverImageLoading}
+                onChange={(e) =>
+                  setZoomCoverImage(
+                    Math.max(Number(e.target.value), minZoomCoverImage)
+                  )
+                }
+              />
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={
+                  zoomCoverImage >= minZoomCoverImage + 2 ||
+                  updateCoverImageLoading
+                }
+                onClick={handleZoomInCoverImage}
+              >
+                <InlineSvg
+                  svg={ZoomInIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+            </SSliderWrapper>
+            <SControlsWrapperPicture>
+              <Button
+                view='secondary'
+                disabled={updateCoverImageLoading}
+                onClick={handleSetStageToEditingGeneralUnsetPicture}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Cancel Cover Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
+              >
+                {t('editProfileMenu.button.cancel')}
+              </Button>
+              <Button
+                withShadow
+                disabled={updateCoverImageLoading}
+                onClick={completeCoverImageCropAndSave}
+                onClickCapture={() => {
+                  Mixpanel.track('Click Save Cover Image Button', {
+                    _stage: 'MyProfile',
+                    _component: 'EditProfileMenu',
+                  });
+                }}
+              >
+                {t('editProfileMenu.button.save')}
+              </Button>
+            </SControlsWrapperPicture>
+          </SEditPicture>
         )}
       </AnimatePresence>
     </SEditProfileMenu>
@@ -1337,7 +1443,7 @@ const STextInputsWrapper = styled.div`
   }
 `;
 
-const ProfilePictureContent = styled.div`
+const PictureContent = styled.div`
   overflow-y: auto;
   padding: 0 20px;
   height: 100%;
@@ -1387,7 +1493,7 @@ const SControlsWrapper = styled.div`
   }
 `;
 
-const SEditProfilePicture = styled(motion.div)`
+const SEditPicture = styled(motion.div)`
   display: flex;
   flex-direction: column;
 
