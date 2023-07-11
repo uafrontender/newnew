@@ -7,6 +7,7 @@ import jwtDecode from 'jwt-decode';
 import { v4 as uuidv4 } from 'uuid';
 
 import isBrowser from '../utils/isBrowser';
+import sleep from '../utils/sleep';
 
 const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
 
@@ -314,6 +315,26 @@ export const refreshCredentials = (
     payload,
   });
 
+// Store refreshing credential Promise in a variable global to this file
+let refreshTokensPromise: Promise<
+  APIResponse<newnewapi.RefreshCredentialResponse>
+> | null = null;
+
+const refreshTokens = async (payload: newnewapi.RefreshCredentialRequest) => {
+  // If there is no running request, evoke it and return Promise
+  if (refreshTokensPromise === null) {
+    refreshTokensPromise = refreshCredentials(payload).then(
+      (refreshCredentialsResponse) => {
+        // Set running Promise to `null`, return response
+        refreshTokensPromise = null;
+        return refreshCredentialsResponse;
+      }
+    );
+  }
+  // If there is a running request, return the pending Promise
+  return refreshTokensPromise;
+};
+
 export type TTokenCookie = {
   name: string;
   value: string;
@@ -331,6 +352,7 @@ interface IFetchProtobuf<
   method?: Request['method'];
   payload?: RequestType;
   signal?: RequestInit['signal'];
+  maxAttempts?: number;
   serverSideTokens?: {
     accessToken: string;
     refreshToken: string;
@@ -364,6 +386,7 @@ export async function fetchProtobuf<
   method,
   payload,
   signal,
+  maxAttempts,
   serverSideTokens,
   updateCookieServerSideCallback,
 }: IFetchProtobuf<RequestType, ResponseType>): Promise<
@@ -371,6 +394,8 @@ export async function fetchProtobuf<
 > {
   // Declare response
   let res: APIResponse<ResponseType>;
+  //
+  let currentAttempts = 1;
   // Try to get tokens - from react-cookie instance or from passed params
   const accessToken =
     serverSideTokens?.accessToken || cookiesInstance.get('accessToken');
@@ -378,15 +403,6 @@ export async function fetchProtobuf<
     serverSideTokens?.refreshToken || cookiesInstance.get('refreshToken');
 
   try {
-    // No need as tokens will be sent with any request if present
-    // if (!accessToken && !refreshToken) {
-    //   throw new Error('No token');
-    // }
-    // if (!accessToken && refreshToken) {
-    //   throw new Error('Access token invalid');
-    // }
-
-    // Try to make request if access and refresh tokens are present
     res = await _fetchProtobuf<RequestType, ResponseType>({
       reqT,
       resT,
@@ -412,6 +428,31 @@ export async function fetchProtobuf<
       throw new Error(res?.error?.message);
     }
 
+    if (res.error) {
+      if (maxAttempts) {
+        while (currentAttempts < maxAttempts) {
+          // eslint-disable-next-line no-await-in-loop
+          await sleep(500);
+          currentAttempts += 1;
+          // eslint-disable-next-line no-await-in-loop
+          res = await _fetchProtobuf<RequestType, ResponseType>({
+            reqT,
+            resT,
+            url,
+            method,
+            payload,
+            ...(accessToken
+              ? {
+                  headers: {
+                    'x-auth-token': accessToken,
+                  },
+                }
+              : {}),
+          });
+        }
+      }
+    }
+
     return res;
   } catch (errFirstAttempt) {
     // Invalid access token, refresh and try again
@@ -420,8 +461,10 @@ export async function fetchProtobuf<
         const refreshPayload = new newnewapi.RefreshCredentialRequest({
           refreshToken,
         });
-        // TODO: Call once, block if already called by other request failing
-        const resRefresh = await refreshCredentials(refreshPayload);
+        // Once launched, `refreshTokens` will return the same result
+        // for the functions that called it simultaneously, i.e.
+        // they are going to wait for the same Promise to be resolved
+        const resRefresh = await refreshTokens(refreshPayload);
 
         // Refresh failed, session "expired"
         // (i.e. user probably logged in from another device, or exceeded
