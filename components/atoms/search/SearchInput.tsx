@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
@@ -70,15 +70,32 @@ const SearchInput: React.FC = React.memo(() => {
   const pushRouteOrClose = useCallback(
     (path: string) => {
       if (router.asPath === path) {
+        // Clear search right away
         setSearchValue('');
         setIsResultsDropVisible(false);
         setGlobalSearchActive(false);
       } else {
+        // Search clears later, when page changes
         router.push(path);
       }
     },
     [router, setGlobalSearchActive]
   );
+
+  // Clear search on page changed
+  useEffect(() => {
+    const clearSearch = () => {
+      setSearchValue('');
+      setIsResultsDropVisible(false);
+      setGlobalSearchActive(false);
+    };
+
+    Router.events.on('routeChangeComplete', clearSearch);
+
+    return () => {
+      Router.events.off('routeChangeComplete', clearSearch);
+    };
+  }, [setGlobalSearchActive]);
 
   const handleSeeResults = (query: string) => {
     Mixpanel.track('Search All Results Clicked', {
