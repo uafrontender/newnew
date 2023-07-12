@@ -119,6 +119,7 @@
     "button": {
       "backToProfile": "Edit profile",
       "backToImage": "Edit Profile Image",
+      "backToCover": "Change Cover Image",
       "save": "Save changes",
       "cancel": "Cancel"
     },

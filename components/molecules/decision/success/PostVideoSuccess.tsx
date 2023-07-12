@@ -66,31 +66,40 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   // Show controls on shorter screens
   const [uiOffset, setUiOffset] = useState<number | undefined>(undefined);
 
-  useEffect(() => {
-    async function markResponseAsViewed() {
-      try {
-        const payload = new newnewapi.MarkPostRequest({
-          postUuid,
-          markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
-        });
+  useEffect(
+    () => {
+      async function markResponseAsViewed() {
+        try {
+          const payload = new newnewapi.MarkPostRequest({
+            postUuid,
+            markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
+          });
 
-        const res = await markPost(payload);
+          const res = await markPost(payload);
 
-        if (!res.error) {
-          handleSetResponseViewed(true);
+          if (!res.error) {
+            handleSetResponseViewed(true);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
-    }
 
-    if (openedTab === 'response' && userLoggedIn && !responseViewed) {
-      markResponseAsViewed();
-    } else if (openedTab === 'response' && !userLoggedIn && !responseViewed) {
-      handleSetResponseViewed(true);
-    }
+      if (openedTab === 'response' && userLoggedIn && !responseViewed) {
+        markResponseAsViewed();
+      } else if (openedTab === 'response' && !userLoggedIn && !responseViewed) {
+        handleSetResponseViewed(true);
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postUuid, userLoggedIn, responseViewed]);
+    [
+      openedTab,
+      postUuid,
+      userLoggedIn,
+      responseViewed,
+      // handleSetResponseViewed, - reason unknown
+    ]
+  );
 
   // Adjust sound button if needed
   useEffect(() => {

@@ -2,14 +2,13 @@ import { newnewapi } from 'newnew-api';
 
 function canBecomeCreator(
   dateOfBirth: newnewapi.IDateComponents | null | undefined,
-  minCreatorAgeYears: number | undefined
+  minCreatorAgeYears: number | undefined = 18
 ) {
   if (
     !dateOfBirth ||
     !dateOfBirth.year ||
     !dateOfBirth.month ||
-    !dateOfBirth.day ||
-    !minCreatorAgeYears
+    !dateOfBirth.day
   ) {
     return true;
   }

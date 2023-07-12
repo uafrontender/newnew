@@ -78,37 +78,55 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
   );
 
   // Close on back btn
-  useEffect(() => {
-    const verifyOptionHistoryOpen = () => {
-      if (!isBrowser()) return;
+  useEffect(
+    () => {
+      const verifyOptionHistoryOpen = () => {
+        if (!isBrowser()) return;
 
-      const optionId = new URL(window.location.href).searchParams.get(
-        'suggestion'
-      );
+        const optionId = new URL(window.location.href).searchParams.get(
+          'suggestion'
+        );
 
-      if (!optionId) {
-        handleCloseOptionBidHistory();
+        if (!optionId) {
+          handleCloseOptionBidHistory();
+        }
+      };
+
+      window.addEventListener('popstate', verifyOptionHistoryOpen);
+
+      return () =>
+        window.removeEventListener('popstate', verifyOptionHistoryOpen);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      // handleCloseOptionBidHistory, reason unknown
+    ]
+  );
+
+  useEffect(
+    () => {
+      fetchBids();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      // fetchBids, - reason unknown
+    ]
+  );
+
+  useEffect(
+    () => {
+      if (inView && !bidsLoading && bidsNextPageToken) {
+        fetchBids(bidsNextPageToken);
       }
-    };
-
-    window.addEventListener('popstate', verifyOptionHistoryOpen);
-
-    return () =>
-      window.removeEventListener('popstate', verifyOptionHistoryOpen);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchBids();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (inView && !bidsLoading && bidsNextPageToken) {
-      fetchBids(bidsNextPageToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, bidsNextPageToken, bidsLoading]);
+    [
+      inView,
+      bidsNextPageToken,
+      bidsLoading,
+      // fetchBids, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     const socketHandler = (data: any) => {

@@ -598,7 +598,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [videoProcessing, fileProcessing]
+    [
+      videoProcessing,
+      fileProcessing,
+      showErrorToastPredefined,
+      // setCreationFileProcessingETA, - reason unknown
+      // setCreationFileProcessingLoading, - reason unknown
+      // setCreationFileProcessingProgress, - reason unknown
+      // setCreationFileUploadError, - reason unknown
+    ]
   );
 
   useEffect(() => {
@@ -614,12 +622,18 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   }, [socketConnection, handlerSocketUpdated]);
 
   // Redirect if post state is empty
-  useEffect(() => {
-    if (!post.title) {
-      router.push('/profile/my-posts');
-    }
+  useEffect(
+    () => {
+      if (!post.title) {
+        router.push('/profile/my-posts');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // post.title, - reason unknown
+      // router, - probably can be replaced with Router
+    ]
+  );
 
   // Clear creation on popstate after modal was shown
   useEffect(() => {

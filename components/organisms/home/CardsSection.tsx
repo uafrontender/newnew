@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -75,7 +75,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
-    const router = useRouter();
     const ref: any = useRef();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -127,9 +126,9 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       return SCROLL_STEP.desktop;
     }, [resizeMode]);
 
-    const handleUserClick = (username: string) => {
-      router.push(`/${username}`);
-    };
+    const handleUserClick = useCallback((username: string) => {
+      Router.push(`/${username}`);
+    }, []);
     const handleLeftClick = () => {
       scrollListTo(visibleListItem - scrollStep);
     };
@@ -349,20 +348,19 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       );
     };
 
-    const handleSeeMoreClick = () => {
+    const handleSeeMoreClick = useCallback(() => {
       Mixpanel.track('See More in Category Clicked');
       if (type === 'default' && seeMoreLink) {
-        router.push(seeMoreLink);
+        Router.push(seeMoreLink);
       }
-    };
+    }, [type, seeMoreLink]);
 
     // Try to pre-fetch the content
     useEffect(() => {
       if (seeMoreLink) {
-        router.prefetch(seeMoreLink);
+        Router.prefetch(seeMoreLink);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [seeMoreLink]);
 
     useEffect(() => {
       function onScroll() {
