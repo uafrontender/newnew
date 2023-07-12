@@ -112,6 +112,7 @@ const SWrapper = styled.a<{
   height: 40px;
   cursor: pointer;
   display: flex;
+  flex-shrink: 0;
   position: relative;
   align-items: center;
   justify-content: flex-end;

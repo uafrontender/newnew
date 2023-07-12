@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
@@ -45,6 +45,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 const LoadingModal = dynamic(() => import('../LoadingModal'));
 const CheckboxWithALink = dynamic(() => import('./CheckboxWithALink'));
@@ -146,8 +147,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
-  const onlySpacesRegex = /^\s+$/;
-
   // Firstname
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
   const [firstNameError, setFirstnameError] = useState('');
@@ -162,7 +161,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setFirstnameError('');
     }
 
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setFirstnameInEdit('');
     } else {
       setFirstnameInEdit(e.target.value);
@@ -182,7 +181,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setLastnameError('');
     }
 
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setLastnameInEdit('');
     } else {
       setLastnameInEdit(e.target.value);
@@ -205,7 +204,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const [nicknameError, setNicknameError] = useState('');
   const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setNicknameInEdit('');
     } else {
       setNicknameInEdit(e.target.value);
@@ -462,218 +461,207 @@ const OnboardingSectionDetails: React.FunctionComponent<
     }
   };
 
-  const handleSaveChangesAndGoToDashboard = useCallback(
-    async () => {
-      if (isAPIValidateLoading) {
-        return;
-      }
-      let newAvatarUrl;
-      try {
-        Mixpanel.track('Submit Onboarding Details', {
-          _stage: 'Onboarding',
-          _component: 'OnboardingSectionDetails',
+  const handleSaveChangesAndGoToDashboard = useCallback(async () => {
+    if (isAPIValidateLoading) {
+      return;
+    }
+    let newAvatarUrl;
+    try {
+      Mixpanel.track('Submit Onboarding Details', {
+        _stage: 'Onboarding',
+        _component: 'OnboardingSectionDetails',
+      });
+
+      setLoadingModalOpen(true);
+
+      if (fieldsToBeUpdated.image) {
+        const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+          filename: imageToSave?.name,
         });
 
-        setLoadingModalOpen(true);
+        const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
 
-        if (fieldsToBeUpdated.image) {
-          const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
-            filename: imageToSave?.name,
-          });
-
-          const imgUploadRes = await getImageUploadUrl(imageUrlPayload);
-
-          if (!imgUploadRes?.data || imgUploadRes.error) {
-            throw new Error(imgUploadRes?.error?.message ?? 'Upload error');
-          }
-
-          const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
-            method: 'PUT',
-            body: imageToSave,
-            headers: {
-              'Content-Type': 'image/png',
-            },
-          });
-
-          if (!uploadResponse.ok) {
-            throw new Error('Upload failed');
-          }
-
-          newAvatarUrl = imgUploadRes.data.publicUrl;
+        if (!imgUploadRes?.data || imgUploadRes.error) {
+          throw new Error(imgUploadRes?.error?.message ?? 'Upload error');
         }
 
-        const updateMePayload = new newnewapi.UpdateMeRequest({
-          countryCode: selectedCountry,
-          isForOnboarding: true,
-          ...(fieldsToBeUpdated.firstName
-            ? {
-                firstName: firstNameInEdit.trim(),
-              }
-            : {}),
-          ...(fieldsToBeUpdated.lastName
-            ? {
-                lastName: lastNameInEdit.trim(),
-              }
-            : {}),
-          ...(fieldsToBeUpdated.username
-            ? {
-                username: usernameInEdit.trim(),
-              }
-            : {}),
-          ...(fieldsToBeUpdated.nickname
-            ? {
-                nickname: nicknameInEdit.trim(),
-              }
-            : {}),
-          ...(fieldsToBeUpdated.dateOfBirth &&
-          !isEqual(userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
-            ? {
-                dateOfBirth: dateInEdit,
-              }
-            : {}),
-          ...(newAvatarUrl
-            ? {
-                avatarUrl: newAvatarUrl,
-              }
-            : {}),
+        const uploadResponse = await fetch(imgUploadRes.data.uploadUrl, {
+          method: 'PUT',
+          body: imageToSave,
+          headers: {
+            'Content-Type': 'image/png',
+          },
         });
 
-        const updateMeRes = await updateMe(updateMePayload);
-        if (!updateMeRes?.data || updateMeRes.error) {
-          throw new Error(updateMeRes?.error?.message || 'Request failed');
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        newAvatarUrl = imgUploadRes.data.publicUrl;
+      }
+
+      const updateMePayload = new newnewapi.UpdateMeRequest({
+        countryCode: selectedCountry,
+        isForOnboarding: true,
+        ...(fieldsToBeUpdated.firstName
+          ? {
+              firstName: firstNameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.lastName
+          ? {
+              lastName: lastNameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.username
+          ? {
+              username: usernameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.nickname
+          ? {
+              nickname: nicknameInEdit.trim(),
+            }
+          : {}),
+        ...(fieldsToBeUpdated.dateOfBirth &&
+        !isEqual(userData?.dateOfBirth, fieldsToBeUpdated.dateOfBirth)
+          ? {
+              dateOfBirth: dateInEdit,
+            }
+          : {}),
+        ...(newAvatarUrl
+          ? {
+              avatarUrl: newAvatarUrl,
+            }
+          : {}),
+      });
+
+      const updateMeRes = await updateMe(updateMePayload);
+      if (!updateMeRes?.data || updateMeRes.error) {
+        throw new Error(updateMeRes?.error?.message || 'Request failed');
+      }
+
+      updateUserData({
+        username: updateMeRes.data.me?.username ?? undefined,
+        nickname: updateMeRes.data.me?.nickname ?? undefined,
+        avatarUrl: updateMeRes.data.me?.avatarUrl ?? undefined,
+        countryCode: updateMeRes.data.me?.countryCode ?? undefined,
+        dateOfBirth: updateMeRes.data.me?.dateOfBirth ?? undefined,
+      });
+
+      if (fieldsToBeUpdated.email) {
+        const sendVerificationCodePayload =
+          new newnewapi.SendVerificationEmailRequest({
+            emailAddress: emailInEdit,
+            useCase:
+              newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+          });
+
+        const res = await sendVerificationNewEmail(sendVerificationCodePayload);
+
+        if (
+          !res?.data ||
+          res.error ||
+          (res.data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+            res.data.status !==
+              newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+        ) {
+          throw new Error('Email taken');
+        }
+
+        const newEmailValue = encodeURIComponent(emailInEdit);
+        Router.push(
+          `/verify-new-email?email=${newEmailValue}&retryAfter=${res.data.retryAfter}&redirect=dashboard`
+        );
+      } else {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+        if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
+          throw new Error('Become creator failed');
         }
 
         updateUserData({
-          username: updateMeRes.data.me?.username ?? undefined,
-          nickname: updateMeRes.data.me?.nickname ?? undefined,
-          avatarUrl: updateMeRes.data.me?.avatarUrl ?? undefined,
-          countryCode: updateMeRes.data.me?.countryCode ?? undefined,
-          dateOfBirth: updateMeRes.data.me?.dateOfBirth ?? undefined,
+          options: {
+            isActivityPrivate:
+              becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+          },
         });
 
-        if (fieldsToBeUpdated.email) {
-          const sendVerificationCodePayload =
-            new newnewapi.SendVerificationEmailRequest({
-              emailAddress: emailInEdit,
-              useCase:
-                newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
-            });
-
-          const res = await sendVerificationNewEmail(
-            sendVerificationCodePayload
-          );
-
-          if (
-            !res?.data ||
-            res.error ||
-            (res.data.status !==
-              newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-              res.data.status !==
-                newnewapi.SendVerificationEmailResponse.Status
-                  .SHOULD_RETRY_AFTER)
-          ) {
-            throw new Error('Email taken');
-          }
-
-          const newEmailValue = encodeURIComponent(emailInEdit);
-          router.push(
-            `/verify-new-email?email=${newEmailValue}&retryAfter=${res.data.retryAfter}&redirect=dashboard`
-          );
-        } else {
-          const becomeCreatorPayload = new newnewapi.EmptyRequest({});
-
-          const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
-
-          if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
-            throw new Error('Become creator failed');
-          }
-
-          updateUserData({
-            options: {
-              isActivityPrivate:
-                becomeCreatorRes.data.me?.options?.isActivityPrivate,
-              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-            },
-          });
-
-          if (becomeCreatorRes.data.me?.options?.isCreator) {
-            handleBecameCreator();
-          }
-
-          const acceptTermsPayload = new newnewapi.EmptyRequest({});
-
-          const res = await acceptCreatorTerms(acceptTermsPayload);
-
-          if (res.error) {
-            throw new Error(res.error?.message || 'Request failed');
-          }
-
-          setCreatorDataLoaded(true);
-          router.push('/creator/dashboard?askPushNotificationPermission=true');
-        }
-      } catch (err) {
-        console.error(err);
-        setLoadingModalOpen(false);
-
-        if (
-          (err as Error).message &&
-          (err as Error).message === 'Email taken'
-        ) {
-          setEmailError('emailTaken');
-        } else if (
-          (err as Error).message &&
-          (err as Error).message.includes('Uploaded image')
-        ) {
-          showErrorToastCustom(
-            t('detailsSection.form.profilePicture.errors.inappropriate')
-          );
-        } else if (
-          ((err as Error).message &&
-            (err as Error).message === 'Age is under allowed age') ||
-          ((err as Error).message &&
-            (err as Error).message?.toLowerCase().includes('age'))
-        ) {
-          setDateError('tooYoung');
-        } else {
-          showErrorToastPredefined(undefined);
+        if (becomeCreatorRes.data.me?.options?.isCreator) {
+          handleBecameCreator();
         }
 
-        if ((err as Error).message === 'No token') {
-          logoutAndRedirect();
+        const acceptTermsPayload = new newnewapi.EmptyRequest({});
+
+        const res = await acceptCreatorTerms(acceptTermsPayload);
+
+        if (res.error) {
+          throw new Error(res.error?.message || 'Request failed');
         }
-        // Refresh token was present, session probably expired
-        // Redirect to sign up page
-        if ((err as Error).message === 'Refresh token invalid') {
-          logoutAndRedirect('/sign-up?reason=session_expired');
-        }
+
+        setCreatorDataLoaded(true);
+        Router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      fieldsToBeUpdated,
-      dateInEdit,
-      selectedCountry,
-      firstNameInEdit,
-      lastNameInEdit,
-      nicknameInEdit,
-      usernameInEdit,
-      emailInEdit,
-      userData,
-      imageToSave,
-      isAPIValidateLoading,
-      // router, - causes additional re-renders
-      setLoadingModalOpen,
-      handleBecameCreator,
-      updateUserData,
-      setCreatorDataLoaded,
-      logoutAndRedirect,
-      showErrorToastCustom,
-      showErrorToastPredefined,
-      // t, reason unknown, can cause issues
-    ]
-  );
+    } catch (err) {
+      console.error(err);
+      setLoadingModalOpen(false);
+
+      if ((err as Error).message && (err as Error).message === 'Email taken') {
+        setEmailError('emailTaken');
+      } else if (
+        (err as Error).message &&
+        (err as Error).message.includes('Uploaded image')
+      ) {
+        showErrorToastCustom(
+          t('detailsSection.form.profilePicture.errors.inappropriate')
+        );
+      } else if (
+        ((err as Error).message &&
+          (err as Error).message === 'Age is under allowed age') ||
+        ((err as Error).message &&
+          (err as Error).message?.toLowerCase().includes('age'))
+      ) {
+        setDateError('tooYoung');
+      } else {
+        showErrorToastPredefined(undefined);
+      }
+
+      if ((err as Error).message === 'No token') {
+        logoutAndRedirect();
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        logoutAndRedirect('/sign-up?reason=session_expired');
+      }
+    }
+  }, [
+    fieldsToBeUpdated,
+    dateInEdit,
+    selectedCountry,
+    firstNameInEdit,
+    lastNameInEdit,
+    nicknameInEdit,
+    usernameInEdit,
+    emailInEdit,
+    userData,
+    imageToSave,
+    isAPIValidateLoading,
+    setLoadingModalOpen,
+    handleBecameCreator,
+    updateUserData,
+    setCreatorDataLoaded,
+    logoutAndRedirect,
+    showErrorToastCustom,
+    showErrorToastPredefined,
+    t,
+  ]);
 
   // Update image to be saved
   useEffect(() => {

@@ -50,7 +50,6 @@ const getStripeButtonTextKey = (
 const OnboardingSectionStripe: React.FunctionComponent = () => {
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
-  // const dispatch = useAppDispatch();
   const { creatorData } = useUserData();
   const { t } = useTranslation('page-CreatorOnboarding');
   const { resizeMode } = useAppState();

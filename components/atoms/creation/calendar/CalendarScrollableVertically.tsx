@@ -77,7 +77,7 @@ export const RenderCalendarYear = (props: any) => {
     );
     now = now.add(1, 'M');
   }
-  return <SContent>{elements}</SContent>;
+  return <SContent data-body-scroll-lock-ignore>{elements}</SContent>;
 };
 
 const SContent = styled.div`

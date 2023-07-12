@@ -820,6 +820,6 @@
     "cfFinished": "El Goal ya ha concluido",
     "cfNotStarted": "El Goal no ha comenzado todavía",
     "requestFailed": "La solicitud ha fallado",
-    "inappropriate_NEED_TRANSLATION": "Inappropriate content is not allowed on NewNew"
+    "inappropriate": "No se permite contenido inapropiado en NewNew"
   }
 }
