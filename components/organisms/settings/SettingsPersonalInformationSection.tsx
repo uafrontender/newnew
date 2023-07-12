@@ -128,7 +128,11 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     };
 
     useEffect(() => {
-      if (dateInEdit?.getTime() !== currentDate?.getTime()) {
+      setDateInEdit(currentDate);
+    }, [currentDate]);
+
+    useEffect(() => {
+      if (dateInEdit && dateInEdit?.getTime() !== currentDate?.getTime()) {
         setWasDateModified(true);
       } else {
         setWasDateModified(false);
