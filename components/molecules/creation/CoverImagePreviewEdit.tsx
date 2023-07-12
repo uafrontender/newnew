@@ -143,7 +143,7 @@ const CoverImagePreviewEdit: React.FunctionComponent<
 
   return (
     <Modal show={open} onClose={handleClose}>
-      <SContainer onClick={preventCLick}>
+      <SContainer onClick={preventCLick} data-body-scroll-lock-ignore>
         <SModalTopContent>
           <SModalTopLine>
             {isMobile && (

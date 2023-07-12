@@ -206,6 +206,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
           ref={(el) => {
             daysScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {availableDays.map((d, i) => (
             <SScrollerItem
@@ -229,6 +230,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
           ref={(el) => {
             monthsScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {months.map((m, i) => (
             <SScrollerItem
@@ -252,6 +254,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
           ref={(el) => {
             yearsScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {years.map((y, i) => (
             <SScrollerItem
