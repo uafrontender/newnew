@@ -394,12 +394,18 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleSetReadyToUploadAdditionalResponse,
   ]);
 
-  useEffect(() => {
-    if (responses?.length && responses?.length < 2) {
-      handleUnsetEditingStories();
-    }
+  useEffect(
+    () => {
+      if (responses?.length && responses?.length < 2) {
+        handleUnsetEditingStories();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [responses]);
+    [
+      responses,
+      // handleUnsetEditingStories, - reason unknown
+    ]
+  );
 
   return (
     <SContainer>
