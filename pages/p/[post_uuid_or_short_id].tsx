@@ -14,7 +14,7 @@ import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 // import { useInView } from 'react-intersection-observer';
 import { validate as validateUuid } from 'uuid';
@@ -690,9 +690,8 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch('/sign-up');
-    router.prefetch('/creation');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Router.prefetch('/sign-up');
+    Router.prefetch('/creation');
   }, []);
 
   const description = useMemo(() => {

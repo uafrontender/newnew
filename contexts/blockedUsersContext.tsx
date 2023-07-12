@@ -128,7 +128,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         socketHandlerUserBlockStatusChanged
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   const contextValue = useMemo(

@@ -680,7 +680,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.mc'
-          components={[<DisplayName user={postCreator} />]}
+          components={[<SDisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
       {/* Mobile floating button */}
@@ -959,4 +959,8 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const SDisplayName = styled(DisplayName)`
+  max-width: 100%;
 `;

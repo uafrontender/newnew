@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -37,7 +36,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const router = useRouter();
 
   const [isCopiedUrlIndex, setIsCopiedUrlIndex] = useState<number | null>(null);
   const linkCopiedTimerRef = useRef<NodeJS.Timeout | undefined>();
@@ -225,15 +223,15 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         </SListItemWrapper>
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [
-      t,
-      isMobile,
+      isTablet,
       isDesktop,
       expirationPosts.length,
       theme.colorsThemed.text.primary,
-      router,
       isCopiedUrlIndex,
+      copyPostUrlToClipboard,
+      t,
     ]
   );
 

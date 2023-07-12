@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { useUserData } from '../../contexts/userDataContext';
@@ -58,7 +58,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
   children,
 }) => {
-  const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
@@ -163,7 +162,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const handleClickReport = useCallback(() => {
     if (!userLoggedIn) {
-      router.push(
+      Router.push(
         `/sign-up?reason=report&redirect=${encodeURIComponent(
           window.location.href
         )}`
@@ -172,7 +171,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
 
     setConfirmReportUser(true);
-  }, [userLoggedIn, router]);
+  }, [userLoggedIn]);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
@@ -185,13 +184,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
   // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch('/sign-up?reason=follow-creator');
-    router.prefetch(`/${user.username}/subscribe`);
-    router.prefetch(`/${user.username}/activity`);
-    router.prefetch(`/${user.username}`);
+  useEffect(
+    () => {
+      Router.prefetch('/sign-up?reason=follow-creator');
+      Router.prefetch(`/${user.username}/subscribe`);
+      Router.prefetch(`/${user.username}/activity`);
+      Router.prefetch(`/${user.username}`);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // user.username - only initial value needed, rework
+    ]
+  );
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
@@ -199,9 +203,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       userLoggedIn &&
       userData?.userUuid?.toString() === user.uuid.toString()
     ) {
-      router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
+      Router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
     }
-  }, [userLoggedIn, userIsCreator, userData?.userUuid, router, user.uuid]);
+  }, [userLoggedIn, userIsCreator, userData?.userUuid, user.uuid]);
 
   const moreButtonRef = useRef() as any;
 

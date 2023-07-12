@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
@@ -45,6 +45,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 const LoadingModal = dynamic(() => import('../LoadingModal'));
 const CheckboxWithALink = dynamic(() => import('./CheckboxWithALink'));
@@ -146,8 +147,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
-  const onlySpacesRegex = /^\s+$/;
-
   // Firstname
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
   const [firstNameError, setFirstnameError] = useState('');
@@ -162,7 +161,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setFirstnameError('');
     }
 
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setFirstnameInEdit('');
     } else {
       setFirstnameInEdit(e.target.value);
@@ -182,7 +181,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setLastnameError('');
     }
 
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setLastnameInEdit('');
     } else {
       setLastnameInEdit(e.target.value);
@@ -205,7 +204,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const [nicknameError, setNicknameError] = useState('');
   const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setNicknameInEdit('');
     } else {
       setNicknameInEdit(e.target.value);
@@ -463,7 +462,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
   };
 
   const handleSaveChangesAndGoToDashboard = useCallback(async () => {
-    if (isAPIValidateLoading) return;
+    if (isAPIValidateLoading) {
+      return;
+    }
     let newAvatarUrl;
     try {
       Mixpanel.track('Submit Onboarding Details', {
@@ -492,7 +493,9 @@ const OnboardingSectionDetails: React.FunctionComponent<
           },
         });
 
-        if (!uploadResponse.ok) throw new Error('Upload failed');
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
 
         newAvatarUrl = imgUploadRes.data.publicUrl;
       }
@@ -568,7 +571,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         }
 
         const newEmailValue = encodeURIComponent(emailInEdit);
-        router.push(
+        Router.push(
           `/verify-new-email?email=${newEmailValue}&retryAfter=${res.data.retryAfter}&redirect=dashboard`
         );
       } else {
@@ -603,7 +606,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
         }
 
         setCreatorDataLoaded(true);
-        router.push('/creator/dashboard?askPushNotificationPermission=true');
+        Router.push('/creator/dashboard?askPushNotificationPermission=true');
       }
     } catch (err) {
       console.error(err);
@@ -638,8 +641,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
         logoutAndRedirect('/sign-up?reason=session_expired');
       }
     }
-    // We dont need router here?
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     fieldsToBeUpdated,
     dateInEdit,
@@ -653,8 +654,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
     imageToSave,
     isAPIValidateLoading,
     setLoadingModalOpen,
+    handleBecameCreator,
     updateUserData,
     setCreatorDataLoaded,
+    logoutAndRedirect,
+    showErrorToastCustom,
+    showErrorToastPredefined,
+    t,
   ]);
 
   // Update image to be saved
