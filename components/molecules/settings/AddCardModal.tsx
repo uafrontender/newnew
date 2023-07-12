@@ -97,8 +97,7 @@ const AddCardForm: React.FC<IAddCardForm> = ({ onCancel, onSuccess }) => {
     if (recaptchaErrorMessage) {
       showErrorToastPredefined(recaptchaErrorMessage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recaptchaErrorMessage]);
+  }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
   useEffect(
     () => () => {
