@@ -46,7 +46,7 @@ const Home: NextPage<IHome> = ({
   const theme = useTheme();
   const { userData } = useUserData();
   const { appConstants } = useGetAppConstants();
-  const { userLoggedIn, userIsCreator } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth } = useAppState();
 
   const [popularPostsArr, setPopularPostsAdd] = useState(popularPosts?.posts);
 
@@ -162,7 +162,7 @@ const Home: NextPage<IHome> = ({
 
       {!userIsCreator &&
         canBecomeCreator(
-          userData?.dateOfBirth,
+          userDateOfBirth ?? userData?.dateOfBirth,
           appConstants.minCreatorAgeYears
         ) && <BecomeCreatorSection />}
     </>

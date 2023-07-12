@@ -25,7 +25,8 @@ import ShareMenu from '../../organisms/ShareMenu';
 export const Desktop: React.FC = () => {
   const { t } = useTranslation();
   const { userData } = useUserData();
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth, resizeMode } =
+    useAppState();
   const theme = useTheme();
   const { appConstants } = useGetAppConstants();
 
@@ -186,7 +187,7 @@ export const Desktop: React.FC = () => {
             {!userIsCreator && (
               <>
                 {canBecomeCreator(
-                  userData?.dateOfBirth,
+                  userDateOfBirth ?? userData?.dateOfBirth,
                   appConstants.minCreatorAgeYears
                 ) && (
                   <SItemWithMargin>
