@@ -211,13 +211,13 @@ const SContainer = styled.div<ISContainer>`
 
   ${(props) => props.theme.media.tablet} {
     position: static;
-    min-height: calc(100% - 160px);
-    height: calc(100vh - 160px);
     flex: 0;
     padding-bottom: unset;
     padding: 0 24px;
     margin: 0;
     overscroll-behavior: auto;
+
+    flex: 1;
   }
 `;
 

@@ -9,9 +9,8 @@ import React, {
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
-import { useMeasure } from 'react-use';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 /* Contexts */
@@ -122,9 +121,6 @@ const ChatContent: React.FC<IFuncProps> = ({
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
     useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-
-  const [bottomPartRef, { height: bottomPartHeight }] =
-    useMeasure<HTMLDivElement>();
 
   const handleCloseConfirmBlockUserModal = useCallback(() => {
     Mixpanel.track('Close Block User Modal', {
@@ -435,18 +431,16 @@ const ChatContent: React.FC<IFuncProps> = ({
       />
 
       <SContent>
-        <SChatAreaCenter
+        <ChatAreaCenter
           forwardRef={chatContentRef}
           chatRoom={chatRoom}
           isAnnouncement={isAnnouncement}
           withAvatars={withChatMessageAvatars}
           variant={variant}
-          bottomOffset={isBottomPartElementVisible ? bottomPartHeight : 0}
-          isAnnouncementLabel={!isMyAnnouncement && isAnnouncement}
         />
 
         {isBottomPartElementVisible && (
-          <SBottomPart ref={bottomPartRef}>
+          <SBottomPart>
             <SBottomPartContentWrapper>
               {isTextareaHidden ? (
                 whatComponentToDisplay()
@@ -535,6 +529,10 @@ const SContainer = styled.div`
     padding: 0;
     flex-shrink: unset;
   }
+
+  ${(props) => props.theme.media.laptop} {
+    height: 100%;
+  }
 `;
 
 const SContent = styled.div`
@@ -545,6 +543,10 @@ const SContent = styled.div`
   overflow-y: auto;
 
   height: calc(var(--window-inner-height, 1vh) * 100 - 80px);
+
+  ${(props) => props.theme.media.laptop} {
+    height: 100%;
+  }
 `;
 
 const SBottomPart = styled.div`
@@ -596,31 +598,4 @@ const SButton = styled(Button)`
         ? props.theme.colors.white
         : props.theme.colorsThemed.button.background.secondary};
   }
-`;
-
-const SChatAreaCenter = styled(ChatAreaCenter)<{
-  bottomOffset: number;
-  isAnnouncementLabel: boolean;
-}>`
-  ${({ bottomOffset, theme, isAnnouncementLabel }) =>
-    bottomOffset !== undefined
-      ? css`
-          && {
-            bottom: ${`${bottomOffset}px`};
-          }
-
-          && {
-            // 80px chat area header height
-            ${theme.media.tablet} {
-              bottom: 0;
-              min-height: ${`calc(100% - ${
-                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
-              }px)`};
-              height: ${`calc(100vh - ${
-                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
-              }px)`};
-            }
-          }
-        `
-      : null}
 `;
