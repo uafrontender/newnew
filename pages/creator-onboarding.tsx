@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
@@ -80,8 +80,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch('/creator/dashboard');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Router.prefetch('/creator/dashboard');
   }, []);
 
   useEffect(() => {
