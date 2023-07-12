@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
-import React, { ReactElement, useEffect, useMemo } from 'react';
+import React, { ReactElement, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 
 import MyProfileSettingsLayout from '../../../components/templates/MyProfileSettingsLayout';
 import { NextPageWithLayout } from '../../_app';
@@ -26,7 +26,6 @@ const CardSetupComplete: NextPage<ICardSetupComplete> = ({
   setup_intent_client_secret,
   setup_intent,
 }) => {
-  const router = useRouter();
   const { t } = useTranslation('page-Profile');
 
   const clientSecret = useMemo(
@@ -36,12 +35,12 @@ const CardSetupComplete: NextPage<ICardSetupComplete> = ({
   const setupIntentId = useMemo(() => setup_intent, [setup_intent]);
 
   useEffect(() => {
-    router.prefetch('/profile/settings');
-  }, [router]);
+    Router.prefetch('/profile/settings');
+  }, []);
 
-  const closeModal = () => {
-    router.replace('/profile/settings');
-  };
+  const closeModal = useCallback(() => {
+    Router.replace('/profile/settings');
+  }, []);
 
   return (
     <>

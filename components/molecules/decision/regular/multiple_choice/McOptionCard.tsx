@@ -1025,8 +1025,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   ? t('mcPost.optionsTab.optionCard.others')
                   : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
-            ) : null}{' '}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
+              {' '}
               {t('mcPost.optionsTab.optionCard.voted')}
             </SSpanBiddersRegular>
           </>
@@ -1054,8 +1055,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   ? t('mcPost.optionsTab.optionCard.others')
                   : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
-            ) : null}{' '}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
+              {' '}
               {t('mcPost.optionsTab.optionCard.voted')}
             </SSpanBiddersRegular>
           </>
@@ -1083,8 +1085,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
-        ) : null}{' '}
+        ) : null}
         <SSpanBiddersRegular className='spanRegular'>
+          {' '}
           {t('mcPost.optionsTab.optionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -1112,8 +1115,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
-        ) : null}{' '}
+        ) : null}
         <SSpanBiddersRegular className='spanRegular'>
+          {' '}
           {t('mcPost.optionsTab.optionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -1139,8 +1143,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
-        ) : null}{' '}
+        ) : null}
         <SSpanBiddersRegular className='spanRegular'>
+          {' '}
           {t('mcPost.optionsTab.optionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -1281,10 +1286,15 @@ const SOptionInfo = styled(Text)`
 
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  max-width: 100%;
 
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  white-space: pre;
 
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
@@ -1439,6 +1449,7 @@ const SPaymentModalHeadingPostSymbol = styled.div`
   background: ${({ theme }) => theme.colorsThemed.background.quaternary};
 
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
 
@@ -1453,6 +1464,8 @@ const SPaymentModalHeadingPostSymbolImg = styled.img`
 
 const SPaymentModalHeadingPostCreator = styled(Text)`
   display: flex;
+  flex-shrink: 1;
+  overflow: hidden;
   flex-direction: row;
   align-items: center;
   white-space: pre;
