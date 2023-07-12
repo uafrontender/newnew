@@ -128,7 +128,11 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     };
 
     useEffect(() => {
-      if (dateInEdit?.getTime() !== currentDate?.getTime()) {
+      setDateInEdit(currentDate);
+    }, [currentDate]);
+
+    useEffect(() => {
+      if (dateInEdit && dateInEdit?.getTime() !== currentDate?.getTime()) {
         setWasDateModified(true);
       } else {
         setWasDateModified(false);
@@ -205,14 +209,14 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Button
+              <SButton
                 view='primaryGrad'
                 onClick={() => handleSaveModifications()}
                 disabled={isLoading}
               >
                 {t('Settings.sections.personalInformation.button.save')}
-              </Button>
-              <Button
+              </SButton>
+              <SButton
                 view='secondary'
                 style={{
                   ...(isMobile ? { order: -1 } : {}),
@@ -220,7 +224,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
                 onClick={() => handleResetModifications()}
               >
                 {t('Settings.sections.personalInformation.button.cancel')}
-              </Button>
+              </SButton>
             </SControlsWrapper>
           ) : null}
         </AnimatePresence>
@@ -249,6 +253,7 @@ const SInputsWrapper = styled.div`
 const SControlsWrapper = styled(motion.div)`
   display: flex;
   justify-content: space-between;
+  overflow: hidden;
 
   ${({ theme }) => theme.media.tablet} {
     justify-content: flex-start;
@@ -258,4 +263,8 @@ const SControlsWrapper = styled(motion.div)`
   button {
     margin-bottom: 24px;
   }
+`;
+
+const SButton = styled(Button)`
+  height: 48px;
 `;

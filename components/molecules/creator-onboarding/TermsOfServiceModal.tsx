@@ -91,6 +91,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
               dangerouslySetInnerHTML={{
                 __html: TermsOfServiceHtml,
               }}
+              data-body-scroll-lock-ignore
             />
           </SContainer>
           <SButton onClick={() => onClose()}>{t('tosSection.close')}</SButton>
@@ -240,13 +241,13 @@ const STosText = styled.div`
       border-radius: 4px;
       transition: 0.2s linear;
     }
-  
+
     &:hover {
       scrollbar-width: thin;
       &::-webkit-scrollbar-track {
         background: ${({ theme }) => theme.colorsThemed.background.outlines1};
       }
-  
+
       &::-webkit-scrollbar-thumb {
         background: ${({ theme }) => theme.colorsThemed.background.outlines2};
       }

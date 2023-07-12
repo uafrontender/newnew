@@ -71,6 +71,7 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
     }
 
     return cleanup;
+    // fetchInitialized is a flag
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cookies?.accessToken, fetchInitialized]);
 
