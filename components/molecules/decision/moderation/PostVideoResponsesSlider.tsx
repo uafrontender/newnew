@@ -165,12 +165,19 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     ]
   );
 
-  useEffect(() => {
-    if (uploadedFile?.hlsStreamUrl) {
-      scrollSliderTo(videosLength - 1);
-    }
+  useEffect(
+    () => {
+      if (uploadedFile?.hlsStreamUrl) {
+        scrollSliderTo(videosLength - 1);
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedFile]);
+    [
+      uploadedFile,
+      // scrollSliderTo, - reason unknown
+      // videosLength, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     if (initialVideoFromUrl) {

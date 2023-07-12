@@ -440,6 +440,7 @@ const OpenedFlash = keyframes`
 
 const SMoreButton = styled(Button)`
   padding: 2px;
+  margin-left: 4px;
 
   background: none;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -535,7 +536,7 @@ const SActionsDiv = styled.div`
 const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
-  flex-shrink: 0;
+  flex-shrink: 1;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
@@ -563,7 +564,7 @@ const SBid = styled.span`
 `;
 
 const SDate = styled.span`
-  flex-shrink: 1;
+  flex-shrink: 0;
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;

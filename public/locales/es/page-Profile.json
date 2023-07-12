@@ -119,6 +119,7 @@
     "button": {
       "backToProfile": "Editar perfil",
       "backToImage": "Editar imagen de perfil",
+      "backToCover": "Editar imagen de portada",
       "save": "Guardar cambios",
       "cancel": "Cancelar"
     },

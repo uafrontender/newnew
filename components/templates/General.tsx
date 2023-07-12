@@ -54,11 +54,13 @@ export const General: React.FC<IGeneral> = (props) => {
   } = props;
   const { userData } = useUserData();
   const { appConstants } = useGetAppConstants();
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth, resizeMode } =
+    useAppState();
   const { globalSearchActive, banner } = useUiState();
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
+
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
@@ -124,7 +126,7 @@ export const General: React.FC<IGeneral> = (props) => {
         )
           .concat(
             canBecomeCreator(
-              userData?.dateOfBirth,
+              userDateOfBirth ?? userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
             )
               ? [
@@ -157,6 +159,7 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [
     userLoggedIn,
     unreadNotificationCount,
+    userDateOfBirth,
     userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
     userIsCreator,

@@ -169,7 +169,9 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       return (
         <SModal show={focused} onClose={handleBlur}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>{options?.map(renderItem)}</SMobileList>
+            <SMobileList data-body-scroll-lock-ignore>
+              {options?.map(renderItem)}
+            </SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleBlur}>
               {t('secondStep.button.cancel')}
             </SCancelButton>
@@ -256,7 +258,10 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       return (
         <SModal show={focused} onClose={handleBlur}>
           <SMobileDateContainer focused={focused}>
-            <SMobileDateContent onClick={preventCLick}>
+            <SMobileDateContent
+              onClick={preventCLick}
+              data-body-scroll-lock-ignore
+            >
               <SModalTopLine>
                 <SModalTitle variant={6}>
                   {t('secondStep.field.startsAt.modal.title')}

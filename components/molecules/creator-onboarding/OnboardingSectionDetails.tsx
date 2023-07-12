@@ -45,6 +45,7 @@ import { Mixpanel } from '../../../utils/mixpanel';
 import { NAME_LENGTH_LIMIT } from '../../../utils/consts';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 const LoadingModal = dynamic(() => import('../LoadingModal'));
 const CheckboxWithALink = dynamic(() => import('./CheckboxWithALink'));
@@ -146,8 +147,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
-  const onlySpacesRegex = /^\s+$/;
-
   // Firstname
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
   const [firstNameError, setFirstnameError] = useState('');
@@ -162,7 +161,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setFirstnameError('');
     }
 
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setFirstnameInEdit('');
     } else {
       setFirstnameInEdit(e.target.value);
@@ -182,7 +181,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
       setLastnameError('');
     }
 
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setLastnameInEdit('');
     } else {
       setLastnameInEdit(e.target.value);
@@ -205,7 +204,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   );
   const [nicknameError, setNicknameError] = useState('');
   const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onlySpacesRegex.test(e.target.value)) {
+    if (isStringEmpty(e.target.value)) {
       setNicknameInEdit('');
     } else {
       setNicknameInEdit(e.target.value);
