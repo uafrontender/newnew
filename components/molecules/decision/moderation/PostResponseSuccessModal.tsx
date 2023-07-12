@@ -66,7 +66,7 @@ const PostResponseSuccessModal: React.FunctionComponent<
           />
         </SCloseButton>
       )}
-      <SWrapper>
+      <SWrapper data-body-scroll-lock-ignore>
         <SContentContainer>
           {isMobile && (
             <SCloseButton
