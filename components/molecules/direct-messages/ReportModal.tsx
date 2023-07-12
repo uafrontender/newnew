@@ -21,6 +21,7 @@ import DisplayName from '../../atoms/DisplayName';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 import InlineSvg from '../../atoms/InlineSVG';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -158,8 +159,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const handleMessageChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const onlySpacesRegex = /^\s+$/;
-        if (onlySpacesRegex.test(e.target.value)) {
+        if (isStringEmpty(e.target.value)) {
           setMessage('');
         } else {
           const newMessage = e.target.value

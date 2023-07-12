@@ -13,7 +13,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
 import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import Button from '../../atoms/Button';
-import ProfileImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
+import ImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingEditProfileImageModal {
@@ -138,7 +138,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
               height='24px'
             />
           </Button>
-          <ProfileImageZoomSlider
+          <ImageZoomSlider
             value={zoomProfileImage}
             min={minZoom}
             max={minZoom + 2}
