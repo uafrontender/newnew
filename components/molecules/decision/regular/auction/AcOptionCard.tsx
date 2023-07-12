@@ -551,8 +551,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {(optionBeingSupported && !disabled) ||
-        !votingAllowed ? null : isMobile ? (
+        {!votingAllowed ? null : isMobile ? (
           <SSupportButton
             view='quaternary'
             disabled={disabled}
