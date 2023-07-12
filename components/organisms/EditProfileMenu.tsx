@@ -926,7 +926,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <ProfileGeneralContent>
+            <ProfileGeneralContent data-body-scroll-lock-ignore>
               <SImageInputsWrapper>
                 <ProfileCoverImage
                   pictureInEditUrl={coverUrlInEdit ?? ''}
@@ -1115,7 +1115,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <PictureContent>
+            <PictureContent data-body-scroll-lock-ignore>
               <ProfileImageCropper
                 crop={cropProfileImage}
                 zoom={zoomProfileImage}
