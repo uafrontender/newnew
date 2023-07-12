@@ -224,18 +224,23 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     [removeMcOptionMutation]
   );
 
-  const fetchPostLatestData = useCallback(async () => {
-    try {
-      const res = await refetchPost();
+  const fetchPostLatestData = useCallback(
+    async () => {
+      try {
+        const res = await refetchPost();
 
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // refetchPost, - reason unknown
+    ]
+  );
 
   const handleOnVotingTimeExpired = async () => {
     await refetchPost();
@@ -278,150 +283,178 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     };
   }, [post.postUuid, userLoggedIn, creatorsBundle]);
 
-  useEffect(() => {
-    const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
-      if (decoded.option && decoded.postUuid === post.postUuid) {
-        addOrUpdateMcOptionMutation?.mutate(decoded.option);
-      }
-    };
+  useEffect(
+    () => {
+      const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          addOrUpdateMcOptionMutation?.mutate(decoded.option);
+        }
+      };
 
-    const socketHandlerOptionDeleted = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.McOptionDeleted.decode(arr);
+      const socketHandlerOptionDeleted = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.McOptionDeleted.decode(arr);
 
-      if (decoded.optionId) {
-        removeMcOptionMutation?.mutate({
-          id: decoded.optionId,
-        });
-        await fetchPostLatestData();
-      }
-    };
+        if (decoded.optionId) {
+          removeMcOptionMutation?.mutate({
+            id: decoded.optionId,
+          });
+          await fetchPostLatestData();
+        }
+      };
 
-    const socketHandlerPostData = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostUpdated.decode(arr);
+      const socketHandlerPostData = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostUpdated.decode(arr);
 
-      if (!decoded) {
-        return;
-      }
-      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
-        handleUpdatePostData(decoded.post);
-      }
-    };
+        if (!decoded) {
+          return;
+        }
+        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
+        if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+          handleUpdatePostData(decoded.post);
+        }
+      };
 
-    if (socketConnection) {
-      socketConnection?.on(
-        'McOptionCreatedOrUpdated',
-        socketHandlerOptionCreatedOrUpdated
-      );
-      socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
-      socketConnection?.on('PostUpdated', socketHandlerPostData);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off(
+      if (socketConnection) {
+        socketConnection?.on(
           'McOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection?.off('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
       }
-    };
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'McOptionCreatedOrUpdated',
+            socketHandlerOptionCreatedOrUpdated
+          );
+          socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, userData?.userUuid]);
+    [
+      socketConnection,
+      post,
+      userData?.userUuid,
+      // addOrUpdateAcOptionMutation, - reason unknown
+      // fetchPostLatestData, - reason unknown
+      // handleUpdatePostData, - reason unknown
+      // removeMcOptionMutation, - reason unknown
+    ]
+  );
 
   const isVoteMadeAfterRedirect = useRef(false);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const makeVoteAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret || loadingModalOpen) {
-        return;
-      }
-
-      if (!userLoggedIn) {
-        router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-        );
-        return;
-      }
-
-      isVoteMadeAfterRedirect.current = true;
-
-      Mixpanel.track('Make Vote After Stripe Redirect', {
-        _stage: 'Post',
-        _postUuid: post.postUuid,
-        _component: 'PostViewMC',
-      });
-
-      try {
-        setLoadingModalOpen(true);
-
-        const stripeContributionRequest =
-          new newnewapi.StripeContributionRequest({
-            stripeSetupIntentClientSecret,
-            ...(saveCard !== undefined
-              ? {
-                  saveCard,
-                }
-              : {}),
-          });
-
-        resetSetupIntentClientSecret();
-
-        const res = await voteOnPost(
-          stripeContributionRequest,
-          controller.signal
-        );
-
-        if (
-          !res?.data ||
-          res.error ||
-          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        ) {
-          throw new Error(
-            res?.error?.message ??
-              t(getPayWithCardErrorMessage(res.data?.status))
-          );
+  useEffect(
+    () => {
+      const controller = new AbortController();
+      const makeVoteAfterStripeRedirect = async () => {
+        if (!stripeSetupIntentClientSecret || loadingModalOpen) {
+          return;
         }
 
-        const optionFromResponse = res.data
-          .option as newnewapi.MultipleChoice.Option;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        if (!userLoggedIn) {
+          router.push(
+            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
+          );
+          return;
+        }
 
-        fetchPostLatestData();
+        isVoteMadeAfterRedirect.current = true;
 
-        setLoadingModalOpen(false);
-        setPaymentSuccessModalOpen(true);
-      } catch (err: any) {
-        console.error(err);
-        showErrorToastCustom(err.message);
-        setLoadingModalOpen(false);
-      } finally {
-        router.replace(
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postShortId ? post.postShortId : post.postUuid
-          }`,
-          undefined,
-          { shallow: true }
-        );
+        Mixpanel.track('Make Vote After Stripe Redirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewMC',
+        });
+
+        try {
+          setLoadingModalOpen(true);
+
+          const stripeContributionRequest =
+            new newnewapi.StripeContributionRequest({
+              stripeSetupIntentClientSecret,
+              ...(saveCard !== undefined
+                ? {
+                    saveCard,
+                  }
+                : {}),
+            });
+
+          resetSetupIntentClientSecret();
+
+          const res = await voteOnPost(
+            stripeContributionRequest,
+            controller.signal
+          );
+
+          if (
+            !res?.data ||
+            res.error ||
+            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          ) {
+            throw new Error(
+              res?.error?.message ??
+                t(getPayWithCardErrorMessage(res.data?.status))
+            );
+          }
+
+          const optionFromResponse = res.data
+            .option as newnewapi.MultipleChoice.Option;
+          optionFromResponse.isSupportedByMe = true;
+          handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+          fetchPostLatestData();
+
+          setLoadingModalOpen(false);
+          setPaymentSuccessModalOpen(true);
+        } catch (err: any) {
+          console.error(err);
+          showErrorToastCustom(err.message);
+          setLoadingModalOpen(false);
+        } finally {
+          router.replace(
+            `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
+              post.postShortId ? post.postShortId : post.postUuid
+            }`,
+            undefined,
+            { shallow: true }
+          );
+        }
+      };
+
+      if (stripeSetupIntentClientSecret && !isVoteMadeAfterRedirect.current) {
+        makeVoteAfterStripeRedirect();
       }
-    };
 
-    if (stripeSetupIntentClientSecret && !isVoteMadeAfterRedirect.current) {
-      makeVoteAfterStripeRedirect();
-    }
-
-    return () => {
-      controller.abort();
-    };
+      return () => {
+        controller.abort();
+      };
+    },
+    // TODO: refactor into a hook similar to useBuyBundleAfterRedirect
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // fetchPostLatestData, - runs once
+      // handleAddOrUpdateOptionFromResponse, - runs once
+      // loadingModalOpen, - runs once
+      // post.postShortId, - runs once
+      // post.postUuid, - runs once
+      // resetSetupIntentClientSecret, - runs once
+      // router, - runs once
+      // saveCard, - runs once
+      // showErrorToastCustom, - runs once
+      // stripeSetupIntentClientSecret, - runs once
+      // t, - runs once
+      // userLoggedIn, - runs once
+    ]
+  );
 
   const goToNextStep = () => {
     if (

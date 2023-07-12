@@ -178,29 +178,45 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       [post.postUuid, removeMcOptionMutation]
     );
 
-    const fetchPostLatestData = useCallback(async () => {
-      try {
-        const res = await refetchPost();
+    const fetchPostLatestData = useCallback(
+      async () => {
+        try {
+          const res = await refetchPost();
 
-        if (!res?.data || res.error) {
-          throw new Error(res?.error?.message ?? 'Request failed');
-        }
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
+          }
 
-        if (res.data.multipleChoice) {
-          if (res.data.multipleChoice?.winningOptionId && !winningOption) {
-            const winner = options.find(
-              (o) => o.id === res!!.data!!.multipleChoice!!.winningOptionId
-            );
-            if (winner) {
-              setWinningOption(winner);
+          if (res.data.multipleChoice) {
+            if (res.data.multipleChoice?.winningOptionId && !winningOption) {
+              const winner = options.find(
+                (o) => o.id === res!!.data!!.multipleChoice!!.winningOptionId
+              );
+              if (winner) {
+                setWinningOption(winner);
+              }
             }
           }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [options, winningOption, post.postUuid]);
+      [
+        options,
+        winningOption,
+        post.postUuid, // - added to depend on postId
+        // refetchPost, - disabled to not to depend on refetch from react query
+      ]
+    );
+
+    useEffect(() => {
+      console.log('post.postUuid changed');
+    }, [post.postUuid]);
+
+    useEffect(() => {
+      console.log('refetchPost changed');
+    }, [refetchPost]);
 
     useEffect(() => {
       if (postStatus === 'waiting_for_response') {
@@ -240,62 +256,78 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
       }
     }, [post.winningOptionId]);
 
-    useEffect(() => {
-      const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
-        if (decoded.option && decoded.postUuid === post.postUuid) {
-          addOrUpdateMcOptionMutation?.mutate(decoded.option);
-        }
-      };
+    useEffect(
+      () => {
+        const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
+          if (decoded.option && decoded.postUuid === post.postUuid) {
+            addOrUpdateMcOptionMutation?.mutate(decoded.option);
+          }
+        };
 
-      const socketHandlerOptionDeleted = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.McOptionDeleted.decode(arr);
+        const socketHandlerOptionDeleted = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.McOptionDeleted.decode(arr);
 
-        if (decoded.optionId) {
-          removeMcOptionMutation?.mutate({
-            id: decoded.optionId,
-          });
-          await fetchPostLatestData();
-        }
-      };
+          if (decoded.optionId) {
+            removeMcOptionMutation?.mutate({
+              id: decoded.optionId,
+            });
+            await fetchPostLatestData();
+          }
+        };
 
-      const socketHandlerPostData = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostUpdated.decode(arr);
+        const socketHandlerPostData = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.PostUpdated.decode(arr);
 
-        if (!decoded) {
-          return;
-        }
-        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-        if (decoded.post && decodedParsed.postUuid === post.postUuid) {
-          handleUpdatePostData(decoded.post);
-        }
-      };
+          if (!decoded) {
+            return;
+          }
+          const [decodedParsed] = switchPostType(
+            decoded.post as newnewapi.IPost
+          );
+          if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+            handleUpdatePostData(decoded.post);
+          }
+        };
 
-      if (socketConnection) {
-        socketConnection?.on(
-          'McOptionCreatedOrUpdated',
-          socketHandlerOptionCreatedOrUpdated
-        );
-        socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection?.on('PostUpdated', socketHandlerPostData);
-      }
-
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off(
+        if (socketConnection) {
+          socketConnection?.on(
             'McOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.on('PostUpdated', socketHandlerPostData);
         }
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, userData?.userUuid]);
 
+        return () => {
+          if (socketConnection && socketConnection?.connected) {
+            socketConnection?.off(
+              'McOptionCreatedOrUpdated',
+              socketHandlerOptionCreatedOrUpdated
+            );
+            socketConnection?.off(
+              'McOptionDeleted',
+              socketHandlerOptionDeleted
+            );
+            socketConnection?.off('PostUpdated', socketHandlerPostData);
+          }
+        };
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [
+        socketConnection,
+        post,
+        userData?.userUuid,
+        // addOrUpdateMcOptionMutation, - reason unknown
+        // fetchPostLatestData, - reason unknown
+        // handleUpdatePostData, - reason unknown
+        // removeMcOptionMutation, - reason unknown
+      ]
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const goToNextStep = () => {
       if (
         userTutorialsProgress?.remainingMcSteps &&
