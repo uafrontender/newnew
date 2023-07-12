@@ -42,36 +42,6 @@ const BaseLayout: React.FunctionComponent<IBaseLayout> = React.memo(
       []
     );
 
-    useEffect(() => {
-      document.documentElement.style.setProperty(
-        '--window-inner-height',
-        `${window.visualViewport?.height || window.innerHeight}px`
-      );
-    }, []);
-
-    useEffect(() => {
-      const handleUpdateWindowInnerHeightValue = (event: Event) => {
-        document.documentElement.style.setProperty(
-          '--window-inner-height',
-          `${(event.target as VisualViewport)?.height || window.innerHeight}px`
-        );
-      };
-
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      }
-
-      return () => {
-        window.visualViewport?.removeEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      };
-    }, []);
-
     return (
       <SWrapper
         id={id}

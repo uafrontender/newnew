@@ -12,6 +12,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
 import { useMeasure } from 'react-use';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -402,6 +403,20 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
+  useEffect(() => {
+    const chatContent = chatContentRef?.current as HTMLElement;
+
+    if (isMobileOrTablet) {
+      disableBodyScroll(chatContent);
+    } else {
+      enableBodyScroll(chatContent);
+    }
+
+    return () => {
+      enableBodyScroll(chatContent);
+    };
+  }, [chatContentRef, isMobileOrTablet]);
+
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
 
@@ -419,61 +434,63 @@ const ChatContent: React.FC<IFuncProps> = ({
         withAvatar={withHeaderAvatar}
       />
 
-      <SChatAreaCenter
-        forwardRef={chatContentRef}
-        chatRoom={chatRoom}
-        isAnnouncement={isAnnouncement}
-        withAvatars={withChatMessageAvatars}
-        variant={variant}
-        bottomOffset={isBottomPartElementVisible ? bottomPartHeight : 0}
-        isAnnouncementLabel={!isMyAnnouncement && isAnnouncement}
-      />
+      <SContent>
+        <SChatAreaCenter
+          forwardRef={chatContentRef}
+          chatRoom={chatRoom}
+          isAnnouncement={isAnnouncement}
+          withAvatars={withChatMessageAvatars}
+          variant={variant}
+          bottomOffset={isBottomPartElementVisible ? bottomPartHeight : 0}
+          isAnnouncementLabel={!isMyAnnouncement && isAnnouncement}
+        />
 
-      {isBottomPartElementVisible && (
-        <SBottomPart ref={bottomPartRef}>
-          <SBottomPartContentWrapper>
-            {isTextareaHidden ? (
-              whatComponentToDisplay()
-            ) : (
-              <SBottomTextarea>
-                <STextArea>
-                  <TextArea
-                    maxlength={500}
-                    value={messageText}
-                    onChange={handleChange}
-                    placeholder={t('chat.placeholder')}
-                    gotMaxLength={handleSubmit}
-                    variant={variant}
-                  />
-                </STextArea>
-                <SButton
-                  withShadow
-                  view={messageTextValid ? 'primaryGrad' : 'secondary'}
-                  onClick={handleSubmit}
-                  loading={sendingMessage}
-                  loadingAnimationColor='blue'
-                  disabled={
-                    sendingMessage ||
-                    !messageTextValid ||
-                    messageText.length < 1
-                  }
-                >
-                  <SInlineSVG
-                    svg={!sendingMessage ? sendIcon : ''}
-                    fill={
-                      messageTextValid && messageText.length > 0
-                        ? theme.colors.white
-                        : theme.colorsThemed.text.primary
+        {isBottomPartElementVisible && (
+          <SBottomPart ref={bottomPartRef}>
+            <SBottomPartContentWrapper>
+              {isTextareaHidden ? (
+                whatComponentToDisplay()
+              ) : (
+                <SBottomTextarea>
+                  <STextArea>
+                    <TextArea
+                      maxlength={500}
+                      value={messageText}
+                      onChange={handleChange}
+                      placeholder={t('chat.placeholder')}
+                      gotMaxLength={handleSubmit}
+                      variant={variant}
+                    />
+                  </STextArea>
+                  <SButton
+                    withShadow
+                    view={messageTextValid ? 'primaryGrad' : 'secondary'}
+                    onClick={handleSubmit}
+                    loading={sendingMessage}
+                    loadingAnimationColor='blue'
+                    disabled={
+                      sendingMessage ||
+                      !messageTextValid ||
+                      messageText.length < 1
                     }
-                    width='24px'
-                    height='24px'
-                  />
-                </SButton>
-              </SBottomTextarea>
-            )}
-          </SBottomPartContentWrapper>
-        </SBottomPart>
-      )}
+                  >
+                    <SInlineSVG
+                      svg={!sendingMessage ? sendIcon : ''}
+                      fill={
+                        messageTextValid && messageText.length > 0
+                          ? theme.colors.white
+                          : theme.colorsThemed.text.primary
+                      }
+                      width='24px'
+                      height='24px'
+                    />
+                  </SButton>
+                </SBottomTextarea>
+              )}
+            </SBottomPartContentWrapper>
+          </SBottomPart>
+        )}
+      </SContent>
       {chatRoom.visavis && (
         <ReportModal
           show={confirmReportUser}
@@ -510,7 +527,7 @@ const SContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 80px 0 82px;
+  height: calc(var(--window-inner-height, 1vh) * 100);
 
   flex-shrink: 0;
 
@@ -520,20 +537,27 @@ const SContainer = styled.div`
   }
 `;
 
+const SContent = styled.div`
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  height: calc(var(--window-inner-height, 1vh) * 100 - 80px);
+`;
+
 const SBottomPart = styled.div`
   display: flex;
   flex-direction: column;
-  position: fixed;
+  /* position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0; */
+
   background: ${(props) => props.theme.colorsThemed.background.secondary};
 
   ${(props) => props.theme.media.tablet} {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
     background: none;
     min-height: 80px;
   }

@@ -22,12 +22,14 @@ const ChatListItem = dynamic(() => import('./ChatListItem'));
 interface IChatList {
   hidden?: boolean;
   myRole: newnewapi.ChatRoom.MyRole | undefined;
+  className?: string;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
 const ChatList: React.FC<IChatList> = ({
   myRole,
   hidden,
+  className,
   onChatRoomSelect: onChatRoomSelected,
 }) => {
   const { t } = useTranslation('page-Chat');
@@ -84,63 +86,68 @@ const ChatList: React.FC<IChatList> = ({
   }, [myRole, unreadCountForUser, refetch]);
 
   return (
-    <SChatList
-      style={
-        hidden
-          ? {
-              display: 'none',
-            }
-          : {}
-      }
-    >
-      {/* Loading state */}
-      {isLoading && <Loader size='md' isStatic />}
+    <SChatListWrapper>
+      <SChatList
+        style={
+          hidden
+            ? {
+                display: 'none',
+              }
+            : {}
+        }
+        className={className}
+      >
+        {/* Loading state */}
+        {isLoading && <Loader size='md' isStatic />}
 
-      {/* Chats */}
-      {!isLoading && (
-        <>
-          {chatRooms.length > 0 && (
-            <>
-              {chatRooms.map((chatroom, index) => (
-                <React.Fragment key={chatroom.id as number}>
-                  {hasNextPage && index === chatRooms.length - 1 && (
-                    <SRef ref={scrollRef}>Loading...</SRef>
-                  )}
-                  <ChatListItem
-                    chatRoom={chatroom}
-                    onChatRoomSelected={onChatRoomSelected}
-                    isActive={
-                      !!selectedChatRoomId && chatroom.id === selectedChatRoomId
-                    }
-                  />
-                  {index < chatRooms.length - 1 && <SChatSeparator />}
-                </React.Fragment>
-              ))}
-            </>
-          )}
+        {/* Chats */}
+        {!isLoading && (
+          <>
+            {chatRooms.length > 0 && (
+              <>
+                {chatRooms.map((chatroom, index) => (
+                  <React.Fragment key={chatroom.id as number}>
+                    {hasNextPage && index === chatRooms.length - 1 && (
+                      <SRef ref={scrollRef}>Loading...</SRef>
+                    )}
+                    <ChatListItem
+                      chatRoom={chatroom}
+                      onChatRoomSelected={onChatRoomSelected}
+                      isActive={
+                        !!selectedChatRoomId &&
+                        chatroom.id === selectedChatRoomId
+                      }
+                    />
+                    {index < chatRooms.length - 1 && <SChatSeparator />}
+                  </React.Fragment>
+                ))}
+              </>
+            )}
 
-          {/* Empty inbox */}
-          {chatRooms.length === 0 && !searchChatroom && <EmptyInbox />}
+            {/* Empty inbox */}
+            {chatRooms.length === 0 && !searchChatroom && <EmptyInbox />}
 
-          {/* No Search Results */}
-          {chatRooms.length === 0 && searchChatroom && (
-            <NoResults text={searchChatroom} />
-          )}
-        </>
-      )}
-    </SChatList>
+            {/* No Search Results */}
+            {chatRooms.length === 0 && searchChatroom && (
+              <NoResults text={searchChatroom} />
+            )}
+          </>
+        )}
+      </SChatList>
+    </SChatListWrapper>
   );
 };
 
 export default ChatList;
 
-const SChatList = styled.div`
+const SChatListWrapper = styled.div`
+  flex: 1;
+
   display: flex;
   position: relative;
   overflow-y: auto;
   flex-direction: column;
   overscroll-behavior: contain;
-  height: calc(var(--window-inner-height) - 70px); // 70px height
 
   /* Hide scrollbar */
   ::-webkit-scrollbar {
@@ -149,6 +156,8 @@ const SChatList = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
 `;
+
+const SChatList = styled.div``;
 
 const SRef = styled.span`
   text-indent: -9999px;

@@ -166,29 +166,29 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer
-      className={className}
-      isAnnouncement={isAnnouncement}
-      ref={forwardRef}
-    >
-      {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
-      {hasNoMessagesYet && <NoMessagesYet />}
-      {hasNoAnnouncementMessagesYet && <NoAnnouncementMessagesYet />}
+    <SContainer className={className} isAnnouncement={isAnnouncement}>
+      <SMessagesContent ref={forwardRef}>
+        {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
+        {hasNoMessagesYet && <NoMessagesYet />}
+        {hasNoAnnouncementMessagesYet && <NoAnnouncementMessagesYet />}
+        <SMessages>
+          {messages.map((item, index) => (
+            <ChatMessage
+              key={`${chatRoom}-${item.id}`}
+              chatRoom={chatRoom}
+              item={item}
+              nextElement={messages[index + 1]}
+              prevElement={messages[index - 1]}
+              withAvatar={withAvatars}
+              variant={variant}
+            />
+          ))}
+        </SMessages>
 
-      {messages.map((item, index) => (
-        <ChatMessage
-          key={`${chatRoom}-${item.id}`}
-          chatRoom={chatRoom}
-          item={item}
-          nextElement={messages[index + 1]}
-          prevElement={messages[index - 1]}
-          withAvatar={withAvatars}
-          variant={variant}
-        />
-      ))}
-      {messages.length === 0 && isLoading && <Loader isStatic size='md' />}
-      {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
-      {messages.length > 0 && isFetchingNextPage && <SPageLoader size='xs' />}
+        {messages.length === 0 && isLoading && <Loader isStatic size='md' />}
+        {hasNextPage && !isFetchingNextPage && <SRef ref={loadingRef} />}
+        {messages.length > 0 && isFetchingNextPage && <SPageLoader size='xs' />}
+      </SMessagesContent>
     </SContainer>
   );
 };
@@ -200,21 +200,7 @@ interface ISContainer {
 }
 const SContainer = styled.div<ISContainer>`
   flex: 1;
-  display: flex;
-  overflow-y: auto;
-  flex-direction: column-reverse;
-  padding: 0 12px;
-  position: fixed;
-  top: 80px;
-  bottom: 80px;
-  left: 0;
-  right: 0;
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  overscroll-behavior: contain;
+  overflow-y: hidden;
 
   ${({ isAnnouncement }) =>
     isAnnouncement
@@ -233,6 +219,28 @@ const SContainer = styled.div<ISContainer>`
     margin: 0;
     overscroll-behavior: auto;
   }
+`;
+
+const SMessagesContent = styled.div`
+  overflow-y: auto;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column-reverse;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+`;
+
+const SMessages = styled.div`
+  display: flex;
+  flex-direction: column-reverse;
+
+  padding: 0 12px;
 `;
 
 const SRef = styled.span`

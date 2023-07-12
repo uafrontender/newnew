@@ -587,7 +587,9 @@ const SResultsDropMobile = styled.div`
 
 const SResultsDropMobileContentWrapper = styled.div`
   padding: 16px;
-  max-height: calc(var(--window-inner-height) - 50px); // 50px needs for ios
+  max-height: calc(
+    var(--window-inner-height, 1vh) * 100 - 50px
+  ); // 50px needs for ios
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;

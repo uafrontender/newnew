@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
@@ -48,6 +48,20 @@ export const ChatContainer: React.FC<IChatContainer> = ({
     router.replace('/direct-messages', undefined, { shallow: true });
   }, [router]);
 
+  useEffect(() => {
+    document.addEventListener('focusin', (e) => {
+      const input = e.target as HTMLInputElement;
+      // TODO: Add some data attribute to input element, handle focusout
+      if (input) {
+        input.style.transform = 'translateY(-99999px)';
+
+        setTimeout(() => {
+          input.style.transform = '';
+        }, 100);
+      }
+    });
+  }, []);
+
   return (
     <SContainer className={className}>
       <ChatSidebar
@@ -76,9 +90,8 @@ export const ChatContainer: React.FC<IChatContainer> = ({
 export default ChatContainer;
 
 const SContainer = styled.div`
-  padding: 0 10px;
   overflow: hidden;
-  height: 100vh;
+  height: calc(var(--window-inner-height, 1vh) * 100);
 
   ${(props) => props.theme.media.laptop} {
     position: relative;
@@ -97,7 +110,6 @@ const SContent = styled.div<{
   position: relative;
   height: 100%;
   background: ${({ theme }) => theme.colorsThemed.background.secondary};
-  margin: 0 -15px;
   padding: 0;
 
   ${(props) => props.theme.media.laptop} {

@@ -120,44 +120,50 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   ]);
 
   return (
-    <SContainer>
-      <ChatSidebar
-        initialTab={myRole}
-        hidden={isMobileOrTablet && !!selectedChatRoomId}
-        onChatRoomSelect={handleChatRoomSelect}
-      />
+    <SWrapper>
+      <SContainer>
+        <ChatSidebar
+          initialTab={myRole}
+          hidden={isMobileOrTablet && !!selectedChatRoomId}
+          onChatRoomSelect={handleChatRoomSelect}
+        />
 
-      <SContent hidden={isMobileOrTablet && !selectedChatRoomId}>
-        {activeChatRoom && (
-          <ChatContent
-            chatRoom={activeChatRoom}
-            isBackButton={isMobileOrTablet}
-            onBackButtonClick={handleCloseChatRoom}
-            isMoreButton
-            withChatMessageAvatars
-          />
-        )}
-        {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
-      </SContent>
-    </SContainer>
+        <SContent hidden={isMobileOrTablet && !selectedChatRoomId}>
+          {activeChatRoom && (
+            <ChatContent
+              chatRoom={activeChatRoom}
+              isBackButton={isMobileOrTablet}
+              onBackButtonClick={handleCloseChatRoom}
+              isMoreButton
+              withChatMessageAvatars
+            />
+          )}
+          {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
+        </SContent>
+      </SContainer>
+    </SWrapper>
   );
 };
 
 export default MobileChat;
 
-const SContainer = styled.div`
+const SWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 0 15px;
+  overflow: hidden;
+
   background: ${({ theme }) =>
     theme.name === 'light' ? theme.colors.white : theme.colors.black};
+  height: 100vh;
+`;
 
+const SContainer = styled.div`
   padding: 0 10px;
-  overflow: hidden;
-  height: var(--window-inner-height);
+
+  max-height: calc(var(--window-inner-height, 1vh) * 100);
 
   ${(props) => props.theme.media.laptop} {
     position: relative;
