@@ -31,12 +31,18 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
     [collection.length]
   );
 
-  useEffect(() => {
-    if (!visible) {
-      handleCloseMobileMenu();
-    }
+  useEffect(
+    () => {
+      if (!visible) {
+        handleCloseMobileMenu();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+    [
+      visible,
+      // handleCloseMobileMenu, - reason unknown
+    ]
+  );
 
   return (
     <SContainer
