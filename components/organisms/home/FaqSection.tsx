@@ -52,7 +52,7 @@ const FaqSection = () => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const { userData } = useUserData();
-  const { userLoggedIn, userIsCreator } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth } = useAppState();
   const { appConstants } = useGetAppConstants();
 
   return (
@@ -66,7 +66,7 @@ const FaqSection = () => {
             userLoggedIn &&
             !userIsCreator &&
             !canBecomeCreator(
-              userData?.dateOfBirth,
+              userDateOfBirth ?? userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
             )
           ) {

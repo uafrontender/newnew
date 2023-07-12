@@ -147,18 +147,26 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
     years,
   ]);
 
-  useEffect(() => {
-    daysScrollerRef.current?.scrollBy({
-      top: availableDays.findIndex((i) => i.value === currentDate.day) * 28,
-    });
-    monthsScrollerRef.current?.scrollBy({
-      top: months.findIndex((i) => i.value === currentDate.month) * 28,
-    });
-    yearsScrollerRef.current?.scrollBy({
-      top: years.findIndex((i) => i.value === currentDate.year) * 28,
-    });
+  useEffect(
+    () => {
+      daysScrollerRef.current?.scrollBy({
+        top: availableDays.findIndex((i) => i.value === currentDate.day) * 28,
+      });
+      monthsScrollerRef.current?.scrollBy({
+        top: months.findIndex((i) => i.value === currentDate.month) * 28,
+      });
+      yearsScrollerRef.current?.scrollBy({
+        top: years.findIndex((i) => i.value === currentDate.year) * 28,
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // availableDays, - only initial value needed
+      // currentDate, - only initial value needed
+      // months, - only initial value needed
+      // years - only initial value needed
+    ]
+  );
 
   useEffect(() => {
     setAvailableDays(() => {
@@ -198,6 +206,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
           ref={(el) => {
             daysScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {availableDays.map((d, i) => (
             <SScrollerItem
@@ -221,6 +230,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
           ref={(el) => {
             monthsScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {months.map((m, i) => (
             <SScrollerItem
@@ -244,6 +254,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
           ref={(el) => {
             yearsScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {years.map((y, i) => (
             <SScrollerItem

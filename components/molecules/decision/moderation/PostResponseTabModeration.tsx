@@ -606,6 +606,7 @@ const SShareButton = styled(Button)`
   align-self: end;
   position: static;
   width: 100%;
+  flex-shrink: 0;
 
   margin-top: 16px;
 

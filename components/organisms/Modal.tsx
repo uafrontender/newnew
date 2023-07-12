@@ -39,17 +39,16 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
-  const elementRef = useRef(null);
+  const modalContentContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const elementContainer = elementRef.current;
-
+    const modalContentContainer = modalContentContainerRef.current;
     if (show) {
-      enableOverlayMode(elementContainer);
+      enableOverlayMode(modalContentContainer);
     }
 
     return () => {
-      disableOverlayMode();
+      disableOverlayMode(modalContentContainer);
     };
   }, [show, enableOverlayMode, disableOverlayMode]);
 
@@ -105,11 +104,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        {React.isValidElement(children)
-          ? React.cloneElement(children as React.ReactElement<any>, {
-              ref: elementRef,
-            })
-          : children}
+        <SContent ref={modalContentContainerRef}>{children}</SContent>
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
@@ -135,7 +130,7 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
   height: calc(100% + 2px);
   transform: translateZ(0);
   overflow: hidden;
-  z-index: ${({ additionalz }) => additionalz ?? 10};
+  z-index: ${({ additionalz }) => additionalz ?? 12};
 
   backdrop-filter: ${({ custombackdropfiltervalue, nodimming }) =>
     // eslint-disable-next-line no-nested-ternary
@@ -179,6 +174,10 @@ const SClickableDiv = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
+`;
+
+const SContent = styled.div`
+  display: contents;
 `;
 
 export default Modal;

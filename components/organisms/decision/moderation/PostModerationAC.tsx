@@ -180,19 +180,23 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     );
 
-    const fetchPostLatestData = useCallback(async () => {
-      try {
-        const res = await refetchPost();
+    const fetchPostLatestData = useCallback(
+      async () => {
+        try {
+          const res = await refetchPost();
 
-        if (!res?.data || res.error) {
-          throw new Error(res?.error?.message ?? 'Request failed');
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
-      // Made not to depend on refetchPost from post inner state
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      [
+        // refetchPost - not to depend on refetchPost from post inner state
+      ]
+    );
 
     const handleRemoveOption = useCallback(
       async (optionToRemove: newnewapi.Auction.Option) => {
@@ -236,62 +240,78 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       }
     }, [winningOptionId, winningOption?.id]);
 
-    useEffect(() => {
-      const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
-        if (decoded.option && decoded.postUuid === post.postUuid) {
-          addOrUpdateAcOptionMutation?.mutate(decoded.option);
-        }
-      };
+    useEffect(
+      () => {
+        const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
+          if (decoded.option && decoded.postUuid === post.postUuid) {
+            addOrUpdateAcOptionMutation?.mutate(decoded.option);
+          }
+        };
 
-      const socketHandlerOptionDeleted = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.AcOptionDeleted.decode(arr);
+        const socketHandlerOptionDeleted = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
-        if (decoded.optionId) {
-          removeAcOptionMutation?.mutate({
-            id: decoded.optionId,
-          });
+          if (decoded.optionId) {
+            removeAcOptionMutation?.mutate({
+              id: decoded.optionId,
+            });
 
-          await fetchPostLatestData();
-        }
-      };
+            await fetchPostLatestData();
+          }
+        };
 
-      const socketHandlerPostData = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostUpdated.decode(arr);
+        const socketHandlerPostData = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.PostUpdated.decode(arr);
 
-        if (!decoded) {
-          return;
-        }
-        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-        if (decoded.post && decodedParsed.postUuid === post.postUuid) {
-          handleUpdatePostData(decoded.post);
-        }
-      };
+          if (!decoded) {
+            return;
+          }
+          const [decodedParsed] = switchPostType(
+            decoded.post as newnewapi.IPost
+          );
+          if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+            handleUpdatePostData(decoded.post);
+          }
+        };
 
-      if (socketConnection) {
-        socketConnection?.on(
-          'AcOptionCreatedOrUpdated',
-          socketHandlerOptionCreatedOrUpdated
-        );
-        socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection?.on('PostUpdated', socketHandlerPostData);
-      }
-
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off(
+        if (socketConnection) {
+          socketConnection?.on(
             'AcOptionCreatedOrUpdated',
             socketHandlerOptionCreatedOrUpdated
           );
-          socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
-          socketConnection?.off('PostUpdated', socketHandlerPostData);
+          socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.on('PostUpdated', socketHandlerPostData);
         }
-      };
+
+        return () => {
+          if (socketConnection && socketConnection?.connected) {
+            socketConnection?.off(
+              'AcOptionCreatedOrUpdated',
+              socketHandlerOptionCreatedOrUpdated
+            );
+            socketConnection?.off(
+              'AcOptionDeleted',
+              socketHandlerOptionDeleted
+            );
+            socketConnection?.off('PostUpdated', socketHandlerPostData);
+          }
+        };
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, postStatus, userData?.userUuid]);
+      [
+        socketConnection,
+        post,
+        postStatus,
+        userData?.userUuid,
+        // addOrUpdateAcOptionMutation, - reason unknown
+        // handleUpdatePostData, - reason unknown
+        // removeAcOptionMutation, - reason unknown
+      ]
+    );
 
     const goToNextStep = () => {
       if (

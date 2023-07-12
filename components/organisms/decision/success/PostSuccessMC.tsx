@@ -24,6 +24,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import WinningMcOptionSupporters from '../../../molecules/decision/common/WinningMcOptionSupporters';
 import DisplayName from '../../../atoms/DisplayName';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
 
 const McSuccessOptionsTab = dynamic(
   () =>
@@ -56,6 +57,8 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
 
     const { refetchPost, handleGoBackInsidePost } = usePostInnerState();
 
+    const { responseFromUrl } = useResponseNumberFromUrl();
+
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
       newnewapi.MultipleChoice.Option | undefined
@@ -64,7 +67,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     // Video
     // Open video tab
     const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
-      'announcement'
+      responseFromUrl ? 'response' : 'announcement'
     );
     // Response viewed
     const [responseViewed, setResponseViewed] = useState(

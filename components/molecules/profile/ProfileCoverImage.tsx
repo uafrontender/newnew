@@ -1,55 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { Area, Point } from 'react-easy-crop/types';
 
-import ProfileBackgroundCropper, {
-  CropperObjectFit,
-} from './ProfileBackgroundCropper';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
-
-import PencilIcon from '../../../public/images/svg/icons/filled/Edit.svg';
+import TrashIcon from '../../../public/images/svg/icons/filled/Trash.svg';
 import ImageIcon from '../../../public/images/svg/icons/filled/Image.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
 
-interface IProfileBackgroundInput {
-  originalPictureUrl?: string;
+interface IProfileCoverImage {
   pictureInEditUrl?: string;
-  coverUrlInEditAnimated: boolean;
-  crop: Point;
-  zoom: number;
-  initialObjectFit: CropperObjectFit;
   disabled: boolean;
   handleSetPictureInEdit: (files: FileList | null) => void;
   handleUnsetPictureInEdit: () => void;
-  onCropChange: (location: Point) => void;
-  onCropComplete:
-    | ((croppedArea: Area, croppedAreaPixels: Area) => void)
-    | undefined;
-  onZoomChange: ((zoom: number) => void) | undefined;
 }
 
-const ProfileBackgroundInput: React.FunctionComponent<
-  IProfileBackgroundInput
-> = ({
-  originalPictureUrl,
+const ProfileCoverImage: React.FunctionComponent<IProfileCoverImage> = ({
   pictureInEditUrl,
-  coverUrlInEditAnimated,
-  zoom,
-  crop,
-  initialObjectFit,
   disabled,
   handleSetPictureInEdit,
   handleUnsetPictureInEdit,
-  onCropChange,
-  onCropComplete,
-  onZoomChange,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
 
-  const [mobileCropWidth, setMobileCropWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -68,67 +42,25 @@ const ProfileBackgroundInput: React.FunctionComponent<
   const handleOnDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
 
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
 
     const { files } = e.dataTransfer;
     handleSetPictureInEdit(files);
   };
 
-  useEffect(() => {
-    const initialValue =
-      containerRef.current?.getBoundingClientRect().width ?? 0;
-    setMobileCropWidth(initialValue);
-
-    const resetMobileCropWidth = () => {
-      const newValue = containerRef.current?.getBoundingClientRect().width ?? 0;
-      setMobileCropWidth(newValue);
-    };
-
-    window.addEventListener('resize', resetMobileCropWidth);
-
-    return () => window.removeEventListener('resize', resetMobileCropWidth);
-  }, []);
-
   return (
-    <SProfileBackgroundInput
+    <SProfileCoverImageContainer
       ref={(el) => {
         containerRef.current = el!!;
       }}
     >
       {pictureInEditUrl ? (
         <>
-          {
-            // eslint-disable-next-line no-nested-ternary
-            originalPictureUrl === pictureInEditUrl ? (
-              <SOriginalImgDiv pictureUrl={originalPictureUrl}>
-                <img
-                  src={originalPictureUrl}
-                  alt='Profile cover'
-                  draggable={false}
-                />
-              </SOriginalImgDiv>
-            ) : !coverUrlInEditAnimated ? (
-              <ProfileBackgroundCropper
-                pictureUrlInEdit={pictureInEditUrl!!}
-                crop={crop}
-                zoom={zoom}
-                initialObjectFit={initialObjectFit}
-                mobileCropWidth={mobileCropWidth}
-                disabled={disabled}
-                onCropChange={disabled ? () => {} : onCropChange}
-                onCropComplete={disabled ? () => {} : onCropComplete}
-                onZoomChange={disabled ? () => {} : onZoomChange}
-              />
-            ) : (
-              <SOriginalImgDiv pictureUrl={pictureInEditUrl!!}>
-                <img
-                  src={pictureInEditUrl!!}
-                  alt='Profile cover'
-                  draggable={false}
-                />
-              </SOriginalImgDiv>
-            )
-          }
+          <SOriginalImgDiv>
+            <img src={pictureInEditUrl} alt='Profile cover' draggable={false} />
+          </SOriginalImgDiv>
           <SDeleteImgButton
             iconOnly
             size='sm'
@@ -140,14 +72,14 @@ const ProfileBackgroundInput: React.FunctionComponent<
               handleUnsetPictureInEdit();
             }}
             onClickCapture={() => {
-              Mixpanel.track('Click Clear Current Background Image Button', {
+              Mixpanel.track('Click Clear Current Cover Image Button', {
                 _stage: 'MyProfile',
-                _component: 'ProfileBackgroundInput',
+                _component: 'ProfileCoverImage',
               });
             }}
           >
             <InlineSvg
-              svg={PencilIcon}
+              svg={TrashIcon}
               width='20px'
               height='20px'
               fill='#FFFFFF'
@@ -168,9 +100,9 @@ const ProfileBackgroundInput: React.FunctionComponent<
             disabled={disabled}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const { files } = e.target;
-              Mixpanel.track('Add New Background Image', {
+              Mixpanel.track('Add New Cover Image', {
                 _stage: 'MyProfile',
-                _component: 'ProfileBackgroundInput',
+                _component: 'ProfileCoverImage',
               });
               handleSetPictureInEdit(files);
 
@@ -195,20 +127,17 @@ const ProfileBackgroundInput: React.FunctionComponent<
           </SChangeImageCaption>
         </SLabel>
       )}
-    </SProfileBackgroundInput>
+    </SProfileCoverImageContainer>
   );
 };
 
-ProfileBackgroundInput.defaultProps = {
-  originalPictureUrl: undefined,
+ProfileCoverImage.defaultProps = {
   pictureInEditUrl: undefined,
 };
 
-export default ProfileBackgroundInput;
+export default ProfileCoverImage;
 
-interface ISProfileBackgroundInput {}
-
-const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
+const SProfileCoverImageContainer = styled.div`
   position: relative;
   overflow: hidden;
 
@@ -254,9 +183,7 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
   }
 `;
 
-const SOriginalImgDiv = styled.div<{
-  pictureUrl: string;
-}>`
+const SOriginalImgDiv = styled.div`
   position: relative;
   overflow: hidden;
 

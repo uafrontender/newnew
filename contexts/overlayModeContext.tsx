@@ -2,12 +2,17 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import {
+  disableBodyScroll,
+  clearAllBodyScrollLocks,
+  enableBodyScroll,
+} from 'body-scroll-lock';
 
 export const OverlayModeContext = createContext<{
   overlayModeEnabled: boolean;
@@ -42,7 +47,31 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
         }
 
         if (elementContainer) {
-          disableBodyScroll(elementContainer);
+          disableBodyScroll(elementContainer, {
+            // Allow scroll for child elements
+            allowTouchMove: (targetEl) => {
+              const childElementsIgnoredBodyScrollLock =
+                elementContainer.querySelectorAll(
+                  '[data-body-scroll-lock-ignore="true"]'
+                );
+
+              if (
+                targetEl &&
+                // Check if target element is child of container which disables scroll
+                elementContainer.contains(targetEl) &&
+                // check if target element has data-body-scroll-lock-ignore attribute
+                // or if target element is child of element with data-body-scroll-lock-ignore attribute
+                (targetEl.getAttribute('data-body-scroll-lock-ignore') ||
+                  [...childElementsIgnoredBodyScrollLock].some((childEl) =>
+                    childEl.contains(targetEl)
+                  ))
+              ) {
+                return true;
+              }
+
+              return false;
+            },
+          });
         }
         return [...curr, id];
       });
@@ -50,17 +79,26 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
     []
   );
 
-  const disableOverlayMode = useCallback((id: string) => {
-    setRequests((curr) => {
-      const newRequests = curr.filter((request) => request !== id);
+  const disableOverlayMode = useCallback(
+    (id: string, elementContainer?: HTMLElement | null) => {
+      setRequests((curr) => {
+        const newRequests = curr.filter((request) => request !== id);
 
-      if (newRequests.length === 0) {
-        clearAllBodyScrollLocks();
-      }
+        if (elementContainer) {
+          enableBodyScroll(elementContainer);
+        }
 
-      return newRequests;
-    });
-  }, []);
+        return newRequests;
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (requests.length === 0) {
+      clearAllBodyScrollLocks();
+    }
+  }, [requests.length]);
 
   const contextValue = useMemo(
     () => ({
@@ -88,21 +126,22 @@ export function useOverlayMode() {
     );
   }
 
-  // Adding context to deps results in infinite loop
-
   const enable = useCallback(
     (elementContainer?: HTMLElement | null) =>
       context.enableOverlayMode(id.current, elementContainer),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // context, - causes infinite loop
+    ]
   );
 
-  // Adding context to deps results in infinite loop
-
   const disable = useCallback(
-    () => context.disableOverlayMode(id.current),
+    (elementContainer?: HTMLElement | null) =>
+      context.disableOverlayMode(id.current, elementContainer),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // context, - causes infinite loop
+    ]
   );
 
   return {

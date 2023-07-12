@@ -119,6 +119,7 @@
     "button": {
       "backToProfile": "編輯個人資料",
       "backToImage": "編輯個人資料圖片",
+      "backToCover": "編輯封面圖片",
       "save": "保存更改",
       "cancel": "取消"
     },
@@ -136,7 +137,7 @@
           "invalidChar": "名字中有無效字元",
           "inappropriate": "禁止使用冒犯性詞語",
           "linksForbidden": "不允許插入連結",
-          "sideSpacesForbidden_NEED_TRANSLATION": "Leading and trailing spaces aren't allowed"
+          "sideSpacesForbidden": "前面和後面均不能有空格"
         }
       },
       "username": {

@@ -23,6 +23,9 @@ export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
   userLoggedIn: boolean;
   userIsCreator: boolean;
+  // Must be optional until 30 days since token change is merged to BE prod
+  // IDEA: we can replace it with "canBEcomeCreator" from BE (DoB + appConstants needed)
+  userDateOfBirth: newnewapi.IDateComponents | undefined;
   handleUserLoggedIn: (isCreator: boolean) => void;
   handleBecameCreator: () => void;
   logoutAndRedirect: (redirectUrl?: string) => void;
@@ -31,6 +34,7 @@ export const AppStateContext = createContext<{
   resizeMode: 'mobile',
   userLoggedIn: false,
   userIsCreator: false,
+  userDateOfBirth: undefined,
   handleUserLoggedIn: () => {},
   handleBecameCreator: () => {},
   logoutAndRedirect: () => {},
@@ -67,6 +71,7 @@ function getIsCreator(accessToken: string | undefined): boolean {
       date: string;
       is_creator: boolean;
       iat: number;
+      dob: string;
       exp: number;
       aud: string;
       iss: string;
@@ -77,6 +82,36 @@ function getIsCreator(accessToken: string | undefined): boolean {
   return false;
 }
 
+function getUserDateOfBirth(
+  accessToken: string | undefined
+): newnewapi.IDateComponents | undefined {
+  if (accessToken) {
+    const decodedToken: {
+      account_id: string;
+      account_type: string;
+      date: string;
+      is_creator: boolean;
+      iat: number;
+      dob: string;
+      exp: number;
+      aud: string;
+      iss: string;
+    } = jwtDecode(accessToken);
+
+    if (decodedToken.dob) {
+      const date = new Date(decodedToken.dob);
+
+      return new newnewapi.DateComponents({
+        day: date.getDay(),
+        month: date.getMonth() + 1,
+        year: date.getFullYear(),
+      });
+    }
+  }
+
+  return undefined;
+}
+
 const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   accessToken,
   uaString,
@@ -85,6 +120,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   // Should we check that token is valid or just it's presence here?
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
   const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
+  const [userDateOfBirth] = useState(getUserDateOfBirth(accessToken));
   const [resizeMode, setResizeMode] = useState<TResizeMode>(
     getResizeMode(uaString)
   );
@@ -206,6 +242,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     () => ({
       userLoggedIn,
       userIsCreator,
+      userDateOfBirth,
       resizeMode,
       handleUserLoggedIn,
       handleBecameCreator,
@@ -214,6 +251,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
     [
       userLoggedIn,
       userIsCreator,
+      userDateOfBirth,
       resizeMode,
       handleUserLoggedIn,
       handleBecameCreator,

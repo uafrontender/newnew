@@ -205,7 +205,11 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused, innerRef]
+    [
+      handleSetIsPaused,
+      // resources, - reason unknown
+      innerRef,
+    ]
   );
 
   useEffect(() => {
@@ -356,7 +360,7 @@ const SContent = styled.div<ISContent>`
 
   &::before {
     content: '';
-    margin: -10px; // to prevent gaps
+    margin: -10%; // to prevent gaps
     position: absolute;
     top: 0;
     right: 0;

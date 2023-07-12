@@ -25,7 +25,7 @@
       "insights": "Estadísticas",
       "insightsTablet": "Ir a estadísticas",
       "cashOutTutorial": {
-        "gracePeriod_NEED_TRANSLATION": "Your balance updates every 3 days."
+        "gracePeriod": "Tu saldo se actualiza cada 3 días."
       },
       "cashOut": {
         "amount": "Tus ganancias en Stripe son",
@@ -41,7 +41,7 @@
         "textBio": "Añade una biografía para retirar tus ganancias",
         "textBank": "Añade tus datos bancarios para retirar tus ganancias",
         "button": "Añadir",
-        "stripeIssue_NEED_TRANSLATION": "There is a problem with your Stripe account or its setup is unfinished",
+        "stripeIssue": "Hay un problema con tu cuenta de Stripe o la configuración está incompleta.",
         "stripeIssueButton": "Ver cuenta de Stripe"
       },
       "makeDecision": {

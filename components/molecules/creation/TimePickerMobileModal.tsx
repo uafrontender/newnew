@@ -170,15 +170,23 @@ const TimePickerMobileModal: React.FunctionComponent<
     };
   }, [hours, minutes, handleUpdateHours, handleUpdateMinutes]);
 
-  useEffect(() => {
-    hoursScrollerRef.current?.scrollBy({
-      top: hours.findIndex((i) => i.value === currentTime.hours) * 28,
-    });
-    minutesScrollerRef.current?.scrollBy({
-      top: minutes.findIndex((i) => i.value === currentTime.minutes) * 28,
-    });
+  useEffect(
+    () => {
+      hoursScrollerRef.current?.scrollBy({
+        top: hours.findIndex((i) => i.value === currentTime.hours) * 28,
+      });
+      minutesScrollerRef.current?.scrollBy({
+        top: minutes.findIndex((i) => i.value === currentTime.minutes) * 28,
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // currentTime.hours, - only initial value needed, needs change
+      // currentTime.minutes, - only initial value needed, needs change
+      // hours, - only initial value needed, needs change
+      // minutes, - only initial value needed, needs change
+    ]
+  );
 
   useEffect(() => {
     if (
@@ -198,6 +206,7 @@ const TimePickerMobileModal: React.FunctionComponent<
           ref={(el) => {
             hoursScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {hours.map((d, i) => (
             <SScrollerItem
@@ -221,6 +230,7 @@ const TimePickerMobileModal: React.FunctionComponent<
           ref={(el) => {
             minutesScrollerRef.current = el!!;
           }}
+          data-body-scroll-lock-ignore
         >
           {minutes.map((m, i) => (
             <SScrollerItem

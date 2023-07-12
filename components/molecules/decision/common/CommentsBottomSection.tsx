@@ -131,56 +131,71 @@ const CommentsBottomSection: React.FunctionComponent<
     },
     [removeCommentMutation, showErrorToastPredefined]
   );
-  useEffect(() => {
-    if (commentsRoomId && isSocketConnected) {
-      addChannel(`comments_${commentsRoomId.toString()}`, {
-        chatRoomUpdates: {
-          chatRoomId: commentsRoomId,
-        },
-      });
-    }
+  useEffect(
+    () => {
+      if (commentsRoomId && isSocketConnected) {
+        addChannel(`comments_${commentsRoomId.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: commentsRoomId,
+          },
+        });
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentsRoomId, isSocketConnected]);
+    [
+      commentsRoomId,
+      isSocketConnected,
+      // addChannel, - reason unknown
+    ]
+  );
 
-  useEffect(() => {
-    const socketHandlerMessageCreated = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      if (
-        decoded?.newMessage &&
-        decoded.newMessage!!.sender?.uuid !== userData?.userUuid
-      ) {
-        addCommentMutation?.mutate(decoded.newMessage);
+  useEffect(
+    () => {
+      const socketHandlerMessageCreated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.ChatMessageCreated.decode(arr);
+        if (
+          decoded?.newMessage &&
+          decoded.newMessage!!.sender?.uuid !== userData?.userUuid
+        ) {
+          addCommentMutation?.mutate(decoded.newMessage);
+        }
+      };
+
+      const socketHandlerMessageDeleted = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.ChatMessageDeleted.decode(arr);
+        if (decoded.deletedMessage) {
+          removeCommentMutation?.mutate(decoded.deletedMessage);
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
+        socketConnection?.on('ChatMessageDeleted', socketHandlerMessageDeleted);
       }
-    };
 
-    const socketHandlerMessageDeleted = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.ChatMessageDeleted.decode(arr);
-      if (decoded.deletedMessage) {
-        removeCommentMutation?.mutate(decoded.deletedMessage);
-      }
-    };
-
-    if (socketConnection) {
-      socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
-      socketConnection?.on('ChatMessageDeleted', socketHandlerMessageDeleted);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off(
-          'ChatMessageCreated',
-          socketHandlerMessageCreated
-        );
-        socketConnection?.off(
-          'ChatMessageDeleted',
-          socketHandlerMessageDeleted
-        );
-      }
-    };
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'ChatMessageCreated',
+            socketHandlerMessageCreated
+          );
+          socketConnection?.off(
+            'ChatMessageDeleted',
+            socketHandlerMessageDeleted
+          );
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, userData?.userUuid]);
+    [
+      socketConnection,
+      userData?.userUuid,
+      // addCommentMutation, - reason unknown
+      // removeCommentMutation, - reason unknown
+    ]
+  );
 
   // Cleanup
   useEffect(
@@ -189,9 +204,11 @@ const CommentsBottomSection: React.FunctionComponent<
         removeChannel(`comments_${commentsRoomId.toString()}`);
       }
     },
-    // TODO: should it depend on commentsRoomId? Why not?
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // commentsRoomId, - reason unknown. why? looks odd
+      // removeChannel,  - reason unknown - reason unknown
+    ]
   );
 
   return (

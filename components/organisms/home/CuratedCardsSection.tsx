@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -52,7 +52,6 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
     ...restProps
   }) => {
     const { t } = useTranslation('page-Home');
-    const router = useRouter();
     const ref: any = useRef();
 
     const { resizeMode } = useAppState();
@@ -106,20 +105,19 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       </Link>
     );
 
-    const handleSeeMoreClick = () => {
+    const handleSeeMoreClick = useCallback(() => {
       Mixpanel.track('See More in Category Clicked');
       if (type === 'default' && seeMoreLink) {
-        router.push(seeMoreLink);
+        Router.push(seeMoreLink);
       }
-    };
+    }, [type, seeMoreLink]);
 
     // Try to pre-fetch the content
     useEffect(() => {
       if (seeMoreLink) {
-        router.prefetch(seeMoreLink);
+        Router.prefetch(seeMoreLink);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [seeMoreLink]);
 
     return (
       <SWrapper name={category} {...restProps}>
