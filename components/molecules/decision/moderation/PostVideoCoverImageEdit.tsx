@@ -214,7 +214,7 @@ const PostVideoCoverImageEdit: React.FunctionComponent<
 
   return (
     <Modal show={open} onClose={handleClose} additionalz={11}>
-      <SContainer onClick={preventCLick}>
+      <SContainer onClick={preventCLick} data-body-scroll-lock-ignore>
         <SModalTopContent>
           <SModalTopLine>
             {isMobile && (

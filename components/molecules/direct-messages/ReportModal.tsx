@@ -199,6 +199,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             onClose={handleClose}
             isMobileFullScreen
             onClick={preventParentClick()}
+            data-body-scroll-lock-ignore
           >
             <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
             <SCheckBoxList>
