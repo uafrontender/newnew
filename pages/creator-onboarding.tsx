@@ -46,13 +46,16 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 }) => {
   const { t } = useTranslation('page-CreatorOnboarding');
   const { appConstants } = useGetAppConstants();
-  const { userIsCreator } = useAppState();
+  const { userIsCreator, userDateOfBirth } = useAppState();
 
   const router = useRouter();
   const { userData, creatorData, updateCreatorData } = useUserData();
 
   useLeavePageConfirm(
-    canBecomeCreator(userData?.dateOfBirth, appConstants.minCreatorAgeYears),
+    canBecomeCreator(
+      userDateOfBirth ?? userData?.dateOfBirth,
+      appConstants.minCreatorAgeYears
+    ),
     t('detailsSection.leaveMsg'),
     ['/creator/dashboard', '/verify-new-email']
   );
@@ -67,12 +70,16 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
     }
 
     if (
-      !canBecomeCreator(userData?.dateOfBirth, appConstants.minCreatorAgeYears)
+      !canBecomeCreator(
+        userDateOfBirth ?? userData?.dateOfBirth,
+        appConstants.minCreatorAgeYears
+      )
     ) {
       router.replace('/');
     }
   }, [
     userIsCreator,
+    userDateOfBirth,
     userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
     router,
