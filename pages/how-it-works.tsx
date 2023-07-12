@@ -24,7 +24,8 @@ export const HowItWorks = () => {
   const { t } = useTranslation('page-HowItWorks');
   const theme = useTheme();
   const { appConstants } = useGetAppConstants();
-  const { resizeMode, userLoggedIn, userIsCreator } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth, resizeMode } =
+    useAppState();
   const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -148,7 +149,7 @@ export const HowItWorks = () => {
             {userLoggedIn &&
               !userIsCreator &&
               canBecomeCreator(
-                userData?.dateOfBirth,
+                userDateOfBirth ?? userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears
               ) && (
                 <Link href='/creator-onboarding'>

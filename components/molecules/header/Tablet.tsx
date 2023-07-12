@@ -32,7 +32,8 @@ export const Tablet: React.FC = () => {
   const { unreadCount } = useChatsUnreadMessages();
   const { userData } = useUserData();
   const { globalSearchActive } = useUiState();
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth, resizeMode } =
+    useAppState();
 
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
@@ -180,7 +181,7 @@ export const Tablet: React.FC = () => {
             {!userIsCreator && (
               <>
                 {canBecomeCreator(
-                  userData?.dateOfBirth,
+                  userDateOfBirth ?? userData?.dateOfBirth,
                   appConstants.minCreatorAgeYears
                 ) && (
                   <SItemWithMargin>
