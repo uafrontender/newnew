@@ -258,7 +258,6 @@ export const General: React.FC<IGeneral> = (props) => {
         >
           <Header
             visible={!isMobile || mobileNavigationVisible || globalSearchActive}
-            globalSearchActive={globalSearchActive}
           />
           <SContent noPaddingTop={!!noMobileNavigation}>
             <Container {...containerParams}>
