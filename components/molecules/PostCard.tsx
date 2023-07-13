@@ -12,7 +12,6 @@ import { newnewapi } from 'newnew-api';
 import Router from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
-import { useInView } from 'react-intersection-observer';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -121,9 +120,8 @@ export const PostCard: React.FC<ICard> = React.memo(
       resizeMode
     );
 
-    const { ref: wrapperRef, inView } = useInView({
-      threshold: 0.55,
-    });
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [inView, setInView] = useState(false);
 
     // Check if video is ready to avoid errors
     const videoRef = useRef<HTMLVideoElement>();
@@ -552,12 +550,47 @@ export const PostCard: React.FC<ICard> = React.memo(
     }, [postParsed.response?.coverImageUrl]);
 
     useEffect(() => {
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
       if (isMobile) {
-        if (inView) {
-          handleSetHovered();
-        } else {
-          handleSetUnhovered();
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                timeoutId = setTimeout(
+                  () => setInView(entry.isIntersecting),
+                  500
+                );
+              } else {
+                if (timeoutId) {
+                  clearTimeout(timeoutId);
+                }
+                setInView(entry.isIntersecting);
+              }
+            });
+          },
+          {
+            threshold: 0.55,
+          }
+        );
+
+        if (wrapperRef.current) {
+          obs.observe(wrapperRef.current);
         }
+      }
+
+      return () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      };
+    }, [isMobile]);
+
+    useEffect(() => {
+      if (inView) {
+        handleSetHovered();
+      } else {
+        handleSetUnhovered();
       }
     }, [isMobile, inView]);
 
