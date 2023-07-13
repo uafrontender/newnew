@@ -214,8 +214,9 @@ export const General: React.FC<IGeneral> = (props) => {
 
   const [inView, setInView] = useState(false);
 
+  // On iOS bottom navigation is sticky so we need it to hide bottom navigation
   useEffect(() => {
-    if (ref.current) {
+    if (ref.current && isIOS()) {
       const obs = new IntersectionObserver(
         (entries, observer) => {
           entries.forEach((entry) => {
@@ -230,6 +231,16 @@ export const General: React.FC<IGeneral> = (props) => {
       obs.observe(ref.current);
     }
   }, []);
+
+  const containerParams = useMemo(
+    () =>
+      restrictMaxWidth
+        ? {}
+        : {
+            wideContainer: true,
+          },
+    [restrictMaxWidth]
+  );
 
   return (
     <>
@@ -247,15 +258,10 @@ export const General: React.FC<IGeneral> = (props) => {
         >
           <Header
             visible={!isMobile || mobileNavigationVisible || globalSearchActive}
+            globalSearchActive={globalSearchActive}
           />
           <SContent noPaddingTop={!!noMobileNavigation}>
-            <Container
-              {...(restrictMaxWidth
-                ? {}
-                : {
-                    wideContainer: true,
-                  })}
-            >
+            <Container {...containerParams}>
               <Row noPaddingMobile={noPaddingMobile}>
                 <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
               </Row>
