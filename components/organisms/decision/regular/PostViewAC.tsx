@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import styled from 'styled-components';
@@ -16,7 +15,6 @@ import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useUserData } from '../../../../contexts/userDataContext';
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostTimer from '../../../molecules/decision/common/PostTimer';
@@ -39,6 +37,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import useMakeBidAfterStripeRedirect from '../../../../utils/hooks/useMakeBidAfterStripeRedirect';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -52,27 +51,6 @@ const PaymentSuccessModal = dynamic(
 const HeroPopup = dynamic(
   () => import('../../../molecules/decision/common/HeroPopup')
 );
-
-const getPayWithCardErrorMessage = (
-  status?: newnewapi.PlaceBidResponse.Status
-) => {
-  switch (status) {
-    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
-      return 'errors.notEnoughMoney';
-    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
-      return 'errors.cardNotFound';
-    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
-      return 'errors.cardCannotBeUsed';
-    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
-      return 'errors.biddingNotStarted';
-    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
-      return 'errors.biddingIsEnded';
-    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
-      return 'errors.optionNotUnique';
-    default:
-      return 'errors.requestFailed';
-  }
-};
 
 interface IPostViewAC {}
 
@@ -291,111 +269,43 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     ]
   );
 
-  const isBidMadeAfterRedirect = useRef(false);
+  const onSuccess = useCallback(
+    (optionFromResponse: newnewapi.Auction.Option) => {
+      const supportedOption = new newnewapi.Auction.Option({
+        ...optionFromResponse,
+        isSupportedByMe: true,
+      });
 
-  useEffect(
-    () => {
-      const controller = new AbortController();
-      const makeBidAfterStripeRedirect = async () => {
-        if (!stripeSetupIntentClientSecret || loadingModalOpen) {
-          return;
-        }
+      handleAddOrUpdateOptionFromResponse(supportedOption);
+      fetchPostLatestData();
+      setLoadingModalOpen(false);
+      setPaymentSuccessModalOpen(true);
+    },
+    [handleAddOrUpdateOptionFromResponse, fetchPostLatestData]
+  );
 
-        if (!userLoggedIn) {
-          router.push(
-            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-          );
-          return;
-        }
-
+  const onStatusChanged = useCallback(
+    (loading: boolean) => {
+      if (loading) {
+        setLoadingModalOpen(true);
+        resetSetupIntentClientSecret();
         Mixpanel.track('Make Bid After Stripe Redirect', {
           _stage: 'Post',
           _postUuid: post.postUuid,
           _component: 'PostViewAC',
         });
-
-        isBidMadeAfterRedirect.current = true;
-
-        try {
-          setLoadingModalOpen(true);
-
-          const stripeContributionRequest =
-            new newnewapi.StripeContributionRequest({
-              stripeSetupIntentClientSecret,
-              ...(saveCard !== undefined
-                ? {
-                    saveCard,
-                  }
-                : {}),
-            });
-
-          resetSetupIntentClientSecret();
-
-          const res = await placeBidOnAuction(
-            stripeContributionRequest,
-            controller.signal
-          );
-
-          if (
-            !res?.data ||
-            res.error ||
-            res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-          ) {
-            throw new Error(
-              res?.error?.message ??
-                t(getPayWithCardErrorMessage(res.data?.status))
-            );
-          }
-
-          const optionFromResponse = res.data
-            .option as newnewapi.Auction.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-          fetchPostLatestData();
-
-          setLoadingModalOpen(false);
-          setPaymentSuccessModalOpen(true);
-        } catch (err: any) {
-          console.error(err);
-          showErrorToastCustom(err.message);
-
-          setLoadingModalOpen(false);
-        } finally {
-          router.replace(
-            `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-              post.postShortId ? post.postShortId : post.postUuid
-            }`,
-            undefined,
-            { shallow: true }
-          );
-        }
-      };
-
-      if (stripeSetupIntentClientSecret && !isBidMadeAfterRedirect.current) {
-        makeBidAfterStripeRedirect();
+      } else {
+        setLoadingModalOpen(false);
       }
-
-      return () => {
-        controller.abort();
-      };
     },
-    // TODO: refactor into a hook similar to useBuyBundleAfterRedirect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      // fetchPostLatestData, - runs once
-      // handleAddOrUpdateOptionFromResponse, - runs once
-      // loadingModalOpen, - runs once
-      // post.postShortId, - runs once
-      // post.postUuid, - runs once
-      // resetSetupIntentClientSecret, - runs once
-      // router, - runs once
-      // saveCard, - runs once
-      // showErrorToastCustom, - runs once
-      // stripeSetupIntentClientSecret, - runs once
-      // t, - runs once
-      // userLoggedIn, - runs once
-    ]
+    [post.postUuid, resetSetupIntentClientSecret]
+  );
+
+  useMakeBidAfterStripeRedirect(
+    stripeSetupIntentClientSecret,
+    saveCard,
+    onSuccess,
+    onStatusChanged
   );
 
   const goToNextStep = () => {
@@ -632,7 +542,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.ac'
-              components={[<DisplayName user={post.creator} />]}
+              components={[<SDisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}
@@ -761,3 +671,7 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+const SDisplayName = styled(DisplayName)`
+  max-width: 100%;
+`;
