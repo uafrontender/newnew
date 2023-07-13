@@ -38,6 +38,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
+import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -47,9 +48,6 @@ const BlockedUser = dynamic(
 );
 const AccountDeleted = dynamic(
   () => import('../../molecules/direct-messages/AccountDeleted')
-);
-const ChatAreaCenter = dynamic(
-  () => import('../../molecules/direct-messages/ChatAreaCenter')
 );
 
 const MessagingDisabled = dynamic(
