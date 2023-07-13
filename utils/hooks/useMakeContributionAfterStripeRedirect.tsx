@@ -5,32 +5,63 @@ import { useTranslation } from 'react-i18next';
 import useErrorToasts from './useErrorToasts';
 import { useAppState } from '../../contexts/appStateContext';
 import { placeBidOnAuction } from '../../api/endpoints/auction';
+import { voteOnPost } from '../../api/endpoints/multiple_choice';
 
 const getPayWithCardErrorMessage = (
-  status?: newnewapi.PlaceBidResponse.Status
+  status?:
+    | newnewapi.PlaceBidResponse.Status
+    | newnewapi.VoteOnPostResponse.Status
 ) => {
   switch (status) {
     case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
+    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
       return 'errors.notEnoughMoney';
     case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
+    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
       return 'errors.cardNotFound';
     case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
+    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
     case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
       return 'errors.biddingNotStarted';
+    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
+      return 'errors.mcCancelled';
     case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
       return 'errors.biddingIsEnded';
+    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
+      return 'errors.mcFinished';
     case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
       return 'errors.optionNotUnique';
+    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
+      return 'errors.alreadyVoted';
+    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
+      return 'errors.mcVoteCountTooSmall';
+    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
+      return 'errors.notAllowedToCreateNewOption';
     default:
       return 'errors.requestFailed';
   }
 };
 
-function useMakeBidAfterStripeRedirect(
+function getContributionRequest(type: 'bid' | 'vote') {
+  if (type === 'bid') {
+    return placeBidOnAuction;
+  }
+
+  if (type === 'vote') {
+    return voteOnPost;
+  }
+
+  throw new Error(`unknown type ${type} at getContributionRequest`);
+}
+
+function useMakeContributionAfterStripeRedirect(
+  type: 'bid' | 'vote',
   stripeSetupIntentClientSecretFromRedirect?: string,
   saveCardFromRedirect?: boolean,
-  onSuccess?: (option: newnewapi.Auction.Option) => void,
+  onSuccess?:
+    | ((option: newnewapi.Auction.IOption) => void)
+    | ((option: newnewapi.MultipleChoice.IOption) => void),
   onLoadingChanged?: (loading: boolean) => void
 ) {
   const router = useRouter();
@@ -74,12 +105,15 @@ function useMakeBidAfterStripeRedirect(
         setStripeSetupIntentClientSecret(undefined);
         setSaveCard(undefined);
 
-        const res = await placeBidOnAuction(stripeContributionRequest);
+        const contributionRequest = getContributionRequest(type);
+        const res = await contributionRequest(stripeContributionRequest);
 
         if (
           !res?.data ||
           res.error ||
-          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+          (res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS &&
+            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS) ||
+          !res.data.option
         ) {
           throw new Error(
             res?.error?.message ??
@@ -87,8 +121,7 @@ function useMakeBidAfterStripeRedirect(
           );
         }
 
-        const optionFromResponse = res.data.option as newnewapi.Auction.Option;
-        onSuccess?.(optionFromResponse);
+        onSuccess?.(res.data.option);
       } catch (err: any) {
         console.error(err);
         showErrorToastCustom(err.message);
@@ -101,6 +134,7 @@ function useMakeBidAfterStripeRedirect(
       }
     },
     [
+      type,
       userLoggedIn,
       router,
       saveCard,
@@ -120,4 +154,4 @@ function useMakeBidAfterStripeRedirect(
   }, [stripeSetupIntentClientSecret, makeBidAfterStripeRedirect]);
 }
 
-export default useMakeBidAfterStripeRedirect;
+export default useMakeContributionAfterStripeRedirect;

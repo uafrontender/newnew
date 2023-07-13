@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
@@ -16,10 +15,7 @@ import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useUserData } from '../../../../contexts/userDataContext';
-import {
-  canCreateCustomOption,
-  voteOnPost,
-} from '../../../../api/endpoints/multiple_choice';
+import { canCreateCustomOption } from '../../../../api/endpoints/multiple_choice';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostTimer from '../../../molecules/decision/common/PostTimer';
@@ -45,6 +41,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import useMakeContributionAfterStripeRedirect from '../../../../utils/hooks/useMakeContributionAfterStripeRedirect';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -59,33 +56,6 @@ const HeroPopup = dynamic(
 const PaymentSuccessModal = dynamic(
   () => import('../../../molecules/decision/common/PaymentSuccessModal')
 );
-
-const getPayWithCardErrorMessage = (
-  status?: newnewapi.VoteOnPostResponse.Status
-) => {
-  switch (status) {
-    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
-      return 'errors.notEnoughMoney';
-    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
-      return 'errors.cardNotFound';
-    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
-      return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
-      return 'errors.mcCancelled';
-    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
-      return 'errors.mcFinished';
-    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
-      return 'errors.mcNotStarted';
-    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
-      return 'errors.alreadyVoted';
-    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
-      return 'errors.mcVoteCountTooSmall';
-    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
-      return 'errors.notAllowedToCreateNewOption';
-    default:
-      return 'errors.requestFailed';
-  }
-};
 
 interface IPostViewMC {}
 
@@ -350,110 +320,44 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     ]
   );
 
-  const isVoteMadeAfterRedirect = useRef(false);
+  const onSuccess = useCallback(
+    (optionFromResponse: newnewapi.MultipleChoice.IOption) => {
+      const supportedOption = new newnewapi.MultipleChoice.Option({
+        ...optionFromResponse,
+        isSupportedByMe: true,
+      });
 
-  useEffect(
-    () => {
-      const controller = new AbortController();
-      const makeVoteAfterStripeRedirect = async () => {
-        if (!stripeSetupIntentClientSecret || loadingModalOpen) {
-          return;
-        }
+      handleAddOrUpdateOptionFromResponse(supportedOption);
+      fetchPostLatestData();
+      setLoadingModalOpen(false);
+      setPaymentSuccessModalOpen(true);
+    },
+    [handleAddOrUpdateOptionFromResponse, fetchPostLatestData]
+  );
 
-        if (!userLoggedIn) {
-          router.push(
-            `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-          );
-          return;
-        }
-
-        isVoteMadeAfterRedirect.current = true;
-
-        Mixpanel.track('Make Vote After Stripe Redirect', {
+  const onStatusChanged = useCallback(
+    (loading: boolean) => {
+      if (loading) {
+        setLoadingModalOpen(true);
+        resetSetupIntentClientSecret();
+        Mixpanel.track('Make Bid After Stripe Redirect', {
           _stage: 'Post',
           _postUuid: post.postUuid,
-          _component: 'PostViewMC',
+          _component: 'PostViewAC',
         });
-
-        try {
-          setLoadingModalOpen(true);
-
-          const stripeContributionRequest =
-            new newnewapi.StripeContributionRequest({
-              stripeSetupIntentClientSecret,
-              ...(saveCard !== undefined
-                ? {
-                    saveCard,
-                  }
-                : {}),
-            });
-
-          resetSetupIntentClientSecret();
-
-          const res = await voteOnPost(
-            stripeContributionRequest,
-            controller.signal
-          );
-
-          if (
-            !res?.data ||
-            res.error ||
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-          ) {
-            throw new Error(
-              res?.error?.message ??
-                t(getPayWithCardErrorMessage(res.data?.status))
-            );
-          }
-
-          const optionFromResponse = res.data
-            .option as newnewapi.MultipleChoice.Option;
-          optionFromResponse.isSupportedByMe = true;
-          handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-          fetchPostLatestData();
-
-          setLoadingModalOpen(false);
-          setPaymentSuccessModalOpen(true);
-        } catch (err: any) {
-          console.error(err);
-          showErrorToastCustom(err.message);
-          setLoadingModalOpen(false);
-        } finally {
-          router.replace(
-            `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-              post.postShortId ? post.postShortId : post.postUuid
-            }`,
-            undefined,
-            { shallow: true }
-          );
-        }
-      };
-
-      if (stripeSetupIntentClientSecret && !isVoteMadeAfterRedirect.current) {
-        makeVoteAfterStripeRedirect();
+      } else {
+        setLoadingModalOpen(false);
       }
-
-      return () => {
-        controller.abort();
-      };
     },
-    // TODO: refactor into a hook similar to useBuyBundleAfterRedirect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      // fetchPostLatestData, - runs once
-      // handleAddOrUpdateOptionFromResponse, - runs once
-      // loadingModalOpen, - runs once
-      // post.postShortId, - runs once
-      // post.postUuid, - runs once
-      // resetSetupIntentClientSecret, - runs once
-      // router, - runs once
-      // saveCard, - runs once
-      // showErrorToastCustom, - runs once
-      // stripeSetupIntentClientSecret, - runs once
-      // t, - runs once
-      // userLoggedIn, - runs once
-    ]
+    [post.postUuid, resetSetupIntentClientSecret]
+  );
+
+  useMakeContributionAfterStripeRedirect(
+    'vote',
+    stripeSetupIntentClientSecret,
+    saveCard,
+    onSuccess,
+    onStatusChanged
   );
 
   const goToNextStep = () => {

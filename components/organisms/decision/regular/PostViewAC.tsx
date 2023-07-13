@@ -37,7 +37,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
-import useMakeBidAfterStripeRedirect from '../../../../utils/hooks/useMakeBidAfterStripeRedirect';
+import useMakeContributionAfterStripeRedirect from '../../../../utils/hooks/useMakeContributionAfterStripeRedirect';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -270,7 +270,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   );
 
   const onSuccess = useCallback(
-    (optionFromResponse: newnewapi.Auction.Option) => {
+    (optionFromResponse: newnewapi.Auction.IOption) => {
       const supportedOption = new newnewapi.Auction.Option({
         ...optionFromResponse,
         isSupportedByMe: true,
@@ -301,7 +301,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     [post.postUuid, resetSetupIntentClientSecret]
   );
 
-  useMakeBidAfterStripeRedirect(
+  useMakeContributionAfterStripeRedirect(
+    'bid',
     stripeSetupIntentClientSecret,
     saveCard,
     onSuccess,
