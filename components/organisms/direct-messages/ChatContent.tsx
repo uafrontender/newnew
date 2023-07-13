@@ -38,6 +38,7 @@ import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
+import isIOS from '../../../utils/isIOS';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -397,24 +398,32 @@ const ChatContent: React.FC<IFuncProps> = ({
   ]);
 
   useEffect(() => {
-    document.addEventListener(
-      'touchmove',
-      (e: TouchEvent) => {
-        const targetEl = e.target as HTMLElement;
-        const chatContent = chatContentRef?.current as HTMLElement;
+    const handleTouchMove = (e: TouchEvent) => {
+      const targetEl = e.target as HTMLElement;
+      const chatContent = chatContentRef?.current as HTMLElement | null;
 
-        if (
-          targetEl.getAttribute('data-body-scroll-lock-ignore') ||
-          chatContent.contains(targetEl)
-        ) {
-          return true;
-        }
-        e.preventDefault();
+      if (
+        targetEl.getAttribute('data-body-scroll-lock-ignore') ||
+        (chatContent && chatContent.contains(targetEl))
+      ) {
+        return true;
+      }
+      e.preventDefault();
 
-        return false;
-      },
-      { passive: false }
-    );
+      return false;
+    };
+
+    if (isIOS()) {
+      document.addEventListener('touchmove', handleTouchMove, {
+        passive: false,
+      });
+    }
+
+    return () => {
+      if (isIOS()) {
+        document.removeEventListener('touchmove', handleTouchMove);
+      }
+    };
   });
 
   const isBottomPartElementVisible =
