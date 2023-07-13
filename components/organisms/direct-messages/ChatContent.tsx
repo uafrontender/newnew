@@ -402,8 +402,6 @@ const ChatContent: React.FC<IFuncProps> = ({
 
     if (isMobileOrTablet) {
       disableBodyScroll(chatContent);
-    } else {
-      enableBodyScroll(chatContent);
     }
 
     return () => {

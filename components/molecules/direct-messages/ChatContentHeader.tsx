@@ -101,7 +101,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   }, [chatRoom?.visavis?.user?.username, router]);
 
   return (
-    <>
+    <SWrapper>
       <STopPart className={className}>
         {isBackButton && onBackButtonClick && (
           <GoBackButton onClick={goBackHandler} />
@@ -171,11 +171,15 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
       {isAnnouncement && !isMyAnnouncement && chatRoom?.visavis?.user && (
         <AnnouncementHeader user={chatRoom.visavis?.user} />
       )}
-    </>
+    </SWrapper>
   );
 };
 
 export default ChatContentHeader;
+
+const SWrapper = styled.div`
+  position: relative;
+`;
 
 const STopPart = styled.header`
   position: sticky;

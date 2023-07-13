@@ -21,12 +21,14 @@ interface IChatSidebar {
   hidden: boolean;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
   withTabs?: boolean;
+  className?: string;
 }
 
 const ChatSidebar: React.FC<IChatSidebar> = ({
   initialTab,
   hidden,
   withTabs,
+  className,
   onChatRoomSelect,
 }) => {
   const { searchChatroom } = useGetChats();
@@ -77,7 +79,7 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
 
   // TODO: move hidden to parent, just pass className here
   return (
-    <SSidebar hidden={hidden}>
+    <SSidebar hidden={hidden} className={className}>
       <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
       {isTabs && (
         <ChatListTabs

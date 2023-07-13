@@ -8,6 +8,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import SelectChat from '../../atoms/direct-messages/SelectChat';
 import Loader from '../../atoms/Loader';
 import ChatContent from './ChatContent';
+import isIOS from '../../../utils/isIOS';
 
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 
@@ -49,17 +50,41 @@ export const ChatContainer: React.FC<IChatContainer> = ({
   }, [router]);
 
   useEffect(() => {
-    document.addEventListener('focusin', (e) => {
-      const input = e.target as HTMLInputElement;
-      // TODO: Add some data attribute to input element, handle focusout
-      if (input) {
+    let input: HTMLInputElement | null = null;
+
+    const handleFocusIn = (e: Event) => {
+      input = e.target as HTMLInputElement;
+
+      if (input && input.getAttribute('data-new-message-textarea')) {
         input.style.transform = 'translateY(-99999px)';
 
         setTimeout(() => {
-          input.style.transform = '';
+          if (input) {
+            input.style.transform = '';
+          }
         }, 100);
       }
-    });
+    };
+
+    const handleFocusOut = (e: Event) => {
+      if (input) {
+        input.style.transform = '';
+      }
+    };
+
+    if (isIOS()) {
+      document.addEventListener('focusin', handleFocusIn);
+
+      document.addEventListener('focusout', handleFocusOut);
+    }
+
+    return () => {
+      if (isIOS()) {
+        document.removeEventListener('focusin', handleFocusIn);
+
+        document.removeEventListener('focusout', handleFocusOut);
+      }
+    };
   }, []);
 
   return (

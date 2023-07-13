@@ -133,7 +133,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   return (
     <SWrapper>
       <SContainer>
-        <ChatSidebar
+        <SChatSidebar
           initialTab={myRole}
           hidden={isMobileOrTablet && !!selectedChatRoomId}
           onChatRoomSelect={handleChatRoomSelect}
@@ -202,4 +202,8 @@ const SContent = styled.div<{
     margin: 0 0 0 auto;
     border-radius: ${({ theme }) => theme.borderRadius.large};
   }
+`;
+
+const SChatSidebar = styled(ChatSidebar)`
+  height: calc(var(--window-inner-height, 1vh) * 100);
 `;
