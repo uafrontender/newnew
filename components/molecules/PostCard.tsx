@@ -122,6 +122,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     );
 
     const { ref: wrapperRef, inView } = useInView({
+      skip: !isMobile,
       threshold: 0.55,
     });
 

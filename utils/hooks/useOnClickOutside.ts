@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react';
 export const useOnClickOutside = (
   ref: any | any[],
   // Don't forget to wrap callback into usecallback
-  handler: (e: Event) => void
+  handler: (e: Event) => void,
+  listenerName?: 'mousedown' | 'touchstart'
 ) => {
   const refs = useRef(Array.isArray(ref) ? ref : [ref]);
   useEffect(() => {
@@ -27,12 +28,12 @@ export const useOnClickOutside = (
       }
     };
 
-    document.addEventListener('mousedown', listener);
+    document.addEventListener(listenerName || 'mousedown', listener);
 
     return () => {
-      document.removeEventListener('mousedown', listener);
+      document.removeEventListener(listenerName || 'mousedown', listener);
     };
-  }, [refs, handler]);
+  }, [refs, handler, listenerName]);
 };
 
 export default useOnClickOutside;

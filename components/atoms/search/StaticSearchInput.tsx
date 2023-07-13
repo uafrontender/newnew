@@ -29,6 +29,7 @@ import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
 import isStringEmpty from '../../../utils/isStringEmpty';
+import isIOS from '../../../utils/isIOS';
 
 interface IStaticSearchInput {
   width?: string;
@@ -41,8 +42,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const { showErrorToastPredefined } = useErrorToasts();
     const queryClient = useQueryClient();
 
-    const inputRef: any = useRef();
-    const inputContainerRef: any = useRef();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const inputContainerRef = useRef<HTMLDivElement>(null);
 
     const resultsContainerRef = useRef(null);
 
@@ -224,6 +225,16 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       handleClickOutside
     );
 
+    // Exit global search on scroll for iOS to prevent issues with header
+    const handleCloseSearch = useCallback(() => {
+      if (globalSearchActive && isIOS() && !isResultsDropVisible) {
+        inputRef.current?.blur();
+        setGlobalSearchActive(false);
+      }
+    }, [globalSearchActive, setGlobalSearchActive, isResultsDropVisible]);
+
+    useOnClickOutside(inputContainerRef, handleCloseSearch, 'touchstart');
+
     useEffect(() => {
       const resizeObserver = new ResizeObserver(() => {
         setInputRightPosition(
@@ -358,6 +369,12 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       };
     }, [isMobileOrTablet, isResultsDropVisible]);
 
+    const handleInputBlur = () => {
+      if (!isResultsDropVisible) {
+        setGlobalSearchActive(false);
+      }
+    };
+
     return (
       <>
         {isMobileOrTablet && globalSearchActive ? (
@@ -407,6 +424,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
                   ? t('search.placeholderLong')
                   : t('search.placeholder')
               }
+              onBlur={handleInputBlur}
             />
           </SInputWrapper>
 
