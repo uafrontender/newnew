@@ -211,14 +211,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     );
 
     useEffect(() => {
-      console.log('post.postUuid changed');
-    }, [post.postUuid]);
-
-    useEffect(() => {
-      console.log('refetchPost changed');
-    }, [refetchPost]);
-
-    useEffect(() => {
       if (postStatus === 'waiting_for_response') {
         fetchPostLatestData();
       }
