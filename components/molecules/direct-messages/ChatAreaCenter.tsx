@@ -167,7 +167,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
 
   return (
     <SContainer className={className} isAnnouncement={isAnnouncement}>
-      <SMessagesContent ref={forwardRef}>
+      <SMessagesContent ref={forwardRef} data-body-scroll-lock-ignore>
         {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
         {hasNoMessagesYet && <NoMessagesYet />}
         {hasNoAnnouncementMessagesYet && <NoAnnouncementMessagesYet />}

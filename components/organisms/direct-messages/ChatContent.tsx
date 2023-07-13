@@ -11,7 +11,6 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -398,16 +397,25 @@ const ChatContent: React.FC<IFuncProps> = ({
   ]);
 
   useEffect(() => {
-    const chatContent = chatContentRef?.current as HTMLElement;
+    document.addEventListener(
+      'touchmove',
+      (e: TouchEvent) => {
+        const targetEl = e.target as HTMLElement;
+        const chatContent = chatContentRef?.current as HTMLElement;
 
-    if (isMobileOrTablet) {
-      disableBodyScroll(chatContent);
-    }
+        if (
+          targetEl.getAttribute('data-body-scroll-lock-ignore') ||
+          chatContent.contains(targetEl)
+        ) {
+          return true;
+        }
+        e.preventDefault();
 
-    return () => {
-      enableBodyScroll(chatContent);
-    };
-  }, [chatContentRef, isMobileOrTablet]);
+        return false;
+      },
+      { passive: false }
+    );
+  });
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
