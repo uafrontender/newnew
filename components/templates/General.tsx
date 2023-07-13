@@ -1,5 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -33,6 +39,7 @@ import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContex
 import MobileChat from '../organisms/MobileChat';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useUiState } from '../../contexts/uiStateContext';
+import isIOS from '../../utils/isIOS';
 
 interface IGeneral {
   className?: string;
@@ -202,86 +209,117 @@ export const General: React.FC<IGeneral> = (props) => {
     [isMobile, scrollDirection, noMobileNavigation]
   );
 
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  const [inView, setInView] = useState(false);
+
+  // On iOS bottom navigation is sticky so we need it to hide bottom navigation
+  useEffect(() => {
+    if (ref.current && isIOS()) {
+      const obs = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            setInView(entry.isIntersecting);
+          });
+        },
+        {
+          rootMargin: '90px',
+        }
+      );
+
+      obs.observe(ref.current);
+    }
+  }, []);
+
+  const containerParams = useMemo(
+    () =>
+      restrictMaxWidth
+        ? {}
+        : {
+            wideContainer: true,
+          },
+    [restrictMaxWidth]
+  );
+
   return (
-    <SBaseLayout
-      id='generalContainer'
-      className={className}
-      containerRef={wrapperRef}
-      withBanner={!!banner?.show}
-      noPaddingTop={!!noMobileNavigation}
-    >
-      <SkeletonTheme
-        baseColor={theme.colorsThemed.background.secondary}
-        highlightColor={theme.colorsThemed.background.tertiary}
+    <>
+      {/* header is sticky for iOS devices so padding for iOS devices isn't needed */}
+      <SBaseLayout
+        id='generalContainer'
+        className={className}
+        containerRef={wrapperRef}
+        withBanner={!!banner?.show}
+        noPaddingTop={!!noMobileNavigation || isIOS()}
       >
-        <Header
-          visible={!isMobile || mobileNavigationVisible || globalSearchActive}
-        />
-        <SContent noPaddingTop={!!noMobileNavigation}>
-          <Container
-            {...(restrictMaxWidth
-              ? {}
-              : {
-                  wideContainer: true,
-                })}
-          >
-            <Row noPaddingMobile={noPaddingMobile}>
-              <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
-            </Row>
-          </Container>
-        </SContent>
-        <Footer />
-        <BottomNavigation
-          collection={bottomNavigation}
-          moreMenuMobileOpen={moreMenuMobileOpen}
-          handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-          visible={mobileNavigationVisible && !globalSearchActive}
-        />
-        {hasMounted ? (
-          <>
-            <SortingContainer
-              id='sorting-container'
-              withCookie={cookies.accepted !== 'true'}
-              bottomNavigationVisible={mobileNavigationVisible}
-            />
-            <CookieContainer
-              bottomNavigationVisible={mobileNavigationVisible}
-              zIndex={moreMenuMobileOpen ? 9 : 10}
-            >
-              <Cookie />
-            </CookieContainer>
-          </>
-        ) : null}
-        {chatButtonVisible && (
-          <SChatContainer
-            bottomNavigationVisible={mobileNavigationVisible}
-            zIndex={mobileChatOpen ? 11 : moreMenuMobileOpen ? 9 : 10}
-          >
-            {!mobileChatOpen ? (
-              <FloatingMessages withCounter openChat={openChat} />
-            ) : (
-              <ChatsProvider>
-                <MobileChat myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
-              </ChatsProvider>
-            )}
-          </SChatContainer>
-        )}
-        {!isMobileOrTablet && !router.route.includes('direct-messages') && (
-          <ReportBugButton
-            bottom={
-              (isMobile ? 24 : 16) +
-              (isMobile && mobileNavigationVisible && !mobileChatOpen
-                ? 56
-                : 0) +
-              (chatButtonVisible && !mobileChatOpen ? 72 : 0)
-            }
-            right={4}
-            zIndex={moreMenuMobileOpen ? 9 : undefined}
+        <SkeletonTheme
+          baseColor={theme.colorsThemed.background.secondary}
+          highlightColor={theme.colorsThemed.background.tertiary}
+        >
+          <Header
+            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
           />
-        )}
-        <ModalNotifications />
-      </SkeletonTheme>
-    </SBaseLayout>
+          <SContent noPaddingTop={!!noMobileNavigation}>
+            <Container {...containerParams}>
+              <Row noPaddingMobile={noPaddingMobile}>
+                <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
+              </Row>
+            </Container>
+          </SContent>
+          <Footer />
+          <BottomNavigation
+            collection={bottomNavigation}
+            moreMenuMobileOpen={moreMenuMobileOpen}
+            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+            visible={mobileNavigationVisible && !globalSearchActive}
+            reachedPageEnd={inView}
+          />
+          <div ref={ref} />
+          {hasMounted ? (
+            <>
+              <SortingContainer
+                id='sorting-container'
+                withCookie={cookies.accepted !== 'true'}
+                bottomNavigationVisible={mobileNavigationVisible}
+              />
+              <CookieContainer
+                bottomNavigationVisible={mobileNavigationVisible}
+                zIndex={moreMenuMobileOpen ? 9 : 10}
+              >
+                <Cookie />
+              </CookieContainer>
+            </>
+          ) : null}
+          {chatButtonVisible && (
+            <SChatContainer
+              bottomNavigationVisible={mobileNavigationVisible}
+              zIndex={mobileChatOpen ? 11 : moreMenuMobileOpen ? 9 : 10}
+            >
+              {!mobileChatOpen ? (
+                <FloatingMessages withCounter openChat={openChat} />
+              ) : (
+                <ChatsProvider>
+                  <MobileChat myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
+                </ChatsProvider>
+              )}
+            </SChatContainer>
+          )}
+          {!isMobileOrTablet && !router.route.includes('direct-messages') && (
+            <ReportBugButton
+              bottom={
+                (isMobile ? 24 : 16) +
+                (isMobile && mobileNavigationVisible && !mobileChatOpen
+                  ? 56
+                  : 0) +
+                (chatButtonVisible && !mobileChatOpen ? 72 : 0)
+              }
+              right={4}
+              zIndex={moreMenuMobileOpen ? 9 : undefined}
+            />
+          )}
+          <ModalNotifications />
+        </SkeletonTheme>
+      </SBaseLayout>
+    </>
   );
 };
 
