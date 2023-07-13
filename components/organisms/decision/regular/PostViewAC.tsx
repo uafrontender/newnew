@@ -37,7 +37,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
-import useMakeContributionAfterStripeRedirect from '../../../../utils/hooks/useMakeContributionAfterStripeRedirect';
+import useMakeBidAfterStripeRedirect from '../../../../utils/hooks/useMakeBidAfterStripeRedirect';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -301,8 +301,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     [post.postUuid, resetSetupIntentClientSecret]
   );
 
-  useMakeContributionAfterStripeRedirect(
-    'bid',
+  useMakeBidAfterStripeRedirect(
     stripeSetupIntentClientSecret,
     saveCard,
     onSuccess,

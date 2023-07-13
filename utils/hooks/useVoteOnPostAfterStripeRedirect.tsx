@@ -4,34 +4,22 @@ import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useErrorToasts from './useErrorToasts';
 import { useAppState } from '../../contexts/appStateContext';
-import { placeBidOnAuction } from '../../api/endpoints/auction';
 import { voteOnPost } from '../../api/endpoints/multiple_choice';
 
 const getPayWithCardErrorMessage = (
-  status?:
-    | newnewapi.PlaceBidResponse.Status
-    | newnewapi.VoteOnPostResponse.Status
+  status?: newnewapi.VoteOnPostResponse.Status
 ) => {
   switch (status) {
-    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
     case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
       return 'errors.notEnoughMoney';
-    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
     case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
       return 'errors.cardNotFound';
-    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
     case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
       return 'errors.cardCannotBeUsed';
-    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
-      return 'errors.biddingNotStarted';
     case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
       return 'errors.mcCancelled';
-    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
-      return 'errors.biddingIsEnded';
     case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
       return 'errors.mcFinished';
-    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
-      return 'errors.optionNotUnique';
     case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
       return 'errors.alreadyVoted';
     case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
@@ -43,20 +31,7 @@ const getPayWithCardErrorMessage = (
   }
 };
 
-function getContributionRequest(type: 'bid' | 'vote') {
-  if (type === 'bid') {
-    return placeBidOnAuction;
-  }
-
-  if (type === 'vote') {
-    return voteOnPost;
-  }
-
-  throw new Error(`unknown type ${type} at getContributionRequest`);
-}
-
-function useMakeContributionAfterStripeRedirect(
-  type: 'bid' | 'vote',
+function useVoteOnPostAfterStripeRedirect(
   stripeSetupIntentClientSecretFromRedirect?: string,
   saveCardFromRedirect?: boolean,
   onSuccess?:
@@ -105,14 +80,12 @@ function useMakeContributionAfterStripeRedirect(
         setStripeSetupIntentClientSecret(undefined);
         setSaveCard(undefined);
 
-        const contributionRequest = getContributionRequest(type);
-        const res = await contributionRequest(stripeContributionRequest);
+        const res = await voteOnPost(stripeContributionRequest);
 
         if (
           !res?.data ||
           res.error ||
-          (res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS &&
-            res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS) ||
+          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
           !res.data.option
         ) {
           throw new Error(
@@ -134,7 +107,6 @@ function useMakeContributionAfterStripeRedirect(
       }
     },
     [
-      type,
       userLoggedIn,
       router,
       saveCard,
@@ -154,4 +126,4 @@ function useMakeContributionAfterStripeRedirect(
   }, [stripeSetupIntentClientSecret, makeBidAfterStripeRedirect]);
 }
 
-export default useMakeContributionAfterStripeRedirect;
+export default useVoteOnPostAfterStripeRedirect;
