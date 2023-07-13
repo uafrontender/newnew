@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { animateScroll } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -23,6 +23,7 @@ import { I18nNamespaces } from '../../@types/i18next';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import { TColorMode, useUiState } from '../../contexts/uiStateContext';
+import isIOS from '../../utils/isIOS';
 
 interface IFooter {}
 
@@ -157,7 +158,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   };
 
   return (
-    <SWrapper>
+    <SWrapper isIOSDevice={isIOS()}>
       <Container>
         <Row>
           <Col>
@@ -278,12 +279,21 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
 export default Footer;
 
-const SWrapper = styled.footer`
+const SWrapper = styled.footer<{
+  isIOSDevice: boolean;
+}>`
   padding-bottom: 36px;
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.background.secondary
       : props.theme.colorsThemed.background.primary};
+
+  ${({ isIOSDevice }) =>
+    isIOSDevice
+      ? css`
+          margin-bottom: -56px;
+        `
+      : null}
 `;
 
 const SContent = styled.div`
