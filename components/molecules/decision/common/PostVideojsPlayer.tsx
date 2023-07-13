@@ -225,6 +225,18 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       [resources]
     );
 
+    const handleExitFullscreen = useCallback(() => {
+      if (!isSafari() && !isIOS()) {
+        playerRef?.current?.exitFullscreen();
+      } else {
+        (
+          videoRef.current?.querySelector(
+            `.vjs-tech_${id}`
+          ) as TSafariHtmlPlayer
+        )?.webkitExitFullscreen();
+      }
+    }, [id]);
+
     // playerRef is set here, as well as all the listeners
     // List of video.js events
     // https://gist.github.com/alexrqs/a6db03bade4dc405a61c63294a64f97a
@@ -350,12 +362,15 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [
+        id,
+        resources, // unnecessary added for unknown reason
+        isInSlider,
+        shouldPrefetch, // unnecessary added for unknown reason
+        isActive,
+        setMutedMode,
+        handleExitFullscreen,
         handleSetIsPaused,
         onPlaybackFinished,
-        resources,
-        isInSlider,
-        shouldPrefetch,
-        isActive,
       ]
     );
 
@@ -379,18 +394,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           ) as TSafariHtmlPlayer
         )?.webkitEnterFullscreen();
         setIsFullscreen(true);
-      }
-    }, [id]);
-
-    const handleExitFullscreen = useCallback(() => {
-      if (!isSafari() && !isIOS()) {
-        playerRef?.current?.exitFullscreen();
-      } else {
-        (
-          videoRef.current?.querySelector(
-            `.vjs-tech_${id}`
-          ) as TSafariHtmlPlayer
-        )?.webkitExitFullscreen();
       }
     }, [id]);
 
@@ -537,9 +540,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           handleVolumeChangeSafari
         );
       };
-      // Skipping `dispatch`
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isFullscreen, id, isReady]);
+    }, [isFullscreen, id, isReady, setMutedMode]);
 
     // Set minimize button position in fullscreen
     // Listenere mostly for devtools screen size change
@@ -670,41 +671,50 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     }, [isFullscreen, fullscreenInteracted]);
 
     // Slider prefetching
-    useEffect(() => {
-      if (isInSlider) {
-        if (isActive) {
-          onPlaybackProgress?.(0);
-          const promise = playerRef?.current?.play();
+    useEffect(
+      () => {
+        if (isInSlider) {
+          if (isActive) {
+            onPlaybackProgress?.(0);
+            const promise = playerRef?.current?.play();
 
-          if (promise !== undefined) {
-            promise
-              .then(() => {
-                // Autoplay started!
-              })
-              .catch(() => {
-                // Autoplay was prevented.
-                // Try to mute and start over, catch with displaying pause button
-                console.warn('Autoplay is not allowed');
-                setMutedMode(true);
-                setTimeout(() => {
-                  playerRef.current?.play()?.catch((e) => {
-                    handleSetIsPaused(true);
-                  });
-                }, 100);
-              });
+            if (promise !== undefined) {
+              promise
+                .then(() => {
+                  // Autoplay started!
+                })
+                .catch(() => {
+                  // Autoplay was prevented.
+                  // Try to mute and start over, catch with displaying pause button
+                  console.warn('Autoplay is not allowed');
+                  setMutedMode(true);
+                  setTimeout(() => {
+                    playerRef.current?.play()?.catch((e) => {
+                      handleSetIsPaused(true);
+                    });
+                  }, 100);
+                });
+            }
+          } else {
+            playerRef?.current?.pause();
+            // Required to avoid one frame flickering when changing items in the slider
+            setTimeout(() => {
+              playerScrubberRef?.current?.changeCurrentTime(0);
+              postVideoFullscreenControlsRef?.current?.changeCurrentTime(0);
+              playerRef.current?.currentTime(0);
+            }, 100);
           }
-        } else {
-          playerRef?.current?.pause();
-          // Required to avoid one frame flickering when changing items in the slider
-          setTimeout(() => {
-            playerScrubberRef?.current?.changeCurrentTime(0);
-            postVideoFullscreenControlsRef?.current?.changeCurrentTime(0);
-            playerRef.current?.currentTime(0);
-          }, 100);
         }
-      }
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isInSlider, isActive]);
+      [
+        isInSlider,
+        isActive,
+        setMutedMode,
+        // handleSetIsPaused, - reason unknown
+        // onPlaybackProgress, - reason unknown
+      ]
+    );
 
     // Keyboard action handlers
     useEffect(() => {
@@ -923,7 +933,7 @@ const SContent = styled.div<{
 
   &::before {
     content: '';
-    margin: -10px; // to prevent gaps
+    margin: -10%; // to prevent gaps
     position: absolute;
     top: 0;
     right: 0;

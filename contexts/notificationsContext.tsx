@@ -84,7 +84,6 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
         socketHandlerNotificationUnreadCountsChanged
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   const contextValue = useMemo(

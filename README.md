@@ -127,3 +127,14 @@ In Contexts it is vital to check dependencies and ensure that no additional data
 
 - Use `Router` instead of `useRouter` hook whenever possible, as it does not cause effects and callbacks to be re-evaluated on page changed
 - Check the initialization and flow of the context with a help of `console.log` statements in every effect and callback. Avoid excessive calls.
+
+## Routing
+
+- The use of Router over useRouter hook is recommended for cases when the change in routing is not important. For example prefetching and changing state to a pre-defined one. useRouter hook object, set as dependency, causes extra calls of functions and effects. And thus, ideally, it should be used for cases where we care about a change in path, parameters and etc only. this is especially relevant for useEffect, useCallbacks and other hooks which should not depend on routing, but only use it declaratively.
+
+## overlayMode
+
+To prevent scrolling on iOS devices, the `overlayModeContext` utilizes the `body-scroll-lock` package, which is only applied when an element ref is provided.
+The `body-scroll-lock` package requires the reference of the element that should remain scrollable; otherwise, scrolling will be completely disabled on iOS devices, as `body-scroll-lock` disables the `touchMove` event.
+
+Since the `enableOverlayMode` is called within the `Modal` component, it becomes challenging to provide a scrollable element reference for all modals. So to allow scrolling inside a modal , the scrollable element should have a data attribute `data-body-scroll-lock-ignore`.

@@ -1004,44 +1004,63 @@ export const CreationSecondStepContent: React.FC<
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [videoProcessing, fileProcessing]
+    [
+      videoProcessing,
+      fileProcessing,
+      showErrorToastPredefined,
+      // setCreationFileProcessingETA, - reason unknown
+      // setCreationFileProcessingLoading, - reason unknown
+      // setCreationFileProcessingProgress, - reason unknown
+      // setCreationFileUploadError, - reason unknown
+    ]
   );
 
   const videoProcessingFallbackAbortControllerRef = useRef<
     AbortController | undefined
   >();
   // Video processing fallback
-  useEffect(() => {
-    async function videoProcessingFallback(hlsUrl: string) {
-      videoProcessingFallbackAbortControllerRef.current = new AbortController();
+  useEffect(
+    () => {
+      async function videoProcessingFallback(hlsUrl: string) {
+        videoProcessingFallbackAbortControllerRef.current =
+          new AbortController();
 
-      const available = await waitResourceIsAvailable(
-        hlsUrl,
-        {
-          maxAttempts: 720,
-          retryTimeMs: 5000,
-        },
-        videoProcessingFallbackAbortControllerRef?.current.signal
-      );
+        const available = await waitResourceIsAvailable(
+          hlsUrl,
+          {
+            maxAttempts: 720,
+            retryTimeMs: 5000,
+          },
+          videoProcessingFallbackAbortControllerRef?.current.signal
+        );
 
-      if (available) {
-        setCreationFileProcessingLoading(false);
-        setCreationFileProcessingProgress(100);
-      } else {
-        setCreationFileUploadError(true);
-        showErrorToastPredefined(undefined);
+        if (available) {
+          setCreationFileProcessingLoading(false);
+          setCreationFileProcessingProgress(100);
+        } else {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(undefined);
+        }
       }
-    }
 
-    if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
-      videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
-    }
+      if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
+        videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
+      }
 
-    return () => {
-      videoProcessingFallbackAbortControllerRef?.current?.abort();
-    };
+      return () => {
+        videoProcessingFallbackAbortControllerRef?.current?.abort();
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileProcessing.loading, videoProcessing?.targetUrls?.hlsStreamUrl]);
+    [
+      fileProcessing.loading,
+      videoProcessing?.targetUrls?.hlsStreamUrl,
+      showErrorToastPredefined,
+      // setCreationFileProcessingLoading, - reason unknown
+      // setCreationFileProcessingProgress, - reason unknown
+      // setCreationFileUploadError, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     if (socketConnection) {
@@ -1053,7 +1072,6 @@ export const CreationSecondStepContent: React.FC<
         socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
   useEffect(() => {
@@ -1090,6 +1108,7 @@ export const CreationSecondStepContent: React.FC<
   }, [activeTabIndex]);
 
   useEffect(() => {
+    console.log('PING');
     if (userTutorialsProgressSynced) {
       switch (tutorialType) {
         case 'MC': {
@@ -1125,9 +1144,13 @@ export const CreationSecondStepContent: React.FC<
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutorialType, userTutorialsProgressSynced]);
-
+  }, [
+    tutorialType,
+    userTutorialsProgressSynced,
+    userTutorialsProgress?.remainingAcCrCurrentStep,
+    userTutorialsProgress?.remainingCfCrCurrentStep,
+    userTutorialsProgress?.remainingMcCrCurrentStep,
+  ]);
   const goToNextStep = () => {
     let payload = null;
     switch (tutorialType) {

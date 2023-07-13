@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useQueryClient } from 'react-query';
@@ -28,6 +28,7 @@ import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
+import isStringEmpty from '../../../utils/isStringEmpty';
 
 interface IStaticSearchInput {
   width?: string;
@@ -78,15 +79,32 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const pushRouteOrClose = useCallback(
       (path: string) => {
         if (router.asPath === path) {
+          // Clear search right away
           setSearchValue('');
           setIsResultsDropVisible(false);
           setGlobalSearchActive(false);
         } else {
+          // Search clears later, when page changes
           router.push(path);
         }
       },
       [router, setGlobalSearchActive]
     );
+
+    // Clear search on page changed
+    useEffect(() => {
+      const clearSearch = () => {
+        setSearchValue('');
+        setIsResultsDropVisible(false);
+        setGlobalSearchActive(false);
+      };
+
+      Router.events.on('routeChangeComplete', clearSearch);
+
+      return () => {
+        Router.events.off('routeChangeComplete', clearSearch);
+      };
+    }, [setGlobalSearchActive]);
 
     const resetPostsSearchResultOnSearchPage = useCallback(
       (query: string) => {
@@ -145,7 +163,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           resetCreatorSearchResultOnSearchPage(encodedQuery);
         } else {
           pushRouteOrClose(`/search?query=${encodedQuery}&tab=posts`);
-
           resetPostsSearchResultOnSearchPage(firstChunk.text);
         }
       }
@@ -165,9 +182,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     }, [setGlobalSearchActive]);
 
     const handleInputChange = (e: any) => {
-      const onlySpacesRegex = /^\s+$/;
-
-      if (onlySpacesRegex.test(e.target.value)) {
+      if (isStringEmpty(e.target.value)) {
         setSearchValue('');
       } else {
         setSearchValue(e.target.value);

@@ -10,6 +10,7 @@ import ChatContent from './direct-messages/ChatContent';
 import ChatSidebar from './direct-messages/ChatSidebar';
 import Loader from '../atoms/Loader';
 import { getRoom } from '../../api/endpoints/chat';
+import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IChatContainer {
   myRole: newnewapi.ChatRoom.MyRole | undefined;
@@ -18,6 +19,8 @@ interface IChatContainer {
 export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
   const { setSearchChatroom } = useGetChats();
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -118,6 +121,14 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     setActiveChatRoom,
     queryClient,
   ]);
+
+  useEffect(() => {
+    enableOverlayMode();
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [disableOverlayMode, enableOverlayMode]);
 
   return (
     <SWrapper>

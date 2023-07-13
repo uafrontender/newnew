@@ -493,10 +493,15 @@ const SOptionInfo = styled(Text)<{
 
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  max-width: 100%;
 
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  white-space: pre;
 
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;

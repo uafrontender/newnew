@@ -20,7 +20,8 @@ export const Mobile: React.FC = () => {
   const { t } = useTranslation();
   const { appConstants } = useGetAppConstants();
 
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth, resizeMode } =
+    useAppState();
 
   const isMobileS = ['mobile', 'mobileS'].includes(resizeMode);
   const isMobileM = ['mobileM'].includes(resizeMode);
@@ -98,7 +99,7 @@ export const Mobile: React.FC = () => {
             )}
             {!userIsCreator &&
               canBecomeCreator(
-                userData?.dateOfBirth,
+                userDateOfBirth ?? userData?.dateOfBirth,
                 appConstants.minCreatorAgeYears
               ) && (
                 <SItemWithMargin>

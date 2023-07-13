@@ -394,12 +394,18 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleSetReadyToUploadAdditionalResponse,
   ]);
 
-  useEffect(() => {
-    if (responses?.length && responses?.length < 2) {
-      handleUnsetEditingStories();
-    }
+  useEffect(
+    () => {
+      if (responses?.length && responses?.length < 2) {
+        handleUnsetEditingStories();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [responses]);
+    [
+      responses,
+      // handleUnsetEditingStories, - reason unknown
+    ]
+  );
 
   return (
     <SContainer>
@@ -476,12 +482,13 @@ const SContainer = styled.div`
   height: 100%;
 `;
 
+// TODO: Needs to be responsive to accommodate for different languages
 const SUploadVideoButton = styled.button`
   position: absolute;
   top: 16px;
-  left: calc(50% - 60px);
+  left: calc(50% - 65px);
 
-  width: 120px;
+  width: 130px;
 
   color: ${({ theme }) => theme.colors.dark};
   background: #ffffff;
