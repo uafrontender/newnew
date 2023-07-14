@@ -28,10 +28,14 @@ const AnnouncementHeader: React.FC<IAnnouncementHeader> = React.memo(
 export default AnnouncementHeader;
 
 const SAnnouncementHeader = styled.div`
+  position: absolute;
+  bottom: 0;
+
   display: flex;
   justify-content: center;
   width: 100%;
   z-index: 1;
+  transform: translateY(100%);
 `;
 
 const SAnnouncementText = styled.div`
