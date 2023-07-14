@@ -80,8 +80,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
     }
 
     fetchUsersIBlocked();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usersIBlockedIds]);
+  }, [usersIBlockedIds, showErrorToastPredefined]);
 
   return (
     <SWrapper onMouseEnter={() => handleSetActive()}>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -289,10 +289,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         showErrorToastPredefined(undefined);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setCollectionLoaded, userLoggedIn, isCollectionLoading]
-  );
 
+    [userLoggedIn, isCollectionLoading, showErrorToastPredefined]
+  );
   // Scroll to top once category changed
   useEffect(() => {
     const category = router.query.category?.toString() ?? '';
@@ -321,7 +320,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     }
 
     if (!userLoggedIn && category === 'for-you') {
-      router?.push('/sign-up');
+      Router.push('/sign-up');
       return;
     }
 
@@ -362,14 +361,14 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
         sortingRef.current = sorting?.toString();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     inView,
     nextPageToken,
-    isCollectionLoading,
     router.query.category,
     router.query.sort,
     userLoggedIn,
+    isCollectionLoading,
+    loadPosts,
   ]);
 
   return (

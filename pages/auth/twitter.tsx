@@ -37,6 +37,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
     setMounted(true);
   }, []);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     if (userLoggedIn) {
       router?.push('/');
@@ -44,6 +45,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
       if (isLoading || userLoggedIn) {

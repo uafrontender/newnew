@@ -90,27 +90,33 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
     Router.prefetch('/creator/dashboard');
   }, []);
 
-  useEffect(() => {
-    async function fetchOnboardingState() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
+  useEffect(
+    () => {
+      async function fetchOnboardingState() {
+        try {
+          const payload = new newnewapi.EmptyRequest({});
+          const res = await getMyOnboardingState(payload);
 
-        if (res.data) {
-          setOnboardingState(res.data);
-          updateCreatorData({
-            ...creatorData,
-            ...res.data,
-          });
+          if (res.data) {
+            setOnboardingState(res.data);
+            updateCreatorData({
+              ...creatorData,
+              ...res.data,
+            });
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
-    }
 
-    fetchOnboardingState();
+      fetchOnboardingState();
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // creatorData, - reason unknown
+      // updateCreatorData, - reason unknown
+    ]
+  );
 
   return (
     <>
