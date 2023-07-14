@@ -104,8 +104,6 @@ const McOptionsTabModeration: React.FunctionComponent<
               : {}),
           }}
         >
-          {/* Seems like every option has a creator now. */}
-          {/* TODO: confirm, update types, remove unnecessary parameter 'creator'. */}
           {options.map((option, i) => (
             <McOptionCardModeration
               index={i}

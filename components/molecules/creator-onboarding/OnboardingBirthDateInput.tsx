@@ -228,7 +228,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<
           <AnimatedPresence animation='t-09'>
             <SErrorDiv>
               <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-              {/* TODO: improve error messages */}
+              {/* TODO: cover other errors */}
               {t('detailsSection.form.dateOfBirth.errors.tooYoung', {
                 value: appConstants.minCreatorAgeYears,
               })}
