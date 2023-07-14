@@ -12,6 +12,7 @@ import Container from '../atoms/Grid/Container';
 import { useAppState } from '../../contexts/appStateContext';
 import { useUiState } from '../../contexts/uiStateContext';
 import isIOS from '../../utils/isIOS';
+import isSafari from '../../utils/isSafari';
 
 interface IHeader {
   visible: boolean;
@@ -26,8 +27,6 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
     resizeMode
   );
 
-  const isIOSDevice = isIOS();
-
   const isTabletOrSmallDesktop = ['tablet', 'laptop'].includes(resizeMode);
   const isDesktop = ['laptopM', 'laptopL', 'desktop'].includes(resizeMode);
 
@@ -40,7 +39,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       visible={visible}
       withBanner={!!banner.show}
       ref={headerRef}
-      isIOSDevice={isIOSDevice}
+      isMobileSafari={isIOS() && !!isSafari()}
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>
@@ -64,13 +63,13 @@ interface ISWrapper {
   name: string;
   visible: boolean;
   withBanner: boolean;
-  isIOSDevice: boolean;
+  isMobileSafari: boolean;
 }
 
 // NOTE: 'transform: translateZ(0);' and '-41px' needed to fix mobile Safari issue with transparent line above header
 const SWrapper = styled.header<ISWrapper>`
-  ${({ isIOSDevice, withBanner }) =>
-    isIOSDevice
+  ${({ isMobileSafari, withBanner }) =>
+    isMobileSafari
       ? css`
           position: sticky;
           position: -webkit-sticky; /* Safari */
