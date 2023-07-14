@@ -1,12 +1,15 @@
-// import { newnewapi } from 'newnew-api';
 import { getServerSideSitemap } from 'next-sitemap';
-// import { searchPosts } from '../../api/endpoints/search';
 
 export const getServerSideProps = async (ctx) => {
   // Return nothing, if staging
   if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
     return getServerSideSitemap(ctx, []);
   }
+
+  const BASE_URL_SITEMAP = `${process.env.NEXT_PUBLIC_BASE_URL.replace(
+    '/v1',
+    ''
+  )}/sitemap`;
 
   // TODO: return see more?
   /* const SEE_MORE_CATEGORIES = ['ac', 'mc'];
@@ -16,32 +19,8 @@ export const getServerSideProps = async (ctx) => {
     lastmod: new Date().toISOString(),
   })); */
 
-  const postIds = [];
-  // let postIds = [];
-
-  // TODO: Load ALL posts (or all shortPostIds)
-  /* const payload = new newnewapi.SearchPostsRequest({
-    query: '',
-  });
-
-  const postsResponse = await searchPosts(payload);
-
-  if (postsResponse?.data && !postsResponse.error) {
-    postIds = postsResponse?.data?.posts
-      .map((post) => {
-        if (post.auction) {
-          return post.auction.postShortId;
-        }
-        if (post.crowdfunding) {
-          return post.crowdfunding.postShortId;
-        }
-        if (post.multipleChoice) {
-          return post.multipleChoice.postShortId;
-        }
-        return '';
-      })
-      .filter((postId) => postId !== '');
-  } */
+  const postsResponse = await fetch(`${BASE_URL_SITEMAP}/posts`);
+  const postIds = await postsResponse.json();
 
   const postUrlsEn = postIds.map((postId) => ({
     loc: `${process.env.NEXT_PUBLIC_APP_URL}/p/${postId}`,
@@ -58,12 +37,32 @@ export const getServerSideProps = async (ctx) => {
     lastmod: new Date().toISOString(),
   }));
 
-  // TODO: add creator profiles?
+  const creatorsResponse = await fetch(`${BASE_URL_SITEMAP}/creators`);
+  const creatorUsernames = await creatorsResponse.json();
+
+  const creatorUrlsEn = creatorUsernames.map((username) => ({
+    loc: `${process.env.NEXT_PUBLIC_APP_URL}/${username}`,
+    lastmod: new Date().toISOString(),
+  }));
+
+  const creatorUrlsEs = creatorUsernames.map((username) => ({
+    loc: `${process.env.NEXT_PUBLIC_APP_URL}/es/${username}`,
+    lastmod: new Date().toISOString(),
+  }));
+
+  const creatorUrlsZh = creatorUsernames.map((username) => ({
+    loc: `${process.env.NEXT_PUBLIC_APP_URL}/zh/${username}`,
+    lastmod: new Date().toISOString(),
+  }));
+
   const fields = [
     /* ...seeMoreSitemaps */
     ...postUrlsEn,
     ...postUrlsEs,
     ...postUrlsZh,
+    ...creatorUrlsEn,
+    ...creatorUrlsEs,
+    ...creatorUrlsZh,
   ];
 
   return getServerSideSitemap(ctx, fields);
