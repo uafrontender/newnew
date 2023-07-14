@@ -7,6 +7,7 @@ import BottomNavigationItem, {
 import MoreMenuMobile from './MoreMenuMobile';
 import { useAppState } from '../../contexts/appStateContext';
 import isIOS from '../../utils/isIOS';
+import isSafari from '../../utils/isSafari';
 
 interface IBottomNavigation {
   visible: boolean;
@@ -56,7 +57,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
       id='bottom-nav-mobile'
       visible={visible}
       isCreator={userIsCreator}
-      isIOSDevice={isIOS()}
+      isMobileSafari={isIOS() && !!isSafari()}
       reachedPageEnd={reachedPageEnd}
     >
       {collection?.map(renderItem)}
@@ -73,14 +74,14 @@ export default BottomNavigation;
 interface ISContainer {
   visible: boolean;
   isCreator: boolean;
-  isIOSDevice: boolean;
+  isMobileSafari: boolean;
   reachedPageEnd: boolean;
 }
 
 // NOTE: 'transform: translateZ(0);' and '-1px' needed to fix mobile Safari issue with transparent line under navigation bar
 const SContainer = styled.nav<ISContainer>`
-  ${({ isIOSDevice, reachedPageEnd }) =>
-    isIOSDevice
+  ${({ isMobileSafari, reachedPageEnd }) =>
+    isMobileSafari
       ? css`
           position: sticky;
           position: -webkit-sticky; /* Safari */
