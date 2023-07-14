@@ -54,20 +54,27 @@ const Home: NextPage<IHome> = ({
   const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  useEffect(() => {
-    if (isSocketConnected) {
-      addChannel(newnewapi.CuratedListType.POPULAR.toString(), {
-        curatedListUpdates: {
-          type: newnewapi.CuratedListType.POPULAR,
-        },
-      });
-    }
+  useEffect(
+    () => {
+      if (isSocketConnected) {
+        addChannel(newnewapi.CuratedListType.POPULAR.toString(), {
+          curatedListUpdates: {
+            type: newnewapi.CuratedListType.POPULAR,
+          },
+        });
+      }
 
-    return () => {
-      removeChannel(newnewapi.CuratedListType.POPULAR.toString());
-    };
+      return () => {
+        removeChannel(newnewapi.CuratedListType.POPULAR.toString());
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSocketConnected]);
+    [
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel,  - reason unknown
+    ]
+  );
 
   useEffect(() => {
     const handlerSocketCuratedListUpdated = (data: any) => {
