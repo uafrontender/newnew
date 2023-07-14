@@ -319,7 +319,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         // removeMcOptionMutation, - reason unknown
       ]
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     const goToNextStep = () => {
       if (
         userTutorialsProgress?.remainingMcSteps &&

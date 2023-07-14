@@ -27,26 +27,32 @@ const CreatorOnboardingStripe = () => {
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const { updateCreatorData } = useUserData();
 
-  useEffect(() => {
-    async function fetchOnboardingState() {
-      if (isLoading) return;
-      try {
-        setIsLoading(true);
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-        if (res.data) {
-          updateCreatorData(res.data);
-        }
+  useEffect(
+    () => {
+      async function fetchOnboardingState() {
+        if (isLoading) return;
+        try {
+          setIsLoading(true);
+          const payload = new newnewapi.EmptyRequest({});
+          const res = await getMyOnboardingState(payload);
+          if (res.data) {
+            updateCreatorData(res.data);
+          }
 
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err);
-        setIsLoading(false);
+          setIsLoading(false);
+        } catch (err) {
+          console.error(err);
+          setIsLoading(false);
+        }
       }
-    }
-    fetchOnboardingState();
+      fetchOnboardingState();
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // isLoading, - reason unknown
+      // updateCreatorData, - reason unknown
+    ]
+  );
 
   return (
     <>

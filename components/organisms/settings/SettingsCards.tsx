@@ -54,19 +54,23 @@ const SettingsCards: React.FunctionComponent<ISettingsCards> = () => {
     [cards]
   );
 
-  // Dependency on cards isn't added on purpose to prevent background updates on cards order change if primary card has changed.
-  // So cards has static backgrounds for one session
   // TODO: ideally store background for card in the DB
-  const backgroundsByCardUuid = useMemo(() => {
-    const obj: { [key: string]: string } = {};
-    cards.forEach((card, index) => {
-      obj[card.cardUuid! as string] =
-        assets.cards.background[index % assets.cards.background.length];
-    });
+  const backgroundsByCardUuid = useMemo(
+    () => {
+      const obj: { [key: string]: string } = {};
+      cards.forEach((card, index) => {
+        obj[card.cardUuid! as string] =
+          assets.cards.background[index % assets.cards.background.length];
+      });
 
-    return obj;
+      return obj;
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cards.length]);
+    [
+      // cards, - prevents background updates on cards order change if primary card has changed, so cards has static backgrounds for one session
+      cards.length, // update on number of cards changed
+    ]
+  );
 
   const notWhitelisted = useMemo(
     () => userData && !userData?.options?.isWhiteListed,

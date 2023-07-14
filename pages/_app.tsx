@@ -142,12 +142,17 @@ const MyApp = (props: IMyApp): ReactElement => {
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
   const PRE_FETCHING_DELAY = 2500;
-  useEffect(() => {
-    setTimeout(() => {
-      setPreFetchImages(themeFromCookie || 'light');
-    }, PRE_FETCHING_DELAY);
+  useEffect(
+    () => {
+      setTimeout(() => {
+        setPreFetchImages(themeFromCookie || 'light');
+      }, PRE_FETCHING_DELAY);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // themeFromCookie, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     // Imported one by one not to break import\no-dynamic-require rule
@@ -193,30 +198,37 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, []);
 
-  useEffect(() => {
-    // Requires user data to be loaded
-    if (!userData) {
-      return;
-    }
+  useEffect(
+    () => {
+      // Requires user data to be loaded
+      if (!userData) {
+        return;
+      }
 
-    if (userLoggedIn && userData.username) {
-      Mixpanel.identify(userData.userUuid);
-      Mixpanel.people.set({
-        $name: userData.username,
-        $email: userData.email,
-        newnewId: userData.userUuid,
-        isCreator: userIsCreator,
-      });
-      Mixpanel.register({
-        isCreator: userIsCreator,
-        username: userData.username,
-      });
-      Mixpanel.track('Session started!');
-    } else {
-      Mixpanel.track('Guest Session started!');
-    }
+      if (userLoggedIn && userData.username) {
+        Mixpanel.identify(userData.userUuid);
+        Mixpanel.people.set({
+          $name: userData.username,
+          $email: userData.email,
+          newnewId: userData.userUuid,
+          isCreator: userIsCreator,
+        });
+        Mixpanel.register({
+          isCreator: userIsCreator,
+          username: userData.username,
+        });
+        Mixpanel.track('Session started!');
+      } else {
+        Mixpanel.track('Guest Session started!');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+    [
+      userLoggedIn,
+      // userData, - reason unknown
+      // userIsCreator, - reason unknown
+    ]
+  );
 
   // TODO: move to the store logic
   useEffect(() => {

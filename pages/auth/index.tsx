@@ -52,6 +52,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
     setMounted(true);
   }, []);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     if (userLoggedIn) {
       router?.push('/');
@@ -59,6 +60,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
       if (isLoading || userLoggedIn) {
