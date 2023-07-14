@@ -265,6 +265,7 @@ const PostPage: NextPage<IPostPage> = ({
       });
 
       if (!userLoggedIn) {
+        // TODO: Add action on redirect
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );

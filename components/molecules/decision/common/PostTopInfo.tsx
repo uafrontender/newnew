@@ -234,6 +234,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       });
 
       if (!userLoggedIn) {
+        // TODO: Add action on redirect
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             window.location.href
