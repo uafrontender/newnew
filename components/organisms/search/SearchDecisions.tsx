@@ -19,11 +19,13 @@ export const SearchDecisions: React.FC<ISearchDecisions> = ({ query }) => {
   const { showErrorToastPredefined } = useErrorToasts();
   const { userLoggedIn } = useAppState();
 
-  const onLoadingCreatorsError = useCallback((err: any) => {
-    console.error(err);
-    showErrorToastPredefined(undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onLoadingCreatorsError = useCallback(
+    (err: any) => {
+      console.error(err);
+      showErrorToastPredefined(undefined);
+    },
+    [showErrorToastPredefined]
+  );
 
   const { data, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     useSearchPosts(

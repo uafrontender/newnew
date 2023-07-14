@@ -145,11 +145,9 @@ const Notification: React.FC<INotification> = ({
       content.relatedUser.uuid !== userData?.userUuid
     ) {
       return (
-        <>
-          <STitleText>
-            <DisplayName user={content.relatedUser} />
-          </STitleText>
-        </>
+        <STitleText>
+          <DisplayName user={content.relatedUser} />
+        </STitleText>
       );
     }
 

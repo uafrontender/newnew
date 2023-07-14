@@ -126,44 +126,52 @@ const CardSetupCompleteModal: React.FC<ICardSetupCompleteModal> = ({
     };
   }, [clientSecret, setupIntentId, isStatusChecked, t, addCardMutation]);
 
-  useEffect(() => {
-    const handleCardAdded = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.CardStatusChanged.decode(arr);
-      if (!decoded) {
-        return;
+  useEffect(
+    () => {
+      const handleCardAdded = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.CardStatusChanged.decode(arr);
+        if (!decoded) {
+          return;
+        }
+
+        setMessage(t(getCardStatusMessage(decoded.cardStatus)));
+
+        if (decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
+          setIsProcessing(false);
+          setIsStatusChecked(true);
+        }
+
+        if (
+          decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS &&
+          decoded.cardStatus !== newnewapi.CardStatus.ADDED
+        ) {
+          setIsError(true);
+        }
+        if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
+          addCardMutation?.mutate(decoded.card);
+          setIsCardAdded(true);
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on('CardStatusChanged', handleCardAdded);
       }
 
-      setMessage(t(getCardStatusMessage(decoded.cardStatus)));
-
-      if (decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS) {
-        setIsProcessing(false);
-        setIsStatusChecked(true);
-      }
-
-      if (
-        decoded.cardStatus !== newnewapi.CardStatus.IN_PROGRESS &&
-        decoded.cardStatus !== newnewapi.CardStatus.ADDED
-      ) {
-        setIsError(true);
-      }
-      if (decoded.cardStatus === newnewapi.CardStatus.ADDED && decoded.card) {
-        addCardMutation?.mutate(decoded.card);
-        setIsCardAdded(true);
-      }
-    };
-
-    if (socketConnection) {
-      socketConnection?.on('CardStatusChanged', handleCardAdded);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('CardStatusChanged', handleCardAdded);
-      }
-    };
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('CardStatusChanged', handleCardAdded);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection?.connected]);
+    [
+      socketConnection?.connected,
+      t,
+      // addCardMutation, - reason unknown
+      // socketConnection, - reason unknown
+    ]
+  );
 
   const handleCloseModal = () => {
     Mixpanel.track('Close Add Card Complete Modal', {

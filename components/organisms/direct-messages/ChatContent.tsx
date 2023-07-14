@@ -132,21 +132,29 @@ const ChatContent: React.FC<IFuncProps> = ({
     setIsConfirmBlockUserModalOpen(false);
   }, []);
 
-  useEffect(() => {
-    if (chatRoom.id && isSocketConnected) {
-      addChannel(`chat_${chatRoom.id.toString()}`, {
-        chatRoomUpdates: {
-          chatRoomId: chatRoom.id,
-        },
-      });
-    }
-    return () => {
-      if (chatRoom.id) {
-        removeChannel(`chat_${chatRoom.id.toString()}`);
+  useEffect(
+    () => {
+      if (chatRoom.id && isSocketConnected) {
+        addChannel(`chat_${chatRoom.id.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: chatRoom.id,
+          },
+        });
       }
-    };
+      return () => {
+        if (chatRoom.id) {
+          removeChannel(`chat_${chatRoom.id.toString()}`);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom, isSocketConnected]);
+    [
+      chatRoom,
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel, - reason unknown
+    ]
+  );
 
   const prevChatRoomId = useRef(chatRoom.id);
 
