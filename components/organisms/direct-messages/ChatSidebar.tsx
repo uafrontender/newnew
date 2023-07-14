@@ -21,12 +21,14 @@ interface IChatSidebar {
   hidden: boolean;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
   withTabs?: boolean;
+  className?: string;
 }
 
 const ChatSidebar: React.FC<IChatSidebar> = ({
   initialTab,
   hidden,
   withTabs,
+  className,
   onChatRoomSelect,
 }) => {
   const { searchChatroom } = useGetChats();
@@ -70,12 +72,20 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     [setActiveTab]
   );
 
+  const isTabs = useMemo(
+    () => withTabs && !searchChatroom && tabsVisible && !!activeTab,
+    [activeTab, searchChatroom, tabsVisible, withTabs]
+  );
+
   // TODO: move hidden to parent, just pass className here
   return (
-    <SSidebar hidden={hidden}>
+    <SSidebar hidden={hidden} className={className}>
       <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
-      {withTabs && !searchChatroom && tabsVisible && activeTab && (
-        <ChatListTabs activeTab={activeTab} changeActiveTab={changeActiveTab} />
+      {isTabs && (
+        <ChatListTabs
+          activeTab={activeTab!!}
+          changeActiveTab={changeActiveTab}
+        />
       )}
       <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
     </SSidebar>
@@ -92,6 +102,8 @@ const SSidebar = styled.div<{
   width: 100%;
   overflow: hidden;
   flex-direction: column;
+  height: 100%;
+  padding: 0 10px;
 
   ${(props) => props.theme.media.laptop} {
     background: none;

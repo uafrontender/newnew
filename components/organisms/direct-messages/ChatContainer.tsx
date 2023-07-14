@@ -64,6 +64,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({
             onBackButtonClick={handleCloseChatRoom}
             isMoreButton
             withChatMessageAvatars
+            isHidden={isMobileOrTablet && !chatRoomSelected}
           />
         )}
         {!activeChatRoom && !isLoading && !isMobileOrTablet && <SelectChat />}
@@ -76,9 +77,8 @@ export const ChatContainer: React.FC<IChatContainer> = ({
 export default ChatContainer;
 
 const SContainer = styled.div`
-  padding: 0 10px;
   overflow: hidden;
-  height: 100vh;
+  height: calc(var(--window-inner-height, 1vh) * 100);
 
   ${(props) => props.theme.media.laptop} {
     position: relative;
@@ -97,7 +97,6 @@ const SContent = styled.div<{
   position: relative;
   height: 100%;
   background: ${({ theme }) => theme.colorsThemed.background.secondary};
-  margin: 0 -15px;
   padding: 0;
 
   ${(props) => props.theme.media.laptop} {

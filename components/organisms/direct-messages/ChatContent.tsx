@@ -9,9 +9,8 @@ import React, {
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
-import { useMeasure } from 'react-use';
 
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -38,6 +37,8 @@ import { useAppState } from '../../../contexts/appStateContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
+import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
+import isIOS from '../../../utils/isIOS';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -47,9 +48,6 @@ const BlockedUser = dynamic(
 );
 const AccountDeleted = dynamic(
   () => import('../../molecules/direct-messages/AccountDeleted')
-);
-const ChatAreaCenter = dynamic(
-  () => import('../../molecules/direct-messages/ChatAreaCenter')
 );
 
 const MessagingDisabled = dynamic(
@@ -67,6 +65,7 @@ interface IFuncProps {
   withHeaderAvatar?: boolean;
   className?: string;
   variant?: 'primary' | 'secondary';
+  isHidden?: boolean;
   onBackButtonClick?: () => void;
 }
 
@@ -78,6 +77,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   withHeaderAvatar,
   className,
   variant,
+  isHidden,
   onBackButtonClick,
 }) => {
   const theme = useTheme();
@@ -122,9 +122,6 @@ const ChatContent: React.FC<IFuncProps> = ({
     useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
 
-  const [bottomPartRef, { height: bottomPartHeight }] =
-    useMeasure<HTMLDivElement>();
-
   const handleCloseConfirmBlockUserModal = useCallback(() => {
     Mixpanel.track('Close Block User Modal', {
       _stage: 'Direct Messages',
@@ -132,21 +129,29 @@ const ChatContent: React.FC<IFuncProps> = ({
     setIsConfirmBlockUserModalOpen(false);
   }, []);
 
-  useEffect(() => {
-    if (chatRoom.id && isSocketConnected) {
-      addChannel(`chat_${chatRoom.id.toString()}`, {
-        chatRoomUpdates: {
-          chatRoomId: chatRoom.id,
-        },
-      });
-    }
-    return () => {
-      if (chatRoom.id) {
-        removeChannel(`chat_${chatRoom.id.toString()}`);
+  useEffect(
+    () => {
+      if (chatRoom.id && isSocketConnected) {
+        addChannel(`chat_${chatRoom.id.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: chatRoom.id,
+          },
+        });
       }
-    };
+      return () => {
+        if (chatRoom.id) {
+          removeChannel(`chat_${chatRoom.id.toString()}`);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom, isSocketConnected]);
+    [
+      chatRoom,
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel, - reason unknown
+    ]
+  );
 
   const prevChatRoomId = useRef(chatRoom.id);
 
@@ -402,6 +407,74 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      const targetEl = e.target as HTMLElement;
+      const chatContent = chatContentRef?.current as HTMLElement | null;
+
+      if (
+        targetEl.getAttribute('data-body-scroll-lock-ignore') ||
+        (chatContent && chatContent.contains(targetEl))
+      ) {
+        return true;
+      }
+      e.preventDefault();
+
+      return false;
+    };
+
+    if (isIOS() && !isHidden) {
+      document.addEventListener('touchmove', handleTouchMove, {
+        passive: false,
+      });
+    }
+
+    return () => {
+      if (isIOS()) {
+        document.removeEventListener('touchmove', handleTouchMove);
+      }
+    };
+  }, [isHidden]);
+
+  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
+  useEffect(() => {
+    let input: HTMLInputElement | null = null;
+
+    const handleFocusIn = (e: Event) => {
+      input = e.target as HTMLInputElement;
+
+      if (input && input.getAttribute('data-new-message-textarea')) {
+        input.style.transform = 'translateY(-99999px)';
+
+        setTimeout(() => {
+          if (input) {
+            input.style.transform = '';
+          }
+        }, 100);
+      }
+    };
+
+    const handleFocusOut = (e: Event) => {
+      if (input) {
+        input.style.transform = '';
+      }
+    };
+
+    if (isIOS()) {
+      document.addEventListener('focusin', handleFocusIn);
+
+      document.addEventListener('focusout', handleFocusOut);
+    }
+
+    return () => {
+      if (isIOS()) {
+        document.removeEventListener('focusin', handleFocusIn);
+
+        document.removeEventListener('focusout', handleFocusOut);
+      }
+    };
+  }, []);
+
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
 
@@ -419,61 +492,61 @@ const ChatContent: React.FC<IFuncProps> = ({
         withAvatar={withHeaderAvatar}
       />
 
-      <SChatAreaCenter
-        forwardRef={chatContentRef}
-        chatRoom={chatRoom}
-        isAnnouncement={isAnnouncement}
-        withAvatars={withChatMessageAvatars}
-        variant={variant}
-        bottomOffset={isBottomPartElementVisible ? bottomPartHeight : 0}
-        isAnnouncementLabel={!isMyAnnouncement && isAnnouncement}
-      />
+      <SContent>
+        <ChatAreaCenter
+          forwardRef={chatContentRef}
+          chatRoom={chatRoom}
+          isAnnouncement={isAnnouncement}
+          withAvatars={withChatMessageAvatars}
+          variant={variant}
+        />
 
-      {isBottomPartElementVisible && (
-        <SBottomPart ref={bottomPartRef}>
-          <SBottomPartContentWrapper>
-            {isTextareaHidden ? (
-              whatComponentToDisplay()
-            ) : (
-              <SBottomTextarea>
-                <STextArea>
-                  <TextArea
-                    maxlength={500}
-                    value={messageText}
-                    onChange={handleChange}
-                    placeholder={t('chat.placeholder')}
-                    gotMaxLength={handleSubmit}
-                    variant={variant}
-                  />
-                </STextArea>
-                <SButton
-                  withShadow
-                  view={messageTextValid ? 'primaryGrad' : 'secondary'}
-                  onClick={handleSubmit}
-                  loading={sendingMessage}
-                  loadingAnimationColor='blue'
-                  disabled={
-                    sendingMessage ||
-                    !messageTextValid ||
-                    messageText.length < 1
-                  }
-                >
-                  <SInlineSVG
-                    svg={!sendingMessage ? sendIcon : ''}
-                    fill={
-                      messageTextValid && messageText.length > 0
-                        ? theme.colors.white
-                        : theme.colorsThemed.text.primary
+        {isBottomPartElementVisible && (
+          <SBottomPart>
+            <SBottomPartContentWrapper>
+              {isTextareaHidden ? (
+                whatComponentToDisplay()
+              ) : (
+                <SBottomTextarea>
+                  <STextArea>
+                    <TextArea
+                      maxlength={500}
+                      value={messageText}
+                      onChange={handleChange}
+                      placeholder={t('chat.placeholder')}
+                      gotMaxLength={handleSubmit}
+                      variant={variant}
+                    />
+                  </STextArea>
+                  <SButton
+                    withShadow
+                    view={messageTextValid ? 'primaryGrad' : 'secondary'}
+                    onClick={handleSubmit}
+                    loading={sendingMessage}
+                    loadingAnimationColor='blue'
+                    disabled={
+                      sendingMessage ||
+                      !messageTextValid ||
+                      messageText.length < 1
                     }
-                    width='24px'
-                    height='24px'
-                  />
-                </SButton>
-              </SBottomTextarea>
-            )}
-          </SBottomPartContentWrapper>
-        </SBottomPart>
-      )}
+                  >
+                    <SInlineSVG
+                      svg={!sendingMessage ? sendIcon : ''}
+                      fill={
+                        messageTextValid && messageText.length > 0
+                          ? theme.colors.white
+                          : theme.colorsThemed.text.primary
+                      }
+                      width='24px'
+                      height='24px'
+                    />
+                  </SButton>
+                </SBottomTextarea>
+              )}
+            </SBottomPartContentWrapper>
+          </SBottomPart>
+        )}
+      </SContent>
       {chatRoom.visavis && (
         <ReportModal
           show={confirmReportUser}
@@ -510,7 +583,7 @@ const SContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 80px 0 82px;
+  height: calc(var(--window-inner-height, 1vh) * 100);
 
   flex-shrink: 0;
 
@@ -518,22 +591,37 @@ const SContainer = styled.div`
     padding: 0;
     flex-shrink: unset;
   }
+
+  ${(props) => props.theme.media.laptop} {
+    height: 100%;
+  }
+`;
+
+const SContent = styled.div`
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  height: calc(var(--window-inner-height, 1vh) * 100 - 80px);
+
+  ${(props) => props.theme.media.laptop} {
+    height: 100%;
+  }
 `;
 
 const SBottomPart = styled.div`
   display: flex;
   flex-direction: column;
-  position: fixed;
+  /* position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0; */
+
   background: ${(props) => props.theme.colorsThemed.background.secondary};
 
   ${(props) => props.theme.media.tablet} {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
     background: none;
     min-height: 80px;
   }
@@ -572,31 +660,4 @@ const SButton = styled(Button)`
         ? props.theme.colors.white
         : props.theme.colorsThemed.button.background.secondary};
   }
-`;
-
-const SChatAreaCenter = styled(ChatAreaCenter)<{
-  bottomOffset: number;
-  isAnnouncementLabel: boolean;
-}>`
-  ${({ bottomOffset, theme, isAnnouncementLabel }) =>
-    bottomOffset !== undefined
-      ? css`
-          && {
-            bottom: ${`${bottomOffset}px`};
-          }
-
-          && {
-            // 80px chat area header height
-            ${theme.media.tablet} {
-              bottom: 0;
-              min-height: ${`calc(100% - ${
-                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
-              }px)`};
-              height: ${`calc(100vh - ${
-                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
-              }px)`};
-            }
-          }
-        `
-      : null}
 `;

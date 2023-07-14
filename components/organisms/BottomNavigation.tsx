@@ -1,22 +1,30 @@
 import React, { useCallback, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import BottomNavigationItem, {
   TBottomNavigationItem,
 } from '../molecules/BottomNavigationItem';
 import MoreMenuMobile from './MoreMenuMobile';
 import { useAppState } from '../../contexts/appStateContext';
+import isIOS from '../../utils/isIOS';
+import isSafari from '../../utils/isSafari';
 
 interface IBottomNavigation {
   visible: boolean;
   moreMenuMobileOpen: boolean;
+  reachedPageEnd: boolean;
   handleCloseMobileMenu: () => void;
   collection: TBottomNavigationItem[];
 }
 
 export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
-  const { visible, collection, moreMenuMobileOpen, handleCloseMobileMenu } =
-    props;
+  const {
+    visible,
+    collection,
+    moreMenuMobileOpen,
+    reachedPageEnd,
+    handleCloseMobileMenu,
+  } = props;
 
   const { userIsCreator } = useAppState();
 
@@ -49,6 +57,8 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
       id='bottom-nav-mobile'
       visible={visible}
       isCreator={userIsCreator}
+      isMobileSafari={isIOS() && !!isSafari()}
+      reachedPageEnd={reachedPageEnd}
     >
       {collection?.map(renderItem)}
       <MoreMenuMobile
@@ -64,21 +74,35 @@ export default BottomNavigation;
 interface ISContainer {
   visible: boolean;
   isCreator: boolean;
+  isMobileSafari: boolean;
+  reachedPageEnd: boolean;
 }
 
 // NOTE: 'transform: translateZ(0);' and '-1px' needed to fix mobile Safari issue with transparent line under navigation bar
 const SContainer = styled.nav<ISContainer>`
+  ${({ isMobileSafari, reachedPageEnd }) =>
+    isMobileSafari
+      ? css`
+          position: sticky;
+          position: -webkit-sticky; /* Safari */
+          opacity: ${() => (reachedPageEnd ? 0 : 1)};
+        `
+      : css`
+          position: fixed;
+          display: flex;
+        `}
+
   left: 0;
   width: 100vw;
   bottom: ${(props) => (props.visible ? '-1px' : '-60px')};
   z-index: 10;
   padding: 0 2px;
   display: flex;
-  position: fixed;
   transition: bottom ease 0.5s;
   align-items: center;
   justify-content: ${({ isCreator }) =>
     isCreator ? 'space-around' : 'center'};
   background-color: ${(props) => props.theme.colorsThemed.background.primary};
+
   transform: translateZ(0);
 `;

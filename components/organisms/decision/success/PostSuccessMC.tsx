@@ -73,22 +73,27 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
-    const fetchPostLatestData = useCallback(async () => {
-      try {
-        const res = await refetchPost();
+    const fetchPostLatestData = useCallback(
+      async () => {
+        try {
+          const res = await refetchPost();
 
-        if (!res?.data || res.error) {
-          throw new Error(res?.error?.message ?? 'Request failed');
-        }
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
+          }
 
-        if (res.data.multipleChoice?.isResponseViewedByMe) {
-          setResponseViewed(true);
+          if (res.data.multipleChoice?.isResponseViewedByMe) {
+            setResponseViewed(true);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      [
+        // refetchPost, - reason unknown, probably safe
+      ]
+    );
 
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
@@ -120,8 +125,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     // Check if the response has been viewed
     useEffect(() => {
       fetchPostLatestData();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [fetchPostLatestData]);
 
     // Scroll to comments if hash is present
     useEffect(() => {

@@ -55,8 +55,7 @@ const GetPaid = () => {
       }
     }
     fetchOnboardingState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoading, updateCreatorData]);
 
   return (
     <>

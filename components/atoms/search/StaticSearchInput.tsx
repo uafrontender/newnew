@@ -29,6 +29,7 @@ import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
 import isStringEmpty from '../../../utils/isStringEmpty';
+import isIOS from '../../../utils/isIOS';
 
 interface IStaticSearchInput {
   width?: string;
@@ -41,8 +42,8 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const { showErrorToastPredefined } = useErrorToasts();
     const queryClient = useQueryClient();
 
-    const inputRef: any = useRef();
-    const inputContainerRef: any = useRef();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const inputContainerRef = useRef<HTMLDivElement>(null);
 
     const resultsContainerRef = useRef(null);
 
@@ -224,6 +225,16 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       handleClickOutside
     );
 
+    // Exit global search on scroll for iOS to prevent issues with header
+    const handleCloseSearch = useCallback(() => {
+      if (globalSearchActive && isIOS() && !isResultsDropVisible) {
+        inputRef.current?.blur();
+        setGlobalSearchActive(false);
+      }
+    }, [globalSearchActive, setGlobalSearchActive, isResultsDropVisible]);
+
+    useOnClickOutside(inputContainerRef, handleCloseSearch, 'touchstart');
+
     useEffect(() => {
       const resizeObserver = new ResizeObserver(() => {
         setInputRightPosition(
@@ -307,36 +318,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
     }, [debouncedSearchValue, isMobileOrTablet, getQuickSearchResult]);
 
-    useEffect(() => {
-      document.documentElement.style.setProperty(
-        '--window-inner-height',
-        `${window.visualViewport?.height || window.innerHeight}px`
-      );
-    }, []);
-
-    useEffect(() => {
-      const handleUpdateWindowInnerHeightValue = (event: Event) => {
-        document.documentElement.style.setProperty(
-          '--window-inner-height',
-          `${(event.target as VisualViewport)?.height || window.innerHeight}px`
-        );
-      };
-
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      }
-
-      return () => {
-        window.visualViewport?.removeEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      };
-    }, []);
-
     const closeSearch = useCallback(() => {
       handleSearchClose();
       setSearchValue('');
@@ -357,6 +338,12 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
         }
       };
     }, [isMobileOrTablet, isResultsDropVisible]);
+
+    const handleInputBlur = () => {
+      if (!isResultsDropVisible) {
+        setGlobalSearchActive(false);
+      }
+    };
 
     return (
       <>
@@ -407,6 +394,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
                   ? t('search.placeholderLong')
                   : t('search.placeholder')
               }
+              onBlur={handleInputBlur}
             />
           </SInputWrapper>
 
@@ -632,7 +620,9 @@ const SResultsDropMobile = styled.div`
 
 const SResultsDropMobileContentWrapper = styled.div`
   padding: 16px;
-  max-height: calc(var(--window-inner-height) - 50px); // 50px needs for ios
+  max-height: calc(
+    var(--window-inner-height, 1vh) * 100 - 50px
+  ); // 50px needs for ios
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;

@@ -2,7 +2,7 @@ import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSidePropsContext, NextPage } from 'next';
-import { useRouter } from 'next/dist/client/router';
+import Router, { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -34,63 +34,71 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   // Redirect if the user is not logged in
   useEffect(() => {
     if (!userLoggedIn) {
-      router.replace('/');
+      Router.replace('/');
     }
-  }, [userLoggedIn, router]);
+  }, [userLoggedIn]);
 
   // Listen to Me update event
-  useEffect(() => {
-    const handlerSocketMeUpdated = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.MeUpdated.decode(arr);
+  useEffect(
+    () => {
+      const handlerSocketMeUpdated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.MeUpdated.decode(arr);
 
-      if (!decoded) {
-        return;
-      }
-
-      if (redirect === 'dashboard') {
-        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
-
-        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
-
-        if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
-          throw new Error('Become creator failed');
+        if (!decoded) {
+          return;
         }
 
-        // TODO: ideally we want it happen in syncUserWrapper as well
-        updateUserData({
-          options: {
-            isActivityPrivate:
-              becomeCreatorRes.data.me?.options?.isActivityPrivate,
-            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
-            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
-            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
-          },
-        });
+        if (redirect === 'dashboard') {
+          const becomeCreatorPayload = new newnewapi.EmptyRequest({});
 
-        handleUserLoggedIn(
-          becomeCreatorRes.data.me?.options?.isCreator ?? false
-        );
+          const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+          if (!becomeCreatorRes?.data || becomeCreatorRes.error) {
+            throw new Error('Become creator failed');
+          }
+
+          // TODO: ideally we want it happen in syncUserWrapper as well
+          updateUserData({
+            options: {
+              isActivityPrivate:
+                becomeCreatorRes.data.me?.options?.isActivityPrivate,
+              isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+              isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+              creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+            },
+          });
+
+          handleUserLoggedIn(
+            becomeCreatorRes.data.me?.options?.isCreator ?? false
+          );
+        }
+
+        if (redirect === 'settings') {
+          Router.push('/profile/settings');
+        } else {
+          Router.push('/creator/dashboard?askPushNotificationPermission=true');
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
       }
 
-      if (redirect === 'settings') {
-        router.push('/profile/settings');
-      } else {
-        router.push('/creator/dashboard?askPushNotificationPermission=true');
-      }
-    };
-
-    if (socketConnection) {
-      socketConnection?.on('MeUpdated', handlerSocketMeUpdated);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
-      }
-    };
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('MeUpdated', handlerSocketMeUpdated);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
+    [
+      socketConnection,
+      // handleUserLoggedIn, - reason unknown
+      // redirect, - reason unknown
+      // updateUserData, - reason unknown
+    ]
+  );
 
   if (!email || !redirect) {
     return <></>;

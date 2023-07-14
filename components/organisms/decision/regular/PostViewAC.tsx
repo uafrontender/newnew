@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import styled from 'styled-components';
@@ -16,7 +15,6 @@ import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useUserData } from '../../../../contexts/userDataContext';
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostTimer from '../../../molecules/decision/common/PostTimer';
@@ -39,6 +37,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import useMakeBidAfterStripeRedirect from '../../../../utils/hooks/useMakeBidAfterStripeRedirect';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -52,27 +51,6 @@ const PaymentSuccessModal = dynamic(
 const HeroPopup = dynamic(
   () => import('../../../molecules/decision/common/HeroPopup')
 );
-
-const getPayWithCardErrorMessage = (
-  status?: newnewapi.PlaceBidResponse.Status
-) => {
-  switch (status) {
-    case newnewapi.PlaceBidResponse.Status.NOT_ENOUGH_MONEY:
-      return 'errors.notEnoughMoney';
-    case newnewapi.PlaceBidResponse.Status.CARD_NOT_FOUND:
-      return 'errors.cardNotFound';
-    case newnewapi.PlaceBidResponse.Status.CARD_CANNOT_BE_USED:
-      return 'errors.cardCannotBeUsed';
-    case newnewapi.PlaceBidResponse.Status.BIDDING_NOT_STARTED:
-      return 'errors.biddingNotStarted';
-    case newnewapi.PlaceBidResponse.Status.BIDDING_ENDED:
-      return 'errors.biddingIsEnded';
-    case newnewapi.PlaceBidResponse.Status.OPTION_NOT_UNIQUE:
-      return 'errors.optionNotUnique';
-    default:
-      return 'errors.requestFailed';
-  }
-};
 
 interface IPostViewAC {}
 
@@ -181,18 +159,23 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     [removeAcOptionMutation]
   );
 
-  const fetchPostLatestData = useCallback(async () => {
-    try {
-      const res = await refetchPost();
+  const fetchPostLatestData = useCallback(
+    async () => {
+      try {
+        const res = await refetchPost();
 
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // refetchPost, - reason unknown
+    ]
+  );
 
   const [lastContributedOptionId, setLastContributedOptionId] = useState<
     number | undefined
@@ -218,151 +201,112 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     [post]
   ); */
 
-  useEffect(() => {
-    const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
-      if (decoded.option && decoded.postUuid === post.postUuid) {
-        addOrUpdateAcOptionMutation?.mutate(decoded.option);
-      }
-    };
+  useEffect(
+    () => {
+      const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          addOrUpdateAcOptionMutation?.mutate(decoded.option);
+        }
+      };
 
-    const socketHandlerOptionDeleted = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.AcOptionDeleted.decode(arr);
+      const socketHandlerOptionDeleted = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
-      if (decoded.optionId) {
-        removeAcOptionMutation?.mutate({
-          id: decoded.optionId,
-        });
+        if (decoded.optionId) {
+          removeAcOptionMutation?.mutate({
+            id: decoded.optionId,
+          });
 
-        await fetchPostLatestData();
-      }
-    };
+          await fetchPostLatestData();
+        }
+      };
 
-    const socketHandlerPostData = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostUpdated.decode(arr);
+      const socketHandlerPostData = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostUpdated.decode(arr);
 
-      if (!decoded) {
-        return;
-      }
-      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
-        handleUpdatePostData(decoded.post);
-      }
-    };
+        if (!decoded) {
+          return;
+        }
+        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
+        if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+          handleUpdatePostData(decoded.post);
+        }
+      };
 
-    if (socketConnection) {
-      socketConnection?.on(
-        'AcOptionCreatedOrUpdated',
-        socketHandlerOptionCreatedOrUpdated
-      );
-      socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
-      socketConnection?.on('PostUpdated', socketHandlerPostData);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off(
+      if (socketConnection) {
+        socketConnection?.on(
           'AcOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection?.off('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('AcOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
       }
-    };
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'AcOptionCreatedOrUpdated',
+            socketHandlerOptionCreatedOrUpdated
+          );
+          socketConnection?.off('AcOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, userData?.userUuid]);
+    [
+      socketConnection,
+      post,
+      userData?.userUuid,
+      // addOrUpdateAcOptionMutation, - reason unknown
+      // fetchPostLatestData, - reason unknown
+      // handleUpdatePostData, - reason unknown
+      // removeAcOptionMutation, - reason unknown
+    ]
+  );
 
-  const isBidMadeAfterRedirect = useRef(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const makeBidAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret || loadingModalOpen) {
-        return;
-      }
-
-      if (!userLoggedIn) {
-        router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-        );
-        return;
-      }
-
-      Mixpanel.track('Make Bid After Stripe Redirect', {
-        _stage: 'Post',
-        _postUuid: post.postUuid,
-        _component: 'PostViewAC',
+  const onSuccess = useCallback(
+    (optionFromResponse: newnewapi.Auction.IOption) => {
+      const supportedOption = new newnewapi.Auction.Option({
+        ...optionFromResponse,
+        isSupportedByMe: true,
       });
 
-      isBidMadeAfterRedirect.current = true;
+      handleAddOrUpdateOptionFromResponse(supportedOption);
+      fetchPostLatestData();
+      setLoadingModalOpen(false);
+      setPaymentSuccessModalOpen(true);
+    },
+    [handleAddOrUpdateOptionFromResponse, fetchPostLatestData]
+  );
 
-      try {
+  const onStatusChanged = useCallback(
+    (loading: boolean) => {
+      if (loading) {
         setLoadingModalOpen(true);
-
-        const stripeContributionRequest =
-          new newnewapi.StripeContributionRequest({
-            stripeSetupIntentClientSecret,
-            ...(saveCard !== undefined
-              ? {
-                  saveCard,
-                }
-              : {}),
-          });
-
         resetSetupIntentClientSecret();
-
-        const res = await placeBidOnAuction(
-          stripeContributionRequest,
-          controller.signal
-        );
-
-        if (
-          !res?.data ||
-          res.error ||
-          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-        ) {
-          throw new Error(
-            res?.error?.message ??
-              t(getPayWithCardErrorMessage(res.data?.status))
-          );
-        }
-
-        const optionFromResponse = res.data.option as newnewapi.Auction.Option;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-        fetchPostLatestData();
-
+        Mixpanel.track('Make Bid After Stripe Redirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewAC',
+        });
+      } else {
         setLoadingModalOpen(false);
-        setPaymentSuccessModalOpen(true);
-      } catch (err: any) {
-        console.error(err);
-        showErrorToastCustom(err.message);
-
-        setLoadingModalOpen(false);
-      } finally {
-        router.replace(
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postShortId ? post.postShortId : post.postUuid
-          }`,
-          undefined,
-          { shallow: true }
-        );
       }
-    };
+    },
+    [post.postUuid, resetSetupIntentClientSecret]
+  );
 
-    if (stripeSetupIntentClientSecret && !isBidMadeAfterRedirect.current) {
-      makeBidAfterStripeRedirect();
-    }
-
-    return () => {
-      controller.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useMakeBidAfterStripeRedirect(
+    stripeSetupIntentClientSecret,
+    saveCard,
+    onSuccess,
+    onStatusChanged
+  );
 
   const goToNextStep = () => {
     if (
@@ -598,7 +542,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.ac'
-              components={[<DisplayName user={post.creator} />]}
+              components={[<SDisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}
@@ -727,3 +671,7 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
+
+const SDisplayName = styled(DisplayName)`
+  max-width: 100%;
+`;
