@@ -70,6 +70,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           maxLength={maxlength}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
+          data-new-message-textarea
         />
       </SContent>
       {error ? (

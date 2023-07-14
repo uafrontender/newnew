@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useAppState } from '../../contexts/appStateContext';
 import General from './General';
@@ -19,24 +19,6 @@ const ChatLayout: React.FunctionComponent<IChatLayout> = React.memo(
       'mobileL',
       'tablet',
     ].includes(resizeMode);
-
-    useEffect(() => {
-      if (isMobileOrTablet) {
-        document.body.style.cssText = `
-          overflow: hidden;
-          height: 100vh;
-        `;
-      } else {
-        document.body.style.cssText = ``;
-      }
-    }, [isMobileOrTablet]);
-
-    useEffect(
-      () => () => {
-        document.body.style.cssText = '';
-      },
-      []
-    );
 
     return isMobileOrTablet ? (
       <SWrapper
@@ -61,7 +43,8 @@ export default ChatLayout;
 
 const SWrapper = styled.div`
   position: relative;
-  height: 100vh;
+  height: 100%;
+
   width: 100vw;
   overflow: hidden;
 `;
