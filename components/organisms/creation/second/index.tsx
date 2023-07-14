@@ -783,7 +783,6 @@ export const CreationSecondStepContent: React.FC<
     () => (
       <>
         <SItemWrapper>
-          {/* TODO: move to locales */}
           <SInputLabel htmlFor='title'>
             {t('secondStep.input.label')}
           </SInputLabel>

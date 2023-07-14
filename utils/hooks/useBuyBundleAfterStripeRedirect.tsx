@@ -68,15 +68,12 @@ function useBuyBundleAfterStripeRedirect(
         // Clear stripeSecret from query to avoid same request on page reload
         // Removes all query parameters. Change in case you need any
         const path = router.asPath.split('?')[0];
-        router.replace(path);
+        router.replace(path, undefined, { shallow: true });
       }
     },
     [userLoggedIn, router, saveCard, t, onSuccess, showErrorToastCustom]
   );
 
-  // A Delay allows to cancel first request when the second full re-render happens
-  // TODO: use abortController instead?
-  // Can be abandoned after we get rid of Redux which causes double rendering
   useEffect(() => {
     if (!stripeSetupIntentClientSecret) {
       return;
