@@ -17,18 +17,12 @@ import PostCard, {
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 
-import { formatString } from '../../../utils/format';
-
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 
-interface ICardSection {
-  user?: {
-    avatarUrl: string;
-    username: string;
-  };
+interface ICuratedCardsSection {
   type?: 'default' | 'creator';
   title?: string;
   category: string;
@@ -39,9 +33,8 @@ interface ICardSection {
   onReachEnd?: () => void;
 }
 
-export const CardsSection: React.FC<ICardSection> = React.memo(
+export const CuratedCardsSection: React.FC<ICuratedCardsSection> = React.memo(
   ({
-    user,
     type,
     title,
     category,
@@ -73,36 +66,44 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
       return false;
     }, [isMobile, collection?.length]);
 
-    const renderItem = (item: any, index: number) => (
-      <Link
-        href={`/p/${
-          switchPostType(item)[0].postShortId
-            ? switchPostType(item)[0].postShortId
-            : switchPostType(item)[0].postUuid
-        }`}
-        key={switchPostType(item)[0].postUuid}
-      >
-        <SItemWrapper
-          name={`cards-section-${category}-${index}`}
-          onClickCapture={() => {
-            Mixpanel.track('Open Post', {
-              _stage: 'Post Card',
-              _postUuid: switchPostType(item)[0].postUuid,
-              _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-                switchPostType(item)[0].postShortId ||
-                switchPostType(item)[0].postUuid
-              }`,
-            });
-          }}
+    const renderItem = useCallback(
+      (item: any, index: number) => (
+        <Link
+          href={`/p/${
+            switchPostType(item)[0].postShortId
+              ? switchPostType(item)[0].postShortId
+              : switchPostType(item)[0].postUuid
+          }`}
+          key={switchPostType(item)[0].postUuid}
         >
-          <SPostCard
-            item={item}
-            index={index}
-            height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
-            maxWidthTablet='224px'
-          />
-        </SItemWrapper>
-      </Link>
+          <SItemWrapper
+            name={`cards-section-${category}-${index}`}
+            onClickCapture={() => {
+              Mixpanel.track('Open Post', {
+                _stage: 'Post Card',
+                _postUuid: switchPostType(item)[0].postUuid,
+                _target: `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                  switchPostType(item)[0].postShortId ||
+                  switchPostType(item)[0].postUuid
+                }`,
+              });
+            }}
+          >
+            <SPostCard
+              item={item}
+              index={index}
+              height={isMobile ? '564px' : isTablet ? '412px' : '596px'}
+              maxWidthTablet='224px'
+            />
+          </SItemWrapper>
+        </Link>
+      ),
+      [category, isMobile, isTablet]
+    );
+
+    const collectionR = useMemo(
+      () => collection?.map(renderItem),
+      [collection, renderItem]
     );
 
     const handleSeeMoreClick = useCallback(() => {
@@ -129,7 +130,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         <SListContainer ref={ref}>
           <SListWrapper id={`${category}-scrollContainer`}>
             {!loading ? (
-              collection?.map(renderItem)
+              collectionR
             ) : (
               <SCardSkeletonSection
                 count={!isMobile ? (isLaptop || isTablet ? 3 : 4) : 1}
@@ -143,8 +144,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
               {t(
                 type === 'default' || isMobile
                   ? 'cardsSection.button.showMore'
-                  : 'cardsSection.button.showMoreCreator',
-                { name: formatString(user?.username, true) }
+                  : 'cardsSection.button.showMoreCreator'
               )}
             </Button>
           </SButtonHolder>
@@ -154,14 +154,10 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
   }
 );
 
-export default CardsSection;
+export default CuratedCardsSection;
 
-CardsSection.defaultProps = {
+CuratedCardsSection.defaultProps = {
   type: 'default',
-  user: {
-    avatarUrl: '',
-    username: '',
-  },
   title: '',
   loading: undefined,
 };
