@@ -15,7 +15,7 @@ import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useMyPosts from '../../../utils/hooks/useMyPosts';
 import { Mixpanel } from '../../../utils/mixpanel';
 
-const YourPostsSection = () => {
+const YourPostsSection = React.memo(() => {
   const { t: tCommon } = useTranslation('common');
   const { t } = useTranslation('page-Home');
 
@@ -168,7 +168,7 @@ const YourPostsSection = () => {
       )}
     </SContainer>
   );
-};
+});
 
 const SContainer = styled.section`
   position: relative;

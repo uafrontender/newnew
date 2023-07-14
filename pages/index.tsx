@@ -14,7 +14,7 @@ import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSect
 import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
-import CardsSection from '../components/organisms/home/CuratedCardsSection';
+import CuratedCardsSection from '../components/organisms/home/CuratedCardsSection';
 import HeroSection from '../components/organisms/home/HeroSection';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
@@ -180,7 +180,7 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-const SCardsSection = styled(CardsSection)`
+const SCardsSection = styled(CuratedCardsSection)`
   &:first-child {
     padding-top: 0;
   }
