@@ -237,6 +237,38 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, [userData?.username]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--window-inner-height',
+      `${(window.visualViewport?.height || window.innerHeight) / 100}px`
+    );
+  }, []);
+
+  useEffect(() => {
+    const handleUpdateWindowInnerHeightValue = (event: Event) => {
+      document.documentElement.style.setProperty(
+        '--window-inner-height',
+        `${
+          ((event.target as VisualViewport)?.height || window.innerHeight) / 100
+        }px`
+      );
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        'resize',
+        handleUpdateWindowInnerHeightValue
+      );
+    }
+
+    return () => {
+      window.visualViewport?.removeEventListener(
+        'resize',
+        handleUpdateWindowInnerHeightValue
+      );
+    };
+  }, []);
+
   return (
     <>
       <Head>

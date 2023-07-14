@@ -318,36 +318,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
     }, [debouncedSearchValue, isMobileOrTablet, getQuickSearchResult]);
 
-    useEffect(() => {
-      document.documentElement.style.setProperty(
-        '--window-inner-height',
-        `${window.visualViewport?.height || window.innerHeight}px`
-      );
-    }, []);
-
-    useEffect(() => {
-      const handleUpdateWindowInnerHeightValue = (event: Event) => {
-        document.documentElement.style.setProperty(
-          '--window-inner-height',
-          `${(event.target as VisualViewport)?.height || window.innerHeight}px`
-        );
-      };
-
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      }
-
-      return () => {
-        window.visualViewport?.removeEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      };
-    }, []);
-
     const closeSearch = useCallback(() => {
       handleSearchClose();
       setSearchValue('');
@@ -650,7 +620,9 @@ const SResultsDropMobile = styled.div`
 
 const SResultsDropMobileContentWrapper = styled.div`
   padding: 16px;
-  max-height: calc(var(--window-inner-height) - 50px); // 50px needs for ios
+  max-height: calc(
+    var(--window-inner-height, 1vh) * 100 - 50px
+  ); // 50px needs for ios
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
