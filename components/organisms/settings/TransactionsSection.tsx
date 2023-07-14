@@ -74,7 +74,6 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
     if (!myTransactions || myTransactions.length < 1) {
       setMyTransactions(transactions);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myTransactions, transactions]);
 
   const goNextPage = useCallback(() => {
@@ -87,12 +86,19 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
     setCurrentPage((curr) => curr - 1);
   }, [currentPage]);
 
-  useEffect(() => {
-    if (prevPage !== currentPage) {
-      fetchMyTransactions();
-    }
+  useEffect(
+    () => {
+      if (prevPage !== currentPage) {
+        fetchMyTransactions();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, prevPage]);
+    [
+      currentPage,
+      prevPage,
+      // fetchMyTransactions, - reason unknown
+    ]
+  );
 
   return (
     <SWrapper

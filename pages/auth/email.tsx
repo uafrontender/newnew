@@ -41,6 +41,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
     setMounted(true);
   }, []);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     if (userLoggedIn) {
       router?.push('/');
@@ -48,6 +49,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
       if (isLoading) return;

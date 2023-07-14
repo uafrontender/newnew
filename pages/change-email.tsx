@@ -27,51 +27,60 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
 
-  useEffect(() => {
-    async function handleAuth() {
-      try {
-        setIsLoading(true);
+  useEffect(
+    () => {
+      async function handleAuth() {
+        try {
+          setIsLoading(true);
 
-        if (!email_address || !token) {
-          throw new Error('No token on change email');
-        }
+          if (!email_address || !token) {
+            throw new Error('No token on change email');
+          }
 
-        const requestPayload = new newnewapi.SetMyEmailRequest({
-          emailAddress: email_address,
-          token,
-        });
-
-        const res = await setMyEmail(requestPayload);
-
-        if (!res || res.error || !res.data) {
-          throw new Error(res!!.error?.message ?? 'An error occurred');
-        }
-
-        const { data } = res;
-
-        if (data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS) {
-          throw new Error('Request failed');
-        }
-
-        if (userIsCreator) {
-          updateUserData({
-            email: email_address,
+          const requestPayload = new newnewapi.SetMyEmailRequest({
+            emailAddress: email_address,
+            token,
           });
+
+          const res = await setMyEmail(requestPayload);
+
+          if (!res || res.error || !res.data) {
+            throw new Error(res!!.error?.message ?? 'An error occurred');
+          }
+
+          const { data } = res;
+
+          if (data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS) {
+            throw new Error('Request failed');
+          }
+
+          if (userIsCreator) {
+            updateUserData({
+              email: email_address,
+            });
+          }
+
+          router.push('/');
+        } catch (err) {
+          // NB! Might need an error toast
+          console.log(err);
+          setIsLoading(false);
+          setSignInError(true);
+          // router.push('/');
         }
-
-        router.push('/');
-      } catch (err) {
-        // NB! Might need an error toast
-        console.log(err);
-        setIsLoading(false);
-        setSignInError(true);
-        // router.push('/');
       }
-    }
 
-    handleAuth();
+      handleAuth();
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // email_address, - reason unknown
+      // router, - reason unknown
+      // token, - reason unknown
+      // updateUserData, - reason unknown
+      // userIsCreator, - reason unknown
+    ]
+  );
 
   return (
     <div>
