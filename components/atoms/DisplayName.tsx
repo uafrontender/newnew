@@ -20,7 +20,6 @@ export interface IDisplayName {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-// TODO: go through the uses and clear external wrappers as this component has own wrapper now
 const DisplayName: React.FC<IDisplayName> = ({
   className,
   user,

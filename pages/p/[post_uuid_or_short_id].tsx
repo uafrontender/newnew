@@ -265,6 +265,7 @@ const PostPage: NextPage<IPostPage> = ({
       });
 
       if (!userLoggedIn) {
+        // TODO: Add action on redirect
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -519,30 +520,46 @@ const PostPage: NextPage<IPostPage> = ({
   // );
 
   // Refetch Post if user authenticated
-  useEffect(() => {
-    if (userLoggedIn) {
-      refetchPost();
-    }
+  useEffect(
+    () => {
+      if (userLoggedIn) {
+        refetchPost();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+    [
+      userLoggedIn,
+      // refetchPost, - reason unknown, probably safe
+    ]
+  );
 
   useEffect(() => {
     setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
   }, [postParsed?.isFavoritedByMe]);
 
   // Comment ID from URL
-  useEffect(() => {
-    const shouldReplace =
-      !!commentIdFromUrl || !!commentContentFromUrl || !!responseNumberFromUrl;
+  useEffect(
+    () => {
+      const shouldReplace =
+        !!commentIdFromUrl ||
+        !!commentContentFromUrl ||
+        !!responseNumberFromUrl;
 
-    if (shouldReplace) {
-      router.replace(`/p/${postUuidOrShortId}`, undefined, {
-        shallow: true,
-      });
-    }
-
+      if (shouldReplace) {
+        router.replace(`/p/${postUuidOrShortId}`, undefined, {
+          shallow: true,
+        });
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, commentContentFromUrl]);
+    [
+      commentIdFromUrl,
+      commentContentFromUrl,
+      // responseNumberFromUrl, - reason unknown
+      // router, - reason unknown
+      // postUuidOrShortId, - reason unknown
+    ]
+  );
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {
@@ -607,86 +624,104 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Increment channel subs after mounting
   // Decrement when unmounting
-  useEffect(() => {
-    if (postParsed?.postUuid && isSocketConnected) {
-      addChannel(postParsed.postUuid, {
-        postUpdates: {
-          postUuid: postParsed.postUuid,
-        },
-      });
-    }
-
-    return () => {
-      if (postParsed?.postUuid) {
-        removeChannel(postParsed.postUuid);
+  useEffect(
+    () => {
+      if (postParsed?.postUuid && isSocketConnected) {
+        addChannel(postParsed.postUuid, {
+          postUpdates: {
+            postUuid: postParsed.postUuid,
+          },
+        });
       }
-    };
+
+      return () => {
+        if (postParsed?.postUuid) {
+          removeChannel(postParsed.postUuid);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postParsed?.postUuid, isSocketConnected]);
+    [
+      postParsed?.postUuid,
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel, - reason unknown
+    ]
+  );
 
   // Listen for Post status updates
-  useEffect(() => {
-    const socketHandlerPostStatus = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+  useEffect(
+    () => {
+      const socketHandlerPostStatus = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-      if (!decoded) {
-        return;
-      }
-      if (decoded.postUuid === postParsed?.postUuid) {
-        if (decoded.auction) {
-          const parsedStatus = switchPostStatus(
-            'ac',
-            decoded.auction as newnewapi.Auction.Status
-          );
-
-          if (
-            parsedStatus === 'deleted_by_admin' ||
-            parsedStatus === 'deleted_by_creator'
-          ) {
-            updatePostStatusMutation.mutate({
-              postUuid: postParsed?.postUuid,
-              postType: 'ac',
-              status: decoded.auction as newnewapi.Auction.Status,
-            });
-          } else {
-            await refetchPost();
-          }
-        } else if (decoded.multipleChoice) {
-          const parsedStatus = switchPostStatus(
-            'mc',
-            decoded.multipleChoice as newnewapi.MultipleChoice.Status
-          );
-
-          if (
-            parsedStatus === 'deleted_by_admin' ||
-            parsedStatus === 'deleted_by_creator'
-          ) {
-            updatePostStatusMutation.mutate({
-              postUuid: postParsed?.postUuid,
-              postType: 'mc',
-              status: decoded.multipleChoice as newnewapi.MultipleChoice.Status,
-            });
-          } else {
-            await refetchPost();
-          }
-        } else {
-          await refetchPost();
+        if (!decoded) {
+          return;
         }
-      }
-    };
+        if (decoded.postUuid === postParsed?.postUuid) {
+          if (decoded.auction) {
+            const parsedStatus = switchPostStatus(
+              'ac',
+              decoded.auction as newnewapi.Auction.Status
+            );
 
-    if (socketConnection) {
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
-    }
+            if (
+              parsedStatus === 'deleted_by_admin' ||
+              parsedStatus === 'deleted_by_creator'
+            ) {
+              updatePostStatusMutation.mutate({
+                postUuid: postParsed?.postUuid,
+                postType: 'ac',
+                status: decoded.auction as newnewapi.Auction.Status,
+              });
+            } else {
+              await refetchPost();
+            }
+          } else if (decoded.multipleChoice) {
+            const parsedStatus = switchPostStatus(
+              'mc',
+              decoded.multipleChoice as newnewapi.MultipleChoice.Status
+            );
 
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+            if (
+              parsedStatus === 'deleted_by_admin' ||
+              parsedStatus === 'deleted_by_creator'
+            ) {
+              updatePostStatusMutation.mutate({
+                postUuid: postParsed?.postUuid,
+                postType: 'mc',
+                status:
+                  decoded.multipleChoice as newnewapi.MultipleChoice.Status,
+              });
+            } else {
+              await refetchPost();
+            }
+          } else {
+            await refetchPost();
+          }
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
-    };
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, postParsed, userData?.userUuid]);
+    [
+      socketConnection,
+      postParsed,
+      userData?.userUuid,
+      // refetchPost, - reason unknown, probably safe
+      // updatePostStatusMutation, - reason unknown
+    ]
+  );
 
   // Try to pre-fetch the content
   useEffect(() => {

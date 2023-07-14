@@ -283,5 +283,5 @@ const SContainer = styled.div`
   max-width: 100%;
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 `;

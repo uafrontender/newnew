@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -22,7 +22,6 @@ interface IEmailAuthRedirectPage {
 const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   stripe_setup_intent_client_secret,
 }) => {
-  const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { setSignupEmailInput, setSignupTimerValue } = useSignup();
 
@@ -30,12 +29,17 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const { userLoggedIn } = useAppState();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (userLoggedIn) {
-      router.replace('/');
-    }
+  useEffect(
+    () => {
+      if (userLoggedIn) {
+        Router.replace('/');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // userLoggedIn, - reason unknown, seems bad
+    ]
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -47,7 +51,6 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         if (!stripe_setup_intent_client_secret) {
           throw new Error('No setup intent');
         }
-
         const requestPayload = new newnewapi.SendVerificationEmailRequest({
           stripeSetupIntentClientSecret: stripe_setup_intent_client_secret,
           useCase:
@@ -74,12 +77,11 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         ) {
           throw new Error('No data');
         }
-
         setSignupEmailInput(data.emailAddress);
         setSignupTimerValue(data.retryAfter);
 
         setIsLoading(false);
-        router.replace('/verify-email');
+        Router.replace('/verify-email');
       } catch (err: any) {
         setIsLoading(false);
 
@@ -99,8 +101,13 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
     return () => {
       controller.abort();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    goBackOrRedirect,
+    setSignupEmailInput,
+    setSignupTimerValue,
+    showErrorToastPredefined,
+    stripe_setup_intent_client_secret,
+  ]);
 
   return (
     <div>

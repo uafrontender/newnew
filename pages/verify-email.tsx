@@ -1,7 +1,7 @@
 import React, { ReactElement, useCallback, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { GetServerSideProps } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -24,21 +24,30 @@ interface IVerifyEmail {
 
 const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
   const { t } = useTranslation('page-VerifyEmail');
-  const router = useRouter();
   const authLayoutContext = useContext(AuthLayoutContext);
   const { signupEmailInput } = useSignup();
 
-  useEffect(() => {
-    if (!signupEmailInput) {
-      router?.replace('/');
-    }
+  useEffect(
+    () => {
+      if (!signupEmailInput) {
+        Router?.replace('/');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // signupEmailInput, - reason unknown
+    ]
+  );
 
-  useEffect(() => {
-    authLayoutContext.setShouldHeroUnmount(false);
+  useEffect(
+    () => {
+      authLayoutContext.setShouldHeroUnmount(false);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // authLayoutContext, - reason unknown
+    ]
+  );
 
   const handleBack = useCallback(() => {
     const parameters = {
@@ -52,8 +61,8 @@ const VerifyEmail: React.FC<IVerifyEmail> = ({ reason, redirectURL, goal }) => {
       .join('&');
 
     const signUpPath = `/sign-up${queryString ? `?${queryString}` : ''}`;
-    router.replace(signUpPath);
-  }, [goal, reason, redirectURL, router]);
+    Router.replace(signUpPath);
+  }, [goal, reason, redirectURL]);
 
   return (
     <>

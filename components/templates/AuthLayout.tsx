@@ -35,7 +35,7 @@ const AuthLayoutContextProvider: React.FC<IAuthLayoutContextProvider> = ({
       setShouldHeroUnmount: (newValue: boolean) =>
         setShouldHeroUnmount(newValue),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [shouldHeroUnmount]
   );
 
