@@ -366,6 +366,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
                 onBackButtonClick={handleCloseChatRoom}
                 withHeaderAvatar
                 variant='secondary'
+                isHidden={tab !== 'direct-messages'}
               />
             )}
 

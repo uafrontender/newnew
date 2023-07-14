@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
@@ -8,7 +8,6 @@ import { useAppState } from '../../../contexts/appStateContext';
 import SelectChat from '../../atoms/direct-messages/SelectChat';
 import Loader from '../../atoms/Loader';
 import ChatContent from './ChatContent';
-import isIOS from '../../../utils/isIOS';
 
 const ChatSidebar = dynamic(() => import('./ChatSidebar'));
 
@@ -49,44 +48,6 @@ export const ChatContainer: React.FC<IChatContainer> = ({
     router.replace('/direct-messages', undefined, { shallow: true });
   }, [router]);
 
-  useEffect(() => {
-    let input: HTMLInputElement | null = null;
-
-    const handleFocusIn = (e: Event) => {
-      input = e.target as HTMLInputElement;
-
-      if (input && input.getAttribute('data-new-message-textarea')) {
-        input.style.transform = 'translateY(-99999px)';
-
-        setTimeout(() => {
-          if (input) {
-            input.style.transform = '';
-          }
-        }, 100);
-      }
-    };
-
-    const handleFocusOut = (e: Event) => {
-      if (input) {
-        input.style.transform = '';
-      }
-    };
-
-    if (isIOS()) {
-      document.addEventListener('focusin', handleFocusIn);
-
-      document.addEventListener('focusout', handleFocusOut);
-    }
-
-    return () => {
-      if (isIOS()) {
-        document.removeEventListener('focusin', handleFocusIn);
-
-        document.removeEventListener('focusout', handleFocusOut);
-      }
-    };
-  }, []);
-
   return (
     <SContainer className={className}>
       <ChatSidebar
@@ -103,6 +64,7 @@ export const ChatContainer: React.FC<IChatContainer> = ({
             onBackButtonClick={handleCloseChatRoom}
             isMoreButton
             withChatMessageAvatars
+            isHidden={isMobileOrTablet && !chatRoomSelected}
           />
         )}
         {!activeChatRoom && !isLoading && !isMobileOrTablet && <SelectChat />}

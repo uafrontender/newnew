@@ -147,6 +147,7 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
               onBackButtonClick={handleCloseChatRoom}
               isMoreButton
               withChatMessageAvatars
+              isHidden={isMobileOrTablet && !selectedChatRoomId}
             />
           )}
           {!activeChatRoom && isLoading && <Loader size='md' isStatic />}

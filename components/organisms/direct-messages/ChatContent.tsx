@@ -65,6 +65,7 @@ interface IFuncProps {
   withHeaderAvatar?: boolean;
   className?: string;
   variant?: 'primary' | 'secondary';
+  isHidden?: boolean;
   onBackButtonClick?: () => void;
 }
 
@@ -76,6 +77,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   withHeaderAvatar,
   className,
   variant,
+  isHidden,
   onBackButtonClick,
 }) => {
   const theme = useTheme();
@@ -413,7 +415,7 @@ const ChatContent: React.FC<IFuncProps> = ({
       return false;
     };
 
-    if (isIOS()) {
+    if (isIOS() && !isHidden) {
       document.addEventListener('touchmove', handleTouchMove, {
         passive: false,
       });
@@ -424,7 +426,46 @@ const ChatContent: React.FC<IFuncProps> = ({
         document.removeEventListener('touchmove', handleTouchMove);
       }
     };
-  });
+  }, [isHidden]);
+
+  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
+  useEffect(() => {
+    let input: HTMLInputElement | null = null;
+
+    const handleFocusIn = (e: Event) => {
+      input = e.target as HTMLInputElement;
+
+      if (input && input.getAttribute('data-new-message-textarea')) {
+        input.style.transform = 'translateY(-99999px)';
+
+        setTimeout(() => {
+          if (input) {
+            input.style.transform = '';
+          }
+        }, 100);
+      }
+    };
+
+    const handleFocusOut = (e: Event) => {
+      if (input) {
+        input.style.transform = '';
+      }
+    };
+
+    if (isIOS()) {
+      document.addEventListener('focusin', handleFocusIn);
+
+      document.addEventListener('focusout', handleFocusOut);
+    }
+
+    return () => {
+      if (isIOS()) {
+        document.removeEventListener('focusin', handleFocusIn);
+
+        document.removeEventListener('focusout', handleFocusOut);
+      }
+    };
+  }, []);
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
