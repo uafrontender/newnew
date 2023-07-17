@@ -3,17 +3,61 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 
 import { markPost } from '../../api/endpoints/post';
+import {
+  reportEventOption,
+  reportMessage,
+  reportPost,
+  reportSuperpollOption,
+  reportUser,
+} from '../../api/endpoints/report';
 
 interface BaseActionOnSignUp {
-  action: string;
+  type: string;
 }
 
 export interface MarkPostAsFavoriteOnSignUp extends BaseActionOnSignUp {
-  action: 'favorite-post';
+  type: 'favorite-post';
   postUuid?: string;
 }
 
-type ActionOnSignUp = MarkPostAsFavoriteOnSignUp;
+interface BaseReportActionOnSignUp extends BaseActionOnSignUp {
+  reasons?: newnewapi.ReportingReason[];
+  message?: string;
+}
+
+export interface ReportUserOnSignUp extends BaseReportActionOnSignUp {
+  type: 'report-user';
+  userId?: string;
+}
+
+export interface ReportPostOnSignUp extends BaseReportActionOnSignUp {
+  type: 'report-post';
+  postUuid?: string;
+}
+
+export interface ReportEventOptionOnSignUp extends BaseReportActionOnSignUp {
+  type: 'report-event-option';
+  optionId?: number | Long;
+}
+
+export interface ReportSuperpollOptionOnSignUp
+  extends BaseReportActionOnSignUp {
+  type: 'report-superpoll-option';
+  optionId?: number | Long;
+}
+
+export interface ReportMessageOnSignUp extends BaseReportActionOnSignUp {
+  type: 'report-message';
+  messageId?: number | Long;
+}
+
+type ActionOnSignUp =
+  | MarkPostAsFavoriteOnSignUp
+  | ReportUserOnSignUp
+  | ReportPostOnSignUp
+  | ReportEventOptionOnSignUp
+  | ReportSuperpollOptionOnSignUp
+  | ReportMessageOnSignUp;
 
 function parseOnSignUpJson(jsonString?: string): ActionOnSignUp | undefined {
   if (!jsonString) {
@@ -48,22 +92,61 @@ function useOnSignUp(onSignUp?: string) {
   }, [onSignUp]);
 
   useEffect(() => {
-    const afterSignUp = parseOnSignUpJson(onSignUpJsonString);
+    const action = parseOnSignUpJson(onSignUpJsonString);
 
-    if (!afterSignUp) {
+    if (!action) {
       return;
     }
 
-    switch (afterSignUp.action) {
+    switch (action.type) {
       case 'favorite-post': {
-        if (afterSignUp.postUuid) {
-          markPostAsFavorite(afterSignUp.postUuid);
+        if (action.postUuid) {
+          markPostAsFavorite(action.postUuid);
+        }
+        break;
+      }
+
+      case 'report-user': {
+        if (action.userId && action.reasons && action.message) {
+          reportUser(action.userId, action.reasons, action.message);
+        }
+        break;
+      }
+
+      case 'report-post': {
+        if (action.postUuid && action.reasons && action.message) {
+          reportPost(action.postUuid, action.reasons, action.message);
+        }
+        break;
+      }
+
+      case 'report-event-option': {
+        if (action.optionId && action.reasons && action.message) {
+          reportEventOption(action.optionId, action.reasons, action.message);
+        }
+        break;
+      }
+
+      case 'report-superpoll-option': {
+        if (action.optionId && action.reasons && action.message) {
+          reportSuperpollOption(
+            action.optionId,
+            action.reasons,
+            action.message
+          );
+        }
+        break;
+      }
+
+      case 'report-message': {
+        if (action.messageId && action.reasons && action.message) {
+          reportMessage(action.messageId, action.reasons, action.message);
         }
         break;
       }
 
       default:
-        console.warn(`Unknown action type ${afterSignUp.action}`);
+        console.warn(`Unknown action type ${(action as any).type}`);
     }
 
     setOnSignUpJsonString('');

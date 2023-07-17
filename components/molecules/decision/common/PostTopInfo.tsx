@@ -236,7 +236,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       if (!userLoggedIn) {
         const onSignUp: MarkPostAsFavoriteOnSignUp = {
-          action: 'favorite-post',
+          type: 'favorite-post',
           postUuid,
         };
 

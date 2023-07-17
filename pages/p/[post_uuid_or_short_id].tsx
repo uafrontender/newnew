@@ -267,7 +267,7 @@ const PostPage: NextPage<IPostPage> = ({
 
       if (!userLoggedIn) {
         const onSignUp: MarkPostAsFavoriteOnSignUp = {
-          action: 'favorite-post',
+          type: 'favorite-post',
           postUuid: postParsed?.postUuid,
         };
 
