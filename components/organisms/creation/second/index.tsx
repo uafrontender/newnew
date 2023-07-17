@@ -783,7 +783,6 @@ export const CreationSecondStepContent: React.FC<
     () => (
       <>
         <SItemWrapper>
-          {/* TODO: move to locales */}
           <SInputLabel htmlFor='title'>
             {t('secondStep.input.label')}
           </SInputLabel>
@@ -1084,31 +1083,36 @@ export const CreationSecondStepContent: React.FC<
     }
   }, [overlayModeEnabled, isDesktop]);
 
-  useEffect(() => {
-    switch (activeTabIndex) {
-      case 1: {
-        if (tutorialType !== 'MC') {
-          setTutorialType('MC');
+  useEffect(
+    () => {
+      switch (activeTabIndex) {
+        case 1: {
+          if (tutorialType !== 'MC') {
+            setTutorialType('MC');
+          }
+          break;
         }
-        break;
-      }
-      case 2: {
-        if (tutorialType !== 'CF') {
-          setTutorialType('CF');
+        case 2: {
+          if (tutorialType !== 'CF') {
+            setTutorialType('CF');
+          }
+          break;
         }
-        break;
-      }
-      default: {
-        if (tutorialType !== 'AC') {
-          setTutorialType('AC');
+        default: {
+          if (tutorialType !== 'AC') {
+            setTutorialType('AC');
+          }
         }
       }
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabIndex]);
+    [
+      activeTabIndex,
+      // tutorialType, - reason unknown
+    ]
+  );
 
   useEffect(() => {
-    console.log('PING');
     if (userTutorialsProgressSynced) {
       switch (tutorialType) {
         case 'MC': {

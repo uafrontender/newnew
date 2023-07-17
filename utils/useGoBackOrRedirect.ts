@@ -1,19 +1,18 @@
-import { useRouter } from 'next/router';
+import Router from 'next/router';
+import { useCallback } from 'react';
 
 interface IUseGoBackOrRedirect {
   goBackOrRedirect: (pathname: string) => void;
 }
 
 function useGoBackOrRedirect(): IUseGoBackOrRedirect {
-  const router = useRouter();
-
-  function goBackOrRedirect(pathname: string) {
+  const goBackOrRedirect = useCallback((pathname: string) => {
     if (window?.history?.state?.idx && window.history.state.idx > 0) {
-      router.back();
+      Router.back();
     } else {
-      router.replace(pathname);
+      Router.replace(pathname);
     }
-  }
+  }, []);
 
   return { goBackOrRedirect };
 }

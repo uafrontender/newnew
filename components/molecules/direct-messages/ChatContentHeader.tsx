@@ -27,6 +27,7 @@ interface IFunctionProps {
   isBackButton?: boolean;
   isMoreButton?: boolean;
   withAvatar?: boolean;
+  className?: string;
   onUserReport: () => void;
   onUserBlock: () => Promise<void>;
   onUserUnblock: () => Promise<void>;
@@ -43,6 +44,7 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   onUserReport,
   onBackButtonClick,
   chatRoom,
+  className,
 }) => {
   const theme = useTheme();
   const { userData } = useUserData();
@@ -99,8 +101,8 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
   }, [chatRoom?.visavis?.user?.username, router]);
 
   return (
-    <>
-      <STopPart>
+    <SWrapper>
+      <STopPart className={className}>
         {isBackButton && onBackButtonClick && (
           <GoBackButton onClick={goBackHandler} />
         )}
@@ -169,31 +171,36 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
       {isAnnouncement && !isMyAnnouncement && chatRoom?.visavis?.user && (
         <AnnouncementHeader user={chatRoom.visavis?.user} />
       )}
-    </>
+    </SWrapper>
   );
 };
 
 export default ChatContentHeader;
 
+const SWrapper = styled.div`
+  position: relative;
+`;
+
 const STopPart = styled.header`
-  height: 80px;
-  z-index: 1;
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 10px 0 24px;
+  flex-shrink: 0;
+
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
+  z-index: 1;
+
   ${(props) => props.theme.media.tablet} {
     background: none;
     position: static;
     padding: 21px 10px 21px 24px;
   }
-  border-bottom: 1px solid
-    ${(props) => props.theme.colorsThemed.background.outlines1};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px 0 24px;
 `;
 
 const SActionsDiv = styled.div`
@@ -201,10 +208,12 @@ const SActionsDiv = styled.div`
 `;
 
 const SMoreButton = styled(Button)`
-  background: none;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
   padding: 8px;
   margin-right: 18px;
+
+  background: none;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
   span {
     display: flex;
     flex-direction: column;

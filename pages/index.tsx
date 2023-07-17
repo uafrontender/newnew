@@ -14,7 +14,7 @@ import BecomeCreatorSection from '../components/organisms/home/BecomeCreatorSect
 import YourPostsSection from '../components/organisms/home/YourPostsSection';
 import Headline from '../components/atoms/Headline';
 import { TStaticPost } from '../components/molecules/home/StaticPostCard';
-import CardsSection from '../components/organisms/home/CuratedCardsSection';
+import CuratedCardsSection from '../components/organisms/home/CuratedCardsSection';
 import HeroSection from '../components/organisms/home/HeroSection';
 
 import { SUPPORTED_LANGUAGES } from '../constants/general';
@@ -54,20 +54,27 @@ const Home: NextPage<IHome> = ({
   const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  useEffect(() => {
-    if (isSocketConnected) {
-      addChannel(newnewapi.CuratedListType.POPULAR.toString(), {
-        curatedListUpdates: {
-          type: newnewapi.CuratedListType.POPULAR,
-        },
-      });
-    }
+  useEffect(
+    () => {
+      if (isSocketConnected) {
+        addChannel(newnewapi.CuratedListType.POPULAR.toString(), {
+          curatedListUpdates: {
+            type: newnewapi.CuratedListType.POPULAR,
+          },
+        });
+      }
 
-    return () => {
-      removeChannel(newnewapi.CuratedListType.POPULAR.toString());
-    };
+      return () => {
+        removeChannel(newnewapi.CuratedListType.POPULAR.toString());
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSocketConnected]);
+    [
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel,  - reason unknown
+    ]
+  );
 
   useEffect(() => {
     const handlerSocketCuratedListUpdated = (data: any) => {
@@ -173,7 +180,7 @@ const Home: NextPage<IHome> = ({
   <HomeLayout>{page}</HomeLayout>
 );
 
-const SCardsSection = styled(CardsSection)`
+const SCardsSection = styled(CuratedCardsSection)`
   &:first-child {
     padding-top: 0;
   }

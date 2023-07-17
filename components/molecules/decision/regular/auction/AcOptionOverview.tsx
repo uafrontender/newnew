@@ -99,7 +99,7 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      // handleCloseOptionBidHistory, reason unknown
+      // handleCloseOptionBidHistory, - reason unknown
     ]
   );
 
