@@ -20,7 +20,7 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 import InlineSvg from '../atoms/InlineSVG';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import { useAppState } from '../../contexts/appStateContext';
-import { MarkPostAsFavoriteAfterSignUp } from '../../utils/hooks/useAfterSighUp';
+import { MarkPostAsFavoriteOnSignUp } from '../../utils/hooks/useOnSighUp';
 
 interface IPostCardEllipseMenu {
   postUuid: string;
@@ -82,7 +82,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
           });
 
           if (!userLoggedIn) {
-            const onLogin: MarkPostAsFavoriteAfterSignUp = {
+            const onSignUp: MarkPostAsFavoriteOnSignUp = {
               action: 'favorite-post',
               postUuid,
             };
@@ -91,7 +91,7 @@ const PostCardEllipseMenu: React.FunctionComponent<IPostCardEllipseMenu> =
               `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
                 `${process.env.NEXT_PUBLIC_APP_URL}/p/${
                   postShortId || postUuid
-                }?onLogin=${JSON.stringify(onLogin)}`
+                }?onSignUp=${JSON.stringify(onSignUp)}`
               )}`
             );
             return;

@@ -71,7 +71,7 @@ import PostCreationContextProvider from '../contexts/postCreationContext';
 import { TutorialProgressContextProvider } from '../contexts/tutorialProgressContext';
 import UiStateContextProvider, { TColorMode } from '../contexts/uiStateContext';
 import { SignUpContextProvider } from '../contexts/signUpContext';
-import useAfterSignUp from '../utils/hooks/useAfterSighUp';
+import useOnSignUp from '../utils/hooks/useOnSighUp';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -84,7 +84,7 @@ interface IMyApp extends AppProps {
   uaString: string;
   colorMode: string;
   mutedMode: string;
-  onLogin?: string;
+  onSignUp?: string;
   themeFromCookie?: 'light' | 'dark';
 }
 
@@ -127,7 +127,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     uaString,
     colorMode,
     mutedMode,
-    onLogin,
+    onSignUp,
     themeFromCookie,
   } = props;
   const { userLoggedIn, userIsCreator } = useAppState();
@@ -136,7 +136,7 @@ const MyApp = (props: IMyApp): ReactElement => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentLocale, setCurrentLocale] = useState(locale);
 
-  useAfterSignUp(onLogin);
+  useOnSignUp(onSignUp);
 
   // Shared layouts
   const getLayout = useMemo(
@@ -399,7 +399,7 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
       uaString: appContext.ctx?.req?.headers?.['user-agent'],
       colorMode: appContext.ctx?.req.cookies?.colorMode || 'auto',
       mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-      onLogin: appContext.ctx.query.onLogin,
+      onSignUp: appContext.ctx.query.onSignUp,
       themeFromCookie: isDayTime ? 'light' : 'dark',
     };
   }
@@ -410,7 +410,7 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
     uaString: appContext.ctx?.req?.headers?.['user-agent'],
     colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-    onLogin: appContext.ctx.query.onLogin,
+    onSignUp: appContext.ctx.query.onSignUp,
   };
 };
 

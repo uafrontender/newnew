@@ -18,7 +18,7 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 import InlineSvg from '../atoms/InlineSVG';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import { useAppState } from '../../contexts/appStateContext';
-import { MarkPostAsFavoriteAfterSignUp } from '../../utils/hooks/useAfterSighUp';
+import { MarkPostAsFavoriteOnSignUp } from '../../utils/hooks/useOnSighUp';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;
@@ -80,7 +80,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
       });
 
       if (!userLoggedIn) {
-        const onLogin: MarkPostAsFavoriteAfterSignUp = {
+        const onSignUp: MarkPostAsFavoriteOnSignUp = {
           action: 'favorite-post',
           postUuid,
         };
@@ -89,7 +89,7 @@ const PostCardEllipseModal: React.FunctionComponent<IPostCardEllipseModal> = ({
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
             `${process.env.NEXT_PUBLIC_APP_URL}/p/${
               postShortId || postUuid
-            }?onLogin=${JSON.stringify(onLogin)}`
+            }?onSignUp=${JSON.stringify(onSignUp)}`
           )}`
         );
         return;

@@ -4,37 +4,34 @@ import { useRouter } from 'next/router';
 
 import { markPost } from '../../api/endpoints/post';
 
-interface BaseAfterSignUp {
+interface BaseActionOnSignUp {
   action: string;
 }
 
-export interface MarkPostAsFavoriteAfterSignUp extends BaseAfterSignUp {
+export interface MarkPostAsFavoriteOnSignUp extends BaseActionOnSignUp {
   action: 'favorite-post';
   postUuid?: string;
 }
 
-type AfterSignUp = MarkPostAsFavoriteAfterSignUp;
+type ActionOnSignUp = MarkPostAsFavoriteOnSignUp;
 
-function parseOnLoginJson(jsonString?: string): AfterSignUp | undefined {
+function parseOnSignUpJson(jsonString?: string): ActionOnSignUp | undefined {
   if (!jsonString) {
     return undefined;
   }
 
   try {
     const data = JSON.parse(jsonString);
-    return data as AfterSignUp;
+    return data as ActionOnSignUp;
   } catch (e) {
     console.error(e);
     return undefined;
   }
 }
 
-function useAfterSignUp(initialAfterSignUpJsonString?: string) {
+function useOnSignUp(onSignUp?: string) {
   const router = useRouter();
-
-  const [afterSignUpJsonString, setAfterSignUpJsonString] = useState(
-    initialAfterSignUpJsonString
-  );
+  const [onSignUpJsonString, setOnSignUpJsonString] = useState(onSignUp);
 
   const markPostAsFavorite = useCallback((postUuid: string) => {
     const markAsFavoritePayload = new newnewapi.MarkPostRequest({
@@ -47,11 +44,11 @@ function useAfterSignUp(initialAfterSignUpJsonString?: string) {
   }, []);
 
   useEffect(() => {
-    setAfterSignUpJsonString(initialAfterSignUpJsonString);
-  }, [initialAfterSignUpJsonString]);
+    setOnSignUpJsonString(onSignUp);
+  }, [onSignUp]);
 
   useEffect(() => {
-    const afterSignUp = parseOnLoginJson(afterSignUpJsonString);
+    const afterSignUp = parseOnSignUpJson(onSignUpJsonString);
 
     if (!afterSignUp) {
       return;
@@ -69,15 +66,15 @@ function useAfterSignUp(initialAfterSignUpJsonString?: string) {
         console.warn(`Unknown action type ${afterSignUp.action}`);
     }
 
-    setAfterSignUpJsonString('');
+    setOnSignUpJsonString('');
     // Clear stripeSecret from query to avoid same request on page reload
     const [path, query] = router.asPath.split('?');
     const clearedQuery = query
-      ? query.replace(/onLogin={.*}&/, '').replace(/&?onLogin={.*}/, '')
+      ? query.replace(/onSignUp={.*}&/, '').replace(/&?onSignUp={.*}/, '')
       : '';
     const url = clearedQuery ? `${path}?${clearedQuery}` : path;
     router.replace(url, undefined, { shallow: true });
-  }, [afterSignUpJsonString, router, markPostAsFavorite]);
+  }, [onSignUpJsonString, router, markPostAsFavorite]);
 }
 
-export default useAfterSignUp;
+export default useOnSignUp;
