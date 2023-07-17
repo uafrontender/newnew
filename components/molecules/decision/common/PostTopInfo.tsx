@@ -42,6 +42,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { MarkPostAsFavoriteAfterSignUp } from '../../../../utils/hooks/useAfterSighUp';
 /* import getGuestId from '../../../../utils/getGuestId';
  import {
   getGuestSmsNotificationsSubscriptionStatus,
@@ -234,10 +235,19 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       });
 
       if (!userLoggedIn) {
-        // TODO: Add action on redirect
+        const onLogin: MarkPostAsFavoriteAfterSignUp = {
+          action: 'favorite-post',
+          postUuid,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onLoginQuery = `onLogin=${JSON.stringify(onLogin)}`;
+        const queryWithOnLogin = query
+          ? `${query}&${onLoginQuery}`
+          : onLoginQuery;
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-            window.location.href
+            `${path}?${queryWithOnLogin}`
           )}`
         );
         return;

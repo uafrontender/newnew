@@ -71,6 +71,7 @@ import PostCreationContextProvider from '../contexts/postCreationContext';
 import { TutorialProgressContextProvider } from '../contexts/tutorialProgressContext';
 import UiStateContextProvider, { TColorMode } from '../contexts/uiStateContext';
 import { SignUpContextProvider } from '../contexts/signUpContext';
+import useAfterSignUp from '../utils/hooks/useAfterSighUp';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -83,6 +84,7 @@ interface IMyApp extends AppProps {
   uaString: string;
   colorMode: string;
   mutedMode: string;
+  onLogin?: string;
   themeFromCookie?: 'light' | 'dark';
 }
 
@@ -125,6 +127,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     uaString,
     colorMode,
     mutedMode,
+    onLogin,
     themeFromCookie,
   } = props;
   const { userLoggedIn, userIsCreator } = useAppState();
@@ -132,6 +135,8 @@ const MyApp = (props: IMyApp): ReactElement => {
   const { locale } = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentLocale, setCurrentLocale] = useState(locale);
+
+  useAfterSignUp(onLogin);
 
   // Shared layouts
   const getLayout = useMemo(
@@ -391,9 +396,10 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
     return {
       ...appProps,
       accessToken: accessToken || undefined,
+      uaString: appContext.ctx?.req?.headers?.['user-agent'],
       colorMode: appContext.ctx?.req.cookies?.colorMode || 'auto',
       mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-      uaString: appContext.ctx?.req?.headers?.['user-agent'],
+      onLogin: appContext.ctx.query.onLogin,
       themeFromCookie: isDayTime ? 'light' : 'dark',
     };
   }
@@ -401,9 +407,10 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
   return {
     ...appProps,
     accessToken: accessToken || undefined,
+    uaString: appContext.ctx?.req?.headers?.['user-agent'],
     colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-    uaString: appContext.ctx?.req?.headers?.['user-agent'],
+    onLogin: appContext.ctx.query.onLogin,
   };
 };
 
