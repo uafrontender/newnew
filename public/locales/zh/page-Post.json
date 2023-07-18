@@ -693,6 +693,7 @@
     "comments": "評論",
     "seeMore": "查看更多",
     "noCommentsCaption": "成為第一個評論者......",
+    "loadReplies_NEED_TRANSLATION": "Show more replies",
     "errors": {
       "generic": "請檢查輸入",
       "tooLong": "評論太長",

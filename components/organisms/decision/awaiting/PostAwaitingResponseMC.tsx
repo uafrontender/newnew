@@ -364,7 +364,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             <CommentsBottomSection
               postUuid={post.postUuid}
               postShortId={post.postShortId ?? ''}
-              commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>
         )}

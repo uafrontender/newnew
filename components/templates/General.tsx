@@ -71,7 +71,6 @@ export const General: React.FC<IGeneral> = (props) => {
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
-
   const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
