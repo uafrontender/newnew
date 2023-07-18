@@ -693,6 +693,7 @@
     "comments": "Comments",
     "seeMore": "See more",
     "noCommentsCaption": "Be the first to comment...",
+    "loadReplies": "Show more replies",
     "errors": {
       "generic": "Please check input",
       "tooLong": "Comment is too long",
