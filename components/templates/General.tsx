@@ -40,6 +40,7 @@ import MobileChat from '../organisms/MobileChat';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useUiState } from '../../contexts/uiStateContext';
 import isIOS from '../../utils/isIOS';
+import isSafari from '../../utils/isSafari';
 
 interface IGeneral {
   className?: string;
@@ -210,28 +211,6 @@ export const General: React.FC<IGeneral> = (props) => {
     [isMobile, scrollDirection, noMobileNavigation]
   );
 
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const [inView, setInView] = useState(false);
-
-  // On iOS bottom navigation is sticky so we need it to hide bottom navigation
-  useEffect(() => {
-    if (ref.current && isIOS()) {
-      const obs = new IntersectionObserver(
-        (entries, observer) => {
-          entries.forEach((entry) => {
-            setInView(entry.isIntersecting);
-          });
-        },
-        {
-          rootMargin: '90px',
-        }
-      );
-
-      obs.observe(ref.current);
-    }
-  }, []);
-
   const containerParams = useMemo(
     () =>
       restrictMaxWidth
@@ -242,15 +221,22 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
+  // Otherwise ssr styles will be used
+  const [isMobileSafari, setIsMobileSafari] = useState(false);
+
+  useEffect(() => {
+    setIsMobileSafari(isIOS() && !!isSafari());
+  }, []);
+
   return (
     <>
-      {/* header is sticky for iOS devices so padding for iOS devices isn't needed */}
+      {/* header is sticky for Safari on mobile devices so padding isn't needed */}
       <SBaseLayout
         id='generalContainer'
         className={className}
         containerRef={wrapperRef}
         withBanner={!!banner?.show}
-        noPaddingTop={!!noMobileNavigation || isIOS()}
+        noPaddingTop={!!noMobileNavigation || isMobileSafari}
       >
         <SkeletonTheme
           baseColor={theme.colorsThemed.background.secondary}
@@ -272,9 +258,7 @@ export const General: React.FC<IGeneral> = (props) => {
             moreMenuMobileOpen={moreMenuMobileOpen}
             handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
             visible={mobileNavigationVisible && !globalSearchActive}
-            reachedPageEnd={inView}
           />
-          <div ref={ref} />
           {hasMounted ? (
             <>
               <SortingContainer

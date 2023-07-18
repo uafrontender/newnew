@@ -184,6 +184,7 @@ const SContainer = styled.section`
   align-items: center;
   position: relative;
   padding: 20px 0;
+  overflow-x: hidden;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 20px;
@@ -192,6 +193,7 @@ const SContainer = styled.section`
   ${(props) => props.theme.media.laptop} {
     padding: 60px 128px;
     margin-top: 0;
+    overflow-x: auto;
   }
 
   ${(props) => props.theme.media.laptopM} {
