@@ -315,7 +315,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               postShortId={post.postShortId ?? ''}
-              commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>
         )}

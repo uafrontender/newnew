@@ -19,7 +19,10 @@ interface ICommentTextArea {
   placeholder: string;
 }
 
-export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
+export const CommentTextArea = React.forwardRef<
+  HTMLTextAreaElement,
+  ICommentTextArea
+>((props, ref) => {
   const {
     id = '',
     maxlength,
@@ -54,6 +57,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
     <SWrapper>
       <SContent error={!!error} focus={focus ?? false}>
         <SCommentTextArea
+          ref={ref}
           value={value}
           onBlur={handleBlur}
           onFocus={handleFocus}
@@ -72,7 +76,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
       ) : null}
     </SWrapper>
   );
-};
+});
 
 export default CommentTextArea;
 
@@ -81,8 +85,8 @@ CommentTextArea.defaultProps = {
   error: '',
   maxlength: 524288,
   focus: undefined,
-  onBlur: (key, value) => console.log(key, value),
-  onFocus: (key) => console.log(key),
+  onBlur: () => {},
+  onFocus: () => {},
 };
 
 const SWrapper = styled.div`

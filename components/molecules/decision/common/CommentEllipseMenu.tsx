@@ -42,7 +42,11 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
       const commentsContainer = document.getElementById(
         'comments-scrolling-container'
       );
-      if (isVisible && commentsContainer) {
+      if (
+        isVisible &&
+        commentsContainer &&
+        commentsContainer?.getBoundingClientRect()?.height >= 500
+      ) {
         commentsContainer.style.overflow = 'hidden';
         commentsContainer.style.width = 'calc(100% - 4px)';
       } else if (commentsContainer) {

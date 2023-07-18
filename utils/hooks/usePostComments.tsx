@@ -10,57 +10,31 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import uniqBy from 'lodash/uniqBy';
 
-import { getMessages } from '../../api/endpoints/chat';
+import { getComments } from '../../api/endpoints/comments';
 import { TCommentWithReplies } from '../../components/interfaces/tcomment';
 import useErrorToasts from './useErrorToasts';
 
 interface IUsePostComments {
   loggedInUser: boolean;
-  commentsRoomId: number;
+  postUuid: string;
+  parentCommentId?: number;
 }
 
 const processComments = (
-  commentsRaw: Array<newnewapi.IChatMessage | TCommentWithReplies>
+  commentsRaw: Array<newnewapi.ICommentMessage | TCommentWithReplies>
 ): TCommentWithReplies[] => {
-  let lastParentIdx;
-  const goalArr: TCommentWithReplies[] = [];
-
   const workingArr = uniqBy(commentsRaw, 'id');
 
   const workingArrFiltered = workingArr.filter((c) => !c.isDeleted);
 
-  workingArrFiltered.forEach((rawItem, i) => {
-    const workingItem = { ...rawItem };
-
-    if (!rawItem.parentId || rawItem.parentId === 0) {
-      lastParentIdx = undefined;
-
-      workingItem.parentId = undefined;
-      goalArr.push(workingItem as TCommentWithReplies);
-    } else {
-      lastParentIdx = goalArr.findIndex((o) => o.id === workingItem.parentId);
-
-      if (lastParentIdx !== -1) {
-        if (!goalArr[lastParentIdx].replies) {
-          goalArr[lastParentIdx].replies = [];
-        }
-
-        // @ts-ignore
-        const workingSubarr = [...goalArr[lastParentIdx].replies];
-
-        goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
-      }
-    }
-  });
-
-  return goalArr;
+  return workingArrFiltered as TCommentWithReplies[];
 };
 
 const usePostComments = (
   params: IUsePostComments,
   options?: Omit<
     UseInfiniteQueryOptions<{
-      comments: newnewapi.IChatMessage[];
+      comments: newnewapi.ICommentMessage[];
       paging: newnewapi.IPagingResponse | null | undefined;
     }>,
     'queryKey' | 'queryFn'
@@ -71,22 +45,29 @@ const usePostComments = (
 
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
-    async ({ pageParam, signal }) => {
-      const payload = new newnewapi.GetMessagesRequest({
-        roomId: params.commentsRoomId,
+    async ({ pageParam, signal, meta }) => {
+      const payload = new newnewapi.GetCommentsRequest({
+        postUuid: params.postUuid,
+        ...(params?.parentCommentId
+          ? {
+              parentCommentId: params.parentCommentId,
+            }
+          : {}),
         paging: {
           pageToken: pageParam,
         },
       });
 
-      const postsResponse = await getMessages(payload, signal);
+      const postsResponse = await getComments(payload, signal);
 
       if (!postsResponse?.data || postsResponse.error) {
         throw new Error('Request failed');
       }
 
+      // const commentsWithField = postsResponse?.data?.comments;
+
       return {
-        comments: postsResponse?.data?.messages || [],
+        comments: postsResponse?.data?.comments || [],
         paging: postsResponse?.data?.paging,
       };
     },
@@ -99,7 +80,7 @@ const usePostComments = (
       refetchOnWindowFocus: false,
     } as Omit<
       UseInfiniteQueryOptions<{
-        comments: newnewapi.IChatMessage[];
+        comments: newnewapi.ICommentMessage[];
         paging: newnewapi.IPagingResponse | null | undefined;
       }>,
       'queryKey' | 'queryFn'
@@ -116,7 +97,7 @@ const usePostComments = (
     flatComments ? processComments(flatComments) : []
   );
 
-  const handleOpenCommentProgrammatically = useCallback((idxToOpen: number) => {
+  const handleOpenCommentByIdx = useCallback((idxToOpen: number) => {
     setProcessedComments((curr) => {
       const working = [...curr];
       working[idxToOpen].isOpen = true;
@@ -124,10 +105,22 @@ const usePostComments = (
     });
   }, []);
 
+  const handleToggleCommentRepliesById = useCallback(
+    (idToOpen: number, newState: boolean) => {
+      setProcessedComments((curr) => {
+        const working = [...curr];
+        const idxToOpen = working.findIndex((c) => c.id === idToOpen);
+        working[idxToOpen].isOpen = newState;
+        return working;
+      });
+    },
+    []
+  );
+
   const addCommentMutation = useMutation({
-    mutationFn: (card: newnewapi.IChatMessage) =>
+    mutationFn: (comment: newnewapi.ICommentMessage) =>
       new Promise((res) => {
-        res(card);
+        res(comment);
       }),
     onSuccess: (_, newComment) => {
       queryClient.setQueryData(
@@ -136,39 +129,20 @@ const usePostComments = (
         (
           data:
             | InfiniteData<{
-                comments: newnewapi.IChatMessage[];
+                comments: newnewapi.ICommentMessage[];
                 paging: newnewapi.IPagingResponse | null | undefined;
               }>
             | undefined
         ) => {
           if (data) {
             const workingData = cloneDeep(data);
-            if (!newComment?.parentId) {
-              workingData.pages = workingData.pages.map((page, i: number) => {
-                if (i === 0) {
-                  // eslint-disable-next-line no-param-reassign
-                  page.comments = [newComment, ...page.comments];
-                }
-                return page;
-              });
-
-              return workingData;
-            }
-
-            for (let k = 0; k < workingData.pages.length; k++) {
-              const parentMsgIndex = workingData.pages[k].comments.findIndex(
-                (c) => c.id === newComment?.parentId
-              );
-
-              if (parentMsgIndex !== -1) {
-                workingData.pages[k].comments = [
-                  ...workingData.pages[k].comments.slice(0, parentMsgIndex + 1),
-                  newComment,
-                  ...workingData.pages[k].comments.slice(parentMsgIndex + 1),
-                ];
-                break;
+            workingData.pages = workingData.pages.map((page, i: number) => {
+              if (i === 0) {
+                // eslint-disable-next-line no-param-reassign
+                page.comments = [newComment, ...page.comments];
               }
-            }
+              return page;
+            });
 
             return workingData;
           }
@@ -186,9 +160,9 @@ const usePostComments = (
   });
 
   const removeCommentMutation = useMutation({
-    mutationFn: (card: newnewapi.IChatMessage) =>
+    mutationFn: (comment: newnewapi.ICommentMessage) =>
       new Promise((res) => {
-        res(card);
+        res(comment);
       }),
     onSuccess: (_, deletedComment) => {
       queryClient.setQueryData(
@@ -197,7 +171,7 @@ const usePostComments = (
         (
           data:
             | InfiniteData<{
-                comments: newnewapi.IChatMessage[];
+                comments: newnewapi.ICommentMessage[];
                 paging: newnewapi.IPagingResponse | null | undefined;
               }>
             | undefined
@@ -233,17 +207,86 @@ const usePostComments = (
     },
   });
 
+  const updateCommentNumberOfRepliesMutation = useMutation({
+    mutationFn: (comment: newnewapi.ICommentMessage) =>
+      new Promise((res) => {
+        res(comment);
+      }),
+    onSuccess: (_, updatedComment) => {
+      queryClient.setQueryData(
+        [params.loggedInUser ? 'private' : 'public', 'getPostComments', params],
+        // @ts-ignore
+        (
+          data:
+            | InfiniteData<{
+                comments: newnewapi.ICommentMessage[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (data) {
+            const workingData = cloneDeep(data);
+
+            for (let k = 0; k < workingData.pages.length; k++) {
+              const msgIndex = workingData.pages[k].comments.findIndex(
+                (c) => c.id === updatedComment?.id
+              );
+
+              if (msgIndex !== -1) {
+                workingData.pages[k].comments[msgIndex].numberOfReplies =
+                  updatedComment.numberOfReplies;
+                break;
+              }
+            }
+
+            return workingData;
+          }
+          return data;
+        }
+      );
+    },
+    onError: (err: any) => {
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
+  });
+
   useEffect(() => {
     if (flatComments) {
-      setProcessedComments(() => processComments(flatComments));
+      setProcessedComments((curr) => {
+        const commentsProcessed = processComments(flatComments);
+        const openedCommentsIds = [];
+        for (let i = 0; i < curr.length; i++) {
+          if (curr[i].isOpen === true) {
+            openedCommentsIds.push(curr[i].id);
+          }
+        }
+
+        openedCommentsIds.forEach((commentId) => {
+          const indexOfComment = commentsProcessed.findIndex(
+            (c) => c.id === commentId
+          );
+
+          if (indexOfComment !== -1) {
+            commentsProcessed[indexOfComment].isOpen = true;
+          }
+        });
+
+        return commentsProcessed;
+      });
     }
   }, [flatComments]);
 
   return {
     processedComments,
-    handleOpenCommentProgrammatically,
+    handleOpenCommentByIdx,
+    handleToggleCommentRepliesById,
     addCommentMutation,
     removeCommentMutation,
+    updateCommentNumberOfRepliesMutation,
     ...query,
   };
 };

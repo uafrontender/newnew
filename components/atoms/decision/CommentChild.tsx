@@ -1,23 +1,15 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-} from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import moment from 'moment';
-import { newnewapi } from 'newnew-api';
 
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
-import CommentForm from './CommentForm';
 
 import { useUserData } from '../../../contexts/userDataContext';
 import { useAppState } from '../../../contexts/appStateContext';
@@ -26,7 +18,6 @@ import { reportMessage } from '../../../api/endpoints/report';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import DisplayName from '../DisplayName';
-import { APIResponse } from '../../../api/apiConfigs';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -41,36 +32,17 @@ const DeleteCommentModal = dynamic(
   () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
-interface IComment {
+interface ICommentChild {
   lastChild?: boolean;
   comment: TCommentWithReplies;
   isDeletingComment: boolean;
   canDeleteComment?: boolean;
   index?: number;
-  commentReply?: {
-    isOpen: boolean;
-    text: string;
-  };
-  handleAddComment: (
-    text: string,
-    parentId: number
-  ) => Promise<APIResponse<newnewapi.IChatMessage>>;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
-  onFormFocus?: () => void;
-  onFormBlur?: () => void;
   setCommentHeight?: (index: number, height: number) => void;
-  updateCommentReplies?: ({
-    id,
-    isOpen,
-    text,
-  }: {
-    id: number;
-    isOpen?: boolean;
-    text?: string;
-  }) => void;
 }
 
-const Comment = React.forwardRef<HTMLDivElement, IComment>(
+const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
   (
     {
       comment,
@@ -78,12 +50,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       canDeleteComment,
       isDeletingComment,
       index,
-      commentReply,
-      handleAddComment,
       handleDeleteComment,
-      onFormFocus,
-      onFormBlur,
-      updateCommentReplies,
     },
     ref: any
   ) => {
@@ -102,10 +69,6 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const [confirmDeleteComment, setConfirmDeleteComment] =
       useState<boolean>(false);
 
-    const [isReplyFormOpen, setIsReplyFormOpen] = useState(
-      commentReply?.isOpen || false
-    );
-
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
@@ -113,8 +76,6 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       () => userLoggedIn && userData?.userUuid === comment.sender?.uuid,
       [userLoggedIn, userData?.userUuid, comment.sender?.uuid]
     );
-
-    const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
     const onUserReport = useCallback(() => {
       if (!userLoggedIn) {
@@ -132,61 +93,6 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const onDeleteComment = () => {
       setConfirmDeleteComment(true);
     };
-
-    const commentFormRef = useRef<HTMLFormElement | null>(null);
-
-    const replyHandler = () => {
-      setIsReplyFormOpen((prevState) => !prevState);
-    };
-
-    const isReplyFormOpenRef = useRef(isReplyFormOpen);
-
-    useEffect(() => {
-      if (
-        isReplyFormOpen !== isReplyFormOpenRef.current &&
-        updateCommentReplies
-      ) {
-        updateCommentReplies({
-          id: comment.id as number,
-          isOpen: isReplyFormOpen,
-        });
-      }
-
-      if (
-        isReplyFormOpen &&
-        !isReplyFormOpenRef.current &&
-        commentFormRef.current
-      ) {
-        commentFormRef.current.scrollIntoView({
-          block: 'center',
-          inline: 'end',
-          behavior: 'smooth',
-        });
-        isReplyFormOpenRef.current = true;
-      }
-
-      if (!isReplyFormOpen) {
-        isReplyFormOpenRef.current = false;
-      }
-    }, [comment.id, isReplyFormOpen, updateCommentReplies]);
-
-    const handleReplyChange = useCallback(
-      (value: string) => {
-        if (updateCommentReplies) {
-          updateCommentReplies({
-            id: comment.id as number,
-            text: value,
-          });
-        }
-      },
-      [comment.id, updateCommentReplies]
-    );
-
-    useEffect(() => {
-      if (comment.isOpen) {
-        setIsReplyFormOpen(true);
-      }
-    }, [comment.isOpen]);
 
     const moreButtonRef: any = useRef<HTMLButtonElement>();
 
@@ -216,9 +122,9 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
                       : `/${comment.sender?.username}`
                   }
                 >
-                  <a>
+                  <SUserAvatarAnchor>
                     <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-                  </a>
+                  </SUserAvatarAnchor>
                 </Link>
               ) : (
                 <SUserAvatar
@@ -314,61 +220,6 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
               </SActionsDiv>
             </SCommentHeader>
             {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
-            {/* TODO: SReply is not clickable element */}
-            {!comment.parentId &&
-              !comment.isDeleted &&
-              (!isReplyFormOpen ? (
-                <SReply onClick={replyHandler}>
-                  {t('comments.sendReply')}
-                </SReply>
-              ) : (
-                <>
-                  {replies.length === 0 ? (
-                    <SReply onClick={replyHandler}>
-                      {t('comments.hideReplies')}
-                    </SReply>
-                  ) : null}
-                  <CommentForm
-                    onSubmit={(newMsg: string) =>
-                      handleAddComment(newMsg, comment.id as number)
-                    }
-                    onBlur={onFormBlur ?? undefined}
-                    onFocus={onFormFocus ?? undefined}
-                    ref={commentFormRef}
-                    value={commentReply?.text}
-                    onChange={handleReplyChange}
-                  />
-                </>
-              ))}
-            {!comment.parentId &&
-              !comment.isDeleted &&
-              replies &&
-              replies.length > 0 && (
-                <SReply onClick={replyHandler}>
-                  {isReplyFormOpen
-                    ? t('comments.hideReplies')
-                    : t('comments.viewReplies')}{' '}
-                  {replies.length}{' '}
-                  {replies.length > 1
-                    ? t('comments.replies')
-                    : t('comments.reply')}
-                </SReply>
-              )}
-            {isReplyFormOpen &&
-              replies &&
-              replies.map((item, i) => (
-                <Comment
-                  key={item.id.toString()}
-                  isDeletingComment={isDeletingComment}
-                  canDeleteComment={canDeleteComment}
-                  lastChild={i === replies.length - 1}
-                  comment={item}
-                  handleAddComment={(newMsg: string) =>
-                    handleAddComment(newMsg, item.id as number)
-                  }
-                  handleDeleteComment={handleDeleteComment}
-                />
-              ))}
           </SCommentContent>
           <DeleteCommentModal
             isVisible={confirmDeleteComment}
@@ -407,13 +258,11 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
   }
 );
 
-export default Comment;
+export default CommentChild;
 
-Comment.defaultProps = {
+CommentChild.defaultProps = {
   lastChild: false,
   canDeleteComment: false,
-  onFormFocus: () => {},
-  onFormBlur: () => {},
 };
 
 const SUserAvatar = styled(UserAvatar)<{
@@ -591,14 +440,6 @@ const SText = styled.div`
   }
 `;
 
-const SReply = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  font-size: 12px;
-  line-height: 16px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
 const SSeparator = styled.div`
   height: 1px;
   overflow: hidden;
@@ -607,4 +448,8 @@ const SSeparator = styled.div`
       ? props.theme.colorsThemed.background.outlines1
       : props.theme.colorsThemed.background.tertiary};
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+`;
+
+const SUserAvatarAnchor = styled.a`
+  height: fit-content;
 `;
