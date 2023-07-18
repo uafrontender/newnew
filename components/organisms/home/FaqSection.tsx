@@ -188,12 +188,12 @@ const SContainer = styled.section`
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 20px;
+    overflow-x: visible;
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: 60px 128px;
     margin-top: 0;
-    overflow-x: auto;
   }
 
   ${(props) => props.theme.media.laptopM} {
