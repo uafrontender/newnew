@@ -23,6 +23,7 @@ import CommentParent from '../../../atoms/decision/CommentParent';
 
 interface ICommentsMobile {
   postUuid: string;
+  postShortId: string;
   comments: TCommentWithReplies[];
   canDeleteComments?: boolean;
   isLoading: boolean;
@@ -41,6 +42,7 @@ interface ICommentsMobile {
 
 const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
   postUuid,
+  postShortId,
   comments,
   canDeleteComments,
   isLoading,
@@ -60,9 +62,11 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
   );
 
   // Comment from URL
-  const { commentIdFromUrl, handleResetCommentIdFromUrl } = useContext(
-    CommentFromUrlContext
-  );
+  const {
+    commentIdFromUrl,
+    newCommentContentFromUrl,
+    handleResetCommentIdFromUrl,
+  } = useContext(CommentFromUrlContext);
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -120,79 +124,48 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
 
   // Scroll to comment
   useEffect(() => {
-    async function findComment() {
-      const flat: TCommentWithReplies[] = [];
-      for (let i = 0; i < comments.length; i++) {
-        if (
-          comments[i].replies &&
-          Array.isArray(comments[i].replies) &&
-          comments[i].replies!!.length > 0
-        ) {
-          flat.push(
-            ...[
-              { ...comments[i], index: i } as TCommentWithReplies,
-              ...comments[i].replies!!,
-            ]
-          );
-        }
-        flat.push({ ...comments[i], index: i } as TCommentWithReplies);
-      }
+    async function findComment(commentId: string) {
+      if (commentId) {
+        const idx = comments.findIndex(
+          (comment) => comment.id === parseInt(commentId as string)
+        );
 
-      const idx = flat.findIndex(
-        (comment) => comment.id === parseInt(commentIdFromUrl as string)
-      );
+        if (idx === -1) {
+          scrollRef.current?.scrollIntoView();
 
-      if (idx === -1) {
-        scrollRef.current?.scrollIntoView();
-
-        if (isMobile && hasNextPage && !isLoading) {
           await fetchNextPage();
-        } else {
           scrollRef.current?.scrollBy({
             top: scrollRef.current.scrollHeight,
           });
-        }
-      } else {
-        if (!flat[idx]?.parentCommentId || flat[idx]?.parentCommentId === 0) {
-          // commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
-          //   align: 'center',
-          // });
+        } else {
+          document
+            ?.getElementById(`comment_id_${comments[idx].id}`)
+            ?.scrollIntoView();
 
-          flashCommentOnScroll(`comment_id_${flat[idx].id}`);
-        } else if (flat[idx]?.parentCommentId) {
-          const parentIdx = comments.findIndex(
-            (c) => c.id === flat[idx]?.parentCommentId
-          );
+          openCommentProgrammatically(idx);
 
-          if (parentIdx !== -1) {
-            // commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
-            //   align: 'center',
-            // });
+          flashCommentOnScroll(`comment_id_${comments[idx].id}`);
 
-            openCommentProgrammatically(parentIdx);
-
-            setTimeout(() => {
-              document
-                ?.getElementById(`comment_id_${flat[idx].id}`)
-                ?.scrollIntoView({
-                  block: 'end',
-                  inline: 'nearest',
-                });
-            }, 200);
-
-            flashCommentOnScroll(`comment_id_${flat[idx].id}`, 300);
+          if (!newCommentContentFromUrl) {
+            handleResetCommentIdFromUrl?.();
           }
         }
-
-        handleResetCommentIdFromUrl?.();
       }
     }
 
     if (commentIdFromUrl) {
-      findComment();
+      findComment(commentIdFromUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, comments, isMobile, isLoading]);
+  }, [
+    commentIdFromUrl,
+    newCommentContentFromUrl,
+    comments,
+    // fetchNextPage, - will be updated with comments, do not need to depend
+    // openCommentProgrammatically, - will be updated with comments, do not need to depend
+    // flashCommentOnScroll, - doesn't change
+    // handleResetCommentIdFromUrl, - doesn't change
+  ]);
 
   return (
     <>
@@ -214,6 +187,7 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
                     ) : (
                       <CommentParent
                         postUuid={postUuid}
+                        postShortId={postShortId}
                         canDeleteComment={canDeleteComments}
                         lastChild={index === comments.length - 1}
                         comment={comments[index]}

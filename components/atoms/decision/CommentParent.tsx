@@ -51,6 +51,7 @@ const DeleteCommentModal = dynamic(
 
 interface ICommentParent {
   postUuid: string;
+  postShortId: string;
   lastChild?: boolean;
   comment: TCommentWithReplies;
   isDeletingComment: boolean;
@@ -84,6 +85,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
   (
     {
       postUuid,
+      postShortId,
       comment,
       lastChild,
       canDeleteComment,
@@ -342,7 +344,9 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               <Link
                 href={
                   comment.sender?.uuid === userData?.userUuid
-                    ? '/profile'
+                    ? userData?.options?.isCreator
+                      ? '/profile/my-posts'
+                      : '/profile'
                     : `/${comment.sender?.username}`
                 }
               >
@@ -378,7 +382,9 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                       }
                       href={
                         comment.sender?.uuid === userData?.userUuid
-                          ? '/profile'
+                          ? userData?.options?.isCreator
+                            ? '/profile/my-posts'
+                            : '/profile'
                           : `/${comment.sender?.username}`
                       }
                     />
@@ -460,6 +466,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                   ) : null}
                   <CommentForm
                     commentId={comment.id as number}
+                    postUuidOrShortId={postShortId || postUuid}
                     onSubmit={(newMsg: string) =>
                       handleAddComment(newMsg, comment.id as number)
                     }
@@ -501,7 +508,9 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               hasNextPage &&
               !isFetchingNextPage &&
               !isLoading && (
-                <SReply onClick={() => fetchNextPage()}>Load replies</SReply>
+                <SReply onClick={() => fetchNextPage()}>
+                  {t('comments.loadReplies')}
+                </SReply>
               )}
             {(comment.numberOfReplies &&
               (comment.numberOfReplies as number) > 0 &&
@@ -626,12 +635,17 @@ const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
       width: 100%;
       height: 100%;
 
+      z-index: 1;
+
       background: ${({ theme }) =>
         theme.name === 'dark'
           ? 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)'
           : 'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)'};
-      box-shadow: 4px 4px 100px 75px rgba(34, 60, 80, 0.2);
-      animation: ${OpenedFlash} 1.5s forwards linear;
+      box-shadow: ${({ theme }) =>
+        theme.name === 'dark'
+          ? '4px 4px 100px 75px rgba(34, 60, 80, 0.2)'
+          : '4px 4px 100px 75px rgba(34, 60, 80, 0.8) inset'};
+      animation: ${OpenedFlash} 1.5s infinite linear;
     }
   }
 

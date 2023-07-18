@@ -54,7 +54,7 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
 };
 
 interface ICommentForm {
-  postUuidOrShortId?: string;
+  postUuidOrShortId: string;
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
@@ -201,11 +201,6 @@ const CommentForm = React.forwardRef<TCommentFormAreaHandle, ICommentForm>(
             // Redirect only after the persist data is pulled
             if (!userLoggedIn) {
               if (!isRoot && commentId) {
-                // router.push(
-                //   `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                //     window.location.href
-                //   )}`
-                // );
                 router.push(
                   `/sign-up?reason=comment&redirect=${encodeURIComponent(
                     `${process.env.NEXT_PUBLIC_APP_URL}/${
@@ -354,30 +349,29 @@ const CommentForm = React.forwardRef<TCommentFormAreaHandle, ICommentForm>(
             placeholder={t('comments.placeholder')}
           />
         </SInputWrapper>
-        {(focusedInput || commentText) && (
-          <SButton
-            withShadow
-            view={commentText ? 'primaryGrad' : 'quaternary'}
-            onClick={handleSubmit}
-            disabled={!commentText || !!commentTextError || isSubmitting}
-            style={{
-              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-            }}
-            loading={isSubmitting}
-            loadingAnimationColor='blue'
-          >
-            <SInlineSVG
-              svg={!isSubmitting ? sendIcon : ''}
-              fill={
-                commentText
-                  ? theme.colors.white
-                  : theme.colorsThemed.text.primary
-              }
-              width={isMobile ? '20px' : '24px'}
-              height={isMobile ? '20px' : '24px'}
-            />
-          </SButton>
-        )}
+        <SButton
+          withShadow
+          view={commentText ? 'primaryGrad' : 'quaternary'}
+          onClick={handleSubmit}
+          disabled={!commentText || !!commentTextError || isSubmitting}
+          style={{
+            ...(focusedInput || commentText
+              ? {}
+              : { transform: 'scale(0)', width: 0, padding: 0 }),
+            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+          }}
+          loading={isSubmitting}
+          loadingAnimationColor='blue'
+        >
+          <SInlineSVG
+            svg={!isSubmitting ? sendIcon : ''}
+            fill={
+              commentText ? theme.colors.white : theme.colorsThemed.text.primary
+            }
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+          />
+        </SButton>
       </SCommentsForm>
     );
   }
@@ -436,8 +430,9 @@ const SCommentsForm = styled.form<{
   }
 `;
 
-interface ISInputWrapper {}
-const SInputWrapper = styled.div<ISInputWrapper>`
+const SInputWrapper = styled.div`
   width: 100%;
   border-radius: 16px;
+
+  transition: 0.2s ease-in-out;
 `;

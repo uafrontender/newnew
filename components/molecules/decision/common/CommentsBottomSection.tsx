@@ -241,6 +241,7 @@ const CommentsBottomSection: React.FunctionComponent<
             <CommentsMobile
               comments={comments}
               postUuid={postUuid}
+              postShortId={postShortId}
               onCommentDelete={handleDeleteComment}
               openCommentProgrammatically={handleOpenCommentByIdx}
               handleAddComment={handleAddComment}
@@ -256,6 +257,7 @@ const CommentsBottomSection: React.FunctionComponent<
             <Comments
               comments={comments}
               postUuid={postUuid}
+              postShortId={postShortId}
               onCommentDelete={handleDeleteComment}
               openCommentProgrammatically={handleOpenCommentByIdx}
               handleAddComment={handleAddComment}
