@@ -11,8 +11,6 @@ import Container from '../atoms/Grid/Container';
 
 import { useAppState } from '../../contexts/appStateContext';
 import { useUiState } from '../../contexts/uiStateContext';
-import isIOS from '../../utils/isIOS';
-import isSafari from '../../utils/isSafari';
 
 interface IHeader {
   visible: boolean;
@@ -20,7 +18,7 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
-  const { banner } = useUiState();
+  const { banner, isMobileSafari } = useUiState();
   const { resizeMode } = useAppState();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -39,7 +37,7 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       visible={visible}
       withBanner={!!banner.show}
       ref={headerRef}
-      isMobileSafari={isIOS() && !!isSafari()}
+      isMobileSafari={isMobileSafari}
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>

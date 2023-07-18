@@ -4,7 +4,6 @@ import React, {
   useMemo,
   useState,
   useCallback,
-  useEffect,
   useDeferredValue,
 } from 'react';
 import { useCookies } from 'react-cookie';
@@ -40,8 +39,6 @@ import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContex
 import MobileChat from '../organisms/MobileChat';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useUiState } from '../../contexts/uiStateContext';
-import isIOS from '../../utils/isIOS';
-import isSafari from '../../utils/isSafari';
 
 interface IGeneral {
   className?: string;
@@ -69,6 +66,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
+  const { isMobileSafari } = useUiState();
 
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
@@ -221,13 +219,6 @@ export const General: React.FC<IGeneral> = (props) => {
           },
     [restrictMaxWidth]
   );
-
-  // Otherwise ssr styles will be used
-  const [isMobileSafari, setIsMobileSafari] = useState(false);
-
-  useEffect(() => {
-    setIsMobileSafari(isIOS() && !!isSafari());
-  }, []);
 
   const isBottomNavigationVisible = useDeferredValue(
     mobileNavigationVisible && !globalSearchActive
