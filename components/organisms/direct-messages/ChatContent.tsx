@@ -39,6 +39,7 @@ import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
 import isIOS from '../../../utils/isIOS';
+import { ReportData } from '../../molecules/direct-messages/ReportModal';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -121,6 +122,24 @@ const ChatContent: React.FC<IFuncProps> = ({
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
     useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+
+  const handleReportSubmit = useCallback(
+    async ({ reasons, message }: ReportData) => {
+      if (!chatRoom.visavis?.user?.uuid) {
+        return false;
+      }
+
+      await reportUser(chatRoom.visavis.user?.uuid, reasons, message).catch(
+        (e) => {
+          console.error(e);
+          return false;
+        }
+      );
+
+      return true;
+    },
+    [chatRoom.visavis?.user?.uuid]
+  );
 
   const handleCloseConfirmBlockUserModal = useCallback(() => {
     Mixpanel.track('Close Block User Modal', {
@@ -552,15 +571,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           show={confirmReportUser}
           reportedUser={chatRoom.visavis?.user!!}
           onClose={() => setConfirmReportUser(false)}
-          onSubmit={async ({ reasons, message }) => {
-            if (chatRoom.visavis?.user?.uuid) {
-              await reportUser(
-                chatRoom.visavis.user?.uuid,
-                reasons,
-                message
-              ).catch((e) => console.error(e));
-            }
-          }}
+          onSubmit={handleReportSubmit}
         />
       )}
       {chatRoom.visavis ? (

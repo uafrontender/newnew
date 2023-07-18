@@ -48,6 +48,7 @@ import DisplayName from '../atoms/DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
+import { ReportUserOnSignUp } from '../../utils/hooks/useOnSighUp';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -161,25 +162,42 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );  */
 
   const handleClickReport = useCallback(() => {
-    if (!userLoggedIn) {
-      Router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-
     setConfirmReportUser(true);
-  }, [userLoggedIn]);
+  }, []);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportUser(user.uuid, reasons, message).catch((e) =>
-        console.error(e)
-      );
+      if (!userLoggedIn) {
+        const onSignUp: ReportUserOnSignUp = {
+          type: 'report-user',
+          userId: user.uuid ?? undefined,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
+        );
+
+        return false;
+      }
+
+      await reportUser(user.uuid, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [user.uuid]
+    [userLoggedIn, user.uuid]
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 

@@ -24,13 +24,14 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
+import { Mixpanel } from '../../../../../utils/mixpanel';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 // Icons
 import BidIconLight from '../../../../../public/images/decision/bid-icon-light.png';
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
-import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -96,7 +97,18 @@ const AcOptionCardModeration: React.FunctionComponent<
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportEventOption(option.id, reasons, message);
+      Mixpanel.track('Submit report option', {
+        _stage: 'Post',
+        _optionId: option?.id,
+        _component: 'AcOptionCardModeration',
+      });
+
+      await reportEventOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
     [option.id]
   );

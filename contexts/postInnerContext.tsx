@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import React, {
   createContext,
   useState,
@@ -42,7 +42,7 @@ const PostInnerContext = createContext<{
   recommendedPostsLoading: boolean;
   reportPostOpen: boolean;
   handleSeeNewDeletedBox: () => void;
-  handleReportSubmit: ({ reasons, message }: ReportData) => Promise<void>;
+  handleReportSubmit: ({ reasons, message }: ReportData) => Promise<boolean>;
   handleReportClose: () => void;
   handleSetIsFollowingDecision: (v: boolean) => void;
   handleGoBackInsidePost: () => void;
@@ -93,7 +93,7 @@ const PostInnerContext = createContext<{
   handleReportSubmit: (() => {}) as unknown as ({
     reasons,
     message,
-  }: ReportData) => Promise<void>,
+  }: ReportData) => Promise<boolean>,
   handleReportClose: () => {},
   handleSetIsFollowingDecision: (v: boolean) => {},
   handleGoBackInsidePost: () => {},
@@ -200,7 +200,6 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   refetchPost,
   children,
 }) => {
-  const router = useRouter();
   const { userLoggedIn } = useAppState();
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
@@ -208,26 +207,33 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
   const [reportPostOpen, setReportPostOpen] = useState(false);
 
   const handleReportOpen = useCallback(() => {
-    if (!userLoggedIn) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
     setReportPostOpen(true);
-  }, [userLoggedIn, router]);
+  }, []);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      if (postParsed) {
-        await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
-          console.error(e)
-        );
+      if (!postParsed) {
+        return false;
       }
+
+      if (!userLoggedIn) {
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            window.location.href
+          )}`
+        );
+
+        return false;
+      }
+
+      await reportPost(postParsed.postUuid, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [postParsed]
+    [userLoggedIn, postParsed]
   );
 
   const handleOpenShareMenu = useCallback(() => {

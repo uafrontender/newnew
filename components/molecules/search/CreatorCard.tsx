@@ -1,7 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import React, { useCallback, useMemo, useState, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 
@@ -21,6 +21,7 @@ import { formatNumber } from '../../../utils/format';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
 import GenericSkeleton from '../GenericSkeleton';
+import { ReportUserOnSignUp } from '../../../utils/hooks/useOnSighUp';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
@@ -34,7 +35,6 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   onBundleClicked,
 }) => {
   const { t } = useTranslation('common');
-  const router = useRouter();
   const theme = useTheme();
   const { resizeMode, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -63,25 +63,42 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
   );
 
   const handleClickReport = useCallback(() => {
-    if (!userLoggedIn) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-
     setConfirmReportUser(true);
-  }, [userLoggedIn, router]);
+  }, []);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportUser(creator.uuid as string, reasons, message).catch((e) =>
-        console.error(e)
-      );
+      if (!userLoggedIn) {
+        const onSignUp: ReportUserOnSignUp = {
+          type: 'report-user',
+          userId: creator.uuid ?? undefined,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
+        );
+
+        return false;
+      }
+
+      await reportUser(creator.uuid as string, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [creator.uuid]
+    [userLoggedIn, creator.uuid]
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 

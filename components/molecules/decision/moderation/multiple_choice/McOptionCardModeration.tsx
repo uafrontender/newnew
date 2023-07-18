@@ -192,7 +192,13 @@ const McOptionCardModeration: React.FunctionComponent<
         _optionId: option?.id,
         _component: 'McOptionCardModeration',
       });
-      await reportSuperpollOption(option.id, reasons, message);
+
+      await reportSuperpollOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
     [option.id]
   );

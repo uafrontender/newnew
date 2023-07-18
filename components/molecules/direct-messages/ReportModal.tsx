@@ -31,7 +31,7 @@ export interface ReportData {
 interface IReportModal {
   show: boolean;
   reportedUser: newnewapi.IUser;
-  onSubmit: (reportData: ReportData) => Promise<void>;
+  onSubmit: (reportData: ReportData) => Promise<boolean>;
   onClose: () => void;
 }
 
@@ -136,11 +136,14 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         message.length >= MIN_REPORT_MESSAGE_LENGTH
       ) {
         setIsSubmitting(true);
-        await onSubmit({
+        const showSuccessModal = await onSubmit({
           reasons: reasonsList,
           message,
         });
-        setReportSent(true);
+        if (showSuccessModal) {
+          setReportSent(true);
+        }
+
         setIsSubmitting(false);
       }
     };

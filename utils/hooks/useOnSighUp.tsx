@@ -108,6 +108,7 @@ function useOnSignUp(onSignUp?: string) {
 
       case 'report-user': {
         if (action.userId && action.reasons && action.message) {
+          // TODO: Need to show report sent modal
           reportUser(action.userId, action.reasons, action.message);
         }
         break;
@@ -115,6 +116,7 @@ function useOnSignUp(onSignUp?: string) {
 
       case 'report-post': {
         if (action.postUuid && action.reasons && action.message) {
+          // TODO: Need to show report sent modal
           reportPost(action.postUuid, action.reasons, action.message);
         }
         break;
@@ -122,6 +124,7 @@ function useOnSignUp(onSignUp?: string) {
 
       case 'report-event-option': {
         if (action.optionId && action.reasons && action.message) {
+          // TODO: Need to show report sent modal
           reportEventOption(action.optionId, action.reasons, action.message);
         }
         break;
@@ -129,6 +132,7 @@ function useOnSignUp(onSignUp?: string) {
 
       case 'report-superpoll-option': {
         if (action.optionId && action.reasons && action.message) {
+          // TODO: Need to show report sent modal
           reportSuperpollOption(
             action.optionId,
             action.reasons,
@@ -140,6 +144,7 @@ function useOnSignUp(onSignUp?: string) {
 
       case 'report-message': {
         if (action.messageId && action.reasons && action.message) {
+          // TODO: Need to show report sent modal
           reportMessage(action.messageId, action.reasons, action.message);
         }
         break;
