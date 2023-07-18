@@ -912,6 +912,7 @@ const PostPage: NextPage<IPostPage> = ({
     </motion.div>
   );
 };
+
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
