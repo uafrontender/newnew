@@ -471,11 +471,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             />
           </SEllipseButtonMobile>
         )}
-        <SBidDetails
-          isBlue={isBlue}
-          active={!!optionBeingSupported && !disabled}
-          noAction={!votingAllowed}
-        >
+        <SBidDetails isBlue={isBlue} noAction={!votingAllowed}>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
             <OptionActionIcon
               src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
@@ -894,7 +890,6 @@ const SContainer = styled.div<{
 
 const SBidDetails = styled.div<{
   isBlue: boolean;
-  active: boolean;
   noAction: boolean;
 }>`
   position: relative;
@@ -937,8 +932,8 @@ const SBidDetails = styled.div<{
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
     border-bottom-left-radius: ${({ theme }) => theme.borderRadius.medium};
 
-    ${({ active, noAction }) =>
-      active || noAction
+    ${({ noAction }) =>
+      noAction
         ? css`
             border-top-right-radius: ${({ theme }) =>
               theme.borderRadius.medium};
