@@ -9,7 +9,9 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
-import CommentForm from '../../../atoms/decision/CommentForm';
+import CommentForm, {
+  TCommentFormAreaHandle,
+} from '../../../atoms/decision/CommentForm';
 
 import { useUserData } from '../../../../contexts/userDataContext';
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
@@ -50,7 +52,7 @@ const CommentsBottomSection: React.FunctionComponent<
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Submit form ref
-  const commentFormRef = useRef<HTMLFormElement>();
+  const commentFormRef = useRef<TCommentFormAreaHandle>();
 
   const {
     processedComments: comments,

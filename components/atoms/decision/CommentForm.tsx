@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from 'react';
@@ -65,7 +66,11 @@ interface ICommentForm {
   onChange?: (text: string) => void;
 }
 
-const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
+export type TCommentFormAreaHandle = {
+  handleFocusFormTextArea: () => void;
+};
+
+const CommentForm = React.forwardRef<TCommentFormAreaHandle, ICommentForm>(
   (
     {
       value: initialValue,
@@ -97,6 +102,8 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       'tablet',
     ].includes(resizeMode);
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Comment content from URL
@@ -114,6 +121,12 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
     const debouncedCommentText = useDebouncedValue(commentText, 500);
+
+    useImperativeHandle(ref, () => ({
+      handleFocusFormTextArea() {
+        textareaRef?.current?.focus();
+      },
+    }));
 
     useEffect(() => {
       if (onChange) {
@@ -312,13 +325,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
     return (
       <SCommentsForm
-        {...{
-          ...(ref
-            ? {
-                ref,
-              }
-            : {}),
-        }}
         position={position}
         zIndex={zIndex}
         onKeyDown={handleKeyDown}
@@ -326,6 +332,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         <SInputWrapper>
           <CommentTextArea
             id='title'
+            ref={textareaRef}
             maxlength={500}
             value={commentText}
             focus={focusedInput}

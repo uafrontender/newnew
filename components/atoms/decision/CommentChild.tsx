@@ -122,9 +122,9 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
                       : `/${comment.sender?.username}`
                   }
                 >
-                  <a>
+                  <SUserAvatarAnchor>
                     <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-                  </a>
+                  </SUserAvatarAnchor>
                 </Link>
               ) : (
                 <SUserAvatar
@@ -448,4 +448,8 @@ const SSeparator = styled.div`
       ? props.theme.colorsThemed.background.outlines1
       : props.theme.colorsThemed.background.tertiary};
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+`;
+
+const SUserAvatarAnchor = styled.a`
+  height: fit-content;
 `;

@@ -18,7 +18,7 @@ import { newnewapi } from 'newnew-api';
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
-import CommentForm from './CommentForm';
+import CommentForm, { TCommentFormAreaHandle } from './CommentForm';
 
 import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
@@ -219,9 +219,16 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       setConfirmDeleteComment(true);
     };
 
-    const commentFormRef = useRef<HTMLFormElement | null>(null);
+    const commentFormRef = useRef<TCommentFormAreaHandle>(null);
 
     const replyHandler = useCallback(() => {
+      handleToggleReplies(comment.id as number, !comment?.isOpen);
+      setTimeout(() => {
+        commentFormRef.current?.handleFocusFormTextArea();
+      }, 100);
+    }, [comment.id, comment?.isOpen, handleToggleReplies]);
+
+    const toggleRepliesHandler = useCallback(() => {
       handleToggleReplies(comment.id as number, !comment?.isOpen);
     }, [comment.id, comment?.isOpen, handleToggleReplies]);
 
@@ -243,11 +250,6 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         !isReplyFormOpenRef.current &&
         commentFormRef.current
       ) {
-        commentFormRef.current.scrollIntoView({
-          block: 'center',
-          inline: 'end',
-          behavior: 'smooth',
-        });
         isReplyFormOpenRef.current = true;
       }
 
@@ -344,9 +346,13 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                     : `/${comment.sender?.username}`
                 }
               >
-                <a>
+                <SUserAvatarAnchor
+                  style={{
+                    height: 'fit-content',
+                  }}
+                >
                   <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-                </a>
+                </SUserAvatarAnchor>
               </Link>
             ) : (
               <SUserAvatar
@@ -448,7 +454,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               ) : (
                 <>
                   {comment.numberOfReplies === 0 ? (
-                    <SReply onClick={replyHandler}>
+                    <SReply onClick={toggleRepliesHandler}>
                       {t('comments.hideReplies')}
                     </SReply>
                   ) : null}
@@ -468,7 +474,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
             {!comment.isDeleted &&
             comment.numberOfReplies &&
             (comment.numberOfReplies as number) > 0 ? (
-              <SReply onClick={replyHandler}>
+              <SReply onClick={toggleRepliesHandler}>
                 {isReplyFormOpen
                   ? t('comments.hideReplies')
                   : t('comments.viewReplies')}{' '}
@@ -747,4 +753,8 @@ const SSeparator = styled.div`
 const SLoaderDiv = styled.div`
   position: relative;
   height: 50px;
+`;
+
+const SUserAvatarAnchor = styled.a`
+  height: fit-content;
 `;
