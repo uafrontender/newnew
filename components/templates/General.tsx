@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useDeferredValue,
 } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -228,6 +229,10 @@ export const General: React.FC<IGeneral> = (props) => {
     setIsMobileSafari(isIOS() && !!isSafari());
   }, []);
 
+  const isBottomNavigationVisible = useDeferredValue(
+    mobileNavigationVisible && !globalSearchActive
+  );
+
   return (
     <>
       {/* header is sticky for Safari on mobile devices so padding isn't needed */}
@@ -257,7 +262,7 @@ export const General: React.FC<IGeneral> = (props) => {
             collection={bottomNavigation}
             moreMenuMobileOpen={moreMenuMobileOpen}
             handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={mobileNavigationVisible && !globalSearchActive}
+            visible={isBottomNavigationVisible}
           />
           {hasMounted ? (
             <>
