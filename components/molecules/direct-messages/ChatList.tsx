@@ -25,7 +25,7 @@ interface IChatList {
   className?: string;
   forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
-  onChatListFetched: (value: boolean) => void;
+  onChatListFetched?: (value: boolean) => void;
 }
 
 const ChatList: React.FC<IChatList> = ({
@@ -54,7 +54,9 @@ const ChatList: React.FC<IChatList> = ({
     });
 
   useEffect(() => {
-    onChatListFetched(isFetched);
+    if (onChatListFetched) {
+      onChatListFetched(isFetched);
+    }
   }, [isFetched, onChatListFetched]);
 
   const chatRooms: newnewapi.IChatRoom[] = useMemo(() => {
