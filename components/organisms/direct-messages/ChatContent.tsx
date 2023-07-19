@@ -9,7 +9,7 @@ import React, {
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { createGlobalStyle, useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
 
 /* Contexts */
@@ -39,6 +39,7 @@ import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
 import isIOS from '../../../utils/isIOS';
+import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -407,6 +408,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
+  // body-scroll-lock cannot be used here because of column-reverse
   useEffect(() => {
     const handleTouchMove = (e: TouchEvent) => {
       const targetEl = e.target as HTMLElement;
@@ -437,43 +439,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   }, [isHidden]);
 
   // Needed to prevent soft keyboard from pushing layout up on mobile Safari
-  useEffect(() => {
-    let input: HTMLInputElement | null = null;
-
-    const handleFocusIn = (e: Event) => {
-      input = e.target as HTMLInputElement;
-
-      if (input && input.getAttribute('data-new-message-textarea')) {
-        input.style.transform = 'translateY(-99999px)';
-
-        setTimeout(() => {
-          if (input) {
-            input.style.transform = '';
-          }
-        }, 100);
-      }
-    };
-
-    const handleFocusOut = (e: Event) => {
-      if (input) {
-        input.style.transform = '';
-      }
-    };
-
-    if (isIOS()) {
-      document.addEventListener('focusin', handleFocusIn);
-
-      document.addEventListener('focusout', handleFocusOut);
-    }
-
-    return () => {
-      if (isIOS()) {
-        document.removeEventListener('focusin', handleFocusIn);
-
-        document.removeEventListener('focusout', handleFocusOut);
-      }
-    };
-  }, []);
+  usePreventLayoutMoveOnInputFocusSafari('data-new-message-textarea');
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
@@ -572,6 +538,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           isAnnouncement={isAnnouncement}
         />
       ) : null}
+      <GlobalStyles />
     </SContainer>
   );
 };
@@ -594,6 +561,12 @@ const SContainer = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     height: 100%;
+  }
+`;
+
+const GlobalStyles = createGlobalStyle`
+  body {
+    background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
 `;
 

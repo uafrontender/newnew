@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
+import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
 
 const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatListTabs')
@@ -76,6 +77,9 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     () => withTabs && !searchChatroom && tabsVisible && !!activeTab,
     [activeTab, searchChatroom, tabsVisible, withTabs]
   );
+
+  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
+  usePreventLayoutMoveOnInputFocusSafari('data-chat-list-search');
 
   // TODO: move hidden to parent, just pass className here
   return (

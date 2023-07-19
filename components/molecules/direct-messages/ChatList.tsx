@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -6,6 +6,7 @@ import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
@@ -85,8 +86,23 @@ const ChatList: React.FC<IChatList> = ({
     }
   }, [myRole, unreadCountForUser, refetch]);
 
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!hidden && wrapper) {
+      disableBodyScroll(wrapper);
+    }
+
+    return () => {
+      if (wrapper) {
+        enableBodyScroll(wrapper);
+      }
+    };
+  }, [hidden]);
+
   return (
-    <SChatListWrapper>
+    <SChatListWrapper ref={wrapperRef}>
       <SChatList
         style={
           hidden
