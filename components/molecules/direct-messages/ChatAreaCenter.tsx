@@ -236,6 +236,7 @@ const SMessages = styled.div<{
 }>`
   display: flex;
   flex-direction: column-reverse;
+  flex-shrink: 0;
 
   padding: 0 12px;
 
