@@ -20,7 +20,7 @@ import PostShareEllipseModal from './PostShareEllipseModal';
 import ShareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../../contexts/appStateContext';
-import { MarkPostAsFavoriteOnSignUp } from '../../../../utils/hooks/useOnSighUp';
+import { MarkPostAsFavoriteOnSignUp } from '../../../../utils/hooks/useOnSignUp';
 
 interface IPostSuccessOrWaitingControls {}
 

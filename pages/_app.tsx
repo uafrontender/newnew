@@ -71,7 +71,7 @@ import PostCreationContextProvider from '../contexts/postCreationContext';
 import { TutorialProgressContextProvider } from '../contexts/tutorialProgressContext';
 import UiStateContextProvider, { TColorMode } from '../contexts/uiStateContext';
 import { SignUpContextProvider } from '../contexts/signUpContext';
-import useOnSignUp from '../utils/hooks/useOnSighUp';
+import useOnSignUp from '../utils/hooks/useOnSignUp';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {

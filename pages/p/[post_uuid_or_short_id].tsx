@@ -56,7 +56,7 @@ import useCuratedList, {
   useCuratedListSubscription,
 } from '../../utils/hooks/useCuratedList';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
-import { MarkPostAsFavoriteOnSignUp } from '../../utils/hooks/useOnSighUp';
+import { MarkPostAsFavoriteOnSignUp } from '../../utils/hooks/useOnSignUp';
 
 interface IPostPage {
   postUuidOrShortId: string;
