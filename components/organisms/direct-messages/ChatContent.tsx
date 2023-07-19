@@ -38,8 +38,8 @@ import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
-import isIOS from '../../../utils/isIOS';
 import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
+import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
 
 const ReportModal = dynamic(
   () => import('../../molecules/direct-messages/ReportModal')
@@ -409,34 +409,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   ]);
 
   // body-scroll-lock cannot be used here because of column-reverse
-  useEffect(() => {
-    const handleTouchMove = (e: TouchEvent) => {
-      const targetEl = e.target as HTMLElement;
-      const chatContent = chatContentRef?.current as HTMLElement | null;
-
-      if (
-        targetEl.getAttribute('data-body-scroll-lock-ignore') ||
-        (chatContent && chatContent.contains(targetEl))
-      ) {
-        return true;
-      }
-      e.preventDefault();
-
-      return false;
-    };
-
-    if (isIOS() && !isHidden) {
-      document.addEventListener('touchmove', handleTouchMove, {
-        passive: false,
-      });
-    }
-
-    return () => {
-      if (isIOS()) {
-        document.removeEventListener('touchmove', handleTouchMove);
-      }
-    };
-  }, [isHidden]);
+  useDisableTouchMoveSafari(chatContentRef, isHidden);
 
   // Needed to prevent soft keyboard from pushing layout up on mobile Safari
   usePreventLayoutMoveOnInputFocusSafari('data-new-message-textarea');

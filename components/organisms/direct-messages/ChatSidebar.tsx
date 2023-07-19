@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -6,6 +12,7 @@ import dynamic from 'next/dynamic';
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
 import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
+import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
 
 const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatListTabs')
@@ -78,10 +85,13 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     [activeTab, searchChatroom, tabsVisible, withTabs]
   );
 
+  const chatListRef = useRef<HTMLDivElement | null>(null);
+
   // Needed to prevent soft keyboard from pushing layout up on mobile Safari
   usePreventLayoutMoveOnInputFocusSafari('data-chat-list-search');
 
-  // TODO: move hidden to parent, just pass className here
+  useDisableTouchMoveSafari(chatListRef, hidden);
+
   return (
     <SSidebar hidden={hidden} className={className}>
       <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
@@ -91,7 +101,11 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
           changeActiveTab={changeActiveTab}
         />
       )}
-      <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
+      <ChatList
+        onChatRoomSelect={onChatRoomSelect}
+        myRole={activeTab}
+        forwardRef={chatListRef}
+      />
     </SSidebar>
   );
 };

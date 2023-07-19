@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { RefObject, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -6,7 +6,6 @@ import { useUpdateEffect } from 'react-use';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import useMyChatRooms from '../../../utils/hooks/useMyChatRooms';
 import { SChatSeparator } from '../../atoms/direct-messages/styles';
@@ -24,6 +23,7 @@ interface IChatList {
   hidden?: boolean;
   myRole: newnewapi.ChatRoom.MyRole | undefined;
   className?: string;
+  forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
@@ -31,6 +31,7 @@ const ChatList: React.FC<IChatList> = ({
   myRole,
   hidden,
   className,
+  forwardRef,
   onChatRoomSelect: onChatRoomSelected,
 }) => {
   const { t } = useTranslation('page-Chat');
@@ -86,23 +87,8 @@ const ChatList: React.FC<IChatList> = ({
     }
   }, [myRole, unreadCountForUser, refetch]);
 
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!hidden && wrapper) {
-      disableBodyScroll(wrapper);
-    }
-
-    return () => {
-      if (wrapper) {
-        enableBodyScroll(wrapper);
-      }
-    };
-  }, [hidden]);
-
   return (
-    <SChatListWrapper ref={wrapperRef}>
+    <SChatListWrapper ref={forwardRef}>
       <SChatList
         style={
           hidden
@@ -112,6 +98,7 @@ const ChatList: React.FC<IChatList> = ({
             : {}
         }
         className={className}
+        data-body-scroll-lock-ignore
       >
         {/* Loading state */}
         {isLoading && <Loader size='md' isStatic />}
