@@ -39,7 +39,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const { t: tCommon } = useTranslation('common');
   const theme = useTheme();
   const router = useRouter();
-  const { isMobileSafari, colorMode, setColorMode } = useUiState();
+  const { colorMode, setColorMode } = useUiState();
   const { resizeMode } = useAppState();
 
   const topItems: TItem[] = [
@@ -157,7 +157,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   };
 
   return (
-    <SWrapper isMobileSafari={isMobileSafari}>
+    <SWrapper>
       <Container>
         <Row>
           <Col>
@@ -278,10 +278,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
 export default Footer;
 
-const SWrapper = styled.footer<{
-  isMobileSafari: boolean;
-}>`
-  padding-bottom: ${({ isMobileSafari }) => (isMobileSafari ? 0 : '36px')};
+const SWrapper = styled.footer`
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.background.secondary

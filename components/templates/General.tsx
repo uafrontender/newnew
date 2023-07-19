@@ -66,7 +66,6 @@ export const General: React.FC<IGeneral> = (props) => {
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
-  const { isMobileSafari } = useUiState();
 
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
@@ -232,7 +231,6 @@ export const General: React.FC<IGeneral> = (props) => {
         className={className}
         containerRef={wrapperRef}
         withBanner={!!banner?.show}
-        noPaddingTop={!!noMobileNavigation || isMobileSafari}
       >
         <SkeletonTheme
           baseColor={theme.colorsThemed.background.secondary}
@@ -313,19 +311,15 @@ General.defaultProps = {
 
 interface ISWrapper {
   withBanner: boolean;
-  noPaddingTop: boolean;
 }
 
 const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
   transition: padding ease 0.5s;
-  padding-top: ${(props) =>
-    !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
   flex-direction: column;
   justify-content: space-between;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-top: ${(props) => (props.withBanner ? 112 : 72)}px;
     padding-bottom: 0;
 
     /* Hide scrollbar */
@@ -333,10 +327,6 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
       display: none;
     }
     scrollbar-width: none;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding-top: ${(props) => (props.withBanner ? 120 : 80)}px;
   }
 `;
 

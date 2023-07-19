@@ -4,13 +4,10 @@ import React, {
   useMemo,
   useContext,
   useCallback,
-  useEffect,
 } from 'react';
 import isBrowser from '../utils/isBrowser';
 import { cookiesInstance } from '../api/apiConfigs';
 import getColorMode from '../utils/getColorMode';
-import isIOS from '../utils/isIOS';
-import isSafari from '../utils/isSafari';
 
 export type TColorMode = 'light' | 'dark' | 'auto';
 export type TBanner = {
@@ -23,7 +20,6 @@ export const UiStateContext = createContext<{
   colorMode: TColorMode;
   mutedMode: boolean;
   globalSearchActive: boolean;
-  isMobileSafari: boolean;
   setColorMode: (payload: TColorMode) => void;
   setGlobalSearchActive: (newValue: boolean) => void;
   setBanner: (newValue: TBanner) => void;
@@ -37,7 +33,6 @@ export const UiStateContext = createContext<{
   colorMode: 'auto',
   mutedMode: false,
   globalSearchActive: false,
-  isMobileSafari: false,
   setColorMode: () => {},
   setGlobalSearchActive: () => {},
   setBanner: () => {},
@@ -131,20 +126,12 @@ const UiStateContextProvider: React.FC<IUiStateContextProvider> = ({
     _setBanner(newValue);
   }, []);
 
-  // Detect Safari on mobile
-  const [isMobileSafari, setIsMobileSafari] = useState(false);
-
-  useEffect(() => {
-    setIsMobileSafari(isIOS() && !!isSafari());
-  }, []);
-
   const contextValue = useMemo(
     () => ({
       banner,
       colorMode,
       mutedMode,
       globalSearchActive,
-      isMobileSafari,
       setColorMode,
       setGlobalSearchActive,
       setBanner,
@@ -156,7 +143,6 @@ const UiStateContextProvider: React.FC<IUiStateContextProvider> = ({
       colorMode,
       mutedMode,
       globalSearchActive,
-      isMobileSafari,
       setColorMode,
       setGlobalSearchActive,
       setBanner,
