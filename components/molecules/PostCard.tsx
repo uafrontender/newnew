@@ -441,6 +441,7 @@ export const PostCard: React.FC<ICard> = React.memo(
       if (hovered) {
         videoRef.current?.play().catch(() => {
           console.warn('Autoplay is not allowed');
+          setIsVideoLoading(false);
         });
       } else {
         videoRef.current?.pause();

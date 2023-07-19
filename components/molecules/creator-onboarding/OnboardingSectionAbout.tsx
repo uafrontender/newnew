@@ -207,22 +207,6 @@ const OnboardingSectionAbout: React.FunctionComponent<
     }
   }, [bioError, bioInEdit]);
 
-  // fix issue with gap while keyboard is active on iOS
-  // function preventScroll(e: any) {
-  //   e.preventDefault();
-  // }
-  // const handleBlur = useCallback(() => {
-  //   if (isSafari() && isMobile)
-  //     document.body.removeEventListener('touchmove', preventScroll);
-  // }, [isMobile]);
-
-  // const handleFocus = useCallback(() => {
-  //   if (isSafari() && isMobile)
-  //     document.body.addEventListener('touchmove', preventScroll, {
-  //       passive: false,
-  //     });
-  // }, [isMobile]);
-
   return (
     <>
       <SContainer>
