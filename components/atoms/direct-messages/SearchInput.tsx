@@ -83,6 +83,7 @@ const SearchInput: React.FC<ISearchInput> = ({
           value={searchValue}
           onChange={handleInputChange}
           placeholder={placeholderText}
+          data-chat-list-search
         />
         {searchValue.length > 0 && (
           <SRightInlineSVG

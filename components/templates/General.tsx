@@ -4,7 +4,7 @@ import React, {
   useMemo,
   useState,
   useCallback,
-  useEffect,
+  useDeferredValue,
 } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -39,7 +39,6 @@ import { useChatsUnreadMessages } from '../../contexts/chatsUnreadMessagesContex
 import MobileChat from '../organisms/MobileChat';
 import useHasMounted from '../../utils/hooks/useHasMounted';
 import { useUiState } from '../../contexts/uiStateContext';
-import isIOS from '../../utils/isIOS';
 
 interface IGeneral {
   className?: string;
@@ -209,28 +208,6 @@ export const General: React.FC<IGeneral> = (props) => {
     [isMobile, scrollDirection, noMobileNavigation]
   );
 
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const [inView, setInView] = useState(false);
-
-  // On iOS bottom navigation is sticky so we need it to hide bottom navigation
-  useEffect(() => {
-    if (ref.current && isIOS()) {
-      const obs = new IntersectionObserver(
-        (entries, observer) => {
-          entries.forEach((entry) => {
-            setInView(entry.isIntersecting);
-          });
-        },
-        {
-          rootMargin: '90px',
-        }
-      );
-
-      obs.observe(ref.current);
-    }
-  }, []);
-
   const containerParams = useMemo(
     () =>
       restrictMaxWidth
@@ -241,15 +218,18 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
+  const isBottomNavigationVisible = useDeferredValue(
+    mobileNavigationVisible && !globalSearchActive
+  );
+
   return (
     <>
-      {/* header is sticky for iOS devices so padding for iOS devices isn't needed */}
+      {/* header is sticky for Safari on mobile devices so padding isn't needed */}
       <SBaseLayout
         id='generalContainer'
         className={className}
         containerRef={wrapperRef}
         withBanner={!!banner?.show}
-        noPaddingTop={!!noMobileNavigation || isIOS()}
       >
         <SkeletonTheme
           baseColor={theme.colorsThemed.background.secondary}
@@ -270,10 +250,8 @@ export const General: React.FC<IGeneral> = (props) => {
             collection={bottomNavigation}
             moreMenuMobileOpen={moreMenuMobileOpen}
             handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={mobileNavigationVisible && !globalSearchActive}
-            reachedPageEnd={inView}
+            visible={isBottomNavigationVisible}
           />
-          <div ref={ref} />
           {hasMounted ? (
             <>
               <SortingContainer
@@ -332,19 +310,15 @@ General.defaultProps = {
 
 interface ISWrapper {
   withBanner: boolean;
-  noPaddingTop: boolean;
 }
 
 const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
   transition: padding ease 0.5s;
-  padding-top: ${(props) =>
-    !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
   flex-direction: column;
   justify-content: space-between;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-top: ${(props) => (props.withBanner ? 112 : 72)}px;
     padding-bottom: 0;
 
     /* Hide scrollbar */
@@ -352,10 +326,6 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
       display: none;
     }
     scrollbar-width: none;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding-top: ${(props) => (props.withBanner ? 120 : 80)}px;
   }
 `;
 
