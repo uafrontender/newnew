@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import isIOS from '../isIOS';
+import isSafari from '../isSafari';
 
 const usePreventLayoutMoveOnInputFocusSafari = (inputDataAttribute: string) => {
   useEffect(() => {
@@ -25,14 +26,14 @@ const usePreventLayoutMoveOnInputFocusSafari = (inputDataAttribute: string) => {
       }
     };
 
-    if (isIOS()) {
+    if (isIOS() && isSafari()) {
       document.addEventListener('focusin', handleFocusIn);
 
       document.addEventListener('focusout', handleFocusOut);
     }
 
     return () => {
-      if (isIOS()) {
+      if (isIOS() && isSafari()) {
         document.removeEventListener('focusin', handleFocusIn);
 
         document.removeEventListener('focusout', handleFocusOut);
