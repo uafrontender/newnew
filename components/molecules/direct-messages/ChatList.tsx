@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { RefObject, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -23,14 +23,18 @@ interface IChatList {
   hidden?: boolean;
   myRole: newnewapi.ChatRoom.MyRole | undefined;
   className?: string;
+  forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
+  onChatListFetched?: (value: boolean) => void;
 }
 
 const ChatList: React.FC<IChatList> = ({
   myRole,
   hidden,
   className,
+  forwardRef,
   onChatRoomSelect: onChatRoomSelected,
+  onChatListFetched,
 }) => {
   const { t } = useTranslation('page-Chat');
   const { ref: scrollRef, inView } = useInView();
@@ -42,12 +46,18 @@ const ChatList: React.FC<IChatList> = ({
 
   const { searchChatroom } = useGetChats();
 
-  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
+  const { data, isLoading, hasNextPage, isFetched, fetchNextPage, refetch } =
     useMyChatRooms({
       myRole: searchChatroom ? undefined : myRole,
       searchQuery: searchChatroom,
       announcementsName: t('announcement.announcements'),
     });
+
+  useEffect(() => {
+    if (onChatListFetched) {
+      onChatListFetched(isFetched);
+    }
+  }, [isFetched, onChatListFetched]);
 
   const chatRooms: newnewapi.IChatRoom[] = useMemo(() => {
     if (data) {
@@ -86,7 +96,7 @@ const ChatList: React.FC<IChatList> = ({
   }, [myRole, unreadCountForUser, refetch]);
 
   return (
-    <SChatListWrapper>
+    <SChatListWrapper ref={forwardRef}>
       <SChatList
         style={
           hidden
@@ -96,6 +106,7 @@ const ChatList: React.FC<IChatList> = ({
             : {}
         }
         className={className}
+        data-body-scroll-lock-ignore
       >
         {/* Loading state */}
         {isLoading && <Loader size='md' isStatic />}

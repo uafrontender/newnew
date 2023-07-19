@@ -242,9 +242,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             style={{ marginBottom: '16px' }}
             passInputValue={passInputValue}
           />
-          <SWrapper data-body-scroll-lock-ignore>
+          <SWrapper>
             {!isLoading && (
-              <SSectionContent ref={scrollRef}>
+              <SSectionContent data-body-scroll-lock-ignore ref={scrollRef}>
                 {userData?.options?.isOfferingBundles && !searchValue && (
                   <NewAnnouncement handleClick={openMyAnnouncement} />
                 )}

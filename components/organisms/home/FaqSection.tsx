@@ -184,9 +184,11 @@ const SContainer = styled.section`
   align-items: center;
   position: relative;
   padding: 20px 0;
+  overflow-x: hidden;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 20px;
+    overflow-x: visible;
   }
 
   ${(props) => props.theme.media.laptop} {
