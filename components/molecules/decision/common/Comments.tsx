@@ -22,6 +22,8 @@ import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
 import { APIResponse } from '../../../../api/apiConfigs';
 import CommentParent from '../../../atoms/decision/CommentParent';
+import isFirefox from '../../../../utils/isFirefox';
+import LoadingModal from '../../LoadingModal';
 
 interface IComments {
   postUuid: string;
@@ -68,6 +70,7 @@ const Comments: React.FunctionComponent<IComments> = ({
     newCommentContentFromUrl,
     handleResetCommentIdFromUrl,
   } = useContext(CommentFromUrlContext);
+  const [isSearchingForComment, setIsSearchingForComment] = useState(false);
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -157,21 +160,30 @@ const Comments: React.FunctionComponent<IComments> = ({
   useEffect(() => {
     async function findComment(commentId: string) {
       if (commentId) {
+        setIsSearchingForComment(true);
+
         const idx = comments.findIndex(
           (comment) => comment.id === parseInt(commentId as string)
         );
 
-        if (idx === -1) {
+        if (idx === -1 && hasNextPage) {
           scrollRef.current?.scrollIntoView();
 
           await fetchNextPage();
           scrollRef.current?.scrollBy({
             top: scrollRef.current.scrollHeight,
           });
+        } else if (idx === -1 && !hasNextPage) {
+          // TODO: some notification on the non-existing comment
+          // e.g. toast?
+          // console.log('Comment unavailable');
+          setIsSearchingForComment(false);
         } else {
           document
             ?.getElementById(`comment_id_${comments[idx].id}`)
             ?.scrollIntoView();
+
+          setIsSearchingForComment(false);
 
           openCommentProgrammatically(idx);
 
@@ -270,17 +282,18 @@ const Comments: React.FunctionComponent<IComments> = ({
         gradientType='blended'
         positionTop={heightDelta}
         active={showTopGradient}
-        width='calc(100% - 4px)'
+        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
         height='100px'
         animateOpacity
       />
       <GradientMask
         gradientType='blended'
         active={showBottomGradient}
-        width='calc(100% - 4px)'
+        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
         height='100px'
         animateOpacity
       />
+      <LoadingModal isOpen={isSearchingForComment} zIndex={20} />
     </>
   );
 };
@@ -294,28 +307,19 @@ Comments.defaultProps = {
 export default Comments;
 
 export const SScrollContainer = styled.div`
-  max-height: 600px;
   height: 100%;
+  max-height: 500px;
 
   overflow-y: auto;
 
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    max-height: 500px;
-
-    // Scrollbar
+  // Scrollbar
+  // Firefox
+  scrollbar-width: thin;
+  // Other browsers
+  @supports not (-moz-appearance: none) {
     &::-webkit-scrollbar {
       width: 4px;
-      display: initial;
     }
-    -ms-overflow-style: initial;
-    scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
@@ -325,6 +329,16 @@ export const SScrollContainer = styled.div`
       background: transparent;
       border-radius: 4px;
       transition: 0.2s linear;
+    }
+    &:hover {
+      &::-webkit-scrollbar-track {
+        cursor: grab;
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
     }
   }
 `;
