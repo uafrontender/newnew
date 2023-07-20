@@ -703,7 +703,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setZoomProfileImage(1);
     setMinZoomProfileImage(1);
 
-    setCoverUrlInEdit('');
+    setCoverUrlInEdit(userData?.coverUrl ?? '');
     setZoomCoverImage(1);
     setMinZoomCoverImage(1);
   };
