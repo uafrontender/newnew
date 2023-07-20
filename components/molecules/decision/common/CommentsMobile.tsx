@@ -20,6 +20,7 @@ import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
 import { APIResponse } from '../../../../api/apiConfigs';
 import CommentParent from '../../../atoms/decision/CommentParent';
+import LoadingModal from '../../LoadingModal';
 
 interface ICommentsMobile {
   postUuid: string;
@@ -67,6 +68,7 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
     newCommentContentFromUrl,
     handleResetCommentIdFromUrl,
   } = useContext(CommentFromUrlContext);
+  const [isSearchingForComment, setIsSearchingForComment] = useState(false);
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -126,21 +128,30 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
   useEffect(() => {
     async function findComment(commentId: string) {
       if (commentId) {
+        setIsSearchingForComment(true);
+
         const idx = comments.findIndex(
           (comment) => comment.id === parseInt(commentId as string)
         );
 
-        if (idx === -1) {
+        if (idx === -1 && hasNextPage) {
           scrollRef.current?.scrollIntoView();
 
           await fetchNextPage();
           scrollRef.current?.scrollBy({
             top: scrollRef.current.scrollHeight,
           });
+        } else if (idx === -1 && !hasNextPage) {
+          // TODO: some notification on the non-existing comment
+          // e.g. toast?
+          // console.log('Comment unavailable');
+          setIsSearchingForComment(false);
         } else {
           document
             ?.getElementById(`comment_id_${comments[idx].id}`)
             ?.scrollIntoView();
+
+          setIsSearchingForComment(false);
 
           openCommentProgrammatically(idx);
 
@@ -226,6 +237,7 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
           </SLoadMoreButton>
         )}
       </SScrollContainer>
+      <LoadingModal isOpen={isSearchingForComment} zIndex={20} />
     </>
   );
 };
