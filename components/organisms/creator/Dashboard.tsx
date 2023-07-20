@@ -15,6 +15,7 @@ import StripeIssueBanner from '../../molecules/creator/dashboard/StripeIssueBann
 import { useAppState } from '../../../contexts/appStateContext';
 import { ChatsProvider } from '../../../contexts/chatContext';
 import Loader from '../../atoms/Loader';
+import { useBundles } from '../../../contexts/bundlesContext';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -61,6 +62,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('page-Creator');
   const router = useRouter();
   const { userData, creatorData, creatorDataLoaded } = useUserData();
+  const { isSellingBundles, isBundleDataLoaded } = useBundles();
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -200,9 +202,11 @@ export const Dashboard: React.FC = React.memo(() => {
             {toDosStatus === ToDosStatus.idle && <SLoader size='md' />}
           </SBlock>
         )}
-        <SBlock noMargin>
-          <AboutBundles />
-        </SBlock>
+        {isBundleDataLoaded && !isSellingBundles && (
+          <SBlock noMargin>
+            <AboutBundles />
+          </SBlock>
+        )}
       </SContent>
     </SContainer>
   );
