@@ -1,10 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import {
-  BASE_URL,
-  fetchProtobufProtectedIntercepted,
-  fetchProtobuf,
-  cookiesInstance,
-} from '../apiConfigs';
+import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 const BASE_URL_COMMENTS = `${BASE_URL}/comments`;
 
@@ -12,54 +7,34 @@ export const getComments = (
   payload: newnewapi.GetCommentsRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobuf<newnewapi.GetCommentsRequest, newnewapi.GetCommentsResponse>(
-    newnewapi.GetCommentsRequest,
-    newnewapi.GetCommentsResponse,
-    `${BASE_URL_COMMENTS}/get_comments`,
-    'post',
+  fetchProtobuf<newnewapi.GetCommentsRequest, newnewapi.GetCommentsResponse>({
+    reqT: newnewapi.GetCommentsRequest,
+    resT: newnewapi.GetCommentsResponse,
+    url: `${BASE_URL_COMMENTS}/get_comments`,
     payload,
-    // Optional authentication
-    cookiesInstance.get('accessToken')
-      ? {
-          'x-auth-token': cookiesInstance.get('accessToken'),
-        }
-      : {},
-    'cors',
-    'same-origin',
-    signal ?? undefined
-  );
-
+    ...(signal ? { signal } : {}),
+  });
 
 export const sendComment = (
   payload: newnewapi.SendCommentRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.SendCommentRequest,
-    newnewapi.SendCommentResponse
-  >(
-    newnewapi.SendCommentRequest,
-    newnewapi.SendCommentResponse,
-    `${BASE_URL_COMMENTS}/send_comment`,
-    'post',
+  fetchProtobuf<newnewapi.SendCommentRequest, newnewapi.SendCommentResponse>({
+    reqT: newnewapi.SendCommentRequest,
+    resT: newnewapi.SendCommentResponse,
+    url: `${BASE_URL_COMMENTS}/send_comment`,
     payload,
-    signal ?? undefined
-  );
-
+    ...(signal ? { signal } : {}),
+  });
 
 export const deleteComment = (
   payload: newnewapi.DeleteCommentRequest,
   signal?: RequestInit['signal']
 ) =>
-  fetchProtobufProtectedIntercepted<
-    newnewapi.DeleteCommentRequest,
-    newnewapi.EmptyResponse
-  >(
-    newnewapi.DeleteCommentRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_COMMENTS}/delete_comment`,
-    'post',
+  fetchProtobuf<newnewapi.DeleteCommentRequest, newnewapi.EmptyResponse>({
+    reqT: newnewapi.DeleteCommentRequest,
+    resT: newnewapi.EmptyResponse,
+    url: `${BASE_URL_COMMENTS}/delete_comment`,
     payload,
-    signal ?? undefined
-  );
-
+    ...(signal ? { signal } : {}),
+  });
