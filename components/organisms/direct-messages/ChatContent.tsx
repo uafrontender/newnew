@@ -408,7 +408,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
-  // body-scroll-lock cannot be used here because of column-reverse
+  // react-focus-on cannot be used here because of column-reverse
   useDisableTouchMoveSafari(chatContentRef, isHidden);
 
   // Needed to prevent soft keyboard from pushing layout up on mobile Safari
@@ -511,6 +511,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           isAnnouncement={isAnnouncement}
         />
       ) : null}
+
       <GlobalStyles />
     </SContainer>
   );

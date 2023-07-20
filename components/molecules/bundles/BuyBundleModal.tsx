@@ -63,7 +63,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
             isCloseButton
             isMobileFullScreen={isMobile}
           >
-            <Content data-body-scroll-lock-ignore>
+            <Content data-ignore-touch-move-lock>
               {isMobile && (
                 <SMobileTitle>{t('modal.buyBundle.title')}</SMobileTitle>
               )}

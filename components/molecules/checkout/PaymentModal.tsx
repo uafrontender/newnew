@@ -94,7 +94,6 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           onClick={(e) => {
             e.stopPropagation();
           }}
-          data-body-scroll-lock-ignore
         >
           {isMobile ? (
             <SGoBackButton

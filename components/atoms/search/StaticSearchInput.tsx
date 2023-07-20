@@ -5,7 +5,7 @@ import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useQueryClient } from 'react-query';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { FocusOn } from 'react-focus-on';
 
 import InlineSVG from '../InlineSVG';
 
@@ -325,20 +325,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       resetResults();
     }, [handleSearchClose]);
 
-    useEffect(() => {
-      const resultContainer = resultsContainerRef.current;
-
-      if (isMobileOrTablet && isResultsDropVisible && resultContainer) {
-        disableBodyScroll(resultContainer);
-      }
-
-      return () => {
-        if (resultContainer) {
-          enableBodyScroll(resultContainer);
-        }
-      };
-    }, [isMobileOrTablet, isResultsDropVisible]);
-
     const handleInputBlur = () => {
       if (!isResultsDropVisible) {
         setGlobalSearchActive(false);
@@ -346,7 +332,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     };
 
     return (
-      <>
+      <FocusOn enabled={isResultsDropVisible}>
         {isMobileOrTablet && globalSearchActive ? (
           <SCloseButtonMobile
             view='tertiary'
@@ -496,7 +482,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
             </SResultsDropMobileContentWrapper>
           </SResultsDropMobile>
         )}
-      </>
+      </FocusOn>
     );
   }
 );
@@ -620,9 +606,9 @@ const SResultsDropMobile = styled.div`
 
 const SResultsDropMobileContentWrapper = styled.div`
   padding: 16px;
-  max-height: calc(
-    var(--window-inner-height, 1vh) * 100 - 50px
-  ); // 50px needs for ios
+
+  // 50px needs for ios
+  max-height: calc(var(--window-inner-height, 1vh) * 100 - 50px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;

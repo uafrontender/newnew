@@ -1,7 +1,8 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
+import { FocusOn } from 'react-focus-on';
 
 import isBrowser from '../../utils/isBrowser';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
@@ -39,16 +40,13 @@ const Modal: React.FC<IModal> = React.memo((props) => {
 
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
-  const modalContentContainerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    const modalContentContainer = modalContentContainerRef.current;
     if (show) {
-      enableOverlayMode(modalContentContainer);
+      enableOverlayMode();
     }
 
     return () => {
-      disableOverlayMode(modalContentContainer);
+      disableOverlayMode();
     };
   }, [show, enableOverlayMode, disableOverlayMode]);
 
@@ -104,7 +102,13 @@ const Modal: React.FC<IModal> = React.memo((props) => {
             onClose?.();
           }}
         />
-        <SContent ref={modalContentContainerRef}>{children}</SContent>
+        <FocusOn
+          style={{
+            display: 'contents',
+          }}
+        >
+          {children}
+        </FocusOn>
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
@@ -174,10 +178,6 @@ const SClickableDiv = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-`;
-
-const SContent = styled.div`
-  display: contents;
 `;
 
 export default Modal;

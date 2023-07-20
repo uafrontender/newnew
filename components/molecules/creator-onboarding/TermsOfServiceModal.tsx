@@ -91,7 +91,6 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
               dangerouslySetInnerHTML={{
                 __html: TermsOfServiceHtml,
               }}
-              data-body-scroll-lock-ignore
             />
           </SContainer>
           <SButton onClick={() => onClose()}>{t('tosSection.close')}</SButton>
