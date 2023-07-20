@@ -624,7 +624,7 @@ const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
   padding-top: 12px;
 
   // For scrollIntoView when comment_id is provided in URL
-  scroll-margin-top: -320px;
+  scroll-margin-top: 100px;
 
   &.opened-flash {
     &::before {
