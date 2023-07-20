@@ -22,6 +22,7 @@ import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
 import { APIResponse } from '../../../../api/apiConfigs';
 import CommentParent from '../../../atoms/decision/CommentParent';
+import isFirefox from '../../../../utils/isFirefox';
 
 interface IComments {
   postUuid: string;
@@ -270,14 +271,14 @@ const Comments: React.FunctionComponent<IComments> = ({
         gradientType='blended'
         positionTop={heightDelta}
         active={showTopGradient}
-        width='calc(100% - 4px)'
+        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
         height='100px'
         animateOpacity
       />
       <GradientMask
         gradientType='blended'
         active={showBottomGradient}
-        width='calc(100% - 4px)'
+        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
         height='100px'
         animateOpacity
       />
@@ -294,28 +295,19 @@ Comments.defaultProps = {
 export default Comments;
 
 export const SScrollContainer = styled.div`
-  max-height: 600px;
   height: 100%;
+  max-height: 500px;
 
   overflow-y: auto;
 
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    max-height: 500px;
-
-    // Scrollbar
+  // Scrollbar
+  // Firefox
+  scrollbar-width: thin;
+  // Other browsers
+  @supports not (-moz-appearance: none) {
     &::-webkit-scrollbar {
       width: 4px;
-      display: initial;
     }
-    -ms-overflow-style: initial;
-    scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
@@ -325,6 +317,16 @@ export const SScrollContainer = styled.div`
       background: transparent;
       border-radius: 4px;
       transition: 0.2s linear;
+    }
+    &:hover {
+      &::-webkit-scrollbar-track {
+        cursor: grab;
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
     }
   }
 `;
