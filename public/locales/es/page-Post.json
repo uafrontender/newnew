@@ -693,6 +693,7 @@
     "comments": "Comentarios",
     "seeMore": "Ver más",
     "noCommentsCaption": "Sé el primero en comentar...",
+    "loadReplies_NEED_TRANSLATION": "Show more replies",
     "errors": {
       "generic": "Por favor, comprueba lo que introdujiste",
       "tooLong": "El comentario es demasiado largo",

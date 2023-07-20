@@ -1,10 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
+import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
 
 const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatListTabs')
@@ -77,7 +85,30 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     [activeTab, searchChatroom, tabsVisible, withTabs]
   );
 
-  // TODO: move hidden to parent, just pass className here
+  const chatListRef = useRef<HTMLDivElement | null>(null);
+
+  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
+  usePreventLayoutMoveOnInputFocusSafari('data-chat-list-search');
+
+  const [isChatListFetched, setIsChatListFetched] = useState(false);
+
+  const handleSetIsChatListFetched = (value: boolean) => {
+    setIsChatListFetched(value);
+  };
+
+  useEffect(() => {
+    const chatList = chatListRef.current as HTMLElement | null;
+    if (chatList && !hidden && isChatListFetched) {
+      disableBodyScroll(chatList);
+    }
+
+    return () => {
+      if (chatList) {
+        enableBodyScroll(chatList);
+      }
+    };
+  }, [hidden, isChatListFetched]);
+
   return (
     <SSidebar hidden={hidden} className={className}>
       <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
@@ -87,7 +118,12 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
           changeActiveTab={changeActiveTab}
         />
       )}
-      <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
+      <ChatList
+        onChatRoomSelect={onChatRoomSelect}
+        myRole={activeTab}
+        forwardRef={chatListRef}
+        onChatListFetched={handleSetIsChatListFetched}
+      />
     </SSidebar>
   );
 };

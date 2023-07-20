@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import React, {
   useCallback,
   useContext,
@@ -6,26 +7,22 @@ import React, {
   useState,
 } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { useInView } from 'react-intersection-observer';
-
-import GradientMask from '../../../atoms/GradientMask';
 
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
-import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import { CommentFromUrlContext } from '../../../../contexts/commentFromUrlContext';
 
+import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
-import useComponentScrollRestoration from '../../../../utils/hooks/useComponentScrollRestoration';
 import { useAppState } from '../../../../contexts/appStateContext';
 import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
 import { APIResponse } from '../../../../api/apiConfigs';
 import CommentParent from '../../../atoms/decision/CommentParent';
-import isFirefox from '../../../../utils/isFirefox';
 import LoadingModal from '../../LoadingModal';
 
-interface IComments {
+interface ICommentsMobile {
   postUuid: string;
   postShortId: string;
   comments: TCommentWithReplies[];
@@ -44,7 +41,7 @@ interface IComments {
   handleToggleCommentRepliesById: (idToOpen: number, newState: boolean) => void;
 }
 
-const Comments: React.FunctionComponent<IComments> = ({
+const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
   postUuid,
   postShortId,
   comments,
@@ -59,6 +56,7 @@ const Comments: React.FunctionComponent<IComments> = ({
   openCommentProgrammatically,
   handleToggleCommentRepliesById,
 }) => {
+  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -74,11 +72,6 @@ const Comments: React.FunctionComponent<IComments> = ({
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
-
-  // Submit form ref
-  const commentFormRef = useRef<HTMLFormElement>();
-  const [heightDelta, setHeightDelta] = useState(70);
 
   const [isDeletingComment, setIsDeletingComment] = useState(false);
 
@@ -97,31 +90,6 @@ const Comments: React.FunctionComponent<IComments> = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [postUuid]
-  );
-
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry: any) => {
-      const size = entry[0]?.borderBoxSize
-        ? entry[0]?.borderBoxSize[0]?.blockSize
-        : entry[0]?.contentRect.height;
-
-      if (size) {
-        setHeightDelta(size);
-      }
-    });
-
-    if (commentFormRef.current) {
-      resizeObserver.observe(commentFormRef.current!!);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
-  useComponentScrollRestoration(
-    scrollRef.current || undefined,
-    'comments-scrolling-container'
   );
 
   const [commentsReplies, setCommentsReplies] = useState<
@@ -210,15 +178,6 @@ const Comments: React.FunctionComponent<IComments> = ({
     // handleResetCommentIdFromUrl, - doesn't change
   ]);
 
-  // Infinite load
-  const { ref: loadingRef, inView } = useInView();
-
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage]);
-
   return (
     <>
       <SScrollContainer ref={scrollRef} id='comments-scrolling-container'>
@@ -227,11 +186,11 @@ const Comments: React.FunctionComponent<IComments> = ({
         {comments && comments.length > 0 && (
           <SCommentsContainer>
             <SCommentsVisible>
-              {comments.map((comment, idx) => {
-                const isLoaderRow = idx > comments.length - 1;
+              {comments.map((item, index) => {
+                const isLoaderRow = index > comments.length - 1;
 
                 return (
-                  <div key={comment.id.toString()}>
+                  <div key={item.id?.toString() || index.toString()}>
                     {isLoaderRow && hasNextPage ? (
                       <SLoaderDiv>
                         <Loader size='sm' isStatic />
@@ -241,15 +200,17 @@ const Comments: React.FunctionComponent<IComments> = ({
                         postUuid={postUuid}
                         postShortId={postShortId}
                         canDeleteComment={canDeleteComments}
-                        lastChild={idx === comments.length - 1}
-                        comment={comment}
+                        lastChild={index === comments.length - 1}
+                        comment={comments[index]}
                         isDeletingComment={isDeletingComment}
                         handleAddComment={handleAddComment}
                         handleDeleteComment={handleDeleteComment}
-                        index={idx}
+                        index={index}
                         onFormBlur={onFormBlur ?? undefined}
                         onFormFocus={onFormFocus ?? undefined}
-                        commentReply={commentsReplies[comment.id as number]}
+                        commentReply={
+                          commentsReplies[comments[index].id as number]
+                        }
                         updateCommentReplies={updateCommentReplies}
                         handleToggleReplies={handleToggleCommentRepliesById}
                       />
@@ -260,110 +221,52 @@ const Comments: React.FunctionComponent<IComments> = ({
             </SCommentsVisible>
           </SCommentsContainer>
         )}
-        {isLoading ? (
-          <SLoaderDiv>
-            <Loader size='sm' isStatic />
-          </SLoaderDiv>
-        ) : null}
-        {hasNextPage ? (
-          <SLoaderDiv
-            ref={loadingRef}
-            style={{
-              ...(isLoading || isMobile
-                ? {
-                    display: 'none',
-                  }
-                : {}),
+        {isMobile && hasNextPage && (
+          <SLoadMoreButton
+            view='secondary'
+            disabled={isLoading}
+            onClick={() => {
+              Mixpanel.track('Click Load More Comments', {
+                _stage: 'Post',
+                _postUuid: postUuid,
+              });
+              fetchNextPage();
             }}
-          />
-        ) : null}
+          >
+            {t('comments.seeMore')}
+          </SLoadMoreButton>
+        )}
       </SScrollContainer>
-      <GradientMask
-        gradientType='blended'
-        positionTop={heightDelta}
-        active={showTopGradient}
-        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
-        height='100px'
-        animateOpacity
-      />
-      <GradientMask
-        gradientType='blended'
-        active={showBottomGradient}
-        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
-        height='100px'
-        animateOpacity
-      />
       <LoadingModal isOpen={isSearchingForComment} zIndex={20} />
     </>
   );
 };
 
-Comments.defaultProps = {
+CommentsMobile.defaultProps = {
   canDeleteComments: false,
   onFormFocus: () => {},
   onFormBlur: () => {},
 };
 
-export default Comments;
+export default CommentsMobile;
 
-export const SScrollContainer = styled.div`
-  height: 100%;
-  max-height: 500px;
-
-  overflow-y: auto;
-
-  // Scrollbar
-  // Firefox
-  scrollbar-width: thin;
-  // Other browsers
-  @supports not (-moz-appearance: none) {
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 4px;
-      transition: 0.2s linear;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: transparent;
-      border-radius: 4px;
-      transition: 0.2s linear;
-    }
-    &:hover {
-      &::-webkit-scrollbar-track {
-        cursor: grab;
-        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
-      }
-    }
-  }
-`;
+export const SScrollContainer = styled.div``;
 
 const SCommentsContainer = styled.div`
   width: 100%;
-  height: 100%;
   position: relative;
 `;
 
 const SCommentsVisible = styled.div`
-  /* position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%; */
-
-  ${({ theme }) => theme.media.tablet} {
-    padding: 0 16px 0 32px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding: 0 16px;
-  }
+  width: 100%;
 `;
 
 const SLoaderDiv = styled.div`
   position: relative;
+`;
+
+const SLoadMoreButton = styled(Button)`
+  width: 100%;
+  margin-bottom: 12px;
+  margin-top: 40px;
 `;

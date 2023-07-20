@@ -9,13 +9,15 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
-import CommentForm from '../../../atoms/decision/CommentForm';
+import CommentForm, {
+  TCommentFormAreaHandle,
+} from '../../../atoms/decision/CommentForm';
 
 import { useUserData } from '../../../../contexts/userDataContext';
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
-import { deleteMessage, sendMessage } from '../../../../api/endpoints/chat';
+import { deleteComment, sendComment } from '../../../../api/endpoints/comments';
 
 import { Mixpanel } from '../../../../utils/mixpanel';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
@@ -23,11 +25,11 @@ import usePostComments from '../../../../utils/hooks/usePostComments';
 import Comments, { SScrollContainer } from './Comments';
 import { APIResponse } from '../../../../api/apiConfigs';
 import { useAppState } from '../../../../contexts/appStateContext';
+import CommentsMobile from './CommentsMobile';
 
 interface ICommentsBottomSection {
   postUuid: string;
   postShortId: string;
-  commentsRoomId: number;
   canDeleteComments?: boolean;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
@@ -35,37 +37,37 @@ interface ICommentsBottomSection {
 
 const CommentsBottomSection: React.FunctionComponent<
   ICommentsBottomSection
-> = ({
-  postUuid,
-  postShortId,
-  canDeleteComments,
-  commentsRoomId,
-  onFormFocus,
-  onFormBlur,
-}) => {
+> = ({ postUuid, postShortId, canDeleteComments, onFormFocus, onFormBlur }) => {
   const { userData } = useUserData();
   const { userLoggedIn } = useAppState();
   const { showErrorToastPredefined } = useErrorToasts();
+  const { resizeMode } = useAppState();
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const { socketConnection, isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Submit form ref
-  const commentFormRef = useRef<HTMLFormElement>();
+  const commentFormRef = useRef<TCommentFormAreaHandle>();
 
   const {
     processedComments: comments,
     addCommentMutation,
     removeCommentMutation,
-    handleOpenCommentProgrammatically,
+    updateCommentNumberOfRepliesMutation,
+    handleOpenCommentByIdx,
+    handleToggleCommentRepliesById,
     fetchNextPage,
     isLoading,
     isFetchingNextPage,
     hasNextPage,
   } = usePostComments({
     loggedInUser: userLoggedIn,
-    commentsRoomId,
+    postUuid,
   });
 
   const commentsLoading = useMemo(
@@ -77,49 +79,44 @@ const CommentsBottomSection: React.FunctionComponent<
     async (
       content: string,
       parentMsgId?: number
-    ): Promise<APIResponse<newnewapi.IChatMessage>> => {
+    ): Promise<APIResponse<newnewapi.ICommentMessage>> => {
       Mixpanel.track('Add Comment', {
         _stage: 'Post',
         _postUuid: postUuid,
       });
-      const payload = new newnewapi.SendMessageRequest({
-        roomId: commentsRoomId,
+      const payload = new newnewapi.SendCommentRequest({
+        postUuid,
         content: {
           text: content,
         },
-        ...(parentMsgId
-          ? {
-              parentMessageId: parentMsgId,
-            }
-          : {}),
       });
 
-      const res = await sendMessage(payload);
+      const res = await sendComment(payload);
 
-      if (res.data?.message) {
-        addCommentMutation?.mutate(res.data.message);
+      if (res.data?.comment) {
+        addCommentMutation?.mutate(res.data.comment);
       }
 
-      if (res.data?.message && !res.error) {
+      if (res.data?.comment && !res.error) {
         return {
-          data: res.data.message,
+          data: res.data.comment,
         };
       }
       return {
         error: res?.error || new Error('Could not add comment'),
       };
     },
-    [addCommentMutation, commentsRoomId, postUuid]
+    [addCommentMutation, postUuid]
   );
 
   const handleDeleteComment = useCallback(
     async (comment: TCommentWithReplies) => {
       try {
-        const payload = new newnewapi.DeleteMessageRequest({
-          messageId: comment.id,
+        const payload = new newnewapi.DeleteCommentRequest({
+          commentId: comment.id,
         });
 
-        const res = await deleteMessage(payload);
+        const res = await deleteComment(payload);
 
         if (!res.error) {
           removeCommentMutation?.mutate(comment);
@@ -131,84 +128,92 @@ const CommentsBottomSection: React.FunctionComponent<
     },
     [removeCommentMutation, showErrorToastPredefined]
   );
-  useEffect(
-    () => {
-      if (commentsRoomId && isSocketConnected) {
-        addChannel(`comments_${commentsRoomId.toString()}`, {
-          chatRoomUpdates: {
-            chatRoomId: commentsRoomId,
-          },
-        });
-      }
-    },
+
+  useEffect(() => {
+    if (postUuid && isSocketConnected) {
+      addChannel(`comments_${postUuid.toString()}`, {
+        postCommentsUpdates: {
+          postUuid,
+        },
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      commentsRoomId,
-      isSocketConnected,
-      // addChannel, - reason unknown
-    ]
-  );
+  }, [postUuid, isSocketConnected]);
 
-  useEffect(
-    () => {
-      const socketHandlerMessageCreated = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.ChatMessageCreated.decode(arr);
-        if (
-          decoded?.newMessage &&
-          decoded.newMessage!!.sender?.uuid !== userData?.userUuid
-        ) {
-          addCommentMutation?.mutate(decoded.newMessage);
-        }
-      };
+  useEffect(() => {
+    const socketHandlerMessageCreated = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CommentMessageCreated.decode(arr);
 
-      const socketHandlerMessageDeleted = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.ChatMessageDeleted.decode(arr);
-        if (decoded.deletedMessage) {
-          removeCommentMutation?.mutate(decoded.deletedMessage);
-        }
-      };
-
-      if (socketConnection) {
-        socketConnection?.on('ChatMessageCreated', socketHandlerMessageCreated);
-        socketConnection?.on('ChatMessageDeleted', socketHandlerMessageDeleted);
+      if (
+        decoded?.newComment &&
+        decoded.newComment!!.sender?.uuid !== userData?.userUuid &&
+        !decoded.newComment?.parentCommentId
+      ) {
+        addCommentMutation?.mutate(decoded.newComment);
       }
+    };
 
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off(
-            'ChatMessageCreated',
-            socketHandlerMessageCreated
-          );
-          socketConnection?.off(
-            'ChatMessageDeleted',
-            socketHandlerMessageDeleted
-          );
-        }
-      };
-    },
+    const socketHandlerMessageDeleted = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CommentMessageDeleted.decode(arr);
+      if (decoded.deletedComment && !decoded.deletedComment?.parentCommentId) {
+        removeCommentMutation?.mutate(decoded.deletedComment);
+      }
+    };
+
+    const socketHandlerNumberOfRepliesChanged = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CommentNumberOfRepliesChanged.decode(arr);
+      if (decoded.updatedComment) {
+        updateCommentNumberOfRepliesMutation?.mutate(decoded.updatedComment);
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection?.on(
+        'CommentMessageCreated',
+        socketHandlerMessageCreated
+      );
+      socketConnection?.on(
+        'CommentMessageDeleted',
+        socketHandlerMessageDeleted
+      );
+      socketConnection?.on(
+        'CommentNumberOfRepliesChanged',
+        socketHandlerNumberOfRepliesChanged
+      );
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off(
+          'CommentMessageCreated',
+          socketHandlerMessageCreated
+        );
+        socketConnection?.off(
+          'CommentMessageDeleted',
+          socketHandlerMessageDeleted
+        );
+        socketConnection?.off(
+          'CommentNumberOfRepliesChanged',
+          socketHandlerNumberOfRepliesChanged
+        );
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      socketConnection,
-      userData?.userUuid,
-      // addCommentMutation, - reason unknown
-      // removeCommentMutation, - reason unknown
-    ]
-  );
+  }, [socketConnection, userData?.userUuid]);
 
   // Cleanup
   useEffect(
     () => () => {
-      if (commentsRoomId) {
-        removeChannel(`comments_${commentsRoomId.toString()}`);
+      if (postUuid) {
+        removeChannel(`comments_${postUuid.toString()}`);
       }
     },
+    // TODO: should it depend on commentsRoomId? Why not?
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      // commentsRoomId, - reason unknown. why? looks odd
-      // removeChannel,  - reason unknown - reason unknown
-    ]
+    []
   );
 
   return (
@@ -232,19 +237,39 @@ const CommentsBottomSection: React.FunctionComponent<
             onBlur={onFormBlur ?? undefined}
             onFocus={onFormFocus ?? undefined}
           />
-          <Comments
-            comments={comments}
-            postUuid={postUuid}
-            onCommentDelete={handleDeleteComment}
-            openCommentProgrammatically={handleOpenCommentProgrammatically}
-            handleAddComment={handleAddComment}
-            isLoading={commentsLoading}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            onFormBlur={onFormBlur ?? undefined}
-            onFormFocus={onFormFocus ?? undefined}
-            canDeleteComments={canDeleteComments}
-          />
+          {isMobile ? (
+            <CommentsMobile
+              comments={comments}
+              postUuid={postUuid}
+              postShortId={postShortId}
+              onCommentDelete={handleDeleteComment}
+              openCommentProgrammatically={handleOpenCommentByIdx}
+              handleAddComment={handleAddComment}
+              isLoading={commentsLoading}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              onFormBlur={onFormBlur ?? undefined}
+              onFormFocus={onFormFocus ?? undefined}
+              canDeleteComments={canDeleteComments}
+              handleToggleCommentRepliesById={handleToggleCommentRepliesById}
+            />
+          ) : (
+            <Comments
+              comments={comments}
+              postUuid={postUuid}
+              postShortId={postShortId}
+              onCommentDelete={handleDeleteComment}
+              openCommentProgrammatically={handleOpenCommentByIdx}
+              handleAddComment={handleAddComment}
+              isLoading={commentsLoading}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              onFormBlur={onFormBlur ?? undefined}
+              onFormFocus={onFormFocus ?? undefined}
+              canDeleteComments={canDeleteComments}
+              handleToggleCommentRepliesById={handleToggleCommentRepliesById}
+            />
+          )}
         </SActionSection>
       </STabContainer>
     </>
