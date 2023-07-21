@@ -429,7 +429,7 @@ context('Creator flow', () => {
     });
 
     it('can contribute to an event', () => {
-      const BID_OPTION_AMOUNT = 15;
+      const BID_OPTION_AMOUNT = 85;
 
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
       cy.url().should('include', '/p/');
@@ -697,6 +697,211 @@ context('Creator flow', () => {
       cy.url().should('include', '/p/');
 
       const onSuccess = voteOnSuperpoll('supported', 'custom', 2100);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.dGet('#support-button-supported').should('be.visible');
+    });
+  });
+
+  describe('User willing to contribute as a guest', () => {
+    const USER_EMAIL = getNextUserEmail();
+    const USER_CARD_NUMBER = '4242424242424242';
+    const USER_ANOTHER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_EXPIRY = '1226';
+    const USER_CARD_CVC = '123';
+    const USER_CARD_POSTAL_CODE = '90210';
+
+    const BID_OPTION_TEXT = getBidOptionText();
+
+    // Ignore tutorials
+    const defaultStorage = {
+      userTutorialsProgress:
+        '{"remainingAcSteps":[],"remainingMcSteps":[],"remainingCfSteps":[],"remainingAcCrCurrentStep":[],"remainingCfCrCurrentStep":[],"remainingMcCrCurrentStep":[]}',
+    };
+    const storage = createStorage(defaultStorage);
+
+    before(() => {
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    beforeEach(() => {
+      storage.restore();
+      Cypress.Cookies.preserveOnce('accessToken');
+      Cypress.Cookies.preserveOnce('refreshToken');
+      cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
+    });
+
+    afterEach(() => {
+      storage.save();
+    });
+
+    it('can contribute to an event without prior authentication', () => {
+      // Clear auth, use new email
+      cy.setCookie('accessToken', '');
+      cy.setCookie('refreshToken', '');
+      storage.restart();
+
+      cy.reload();
+      cy.wait(2000);
+
+      const BID_OPTION_AMOUNT = 10;
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = bidOnEvent(BID_OPTION_TEXT, BID_OPTION_AMOUNT);
+
+      cy.dGet('#email-input').type(USER_EMAIL);
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+      enterVerificationCode(VERIFICATION_CODE);
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.contains(BID_OPTION_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can boost a bid as a guest with the same card', () => {
+      // Clear auth, use new email
+      cy.setCookie('accessToken', '');
+      cy.setCookie('refreshToken', '');
+      storage.restart();
+
+      cy.reload();
+      cy.wait(2000);
+
+      const BID_OPTION_AMOUNT = 10;
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = boostEventBid(0, BID_TO_WIN_TEXT, BID_OPTION_AMOUNT);
+
+      cy.dGet('#email-input').type(USER_EMAIL);
+      enterCardInfo(
+        USER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+      enterVerificationCode(VERIFICATION_CODE);
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.contains(BID_TO_WIN_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can contribute to a superpoll with the same card', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll(0, 1);
+
+      // Wait stripe elements
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.dGet('#support-button-supported').should('be.visible');
+    });
+
+    it('can boost a bid as a guest with another card', () => {
+      // Clear auth, use new email
+      cy.setCookie('accessToken', '');
+      cy.setCookie('refreshToken', '');
+      storage.restart();
+
+      cy.reload();
+      cy.wait(2000);
+
+      const BID_OPTION_AMOUNT = 10;
+
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${eventShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = boostEventBid(0, BID_TO_WIN_TEXT, BID_OPTION_AMOUNT);
+
+      cy.dGet('#email-input').type(USER_EMAIL);
+      enterCardInfo(
+        USER_ANOTHER_CARD_NUMBER,
+        USER_CARD_EXPIRY,
+        USER_CARD_CVC,
+        USER_CARD_POSTAL_CODE
+      );
+
+      cy.wait(1000);
+      cy.dGet('#pay').click();
+
+      cy.url().should('include', 'verify-email');
+      cy.contains(USER_EMAIL);
+      enterVerificationCode(VERIFICATION_CODE);
+
+      cy.dGet('#paymentSuccess', {
+        timeout: 15000,
+      })
+        .click()
+        .then(() => {
+          onSuccess();
+        });
+
+      cy.contains(BID_TO_WIN_TEXT);
+      cy.contains(`${BID_OPTION_AMOUNT}`);
+    });
+
+    it('can contribute to a superpoll with another card', () => {
+      cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/p/${superpollShortId}`);
+      cy.url().should('include', '/p/');
+
+      const onSuccess = voteOnSuperpoll('supported', 1);
 
       // Wait stripe elements
       cy.wait(1000);
@@ -2186,6 +2391,9 @@ context('Creator flow', () => {
     });
 
     it('can see correct earnings on dashboard page', () => {
+      // Let data update on BE
+      cy.wait(10000);
+
       cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/creator/dashboard`);
 
       // Let data load

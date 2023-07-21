@@ -39,13 +39,14 @@ export const SBottomAction = styled.div<{ variant?: 'primary' | 'secondary' }>`
 export const SBottomActionLeft = styled.div`
   display: flex;
   align-items: center;
+  overflow: hidden;
 `;
 
 export const SBottomActionIcon = styled.span`
   margin-right: 12px;
 
-  font-size: 48px;
-  line-height: 1;
+  font-size: 42px;
+  line-height: 48px;
 
   ${({ theme }) => theme.media.tablet} {
     margin-right: 24px;
@@ -56,6 +57,7 @@ export const SBottomActionText = styled.div`
   display: flex;
   flex-direction: column;
   font-weight: 600;
+  overflow: hidden;
 `;
 
 export const SBottomActionTitle = styled.strong`
