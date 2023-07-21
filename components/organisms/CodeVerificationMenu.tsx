@@ -223,8 +223,16 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
       const { data, error } = await sendVerificationEmail(payload);
 
+      // TODO: Add translations
       if (!data || error) {
-        throw new Error(error?.message ?? 'Request failed');
+        throw new Error('Request failed');
+      }
+
+      if (
+        data.status ===
+        newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
+      ) {
+        throw new Error(t('error.invalidEmail'));
       }
 
       if (
@@ -233,7 +241,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         data.status !==
           newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
       ) {
-        // TODO: Add texts for individual error statuses
         throw new Error('Request failed');
       }
 

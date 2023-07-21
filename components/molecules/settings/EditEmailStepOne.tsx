@@ -69,15 +69,25 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         sendVerificationCodePayload
       );
 
+      // TODO: Add translations
+      if (!data || error) {
+        throw new Error('Request failed');
+      }
+
       if (
-        error ||
-        !data ||
-        (data.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-          data.status !==
-            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+        data.status ===
+        newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
       ) {
-        throw new Error(error?.message ?? 'Request failed');
+        throw new Error(t('error.invalidEmail'));
+      }
+
+      if (
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+      ) {
+        throw new Error('Request failed');
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);
@@ -88,7 +98,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
       setIsCodeLoading(false);
       console.error(err);
     }
-  }, [isCodeLoading, userData?.email]);
+  }, [isCodeLoading, userData?.email, t]);
 
   const resendVerificationCode = async () => {
     Mixpanel.track('Resend Verification Code', {
