@@ -10,7 +10,6 @@ import SignInTextInput from '../../atoms/SignInTextInput';
 import EmailSignInButton from './EmailSignInButton';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
-import { I18nNamespaces } from '../../../@types/i18next';
 import { useSignup } from '../../../contexts/signUpContext';
 
 export interface IEmailSignInForm {
@@ -35,9 +34,7 @@ const EmailSignInForm: React.FunctionComponent<IEmailSignInForm> = ({
 
   // NB! We won't have 'already exists' errors, but will probably
   // need some case for banned users, etc.
-  const [submitError, setSubmitError] = useState<
-    keyof I18nNamespaces['page-SignUp']['error'] | ''
-  >('');
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
@@ -95,7 +92,7 @@ const EmailSignInForm: React.FunctionComponent<IEmailSignInForm> = ({
           <SErrorDiv>
             <>
               <InlineSvg svg={AlertIcon} width='16px' height='16px' />
-              {t(`error.${submitError}`)}
+              {submitError}
             </>
           </SErrorDiv>
         </AnimatedPresence>
