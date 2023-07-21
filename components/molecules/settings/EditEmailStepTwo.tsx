@@ -67,8 +67,16 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
           sendVerificationCodePayload
         );
 
+        // TODO: Add translations
         if (error || !data) {
           throw new Error(error?.message ?? 'Request failed');
+        }
+
+        if (
+          data.status ===
+          newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
+        ) {
+          throw new Error(tVerify('error.invalidEmail'));
         }
 
         if (
@@ -78,7 +86,7 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
           setNewEmailError(tVerify('error.emailTaken'));
           setIsValid(false);
 
-          throw new Error('Email taken');
+          throw new Error(tVerify('error.emailTaken'));
         }
 
         if (

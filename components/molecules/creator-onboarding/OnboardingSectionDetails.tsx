@@ -559,15 +559,32 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
+        // TODO: Add translations
+        if (!res?.data || res.error) {
+          throw new Error('Request failed');
+        }
+
         if (
-          !res?.data ||
-          res.error ||
-          (res.data.status !==
-            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-            res.data.status !==
-              newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+          res.data.status ===
+          newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
         ) {
-          throw new Error('Email taken');
+          throw new Error('Incorrect email');
+        }
+
+        if (
+          res.data.status ===
+          newnewapi.SendVerificationEmailResponse.Status.EMAIL_TAKEN
+        ) {
+          throw new Error('Email already taken');
+        }
+
+        if (
+          res.data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+          res.data.status !==
+            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+        ) {
+          throw new Error('Request failed');
         }
 
         const newEmailValue = encodeURIComponent(emailInEdit);
