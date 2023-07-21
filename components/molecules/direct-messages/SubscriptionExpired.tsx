@@ -43,7 +43,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
                   <SMessageWrap>
                     {t('subscriptionExpired.message')}
                   </SMessageWrap>
-                  <DisplayName user={user} />
+                  <SDisplayName user={user} />
                 </SBottomActionMessage>
               )}
             </SBottomActionText>
@@ -89,4 +89,8 @@ const SMessageWrap = styled.span`
   ${({ theme }) => theme.media.tablet} {
     white-space: pre;
   }
+`;
+
+const SDisplayName = styled(DisplayName)`
+  max-width: 100%;
 `;
