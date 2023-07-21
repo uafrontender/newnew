@@ -123,8 +123,16 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
     const { data, error } = await sendVerificationEmail(payload);
 
+    // TODO: Add translations
     if (!data || error) {
       throw new Error(error?.message ?? 'Request failed');
+    }
+
+    if (
+      data.status ===
+      newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
+    ) {
+      throw new Error('Incorrect email');
     }
 
     if (

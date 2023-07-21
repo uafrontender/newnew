@@ -13,6 +13,7 @@
   },
   "error": {
     "invalidCode": "Wrong code. Try again...",
+    "invalidEmail": "Incorrect email",
     "emailTaken": "Email already taken",
     "notConfirmedEmail": "Current email wasn't confirmed or time expired",
     "noToken": "No token",
