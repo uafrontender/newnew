@@ -13,6 +13,7 @@
   },
   "error": {
     "invalidCode": "Código incorrecto. Inténtalo de nuevo...",
+    "invalidEmail_NEED_TRANSLATION": "Incorrect email",
     "emailTaken": "Este correo electrónico ya está en uso",
     "notConfirmedEmail": "Este correo electrónico no fue confirmado o el tiempo expiró",
     "noToken": "No hay ningún token",
