@@ -1,4 +1,10 @@
-import React, { useRef, useState, useCallback, useMemo } from 'react';
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';
 
@@ -102,16 +108,16 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   const [scrollY, setScrollY] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
   const [mouseIsDown, setMouseIsDown] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRefHours = useRef<HTMLDivElement>(null);
 
   const mouseDownHandler = (e: any) => {
-    if (!scrollContainerRef.current) {
+    if (!scrollContainerRefHours.current) {
       return;
     }
 
     setMouseIsDown(true);
     setClientY(e.clientY);
-    setScrollY(scrollContainerRef.current.scrollTop);
+    setScrollY(scrollContainerRefHours.current.scrollTop);
   };
 
   const mouseMoveHandler = (e: any) => {
@@ -119,7 +125,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       return;
     }
 
-    if (!scrollContainerRef.current) {
+    if (!scrollContainerRefHours.current) {
       return;
     }
 
@@ -127,7 +133,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       return;
     }
 
-    scrollContainerRef.current.scrollTop = scrollY - e.clientY + clientY;
+    scrollContainerRefHours.current.scrollTop = scrollY - e.clientY + clientY;
     setClientY(e.clientY);
     setScrollY(scrollY - e.clientY + clientY);
     setIsDragging(true);
@@ -190,8 +196,8 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     }
   };
 
-  const hour = time.split(':')[0];
-  const minute = time.split(':')[1];
+  const hour: string = time.split(':')[0];
+  const minute: string = time.split(':')[1];
 
   const handleClick = useCallback(() => {
     setAnimation('o-12');
@@ -336,6 +342,59 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   useOnClickEsc(wrapperRef, handleClose);
   useOnClickOutside(wrapperRef, handleClose);
 
+  useEffect(
+    () => {
+      if (!open) {
+        return;
+      }
+
+      if (scrollContainerRefHours.current) {
+        const selectedHourIndex = parseInt(hour) - 1;
+        if (selectedHourIndex > -1) {
+          const element = scrollContainerRefHours.current.children[
+            selectedHourIndex
+          ] as HTMLDivElement | undefined;
+
+          if (element) {
+            scrollContainerRefHours.current.scrollTo({
+              top:
+                element.offsetTop -
+                scrollContainerRefHours.current.offsetHeight / 2 +
+                element.offsetHeight,
+              behavior: 'smooth',
+            });
+          }
+        }
+      }
+
+      if (scrollContainerRefMinutes.current) {
+        const selectedMinuteIndex = parseInt(minute) - 1;
+        if (selectedMinuteIndex > -1) {
+          const element = scrollContainerRefMinutes.current.children[
+            selectedMinuteIndex
+          ] as HTMLDivElement | undefined;
+
+          if (element) {
+            console.log(scrollContainerRefMinutes.current.offsetHeight / 2);
+            scrollContainerRefMinutes.current.scrollTo({
+              top:
+                element.offsetTop -
+                scrollContainerRefMinutes.current.offsetHeight / 2 +
+                element.offsetHeight,
+              behavior: 'smooth',
+            });
+          }
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      open,
+      // hour, - scroll only on select opened
+      // minute, - scroll only on select opened
+    ]
+  );
+
   return (
     <SWrapper ref={wrapperRef}>
       <SContainer onClick={open ? handleClose : handleClick}>
@@ -359,7 +418,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
           <SScrollListWrapper>
             <SScrollList
               id='hoursContainer'
-              ref={scrollContainerRef}
+              ref={scrollContainerRefHours}
               onMouseUp={mouseUpHandler}
               onMouseDown={mouseDownHandler}
               onMouseMove={mouseMoveHandler}
