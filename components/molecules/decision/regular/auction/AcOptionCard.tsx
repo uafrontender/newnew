@@ -427,6 +427,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     }
   }, [isSupportFormOpen]);
 
+  const active: boolean = useMemo(
+    () => !!optionBeingSupported && !disabled,
+    [optionBeingSupported, disabled]
+  );
+
   return (
     <div
       key={option.id.toString()}
@@ -471,11 +476,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             />
           </SEllipseButtonMobile>
         )}
-        <SBidDetails
-          isBlue={isBlue}
-          active={!!optionBeingSupported && !disabled}
-          noAction={!votingAllowed}
-        >
+        <SBidDetails isBlue={isBlue} active={active} noAction={!votingAllowed}>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
             <OptionActionIcon
               src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
@@ -552,7 +553,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {!votingAllowed ? null : isMobile ? (
+        {isMobile && votingAllowed && (
           <SSupportButton
             view='quaternary'
             disabled={disabled}
@@ -575,7 +576,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 : t('acPost.optionsTab.optionCard.supportAgainButton')}
             </div>
           </SSupportButton>
-        ) : (
+        )}
+
+        {!isMobile && votingAllowed && !active && (
           <SSupportButtonDesktop
             id={`${id}-support`}
             view='secondary'
