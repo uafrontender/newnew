@@ -13,6 +13,7 @@
   },
   "error": {
     "invalidCode": "代碼錯誤。再試一次......",
+    "invalidEmail_NEED_TRANSLATION": "Incorrect email",
     "emailTaken": "電子郵件地址已被佔用",
     "notConfirmedEmail": "當前的電子郵件沒有被確認或時間過期",
     "noToken": "沒有令牌",

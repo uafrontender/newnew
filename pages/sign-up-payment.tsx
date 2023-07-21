@@ -66,6 +66,18 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         const { data } = res;
 
+        // TODO: Add translations
+        if (!data) {
+          throw new Error('Request failed');
+        }
+
+        if (
+          res.data.status ===
+          newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
+        ) {
+          throw new Error('Incorrect email');
+        }
+
         if (
           data.status !==
             newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
