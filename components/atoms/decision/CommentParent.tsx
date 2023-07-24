@@ -11,7 +11,7 @@ import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 
@@ -35,6 +35,8 @@ import { SocketContext } from '../../../contexts/socketContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import Loader from '../Loader';
 import { useUserData } from '../../../contexts/userDataContext';
+import { ReportData } from '../../molecules/ReportModal';
+import { ReportMessageOnSignUp } from '../../../contexts/onSignUpWrapper';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -144,6 +146,46 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       {
         enabled: isReplyFormOpen,
       }
+    );
+
+    const onSubmitReport = useCallback(
+      async (reportData: ReportData) => {
+        if (!userLoggedIn) {
+          const onSignUp: ReportMessageOnSignUp = {
+            type: 'report-message',
+            messageId: comment.id,
+            message: reportData.message,
+            reasons: reportData.reasons,
+          };
+
+          const [path, query] = window.location.href.split('?');
+          const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+          const queryWithOnSignUp = query
+            ? `${query}&${onSignUpQuery}`
+            : onSignUpQuery;
+
+          Router.push(
+            `/sign-up?reason=report&redirect=${encodeURIComponent(
+              `${path}?${queryWithOnSignUp}`
+            )}`
+          );
+
+          return false;
+        }
+
+        // TODO: Need error handling
+        await reportMessage(
+          comment.id,
+          reportData.reasons,
+          reportData.message
+        ).catch((e) => {
+          console.error(e);
+          return false;
+        });
+
+        return true;
+      },
+      [userLoggedIn, comment.id]
     );
 
     const handleAddComment = useCallback(
@@ -546,9 +588,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
             show={confirmReportUser}
             reportedUser={comment.sender}
             onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reasons, message }) => {
-              await reportMessage(comment.id as number, reasons, message);
-            }}
+            onSubmit={onSubmitReport}
           />
         )}
       </>

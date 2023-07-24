@@ -59,7 +59,7 @@ import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../atoms/DisplayName';
 import GenericSkeleton from './GenericSkeleton';
-import { ReportPostOnSignUp } from '../../utils/hooks/useOnSignUp';
+import { ReportPostOnSignUp } from '../../contexts/onSignUpWrapper';
 
 const NUMBER_ICONS: any = {
   light: {
