@@ -25,7 +25,6 @@ interface IChatList {
   className?: string;
   forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
-  onChatListFetched?: (value: boolean) => void;
 }
 
 const ChatList: React.FC<IChatList> = ({
@@ -34,7 +33,6 @@ const ChatList: React.FC<IChatList> = ({
   className,
   forwardRef,
   onChatRoomSelect: onChatRoomSelected,
-  onChatListFetched,
 }) => {
   const { t } = useTranslation('page-Chat');
   const { ref: scrollRef, inView } = useInView();
@@ -46,18 +44,12 @@ const ChatList: React.FC<IChatList> = ({
 
   const { searchChatroom } = useGetChats();
 
-  const { data, isLoading, hasNextPage, isFetched, fetchNextPage, refetch } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
       myRole: searchChatroom ? undefined : myRole,
       searchQuery: searchChatroom,
       announcementsName: t('announcement.announcements'),
     });
-
-  useEffect(() => {
-    if (onChatListFetched) {
-      onChatListFetched(isFetched);
-    }
-  }, [isFetched, onChatListFetched]);
 
   const chatRooms: newnewapi.IChatRoom[] = useMemo(() => {
     if (data) {
@@ -106,7 +98,6 @@ const ChatList: React.FC<IChatList> = ({
             : {}
         }
         className={className}
-        data-body-scroll-lock-ignore
       >
         {/* Loading state */}
         {isLoading && <Loader size='md' isStatic />}
@@ -156,8 +147,14 @@ const SChatListWrapper = styled.div`
 
   display: flex;
   position: relative;
-  overflow-y: auto;
   flex-direction: column;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+`;
+
+const SChatList = styled.div`
+  height: 100%;
+  overflow-y: scroll;
   overscroll-behavior: contain;
 
   /* Hide scrollbar */
@@ -167,8 +164,6 @@ const SChatListWrapper = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
 `;
-
-const SChatList = styled.div``;
 
 const SRef = styled.span`
   text-indent: -9999px;

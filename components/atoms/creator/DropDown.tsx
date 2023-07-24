@@ -105,7 +105,7 @@ export const DropDown: React.FC<IDropDown> = (props) => {
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
-            <SMobileList ref={mobileViewRef} data-body-scroll-lock-ignore>
+            <SMobileList ref={mobileViewRef}>
               {options.map(renderItem)}
             </SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
