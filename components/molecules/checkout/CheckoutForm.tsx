@@ -13,8 +13,12 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
-import { StripePaymentElementOptions } from '@stripe/stripe-js';
+import {
+  StripePaymentElementChangeEvent,
+  StripePaymentElementOptions,
+} from '@stripe/stripe-js';
 import { useRouter } from 'next/router';
+import validator from 'validator';
 
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
@@ -78,11 +82,42 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
   const { primaryCard } = useCards();
   const stripe = useStripe();
 
+  const [isStripePaymentElementCompleted, setIsStripePaymentElementCompleted] =
+    useState(false);
+
+  useEffect(() => {
+    const handleChangeStripeElement = (
+      event: StripePaymentElementChangeEvent
+    ) => {
+      setIsStripePaymentElementCompleted(event.complete);
+    };
+
+    if (isStripeReady) {
+      elements?.getElement('payment')?.on('change', handleChangeStripeElement);
+    }
+
+    return () => {
+      elements?.getElement('payment')?.off('change', handleChangeStripeElement);
+      setIsStripePaymentElementCompleted(false);
+    };
+  }, [isStripeReady, elements, selectedPaymentMethod]);
+
+  const isFormCompleted =
+    isStripePaymentElementCompleted &&
+    (userLoggedIn || validator.isEmail(email));
+
   useEffect(() => {
     if (!selectedPaymentMethod && primaryCard) {
       setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard);
     }
   }, [selectedPaymentMethod, primaryCard]);
+
+  const handleSetPaymentMethod = useCallback(
+    (paymentMethod: PaymentMethodTypes) => {
+      setSelectedPaymentMethod(paymentMethod);
+    },
+    []
+  );
 
   const toggleSaveCard = useCallback(() => {
     setSaveCard((prevState) => !prevState);
@@ -190,6 +225,22 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     }
   }, [isRecaptchaV2Required]);
 
+  const isPayButtonDisabled = useMemo(() => {
+    if (!primaryCard) {
+      return !isFormCompleted;
+    }
+
+    if (!selectedPaymentMethod) {
+      return true;
+    }
+
+    if (selectedPaymentMethod === PaymentMethodTypes.NewCard) {
+      return !isFormCompleted;
+    }
+
+    return false;
+  }, [isFormCompleted, primaryCard, selectedPaymentMethod]);
+
   return (
     <SForm
       id='checkout-form'
@@ -214,7 +265,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
         <>
           <OptionCard
             handleClick={() =>
-              setSelectedPaymentMethod(PaymentMethodTypes.PrimaryCard)
+              handleSetPaymentMethod(PaymentMethodTypes.PrimaryCard)
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.PrimaryCard}
             label={`${t('primaryCard')} **** ${primaryCard.last4}`}
@@ -224,7 +275,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
             id='new-card'
             handleClick={
               !userData?.options?.isWhiteListed
-                ? () => setSelectedPaymentMethod(PaymentMethodTypes.NewCard)
+                ? () => handleSetPaymentMethod(PaymentMethodTypes.NewCard)
                 : () => {}
             }
             selected={selectedPaymentMethod === PaymentMethodTypes.NewCard}
@@ -276,9 +327,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           type='submit'
           id='pay'
           view='primaryGrad'
-          disabled={
-            primaryCard ? !selectedPaymentMethod || isSubmitting : isSubmitting
-          }
+          disabled={isPayButtonDisabled}
           loading={isSubmitting}
         >
           {t('payButton')}
