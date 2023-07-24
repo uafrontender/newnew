@@ -8,15 +8,7 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled from 'styled-components';
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from '@stripe/react-stripe-js';
-import {
-  StripePaymentElementChangeEvent,
-  StripePaymentElementOptions,
-} from '@stripe/stripe-js';
+import { useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import validator from 'validator';
 
@@ -36,6 +28,7 @@ import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
+import NewCardForm from './NewCardForm';
 
 // eslint-disable-next-line no-shadow
 enum PaymentMethodTypes {
@@ -55,6 +48,7 @@ interface ICheckoutForm {
   }) => void;
 }
 
+// TODO: refactoring
 const CheckoutForm: React.FC<ICheckoutForm> = ({
   setupIntent,
   redirectUrl,
@@ -84,23 +78,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
 
   const [isStripePaymentElementCompleted, setIsStripePaymentElementCompleted] =
     useState(false);
-
-  useEffect(() => {
-    const handleChangeStripeElement = (
-      event: StripePaymentElementChangeEvent
-    ) => {
-      setIsStripePaymentElementCompleted(event.complete);
-    };
-
-    if (isStripeReady) {
-      elements?.getElement('payment')?.on('change', handleChangeStripeElement);
-    }
-
-    return () => {
-      elements?.getElement('payment')?.off('change', handleChangeStripeElement);
-      setIsStripePaymentElementCompleted(false);
-    };
-  }, [isStripeReady, elements, selectedPaymentMethod]);
 
   const isFormCompleted =
     isStripePaymentElementCompleted &&
@@ -207,17 +184,6 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
     }
   }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
-  const paymentElementOptions: StripePaymentElementOptions = useMemo(
-    () => ({
-      terms: { card: 'never' },
-      wallets: {
-        googlePay: 'never',
-        applePay: 'never',
-      },
-    }),
-    []
-  );
-
   useEffect(() => {
     // fix recaptcha challenge overlay issue
     if (isRecaptchaV2Required) {
@@ -298,10 +264,9 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
               errorCaption={emailError}
             />
           )}
-          <PaymentElement
-            id='stripePayment'
-            onReady={() => setIsStripeReady(true)}
-            options={paymentElementOptions}
+          <NewCardForm
+            onFormReadyStatusChange={setIsStripeReady}
+            onFormStatusCompleteChange={setIsStripePaymentElementCompleted}
           />
           {/* Show save toggle only if user already has primary card otherwise card will be saved in any case */}
           {isStripeReady && primaryCard && (
