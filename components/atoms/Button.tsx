@@ -147,7 +147,7 @@ const Button = React.memo(
             }
           }}
           onClick={!withRipple ? onClick : handleClickDebounced}
-          disabled={disabled}
+          disabled={disabled || loading}
           withRipple={withRipple}
           isRippling={!withRipple ? false : isRippling}
           onMouseDown={handleOnMouseDown}
