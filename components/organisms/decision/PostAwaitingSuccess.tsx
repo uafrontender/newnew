@@ -14,9 +14,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import Headline from '../../atoms/Headline';
 import ListPostPage from '../see-more/ListPostPage';
 
-const ReportModal = dynamic(
-  () => import('../../molecules/direct-messages/ReportModal')
-);
+const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 
 interface IPostAwaitingSuccess {}
 
