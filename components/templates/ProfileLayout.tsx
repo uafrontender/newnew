@@ -46,7 +46,7 @@ import DisplayName from '../atoms/DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
-import { ReportUserOnSignUp } from '../../utils/hooks/useOnSignUp';
+import { ReportUserOnSignUp } from '../../contexts/onSignUpWrapper';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;

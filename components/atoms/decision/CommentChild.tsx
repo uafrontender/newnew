@@ -19,7 +19,7 @@ import { reportMessage } from '../../../api/endpoints/report';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import DisplayName from '../DisplayName';
 import { ReportData } from '../../molecules/ReportModal';
-import { ReportMessageOnSignUp } from '../../../utils/hooks/useOnSignUp';
+import { ReportMessageOnSignUp } from '../../../contexts/onSignUpWrapper';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')

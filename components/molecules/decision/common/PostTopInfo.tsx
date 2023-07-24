@@ -42,7 +42,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
-import { MarkPostAsFavoriteOnSignUp } from '../../../../utils/hooks/useOnSignUp';
+import { MarkPostAsFavoriteOnSignUp } from '../../../../contexts/onSignUpWrapper';
 /* import getGuestId from '../../../../utils/getGuestId';
  import {
   getGuestSmsNotificationsSubscriptionStatus,
