@@ -9,11 +9,16 @@ const useDisableTouchMoveSafari = (
   useEffect(() => {
     const handleTouchMove = (e: TouchEvent) => {
       const targetEl = e.target as HTMLElement;
-      const container = containerRef?.current as HTMLElement | null;
+
+      const elementsIgnoredTouchMoveLock = document.querySelectorAll(
+        '[data-ignore-touch-move-lock="true"]'
+      );
 
       if (
-        targetEl.getAttribute('data-body-scroll-lock-ignore') ||
-        (container && container.contains(targetEl))
+        targetEl.getAttribute('data-ignore-touch-move-lock') ||
+        [...elementsIgnoredTouchMoveLock].some((childEl) =>
+          childEl.contains(targetEl)
+        )
       ) {
         return true;
       }

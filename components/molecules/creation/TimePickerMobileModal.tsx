@@ -206,7 +206,6 @@ const TimePickerMobileModal: React.FunctionComponent<
           ref={(el) => {
             hoursScrollerRef.current = el!!;
           }}
-          data-body-scroll-lock-ignore
         >
           {hours.map((d, i) => (
             <SScrollerItem
@@ -230,7 +229,6 @@ const TimePickerMobileModal: React.FunctionComponent<
           ref={(el) => {
             minutesScrollerRef.current = el!!;
           }}
-          data-body-scroll-lock-ignore
         >
           {minutes.map((m, i) => (
             <SScrollerItem

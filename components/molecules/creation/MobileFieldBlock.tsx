@@ -169,9 +169,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       return (
         <SModal show={focused} onClose={handleBlur}>
           <SMobileListContainer focused={focused}>
-            <SMobileList data-body-scroll-lock-ignore>
-              {options?.map(renderItem)}
-            </SMobileList>
+            <SMobileList>{options?.map(renderItem)}</SMobileList>
             <SCancelButton view='modalSecondary' onClick={handleBlur}>
               {t('secondStep.button.cancel')}
             </SCancelButton>

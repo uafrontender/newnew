@@ -8,11 +8,11 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { FocusOn } from 'react-focus-on';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
-import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatListTabs')
@@ -39,6 +39,14 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
   className,
   onChatRoomSelect,
 }) => {
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const { searchChatroom } = useGetChats();
 
   const { bundles, isSellingBundles, hasSoldBundles } = useBundles();
@@ -87,43 +95,25 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
 
   const chatListRef = useRef<HTMLDivElement | null>(null);
 
-  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
-  usePreventLayoutMoveOnInputFocusSafari('data-chat-list-search');
-
-  const [isChatListFetched, setIsChatListFetched] = useState(false);
-
-  const handleSetIsChatListFetched = (value: boolean) => {
-    setIsChatListFetched(value);
-  };
-
-  useEffect(() => {
-    const chatList = chatListRef.current as HTMLElement | null;
-    if (chatList && !hidden && isChatListFetched) {
-      disableBodyScroll(chatList);
-    }
-
-    return () => {
-      if (chatList) {
-        enableBodyScroll(chatList);
-      }
-    };
-  }, [hidden, isChatListFetched]);
-
   return (
     <SSidebar hidden={hidden} className={className}>
-      <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
-      {isTabs && (
-        <ChatListTabs
-          activeTab={activeTab!!}
-          changeActiveTab={changeActiveTab}
+      <FocusOn
+        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        enabled={!hidden && isMobileOrTablet}
+      >
+        <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
+        {isTabs && (
+          <ChatListTabs
+            activeTab={activeTab!!}
+            changeActiveTab={changeActiveTab}
+          />
+        )}
+        <ChatList
+          onChatRoomSelect={onChatRoomSelect}
+          myRole={activeTab}
+          forwardRef={chatListRef}
         />
-      )}
-      <ChatList
-        onChatRoomSelect={onChatRoomSelect}
-        myRole={activeTab}
-        forwardRef={chatListRef}
-        onChatListFetched={handleSetIsChatListFetched}
-      />
+      </FocusOn>
     </SSidebar>
   );
 };

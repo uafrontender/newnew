@@ -154,7 +154,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   return (
     <Modal show={open} onClose={handleClose}>
       <SMobileContainer onClick={preventClick}>
-        <SContent data-body-scroll-lock-ignore>
+        <SContent>
           <SPlayerWrapper>
             {open ? (
               fileProcessing.progress === 100 ? (
