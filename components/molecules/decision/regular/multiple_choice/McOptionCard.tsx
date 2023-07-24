@@ -4,7 +4,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import { useUserData } from '../../../../../contexts/userDataContext';
@@ -37,7 +37,7 @@ import TutorialTooltip, {
 } from '../../../../atoms/decision/TutorialTooltip';
 import Headline from '../../../../atoms/Headline';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
+import ReportModal, { ReportData } from '../../../ReportModal';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
@@ -51,6 +51,7 @@ import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.p
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
+import { ReportSuperpollOptionOnSignUp } from '../../../../../utils/hooks/useOnSignUp';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -189,26 +190,45 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   // Report modal
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
+  const handleOpenReportForm = useCallback(() => {
+    setIsReportModalOpen(true);
+  }, []);
+
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportSuperpollOption(option.id, reasons, message);
-      setIsReportModalOpen(false);
+      if (!userLoggedIn) {
+        const onSignUp: ReportSuperpollOptionOnSignUp = {
+          type: 'report-superpoll-option',
+          optionId: option.id,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
+        );
+
+        return false;
+      }
+
+      // TODO: Need error handling
+      await reportSuperpollOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [option.id]
+    [userLoggedIn, option.id]
   );
-
-  const handleOpenReportForm = useCallback(() => {
-    if (!userLoggedIn) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-
-    setIsReportModalOpen(true);
-  }, [userLoggedIn, router]);
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);

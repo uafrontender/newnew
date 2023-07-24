@@ -51,7 +51,7 @@ import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
 import switchPostStatus from '../../utils/switchPostStatus';
 import PostCardEllipseMenu from './PostCardEllipseMenu';
-import ReportModal, { ReportData } from './direct-messages/ReportModal';
+import ReportModal, { ReportData } from './ReportModal';
 import { reportPost } from '../../api/endpoints/report';
 import PostCardEllipseModal from './PostCardEllipseModal';
 import getChunks from '../../utils/getChunks/getChunks';
@@ -59,6 +59,7 @@ import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
 import DisplayName from '../atoms/DisplayName';
 import GenericSkeleton from './GenericSkeleton';
+import { ReportPostOnSignUp } from '../../utils/hooks/useOnSignUp';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -251,20 +252,8 @@ export const PostCard: React.FC<ICard> = React.memo(
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     const handleReportOpen = useCallback(() => {
-      if (!userLoggedIn) {
-        Router.push(
-          `/sign-up?reason=report&redirect=${encodeURIComponent(
-            `${process.env.NEXT_PUBLIC_APP_URL}/p/${
-              postParsed.postShortId
-                ? postParsed.postShortId
-                : postParsed.postUuid
-            }`
-          )}`
-        );
-        return;
-      }
       setIsReportModalOpen(true);
-    }, [userLoggedIn, postParsed.postShortId, postParsed.postUuid]);
+    }, []);
 
     const handleReportClose = useCallback(() => {
       setIsReportModalOpen(false);
@@ -272,13 +261,40 @@ export const PostCard: React.FC<ICard> = React.memo(
 
     const handleReportSubmit = useCallback(
       async ({ reasons, message }: ReportData) => {
-        if (postParsed) {
-          await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
-            console.error(e)
-          );
+        if (!postParsed) {
+          return false;
         }
+
+        if (!userLoggedIn) {
+          const onSignUp: ReportPostOnSignUp = {
+            type: 'report-post',
+            postUuid: postParsed.postUuid,
+            message,
+            reasons,
+          };
+
+          Router.push(
+            `/sign-up?reason=report&redirect=${encodeURIComponent(
+              `${process.env.NEXT_PUBLIC_APP_URL}/p/${
+                postParsed.postShortId
+                  ? postParsed.postShortId
+                  : postParsed.postUuid
+              }?onSignUp=${JSON.stringify(onSignUp)}`
+            )}`
+          );
+
+          return false;
+        }
+
+        // TODO: Need error handling
+        await reportPost(postParsed.postUuid, reasons, message).catch((e) => {
+          console.error(e);
+          return false;
+        });
+
+        return true;
       },
-      [postParsed]
+      [userLoggedIn, postParsed]
     );
 
     const handleBidClick = () => {};
