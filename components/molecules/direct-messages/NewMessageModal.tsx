@@ -244,7 +244,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           />
           <SWrapper>
             {!isLoading && (
-              <SSectionContent data-body-scroll-lock-ignore ref={scrollRef}>
+              <SSectionContent ref={scrollRef}>
                 {userData?.options?.isOfferingBundles && !searchValue && (
                   <NewAnnouncement handleClick={openMyAnnouncement} />
                 )}
@@ -276,8 +276,9 @@ export default NewMessageModal;
 
 const SWrapper = styled.div`
   position: relative;
-  height: 100%;
-  overflow-y: auto;
+  height: calc(var(--window-inner-height, 1vh) * 100 - 130px);
+  overflow-y: hidden;
+
   ${(props) => props.theme.media.tablet} {
     overflow: hidden;
   }
@@ -295,6 +296,14 @@ const SSectionContent = styled.div`
   display: flex;
   overflow-y: auto;
   flex-direction: column;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   ${(props) => props.theme.media.tablet} {
     padding: 0 24px;
     margin: 0 -24px;

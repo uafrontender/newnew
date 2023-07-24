@@ -3,6 +3,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import styled from 'styled-components';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
@@ -48,10 +49,14 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
 };
 
 (BundlesPage as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <HomeLayout>{page}</HomeLayout>
+  <SHomeLayout>{page}</SHomeLayout>
 );
 
 export default BundlesPage;
+
+const SHomeLayout = styled(HomeLayout)`
+  overflow-x: hidden;
+`;
 
 export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
   context
