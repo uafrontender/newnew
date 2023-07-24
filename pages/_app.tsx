@@ -71,6 +71,7 @@ import PostCreationContextProvider from '../contexts/postCreationContext';
 import { TutorialProgressContextProvider } from '../contexts/tutorialProgressContext';
 import UiStateContextProvider, { TColorMode } from '../contexts/uiStateContext';
 import { SignUpContextProvider } from '../contexts/signUpContext';
+import OnSignUpWrapper from '../contexts/onSignUpWrapper';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -83,6 +84,7 @@ interface IMyApp extends AppProps {
   uaString: string;
   colorMode: string;
   mutedMode: string;
+  onSignUp?: string;
   themeFromCookie?: 'light' | 'dark';
 }
 
@@ -125,6 +127,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     uaString,
     colorMode,
     mutedMode,
+    onSignUp,
     themeFromCookie,
   } = props;
   const { userLoggedIn, userIsCreator } = useAppState();
@@ -298,63 +301,65 @@ const MyApp = (props: IMyApp): ReactElement => {
                   themeFromCookie={themeFromCookie}
                 >
                   <LanguageWrapper>
-                    <TutorialProgressContextProvider>
-                      <AppConstantsContextProvider>
-                        <SocketContextProvider>
-                          <ChannelsContextProvider>
-                            <ModalNotificationsContextProvider>
-                              <PushNotificationContextProvider>
-                                <BlockedUsersProvider>
-                                  <BundlesContextProvider>
-                                    <ChatsUnreadMessagesProvider>
-                                      <OverlayModeProvider>
-                                        <MultipleBeforePopStateContextProvider>
-                                          <PostCreationContextProvider>
-                                            <UserDataContextProvider>
-                                              <SignUpContextProvider>
-                                                <NotificationsProvider>
-                                                  <FollowingsContextProvider>
-                                                    <>
-                                                      <ToastContainer containerId='toast-container' />
-                                                      <VideoProcessingWrapper>
-                                                        {!pageProps.error ? (
-                                                          getLayout(
-                                                            <Component
-                                                              {...pageProps}
+                    <OnSignUpWrapper onSignUp={onSignUp}>
+                      <TutorialProgressContextProvider>
+                        <AppConstantsContextProvider>
+                          <SocketContextProvider>
+                            <ChannelsContextProvider>
+                              <ModalNotificationsContextProvider>
+                                <PushNotificationContextProvider>
+                                  <BlockedUsersProvider>
+                                    <BundlesContextProvider>
+                                      <ChatsUnreadMessagesProvider>
+                                        <OverlayModeProvider>
+                                          <MultipleBeforePopStateContextProvider>
+                                            <PostCreationContextProvider>
+                                              <UserDataContextProvider>
+                                                <SignUpContextProvider>
+                                                  <NotificationsProvider>
+                                                    <FollowingsContextProvider>
+                                                      <>
+                                                        <ToastContainer containerId='toast-container' />
+                                                        <VideoProcessingWrapper>
+                                                          {!pageProps.error ? (
+                                                            getLayout(
+                                                              <Component
+                                                                {...pageProps}
+                                                              />
+                                                            )
+                                                          ) : (
+                                                            <Error
+                                                              title={
+                                                                pageProps.error
+                                                                  ?.message
+                                                              }
+                                                              statusCode={
+                                                                pageProps.error
+                                                                  ?.statusCode ??
+                                                                500
+                                                              }
                                                             />
-                                                          )
-                                                        ) : (
-                                                          <Error
-                                                            title={
-                                                              pageProps.error
-                                                                ?.message
-                                                            }
-                                                            statusCode={
-                                                              pageProps.error
-                                                                ?.statusCode ??
-                                                              500
-                                                            }
-                                                          />
-                                                        )}
-                                                        <PushNotificationModalContainer />
-                                                      </VideoProcessingWrapper>
-                                                    </>
-                                                  </FollowingsContextProvider>
-                                                </NotificationsProvider>
-                                              </SignUpContextProvider>
-                                            </UserDataContextProvider>
-                                          </PostCreationContextProvider>
-                                        </MultipleBeforePopStateContextProvider>
-                                      </OverlayModeProvider>
-                                    </ChatsUnreadMessagesProvider>
-                                  </BundlesContextProvider>
-                                </BlockedUsersProvider>
-                              </PushNotificationContextProvider>
-                            </ModalNotificationsContextProvider>
-                          </ChannelsContextProvider>
-                        </SocketContextProvider>
-                      </AppConstantsContextProvider>
-                    </TutorialProgressContextProvider>
+                                                          )}
+                                                          <PushNotificationModalContainer />
+                                                        </VideoProcessingWrapper>
+                                                      </>
+                                                    </FollowingsContextProvider>
+                                                  </NotificationsProvider>
+                                                </SignUpContextProvider>
+                                              </UserDataContextProvider>
+                                            </PostCreationContextProvider>
+                                          </MultipleBeforePopStateContextProvider>
+                                        </OverlayModeProvider>
+                                      </ChatsUnreadMessagesProvider>
+                                    </BundlesContextProvider>
+                                  </BlockedUsersProvider>
+                                </PushNotificationContextProvider>
+                              </ModalNotificationsContextProvider>
+                            </ChannelsContextProvider>
+                          </SocketContextProvider>
+                        </AppConstantsContextProvider>
+                      </TutorialProgressContextProvider>
+                    </OnSignUpWrapper>
                   </LanguageWrapper>
                 </GlobalTheme>
               </UiStateContextProvider>
@@ -391,9 +396,10 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
     return {
       ...appProps,
       accessToken: accessToken || undefined,
+      uaString: appContext.ctx?.req?.headers?.['user-agent'],
       colorMode: appContext.ctx?.req.cookies?.colorMode || 'auto',
       mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-      uaString: appContext.ctx?.req?.headers?.['user-agent'],
+      onSignUp: appContext.ctx.query.onSignUp,
       themeFromCookie: isDayTime ? 'light' : 'dark',
     };
   }
@@ -401,9 +407,10 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
   return {
     ...appProps,
     accessToken: accessToken || undefined,
+    uaString: appContext.ctx?.req?.headers?.['user-agent'],
     colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-    uaString: appContext.ctx?.req?.headers?.['user-agent'],
+    onSignUp: appContext.ctx.query.onSignUp,
   };
 };
 

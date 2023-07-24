@@ -4,7 +4,7 @@ import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Button from '../Button';
@@ -18,6 +18,8 @@ import { reportMessage } from '../../../api/endpoints/report';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import DisplayName from '../DisplayName';
+import { ReportData } from '../../molecules/ReportModal';
+import { ReportMessageOnSignUp } from '../../../utils/hooks/useOnSignUp';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -25,9 +27,7 @@ const CommentEllipseMenu = dynamic(
 const CommentEllipseModal = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseModal')
 );
-const ReportModal = dynamic(
-  () => import('../../molecules/direct-messages/ReportModal')
-);
+const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const DeleteCommentModal = dynamic(
   () => import('../../molecules/decision/common/DeleteCommentModal')
 );
@@ -65,7 +65,7 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
 
     const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-    const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+    const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
     const [confirmDeleteComment, setConfirmDeleteComment] =
       useState<boolean>(false);
 
@@ -78,17 +78,48 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
     );
 
     const onUserReport = useCallback(() => {
-      if (!userLoggedIn) {
-        router.push(
-          `/sign-up?reason=report&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-        return;
-      }
+      setReportModalOpen(true);
+    }, []);
 
-      setConfirmReportUser(true);
-    }, [userLoggedIn, router]);
+    const onSubmitReport = useCallback(
+      async (reportData: ReportData) => {
+        if (!userLoggedIn) {
+          const onSignUp: ReportMessageOnSignUp = {
+            type: 'report-message',
+            messageId: comment.id,
+            message: reportData.message,
+            reasons: reportData.reasons,
+          };
+
+          const [path, query] = window.location.href.split('?');
+          const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+          const queryWithOnSignUp = query
+            ? `${query}&${onSignUpQuery}`
+            : onSignUpQuery;
+
+          Router.push(
+            `/sign-up?reason=report&redirect=${encodeURIComponent(
+              `${path}?${queryWithOnSignUp}`
+            )}`
+          );
+
+          return false;
+        }
+
+        // TODO: Need error handling
+        await reportMessage(
+          comment.id,
+          reportData.reasons,
+          reportData.message
+        ).catch((e) => {
+          console.error(e);
+          return false;
+        });
+
+        return true;
+      },
+      [userLoggedIn, comment.id]
+    );
 
     const onDeleteComment = () => {
       setConfirmDeleteComment(true);
@@ -245,12 +276,10 @@ const CommentChild = React.forwardRef<HTMLDivElement, ICommentChild>(
         ) : null}
         {!comment.isDeleted && comment.sender && (
           <ReportModal
-            show={confirmReportUser}
+            show={reportModalOpen}
             reportedUser={comment.sender}
-            onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reasons, message }) => {
-              await reportMessage(comment.id as number, reasons, message);
-            }}
+            onClose={() => setReportModalOpen(false)}
+            onSubmit={onSubmitReport}
           />
         )}
       </>
