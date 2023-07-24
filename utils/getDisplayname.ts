@@ -14,7 +14,8 @@ const getDisplayname = (
     'isTombstone' in user.options &&
     user.options?.isTombstone
   ) {
-    // TODO: Add translation? Change it?
+    // Only visible when BE fails to provide a user (which is a bug)
+    // Can't translate without passing translations as prop
     return 'Private user';
   }
 
@@ -22,7 +23,8 @@ const getDisplayname = (
     return user?.nickname || `@${user?.username}`;
   }
 
-  // TODO: Add translation? Change it?
+  // Only visible when BE fails to provide a user (which is a bug)
+  // Can't translate without passing translations as prop
   return 'Private user';
 };
 

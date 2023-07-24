@@ -31,7 +31,7 @@ import LibraIcon from '../../../public/images/png/astrology-signs/Libra.png';
 import ScorpioIcon from '../../../public/images/png/astrology-signs/Scorpio.png';
 import SagittariusIcon from '../../../public/images/png/astrology-signs/Sagittarius.png';
 import CapricornIcon from '../../../public/images/png/astrology-signs/Capricorn.png';
-import InputInvalidIcon from '../../../public/images/png/astrology-signs/InputInvalid.png';
+import InputInvalidIcon from '../../../public/images/png/astrology-signs/NeutralFace.png';
 
 // Datepicker utils
 import findAstrologySign, {

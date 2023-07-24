@@ -1,10 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { FocusOn } from 'react-focus-on';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatListTabs')
@@ -31,6 +39,14 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
   className,
   onChatRoomSelect,
 }) => {
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const { searchChatroom } = useGetChats();
 
   const { bundles, isSellingBundles, hasSoldBundles } = useBundles();
@@ -77,17 +93,27 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     [activeTab, searchChatroom, tabsVisible, withTabs]
   );
 
-  // TODO: move hidden to parent, just pass className here
+  const chatListRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <SSidebar hidden={hidden} className={className}>
-      <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
-      {isTabs && (
-        <ChatListTabs
-          activeTab={activeTab!!}
-          changeActiveTab={changeActiveTab}
+      <FocusOn
+        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        enabled={!hidden && isMobileOrTablet}
+      >
+        <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
+        {isTabs && (
+          <ChatListTabs
+            activeTab={activeTab!!}
+            changeActiveTab={changeActiveTab}
+          />
+        )}
+        <ChatList
+          onChatRoomSelect={onChatRoomSelect}
+          myRole={activeTab}
+          forwardRef={chatListRef}
         />
-      )}
-      <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
+      </FocusOn>
     </SSidebar>
   );
 };

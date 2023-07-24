@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -11,8 +11,6 @@ import Container from '../atoms/Grid/Container';
 
 import { useAppState } from '../../contexts/appStateContext';
 import { useUiState } from '../../contexts/uiStateContext';
-import isIOS from '../../utils/isIOS';
-import isSafari from '../../utils/isSafari';
 
 interface IHeader {
   visible: boolean;
@@ -39,7 +37,6 @@ export const Header: React.FC<IHeader> = React.memo((props) => {
       visible={visible}
       withBanner={!!banner.show}
       ref={headerRef}
-      isMobileSafari={isIOS() && !!isSafari()}
     >
       <Banner />
       <SContentWrapper id='top-nav-header-wrapper'>
@@ -63,24 +60,17 @@ interface ISWrapper {
   name: string;
   visible: boolean;
   withBanner: boolean;
-  isMobileSafari: boolean;
 }
 
 // NOTE: 'transform: translateZ(0);' and '-41px' needed to fix mobile Safari issue with transparent line above header
 const SWrapper = styled.header<ISWrapper>`
-  ${({ isMobileSafari, withBanner }) =>
-    isMobileSafari
-      ? css`
-          position: sticky;
-          position: -webkit-sticky; /* Safari */
-          margin-top: ${() => `${withBanner ? 0 : '-41px'}`};
-        `
-      : css`
-          position: fixed;
-        `}
+  position: sticky;
+  position: -webkit-sticky; /* Safari */
 
   top: ${(props) =>
     props.visible ? `${props.withBanner ? 0 : '-41px'}` : '-96px'};
+  margin-top: ${({ withBanner }) => `${withBanner ? 0 : '-41px'}`};
+
   left: 0;
   transform: translateZ(0);
   width: 100vw;

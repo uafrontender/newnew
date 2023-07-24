@@ -562,7 +562,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
           <CommentsBottomSection
             postUuid={post.postUuid}
             postShortId={post.postShortId ?? ''}
-            commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}
           />

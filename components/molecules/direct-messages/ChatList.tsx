@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { RefObject, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -23,6 +23,7 @@ interface IChatList {
   hidden?: boolean;
   myRole: newnewapi.ChatRoom.MyRole | undefined;
   className?: string;
+  forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
@@ -30,6 +31,7 @@ const ChatList: React.FC<IChatList> = ({
   myRole,
   hidden,
   className,
+  forwardRef,
   onChatRoomSelect: onChatRoomSelected,
 }) => {
   const { t } = useTranslation('page-Chat');
@@ -86,7 +88,7 @@ const ChatList: React.FC<IChatList> = ({
   }, [myRole, unreadCountForUser, refetch]);
 
   return (
-    <SChatListWrapper>
+    <SChatListWrapper ref={forwardRef}>
       <SChatList
         style={
           hidden
@@ -145,8 +147,14 @@ const SChatListWrapper = styled.div`
 
   display: flex;
   position: relative;
-  overflow-y: auto;
   flex-direction: column;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+`;
+
+const SChatList = styled.div`
+  height: 100%;
+  overflow-y: scroll;
   overscroll-behavior: contain;
 
   /* Hide scrollbar */
@@ -156,8 +164,6 @@ const SChatListWrapper = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
 `;
-
-const SChatList = styled.div``;
 
 const SRef = styled.span`
   text-indent: -9999px;

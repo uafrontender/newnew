@@ -703,7 +703,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setZoomProfileImage(1);
     setMinZoomProfileImage(1);
 
-    setCoverUrlInEdit('');
+    setCoverUrlInEdit(userData?.coverUrl ?? '');
     setZoomCoverImage(1);
     setMinZoomCoverImage(1);
   };
@@ -926,7 +926,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <ProfileGeneralContent data-body-scroll-lock-ignore>
+            <ProfileGeneralContent>
               <SImageInputsWrapper>
                 <ProfileCoverImage
                   pictureInEditUrl={coverUrlInEdit ?? ''}
@@ -1115,7 +1115,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <PictureContent data-body-scroll-lock-ignore>
+            <PictureContent>
               <ProfileImageCropper
                 crop={cropProfileImage}
                 zoom={zoomProfileImage}

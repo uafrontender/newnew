@@ -7,11 +7,16 @@ import GeneralTemplate from './General';
 interface IHomeLayout {
   restrictMaxWidth?: boolean;
   children: React.ReactNode;
+  className?: string;
 }
 
-const HomeLayout: React.FC<IHomeLayout> = ({ restrictMaxWidth, children }) => (
+const HomeLayout: React.FC<IHomeLayout> = ({
+  restrictMaxWidth,
+  children,
+  className,
+}) => (
   <LayoutGroup>
-    <SGeneralTemplate restrictMaxWidth={restrictMaxWidth}>
+    <SGeneralTemplate restrictMaxWidth={restrictMaxWidth} className={className}>
       {children}
     </SGeneralTemplate>
   </LayoutGroup>

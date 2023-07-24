@@ -9,19 +9,20 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import preventParentClick from '../../../utils/preventParentClick';
+import preventParentClick from '../../utils/preventParentClick';
 
-import Modal from '../../organisms/Modal';
-import ModalPaper from '../../organisms/ModalPaper';
-import Button from '../../atoms/Button';
-import CheckMark from '../CheckMark';
-import { Mixpanel } from '../../../utils/mixpanel';
-import { useAppState } from '../../../contexts/appStateContext';
-import DisplayName from '../../atoms/DisplayName';
-import AnimatedPresence from '../../atoms/AnimatedPresence';
-import InlineSvg from '../../atoms/InlineSVG';
-import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import isStringEmpty from '../../../utils/isStringEmpty';
+import Modal from '../organisms/Modal';
+import ModalPaper from '../organisms/ModalPaper';
+import Button from '../atoms/Button';
+import CheckMark from './CheckMark';
+import { Mixpanel } from '../../utils/mixpanel';
+import { useAppState } from '../../contexts/appStateContext';
+import DisplayName from '../atoms/DisplayName';
+import AnimatedPresence from '../atoms/AnimatedPresence';
+import InlineSvg from '../atoms/InlineSVG';
+import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
+import isStringEmpty from '../../utils/isStringEmpty';
+import ReportSuccessModal from './ReportSuccessModal';
 
 export interface ReportData {
   reasons: newnewapi.ReportingReason[];
@@ -31,7 +32,7 @@ export interface ReportData {
 interface IReportModal {
   show: boolean;
   reportedUser: newnewapi.IUser;
-  onSubmit: (reportData: ReportData) => Promise<void>;
+  onSubmit: (reportData: ReportData) => Promise<boolean>;
   onClose: () => void;
 }
 
@@ -136,11 +137,14 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         message.length >= MIN_REPORT_MESSAGE_LENGTH
       ) {
         setIsSubmitting(true);
-        await onSubmit({
+        const showSuccessModal = await onSubmit({
           reasons: reasonsList,
           message,
         });
-        setReportSent(true);
+        if (showSuccessModal) {
+          setReportSent(true);
+        }
+
         setIsSubmitting(false);
       }
     };
@@ -199,7 +203,6 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             onClose={handleClose}
             isMobileFullScreen
             onClick={preventParentClick()}
-            data-body-scroll-lock-ignore
           >
             <SModalMessage>{t('modal.reportUser.subtitle')}</SModalMessage>
             <SCheckBoxList>
@@ -268,23 +271,11 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             </SModalButtons>
           </ModalPaper>
         </Modal>
-        <Modal show={reportSent} onClose={handleClose} additionalz={1001}>
-          <SConformationModal
-            onClose={handleClose}
-            isCloseButton
-            onClick={preventParentClick()}
-          >
-            <SConformationTitle>
-              {t('modal.reportSent.title')}
-            </SConformationTitle>
-            <SConformationText>
-              {t('modal.reportSent.subtitle')}
-            </SConformationText>
-            <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
-              {t('modal.reportSent.button')}
-            </SAcknowledgementButton>
-          </SConformationModal>
-        </Modal>
+        <ReportSuccessModal
+          show={reportSent}
+          additionalz={1001}
+          onClose={handleClose}
+        />
       </>
     );
   }
@@ -431,80 +422,5 @@ const STextArea = styled.textarea`
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  }
-`;
-
-const SConformationModal = styled(ModalPaper)`
-  position: relative;
-  padding: 32px 40px 40px 40px;
-  margin: auto 16px;
-  height: auto;
-  max-width: 350px;
-  width: 100%;
-
-  & > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    ${(props) => props.theme.media.tablet} {
-      font-size: 16px;
-    }
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    max-width: 480px;
-  }
-`;
-
-const SConformationTitle = styled.strong`
-  margin-bottom: 16px;
-
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 28px;
-
-  ${(props) => props.theme.media.tablet} {
-    font-size: 24px;
-    line-height: 32px;
-  }
-`;
-
-const SConformationText = styled.p`
-  font-size: 14px;
-  line-height: 20px;
-  margin-bottom: 24px;
-  text-align: center;
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-
-  ${(props) => props.theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
-const SAcknowledgementButton = styled(Button)`
-  width: auto;
-  flex-shrink: 0;
-  padding: 12px 24px;
-  line-height: 24px;
-  font-size: 14px;
-
-  &:disabled {
-    cursor: default;
-    opacity: 1;
-    outline: none;
-
-    :after {
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      content: '';
-      opacity: 1;
-      z-index: 6;
-      position: absolute;
-      background: ${(props) => props.theme.colorsThemed.button.disabled};
-    }
   }
 `;

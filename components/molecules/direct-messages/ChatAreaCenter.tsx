@@ -166,12 +166,14 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <SContainer className={className} isAnnouncement={isAnnouncement}>
-      <SMessagesContent ref={forwardRef} data-body-scroll-lock-ignore>
+    <SContainer className={className}>
+      <SMessagesContent ref={forwardRef} data-ignore-touch-move-lock>
         {hasWelcomeMessage && <WelcomeMessage user={chatRoom.visavis?.user} />}
         {hasNoMessagesYet && <NoMessagesYet />}
         {hasNoAnnouncementMessagesYet && <NoAnnouncementMessagesYet />}
-        <SMessages>
+        <SMessages
+          isAnnouncementBannerOffset={isAnnouncement && chatRoom.myRole === 1}
+        >
           {messages.map((item, index) => (
             <ChatMessage
               key={`${chatRoom}-${item.id}`}
@@ -202,13 +204,6 @@ const SContainer = styled.div<ISContainer>`
   flex: 1;
   overflow-y: hidden;
 
-  ${({ isAnnouncement }) =>
-    isAnnouncement
-      ? css`
-          padding-top: 75px;
-        `
-      : null}
-
   ${(props) => props.theme.media.tablet} {
     position: static;
     flex: 0;
@@ -236,11 +231,21 @@ const SMessagesContent = styled.div`
   overscroll-behavior: contain;
 `;
 
-const SMessages = styled.div`
+const SMessages = styled.div<{
+  isAnnouncementBannerOffset?: boolean;
+}>`
   display: flex;
   flex-direction: column-reverse;
+  flex-shrink: 0;
 
   padding: 0 12px;
+
+  ${({ isAnnouncementBannerOffset }) =>
+    isAnnouncementBannerOffset
+      ? css`
+          padding-top: 75px;
+        `
+      : null}
 `;
 
 const SRef = styled.span`

@@ -105,6 +105,7 @@ const EditEmailStepThreeModal = ({
       setIsCodeLoading(false);
       setCode(new Array(6).join('.').split('.'));
     } catch (err) {
+      // TODO: We should probably have an error message below input here
       setIsCodeLoading(false);
       console.error(err);
     }
