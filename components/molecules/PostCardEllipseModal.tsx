@@ -18,7 +18,7 @@ import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 import InlineSvg from '../atoms/InlineSVG';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import { useAppState } from '../../contexts/appStateContext';
-import { MarkPostAsFavoriteOnSignUp } from '../../utils/hooks/useOnSignUp';
+import { MarkPostAsFavoriteOnSignUp } from '../../contexts/onSignUpWrapper';
 
 interface IPostCardEllipseModal {
   isOpen: boolean;

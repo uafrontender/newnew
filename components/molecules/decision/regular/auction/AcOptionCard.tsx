@@ -58,7 +58,7 @@ import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
-import { ReportEventOptionOnSignUp } from '../../../../../utils/hooks/useOnSignUp';
+import { ReportEventOptionOnSignUp } from '../../../../../contexts/onSignUpWrapper';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status

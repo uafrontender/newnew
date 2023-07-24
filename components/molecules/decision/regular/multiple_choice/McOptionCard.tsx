@@ -51,7 +51,7 @@ import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.p
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
-import { ReportSuperpollOptionOnSignUp } from '../../../../../utils/hooks/useOnSignUp';
+import { ReportSuperpollOptionOnSignUp } from '../../../../../contexts/onSignUpWrapper';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status

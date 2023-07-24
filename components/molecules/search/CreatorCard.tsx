@@ -21,7 +21,7 @@ import { formatNumber } from '../../../utils/format';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
 import GenericSkeleton from '../GenericSkeleton';
-import { ReportUserOnSignUp } from '../../../utils/hooks/useOnSignUp';
+import { ReportUserOnSignUp } from '../../../contexts/onSignUpWrapper';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
