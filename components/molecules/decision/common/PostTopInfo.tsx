@@ -797,7 +797,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: auto max-content max-content;
+    grid-template-columns: max-content auto auto;
     align-items: center;
 
     margin-bottom: 0px;
