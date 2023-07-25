@@ -40,10 +40,9 @@ import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
 import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
 import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
+import { ReportData } from '../../molecules/ReportModal';
 
-const ReportModal = dynamic(
-  () => import('../../molecules/direct-messages/ReportModal')
-);
+const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const BlockedUser = dynamic(
   () => import('../../molecules/direct-messages/BlockedUser')
 );
@@ -122,6 +121,24 @@ const ChatContent: React.FC<IFuncProps> = ({
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
     useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+
+  const handleReportSubmit = useCallback(
+    async ({ reasons, message }: ReportData) => {
+      if (!chatRoom.visavis?.user?.uuid) {
+        return false;
+      }
+
+      await reportUser(chatRoom.visavis.user?.uuid, reasons, message).catch(
+        (e) => {
+          console.error(e);
+          return false;
+        }
+      );
+
+      return true;
+    },
+    [chatRoom.visavis?.user?.uuid]
+  );
 
   const handleCloseConfirmBlockUserModal = useCallback(() => {
     Mixpanel.track('Close Block User Modal', {
@@ -408,7 +425,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
-  // body-scroll-lock cannot be used here because of column-reverse
+  // react-focus-on cannot be used here because of column-reverse
   useDisableTouchMoveSafari(chatContentRef, isHidden);
 
   // Needed to prevent soft keyboard from pushing layout up on mobile Safari
@@ -491,15 +508,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           show={confirmReportUser}
           reportedUser={chatRoom.visavis?.user!!}
           onClose={() => setConfirmReportUser(false)}
-          onSubmit={async ({ reasons, message }) => {
-            if (chatRoom.visavis?.user?.uuid) {
-              await reportUser(
-                chatRoom.visavis.user?.uuid,
-                reasons,
-                message
-              ).catch((e) => console.error(e));
-            }
-          }}
+          onSubmit={handleReportSubmit}
         />
       )}
       {chatRoom.visavis ? (

@@ -28,6 +28,7 @@ const SWelcomeMessage = styled.div`
   left: 0;
   top: 50%;
   right: 0;
+  transform: translateY(-50%);
   padding: 0 20px;
   font-size: 14px;
   line-height: 20px;

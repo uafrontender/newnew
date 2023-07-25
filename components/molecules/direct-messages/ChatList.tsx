@@ -156,8 +156,14 @@ const SChatListWrapper = styled.div`
 
   display: flex;
   position: relative;
-  overflow-y: auto;
   flex-direction: column;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+`;
+
+const SChatList = styled.div`
+  height: 100%;
+  overflow-y: scroll;
   overscroll-behavior: contain;
 
   /* Hide scrollbar */
@@ -167,8 +173,6 @@ const SChatListWrapper = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
 `;
-
-const SChatList = styled.div``;
 
 const SRef = styled.span`
   text-indent: -9999px;

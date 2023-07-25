@@ -370,11 +370,15 @@ const SNotificationItemCenter = styled.div`
   display: flex;
   padding: 0 12px;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const SNotificationItemText = styled(Text)`
   display: inline;
   margin-bottom: 4px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SNotificationItemTime = styled(Caption)`

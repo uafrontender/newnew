@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import React, {
   useCallback,
   useEffect,
@@ -29,7 +29,7 @@ import TutorialTooltip, {
 import Headline from '../../../../atoms/Headline';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
+import ReportModal, { ReportData } from '../../../ReportModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
 import AcConfirmDeleteOptionModal from '../../moderation/auction/AcConfirmDeleteOptionModal';
 import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
@@ -58,6 +58,7 @@ import MoreIcon from '../../../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
+import { ReportEventOptionOnSignUp } from '../../../../../contexts/onSignUpWrapper';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.PlaceBidResponse.Status
@@ -159,26 +160,45 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Report modal
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
+  const handleOpenReportForm = useCallback(() => {
+    setIsReportModalOpen(true);
+  }, []);
+
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportEventOption(option.id, reasons, message);
-      setIsReportModalOpen(false);
+      if (!userLoggedIn) {
+        const onSignUp: ReportEventOptionOnSignUp = {
+          type: 'report-event-option',
+          optionId: option.id,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
+        );
+
+        return false;
+      }
+
+      // TODO: Need error handling
+      await reportEventOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [option.id]
+    [userLoggedIn, option.id]
   );
-
-  const handleOpenReportForm = useCallback(() => {
-    if (!userLoggedIn) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-
-    setIsReportModalOpen(true);
-  }, [userLoggedIn, router]);
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);
@@ -427,6 +447,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     }
   }, [isSupportFormOpen]);
 
+  const active: boolean = useMemo(
+    () => !!optionBeingSupported && !disabled,
+    [optionBeingSupported, disabled]
+  );
+
   return (
     <div
       key={option.id.toString()}
@@ -471,11 +496,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             />
           </SEllipseButtonMobile>
         )}
-        <SBidDetails
-          isBlue={isBlue}
-          active={!!optionBeingSupported && !disabled}
-          noAction={!votingAllowed}
-        >
+        <SBidDetails isBlue={isBlue} active={active} noAction={!votingAllowed}>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
             <OptionActionIcon
               src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
@@ -552,7 +573,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {!votingAllowed ? null : isMobile ? (
+        {isMobile && votingAllowed && (
           <SSupportButton
             view='quaternary'
             disabled={disabled}
@@ -575,7 +596,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 : t('acPost.optionsTab.optionCard.supportAgainButton')}
             </div>
           </SSupportButton>
-        ) : (
+        )}
+
+        {!isMobile && votingAllowed && !active && (
           <SSupportButtonDesktop
             id={`${id}-support`}
             view='secondary'

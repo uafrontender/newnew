@@ -56,6 +56,7 @@ import useCuratedList, {
   useCuratedListSubscription,
 } from '../../utils/hooks/useCuratedList';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
+import { MarkPostAsFavoriteOnSignUp } from '../../contexts/onSignUpWrapper';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -265,9 +266,20 @@ const PostPage: NextPage<IPostPage> = ({
       });
 
       if (!userLoggedIn) {
-        // TODO: Add action on redirect
+        const onSignUp: MarkPostAsFavoriteOnSignUp = {
+          type: 'favorite-post',
+          postUuid: postParsed?.postUuid,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
         router.push(
-          `/sign-up?reason=follow-decision&redirect=${window.location.href}`
+          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
         );
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({

@@ -20,9 +20,7 @@ const ListPostPage = dynamic(() => import('../see-more/ListPostPage'));
 const PostFailedBox = dynamic(
   () => import('../../molecules/decision/common/PostFailedBox')
 );
-const ReportModal = dynamic(
-  () => import('../../molecules/direct-messages/ReportModal')
-);
+const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 
 const DARK_IMAGES: Record<string, () => string> = {
   ac: assets.common.ac.darkAcAnimated,

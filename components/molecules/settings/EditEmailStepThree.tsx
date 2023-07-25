@@ -79,15 +79,25 @@ const EditEmailStepThreeModal = ({
         sendVerificationCodePayload
       );
 
+      // TODO: Add translations
+      if (!data || error) {
+        throw new Error('Request failed');
+      }
+
       if (
-        error ||
-        !data ||
-        (data.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-          data.status !==
-            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+        data.status ===
+        newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
       ) {
-        throw new Error(error?.message ?? 'Request failed');
+        throw new Error(tVerifyEmail('error.invalidEmail'));
+      }
+
+      if (
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+      ) {
+        throw new Error('Request failed');
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);
@@ -95,10 +105,11 @@ const EditEmailStepThreeModal = ({
       setIsCodeLoading(false);
       setCode(new Array(6).join('.').split('.'));
     } catch (err) {
+      // TODO: We should probably have an error message below input here
       setIsCodeLoading(false);
       console.error(err);
     }
-  }, [isCodeLoading, newEmail]);
+  }, [isCodeLoading, newEmail, tVerifyEmail]);
 
   const handleSetMyEmail = useCallback(
     async (verificationCode: string) => {

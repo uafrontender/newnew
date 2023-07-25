@@ -32,7 +32,8 @@ const AccountDeleted: React.FC<IAccountDeleted> = React.memo(({ variant }) => {
         withShrink
         view='quaternary'
         onClick={() => {
-          console.log('Delete chat');
+          // TODO: Delete chat on click?
+          // console.log('Delete chat');
         }}
       >
         {t('accountDeleted.buttonText')}
