@@ -485,6 +485,9 @@ const ChatContent: React.FC<IFuncProps> = ({
                       !messageTextValid ||
                       messageText.length < 1
                     }
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                    }}
                   >
                     <SInlineSVG
                       svg={!sendingMessage ? sendIcon : ''}
