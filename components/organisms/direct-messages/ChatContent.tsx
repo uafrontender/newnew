@@ -41,6 +41,7 @@ import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
 import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
 import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
 import { ReportData } from '../../molecules/ReportModal';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const BlockedUser = dynamic(
@@ -84,6 +85,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   const { t } = useTranslation('page-Chat');
   const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   const chatContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -424,6 +426,15 @@ const ChatContent: React.FC<IFuncProps> = ({
     variant,
     renewSubscription,
   ]);
+
+  // FocusOn cannot be use because of column reverse
+  useEffect(() => {
+    enableOverlayMode();
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [enableOverlayMode, disableOverlayMode]);
 
   // react-focus-on cannot be used here because of column-reverse
   useDisableTouchMoveSafari(chatContentRef, isHidden);
