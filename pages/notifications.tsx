@@ -1,5 +1,12 @@
 /* eslint-disable no-nested-ternary */
-import React, { ReactElement, useState, useCallback, useEffect } from 'react';
+import React, {
+  ReactElement,
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useContext,
+} from 'react';
 import Head from 'next/head';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
@@ -28,6 +35,7 @@ import usePagination, {
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { Mixpanel } from '../utils/mixpanel';
 import { useAppState } from '../contexts/appStateContext';
+import { SocketContext } from '../contexts/socketContext';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
@@ -45,11 +53,11 @@ export const Notifications = () => {
 
   // Used to update notification timers
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const { socketConnection } = useContext(SocketContext);
 
-  // TODO: return a list of new notifications once WS message can be used
-  // const [newNotifications, setNewNotifications] = useState<
-  //   newnewapi.INotification[]
-  // >([]);
+  const [newNotifications, setNewNotifications] = useState<
+    newnewapi.INotification[]
+  >([]);
 
   const {
     unreadNotificationCount,
@@ -140,10 +148,41 @@ export const Notifications = () => {
     };
   }, []);
 
-  // TODO: return a list of new notifications once WS message can be used
-  // const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
-  //   return  [...newNotifications, ...notifications];
-  // }, [notifications, newNotifications]);
+  useEffect(() => {
+    const handleNotificationCreated = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.NotificationCreated.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      console.log(decoded);
+
+      setNewNotifications((curr) => {
+        if (!decoded.notification) {
+          return curr;
+        }
+
+        return [decoded.notification, ...curr];
+      });
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('NotificationCreated', handleNotificationCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('NotificationCreated', handleNotificationCreated);
+      }
+    };
+  }, [socketConnection]);
+
+  const displayedNotifications: newnewapi.INotification[] = useMemo(
+    () => [...newNotifications, ...notifications],
+    [newNotifications, notifications]
+  );
 
   const renderNotification = useCallback(
     (item: newnewapi.INotification, itemCurrentTime: number) => {
@@ -194,9 +233,8 @@ export const Notifications = () => {
             </SButton>
           )}
         </SHeadingWrapper>
-
-        {notifications.length > 0 ? (
-          notifications?.map((notification) =>
+        {displayedNotifications.length > 0 ? (
+          displayedNotifications?.map((notification) =>
             renderNotification(notification, currentTime)
           )
         ) : !hasMore ? (
@@ -283,6 +321,8 @@ const SHeadingWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 14px;
+  min-height: 60px;
+
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 20px;
   }
@@ -291,9 +331,11 @@ const SHeadingWrapper = styled.div`
 const SHeading = styled.h2`
   font-weight: 600;
   font-size: 22px;
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 28px;
   }
+
   ${({ theme }) => theme.media.desktop} {
     font-size: 32px;
     line-height: 40px;
