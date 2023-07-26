@@ -186,9 +186,6 @@ export const NotificationsList: React.FC<IFunction> = ({
         return;
       }
 
-      // TODO: Remove before merging
-      console.log(decoded);
-
       setNewNotifications((curr) => {
         if (!decoded.notification) {
           return curr;
