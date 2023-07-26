@@ -42,6 +42,12 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     return parseInt(router.query.roomID);
   }, [router.query.roomID]);
 
+  useEffect(() => {
+    if (!selectedChatRoomId) {
+      setActiveChatRoom(null);
+    }
+  }, [selectedChatRoomId]);
+
   const handleCloseChatRoom = useCallback(() => {
     router.replace(`${router.pathname}?tab=chat`, undefined, { shallow: true });
   }, [router]);
