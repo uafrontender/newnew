@@ -1,4 +1,11 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, {
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useContext,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
@@ -29,6 +36,7 @@ import usePagination, {
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import Loader from '../../../atoms/Loader';
+import { SocketContext } from '../../../../contexts/socketContext';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -38,11 +46,17 @@ export const NotificationsList: React.FC<IFunction> = ({
   markReadNotifications,
 }) => {
   const scrollRef: any = useRef();
+  const { socketConnection } = useContext(SocketContext);
   const { ref: scrollRefNotifications, inView } = useInView();
   const { userData } = useUserData();
   const { locale } = useRouter();
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
+
+  const [newNotifications, setNewNotifications] = useState<
+    newnewapi.INotification[]
+  >([]);
+
   const [unreadNotifications, setUnreadNotifications] = useState<
     number[] | null
   >(null);
@@ -162,6 +176,38 @@ export const NotificationsList: React.FC<IFunction> = ({
       setUnreadNotifications([]);
     }
   }, [notificationsDataLoaded, unreadNotificationCount]);
+
+  useEffect(() => {
+    const handleNotificationCreated = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.NotificationCreated.decode(arr);
+
+      if (!decoded) {
+        return;
+      }
+
+      // TODO: Remove before merging
+      console.log(decoded);
+
+      setNewNotifications((curr) => {
+        if (!decoded.notification) {
+          return curr;
+        }
+
+        return [decoded.notification, ...curr];
+      });
+    };
+
+    if (socketConnection) {
+      socketConnection?.on('NotificationCreated', handleNotificationCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection?.connected) {
+        socketConnection?.off('NotificationCreated', handleNotificationCreated);
+      }
+    };
+  }, [socketConnection]);
 
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
@@ -307,22 +353,22 @@ export const NotificationsList: React.FC<IFunction> = ({
     ]
   );
 
-  // TODO: return a list of new notifications once WS message can be used
-  // const displayedNotifications: newnewapi.INotification[] = useMemo(() => {
-  //   return  [...newNotifications, ...notifications];
-  // }, [notifications, newNotifications]);
+  const displayedNotifications: newnewapi.INotification[] = useMemo(
+    () => [...newNotifications, ...notifications],
+    [newNotifications, notifications]
+  );
 
   return (
     <div ref={scrollRef}>
       {
         // eslint-disable-next-line no-nested-ternary
-        !notifications?.length && (loading || !initialLoadDone) ? (
+        !displayedNotifications?.length && (loading || !initialLoadDone) ? (
           <Loader size='md' isStatic />
-        ) : notifications && notifications.length < 1 ? (
+        ) : displayedNotifications && displayedNotifications.length < 1 ? (
           <NoResults />
         ) : (
-          notifications &&
-          notifications.map((notification) =>
+          displayedNotifications &&
+          displayedNotifications.map((notification) =>
             renderNotificationItem(notification, currentTime)
           )
         )
