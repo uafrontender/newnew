@@ -22,7 +22,6 @@ const DashboardSectionStripe = dynamic(
 );
 
 const GetPaid = () => {
-  console.log('GETPAID');
   const router = useRouter();
   const { t } = useTranslation('page-Creator');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -32,7 +31,6 @@ const GetPaid = () => {
 
   useUpdateEffect(() => {
     if (!userIsCreator) {
-      console.log('REDIRECT');
       router.replace('/');
     }
   }, [userIsCreator]);
