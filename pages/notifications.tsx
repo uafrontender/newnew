@@ -283,6 +283,8 @@ const SHeadingWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 14px;
+  min-height: 60px;
+
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 20px;
   }
@@ -291,9 +293,11 @@ const SHeadingWrapper = styled.div`
 const SHeading = styled.h2`
   font-weight: 600;
   font-size: 22px;
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 28px;
   }
+
   ${({ theme }) => theme.media.desktop} {
     font-size: 32px;
     line-height: 40px;
