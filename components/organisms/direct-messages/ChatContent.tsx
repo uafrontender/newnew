@@ -616,7 +616,8 @@ const STextAreaContainer = styled.div`
 const STextArea = styled(TextArea)<{ withError: boolean }>`
   border-width: 1px;
   border-style: solid;
-  border-color: ${({ withError }) => (withError ? 'red' : 'transparent')};
+  border-color: ${({ theme, withError }) =>
+    withError ? theme.colorsThemed.accent.error : 'transparent'};
   margin: -1px;
 `;
 
