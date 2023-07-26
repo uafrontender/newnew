@@ -116,6 +116,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
   const [messageText, setMessageText] = useState<string>('');
   const [messageTextValid, setMessageTextValid] = useState(false);
+  const [messageTextError, setMessageTextError] = useState(false);
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
@@ -180,6 +181,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
       setMessageText('');
       setMessageTextValid(false);
+      setMessageTextError(false);
       setSendingMessage(false);
 
       prevChatRoomId.current = chatRoom.id;
@@ -223,6 +225,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
       const isValid = validateInputText(draft.text);
       setMessageTextValid(isValid);
+      setMessageTextError(false);
       setMessageText(draft.text);
     }
   }, [chatRoom.id, chatsDraft]);
@@ -289,6 +292,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           const res = await sendMessage(payload);
 
           if (!res?.data || res.error) {
+            // 400 Error: Invalid message at purifyChatMessage
             throw new Error(res?.error?.message ?? 'Request failed');
           }
 
@@ -314,6 +318,12 @@ const ChatContent: React.FC<IFuncProps> = ({
           }
         } catch (err) {
           console.error(err);
+          // 400 Error: Invalid message at purifyChatMessage
+          if ((err as Error).message.includes('Invalid message')) {
+            setMessageTextError(true);
+            setMessageTextValid(false);
+          }
+
           setMessageText(tmpMsgText);
           setSendingMessage(false);
         }
@@ -351,6 +361,7 @@ const ChatContent: React.FC<IFuncProps> = ({
       const isValid = validateInputText(value);
       setMessageTextValid(isValid);
       setMessageText(value);
+      setMessageTextError(false);
     },
     [isMobileOrTablet, handleSubmit]
   );
@@ -464,16 +475,17 @@ const ChatContent: React.FC<IFuncProps> = ({
                 whatComponentToDisplay()
               ) : (
                 <SBottomTextarea>
-                  <STextArea>
-                    <TextArea
+                  <STextAreaContainer>
+                    <STextArea
                       maxlength={500}
                       value={messageText}
                       onChange={handleChange}
                       placeholder={t('chat.placeholder')}
                       gotMaxLength={handleSubmit}
                       variant={variant}
+                      withError={messageTextError}
                     />
-                  </STextArea>
+                  </STextAreaContainer>
                   <SButton
                     withShadow
                     view={messageTextValid ? 'primaryGrad' : 'secondary'}
@@ -597,8 +609,16 @@ const SBottomTextarea = styled.div`
   flex-direction: row;
 `;
 
-const STextArea = styled.div`
+const STextAreaContainer = styled.div`
   flex: 1;
+`;
+
+const STextArea = styled(TextArea)<{ withError: boolean }>`
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme, withError }) =>
+    withError ? theme.colorsThemed.accent.error : 'transparent'};
+  margin: -1px;
 `;
 
 const SInlineSVG = styled(InlineSVG)`
