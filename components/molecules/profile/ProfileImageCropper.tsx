@@ -137,7 +137,6 @@ const SCropperWrapper = styled.div<{
   width: 100%;
 
   .cropper-container {
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
     &:before {
       content: '';
       position: absolute;
