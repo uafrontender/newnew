@@ -108,7 +108,9 @@ const PostTopInfoModeration: React.FunctionComponent<
   const postType = useMemo(() => typeOfPost ?? 'ac', [typeOfPost]);
 
   const failureReason = useMemo(() => {
-    if (postStatus !== 'failed') return '';
+    if (postStatus !== 'failed') {
+      return '';
+    }
 
     if (postType === 'ac') {
       if (amountInBids === 0 || !amountInBids) {
