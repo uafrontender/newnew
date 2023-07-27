@@ -108,7 +108,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     initialLoadDone,
     loadMore,
   } = usePagination(loadData, 6);
-  console.log(notifications);
+
   const markAllNotifications = useCallback(async () => {
     try {
       const payload = new newnewapi.EmptyRequest();
@@ -191,10 +191,6 @@ export const NotificationsList: React.FC<IFunction> = ({
         if (!decoded.notification) {
           return curr;
         }
-
-        console.log(decoded.notification);
-        console.log(decoded.notification.createdAt?.seconds);
-        console.log(Date.now());
 
         return [decoded.notification, ...curr];
       });
