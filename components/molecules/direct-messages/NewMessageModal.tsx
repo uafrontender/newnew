@@ -17,7 +17,6 @@ import {
 } from '../../atoms/direct-messages/styles';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import GradientMask from '../../atoms/GradientMask';
-import { useUserData } from '../../../contexts/userDataContext';
 import InlineSVG from '../../atoms/InlineSVG';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import Modal from '../../organisms/Modal';
@@ -34,6 +33,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
 import Loader from '../../atoms/Loader';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useBundles } from '../../../contexts/bundlesContext';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -62,13 +62,15 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
-  const scrollRef: any = useRef();
   const { resizeMode } = useAppState();
-  const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const { showErrorToastCustom } = useErrorToasts();
+
+  const scrollRef: any = useRef();
+
+  const { isSellingBundles } = useBundles();
 
   const [searchValue, setSearchValue] = useState('');
 
@@ -245,7 +247,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           <SWrapper>
             {!isLoading && (
               <SSectionContent ref={scrollRef}>
-                {userData?.options?.isOfferingBundles && !searchValue && (
+                {isSellingBundles && !searchValue && (
                   <NewAnnouncement handleClick={openMyAnnouncement} />
                 )}
                 {chatsInAlphabetOrder.length > 0 &&
