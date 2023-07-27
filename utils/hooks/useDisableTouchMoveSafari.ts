@@ -14,12 +14,23 @@ const useDisableTouchMoveSafari = (
         '[data-ignore-touch-move-lock="true"]'
       );
 
-      if (
-        targetEl.getAttribute('data-ignore-touch-move-lock') ||
-        [...elementsIgnoredTouchMoveLock].some((childEl) =>
-          childEl.contains(targetEl)
-        )
-      ) {
+      const parentNode = [...elementsIgnoredTouchMoveLock].filter(
+        (elIgnoredTouchMove) => {
+          if (elIgnoredTouchMove.contains(targetEl)) {
+            return true;
+          }
+
+          return false;
+        }
+      )[0];
+
+      if (targetEl.getAttribute('data-ignore-touch-move-lock') || parentNode) {
+        if (parentNode && parentNode.scrollHeight === parentNode.clientHeight) {
+          e.preventDefault();
+
+          return false;
+        }
+
         return true;
       }
       e.preventDefault();

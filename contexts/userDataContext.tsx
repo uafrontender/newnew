@@ -146,6 +146,8 @@ export const UserDataContextProvider: React.FunctionComponent<
               isOfferingBundles: data.me.options?.isOfferingBundles,
               isPhoneNumberConfirmed: data.me.options?.isPhoneNumberConfirmed,
               isWhiteListed: data.me.options?.isWhiteListed,
+              isEmailNotificationsEnabled:
+                data.me.options?.isEmailNotificationsEnabled,
             },
           } as TUserData;
 
