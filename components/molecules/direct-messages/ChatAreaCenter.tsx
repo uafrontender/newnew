@@ -59,7 +59,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     isFetchingNextPage,
     isFetched,
   } = useChatRoomMessages({
-    limit: isIOS() ? 8 : 20,
+    limit: isIOS() ? 12 : 20,
     roomId: chatRoom?.id,
   });
 
