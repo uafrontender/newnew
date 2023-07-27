@@ -3,6 +3,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { InfiniteData, useQueryClient } from 'react-query';
+import { FocusOn } from 'react-focus-on';
 
 import { useAppState } from '../../contexts/appStateContext';
 import { useGetChats } from '../../contexts/chatContext';
@@ -10,7 +11,6 @@ import ChatContent from './direct-messages/ChatContent';
 import ChatSidebar from './direct-messages/ChatSidebar';
 import Loader from '../atoms/Loader';
 import { getRoom } from '../../api/endpoints/chat';
-import { useOverlayMode } from '../../contexts/overlayModeContext';
 
 interface IChatContainer {
   myRole: newnewapi.ChatRoom.MyRole | undefined;
@@ -19,7 +19,6 @@ interface IChatContainer {
 export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   const { setSearchChatroom } = useGetChats();
   const { resizeMode } = useAppState();
@@ -42,6 +41,12 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
 
     return parseInt(router.query.roomID);
   }, [router.query.roomID]);
+
+  useEffect(() => {
+    if (!selectedChatRoomId) {
+      setActiveChatRoom(null);
+    }
+  }, [selectedChatRoomId]);
 
   const handleCloseChatRoom = useCallback(() => {
     router.replace(`${router.pathname}?tab=chat`, undefined, { shallow: true });
@@ -122,22 +127,16 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
     queryClient,
   ]);
 
-  useEffect(() => {
-    enableOverlayMode();
-
-    return () => {
-      disableOverlayMode();
-    };
-  }, [disableOverlayMode, enableOverlayMode]);
-
   return (
     <SWrapper>
       <SContainer>
-        <SChatSidebar
-          initialTab={myRole}
-          hidden={isMobileOrTablet && !!selectedChatRoomId}
-          onChatRoomSelect={handleChatRoomSelect}
-        />
+        <FocusOn enabled={!isMobileOrTablet || !selectedChatRoomId}>
+          <SChatSidebar
+            initialTab={myRole}
+            hidden={isMobileOrTablet && !!selectedChatRoomId}
+            onChatRoomSelect={handleChatRoomSelect}
+          />
+        </FocusOn>
 
         <SContent hidden={isMobileOrTablet && !selectedChatRoomId}>
           {activeChatRoom && (
@@ -191,7 +190,6 @@ const SContent = styled.div<{
 }>`
   display: ${({ hidden }) => (hidden ? 'none' : 'block')};
 
-  position: relative;
   height: 100%;
   background: ${({ theme }) => theme.colorsThemed.background.secondary};
   margin: 0 -15px;
