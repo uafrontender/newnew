@@ -53,6 +53,7 @@ import { SocketContext } from '../../../../contexts/socketContext';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import useGoBackOrRedirect from '../../../../utils/useGoBackOrRedirect';
 import isBrowser from '../../../../utils/isBrowser';
+import { useBundles } from '../../../../contexts/bundlesContext';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -100,6 +101,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   } = useMemo(() => postInCreation, [postInCreation]);
 
   const { userData, userTimezone } = useUserData();
+  const { isSellingBundles } = useBundles();
 
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
@@ -320,7 +322,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             })
           ),
           // TODO: remove as unused
-          isSuggestionsAllowed: userData?.options?.isOfferingBundles,
+          isSuggestionsAllowed: isSellingBundles,
         };
       } else if (tab === 'crowdfunding') {
         body.crowdfunding = {
@@ -377,7 +379,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     isMobile,
     auction.minimalBid,
     multiplechoice.choices,
-    userData?.options?.isOfferingBundles,
+    isSellingBundles,
     crowdfunding.targetBackerCount,
     router,
     showErrorToastPredefined,
@@ -456,7 +458,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           ),
         },
         tab === 'multiple-choice' &&
-          userData?.options?.isOfferingBundles && {
+          isSellingBundles && {
             key: 'allowSuggestions',
             value: t(`preview.values.allowSuggestions-allowed`),
           },
@@ -468,7 +470,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
-      userData?.options?.isOfferingBundles,
+      isSellingBundles,
       router.locale,
       formatExpiresAt,
       timezone,

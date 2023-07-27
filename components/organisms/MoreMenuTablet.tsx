@@ -14,6 +14,7 @@ import { useUserData } from '../../contexts/userDataContext';
 import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
+import { useBundles } from '../../contexts/bundlesContext';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -29,6 +30,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
 
   const { userData } = useUserData();
   const { userIsCreator } = useAppState();
+  const { isSellingBundles } = useBundles();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -96,7 +98,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               </SButton>
             </SLink>
           </Link>
-          {userData?.options?.isOfferingBundles && (
+          {isSellingBundles && (
             <SMyLinkButton onClick={handlerCopy}>
               <InlineSvg svg={copyIcon} width='24px' height='24px' />
               {isCopiedUrl ? t('myLink.copied') : t('myLink.copy')}
