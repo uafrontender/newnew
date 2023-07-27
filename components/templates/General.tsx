@@ -1,11 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useDeferredValue,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -218,9 +212,9 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
-  const isBottomNavigationVisible = useDeferredValue(
-    mobileNavigationVisible && !globalSearchActive
-  );
+
+  const isBottomNavigationVisible =
+    mobileNavigationVisible && !globalSearchActive;
 
   return (
     <>
