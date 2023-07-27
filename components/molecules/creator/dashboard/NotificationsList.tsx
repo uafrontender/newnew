@@ -108,7 +108,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     initialLoadDone,
     loadMore,
   } = usePagination(loadData, 6);
-
+  console.log(notifications);
   const markAllNotifications = useCallback(async () => {
     try {
       const payload = new newnewapi.EmptyRequest();
@@ -165,6 +165,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     const updateTimeInterval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 60000);
+
     return () => {
       clearInterval(updateTimeInterval);
     };
@@ -190,6 +191,10 @@ export const NotificationsList: React.FC<IFunction> = ({
         if (!decoded.notification) {
           return curr;
         }
+
+        console.log(decoded.notification);
+        console.log(decoded.notification.createdAt?.seconds);
+        console.log(Date.now());
 
         return [decoded.notification, ...curr];
       });
@@ -328,7 +333,7 @@ export const NotificationsList: React.FC<IFunction> = ({
                 <SNotificationItemTime variant={2} weight={600}>
                   {moment((item.createdAt?.seconds as number) * 1000)
                     .locale(locale || 'en-US')
-                    .from(itemCurrentTime)}
+                    .fromNow()}
                 </SNotificationItemTime>
               </SNotificationItemCenter>
               {unreadNotifications &&
