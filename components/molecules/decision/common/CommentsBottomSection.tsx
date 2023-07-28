@@ -95,6 +95,29 @@ const CommentsBottomSection: React.FunctionComponent<
 
       if (res.data?.comment) {
         addCommentMutation?.mutate(res.data.comment);
+
+        const scrollingContainer = document?.getElementById(
+          'comments-scrolling-container'
+        );
+
+        if (scrollingContainer) {
+          if (!isMobile) {
+            scrollingContainer.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          } else {
+            const scrollTo = document
+              ?.getElementById('comments')
+              ?.getBoundingClientRect()?.y;
+            if (scrollTo) {
+              document.documentElement?.scrollBy({
+                top: scrollTo,
+                behavior: 'smooth',
+              });
+            }
+          }
+        }
       }
 
       if (res.data?.comment && !res.error) {
@@ -106,7 +129,7 @@ const CommentsBottomSection: React.FunctionComponent<
         error: res?.error || new Error('Could not add comment'),
       };
     },
-    [addCommentMutation, postUuid]
+    [addCommentMutation, isMobile, postUuid]
   );
 
   const handleDeleteComment = useCallback(

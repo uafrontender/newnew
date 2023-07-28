@@ -151,7 +151,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const [firstNameInEdit, setFirstnameInEdit] = useState('');
   const [firstNameError, setFirstnameError] = useState('');
   const handleFirstnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.value || e.target.value.length < 1) {
+    if (!e.target.value || e.target.value.length < 2) {
       setFirstnameError('tooShort');
     } else if (e.target.value.length > NAME_LENGTH_LIMIT) {
       setFirstnameError('tooLong');
@@ -171,7 +171,7 @@ const OnboardingSectionDetails: React.FunctionComponent<
   const [lastNameInEdit, setLastnameInEdit] = useState('');
   const [lastNameError, setLastnameError] = useState('');
   const handleLastnameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.value || e.target.value.length < 1) {
+    if (!e.target.value || e.target.value.length < 2) {
       setLastnameError('tooShort');
     } else if (e.target.value.length > NAME_LENGTH_LIMIT) {
       setLastnameError('tooLong');

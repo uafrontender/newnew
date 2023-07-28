@@ -308,6 +308,18 @@ const CommentForm = React.forwardRef<TCommentFormAreaHandle, ICommentForm>(
         setCommentText(newCommentContentFromUrl);
         handleResetNewCommentContentFromUrl?.();
         handleResetCommentIdFromUrl?.();
+
+        if (isRoot) {
+          const scrollTo = document
+            ?.getElementById('comments')
+            ?.getBoundingClientRect()?.y;
+          if (scrollTo) {
+            document.documentElement?.scrollBy({
+              top: scrollTo,
+              behavior: 'smooth',
+            });
+          }
+        }
       }
     }, [
       newCommentContentFromUrl,
