@@ -214,7 +214,7 @@ const Notification: React.FC<INotification> = ({
             <SDate>
               {moment((createdAt?.seconds as number) * 1000)
                 .locale(locale || 'en-US')
-                .from(currentTime)}
+                .fromNow()}
             </SDate>
           </SInfo>
           {content?.relatedPost &&
