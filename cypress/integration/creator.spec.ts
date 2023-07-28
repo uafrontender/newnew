@@ -530,8 +530,12 @@ context('Creator flow', () => {
 
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
-      }).click();
-      payedForBundles.push(BUNDLE_OFFERS[0]);
+      })
+        .click()
+        .then(() => {
+          payedForBundles.push(BUNDLE_OFFERS[0]);
+        });
+
       cy.dGet('#bundles');
 
       cy.dGet('#support-button-supported').click();
@@ -994,8 +998,11 @@ context('Creator flow', () => {
 
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
-      }).click();
-      payedForBundles.push(BUNDLE_OFFERS[1]);
+      })
+        .click()
+        .then(() => {
+          payedForBundles.push(BUNDLE_OFFERS[1]);
+        });
 
       cy.dGet('#support-button-supported').should('be.visible');
     });
@@ -1161,8 +1168,12 @@ context('Creator flow', () => {
       cy.url().should('include', '/p/');
       cy.dGet('#paymentSuccess', {
         timeout: 15000,
-      }).click();
-      payedForBundles.push(BUNDLE_OFFERS[2]);
+      })
+        .click()
+        .then(() => {
+          payedForBundles.push(BUNDLE_OFFERS[2]);
+        });
+
       // Could be great to show bundle purchased modal, but we don't know which offer was acquired
 
       cy.dGet('#bundles');
@@ -1332,9 +1343,10 @@ context('Creator flow', () => {
 
       // Could be great to show bundle purchased modal, but we don't know which offer was acquired
 
-      payedForBundles.push(BUNDLE_OFFERS[3]);
       // Can fail due to issues with WS event
-      cy.dGet('#bundles');
+      cy.dGet('#bundles').then(() => {
+        payedForBundles.push(BUNDLE_OFFERS[3]);
+      });
 
       cy.dGet('#see-bundle-button').should('be.visible');
     });
@@ -1635,8 +1647,12 @@ context('Creator flow', () => {
 
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
-      }).click();
-      payedForBundles.push(BUNDLE_OFFERS[0]);
+      })
+        .click()
+        .then(() => {
+          payedForBundles.push(BUNDLE_OFFERS[0]);
+        });
+
       cy.dGet('#bundles');
 
       cy.dGet('#support-button-0').click();
@@ -1817,8 +1833,12 @@ context('Creator flow', () => {
 
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
-      }).click();
-      payedForBundles.push(BUNDLE_OFFERS[1]);
+      })
+        .click()
+        .then(() => {
+          payedForBundles.push(BUNDLE_OFFERS[1]);
+        });
+
       cy.dGet('#bundles');
 
       cy.dGet('#see-bundle-button').should('be.visible');
@@ -2042,8 +2062,12 @@ context('Creator flow', () => {
 
       cy.dGet('#bundleSuccess', {
         timeout: 15000,
-      }).click();
-      payedForBundles.push(BUNDLE_OFFERS[2]);
+      })
+        .click()
+        .then(() => {
+          payedForBundles.push(BUNDLE_OFFERS[2]);
+        });
+
       cy.dGet('#bundles');
 
       cy.dGet('#support-button-supported').click();
