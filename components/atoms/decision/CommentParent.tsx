@@ -729,7 +729,7 @@ const SActionsDiv = styled.div`
 const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
-  flex-shrink: 0;
+  flex-shrink: 1;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
