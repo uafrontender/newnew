@@ -212,7 +212,6 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
-
   const isBottomNavigationVisible =
     mobileNavigationVisible && !globalSearchActive;
 
@@ -230,11 +229,13 @@ export const General: React.FC<IGeneral> = (props) => {
           highlightColor={theme.colorsThemed.background.tertiary}
         >
           <TopContainer>
-            <Header
-              visible={
-                !isMobile || mobileNavigationVisible || globalSearchActive
-              }
-            />
+            {!noMobileNavigation && (
+              <Header
+                visible={
+                  !isMobile || mobileNavigationVisible || globalSearchActive
+                }
+              />
+            )}
             <SContent noPaddingTop={!!noMobileNavigation}>
               <Container {...containerParams}>
                 <Row noPaddingMobile={noPaddingMobile}>
