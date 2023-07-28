@@ -143,20 +143,22 @@ const Comments: React.FunctionComponent<IComments> = ({
     []
   );
 
-  const flashCommentOnScroll = useCallback(
-    (commentId: string, timeOffset?: number) => {
-      setTimeout(() => {
-        document?.getElementById(commentId)?.classList.add('opened-flash');
-      }, 100 + (timeOffset || 0));
+  // Commented out for now
+  // const flashCommentOnScroll = useCallback(
+  //   (commentId: string, timeOffset?: number) => {
+  //     setTimeout(() => {
+  //       document?.getElementById(commentId)?.classList.add('opened-flash');
+  //     }, 100 + (timeOffset || 0));
 
-      setTimeout(() => {
-        document?.getElementById(commentId)?.classList.remove('opened-flash');
-      }, 1600 + (timeOffset || 0));
-    },
-    []
-  );
+  //     setTimeout(() => {
+  //       document?.getElementById(commentId)?.classList.remove('opened-flash');
+  //     }, 1600 + (timeOffset || 0));
+  //   },
+  //   []
+  // );
 
   // Scroll to comment
+
   useEffect(() => {
     async function findComment(commentId: string) {
       if (commentId) {
@@ -181,13 +183,15 @@ const Comments: React.FunctionComponent<IComments> = ({
         } else {
           document
             ?.getElementById(`comment_id_${comments[idx].id}`)
-            ?.scrollIntoView();
+            ?.scrollIntoView({
+              block: 'center',
+            });
 
           setIsSearchingForComment(false);
 
           openCommentProgrammatically(idx);
 
-          flashCommentOnScroll(`comment_id_${comments[idx].id}`);
+          // flashCommentOnScroll(`comment_id_${comments[idx].id}`);
 
           if (!newCommentContentFromUrl) {
             handleResetCommentIdFromUrl?.();

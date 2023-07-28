@@ -211,6 +211,15 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
           addCommentMutation?.mutate(res.data.comment);
         }
 
+        setTimeout(() => {
+          document
+            ?.getElementById(`comment_id_${res.data?.comment?.id}`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+        }, 100);
+
         if (res.data?.comment && !res.error) {
           return {
             data: res.data.comment,
@@ -729,7 +738,7 @@ const SActionsDiv = styled.div`
 const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
-  flex-shrink: 0;
+  flex-shrink: 1;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
