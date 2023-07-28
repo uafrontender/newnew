@@ -211,6 +211,15 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
           addCommentMutation?.mutate(res.data.comment);
         }
 
+        setTimeout(() => {
+          document
+            ?.getElementById(`comment_id_${res.data?.comment?.id}`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+        }, 100);
+
         if (res.data?.comment && !res.error) {
           return {
             data: res.data.comment,
