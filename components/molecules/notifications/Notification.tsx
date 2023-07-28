@@ -146,7 +146,7 @@ const Notification: React.FC<INotification> = ({
     ) {
       return (
         <STitleText>
-          <SDisplayName user={content.relatedUser} />
+          <DisplayName user={content.relatedUser} />
         </STitleText>
       );
     }
@@ -393,10 +393,6 @@ const SIcon = styled.span`
 const SInlineSVG = styled(InlineSvg)`
   min-width: 16px;
   min-height: 16px;
-`;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
 `;
 
 const SIconHolder = styled.div`

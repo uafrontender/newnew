@@ -571,7 +571,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.mc'
-              components={[<SDisplayName user={post.creator} />]}
+              components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}
@@ -794,7 +794,3 @@ const SHighlightedButton = styled(HighlightedButton)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
-`;
