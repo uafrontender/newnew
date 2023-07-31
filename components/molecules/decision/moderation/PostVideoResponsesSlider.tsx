@@ -20,7 +20,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import SimplifiedSlider from '../../../atoms/SimplifiedSlider';
-import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
+import { useResponseUuidFromUrl } from '../../../../contexts/responseUuidFromUrlContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
@@ -61,7 +61,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     'tablet',
   ].includes(resizeMode);
 
-  const { handleResetResponseFromUrl } = useResponseNumberFromUrl();
+  const { handleResetResponseFromUrl } = useResponseUuidFromUrl();
 
   const wrapperRef = useRef<HTMLDivElement>();
 
@@ -181,7 +181,12 @@ const PostVideoResponsesSlider: React.FunctionComponent<
 
   useEffect(() => {
     if (initialVideoFromUrl) {
-      setCurrentVideo(parseInt(initialVideoFromUrl));
+      const idx = videos.findIndex((v) => v.uuid === initialVideoFromUrl);
+      if (idx !== -1) {
+        setCurrentVideo(idx);
+      } else {
+        setCurrentVideo(videos.length - 1);
+      }
       handleResetResponseFromUrl?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -12,7 +12,7 @@ import { markPost } from '../../../../api/endpoints/post';
 import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
-import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
+import { useResponseUuidFromUrl } from '../../../../contexts/responseUuidFromUrlContext';
 
 const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
   ssr: false,
@@ -53,7 +53,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     'tablet',
   ].includes(resizeMode);
 
-  const { responseFromUrl } = useResponseNumberFromUrl();
+  const { responseFromUrl } = useResponseUuidFromUrl();
 
   const responseWithAdditionalVideos = useMemo(() => {
     if (additionalResponses && Array.isArray(additionalResponses)) {
@@ -187,12 +187,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               uiOffset={uiOffset}
               videoDurationWithTime
               autoscroll
-              initialVideoFromUrl={
-                responseFromUrl &&
-                parseInt(responseFromUrl) <= responseWithAdditionalVideos.length
-                  ? responseFromUrl
-                  : undefined
-              }
+              initialVideoFromUrl={responseFromUrl || undefined}
             />
           )}
           <PostVideoSoundButton
