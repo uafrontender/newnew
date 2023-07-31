@@ -10,7 +10,7 @@ const useMyNotifications = (
   params?: IUseMyNotifications,
   options?: Omit<
     UseInfiniteQueryOptions<{
-      chatrooms: newnewapi.IChatRoom[];
+      notifications: newnewapi.INotification[];
       paging: newnewapi.IPagingResponse | null | undefined;
     }>,
     'queryKey' | 'queryFn'
