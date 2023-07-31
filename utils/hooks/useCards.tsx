@@ -48,15 +48,6 @@ const useCards = (): CardsData => {
     },
     {
       enabled: userLoggedIn,
-      onError: (error: any) => {
-        if (error?.message) {
-          showErrorToastCustom(error?.message);
-        } else {
-          showErrorToastPredefined();
-        }
-
-        console.error(error);
-      },
     }
   );
 
