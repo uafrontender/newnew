@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import styled from 'styled-components';
 
 import {
   SBottomAction,
@@ -30,7 +29,7 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
               {t('messagingDisabled.title')}
             </SBottomActionTitle>
             <SBottomActionMessage>
-              <SDisplayName user={user} /> {`${t('messagingDisabled.message')}`}
+              <DisplayName user={user} /> {`${t('messagingDisabled.message')}`}
             </SBottomActionMessage>
           </SBottomActionText>
         </SBottomActionLeft>
@@ -40,7 +39,3 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
 );
 
 export default MessagingDisabled;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
-`;

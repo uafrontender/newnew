@@ -589,7 +589,7 @@ const AcAddNewOption: React.FunctionComponent<IAcAddNewOption> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.ac'
-          components={[<SDisplayName user={postCreator} />]}
+          components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
     </>
@@ -769,8 +769,4 @@ const SPaymentSign = styled(Text)`
 
 const SPaymentTermsLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
 `;
