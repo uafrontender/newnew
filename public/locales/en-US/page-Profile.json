@@ -302,7 +302,8 @@
           "title": "Blocked users",
           "noBlockedUsers": "No blocked users",
           "button": {
-            "unblock": "Unblock"
+            "unblock": "Unblock",
+            "loadMoreButton": "Load more"
           }
         },
         "closeAccount": {
