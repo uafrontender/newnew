@@ -302,7 +302,8 @@
           "title": "Usuarios bloqueados",
           "noBlockedUsers": "No hay usuarios bloqueados",
           "button": {
-            "unblock": "Desbloquear"
+            "unblock": "Desbloquear",
+            "loadMoreButton": "Cargar más"
           }
         },
         "closeAccount": {
