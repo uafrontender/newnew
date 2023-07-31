@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { newnewapi } from 'newnew-api';
+import React, { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -10,11 +9,10 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import { getUserByUsername } from '../../../api/endpoints/user';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import Loader from '../../atoms/Loader';
 import DisplayName from '../../atoms/DisplayName';
+import useTinyUsersBlockedByMe from '../../../utils/hooks/useTinyUsersBlockedByMe';
 
 type TPrivacySection = {
   isSpendingHidden: boolean;
@@ -34,53 +32,53 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   handleSetActive,
 }) => {
   const { t } = useTranslation('page-Profile');
-  const { showErrorToastPredefined } = useErrorToasts();
 
   const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] =
     useState(false);
   // Blocked users
+  const { changeUserBlockedStatus, isChangingUserBlockedStatus } =
+    useGetBlockedUsers();
+
   const {
-    usersIBlocked: usersIBlockedIds,
-    changeUserBlockedStatus,
-    isChangingUserBlockedStatus,
-  } = useGetBlockedUsers();
-  const [blockedUsers, setBlockedUsers] = useState<
-    Omit<newnewapi.User, 'toJSON'>[]
-  >([]);
-  const [isBlockedUsersLoading, setBlockedUsersLoading] = useState(false);
+    data,
+    isFetching,
+    isFetchingNextPage,
+    removeTinyUserMutation,
+    hasNextPage,
+    fetchNextPage,
+  } = useTinyUsersBlockedByMe({
+    loggedInUser: true,
+  });
 
-  // TODO: we need to make a normal non-hacky request here
-  useEffect(() => {
-    async function fetchUsersIBlocked() {
-      setBlockedUsersLoading(true);
+  const blockedUsers = useMemo(
+    () => (data ? data.pages.map((page) => page.users).flat() : []),
+    [data]
+  );
+
+  const isBlockedUsersLoading = useMemo(
+    () => isFetching || isFetchingNextPage,
+    [isFetching, isFetchingNextPage]
+  );
+
+  const handleUnblockUser = useCallback(
+    async (userUuidToRemove?: string) => {
       try {
-        const users: newnewapi.User[] = [];
-        for (let i = 0; i < usersIBlockedIds.length; i++) {
-          const payload = new newnewapi.GetUserRequest({
-            uuid: usersIBlockedIds[i],
-          });
-          // eslint-disable-next-line no-await-in-loop
-          const res = await getUserByUsername(payload);
-
-          if (!res?.data || res.error) {
-            throw new Error(res?.error?.message ?? 'Request failed');
-          }
-
-          if (res.data) {
-            users.push(res.data);
-          }
+        if (!userUuidToRemove) {
+          throw new Error('No uuid');
         }
-        setBlockedUsers(users);
-      } catch (err) {
-        console.error(err);
-        showErrorToastPredefined(undefined);
-      } finally {
-        setBlockedUsersLoading(false);
-      }
-    }
 
-    fetchUsersIBlocked();
-  }, [usersIBlockedIds, showErrorToastPredefined]);
+        Mixpanel.track('Unblock user', {
+          _stage: 'Settings',
+          _userUuid: userUuidToRemove,
+        });
+        await changeUserBlockedStatus(userUuidToRemove, false);
+        removeTinyUserMutation.mutate(userUuidToRemove);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [changeUserBlockedStatus, removeTinyUserMutation]
+  );
 
   return (
     <SWrapper onMouseEnter={() => handleSetActive()}>
@@ -136,7 +134,10 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           blockedUsers.map((user) => (
             <SBlockedUserCard key={user.uuid}>
               <SAvatar>
-                <img alt={user.username} src={user.avatarUrl} />
+                <img
+                  alt={user?.username || ''}
+                  src={user?.thumbnailAvatarUrl || ''}
+                />
               </SAvatar>
               <SNickname variant={3}>
                 <DisplayName user={user} />
@@ -148,19 +149,23 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
               </Link>
               <SUnblockButton
                 disabled={isChangingUserBlockedStatus || isBlockedUsersLoading}
-                onClick={() => {
-                  Mixpanel.track('Unblock user', {
-                    _stage: 'Settings',
-                    _userUuid: user.uuid,
-                  });
-                  changeUserBlockedStatus(user.uuid, false);
-                }}
+                onClick={() => handleUnblockUser(user.uuid || '')}
                 view='secondary'
               >
                 {t('Settings.sections.privacy.blockedUsers.button.unblock')}
               </SUnblockButton>
             </SBlockedUserCard>
           ))}
+        {!isBlockedUsersLoading && hasNextPage ? (
+          <SLoadMoreButton onClick={() => fetchNextPage()}>
+            {t('Settings.sections.privacy.blockedUsers.button.loadMoreButton')}
+          </SLoadMoreButton>
+        ) : null}
+        {isBlockedUsersLoading ? (
+          <SLoaderDiv>
+            <Loader size='sm' isStatic />
+          </SLoaderDiv>
+        ) : null}
       </SBlockedUsersContainer>
       <SCloseAccountSubsection>
         <SHidingSubsectionTitle variant={2}>
@@ -212,7 +217,7 @@ const SHidingSubsection = styled.div`
   grid-template-areas:
     'titleAr toggle'
     'captionAr toggle';
-  grid-template-columns: 5fr 1fr; 
+  grid-template-columns: 5fr 1fr;
 `; */
 
 const SHidingSubsectionTitle = styled(Text)`
@@ -321,4 +326,30 @@ const SLoader = styled(Loader)`
   margin-left: auto;
   margin-right: auto;
   margin-top: 24px;
+`;
+
+const SLoadMoreButton = styled.button`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+
+  border: none;
+  display: block;
+  background-color: transparent;
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+`;
+
+const SLoaderDiv = styled.div`
+  position: relative;
+  height: 50px;
 `;

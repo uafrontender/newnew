@@ -8,6 +8,7 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
+import ResizeObserver from 'resize-observer-polyfill';
 
 import GradientMask from '../../../atoms/GradientMask';
 
@@ -223,6 +224,25 @@ const Comments: React.FunctionComponent<IComments> = ({
     }
   }, [inView, fetchNextPage]);
 
+  const [shouldMountGradients, setShouldMountGradients] = useState(false);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      const shouldShow =
+        !!scrollRef?.current?.getBoundingClientRect()?.height &&
+        scrollRef?.current?.getBoundingClientRect()?.height >= 500;
+      setShouldMountGradients(shouldShow);
+    });
+
+    if (scrollRef?.current) {
+      resizeObserver.observe(scrollRef?.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <>
       <SScrollContainer ref={scrollRef} id='comments-scrolling-container'>
@@ -282,21 +302,25 @@ const Comments: React.FunctionComponent<IComments> = ({
           />
         ) : null}
       </SScrollContainer>
-      <GradientMask
-        gradientType='blended'
-        positionTop={heightDelta}
-        active={showTopGradient}
-        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
-        height='100px'
-        animateOpacity
-      />
-      <GradientMask
-        gradientType='blended'
-        active={showBottomGradient}
-        width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
-        height='100px'
-        animateOpacity
-      />
+      {shouldMountGradients ? (
+        <>
+          <GradientMask
+            gradientType='blended'
+            positionTop={heightDelta}
+            active={showTopGradient}
+            width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
+            height='100px'
+            animateOpacity
+          />
+          <GradientMask
+            gradientType='blended'
+            active={showBottomGradient}
+            width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
+            height='100px'
+            animateOpacity
+          />
+        </>
+      ) : null}
       <LoadingModal isOpen={isSearchingForComment} zIndex={20} />
     </>
   );
