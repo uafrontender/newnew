@@ -16,8 +16,6 @@ import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
 // eslint-disable-next-line import/no-duplicates
 import { QualityLevel, QualityLevelList } from 'videojs-contrib-quality-levels';
-// NB! We have to import these twice due to package issues
-import debounce from 'lodash/debounce';
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -88,15 +86,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     const [isLoading, setIsLoading] = useState(false);
 
     const [isPaused, setIsPaused] = useState(false);
-
-    const debouncedSetIsPaused = debounce(setIsPaused, 100);
-
-    const handleSetIsPaused = useCallback(
-      (stateValue: boolean) => {
-        debouncedSetIsPaused(stateValue);
-      },
-      [debouncedSetIsPaused]
-    );
 
     // Fullscren
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -173,12 +162,12 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                 setTimeout(() => setIsScrubberTimeChanging(false), 100);
               })
               .catch(() => {
-                handleSetIsPaused(true);
+                setIsPaused(true);
               });
           }, 100);
         }
       },
-      [isPaused, handleSetIsPaused]
+      [isPaused]
     );
 
     const handlePlayerVolumeChange = useCallback((percentAsDecimal: number) => {
@@ -190,10 +179,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         playerRef.current?.pause();
       } else {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       }
-    }, [handleSetIsPaused]);
+    }, []);
 
     const options: videojs.PlayerOptions = useMemo(
       () => ({
@@ -271,7 +260,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                     setMutedMode(true);
                     setTimeout(() => {
                       playerRef.current?.play()?.catch((e) => {
-                        handleSetIsPaused(true);
+                        setIsPaused(true);
                       });
                     }, 100);
                   });
@@ -281,10 +270,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
           // Paused state
           p?.on('play', () => {
-            handleSetIsPaused(false);
+            setIsPaused(false);
           });
           p?.on('pause', () => {
-            handleSetIsPaused(true);
+            setIsPaused(true);
           });
 
           p?.on('error', (e: any) => {
@@ -325,7 +314,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           } else {
             p?.on('ended', () => {
               p?.play()?.catch(() => {
-                handleSetIsPaused(true);
+                setIsPaused(true);
               });
             });
           }
@@ -369,7 +358,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         isActive,
         setMutedMode,
         handleExitFullscreen,
-        handleSetIsPaused,
         onPlaybackFinished,
       ]
     );
@@ -379,10 +367,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         playerRef.current?.pause();
       } else {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       }
-    }, [handleSetIsPaused]);
+    }, []);
 
     const handleEnterFullscreen = useCallback(() => {
       if (!isSafari() && !isIOS()) {
@@ -601,10 +589,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         playerRef.current?.pause();
       } else {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       }
-    }, [fullscreenInteracted, handleSetIsPaused, isFullscreen]);
+    }, [fullscreenInteracted, isFullscreen]);
 
     // Hide controls if mouse not moved in fullscreen
     useEffect(() => {
@@ -690,7 +678,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                   setMutedMode(true);
                   setTimeout(() => {
                     playerRef.current?.play()?.catch((e) => {
-                      handleSetIsPaused(true);
+                      setIsPaused(true);
                     });
                   }, 100);
                 });
@@ -711,7 +699,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         isInSlider,
         isActive,
         setMutedMode,
-        // handleSetIsPaused, - reason unknown
         // onPlaybackProgress, - reason unknown
       ]
     );
@@ -739,7 +726,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
             playerRef.current?.pause();
           } else {
             playerRef.current?.play()?.catch(() => {
-              handleSetIsPaused(true);
+              setIsPaused(true);
             });
           }
         }
@@ -754,7 +741,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       return () => {
         window.removeEventListener('keydown', handlePressSpacebar);
       };
-    }, [handleSetIsPaused, isActive, isFullscreen, isInSlider]);
+    }, [isActive, isFullscreen, isInSlider]);
 
     // Update scrubber in non-Safari fullscreen controls for a paused video
     useEffect(() => {
@@ -805,16 +792,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
             videoOrientation={videoOrientation}
             isFullScreen={isFullscreen}
           />
-          {shouldShowPlayPseudoButton ? (
-            <SPlayPseudoButton onClick={handlePlayPseudoButtonClick}>
-              <InlineSvg
-                svg={PlayIcon}
-                width='32px'
-                height='32px'
-                fill='#FFFFFF'
-              />
-            </SPlayPseudoButton>
-          ) : null}
+          <SPlayPseudoButton
+            show={shouldShowPlayPseudoButton}
+            onClick={handlePlayPseudoButtonClick}
+          >
+            <InlineSvg
+              svg={PlayIcon}
+              width='32px'
+              height='32px'
+              fill='#FFFFFF'
+            />
+          </SPlayPseudoButton>
           {!isLoading ? (
             <SMaximizeButton
               id='maximize-button'
@@ -1065,7 +1053,7 @@ const SLoader = styled.div`
   z-index: 1;
 `;
 
-const SPlayPseudoButton = styled.button`
+const SPlayPseudoButton = styled.button<{ show?: boolean }>`
   position: absolute;
   top: calc(50% - 32px);
   left: calc(50% - 32px);
@@ -1081,6 +1069,12 @@ const SPlayPseudoButton = styled.button`
   border: transparent;
 
   cursor: pointer;
+  pointer-events: ${({ show }) => (show ? 'all' : 'none')};
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transition-property: opacity;
+  transition-timing-function: ease-in;
+  transition-duration: ${({ show }) => (show ? '100ms' : '0ms')};
+  transition-delay: ${({ show }) => (show ? '100ms' : '0ms')};
 
   &:focus,
   &:active {

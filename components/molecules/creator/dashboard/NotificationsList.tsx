@@ -141,6 +141,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     const updateTimeInterval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 60000);
+
     return () => {
       clearInterval(updateTimeInterval);
     };
@@ -304,7 +305,7 @@ export const NotificationsList: React.FC<IFunction> = ({
                 <SNotificationItemTime variant={2} weight={600}>
                   {moment((item.createdAt?.seconds as number) * 1000)
                     .locale(locale || 'en-US')
-                    .from(itemCurrentTime)}
+                    .fromNow()}
                 </SNotificationItemTime>
               </SNotificationItemCenter>
               {unreadNotifications &&
