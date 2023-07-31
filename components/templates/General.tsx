@@ -215,6 +215,8 @@ export const General: React.FC<IGeneral> = (props) => {
   const isBottomNavigationVisible =
     mobileNavigationVisible && !globalSearchActive;
 
+  const isNoMobileNavigation = noMobileNavigation && isMobile;
+
   return (
     <>
       {/* header is sticky for Safari on mobile devices so padding isn't needed */}
@@ -229,7 +231,7 @@ export const General: React.FC<IGeneral> = (props) => {
           highlightColor={theme.colorsThemed.background.tertiary}
         >
           <TopContainer>
-            {!noMobileNavigation && (
+            {!isNoMobileNavigation && (
               <Header
                 visible={
                   !isMobile || mobileNavigationVisible || globalSearchActive
@@ -245,7 +247,7 @@ export const General: React.FC<IGeneral> = (props) => {
             </SContent>
           </TopContainer>
           <Footer />
-          {!noMobileNavigation && (
+          {!isNoMobileNavigation && (
             <BottomNavigation
               collection={bottomNavigation}
               moreMenuMobileOpen={moreMenuMobileOpen}
