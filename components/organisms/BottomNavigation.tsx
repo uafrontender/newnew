@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import BottomNavigationItem, {
@@ -6,6 +6,8 @@ import BottomNavigationItem, {
 } from '../molecules/BottomNavigationItem';
 import MoreMenuMobile from './MoreMenuMobile';
 import { useAppState } from '../../contexts/appStateContext';
+
+const NAV_HEIGHT_VISIBILITY_OFFSET = 60;
 
 interface IBottomNavigation {
   visible: boolean;
@@ -19,6 +21,8 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
     props;
 
   const { userIsCreator } = useAppState();
+
+  const [isReachedPageEnd, setIsReachedPageEnd] = useState(false);
 
   const renderItem = useCallback(
     (item: TBottomNavigationItem) => (
@@ -44,10 +48,29 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
     ]
   );
 
+  useEffect(() => {
+    const onScroll = () => {
+      const documentHeight = document.body.scrollHeight;
+      const currentScroll = window.scrollY + window.innerHeight;
+
+      setIsReachedPageEnd(
+        currentScroll + NAV_HEIGHT_VISIBILITY_OFFSET > documentHeight
+      );
+    };
+
+    onScroll();
+
+    document.addEventListener('scroll', onScroll);
+
+    return () => {
+      document.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
   return (
     <SContainer
       id='bottom-nav-mobile'
-      visible={visible}
+      visible={visible || isReachedPageEnd}
       isCreator={userIsCreator}
     >
       {collection?.map(renderItem)}

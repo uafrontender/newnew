@@ -245,12 +245,14 @@ export const General: React.FC<IGeneral> = (props) => {
             </SContent>
           </TopContainer>
           <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={isBottomNavigationVisible}
-          />
+          {!noMobileNavigation && (
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={isBottomNavigationVisible}
+            />
+          )}
           {hasMounted ? (
             <>
               <SortingContainer
