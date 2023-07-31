@@ -302,7 +302,8 @@
           "title": "被屏蔽用戶",
           "noBlockedUsers": "沒有屏蔽用戶",
           "button": {
-            "unblock": "解除屏蔽"
+            "unblock": "解除屏蔽",
+            "loadMoreButton": "載入更多"
           }
         },
         "closeAccount": {
