@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Text from '../../atoms/Text';
@@ -27,15 +26,15 @@ const VideojsPlayer = dynamic(() => import('../../atoms/VideojsPlayer'), {
 
 interface IPublishedModal {
   open: boolean;
+  handleRedirect: (url: string) => void;
   handleClose: () => void;
 }
 
 const PublishedModal: React.FC<IPublishedModal> = (props) => {
-  const { open, handleClose } = props;
-  const router = useRouter();
+  const { open, handleRedirect, handleClose } = props;
   const { t } = useTranslation('page-Creation');
   const { userData } = useUserData();
-  const { postInCreation, clearCreation } = usePostCreationState();
+  const { postInCreation } = usePostCreationState();
   const { post, videoProcessing, fileProcessing, postData } = useMemo(
     () => postInCreation,
     [postInCreation]
@@ -85,14 +84,12 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                 : postData.multipleChoice.postUuid;
             }
 
-            router.push(url).then(() => {
-              clearCreation();
-            });
+            handleRedirect(url);
           }
         }
       }
     },
-    [postData, router, clearCreation]
+    [postData, handleRedirect]
   );
 
   const formatExpiresAtNoStartsAt = useCallback(() => {

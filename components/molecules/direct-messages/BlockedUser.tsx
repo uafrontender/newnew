@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import styled from 'styled-components';
 
 import {
   SBottomAction,
@@ -56,7 +55,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({
                 {isAnnouncement
                   ? t('groupBlocked.title')
                   : `${t('userBlocked.title')}`}
-                <SDisplayName user={user.user} />
+                <DisplayName user={user.user} />
               </SBottomActionTitle>
               <SBottomActionMessage>
                 {isAnnouncement
@@ -88,7 +87,3 @@ BlockedUser.defaultProps = {
   isBlocked: false,
   isAnnouncement: false,
 };
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
-`;

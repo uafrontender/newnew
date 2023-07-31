@@ -152,8 +152,6 @@ const SDisplayNameContainer = styled.div`
 
 const SDisplayName = styled(DisplayName)`
   flex-shrink: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   font-weight: 600;
   font-size: 14px;
