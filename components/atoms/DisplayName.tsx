@@ -147,7 +147,9 @@ export default DisplayName;
 const Wrapper = styled.div`
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
   overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SName = styled.div`
