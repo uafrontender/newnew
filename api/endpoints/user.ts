@@ -388,7 +388,7 @@ export const getTinyUsersBlockedByMe = (
   >(
     newnewapi.GetTinyUsersBlockedByMeRequest,
     newnewapi.GetTinyUsersBlockedByMeResponse,
-    `${BASE_URL_USER}/get_tiny_users_blocked_by_me`,
+    `${BASE_URL_USER}/get_tiny_users_i_blocked`,
     'post',
     payload,
     signal ?? undefined
