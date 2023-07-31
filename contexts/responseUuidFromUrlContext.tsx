@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 
-export const ResponseNumberFromUrlContext = createContext<{
+export const ResponseUuidFromUrlContext = createContext<{
   responseFromUrl?: string | undefined;
   handleSetResponseFromUrl?: (newValue: number) => void;
   handleResetResponseFromUrl?: () => void;
@@ -16,13 +16,13 @@ export const ResponseNumberFromUrlContext = createContext<{
   handleResetResponseFromUrl: () => {},
 });
 
-interface IResponseNumberFromUrlContextProvider {
+interface IResponseUuidFromUrlContextProvider {
   responseFromUrlInitial?: string;
   children: React.ReactNode;
 }
 
-const ResponseNumberFromUrlContextProvider: React.FC<
-  IResponseNumberFromUrlContextProvider
+const ResponseUuidFromUrlContextProvider: React.FC<
+  IResponseUuidFromUrlContextProvider
 > = ({ responseFromUrlInitial, children }) => {
   const [responseNumber, setResponseNumber] = useState(
     responseFromUrlInitial || undefined
@@ -48,19 +48,19 @@ const ResponseNumberFromUrlContextProvider: React.FC<
   );
 
   return (
-    <ResponseNumberFromUrlContext.Provider value={contextValue}>
+    <ResponseUuidFromUrlContext.Provider value={contextValue}>
       {children}
-    </ResponseNumberFromUrlContext.Provider>
+    </ResponseUuidFromUrlContext.Provider>
   );
 };
 
-export default ResponseNumberFromUrlContextProvider;
+export default ResponseUuidFromUrlContextProvider;
 
-export function useResponseNumberFromUrl() {
-  const context = useContext(ResponseNumberFromUrlContext);
+export function useResponseUuidFromUrl() {
+  const context = useContext(ResponseUuidFromUrlContext);
   if (!context) {
     throw new Error(
-      'useResponseNumberFromUrl must be used inside a `ResponseNumberFromUrlContextProvider`'
+      'useResponseUuidFromUrl must be used inside a `ResponseUuidFromUrlContextProvider`'
     );
   }
 
