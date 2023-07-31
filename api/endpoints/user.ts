@@ -377,3 +377,19 @@ export const setMyTimeZone = (
     payload,
     signal ?? undefined
   );
+
+export const getTinyUsersBlockedByMe = (
+  payload: newnewapi.GetTinyUsersBlockedByMeRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetTinyUsersBlockedByMeRequest,
+    newnewapi.GetTinyUsersBlockedByMeResponse
+  >(
+    newnewapi.GetTinyUsersBlockedByMeRequest,
+    newnewapi.GetTinyUsersBlockedByMeResponse,
+    `${BASE_URL_USER}/get_tiny_users_blocked_by_me`,
+    'post',
+    payload,
+    signal ?? undefined
+  );
