@@ -818,7 +818,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.ac'
-          components={[<SDisplayName user={postCreator} />]}
+          components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
       {/* Loading Modal */}
@@ -1280,8 +1280,4 @@ const SEllipseButtonMobile = styled(Button)`
     background: transparent;
     box-shadow: none;
   }
-`;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
 `;

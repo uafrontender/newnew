@@ -11,7 +11,7 @@ import moment from 'moment';
 import dynamic from 'next/dynamic';
 import compact from 'lodash/compact';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useUpdateEffect } from 'react-use';
@@ -234,10 +234,20 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleCloseModal = useCallback(() => {
     setIsGoingToHomepage(true);
     setShowModal(false);
-    router.push('/').then(() => {
+    Router.push('/').then(() => {
       clearCreation();
     });
-  }, [router, clearCreation]);
+  }, [clearCreation]);
+
+  const handleRedirect = useCallback(
+    (url: string) => {
+      setIsGoingToHomepage(true);
+      Router.push(url).then(() => {
+        clearCreation();
+      });
+    },
+    [clearCreation]
+  );
 
   const handleSubmit = useCallback(async () => {
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
@@ -502,6 +512,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     </SChoiceItem>
   );
 
+  // TODO: Why do we need it?
   useUpdateEffect(() => {
     if (!post.title && !isGoingToHomepage) {
       router?.push('/creation');
@@ -664,7 +675,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     return (
       <>
         {isGoingToHomepage && <LoadingView />}
-        <PublishedModal open={showModal} handleClose={handleCloseModal} />
+        <PublishedModal
+          open={showModal}
+          handleRedirect={handleRedirect}
+          handleClose={handleCloseModal}
+        />
         <SContent>
           <STopLine>
             <SInlineSVG
@@ -719,7 +734,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   return (
     <>
       {isGoingToHomepage && <LoadingView />}
-      <PublishedModal open={showModal} handleClose={handleCloseModal} />
+      <PublishedModal
+        open={showModal}
+        handleRedirect={handleRedirect}
+        handleClose={handleCloseModal}
+      />
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>

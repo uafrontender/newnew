@@ -157,11 +157,8 @@ const SDisplayName = styled(DisplayName)`
   font-size: 20px;
   line-height: 28px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   margin-bottom: 16px;
-  max-width: 100%;
 
   ${({ theme }) => theme.media.laptop} {
     font-size: 24px;
