@@ -85,7 +85,7 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [
     markReadNotifications,
     markAllAsReadMutation.mutate,
-    // addNewNotificationMutation - no needed here
+    // markAllAsReadMutation - no needed here
   ]);
 
   useEffect(() => {
