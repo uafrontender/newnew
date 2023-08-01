@@ -93,6 +93,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     initialChatRoom.id as number,
     {
       initialData: initialChatRoom,
+      refetchOnWindowFocus: false,
     }
   );
 
