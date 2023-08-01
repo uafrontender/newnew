@@ -11,6 +11,8 @@ import EmailSignInButton from './EmailSignInButton';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useSignup } from '../../../contexts/signUpContext';
+import Lottie from '../../atoms/Lottie';
+import logoAnimationWhite from '../../../public/animations/mobile_logo_white.json';
 
 export interface IEmailSignInForm {
   animationVariants: Variants;
@@ -110,7 +112,20 @@ const EmailSignInForm: React.FunctionComponent<IEmailSignInForm> = ({
             });
           }}
         >
-          <span>{t('signUpOptions.signInButton')}</span>
+          <EmailSignInButtonContent>
+            {t('signUpOptions.signInButton')}
+            {/* Lottie must have a ky to force a re-render */}
+            <Lottie
+              key={`logo-${isSubmitLoading ? 'animated' : 'static'}`}
+              width={24}
+              height={24}
+              options={{
+                loop: isSubmitLoading,
+                autoplay: isSubmitLoading,
+                animationData: logoAnimationWhite,
+              }}
+            />
+          </EmailSignInButtonContent>
         </EmailSignInButton>
       </motion.div>
     </SEmailSignInForm>
@@ -118,6 +133,12 @@ const EmailSignInForm: React.FunctionComponent<IEmailSignInForm> = ({
 };
 
 export default EmailSignInForm;
+
+const EmailSignInButtonContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+`;
 
 const SEmailSignInForm = styled.form<{ isLoading?: boolean }>`
   display: flex;
