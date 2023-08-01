@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -28,6 +28,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   const [, setCookie] = useCookies();
   const { userLoggedIn, handleUserLoggedIn } = useAppState();
   const { updateUserData } = useUserData();
+  const loading = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -48,12 +49,13 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
-      if (isLoading || userLoggedIn) {
+      if (loading.current || userLoggedIn) {
         return;
       }
 
       try {
         setIsLoading(true);
+        loading.current = true;
 
         if (!oauth_token || !oauth_verifier) {
           throw new Error('No token on twitter verification');
@@ -118,6 +120,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         resumePushNotification();
 
         setIsLoading(false);
+        loading.current = false;
         if (data.redirectUrl) {
           router?.push(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
@@ -128,6 +131,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
       } catch (err) {
         // NB! Might need an error toast
         setIsLoading(false);
+        loading.current = false;
         router?.replace('/');
       }
     }

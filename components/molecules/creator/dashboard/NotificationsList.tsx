@@ -90,7 +90,10 @@ export const NotificationsList: React.FC<IFunction> = ({
       const payload = new newnewapi.EmptyRequest();
       const res = await markAllAsRead(payload);
 
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
       setUnreadNotifications(null);
     } catch (err) {
       console.error(err);

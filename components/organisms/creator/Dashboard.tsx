@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -73,7 +73,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const [toDosStatus, setToDosStatus] = useState<ToDosStatus>(
     getIsToDosCompleted(userData, creatorData)
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const loading = useRef(false);
   const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
 
   const [expiringPostsLoaded, setExpiringPostsLoaded] = useState(false);
@@ -121,9 +121,11 @@ export const Dashboard: React.FC = React.memo(() => {
   // TODO: Need WS event to load new expiring posts
 
   const loadMyPosts = useCallback(async () => {
-    if (isLoading) {
+    if (loading.current) {
       return;
     }
+
+    loading.current = true;
 
     try {
       const payload = new newnewapi.GetRelatedToMePostsRequest({
@@ -134,20 +136,18 @@ export const Dashboard: React.FC = React.memo(() => {
       if (postsResponse?.data && postsResponse.data.posts) {
         setHasMyPosts(postsResponse.data.posts.length > 0);
       }
-      setIsLoading(false);
     } catch (err) {
-      setIsLoading(false);
       console.error(err);
+    } finally {
+      loading.current = false;
     }
-  }, [isLoading]);
+  }, []);
 
   useEffect(() => {
-    if (!hasMyPosts && !isLoading) {
+    if (!hasMyPosts && !loading.current) {
       loadMyPosts();
-    } else {
-      setIsLoading(false);
     }
-  }, [isLoading, hasMyPosts, loadMyPosts]);
+  }, [hasMyPosts, loadMyPosts]);
 
   return (
     <SContainer>

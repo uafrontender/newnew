@@ -74,7 +74,10 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 
   const onCodeComplete = useCallback(
     async (completeCode: string) => {
-      if (!newEmail) return;
+      if (!newEmail) {
+        return;
+      }
+
       try {
         setSubmitError('');
         setTimerHidden(true);
@@ -154,6 +157,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
   const handleResendCode = async () => {
     setIsResendCodeLoading(true);
     setSubmitError('');
+
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: newEmail,
