@@ -130,6 +130,54 @@ const useMyNotifications = (
     },
   });
 
+  const markAllAsRead = useCallback(() => {
+    queryClient.setQueriesData<
+      | InfiniteData<{
+          notifications: newnewapi.INotification[];
+          paging: newnewapi.IPagingResponse | null | undefined;
+        }>
+      | undefined
+    >(
+      { queryKey: ['private', 'getMyNotifications'] },
+      (
+        oldData:
+          | InfiniteData<{
+              notifications: newnewapi.INotification[];
+              paging: newnewapi.IPagingResponse | null | undefined;
+            }>
+          | undefined
+      ) => {
+        if (oldData) {
+          console.log(
+            {
+              ...oldData,
+              pages: oldData.pages.map((page) => ({
+                paging: page.paging,
+                notifications: page.notifications.map((notification) => ({
+                  ...notification,
+                  isRead: true,
+                })),
+              })),
+            },
+            'newData'
+          );
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              paging: page.paging,
+              notifications: page.notifications.map((notification) => ({
+                ...notification,
+                isRead: true,
+              })),
+            })),
+          };
+        }
+
+        return oldData;
+      }
+    );
+  }, [queryClient]);
+
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
       const payload = new newnewapi.EmptyRequest();
@@ -140,6 +188,28 @@ const useMyNotifications = (
       }
     },
     onSuccess: () => {
+      markAllAsRead();
+    },
+    onError: (err: any) => {
+      console.error(err);
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
+  });
+
+  const addNewNotificationMutation = useMutation({
+    mutationFn: (notification: newnewapi.INotification) =>
+      new Promise((res) => {
+        res(notification);
+      }),
+    onSuccess: (_, notification: newnewapi.INotification) => {
+      if (!notification) {
+        return;
+      }
+
       queryClient.setQueriesData<
         | InfiniteData<{
             notifications: newnewapi.INotification[];
@@ -159,13 +229,16 @@ const useMyNotifications = (
           if (oldData) {
             return {
               ...oldData,
-              pages: oldData.pages.map((page) => ({
-                paging: page.paging,
-                notifications: page.notifications.map((notification) => ({
-                  ...notification,
-                  isRead: true,
-                })),
-              })),
+              pages: oldData.pages.map((page, i) => {
+                if (i === 0) {
+                  return {
+                    paging: page.paging,
+                    notifications: [notification, ...page.notifications],
+                  };
+                }
+
+                return page;
+              }),
             };
           }
 
@@ -173,56 +246,14 @@ const useMyNotifications = (
         }
       );
     },
-    onError: (err: any) => {
-      console.error(err);
-      if (err?.message) {
-        showErrorToastCustom(err?.message);
-      } else {
-        showErrorToastPredefined();
-      }
-    },
   });
-
-  const markAllAsRead = useCallback(() => {
-    queryClient.setQueriesData<
-      | InfiniteData<{
-          notifications: newnewapi.INotification[];
-          paging: newnewapi.IPagingResponse | null | undefined;
-        }>
-      | undefined
-    >(
-      { queryKey: ['private', 'getMyNotifications'] },
-      (
-        oldData:
-          | InfiniteData<{
-              notifications: newnewapi.INotification[];
-              paging: newnewapi.IPagingResponse | null | undefined;
-            }>
-          | undefined
-      ) => {
-        if (oldData) {
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              paging: page.paging,
-              notifications: page.notifications.map((notification) => ({
-                ...notification,
-                isRead: true,
-              })),
-            })),
-          };
-        }
-
-        return oldData;
-      }
-    );
-  }, [queryClient]);
 
   return {
     ...query,
     markAsReadMutation,
     markAllAsReadMutation,
     markAllAsRead,
+    addNewNotificationMutation,
   };
 };
 

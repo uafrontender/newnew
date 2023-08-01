@@ -45,10 +45,6 @@ export const NotificationsList: React.FC<IFunction> = ({
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
 
-  const [newNotifications, setNewNotifications] = useState<
-    newnewapi.INotification[]
-  >([]);
-
   // Used to update notification timers
   const [currentTime, setCurrentTime] = useState(Date.now());
 
@@ -61,6 +57,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     markAsReadMutation,
     markAllAsReadMutation,
     markAllAsRead,
+    addNewNotificationMutation,
   } = useMyNotifications({
     limit: 10,
   });
@@ -84,7 +81,12 @@ export const NotificationsList: React.FC<IFunction> = ({
     if (markReadNotifications) {
       markAllAsReadMutation.mutate();
     }
-  }, [markReadNotifications, markAllAsReadMutation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    markReadNotifications,
+    markAllAsReadMutation.mutate,
+    // addNewNotificationMutation - no needed here
+  ]);
 
   useEffect(() => {
     if (inView && !isLoading && hasNextPage) {
@@ -118,13 +120,9 @@ export const NotificationsList: React.FC<IFunction> = ({
         return;
       }
 
-      setNewNotifications((curr) => {
-        if (!decoded.notification) {
-          return curr;
-        }
-
-        return [decoded.notification, ...curr];
-      });
+      if (decoded.notification) {
+        addNewNotificationMutation.mutate(decoded.notification);
+      }
     };
 
     if (socketConnection) {
@@ -136,7 +134,12 @@ export const NotificationsList: React.FC<IFunction> = ({
         socketConnection?.off('NotificationCreated', handleNotificationCreated);
       }
     };
-  }, [socketConnection]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    socketConnection,
+    addNewNotificationMutation.mutate,
+    // addNewNotificationMutation - no needed here
+  ]);
 
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
@@ -277,22 +280,17 @@ export const NotificationsList: React.FC<IFunction> = ({
     ]
   );
 
-  const displayedNotifications: newnewapi.INotification[] = useMemo(
-    () => [...newNotifications, ...notifications],
-    [newNotifications, notifications]
-  );
-
   return (
     <div ref={scrollRef}>
       {
         // eslint-disable-next-line no-nested-ternary
-        !displayedNotifications?.length && (isLoading || !isFetched) ? (
+        !notifications?.length && (isLoading || !isFetched) ? (
           <Loader size='md' isStatic />
-        ) : displayedNotifications && displayedNotifications.length < 1 ? (
+        ) : notifications && notifications.length < 1 ? (
           <NoResults />
         ) : (
-          displayedNotifications &&
-          displayedNotifications.map((notification) =>
+          notifications &&
+          notifications.map((notification) =>
             renderNotificationItem(notification, currentTime)
           )
         )
