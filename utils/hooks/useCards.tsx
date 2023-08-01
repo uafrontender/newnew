@@ -47,6 +47,9 @@ const useCards = (): CardsData => {
       return res.data.cards;
     },
     {
+      onError: (error) => {
+        console.error(error);
+      },
       enabled: userLoggedIn,
     }
   );

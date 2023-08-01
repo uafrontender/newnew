@@ -131,3 +131,9 @@ In Contexts it is vital to check dependencies and ensure that no additional data
 ## Routing
 
 - The use of Router over useRouter hook is recommended for cases when the change in routing is not important. For example prefetching and changing state to a pre-defined one. useRouter hook object, set as dependency, causes extra calls of functions and effects. And thus, ideally, it should be used for cases where we care about a change in path, parameters and etc only. this is especially relevant for useEffect, useCallbacks and other hooks which should not depend on routing, but only use it declaratively.
+
+## Coding practices
+
+### Loading state
+
+Some of the function use `loading` state to avoid requesting the same data twice. In such case, `loading` state should be tracked not with `useState`, but instead with `useRef`, as this has nothing to do with the UX and is completely internal part of the logic. In case some loading related UX changes are necessary, a separate state such as `loadingState` or `isLoaded` shell be used. Such UX related state could only be set, not read in effects and callbacks, to avoid unnecessary re-rendering and infinite loops. A separate utility function for functions that need to avoid loading the same data twice unnecessarily will be introduced.
