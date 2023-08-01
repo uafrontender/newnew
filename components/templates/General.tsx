@@ -212,9 +212,10 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
-
   const isBottomNavigationVisible =
     mobileNavigationVisible && !globalSearchActive;
+
+  const isNoMobileNavigation = noMobileNavigation && isMobile;
 
   return (
     <>
@@ -230,11 +231,13 @@ export const General: React.FC<IGeneral> = (props) => {
           highlightColor={theme.colorsThemed.background.tertiary}
         >
           <TopContainer>
-            <Header
-              visible={
-                !isMobile || mobileNavigationVisible || globalSearchActive
-              }
-            />
+            {!isNoMobileNavigation && (
+              <Header
+                visible={
+                  !isMobile || mobileNavigationVisible || globalSearchActive
+                }
+              />
+            )}
             <SContent noPaddingTop={!!noMobileNavigation}>
               <Container {...containerParams}>
                 <Row noPaddingMobile={noPaddingMobile}>
@@ -244,12 +247,14 @@ export const General: React.FC<IGeneral> = (props) => {
             </SContent>
           </TopContainer>
           <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={isBottomNavigationVisible}
-          />
+          {!isNoMobileNavigation && (
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={isBottomNavigationVisible}
+            />
+          )}
           {hasMounted ? (
             <>
               <SortingContainer
