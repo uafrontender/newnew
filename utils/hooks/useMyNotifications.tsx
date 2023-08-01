@@ -1,5 +1,11 @@
 import { newnewapi } from 'newnew-api';
-import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useMutation,
+  useQueryClient,
+} from 'react-query';
 import { getMyNotifications } from '../../api/endpoints/notification';
 
 interface IUseMyNotifications {
@@ -16,6 +22,8 @@ const useMyNotifications = (
     'queryKey' | 'queryFn'
   >
 ) => {
+  const queryClient = useQueryClient();
+
   const query = useInfiniteQuery(
     ['private', 'getMyNotifications', params],
     async ({ pageParam, signal }) => {
@@ -53,7 +61,56 @@ const useMyNotifications = (
     >
   );
 
-  return query;
+  const markAsReadMutation = useMutation({
+    mutationFn: (notificationId: number) =>
+      new Promise((res) => {
+        res(notificationId);
+      }),
+    onSuccess: (_, notificationId: number) => {
+      queryClient.setQueryData<
+        | InfiniteData<{
+            notifications: newnewapi.INotification[];
+            paging: newnewapi.IPagingResponse | null | undefined;
+          }>
+        | undefined
+      >(
+        ['private', 'getMyNotifications', params],
+        (
+          oldData:
+            | InfiniteData<{
+                notifications: newnewapi.INotification[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (oldData) {
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => ({
+                paging: page.paging,
+                notifications: page.notifications.map((notification) => {
+                  if (notification.id === notificationId) {
+                    return {
+                      ...notification,
+                      isRead: true,
+                    };
+                  }
+                  return notification;
+                }),
+              })),
+            };
+          }
+
+          return oldData;
+        }
+      );
+    },
+  });
+
+  return {
+    ...query,
+    markAsReadMutation,
+  };
 };
 
 export default useMyNotifications;

@@ -60,10 +60,16 @@ export const NotificationsList: React.FC<IFunction> = ({
   // Used to update notification timers
   const [currentTime, setCurrentTime] = useState(Date.now());
 
-  const { data, isLoading, hasNextPage, isFetched, fetchNextPage } =
-    useMyNotifications({
-      limit: 10,
-    });
+  const {
+    data,
+    isLoading,
+    hasNextPage,
+    isFetched,
+    fetchNextPage,
+    markAsReadMutation,
+  } = useMyNotifications({
+    limit: 10,
+  });
 
   const notifications = useMemo(() => {
     if (data) {
@@ -74,15 +80,9 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [data]);
 
   useEffect(() => {
-    setUnreadNotifications((curr) => {
-      const arr = curr ? [...curr] : [];
-      notifications.forEach((item) => {
-        if (!item.isRead) {
-          arr.push(item.id as number);
-        }
-      });
-      return arr;
-    });
+    setUnreadNotifications(
+      notifications.filter((item) => !item.isRead).map((el) => el.id as number)
+    );
   }, [notifications]);
 
   const markAllNotifications = useCallback(async () => {
@@ -113,6 +113,8 @@ export const NotificationsList: React.FC<IFunction> = ({
           throw new Error(res.error?.message ?? 'Request failed');
         }
 
+        markAsReadMutation?.mutate(notification.id as number);
+
         setUnreadNotifications((curr) => {
           const arr = curr ? [...curr] : [];
           const result = arr.filter((item) => item !== notification.id);
@@ -122,7 +124,7 @@ export const NotificationsList: React.FC<IFunction> = ({
         console.error(err);
       }
     },
-    []
+    [markAsReadMutation]
   );
 
   useEffect(() => {
