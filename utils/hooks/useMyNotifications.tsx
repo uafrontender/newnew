@@ -1,4 +1,5 @@
 import { newnewapi } from 'newnew-api';
+import { useCallback } from 'react';
 import {
   InfiniteData,
   useInfiniteQuery,
@@ -6,7 +7,12 @@ import {
   useMutation,
   useQueryClient,
 } from 'react-query';
-import { getMyNotifications } from '../../api/endpoints/notification';
+import {
+  getMyNotifications,
+  markAllAsRead as fetchMarkAllAsRead,
+  markAsRead,
+} from '../../api/endpoints/notification';
+import useErrorToasts from './useErrorToasts';
 
 interface IUseMyNotifications {
   limit?: number;
@@ -23,6 +29,7 @@ const useMyNotifications = (
   >
 ) => {
   const queryClient = useQueryClient();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
 
   const query = useInfiniteQuery(
     ['private', 'getMyNotifications', params],
@@ -62,19 +69,35 @@ const useMyNotifications = (
   );
 
   const markAsReadMutation = useMutation({
-    mutationFn: (notificationId: number) =>
-      new Promise((res) => {
-        res(notificationId);
-      }),
-    onSuccess: (_, notificationId: number) => {
-      queryClient.setQueryData<
+    mutationFn: async (notification: newnewapi.INotification) => {
+      if (notification.isRead) {
+        return null;
+      }
+
+      const payload = new newnewapi.MarkAsReadRequest({
+        notificationIds: [notification.id as number],
+      });
+      const res = await markAsRead(payload);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      return notification.id as number;
+    },
+    onSuccess: (notificationId: number | null) => {
+      if (!notificationId) {
+        return;
+      }
+
+      queryClient.setQueriesData<
         | InfiniteData<{
             notifications: newnewapi.INotification[];
             paging: newnewapi.IPagingResponse | null | undefined;
           }>
         | undefined
       >(
-        ['private', 'getMyNotifications', params],
+        { queryKey: ['private', 'getMyNotifications'] },
         (
           oldData:
             | InfiniteData<{
@@ -107,9 +130,99 @@ const useMyNotifications = (
     },
   });
 
+  const markAllAsReadMutation = useMutation({
+    mutationFn: async () => {
+      const payload = new newnewapi.EmptyRequest();
+      const res = await fetchMarkAllAsRead(payload);
+
+      if (res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+    },
+    onSuccess: () => {
+      queryClient.setQueriesData<
+        | InfiniteData<{
+            notifications: newnewapi.INotification[];
+            paging: newnewapi.IPagingResponse | null | undefined;
+          }>
+        | undefined
+      >(
+        { queryKey: ['private', 'getMyNotifications'] },
+        (
+          oldData:
+            | InfiniteData<{
+                notifications: newnewapi.INotification[];
+                paging: newnewapi.IPagingResponse | null | undefined;
+              }>
+            | undefined
+        ) => {
+          if (oldData) {
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => ({
+                paging: page.paging,
+                notifications: page.notifications.map((notification) => ({
+                  ...notification,
+                  isRead: true,
+                })),
+              })),
+            };
+          }
+
+          return oldData;
+        }
+      );
+    },
+    onError: (err: any) => {
+      console.error(err);
+      if (err?.message) {
+        showErrorToastCustom(err?.message);
+      } else {
+        showErrorToastPredefined();
+      }
+    },
+  });
+
+  const markAllAsRead = useCallback(() => {
+    queryClient.setQueriesData<
+      | InfiniteData<{
+          notifications: newnewapi.INotification[];
+          paging: newnewapi.IPagingResponse | null | undefined;
+        }>
+      | undefined
+    >(
+      { queryKey: ['private', 'getMyNotifications'] },
+      (
+        oldData:
+          | InfiniteData<{
+              notifications: newnewapi.INotification[];
+              paging: newnewapi.IPagingResponse | null | undefined;
+            }>
+          | undefined
+      ) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              paging: page.paging,
+              notifications: page.notifications.map((notification) => ({
+                ...notification,
+                isRead: true,
+              })),
+            })),
+          };
+        }
+
+        return oldData;
+      }
+    );
+  }, [queryClient]);
+
   return {
     ...query,
     markAsReadMutation,
+    markAllAsReadMutation,
+    markAllAsRead,
   };
 };
 

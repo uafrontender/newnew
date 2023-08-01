@@ -20,10 +20,6 @@ import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
 import { useUserData } from '../../../../contexts/userDataContext';
-import {
-  markAllAsRead,
-  markAsRead,
-} from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import mobileLogo from '../../../../public/images/svg/MobileLogo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -53,10 +49,6 @@ export const NotificationsList: React.FC<IFunction> = ({
     newnewapi.INotification[]
   >([]);
 
-  const [unreadNotifications, setUnreadNotifications] = useState<
-    number[] | null
-  >(null);
-
   // Used to update notification timers
   const [currentTime, setCurrentTime] = useState(Date.now());
 
@@ -67,6 +59,8 @@ export const NotificationsList: React.FC<IFunction> = ({
     isFetched,
     fetchNextPage,
     markAsReadMutation,
+    markAllAsReadMutation,
+    markAllAsRead,
   } = useMyNotifications({
     limit: 10,
   });
@@ -79,59 +73,18 @@ export const NotificationsList: React.FC<IFunction> = ({
     return [];
   }, [data]);
 
-  useEffect(() => {
-    setUnreadNotifications(
-      notifications.filter((item) => !item.isRead).map((el) => el.id as number)
-    );
-  }, [notifications]);
-
-  const markAllNotifications = useCallback(async () => {
-    try {
-      const payload = new newnewapi.EmptyRequest();
-      const res = await markAllAsRead(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      setUnreadNotifications(null);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
   const markNotificationAsRead = useCallback(
     async (notification: newnewapi.INotification) => {
-      if (!notification || notification.isRead) {
-        return;
-      }
-
-      try {
-        const payload = new newnewapi.MarkAsReadRequest({
-          notificationIds: [notification.id as number],
-        });
-        const res = await markAsRead(payload);
-
-        if (res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
-        }
-
-        markAsReadMutation?.mutate(notification.id as number);
-
-        setUnreadNotifications((curr) => {
-          const arr = curr ? [...curr] : [];
-          const result = arr.filter((item) => item !== notification.id);
-          return result;
-        });
-      } catch (err) {
-        console.error(err);
-      }
+      markAsReadMutation?.mutate(notification);
     },
     [markAsReadMutation]
   );
 
   useEffect(() => {
     if (markReadNotifications) {
-      markAllNotifications();
+      markAllAsReadMutation.mutate();
     }
-  }, [markReadNotifications, markAllNotifications]);
+  }, [markReadNotifications, markAllAsReadMutation]);
 
   useEffect(() => {
     if (inView && !isLoading && hasNextPage) {
@@ -152,9 +105,9 @@ export const NotificationsList: React.FC<IFunction> = ({
   useEffect(() => {
     // If all notifications read in other tabs/apps
     if (notificationsDataLoaded && unreadNotificationCount === 0) {
-      setUnreadNotifications([]);
+      markAllAsRead();
     }
-  }, [notificationsDataLoaded, unreadNotificationCount]);
+  }, [notificationsDataLoaded, unreadNotificationCount, markAllAsRead]);
 
   useEffect(() => {
     const handleNotificationCreated = async (newData: any) => {
@@ -310,11 +263,7 @@ export const NotificationsList: React.FC<IFunction> = ({
                     .fromNow()}
                 </SNotificationItemTime>
               </SNotificationItemCenter>
-              {unreadNotifications &&
-                unreadNotifications.length > 0 &&
-                unreadNotifications.findIndex(
-                  (unreadNotificationId) => unreadNotificationId === item.id
-                ) > -1 && <SNotificationItemIndicator minified />}
+              {!item.isRead && <SNotificationItemIndicator minified />}
             </SNotificationItem>
           </a>
         </Link>
@@ -323,7 +272,6 @@ export const NotificationsList: React.FC<IFunction> = ({
     [
       userData?.userUuid,
       locale,
-      unreadNotifications,
       getEnrichedNotificationMessage,
       markNotificationAsRead,
     ]
