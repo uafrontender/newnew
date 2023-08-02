@@ -1,8 +1,7 @@
 import { useEffect, RefObject } from 'react';
 import isIOS from '../isIOS';
-import isSafari from '../isSafari';
 
-const useDisableTouchMoveSafari = (
+const useDisableTouchMoveIOS = (
   containerRef: RefObject<HTMLElement>,
   disabled?: boolean
 ) => {
@@ -38,18 +37,18 @@ const useDisableTouchMoveSafari = (
       return false;
     };
 
-    if (isIOS() && isSafari() && !disabled) {
+    if (isIOS() && !disabled) {
       document.addEventListener('touchmove', handleTouchMove, {
         passive: false,
       });
     }
 
     return () => {
-      if (isIOS() && isSafari()) {
+      if (isIOS()) {
         document.removeEventListener('touchmove', handleTouchMove);
       }
     };
   }, [disabled, containerRef]);
 };
 
-export default useDisableTouchMoveSafari;
+export default useDisableTouchMoveIOS;
