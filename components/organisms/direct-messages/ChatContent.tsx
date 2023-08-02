@@ -38,8 +38,7 @@ import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
-import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
-import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
+import useDisableTouchMoveIOS from '../../../utils/hooks/useDisableTouchMoveIOS';
 import { ReportData } from '../../molecules/ReportModal';
 import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
@@ -449,10 +448,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   }, [enableOverlayMode, disableOverlayMode]);
 
   // react-focus-on cannot be used here because of column-reverse
-  useDisableTouchMoveSafari(chatContentRef, isHidden);
-
-  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
-  usePreventLayoutMoveOnInputFocusSafari('data-new-message-textarea');
+  useDisableTouchMoveIOS(chatContentRef, isHidden);
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();

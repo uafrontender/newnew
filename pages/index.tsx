@@ -177,7 +177,7 @@ const Home: NextPage<IHome> = ({
 };
 
 (Home as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <HomeLayout>{page}</HomeLayout>
+  <HomeLayout noPaddingBottom>{page}</HomeLayout>
 );
 
 const SCardsSection = styled(CuratedCardsSection)`
