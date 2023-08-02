@@ -33,7 +33,6 @@ import switchPostStatusString from '../../utils/switchPostStatusString';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../utils/switchPostStatus';
-import { useUserData } from '../../contexts/userDataContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
 import CommentFromUrlContextProvider from '../../contexts/commentFromUrlContext';
@@ -86,8 +85,7 @@ const PostPage: NextPage<IPostPage> = ({
   const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const { t } = useTranslation('page-Post');
-  const { userData } = useUserData();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
   const { showErrorToastPredefined } = useErrorToasts();
@@ -310,8 +308,8 @@ const PostPage: NextPage<IPostPage> = ({
   ]);
 
   const isMyPost = useMemo(
-    () => userLoggedIn && userData?.userUuid === postParsed?.creator?.uuid,
-    [userLoggedIn, userData?.userUuid, postParsed?.creator?.uuid]
+    () => userLoggedIn && userUuid === postParsed?.creator?.uuid,
+    [userLoggedIn, userUuid, postParsed?.creator?.uuid]
   );
 
   const [stripeSetupIntentClientSecret, setStripeSetupIntentClientSecret] =
@@ -579,7 +577,7 @@ const PostPage: NextPage<IPostPage> = ({
       if (
         !postParsed?.postUuid ||
         !userLoggedIn ||
-        userData?.userUuid === postParsed?.creator?.uuid
+        userUuid === postParsed?.creator?.uuid
       ) {
         return;
       }
@@ -607,7 +605,7 @@ const PostPage: NextPage<IPostPage> = ({
     postParsed?.postUuid,
     postParsed?.creator?.uuid,
     userLoggedIn,
-    userData?.userUuid,
+    userUuid,
   ]);
 
   // Infinite scroll
@@ -727,7 +725,7 @@ const PostPage: NextPage<IPostPage> = ({
     [
       socketConnection,
       postParsed,
-      userData?.userUuid,
+      userUuid,
       // refetchPost, - reason unknown, probably safe
       // updatePostStatusMutation, - reason unknown
     ]

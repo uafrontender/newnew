@@ -15,7 +15,6 @@ import McOptionsTabModeration from '../../../molecules/decision/moderation/multi
 import useMcOptions from '../../../../utils/hooks/useMcOptions';
 import { useAppState } from '../../../../contexts/appStateContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
-import { useUserData } from '../../../../contexts/userDataContext';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
 const PostTopInfo = dynamic(
@@ -32,9 +31,8 @@ interface IPostViewScheduled {
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
   React.memo(({ variant }) => {
     const { t } = useTranslation('page-Post');
-    const { userData } = useUserData();
     const { mutedMode, toggleMutedMode } = useUiState();
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode, userUuid, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -64,7 +62,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
     } = useMcOptions(
       {
         postUuid: post.postUuid,
-        userUuid: userData?.userUuid,
+        userUuid,
         loggedInUser: userLoggedIn,
       },
       {

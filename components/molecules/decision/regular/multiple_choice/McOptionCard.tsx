@@ -7,7 +7,6 @@ import { Trans, useTranslation } from 'next-i18next';
 import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { useUserData } from '../../../../../contexts/userDataContext';
 import {
   deleteMcOption,
   voteWithBundleVotes,
@@ -119,10 +118,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const router = useRouter();
   const { t } = useTranslation('page-Post');
   const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const { userTutorialsProgress, setUserTutorialsProgress } =
     useTutorialProgress();
-  const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -133,8 +131,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     () =>
       !isCreatorsBid &&
       !!option.creator?.uuid &&
-      option.creator?.uuid === userData?.userUuid,
-    [option.creator?.uuid, userData?.userUuid, isCreatorsBid]
+      option.creator?.uuid === userUuid,
+    [option.creator?.uuid, userUuid, isCreatorsBid]
   );
 
   const isBlue = useMemo(
