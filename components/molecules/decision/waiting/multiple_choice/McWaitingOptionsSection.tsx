@@ -5,7 +5,6 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useUserData } from '../../../../../contexts/userDataContext';
 import useMcOptions, {
   TMcOptionWithHighestField,
 } from '../../../../../utils/hooks/useMcOptions';
@@ -24,8 +23,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
   IMcWaitingOptionsSection
 > = ({ post }) => {
   const { t } = useTranslation('page-Post');
-  const { userData } = useUserData();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -45,7 +43,7 @@ const McWaitingOptionsSection: React.FunctionComponent<
     {
       postUuid: post.postUuid,
       loggedInUser: userLoggedIn,
-      userUuid: userData?.userUuid,
+      userUuid,
     },
     {
       refetchOnWindowFocus: false,
