@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -17,8 +17,9 @@ interface IFunctionProps {
 export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
   ({ isBundlesEnabled }) => {
     const { t } = useTranslation('page-Creator');
-    const [totalEarned, setTotalEarned] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState<boolean | null>(null);
+    const [totalEarned, setTotalEarned] = useState(0);
+    const loading = useRef(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { appConstants } = useGetAppConstants();
     const [myEarnings, setMyEarnings] = useState<
       newnewapi.GetMyBundleEarningsResponse | undefined
@@ -28,6 +29,7 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
       async function fetchMyEarnings() {
         try {
           setIsLoading(true);
+          loading.current = true;
           const payload = new newnewapi.GetMyBundleEarningsRequest();
           const res = await getMyBundleEarnings(payload);
 
@@ -40,17 +42,20 @@ export const BundlesEarnings: React.FC<IFunctionProps> = React.memo(
           if (res.data.totalBundleEarnings?.usdCents) {
             setTotalEarned(res.data.totalBundleEarnings.usdCents);
           }
-
-          setIsLoading(false);
         } catch (err) {
           console.error(err);
-          setIsLoading(null);
+        } finally {
+          setIsLoading(false);
+          loading.current = false;
         }
       }
-      if (isLoading === null) {
-        fetchMyEarnings();
+
+      if (loading.current) {
+        return;
       }
-    }, [myEarnings, isLoading]);
+
+      fetchMyEarnings();
+    }, []);
 
     const renderListItem = useCallback(
       (item: newnewapi.IBundleOffer) => {

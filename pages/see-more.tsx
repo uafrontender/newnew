@@ -62,6 +62,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
   const [nextPageToken, setNextPageToken] = useState<string | null | undefined>(
     ''
   );
+  const collectionLoading = useRef(false);
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -75,9 +76,14 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       sorting?: newnewapi.PostSorting;
       pageToken?: string;
     }) => {
-      if (isCollectionLoading) return;
+      if (collectionLoading.current) {
+        return;
+      }
+
+      setIsCollectionLoading(true);
+      collectionLoading.current = true;
+
       try {
-        setIsCollectionLoading(true);
         let res: APIResponse<
           | newnewapi.PagedPostsResponse
           | newnewapi.PagedMultipleChoicesResponse
@@ -111,6 +117,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             ]);
             setNextPageToken(res.data.paging?.nextPageToken);
             setIsCollectionLoading(false);
+            collectionLoading.current = false;
             return;
           }
           throw new Error('Request failed');
@@ -145,6 +152,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             ]);
             setNextPageToken(res.data.paging?.nextPageToken);
             setIsCollectionLoading(false);
+            collectionLoading.current = false;
             return;
           }
           throw new Error('Request failed');
@@ -180,6 +188,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             ]);
             setNextPageToken(res.data.paging?.nextPageToken);
             setIsCollectionLoading(false);
+            collectionLoading.current = false;
             return;
           }
           throw new Error('Request failed');
@@ -245,6 +254,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             ]);
             setNextPageToken(res.data.paging?.nextPageToken);
             setIsCollectionLoading(false);
+            collectionLoading.current = false;
             return;
           }
           throw new Error('Request failed');
@@ -279,6 +289,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
             ]);
             setNextPageToken(res.data.paging?.nextPageToken);
             setIsCollectionLoading(false);
+            collectionLoading.current = false;
             return;
           }
           throw new Error('Request failed');
@@ -286,11 +297,12 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
       } catch (err) {
         console.error(err);
         setIsCollectionLoading(false);
+        collectionLoading.current = false;
         showErrorToastPredefined(undefined);
       }
     },
 
-    [userLoggedIn, isCollectionLoading, showErrorToastPredefined]
+    [userLoggedIn, showErrorToastPredefined]
   );
   // Scroll to top once category changed
   useEffect(() => {
