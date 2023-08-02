@@ -18,7 +18,7 @@ export const Logo: React.FunctionComponent<{
   style?: React.CSSProperties;
   isShort?: boolean;
 }> = ({ style, isShort }) => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
   const { resizeMode } = useAppState();
@@ -44,13 +44,13 @@ export const Logo: React.FunctionComponent<{
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setLoading(!loading);
+      setIsLoading((curr) => !curr);
     }, 3000);
 
     return () => {
       clearInterval(interval);
     };
-  });
+  }, []);
 
   const Content = (
     <SWrapper
@@ -73,7 +73,7 @@ export const Logo: React.FunctionComponent<{
             autoplay: true,
             animationData: logoAnimation,
           }}
-          isStopped={!loading}
+          isStopped={!isLoading}
         />
       </SAnimationWrapper>
       {!isMobile && !isShort && (

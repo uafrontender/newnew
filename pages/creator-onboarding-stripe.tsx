@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -24,32 +24,36 @@ const OnboardingSectionStripe = dynamic(
 const CreatorOnboardingStripe = () => {
   const { t } = useTranslation('page-CreatorOnboarding');
 
+  const loading = useRef(false);
   const [isLoading, setIsLoading] = useState<null | boolean>(null);
   const { updateCreatorData } = useUserData();
 
   useEffect(
     () => {
       async function fetchOnboardingState() {
-        if (isLoading) return;
+        if (loading.current) {
+          return;
+        }
+
+        loading.current = true;
+
         try {
-          setIsLoading(true);
           const payload = new newnewapi.EmptyRequest({});
           const res = await getMyOnboardingState(payload);
           if (res.data) {
             updateCreatorData(res.data);
           }
-
-          setIsLoading(false);
         } catch (err) {
           console.error(err);
+        } finally {
           setIsLoading(false);
+          loading.current = false;
         }
       }
       fetchOnboardingState();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      // isLoading, - reason unknown
       // updateCreatorData, - reason unknown
     ]
   );

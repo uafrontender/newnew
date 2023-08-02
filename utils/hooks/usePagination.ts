@@ -32,7 +32,8 @@ function usePagination<T>(
 ): PaginatedData<T> {
   const lifeCycleIdRef = useRef<string | undefined>();
   const [data, setData] = useState<T[]>(initialState?.data || []);
-  const [loading, setLoading] = useState<boolean>(false);
+  const loadingRef = useRef(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(
     initialState ? !!initialState.pageToken : true
   );
@@ -47,7 +48,8 @@ function usePagination<T>(
 
   const loadMoreData = useCallback(
     async (lifeCycleIdAtStart: string, limit?: number, initial?: boolean) => {
-      setLoading(true);
+      setIsLoading(true);
+      loadingRef.current = true;
 
       const paging = {
         limit: limit || pageSize,
@@ -57,7 +59,8 @@ function usePagination<T>(
       const tokenAtStart = savedPageToken.current;
       const { nextData, nextPageToken } = await loadData(paging).catch(
         (err) => {
-          setLoading(false);
+          setIsLoading(false);
+          loadingRef.current = false;
           throw err;
         }
       );
@@ -85,7 +88,8 @@ function usePagination<T>(
         savedPageToken.current = nextPageToken;
       }
 
-      setLoading(false);
+      setIsLoading(false);
+      loadingRef.current = false;
     },
     [pageSize, loadData]
   );
@@ -112,7 +116,8 @@ function usePagination<T>(
 
     setInitialLoadDone(false);
     setHasMore(true);
-    setLoading(false);
+    setIsLoading(false);
+    loadingRef.current = false;
 
     loadMoreData(newLifeCycle, undefined, true)
       .then(() => {
@@ -125,7 +130,7 @@ function usePagination<T>(
     async (limit?: number) => {
       if (
         delayed ||
-        loading ||
+        loadingRef.current ||
         data.length === 0 ||
         !hasMore ||
         !initialLoadDone ||
@@ -137,12 +142,12 @@ function usePagination<T>(
       // eslint-disable-next-line consistent-return
       return loadMoreData(lifeCycleIdRef.current, limit);
     },
-    [delayed, loading, data, hasMore, initialLoadDone, loadMoreData]
+    [delayed, data, hasMore, initialLoadDone, loadMoreData]
   );
 
   return {
     data,
-    loading,
+    loading: isLoading,
     hasMore,
     initialLoadDone,
     loadMore,

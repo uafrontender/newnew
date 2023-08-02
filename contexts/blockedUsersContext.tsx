@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
   useCallback,
+  useRef,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { getMyBlockedUsers, markUser } from '../api/endpoints/user';
@@ -33,7 +34,7 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
   const { userLoggedIn } = useAppState();
   const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
   const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
-  const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
+  const usersBlockedLoading = useRef(false);
   const [usersBlockedLoaded, setUsersBlockedLoaded] = useState(false);
   const [isChangingUserBlockedStatus, setIsChangingUserBlockedStatus] =
     useState(false);
@@ -82,12 +83,13 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         setUsersIBlocked([]);
       }
 
-      if (!userLoggedIn || usersBlockedLoading) {
+      if (!userLoggedIn || usersBlockedLoading.current) {
         return;
       }
 
+      usersBlockedLoading.current = true;
+
       try {
-        setUsersBlockedLoading(true);
         const payload = new newnewapi.EmptyRequest();
         const res = await getMyBlockedUsers(payload);
 
@@ -100,11 +102,13 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         setUsersBlockedLoaded(true);
       } catch (err) {
         console.error(err);
-        setUsersBlockedLoading(false);
+      } finally {
+        usersBlockedLoading.current = false;
       }
     }
+
     fetchBlockedUsers();
-  }, [userLoggedIn, usersBlockedLoading]);
+  }, [userLoggedIn]);
 
   useEffect(() => {
     const socketHandlerUserBlockStatusChanged = async (data: any) => {
