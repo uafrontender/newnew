@@ -119,7 +119,7 @@ const PostPage: NextPage<IPostPage> = ({
     [comment_content]
   );
 
-  const responseNumberFromUrl = useMemo(
+  const responseUuidFromUrl = useMemo(
     () => response_uuid_from_url,
     [response_uuid_from_url]
   );
@@ -553,9 +553,7 @@ const PostPage: NextPage<IPostPage> = ({
   useEffect(
     () => {
       const shouldReplace =
-        !!commentIdFromUrl ||
-        !!commentContentFromUrl ||
-        !!responseNumberFromUrl;
+        !!commentIdFromUrl || !!commentContentFromUrl || !!responseUuidFromUrl;
 
       if (shouldReplace) {
         router.replace(`/p/${postUuidOrShortId}`, undefined, {
@@ -963,7 +961,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       save_card,
       bundle,
       custom_option_text,
-      response_uuid,
+      targetVideo,
     } = context.query;
     const translationContext = await serverSideTranslations(
       context.locale!!,
@@ -1043,8 +1041,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
-          ...(response_uuid && !Array.isArray(response_uuid)
-            ? { response_uuid_from_url: response_uuid }
+          ...(targetVideo && !Array.isArray(targetVideo)
+            ? { response_uuid_from_url: targetVideo }
             : {}),
         };
 
@@ -1106,8 +1104,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
-          ...(response_uuid && !Array.isArray(response_uuid)
-            ? { response_uuid_from_url: response_uuid }
+          ...(targetVideo && !Array.isArray(targetVideo)
+            ? { response_uuid_from_url: targetVideo }
             : {}),
           ...translationContext,
         },
@@ -1146,8 +1144,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         ...(custom_option_text && !Array.isArray(custom_option_text)
           ? { custom_option_text }
           : {}),
-        ...(response_uuid && !Array.isArray(response_uuid)
-          ? { response_uuid_from_url: response_uuid }
+        ...(targetVideo && !Array.isArray(targetVideo)
+          ? { response_uuid_from_url: targetVideo }
           : {}),
         ...translationContext,
       },
