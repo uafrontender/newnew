@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -31,6 +31,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   const { userLoggedIn, handleUserLoggedIn } = useAppState();
   const { updateUserData } = useUserData();
   const { setSignupEmailInput, setSignupTimerValue } = useSignup();
+  const loading = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -52,10 +53,14 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
-      if (isLoading) return;
-      try {
-        setIsLoading(true);
+      if (loading.current) {
+        return;
+      }
 
+      setIsLoading(true);
+      loading.current = true;
+
+      try {
         if (!email_address || !token) {
           throw new Error('No token on email verification');
         }
@@ -121,6 +126,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         resumePushNotification();
 
         setIsLoading(false);
+        loading.current = false;
         if (data.redirectUrl) {
           router?.replace(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
@@ -131,6 +137,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
       } catch (err) {
         // NB! Might need an error toast
         setIsLoading(false);
+        loading.current = false;
         setSignInError(true);
         // router.replace('/');
       }

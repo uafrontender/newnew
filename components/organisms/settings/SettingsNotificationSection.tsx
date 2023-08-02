@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -21,6 +21,7 @@ const SettingsNotificationsSection = () => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(
     userData?.options?.isEmailNotificationsEnabled ?? false
   );
+  const emailLoading = useRef(false);
   const [isEmailLoading, setIsEmailLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -37,41 +38,46 @@ const SettingsNotificationsSection = () => {
   } = usePushNotifications();
   const [isWebPushLoading, setIsWebPushLoading] = useState<boolean>(false);
 
-  const updateEmailNotificationState = async (e: React.SyntheticEvent) => {
-    if (isEmailLoading) {
-      return;
-    }
-
-    Mixpanel.track('Update My Notification State', {
-      _stage: 'Settings',
-      _source: newnewapi.NotificationState.NotificationSource.EMAIL,
-      _isEnabled: (e.target as HTMLInputElement).checked,
-    });
-
-    setIsEmailLoading(true);
-
-    try {
-      const payload = new newnewapi.UpdateMyNotificationsStateRequest({
-        notificationState: {
-          notificationSource:
-            newnewapi.NotificationState.NotificationSource.EMAIL,
-          isEnabled: (e.target as HTMLInputElement).checked,
-        },
-      });
-      const res = await updateMyNotificationsState(payload);
-      if (res.error) {
-        throw new Error(res.error?.message ?? 'Request failed');
+  const updateEmailNotificationState = useCallback(
+    async (e: React.SyntheticEvent) => {
+      if (emailLoading.current) {
+        return;
       }
 
-      setIsEmailNotificationEnabled((e.target as HTMLInputElement).checked);
-    } catch (err) {
-      console.error(err);
-      showErrorToastPredefined(undefined);
-      setIsEmailNotificationEnabled(isEmailNotificationEnabled);
-    } finally {
-      setIsEmailLoading(false);
-    }
-  };
+      Mixpanel.track('Update My Notification State', {
+        _stage: 'Settings',
+        _source: newnewapi.NotificationState.NotificationSource.EMAIL,
+        _isEnabled: (e.target as HTMLInputElement).checked,
+      });
+
+      setIsEmailLoading(true);
+      emailLoading.current = true;
+
+      try {
+        const payload = new newnewapi.UpdateMyNotificationsStateRequest({
+          notificationState: {
+            notificationSource:
+              newnewapi.NotificationState.NotificationSource.EMAIL,
+            isEnabled: (e.target as HTMLInputElement).checked,
+          },
+        });
+        const res = await updateMyNotificationsState(payload);
+        if (res.error) {
+          throw new Error(res.error?.message ?? 'Request failed');
+        }
+
+        setIsEmailNotificationEnabled((e.target as HTMLInputElement).checked);
+      } catch (err) {
+        console.error(err);
+        showErrorToastPredefined(undefined);
+        setIsEmailNotificationEnabled(isEmailNotificationEnabled);
+      } finally {
+        setIsEmailLoading(false);
+        emailLoading.current = false;
+      }
+    },
+    [isEmailNotificationEnabled, showErrorToastPredefined]
+  );
 
   const turnOnPushNotifications = async () => {
     Mixpanel.track('Turn On Push Notifications', {
