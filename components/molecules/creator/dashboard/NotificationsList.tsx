@@ -1,10 +1,10 @@
 import React, {
   useCallback,
   useRef,
-  useState,
   useEffect,
   useMemo,
   useContext,
+  useState,
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -20,31 +20,21 @@ import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
 import { useUserData } from '../../../../contexts/userDataContext';
-import {
-  getMyNotifications,
-  markAllAsRead,
-  markAsRead,
-} from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import mobileLogo from '../../../../public/images/svg/MobileLogo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../../utils/hooks/usePagination';
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import Loader from '../../../atoms/Loader';
 import { SocketContext } from '../../../../contexts/socketContext';
+import useMyNotifications, {
+  useMyNotificationsActions,
+} from '../../../../utils/hooks/useMyNotifications';
 
-interface IFunction {
-  markReadNotifications: boolean;
-}
+interface IFunction {}
 
-export const NotificationsList: React.FC<IFunction> = ({
-  markReadNotifications,
-}) => {
+export const NotificationsList: React.FC<IFunction> = () => {
   const scrollRef: any = useRef();
   const { socketConnection } = useContext(SocketContext);
   const { ref: scrollRefNotifications, inView } = useInView();
@@ -53,118 +43,39 @@ export const NotificationsList: React.FC<IFunction> = ({
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
 
-  const [newNotifications, setNewNotifications] = useState<
-    newnewapi.INotification[]
-  >([]);
-
-  const [unreadNotifications, setUnreadNotifications] = useState<
-    number[] | null
-  >(null);
-
   // Used to update notification timers
   const [currentTime, setCurrentTime] = useState(Date.now());
 
-  // TODO: return a list of new notifications once WS message can be used
-  // const [newNotifications, setNewNotifications] = useState<
-  //   newnewapi.INotification[]
-  // >([]);
+  const { data, isLoading, hasNextPage, isFetched, fetchNextPage } =
+    useMyNotifications({
+      limit: 10,
+    });
 
-  const loadData = useCallback(
-    async (
-      paging: Paging
-    ): Promise<PaginatedResponse<newnewapi.INotification>> => {
-      const payload = new newnewapi.GetMyNotificationsRequest({
-        paging,
-      });
+  const { markAsReadMutation, markAllAsRead, addNewNotificationMutation } =
+    useMyNotificationsActions();
 
-      const res = await getMyNotifications(payload);
+  const { mutate: markNotificationAsRead } = markAsReadMutation;
+  const { mutate: addNewNotification } = addNewNotificationMutation;
 
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
-      }
-
-      setUnreadNotifications((curr) => {
-        const arr = curr ? [...curr] : [];
-        res.data?.notifications.forEach((item) => {
-          if (!item.isRead) {
-            arr.push(item.id as number);
-          }
-        });
-        return arr;
-      });
-
-      return {
-        nextData: res.data.notifications,
-        nextPageToken: res.data.paging?.nextPageToken,
-      };
-    },
-    []
-  );
-
-  const {
-    data: notifications,
-    loading,
-    hasMore,
-    initialLoadDone,
-    loadMore,
-  } = usePagination(loadData, 6);
-
-  const markAllNotifications = useCallback(async () => {
-    try {
-      const payload = new newnewapi.EmptyRequest();
-      const res = await markAllAsRead(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      setUnreadNotifications(null);
-    } catch (err) {
-      console.error(err);
+  const notifications = useMemo(() => {
+    if (data) {
+      return data.pages.map((page) => page.notifications).flat();
     }
-  }, []);
 
-  const markNotificationAsRead = useCallback(
-    async (notification: newnewapi.INotification) => {
-      if (!notification || notification.isRead) {
-        return;
-      }
-
-      try {
-        const payload = new newnewapi.MarkAsReadRequest({
-          notificationIds: [notification.id as number],
-        });
-        const res = await markAsRead(payload);
-
-        if (res.error) {
-          throw new Error(res.error?.message ?? 'Request failed');
-        }
-
-        setUnreadNotifications((curr) => {
-          const arr = curr ? [...curr] : [];
-          const result = arr.filter((item) => item !== notification.id);
-          return result;
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    []
-  );
+    return [];
+  }, [data]);
 
   useEffect(() => {
-    if (markReadNotifications) {
-      markAllNotifications();
+    if (inView && !isLoading && hasNextPage) {
+      fetchNextPage();
     }
-  }, [markReadNotifications, markAllNotifications]);
-
-  useEffect(() => {
-    if (inView && !loading && hasMore) {
-      loadMore().catch((e) => console.error(e));
-    }
-  }, [inView, loading, hasMore, loadMore]);
+  }, [inView, isLoading, hasNextPage, fetchNextPage]);
 
   useEffect(() => {
     const updateTimeInterval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 60000);
+
     return () => {
       clearInterval(updateTimeInterval);
     };
@@ -173,26 +84,22 @@ export const NotificationsList: React.FC<IFunction> = ({
   useEffect(() => {
     // If all notifications read in other tabs/apps
     if (notificationsDataLoaded && unreadNotificationCount === 0) {
-      setUnreadNotifications([]);
+      markAllAsRead();
     }
-  }, [notificationsDataLoaded, unreadNotificationCount]);
+  }, [notificationsDataLoaded, unreadNotificationCount, markAllAsRead]);
 
   useEffect(() => {
-    const handleNotificationCreated = async (data: any) => {
-      const arr = new Uint8Array(data);
+    const handleNotificationCreated = async (newData: any) => {
+      const arr = new Uint8Array(newData);
       const decoded = newnewapi.NotificationCreated.decode(arr);
 
       if (!decoded) {
         return;
       }
 
-      setNewNotifications((curr) => {
-        if (!decoded.notification) {
-          return curr;
-        }
-
-        return [decoded.notification, ...curr];
-      });
+      if (decoded.notification) {
+        addNewNotification(decoded.notification);
+      }
     };
 
     if (socketConnection) {
@@ -204,10 +111,12 @@ export const NotificationsList: React.FC<IFunction> = ({
         socketConnection?.off('NotificationCreated', handleNotificationCreated);
       }
     };
-  }, [socketConnection]);
+  }, [socketConnection, addNewNotification]);
 
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
-  const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
+  const getUrl = (
+    target: newnewapi.IRoutingTarget | null | undefined
+  ): string | undefined => {
     if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
         return '/direct-messages';
@@ -239,7 +148,8 @@ export const NotificationsList: React.FC<IFunction> = ({
         }`;
       }
     }
-    return '/direct-messages';
+
+    return undefined;
   };
 
   const getEnrichedNotificationMessage = useCallback(
@@ -288,89 +198,84 @@ export const NotificationsList: React.FC<IFunction> = ({
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification, itemCurrentTime: number) => {
       const message = getEnrichedNotificationMessage(item);
+      const url = getUrl(item.target);
+
+      const NotificationsItem = (
+        <SNotificationItem
+          key={`notification-item-${item.id}`}
+          onClick={() => {
+            markNotificationAsRead(item);
+          }}
+          onContextMenu={() => {
+            markNotificationAsRead(item);
+          }}
+        >
+          {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
+            <SNotificationItemAvatar
+              withClick
+              avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
+            />
+          ) : (
+            <SIconHolder>
+              <InlineSvg
+                clickable
+                svg={mobileLogo}
+                fill='#fff'
+                width='24px'
+                height='24px'
+              />
+            </SIconHolder>
+          )}
+          <SNotificationItemCenter>
+            {message && (
+              <SNotificationItemText variant={3} weight={600}>
+                {message}
+              </SNotificationItemText>
+            )}
+            <SNotificationItemTime variant={2} weight={600}>
+              {moment((item.createdAt?.seconds as number) * 1000)
+                .locale(locale || 'en-US')
+                .fromNow()}
+            </SNotificationItemTime>
+          </SNotificationItemCenter>
+          {!item.isRead && <SNotificationItemIndicator minified />}
+        </SNotificationItem>
+      );
+
+      if (!url) {
+        return NotificationsItem;
+      }
 
       return (
-        <Link href={getUrl(item.target)} key={item.id as number}>
-          <a>
-            <SNotificationItem
-              key={`notification-item-${item.id}`}
-              onClick={() => {
-                markNotificationAsRead(item);
-              }}
-              onContextMenu={() => {
-                markNotificationAsRead(item);
-              }}
-            >
-              {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
-                <SNotificationItemAvatar
-                  withClick
-                  avatarUrl={
-                    item.content?.relatedUser?.thumbnailAvatarUrl ?? ''
-                  }
-                />
-              ) : (
-                <SIconHolder>
-                  <InlineSvg
-                    clickable
-                    svg={mobileLogo}
-                    fill='#fff'
-                    width='24px'
-                    height='24px'
-                  />
-                </SIconHolder>
-              )}
-              <SNotificationItemCenter>
-                {message && (
-                  <SNotificationItemText variant={3} weight={600}>
-                    {message}
-                  </SNotificationItemText>
-                )}
-                <SNotificationItemTime variant={2} weight={600}>
-                  {moment((item.createdAt?.seconds as number) * 1000)
-                    .locale(locale || 'en-US')
-                    .from(itemCurrentTime)}
-                </SNotificationItemTime>
-              </SNotificationItemCenter>
-              {unreadNotifications &&
-                unreadNotifications.length > 0 &&
-                unreadNotifications.findIndex(
-                  (unreadNotificationId) => unreadNotificationId === item.id
-                ) > -1 && <SNotificationItemIndicator minified />}
-            </SNotificationItem>
-          </a>
+        <Link href={url} key={item.id as number}>
+          <a>{NotificationsItem}</a>
         </Link>
       );
     },
     [
       userData?.userUuid,
       locale,
-      unreadNotifications,
       getEnrichedNotificationMessage,
       markNotificationAsRead,
     ]
-  );
-
-  const displayedNotifications: newnewapi.INotification[] = useMemo(
-    () => [...newNotifications, ...notifications],
-    [newNotifications, notifications]
   );
 
   return (
     <div ref={scrollRef}>
       {
         // eslint-disable-next-line no-nested-ternary
-        !displayedNotifications?.length && (loading || !initialLoadDone) ? (
+        !notifications?.length && (isLoading || !isFetched) ? (
           <Loader size='md' isStatic />
-        ) : displayedNotifications && displayedNotifications.length < 1 ? (
+        ) : notifications && notifications.length < 1 ? (
           <NoResults />
         ) : (
-          displayedNotifications &&
-          displayedNotifications.map((notification) =>
+          notifications &&
+          notifications.map((notification) =>
             renderNotificationItem(notification, currentTime)
           )
         )
       }
-      {hasMore && !loading && initialLoadDone && (
+      {hasNextPage && !isLoading && isFetched && (
         <SRef ref={scrollRefNotifications}>
           <Lottie
             width={64}

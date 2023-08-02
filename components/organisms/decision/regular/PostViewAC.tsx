@@ -542,7 +542,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.ac'
-              components={[<SDisplayName user={post.creator} />]}
+              components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}
@@ -670,7 +670,3 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
-`;

@@ -11,7 +11,7 @@ import moment from 'moment';
 import dynamic from 'next/dynamic';
 import compact from 'lodash/compact';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useUpdateEffect } from 'react-use';
@@ -53,6 +53,7 @@ import { SocketContext } from '../../../../contexts/socketContext';
 import waitResourceIsAvailable from '../../../../utils/checkResourceAvailable';
 import useGoBackOrRedirect from '../../../../utils/useGoBackOrRedirect';
 import isBrowser from '../../../../utils/isBrowser';
+import { useBundles } from '../../../../contexts/bundlesContext';
 
 const VideojsPlayer = dynamic(() => import('../../../atoms/VideojsPlayer'), {
   ssr: false,
@@ -100,6 +101,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   } = useMemo(() => postInCreation, [postInCreation]);
 
   const { userData, userTimezone } = useUserData();
+  const { isSellingBundles } = useBundles();
 
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
@@ -232,10 +234,20 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleCloseModal = useCallback(() => {
     setIsGoingToHomepage(true);
     setShowModal(false);
-    router.push('/').then(() => {
+    Router.push('/').then(() => {
       clearCreation();
     });
-  }, [router, clearCreation]);
+  }, [clearCreation]);
+
+  const handleRedirect = useCallback(
+    (url: string) => {
+      setIsGoingToHomepage(true);
+      Router.push(url).then(() => {
+        clearCreation();
+      });
+    },
+    [clearCreation]
+  );
 
   const handleSubmit = useCallback(async () => {
     Mixpanel.track('Publish Post', { _stage: 'Creation' });
@@ -320,7 +332,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             })
           ),
           // TODO: remove as unused
-          isSuggestionsAllowed: userData?.options?.isOfferingBundles,
+          isSuggestionsAllowed: isSellingBundles,
         };
       } else if (tab === 'crowdfunding') {
         body.crowdfunding = {
@@ -377,7 +389,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     isMobile,
     auction.minimalBid,
     multiplechoice.choices,
-    userData?.options?.isOfferingBundles,
+    isSellingBundles,
     crowdfunding.targetBackerCount,
     router,
     showErrorToastPredefined,
@@ -456,7 +468,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           ),
         },
         tab === 'multiple-choice' &&
-          userData?.options?.isOfferingBundles && {
+          isSellingBundles && {
             key: 'allowSuggestions',
             value: t(`preview.values.allowSuggestions-allowed`),
           },
@@ -468,7 +480,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       post.options.commentsEnabled,
       auction.minimalBid,
       crowdfunding.targetBackerCount,
-      userData?.options?.isOfferingBundles,
+      isSellingBundles,
       router.locale,
       formatExpiresAt,
       timezone,
@@ -500,6 +512,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     </SChoiceItem>
   );
 
+  // TODO: Why do we need it?
   useUpdateEffect(() => {
     if (!post.title && !isGoingToHomepage) {
       router?.push('/creation');
@@ -662,7 +675,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     return (
       <>
         {isGoingToHomepage && <LoadingView />}
-        <PublishedModal open={showModal} handleClose={handleCloseModal} />
+        <PublishedModal
+          open={showModal}
+          handleRedirect={handleRedirect}
+          handleClose={handleCloseModal}
+        />
         <SContent>
           <STopLine>
             <SInlineSVG
@@ -717,7 +734,11 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   return (
     <>
       {isGoingToHomepage && <LoadingView />}
-      <PublishedModal open={showModal} handleClose={handleCloseModal} />
+      <PublishedModal
+        open={showModal}
+        handleRedirect={handleRedirect}
+        handleClose={handleCloseModal}
+      />
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>

@@ -249,15 +249,16 @@ export default BundlePaymentModal;
 
 const ModalTitle = styled.h4`
   display: inline-flex;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-right: 20px;
+  width: calc(100% - 40px); // 40 px close modal button
+
   white-space: pre;
   font-weight: 600;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
   font-size: 12px;
   line-height: 16px;
-
-  margin-top: 16px;
-  margin-bottom: 16px;
 `;
 
 const SVotesNumber = styled.p`

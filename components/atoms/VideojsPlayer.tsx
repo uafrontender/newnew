@@ -10,7 +10,6 @@ import styled, { css, useTheme } from 'styled-components';
 import hlsParser from 'hls-parser';
 import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
-import debounce from 'lodash/debounce';
 
 import Button from './Button';
 import Lottie from './Lottie';
@@ -61,15 +60,6 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const [isPaused, setIsPaused] = useState(false);
 
-  const debouncedSetIsPaused = debounce(setIsPaused, 100);
-
-  const handleSetIsPaused = useCallback(
-    (stateValue: boolean) => {
-      debouncedSetIsPaused(stateValue);
-    },
-    [debouncedSetIsPaused]
-  );
-
   const [videoOrientation, setVideoOrientation] = useState<
     'vertical' | 'horizontal'
   >('vertical');
@@ -112,12 +102,12 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
               setTimeout(() => setIsScrubberTimeChanging(false), 100);
             })
             .catch(() => {
-              handleSetIsPaused(true);
+              setIsPaused(true);
             });
         }, 100);
       }
     },
-    [handleSetIsPaused, isPaused]
+    [isPaused]
   );
 
   const options: videojs.PlayerOptions = useMemo(
@@ -177,16 +167,16 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       // Autoplay
       p?.on('ready', (e) => {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       });
 
       // Paused state
       p?.on('play', () => {
-        handleSetIsPaused(false);
+        setIsPaused(false);
       });
       p?.on('pause', () => {
-        handleSetIsPaused(true);
+        setIsPaused(true);
       });
 
       p?.on('timeupdate', (e) => {
@@ -197,7 +187,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       p?.on('loadstart', (e) => {
         setIsLoading(true);
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       });
       p?.on('canplay', (e) => {
@@ -206,7 +196,6 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      handleSetIsPaused,
       // resources, - reason unknown
       innerRef,
     ]
@@ -246,6 +235,11 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
     }
   }, [isMuted]);
 
+  const shouldShowPlayPseudoButton = useMemo(
+    () => showPlayButton && isPaused && !isScrubberTimeChanging,
+    [showPlayButton, isPaused, isScrubberTimeChanging]
+  );
+
   return (
     <SContent
       borderRadius={borderRadius}
@@ -263,32 +257,26 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
               playerRef.current?.pause();
             } else {
               playerRef.current?.play()?.catch(() => {
-                handleSetIsPaused(true);
+                setIsPaused(true);
               });
             }
           }}
         />
-        {showPlayButton && isPaused && !isScrubberTimeChanging && (
-          <SPlayPseudoButton
-            onClick={() => {
-              if (!playerRef.current?.paused()) {
-                playerRef.current?.pause();
-              } else {
-                playerRef.current?.play()?.catch(() => {
-                  handleSetIsPaused(true);
-                });
-              }
-            }}
-            size={playButtonSize}
-          >
-            <InlineSVG
-              svg={PlayIcon}
-              width='32px'
-              height='32px'
-              fill='#FFFFFF'
-            />
-          </SPlayPseudoButton>
-        )}
+        <SPlayPseudoButton
+          show={shouldShowPlayPseudoButton}
+          size={playButtonSize}
+          onClick={() => {
+            if (!playerRef.current?.paused()) {
+              playerRef.current?.pause();
+            } else {
+              playerRef.current?.play()?.catch(() => {
+                setIsPaused(true);
+              });
+            }
+          }}
+        >
+          <InlineSVG svg={PlayIcon} width='32px' height='32px' fill='#FFFFFF' />
+        </SPlayPseudoButton>
       </SVideoWrapper>
       {isLoading && (
         <SLoader>
@@ -476,7 +464,10 @@ const SModalSoundIcon = styled.div<ISModalSoundIcon>`
   }
 `;
 
-const SPlayPseudoButton = styled.button<{ size?: 'default' | 'small' }>`
+const SPlayPseudoButton = styled.button<{
+  show?: boolean;
+  size?: 'default' | 'small';
+}>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -493,6 +484,12 @@ const SPlayPseudoButton = styled.button<{ size?: 'default' | 'small' }>`
   border: transparent;
 
   cursor: pointer;
+  pointer-events: ${({ show }) => (show ? 'all' : 'none')};
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transition-property: opacity;
+  transition-timing-function: ease-in;
+  transition-duration: ${({ show }) => (show ? '100ms' : '0ms')};
+  transition-delay: ${({ show }) => (show ? '100ms' : '0ms')};
 
   &:focus,
   &:active {

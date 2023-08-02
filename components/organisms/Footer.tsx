@@ -279,6 +279,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 export default Footer;
 
 const SWrapper = styled.footer`
+  padding-bottom: 36px;
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.background.secondary

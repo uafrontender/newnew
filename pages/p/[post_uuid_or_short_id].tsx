@@ -37,7 +37,7 @@ import { useUserData } from '../../contexts/userDataContext';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
 import CommentFromUrlContextProvider from '../../contexts/commentFromUrlContext';
-import ResponseNumberFromUrlContextProvider from '../../contexts/responseNumberFromUrlContext';
+import ResponseUuidFromUrlContextProvider from '../../contexts/responseUuidFromUrlContext';
 import PostInnerContextProvider from '../../contexts/postInnerContext';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
@@ -67,7 +67,7 @@ interface IPostPage {
   comment_content?: string;
   custom_option_text?: string;
   save_card?: boolean;
-  response_number_from_url?: string;
+  response_uuid_from_url?: string;
   isServerSide?: boolean;
 }
 
@@ -80,7 +80,7 @@ const PostPage: NextPage<IPostPage> = ({
   comment_id,
   comment_content,
   save_card,
-  response_number_from_url,
+  response_uuid_from_url,
   isServerSide,
 }) => {
   const router = useRouter();
@@ -119,9 +119,9 @@ const PostPage: NextPage<IPostPage> = ({
     [comment_content]
   );
 
-  const responseNumberFromUrl = useMemo(
-    () => response_number_from_url,
-    [response_number_from_url]
+  const responseUuidFromUrl = useMemo(
+    () => response_uuid_from_url,
+    [response_uuid_from_url]
   );
 
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
@@ -553,9 +553,7 @@ const PostPage: NextPage<IPostPage> = ({
   useEffect(
     () => {
       const shouldReplace =
-        !!commentIdFromUrl ||
-        !!commentContentFromUrl ||
-        !!responseNumberFromUrl;
+        !!commentIdFromUrl || !!commentContentFromUrl || !!responseUuidFromUrl;
 
       if (shouldReplace) {
         router.replace(`/p/${postUuidOrShortId}`, undefined, {
@@ -933,11 +931,11 @@ export default PostPage;
       commentIdFromUrl={page?.props?.comment_id || undefined}
       commentContentFromUrl={page?.props?.comment_content || undefined}
     >
-      <ResponseNumberFromUrlContextProvider
+      <ResponseUuidFromUrlContextProvider
         responseFromUrlInitial={
-          page?.props?.response_number_from_url &&
-          !Number.isNaN(parseInt(page?.props?.response_number_from_url))
-            ? page?.props?.response_number_from_url
+          page?.props?.response_uuid_from_url &&
+          validateUuid(page?.props?.response_uuid_from_url)
+            ? page?.props?.response_uuid_from_url
             : undefined
         }
       >
@@ -946,7 +944,7 @@ export default PostPage;
             {page}
           </React.Fragment>
         </AnimatePresence>
-      </ResponseNumberFromUrlContextProvider>
+      </ResponseUuidFromUrlContextProvider>
     </CommentFromUrlContextProvider>
   </GeneralLayout>
 );
@@ -963,7 +961,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       save_card,
       bundle,
       custom_option_text,
-      response_number,
+      targetVideo,
     } = context.query;
     const translationContext = await serverSideTranslations(
       context.locale!!,
@@ -1043,8 +1041,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
-          ...(response_number && !Array.isArray(response_number)
-            ? { response_number_from_url: response_number }
+          ...(targetVideo && !Array.isArray(targetVideo)
+            ? { response_uuid_from_url: targetVideo }
             : {}),
         };
 
@@ -1106,8 +1104,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
-          ...(response_number && !Array.isArray(response_number)
-            ? { response_number_from_url: response_number }
+          ...(targetVideo && !Array.isArray(targetVideo)
+            ? { response_uuid_from_url: targetVideo }
             : {}),
           ...translationContext,
         },
@@ -1146,8 +1144,8 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
         ...(custom_option_text && !Array.isArray(custom_option_text)
           ? { custom_option_text }
           : {}),
-        ...(response_number && !Array.isArray(response_number)
-          ? { response_number_from_url: response_number }
+        ...(targetVideo && !Array.isArray(targetVideo)
+          ? { response_uuid_from_url: targetVideo }
           : {}),
         ...translationContext,
       },

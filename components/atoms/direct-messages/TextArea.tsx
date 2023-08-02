@@ -1,10 +1,11 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useState, useRef } from 'react';
 import styled from 'styled-components';
 import TextAreaAutoSize from 'react-textarea-autosize';
 import InlineSvg from '../InlineSVG';
 import AnimatedPresence from '../AnimatedPresence';
 
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import usePreventLayoutMoveOnInputFocusIOS from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusIOS';
 
 interface ITextArea {
   id?: string;
@@ -32,6 +33,8 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     gotMaxLength,
     setTextareaFocused,
   } = props;
+
+  const ref = useRef<HTMLTextAreaElement | null>(null);
 
   const [isEnter, setIsEnter] = useState<boolean>(false);
 
@@ -61,10 +64,14 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     setTextareaFocused?.();
   }, [setTextareaFocused]);
 
+  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
+  usePreventLayoutMoveOnInputFocusIOS(ref);
+
   return (
     <SWrapper>
       <SContent className={className} error={!!error} variant={variant}>
         <STextArea
+          ref={ref}
           maxRows={8}
           value={value}
           onChange={handleChange}
@@ -72,7 +79,6 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           maxLength={maxlength}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-          data-new-message-textarea
         />
       </SContent>
       {error ? (

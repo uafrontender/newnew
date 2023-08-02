@@ -38,9 +38,9 @@ import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
-import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
-import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
+import useDisableTouchMoveIOS from '../../../utils/hooks/useDisableTouchMoveIOS';
 import { ReportData } from '../../molecules/ReportModal';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const BlockedUser = dynamic(
@@ -84,6 +84,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   const { t } = useTranslation('page-Chat');
   const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   const chatContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -91,6 +92,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     initialChatRoom.id as number,
     {
       initialData: initialChatRoom,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -303,7 +305,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           });
 
           // Update Chat
-          refetchChatRoom();
+          await refetchChatRoom();
           setSendingMessage(false);
 
           if (chatContentRef.current) {
@@ -436,11 +438,17 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
-  // react-focus-on cannot be used here because of column-reverse
-  useDisableTouchMoveSafari(chatContentRef, isHidden);
+  // FocusOn cannot be use because of column reverse
+  useEffect(() => {
+    enableOverlayMode();
 
-  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
-  usePreventLayoutMoveOnInputFocusSafari('data-new-message-textarea');
+    return () => {
+      disableOverlayMode();
+    };
+  }, [enableOverlayMode, disableOverlayMode]);
+
+  // react-focus-on cannot be used here because of column-reverse
+  useDisableTouchMoveIOS(chatContentRef, isHidden);
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
@@ -497,6 +505,9 @@ const ChatContent: React.FC<IFuncProps> = ({
                       !messageTextValid ||
                       messageText.length < 1
                     }
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                    }}
                   >
                     <SInlineSVG
                       svg={!sendingMessage ? sendIcon : ''}

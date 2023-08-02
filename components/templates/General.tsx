@@ -1,11 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useDeferredValue,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -218,9 +212,10 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
-  const isBottomNavigationVisible = useDeferredValue(
-    mobileNavigationVisible && !globalSearchActive
-  );
+  const isBottomNavigationVisible =
+    mobileNavigationVisible && !globalSearchActive;
+
+  const isNoMobileNavigation = noMobileNavigation && isMobile;
 
   return (
     <>
@@ -236,11 +231,13 @@ export const General: React.FC<IGeneral> = (props) => {
           highlightColor={theme.colorsThemed.background.tertiary}
         >
           <TopContainer>
-            <Header
-              visible={
-                !isMobile || mobileNavigationVisible || globalSearchActive
-              }
-            />
+            {!isNoMobileNavigation && (
+              <Header
+                visible={
+                  !isMobile || mobileNavigationVisible || globalSearchActive
+                }
+              />
+            )}
             <SContent noPaddingTop={!!noMobileNavigation}>
               <Container {...containerParams}>
                 <Row noPaddingMobile={noPaddingMobile}>
@@ -250,12 +247,14 @@ export const General: React.FC<IGeneral> = (props) => {
             </SContent>
           </TopContainer>
           <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={isBottomNavigationVisible}
-          />
+          {!isNoMobileNavigation && (
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={isBottomNavigationVisible}
+            />
+          )}
           {hasMounted ? (
             <>
               <SortingContainer
