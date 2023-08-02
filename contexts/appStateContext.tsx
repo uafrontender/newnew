@@ -217,6 +217,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       if (options.name === 'accessToken' && !options.value) {
         setUserLoggedIn(false);
         setUserIsCreator(false);
+        setUserUuid(undefined);
       }
     };
 
