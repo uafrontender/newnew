@@ -19,7 +19,6 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
-import { useUserData } from '../../../../contexts/userDataContext';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import mobileLogo from '../../../../public/images/svg/MobileLogo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -27,6 +26,7 @@ import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Ve
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import Loader from '../../../atoms/Loader';
+import { useAppState } from '../../../../contexts/appStateContext';
 import { SocketContext } from '../../../../contexts/socketContext';
 import useMyNotifications, {
   useMyNotificationsActions,
@@ -38,7 +38,7 @@ export const NotificationsList: React.FC<IFunction> = () => {
   const scrollRef: any = useRef();
   const { socketConnection } = useContext(SocketContext);
   const { ref: scrollRefNotifications, inView } = useInView();
-  const { userData } = useUserData();
+  const { userUuid } = useAppState();
   const { locale } = useRouter();
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
@@ -210,7 +210,7 @@ export const NotificationsList: React.FC<IFunction> = () => {
             markNotificationAsRead(item);
           }}
         >
-          {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
+          {item.content?.relatedUser?.uuid !== userUuid ? (
             <SNotificationItemAvatar
               withClick
               avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
@@ -252,12 +252,7 @@ export const NotificationsList: React.FC<IFunction> = () => {
         </Link>
       );
     },
-    [
-      userData?.userUuid,
-      locale,
-      getEnrichedNotificationMessage,
-      markNotificationAsRead,
-    ]
+    [userUuid, locale, getEnrichedNotificationMessage, markNotificationAsRead]
   );
 
   return (

@@ -18,10 +18,10 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
   ({ postCreator, winningOption }) => {
     const { t } = useTranslation('page-Post');
     const { userData } = useUserData();
-    const { userLoggedIn, userIsCreator } = useAppState();
+    const { userLoggedIn, userUuid, userIsCreator } = useAppState();
 
     const userToRender = useMemo(() => {
-      if (userLoggedIn && !userData?.userUuid) {
+      if (userLoggedIn && !userUuid) {
         return null;
       }
 
@@ -48,7 +48,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
       winningOption.creator,
       winningOption.firstVoter,
       userLoggedIn,
-      userData?.userUuid,
+      userUuid,
       winningOption.isSupportedByMe,
       postCreator?.uuid,
     ]);
