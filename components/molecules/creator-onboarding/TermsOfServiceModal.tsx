@@ -222,13 +222,35 @@ const STosText = styled.div`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   ${({ theme }) => theme.media.tablet} {
-    /* Hide scrollbar */
-    ::-webkit-scrollbar {
-      display: none;
+    // Scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
     }
+
     scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+      margin-bottom: 16px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 4px;
+      transition: 0.2s linear;
+    }
+
+    &:hover {
+      scrollbar-width: thin;
+      &::-webkit-scrollbar-track {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
+    }
 `;
 
 const SButton = styled(Button)`

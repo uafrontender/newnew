@@ -11,7 +11,7 @@ import Button from '../../atoms/Button';
 
 import { sendVerificationNewEmail } from '../../../api/endpoints/user';
 
-import Logo from '../../../public/images/svg/mobile-logo.svg';
+import Logo from '../../../public/images/svg/MobileLogo.svg';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 
@@ -67,8 +67,16 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
           sendVerificationCodePayload
         );
 
+        // TODO: Add translations
         if (error || !data) {
           throw new Error(error?.message ?? 'Request failed');
+        }
+
+        if (
+          data.status ===
+          newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
+        ) {
+          throw new Error(tVerify('error.invalidEmail'));
         }
 
         if (
@@ -78,7 +86,7 @@ const EditEmailStepTwoModal = ({ onComplete }: IEditEmailStepTwoModal) => {
           setNewEmailError(tVerify('error.emailTaken'));
           setIsValid(false);
 
-          throw new Error('Email taken');
+          throw new Error(tVerify('error.emailTaken'));
         }
 
         if (
@@ -166,10 +174,12 @@ const SForm = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 `;
 
 const SInputWrapper = styled.div`
   height: 70px;
+  width: 100%;
 `;
 
 const SButton = styled(Button)`

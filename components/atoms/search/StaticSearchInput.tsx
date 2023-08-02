@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { useQueryClient } from 'react-query';
+import { FocusOn } from 'react-focus-on';
 
 import InlineSVG from '../InlineSVG';
 
@@ -28,6 +28,8 @@ import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import getClearedSearchQuery from '../../../utils/getClearedSearchQuery';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
+import isStringEmpty from '../../../utils/isStringEmpty';
+import isIOS from '../../../utils/isIOS';
 
 interface IStaticSearchInput {
   width?: string;
@@ -40,9 +42,11 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const { showErrorToastPredefined } = useErrorToasts();
     const queryClient = useQueryClient();
 
-    const inputRef: any = useRef();
-    const inputContainerRef: any = useRef();
-    const resultsContainerRef: any = useRef();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const inputContainerRef = useRef<HTMLDivElement>(null);
+
+    const resultsContainerRef = useRef(null);
+
     const [searchValue, setSearchValue] = useState('');
     const [inputRightPosition, setInputRightPosition] = useState(0);
     const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
@@ -76,15 +80,32 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     const pushRouteOrClose = useCallback(
       (path: string) => {
         if (router.asPath === path) {
+          // Clear search right away
           setSearchValue('');
           setIsResultsDropVisible(false);
           setGlobalSearchActive(false);
         } else {
+          // Search clears later, when page changes
           router.push(path);
         }
       },
       [router, setGlobalSearchActive]
     );
+
+    // Clear search on page changed
+    useEffect(() => {
+      const clearSearch = () => {
+        setSearchValue('');
+        setIsResultsDropVisible(false);
+        setGlobalSearchActive(false);
+      };
+
+      Router.events.on('routeChangeComplete', clearSearch);
+
+      return () => {
+        Router.events.off('routeChangeComplete', clearSearch);
+      };
+    }, [setGlobalSearchActive]);
 
     const resetPostsSearchResultOnSearchPage = useCallback(
       (query: string) => {
@@ -143,7 +164,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           resetCreatorSearchResultOnSearchPage(encodedQuery);
         } else {
           pushRouteOrClose(`/search?query=${encodedQuery}&tab=posts`);
-
           resetPostsSearchResultOnSearchPage(firstChunk.text);
         }
       }
@@ -163,9 +183,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
     }, [setGlobalSearchActive]);
 
     const handleInputChange = (e: any) => {
-      const onlySpacesRegex = /^\s+$/;
-
-      if (onlySpacesRegex.test(e.target.value)) {
+      if (isStringEmpty(e.target.value)) {
         setSearchValue('');
       } else {
         setSearchValue(e.target.value);
@@ -206,6 +224,16 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       [inputContainerRef, resultsContainerRef],
       handleClickOutside
     );
+
+    // Exit global search on scroll for iOS to prevent issues with header
+    const handleCloseSearch = useCallback(() => {
+      if (globalSearchActive && isIOS() && !isResultsDropVisible) {
+        inputRef.current?.blur();
+        setGlobalSearchActive(false);
+      }
+    }, [globalSearchActive, setGlobalSearchActive, isResultsDropVisible]);
+
+    useOnClickOutside(inputContainerRef, handleCloseSearch, 'touchstart');
 
     useEffect(() => {
       const resizeObserver = new ResizeObserver(() => {
@@ -290,36 +318,6 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       }
     }, [debouncedSearchValue, isMobileOrTablet, getQuickSearchResult]);
 
-    useEffect(() => {
-      document.documentElement.style.setProperty(
-        '--window-inner-height',
-        `${window.visualViewport?.height || window.innerHeight}px`
-      );
-    }, []);
-
-    useEffect(() => {
-      const handleUpdateWindowInnerHeightValue = (event: Event) => {
-        document.documentElement.style.setProperty(
-          '--window-inner-height',
-          `${(event.target as VisualViewport)?.height || window.innerHeight}px`
-        );
-      };
-
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      }
-
-      return () => {
-        window.visualViewport?.removeEventListener(
-          'resize',
-          handleUpdateWindowInnerHeightValue
-        );
-      };
-    }, []);
-
     const closeSearch = useCallback(() => {
       handleSearchClose();
       setSearchValue('');
@@ -327,22 +325,14 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
       resetResults();
     }, [handleSearchClose]);
 
-    useEffect(() => {
-      const resultContainer = resultsContainerRef.current;
-
-      if (isMobileOrTablet && isResultsDropVisible && resultContainer) {
-        disableBodyScroll(resultContainer);
+    const handleInputBlur = () => {
+      if (!isResultsDropVisible) {
+        setGlobalSearchActive(false);
       }
-
-      return () => {
-        if (resultContainer) {
-          enableBodyScroll(resultContainer);
-        }
-      };
-    }, [isMobileOrTablet, isResultsDropVisible]);
+    };
 
     return (
-      <>
+      <FocusOn enabled={isResultsDropVisible}>
         {isMobileOrTablet && globalSearchActive ? (
           <SCloseButtonMobile
             view='tertiary'
@@ -390,6 +380,7 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
                   ? t('search.placeholderLong')
                   : t('search.placeholder')
               }
+              onBlur={handleInputBlur}
             />
           </SInputWrapper>
 
@@ -443,53 +434,55 @@ const StaticSearchInput: React.FC<IStaticSearchInput> = React.memo(
           )}
         </SContainer>
         {isMobileOrTablet && isResultsDropVisible && (
-          <SResultsDropMobile ref={resultsContainerRef}>
-            {
-              // eslint-disable-next-line no-nested-ternary
-              resultsPosts.length === 0 &&
-              resultsCreators.length === 0 &&
-              resultsHashtags.length === 0 ? (
-                !isLoading ? (
-                  <SNoResults>
-                    <NoResults closeDrop={handleCloseIconClick} />
-                  </SNoResults>
+          <SResultsDropMobile>
+            <SResultsDropMobileContentWrapper ref={resultsContainerRef}>
+              {
+                // eslint-disable-next-line no-nested-ternary
+                resultsPosts.length === 0 &&
+                resultsCreators.length === 0 &&
+                resultsHashtags.length === 0 ? (
+                  !isLoading ? (
+                    <SNoResults>
+                      <NoResults closeDrop={handleCloseIconClick} />
+                    </SNoResults>
+                  ) : (
+                    <SBlock>
+                      <Loader size='md' />
+                    </SBlock>
+                  )
                 ) : (
-                  <SBlock>
-                    <Loader size='md' />
-                  </SBlock>
+                  <SResultsDropMobileContent>
+                    {resultsCreators.length > 0 && (
+                      <PopularCreatorsResults
+                        creators={resultsCreators}
+                        onSelect={closeSearch}
+                      />
+                    )}
+                    {resultsHashtags.length > 0 && (
+                      <PopularTagsResults
+                        hashtags={resultsHashtags}
+                        onSelect={closeSearch}
+                      />
+                    )}
+                    <SButton
+                      onClick={() => {
+                        const clearedSearchValue =
+                          getClearedSearchQuery(searchValue);
+                        if (clearedSearchValue) {
+                          handleSeeResults(clearedSearchValue);
+                        }
+                      }}
+                      view='quaternary'
+                    >
+                      {t('search.allResults')}
+                    </SButton>
+                  </SResultsDropMobileContent>
                 )
-              ) : (
-                <SResultsDropMobileContent>
-                  {resultsCreators.length > 0 && (
-                    <PopularCreatorsResults
-                      creators={resultsCreators}
-                      onSelect={closeSearch}
-                    />
-                  )}
-                  {resultsHashtags.length > 0 && (
-                    <PopularTagsResults
-                      hashtags={resultsHashtags}
-                      onSelect={closeSearch}
-                    />
-                  )}
-                  <SButton
-                    onClick={() => {
-                      const clearedSearchValue =
-                        getClearedSearchQuery(searchValue);
-                      if (clearedSearchValue) {
-                        handleSeeResults(clearedSearchValue);
-                      }
-                    }}
-                    view='quaternary'
-                  >
-                    {t('search.allResults')}
-                  </SButton>
-                </SResultsDropMobileContent>
-              )
-            }
+              }
+            </SResultsDropMobileContentWrapper>
           </SResultsDropMobile>
         )}
-      </>
+      </FocusOn>
     );
   }
 );
@@ -601,18 +594,29 @@ const SResultsDropMobile = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   position: fixed;
   border-radius: 0;
-  padding: 16px;
   width: 100vw;
-  height: calc(var(--window-inner-height) - 40px); // 40px needs for ios
-  top: 56px;
+  height: 100vh;
+  top: 96px;
   left: 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    top: 112px;
+  }
+`;
+
+const SResultsDropMobileContentWrapper = styled.div`
+  padding: 16px;
+
+  // 50px needs for ios
+  max-height: calc(var(--window-inner-height, 1vh) * 100 - 50px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
 
+  transition: max-height 0.2s ease-out;
+
   ${({ theme }) => theme.media.tablet} {
     padding: 16px 48px;
-    top: 64px;
   }
 `;
 

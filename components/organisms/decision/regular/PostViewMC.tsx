@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { Trans, useTranslation } from 'next-i18next';
@@ -15,10 +14,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import {
-  canCreateCustomOption,
-  voteOnPost,
-} from '../../../../api/endpoints/multiple_choice';
+import { canCreateCustomOption } from '../../../../api/endpoints/multiple_choice';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostTimer from '../../../molecules/decision/common/PostTimer';
@@ -44,6 +40,7 @@ import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../contexts/tutorialProgressContext';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import useVoteOnPostAfterStripeRedirect from '../../../../utils/hooks/useVoteOnPostAfterStripeRedirect';
 // import { SubscriptionToPost } from '../../../molecules/profile/SmsNotificationModal';
 
 const GoBackButton = dynamic(() => import('../../../molecules/GoBackButton'));
@@ -58,33 +55,6 @@ const HeroPopup = dynamic(
 const PaymentSuccessModal = dynamic(
   () => import('../../../molecules/decision/common/PaymentSuccessModal')
 );
-
-const getPayWithCardErrorMessage = (
-  status?: newnewapi.VoteOnPostResponse.Status
-) => {
-  switch (status) {
-    case newnewapi.VoteOnPostResponse.Status.NOT_ENOUGH_FUNDS:
-      return 'errors.notEnoughMoney';
-    case newnewapi.VoteOnPostResponse.Status.CARD_NOT_FOUND:
-      return 'errors.cardNotFound';
-    case newnewapi.VoteOnPostResponse.Status.CARD_CANNOT_BE_USED:
-      return 'errors.cardCannotBeUsed';
-    case newnewapi.VoteOnPostResponse.Status.MC_CANCELLED:
-      return 'errors.mcCancelled';
-    case newnewapi.VoteOnPostResponse.Status.MC_FINISHED:
-      return 'errors.mcFinished';
-    case newnewapi.VoteOnPostResponse.Status.MC_NOT_STARTED:
-      return 'errors.mcNotStarted';
-    case newnewapi.VoteOnPostResponse.Status.ALREADY_VOTED:
-      return 'errors.alreadyVoted';
-    case newnewapi.VoteOnPostResponse.Status.MC_VOTE_COUNT_TOO_SMALL:
-      return 'errors.mcVoteCountTooSmall';
-    case newnewapi.VoteOnPostResponse.Status.NOT_ALLOWED_TO_CREATE_NEW_OPTION:
-      return 'errors.notAllowedToCreateNewOption';
-    default:
-      return 'errors.requestFailed';
-  }
-};
 
 interface IPostViewMC {}
 
@@ -222,18 +192,23 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     [removeMcOptionMutation]
   );
 
-  const fetchPostLatestData = useCallback(async () => {
-    try {
-      const res = await refetchPost();
+  const fetchPostLatestData = useCallback(
+    async () => {
+      try {
+        const res = await refetchPost();
 
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'Request failed');
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // refetchPost, - reason unknown
+    ]
+  );
 
   const handleOnVotingTimeExpired = async () => {
     await refetchPost();
@@ -276,150 +251,111 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     };
   }, [post.postUuid, userLoggedIn, creatorsBundle]);
 
-  useEffect(() => {
-    const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
-      if (decoded.option && decoded.postUuid === post.postUuid) {
-        addOrUpdateMcOptionMutation?.mutate(decoded.option);
-      }
-    };
+  useEffect(
+    () => {
+      const socketHandlerOptionCreatedOrUpdated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          addOrUpdateMcOptionMutation?.mutate(decoded.option);
+        }
+      };
 
-    const socketHandlerOptionDeleted = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.McOptionDeleted.decode(arr);
+      const socketHandlerOptionDeleted = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.McOptionDeleted.decode(arr);
 
-      if (decoded.optionId) {
-        removeMcOptionMutation?.mutate({
-          id: decoded.optionId,
-        });
-        await fetchPostLatestData();
-      }
-    };
+        if (decoded.optionId) {
+          removeMcOptionMutation?.mutate({
+            id: decoded.optionId,
+          });
+          await fetchPostLatestData();
+        }
+      };
 
-    const socketHandlerPostData = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostUpdated.decode(arr);
+      const socketHandlerPostData = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostUpdated.decode(arr);
 
-      if (!decoded) {
-        return;
-      }
-      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decoded.post && decodedParsed.postUuid === post.postUuid) {
-        handleUpdatePostData(decoded.post);
-      }
-    };
+        if (!decoded) {
+          return;
+        }
+        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
+        if (decoded.post && decodedParsed.postUuid === post.postUuid) {
+          handleUpdatePostData(decoded.post);
+        }
+      };
 
-    if (socketConnection) {
-      socketConnection?.on(
-        'McOptionCreatedOrUpdated',
-        socketHandlerOptionCreatedOrUpdated
-      );
-      socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
-      socketConnection?.on('PostUpdated', socketHandlerPostData);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off(
+      if (socketConnection) {
+        socketConnection?.on(
           'McOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection?.off('PostUpdated', socketHandlerPostData);
+        socketConnection?.on('McOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection?.on('PostUpdated', socketHandlerPostData);
       }
-    };
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'McOptionCreatedOrUpdated',
+            socketHandlerOptionCreatedOrUpdated
+          );
+          socketConnection?.off('McOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection?.off('PostUpdated', socketHandlerPostData);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, userUuid]);
+    [
+      socketConnection,
+      post,
+      userUuid,
+      // addOrUpdateAcOptionMutation, - reason unknown
+      // fetchPostLatestData, - reason unknown
+      // handleUpdatePostData, - reason unknown
+      // removeMcOptionMutation, - reason unknown
+    ]
+  );
 
-  const isVoteMadeAfterRedirect = useRef(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const makeVoteAfterStripeRedirect = async () => {
-      if (!stripeSetupIntentClientSecret || loadingModalOpen) {
-        return;
-      }
-
-      if (!userLoggedIn) {
-        router.push(
-          `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment?stripe_setup_intent_client_secret=${stripeSetupIntentClientSecret}`
-        );
-        return;
-      }
-
-      isVoteMadeAfterRedirect.current = true;
-
-      Mixpanel.track('Make Vote After Stripe Redirect', {
-        _stage: 'Post',
-        _postUuid: post.postUuid,
-        _component: 'PostViewMC',
+  const onSuccess = useCallback(
+    (optionFromResponse: newnewapi.MultipleChoice.IOption) => {
+      const supportedOption = new newnewapi.MultipleChoice.Option({
+        ...optionFromResponse,
+        isSupportedByMe: true,
       });
 
-      try {
+      handleAddOrUpdateOptionFromResponse(supportedOption);
+      fetchPostLatestData();
+      setLoadingModalOpen(false);
+      setPaymentSuccessModalOpen(true);
+    },
+    [handleAddOrUpdateOptionFromResponse, fetchPostLatestData]
+  );
+
+  const onStatusChanged = useCallback(
+    (loading: boolean) => {
+      if (loading) {
         setLoadingModalOpen(true);
-
-        const stripeContributionRequest =
-          new newnewapi.StripeContributionRequest({
-            stripeSetupIntentClientSecret,
-            ...(saveCard !== undefined
-              ? {
-                  saveCard,
-                }
-              : {}),
-          });
-
         resetSetupIntentClientSecret();
-
-        const res = await voteOnPost(
-          stripeContributionRequest,
-          controller.signal
-        );
-
-        if (
-          !res?.data ||
-          res.error ||
-          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        ) {
-          throw new Error(
-            res?.error?.message ??
-              t(getPayWithCardErrorMessage(res.data?.status))
-          );
-        }
-
-        const optionFromResponse = res.data
-          .option as newnewapi.MultipleChoice.Option;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-        fetchPostLatestData();
-
+        Mixpanel.track('Make Bid After Stripe Redirect', {
+          _stage: 'Post',
+          _postUuid: post.postUuid,
+          _component: 'PostViewAC',
+        });
+      } else {
         setLoadingModalOpen(false);
-        setPaymentSuccessModalOpen(true);
-      } catch (err: any) {
-        console.error(err);
-        showErrorToastCustom(err.message);
-        setLoadingModalOpen(false);
-      } finally {
-        router.replace(
-          `${router.locale !== 'en-US' ? `/${router.locale}` : ''}/p/${
-            post.postShortId ? post.postShortId : post.postUuid
-          }`,
-          undefined,
-          { shallow: true }
-        );
       }
-    };
+    },
+    [post.postUuid, resetSetupIntentClientSecret]
+  );
 
-    if (stripeSetupIntentClientSecret && !isVoteMadeAfterRedirect.current) {
-      makeVoteAfterStripeRedirect();
-    }
-
-    return () => {
-      controller.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useVoteOnPostAfterStripeRedirect(
+    stripeSetupIntentClientSecret,
+    saveCard,
+    onSuccess,
+    onStatusChanged
+  );
 
   const goToNextStep = () => {
     if (
@@ -682,7 +618,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
           <CommentsBottomSection
             postUuid={post.postUuid}
             postShortId={post.postShortId ?? ''}
-            commentsRoomId={post.commentsRoomId as number}
             onFormBlur={handleCommentBlur}
             onFormFocus={handleCommentFocus}
           />

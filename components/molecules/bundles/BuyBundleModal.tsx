@@ -63,7 +63,7 @@ const BuyBundleModal: React.FC<IBuyBundleModal> = React.memo(
             isCloseButton
             isMobileFullScreen={isMobile}
           >
-            <Content>
+            <Content data-ignore-touch-move-lock>
               {isMobile && (
                 <SMobileTitle>{t('modal.buyBundle.title')}</SMobileTitle>
               )}
@@ -157,11 +157,8 @@ const SDisplayName = styled(DisplayName)`
   font-size: 20px;
   line-height: 28px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   margin-bottom: 16px;
-  max-width: 100%;
 
   ${({ theme }) => theme.media.laptop} {
     font-size: 24px;

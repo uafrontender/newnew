@@ -14,7 +14,7 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
-import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
+import ReportModal, { ReportData } from '../../../ReportModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
@@ -24,13 +24,14 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
+import { Mixpanel } from '../../../../../utils/mixpanel';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 // Icons
 import BidIconLight from '../../../../../public/images/decision/bid-icon-light.png';
 import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
-import { useAppState } from '../../../../../contexts/appStateContext';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -96,7 +97,18 @@ const AcOptionCardModeration: React.FunctionComponent<
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportEventOption(option.id, reasons, message);
+      Mixpanel.track('Submit report option', {
+        _stage: 'Post',
+        _optionId: option?.id,
+        _component: 'AcOptionCardModeration',
+      });
+
+      await reportEventOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
     [option.id]
   );
@@ -168,8 +180,9 @@ const AcOptionCardModeration: React.FunctionComponent<
                       : t('acPost.optionsTab.optionCard.other')}
                   </SSpanBiddersHighlighted>
                 </>
-              ) : null}{' '}
+              ) : null}
               <SSpanBiddersRegular className='spanRegular'>
+                {' '}
                 {t('acPost.optionsTab.optionCard.bid')}
               </SSpanBiddersRegular>
             </SBiddersInfo>
@@ -311,8 +324,9 @@ const AcOptionCardModeration: React.FunctionComponent<
                     : t('acPost.optionsTab.optionCard.other')}
                 </SSpanBiddersHighlighted>
               </>
-            ) : null}{' '}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
+              {' '}
               {t('acPost.optionsTab.optionCard.bid')}
             </SSpanBiddersRegular>
           </SBiddersInfo>
@@ -492,10 +506,15 @@ const SOptionInfo = styled(Text)<{
 
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  max-width: 100%;
 
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  white-space: pre;
 
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;

@@ -167,16 +167,24 @@ export default WinningOption;
 
 const SText = styled(Text)`
   margin-top: 24px;
+  max-width: 100%;
+
+  text-align: center;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   &:first-child {
     margin-top: 0;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
   }
 `;
 
 const SSpan = styled.span`
   display: inline-flex;
   white-space: pre;
+  max-width: 100%;
 `;
 
 const SUserAvatar = styled.img`
@@ -203,6 +211,12 @@ const SDisplayName = styled(DisplayName)<{ href?: string }>`
 const SHeadline = styled(Headline)`
   white-space: pre-wrap;
   word-break: break-word;
+
+  text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
 `;
 
 const SSkeletonContainer = styled.div`

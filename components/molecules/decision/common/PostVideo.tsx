@@ -52,29 +52,38 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
     'announcement'
   );
 
-  useEffect(() => {
-    async function markResponseAsViewed() {
-      try {
-        const payload = new newnewapi.MarkPostRequest({
-          postUuid,
-          markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
-        });
+  useEffect(
+    () => {
+      async function markResponseAsViewed() {
+        try {
+          const payload = new newnewapi.MarkPostRequest({
+            postUuid,
+            markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
+          });
 
-        const res = await markPost(payload);
+          const res = await markPost(payload);
 
-        if (!res.error) {
-          handleSetResponseViewed(true);
+          if (!res.error) {
+            handleSetResponseViewed(true);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
-    }
 
-    if (openedTab === 'response' && userLoggedIn && !responseViewed) {
-      markResponseAsViewed();
-    }
+      if (openedTab === 'response' && userLoggedIn && !responseViewed) {
+        markResponseAsViewed();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postUuid, userLoggedIn, responseViewed]);
+    [
+      openedTab,
+      postUuid,
+      userLoggedIn,
+      responseViewed,
+      // handleSetResponseViewed, - needs to be wrapped into useCallback in parents
+    ]
+  );
 
   // Adjust sound button if needed
   useEffect(() => {
@@ -115,6 +124,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         }
       }
 
+      handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
 

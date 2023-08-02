@@ -12,7 +12,7 @@ import { InlineSvg } from '../../atoms/InlineSVG';
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
-import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+import mobileLogo from '../../../public/images/svg/MobileLogo.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
@@ -140,11 +140,9 @@ const Notification: React.FC<INotification> = ({
 
     if (content.relatedUser && content.relatedUser.uuid !== userUuid) {
       return (
-        <>
-          <STitleText>
-            <DisplayName user={content.relatedUser} />
-          </STitleText>
-        </>
+        <STitleText>
+          <DisplayName user={content.relatedUser} />
+        </STitleText>
       );
     }
 
@@ -211,7 +209,7 @@ const Notification: React.FC<INotification> = ({
             <SDate>
               {moment((createdAt?.seconds as number) * 1000)
                 .locale(locale || 'en-US')
-                .from(currentTime)}
+                .fromNow()}
             </SDate>
           </SInfo>
           {content?.relatedPost &&

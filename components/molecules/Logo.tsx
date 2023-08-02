@@ -9,7 +9,7 @@ import InlineSVG from '../atoms/InlineSVG';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
-import logoText from '../../public/images/svg/logo_text.svg';
+import logoText from '../../public/images/svg/LogoText.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 import { Mixpanel } from '../../utils/mixpanel';
 import { useAppState } from '../../contexts/appStateContext';
@@ -112,6 +112,7 @@ const SWrapper = styled.a<{
   height: 40px;
   cursor: pointer;
   display: flex;
+  flex-shrink: 0;
   position: relative;
   align-items: center;
   justify-content: flex-end;

@@ -16,7 +16,6 @@ import videojs from 'video.js';
 import 'videojs-contrib-quality-levels';
 // eslint-disable-next-line import/no-duplicates
 import { QualityLevel, QualityLevelList } from 'videojs-contrib-quality-levels';
-// NB! We have to import these twice due to package issues
 
 import Lottie from '../../../atoms/Lottie';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -87,9 +86,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     const [isLoading, setIsLoading] = useState(false);
 
     const [isPaused, setIsPaused] = useState(false);
-    const handleSetIsPaused = useCallback((stateValue: boolean) => {
-      setIsPaused(stateValue);
-    }, []);
 
     // Fullscren
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -131,8 +127,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     // NB! Commented out for now
     const [bufferedPercent, setBufferedPercent] = useState(0);
 
+    const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const wasVideoPlayingBeforeScrubberChangeTimeRef = useRef(false);
+
     const handlePlayerScrubberChangeTime = useCallback(
       (newValue: number) => {
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+        } else {
+          wasVideoPlayingBeforeScrubberChangeTimeRef.current = !isPaused;
+        }
+
         if (!isPaused) {
           // Pause the player when scrubbing
           // to avoid double playback start
@@ -141,20 +146,28 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           playerScrubberRef?.current?.changeCurrentTime(newValue);
           postVideoFullscreenControlsRef?.current?.changeCurrentTime(newValue);
           playerRef.current?.currentTime(newValue);
-
-          setTimeout(() => {
-            setIsScrubberTimeChanging(false);
-            playerRef.current?.play()?.catch(() => {
-              handleSetIsPaused(true);
-            });
-          }, 100);
         } else {
           playerScrubberRef?.current?.changeCurrentTime(newValue);
           postVideoFullscreenControlsRef?.current?.changeCurrentTime(newValue);
           playerRef.current?.currentTime(newValue);
         }
+
+        if (wasVideoPlayingBeforeScrubberChangeTimeRef.current) {
+          timeoutIdRef.current = setTimeout(() => {
+            playerRef.current
+              ?.play()
+              ?.then(() => {
+                timeoutIdRef.current = null;
+                // setTimeout is needed to prevent the play button from flashing
+                setTimeout(() => setIsScrubberTimeChanging(false), 100);
+              })
+              .catch(() => {
+                setIsPaused(true);
+              });
+          }, 100);
+        }
       },
-      [handleSetIsPaused, isPaused]
+      [isPaused]
     );
 
     const handlePlayerVolumeChange = useCallback((percentAsDecimal: number) => {
@@ -166,10 +179,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         playerRef.current?.pause();
       } else {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       }
-    }, [handleSetIsPaused]);
+    }, []);
 
     const options: videojs.PlayerOptions = useMemo(
       () => ({
@@ -200,6 +213,18 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       }),
       [resources]
     );
+
+    const handleExitFullscreen = useCallback(() => {
+      if (!isSafari() && !isIOS()) {
+        playerRef?.current?.exitFullscreen();
+      } else {
+        (
+          videoRef.current?.querySelector(
+            `.vjs-tech_${id}`
+          ) as TSafariHtmlPlayer
+        )?.webkitExitFullscreen();
+      }
+    }, [id]);
 
     // playerRef is set here, as well as all the listeners
     // List of video.js events
@@ -235,7 +260,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
                     setMutedMode(true);
                     setTimeout(() => {
                       playerRef.current?.play()?.catch((e) => {
-                        handleSetIsPaused(true);
+                        setIsPaused(true);
                       });
                     }, 100);
                   });
@@ -245,10 +270,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
           // Paused state
           p?.on('play', () => {
-            handleSetIsPaused(false);
+            setIsPaused(false);
           });
           p?.on('pause', () => {
-            handleSetIsPaused(true);
+            setIsPaused(true);
           });
 
           p?.on('error', (e: any) => {
@@ -289,7 +314,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           } else {
             p?.on('ended', () => {
               p?.play()?.catch(() => {
-                handleSetIsPaused(true);
+                setIsPaused(true);
               });
             });
           }
@@ -326,12 +351,14 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [
-        handleSetIsPaused,
-        onPlaybackFinished,
-        resources,
+        id,
+        resources, // unnecessary added for unknown reason
         isInSlider,
-        shouldPrefetch,
+        shouldPrefetch, // unnecessary added for unknown reason
         isActive,
+        setMutedMode,
+        handleExitFullscreen,
+        onPlaybackFinished,
       ]
     );
 
@@ -340,10 +367,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         playerRef.current?.pause();
       } else {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       }
-    }, [handleSetIsPaused]);
+    }, []);
 
     const handleEnterFullscreen = useCallback(() => {
       if (!isSafari() && !isIOS()) {
@@ -355,18 +382,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           ) as TSafariHtmlPlayer
         )?.webkitEnterFullscreen();
         setIsFullscreen(true);
-      }
-    }, [id]);
-
-    const handleExitFullscreen = useCallback(() => {
-      if (!isSafari() && !isIOS()) {
-        playerRef?.current?.exitFullscreen();
-      } else {
-        (
-          videoRef.current?.querySelector(
-            `.vjs-tech_${id}`
-          ) as TSafariHtmlPlayer
-        )?.webkitExitFullscreen();
       }
     }, [id]);
 
@@ -513,9 +528,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           handleVolumeChangeSafari
         );
       };
-      // Skipping `dispatch`
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isFullscreen, id, isReady]);
+    }, [isFullscreen, id, isReady, setMutedMode]);
 
     // Set minimize button position in fullscreen
     // Listenere mostly for devtools screen size change
@@ -576,10 +589,10 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         playerRef.current?.pause();
       } else {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       }
-    }, [fullscreenInteracted, handleSetIsPaused, isFullscreen]);
+    }, [fullscreenInteracted, isFullscreen]);
 
     // Hide controls if mouse not moved in fullscreen
     useEffect(() => {
@@ -646,41 +659,49 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     }, [isFullscreen, fullscreenInteracted]);
 
     // Slider prefetching
-    useEffect(() => {
-      if (isInSlider) {
-        if (isActive) {
-          onPlaybackProgress?.(0);
-          const promise = playerRef?.current?.play();
+    useEffect(
+      () => {
+        if (isInSlider) {
+          if (isActive) {
+            onPlaybackProgress?.(0);
+            const promise = playerRef?.current?.play();
 
-          if (promise !== undefined) {
-            promise
-              .then(() => {
-                // Autoplay started!
-              })
-              .catch(() => {
-                // Autoplay was prevented.
-                // Try to mute and start over, catch with displaying pause button
-                console.warn('Autoplay is not allowed');
-                setMutedMode(true);
-                setTimeout(() => {
-                  playerRef.current?.play()?.catch((e) => {
-                    handleSetIsPaused(true);
-                  });
-                }, 100);
-              });
+            if (promise !== undefined) {
+              promise
+                .then(() => {
+                  // Autoplay started!
+                })
+                .catch(() => {
+                  // Autoplay was prevented.
+                  // Try to mute and start over, catch with displaying pause button
+                  console.warn('Autoplay is not allowed');
+                  setMutedMode(true);
+                  setTimeout(() => {
+                    playerRef.current?.play()?.catch((e) => {
+                      setIsPaused(true);
+                    });
+                  }, 100);
+                });
+            }
+          } else {
+            playerRef?.current?.pause();
+            // Required to avoid one frame flickering when changing items in the slider
+            setTimeout(() => {
+              playerScrubberRef?.current?.changeCurrentTime(0);
+              postVideoFullscreenControlsRef?.current?.changeCurrentTime(0);
+              playerRef.current?.currentTime(0);
+            }, 100);
           }
-        } else {
-          playerRef?.current?.pause();
-          // Required to avoid one frame flickering when changing items in the slider
-          setTimeout(() => {
-            playerScrubberRef?.current?.changeCurrentTime(0);
-            postVideoFullscreenControlsRef?.current?.changeCurrentTime(0);
-            playerRef.current?.currentTime(0);
-          }, 100);
         }
-      }
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isInSlider, isActive]);
+      [
+        isInSlider,
+        isActive,
+        setMutedMode,
+        // onPlaybackProgress, - reason unknown
+      ]
+    );
 
     // Keyboard action handlers
     useEffect(() => {
@@ -705,7 +726,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
             playerRef.current?.pause();
           } else {
             playerRef.current?.play()?.catch(() => {
-              handleSetIsPaused(true);
+              setIsPaused(true);
             });
           }
         }
@@ -720,7 +741,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       return () => {
         window.removeEventListener('keydown', handlePressSpacebar);
       };
-    }, [handleSetIsPaused, isActive, isFullscreen, isInSlider]);
+    }, [isActive, isFullscreen, isInSlider]);
 
     // Update scrubber in non-Safari fullscreen controls for a paused video
     useEffect(() => {
@@ -771,16 +792,17 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
             videoOrientation={videoOrientation}
             isFullScreen={isFullscreen}
           />
-          {shouldShowPlayPseudoButton ? (
-            <SPlayPseudoButton onClick={handlePlayPseudoButtonClick}>
-              <InlineSvg
-                svg={PlayIcon}
-                width='32px'
-                height='32px'
-                fill='#FFFFFF'
-              />
-            </SPlayPseudoButton>
-          ) : null}
+          <SPlayPseudoButton
+            show={shouldShowPlayPseudoButton}
+            onClick={handlePlayPseudoButtonClick}
+          >
+            <InlineSvg
+              svg={PlayIcon}
+              width='32px'
+              height='32px'
+              fill='#FFFFFF'
+            />
+          </SPlayPseudoButton>
           {!isLoading ? (
             <SMaximizeButton
               id='maximize-button'
@@ -899,7 +921,7 @@ const SContent = styled.div<{
 
   &::before {
     content: '';
-    margin: -35px;
+    margin: -10%; // to prevent gaps
     position: absolute;
     top: 0;
     right: 0;
@@ -944,6 +966,14 @@ const SWrapper = styled.div<{
   min-height: 100% !important;
   background: transparent !important;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   &:before {
     display: none !important;
   }
@@ -964,6 +994,11 @@ const SWrapper = styled.div<{
 
     &:focus-visible {
       outline: none !important;
+    }
+
+    /* Otherwise borders are straight on Safari */
+    ${({ theme }) => theme.media.tablet} {
+      border-radius: 16px;
     }
   }
 
@@ -1018,7 +1053,7 @@ const SLoader = styled.div`
   z-index: 1;
 `;
 
-const SPlayPseudoButton = styled.button`
+const SPlayPseudoButton = styled.button<{ show?: boolean }>`
   position: absolute;
   top: calc(50% - 32px);
   left: calc(50% - 32px);
@@ -1034,6 +1069,12 @@ const SPlayPseudoButton = styled.button`
   border: transparent;
 
   cursor: pointer;
+  pointer-events: ${({ show }) => (show ? 'all' : 'none')};
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transition-property: opacity;
+  transition-timing-function: ease-in;
+  transition-duration: ${({ show }) => (show ? '100ms' : '0ms')};
+  transition-delay: ${({ show }) => (show ? '100ms' : '0ms')};
 
   &:focus,
   &:active {

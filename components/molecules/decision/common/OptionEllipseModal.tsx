@@ -73,7 +73,6 @@ const OptionEllipseModal: React.FunctionComponent<IOptionModal> = ({
     if (isOpen && isMyOption) {
       fetchCanDelete();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isMyOption, optionType, optionId, optionCreatorUuid]);
 
   return (

@@ -693,6 +693,7 @@
     "comments": "Comentarios",
     "seeMore": "Ver más",
     "noCommentsCaption": "Sé el primero en comentar...",
+    "loadReplies_NEED_TRANSLATION": "Show more replies",
     "errors": {
       "generic": "Por favor, comprueba lo que introdujiste",
       "tooLong": "El comentario es demasiado largo",
@@ -819,6 +820,7 @@
     "cfCancelled": "El Goal ha sido cancelado",
     "cfFinished": "El Goal ya ha concluido",
     "cfNotStarted": "El Goal no ha comenzado todavía",
-    "requestFailed": "La solicitud ha fallado"
+    "requestFailed": "La solicitud ha fallado",
+    "inappropriate": "No se permite contenido inapropiado en NewNew"
   }
 }

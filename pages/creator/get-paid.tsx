@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -24,7 +24,8 @@ const DashboardSectionStripe = dynamic(
 const GetPaid = () => {
   const router = useRouter();
   const { t } = useTranslation('page-Creator');
-  const [isLoading, setIsLoading] = useState<null | boolean>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isLoading = useRef(false);
   const { updateCreatorData } = useUserData();
   const { userIsCreator } = useAppState();
 
@@ -35,28 +36,28 @@ const GetPaid = () => {
   }, [userIsCreator]);
 
   useEffect(() => {
-    async function fetchOnboardingState() {
-      if (isLoading) {
-        return;
-      }
+    if (isLoaded || isLoading.current) {
+      return;
+    }
 
+    async function fetchOnboardingState() {
       try {
-        setIsLoading(true);
+        isLoading.current = true;
         const payload = new newnewapi.EmptyRequest({});
         const res = await getMyOnboardingState(payload);
         if (res.data) {
           updateCreatorData(res.data);
         }
-
-        setIsLoading(false);
       } catch (err) {
         console.error(err);
-        setIsLoading(false);
+      } finally {
+        isLoading.current = false;
+        setIsLoaded(true);
       }
     }
+
     fetchOnboardingState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoaded, updateCreatorData]);
 
   return (
     <>
@@ -69,7 +70,7 @@ const GetPaid = () => {
           content={t('getPaid.meta.description')}
         />
       </Head>
-      {isLoading === false ? <DashboardSectionStripe /> : <SLoader size='md' />}
+      {isLoaded ? <DashboardSectionStripe /> : <SLoader size='md' />}
     </>
   );
 };

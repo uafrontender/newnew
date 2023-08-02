@@ -50,14 +50,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const { postStatus, handleUpdatePostCoverImage } = usePostInnerState();
   const {
     coreResponse,
+    additionalResponseUploading,
     openedTab,
     handleVideoDelete,
-    additionalResponseUploading,
     readyToUploadAdditionalResponse,
     responseFileUploadLoading,
     uploadedResponseVideoUrl,
     videoProcessing,
     responseFileProcessingLoading,
+    responseFileUploadError,
     customCoverImageUrlResponse,
     handleUpdateCustomCoverImageUrl,
   } = usePostModerationResponsesContext();
@@ -178,6 +179,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           setUiOffset(undefined);
         }
       }
+
       handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
@@ -189,7 +191,12 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         document?.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [isMobile, postUuid]);
+  }, [
+    isMobile,
+    postUuid,
+    responseFileUploadLoading,
+    responseFileProcessingLoading,
+  ]);
 
   return (
     <>
@@ -219,7 +226,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         ) : uploadedResponseVideoUrl &&
           videoProcessing?.targetUrls &&
           !responseFileUploadLoading &&
-          !responseFileProcessingLoading ? (
+          !responseFileProcessingLoading &&
+          !responseFileUploadError ? (
           <>
             <PostVideojsPlayer
               id={postUuid}

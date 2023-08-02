@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
+import { FocusOn } from 'react-focus-on';
 
 import isBrowser from '../../utils/isBrowser';
 import { useOverlayMode } from '../../contexts/overlayModeContext';
@@ -36,6 +37,7 @@ const Modal: React.FC<IModal> = React.memo((props) => {
     onClose,
     onEnterKeyUp,
   } = props;
+
   const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   useEffect(() => {
@@ -94,13 +96,21 @@ const Modal: React.FC<IModal> = React.memo((props) => {
         custombackdropfiltervalue={custombackdropfiltervalue ?? undefined}
         transitionspeed={modalType === 'initial' ? transitionspeed ?? 0.15 : 0}
       >
-        <SClickableDiv
-          onClick={(e) => {
-            e.stopPropagation();
+        <FocusOn
+          style={{ display: 'contents' }}
+          onEscapeKey={() => {
             onClose?.();
           }}
-        />
-        {children}
+          preventScrollOnFocus
+        >
+          <SClickableDiv
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose?.();
+            }}
+          />
+          {children}
+        </FocusOn>
       </StyledModalOverlay>
     </AnimatePresence>,
     document.getElementById('modal-root') as HTMLElement
@@ -115,14 +125,19 @@ interface IStyledModalOverlay {
   custombackdropfiltervalue?: number;
 }
 
+// NOTE: 'transform: translateZ(0);', ' height: calc(100% + 2px);',  'top: -1px;' and 'bottom: -1px;' needed to fix mobile Safari issue with transparent line above
 const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
-  left: 0;
-  width: 100vw;
-  height: 100%;
-  bottom: 0;
-  z-index: ${({ additionalz }) => additionalz ?? 10};
-  overflow: hidden;
   position: fixed;
+  left: 0;
+  bottom: -1px;
+  top: -1px;
+
+  width: 100vw;
+  height: calc(100% + 2px);
+  transform: translateZ(0);
+  overflow: hidden;
+  z-index: ${({ additionalz }) => additionalz ?? 12};
+
   backdrop-filter: ${({ custombackdropfiltervalue, nodimming }) =>
     // eslint-disable-next-line no-nested-ternary
     nodimming === 'true'

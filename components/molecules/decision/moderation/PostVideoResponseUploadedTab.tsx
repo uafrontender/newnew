@@ -75,7 +75,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     responseFileProcessingError,
     responseFileProcessingLoading,
     responseFileProcessingProgress,
-    handleItemChange,
+    handleResponseItemChange,
     handleCancelVideoUpload,
     handleResetVideoUploadAndProcessingState,
     handleSetUploadingAdditionalResponse,
@@ -102,6 +102,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
+  const [isVideoDeleting, setIsVideoDeleting] = useState(false);
 
   const handleUploadButtonClick = useCallback(() => {
     Mixpanel.track('Post Additional Video Response Upload', {
@@ -123,7 +124,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       }
 
       setLocalFile(null);
-      await handleItemChange(id, null);
+      await handleResponseItemChange(id, null, 'additional');
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
     } catch (err) {
@@ -131,8 +132,8 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     }
   }, [
     videoProcessing?.targetUrls?.originalVideoUrl,
-    handleItemChange,
     id,
+    handleResponseItemChange,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
   ]);
@@ -166,7 +167,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
         );
       } else {
         setLocalFile(file);
-        handleItemChange(id, file);
+        handleResponseItemChange(id, file, 'additional');
         handleSetCurrentAdditionalResponseStep('editing');
       }
     },
@@ -175,23 +176,30 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       handleDeleteLocalFile,
       showErrorToastCustom,
       t,
-      handleItemChange,
       id,
+      handleResponseItemChange,
       handleSetCurrentAdditionalResponseStep,
     ]
   );
 
   const handleRetryVideoUpload = useCallback(() => {
-    handleItemChange(id, localFile);
-  }, [id, localFile, handleItemChange]);
+    handleResponseItemChange(id, localFile, 'additional');
+  }, [id, localFile, handleResponseItemChange]);
 
-  const handleCancelUploadAndClearLocalFile = useCallback(() => {
+  const handleCancelUploadAndClearLocalFile = useCallback(async () => {
     handleCancelVideoUpload();
     setLocalFile(null);
+    await handleResponseItemChange(id, null, 'initial');
     handleSetCurrentAdditionalResponseStep('regular');
-  }, [handleCancelVideoUpload, handleSetCurrentAdditionalResponseStep]);
+  }, [
+    handleCancelVideoUpload,
+    handleResponseItemChange,
+    handleSetCurrentAdditionalResponseStep,
+    id,
+  ]);
 
   const handleCancelVideoProcessing = useCallback(async () => {
+    setIsVideoDeleting(true);
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
         publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
@@ -214,19 +222,21 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
       }
 
       setLocalFile(null);
-      handleItemChange(id, null);
+      handleResponseItemChange(id, null, 'additional');
       handleSetUploadingAdditionalResponse(false);
       handleSetReadyToUploadAdditionalResponse(false);
       handleResetVideoUploadAndProcessingState();
       handleSetCurrentAdditionalResponseStep('regular');
+      setIsVideoDeleting(false);
     } catch (err) {
       console.error(err);
+      setIsVideoDeleting(false);
     }
   }, [
     videoProcessing?.targetUrls?.originalVideoUrl,
     videoProcessing?.taskUuid,
-    handleItemChange,
     id,
+    handleResponseItemChange,
     handleSetUploadingAdditionalResponse,
     handleSetReadyToUploadAdditionalResponse,
     handleResetVideoUploadAndProcessingState,
@@ -315,6 +325,7 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
             <SErrorBottomBlock>
               <SLoadingBottomBlockButton
                 view='secondary'
+                disabled={isVideoDeleting}
                 onClick={handleCancelVideoProcessing}
               >
                 {t('postVideo.uploadResponseForm.button.cancel')}
@@ -350,17 +361,18 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
     return content;
   }, [
-    t,
     responseFileUploadLoading,
     responseFileUploadError,
     responseFileProcessingError,
     responseFileProcessingLoading,
+    localFile,
     responseFileUploadETA,
+    t,
     responseFileUploadProgress,
+    handleCancelUploadAndClearLocalFile,
+    isVideoDeleting,
     handleCancelVideoProcessing,
     handleRetryVideoUpload,
-    handleCancelUploadAndClearLocalFile,
-    localFile,
   ]);
 
   const thumbnailButtonBottomOverriden = useMemo(
@@ -382,16 +394,24 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
     handleSetReadyToUploadAdditionalResponse,
   ]);
 
-  useEffect(() => {
-    if (responses?.length && responses?.length < 2) {
-      handleUnsetEditingStories();
-    }
+  useEffect(
+    () => {
+      if (responses?.length && responses?.length < 2) {
+        handleUnsetEditingStories();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [responses]);
+    [
+      responses,
+      // handleUnsetEditingStories, - reason unknown
+    ]
+  );
 
   return (
     <SContainer>
-      {!responseFileUploadLoading && !responseFileProcessingLoading ? (
+      {!responseFileUploadLoading &&
+      !responseFileProcessingLoading &&
+      !responseFileUploadError ? (
         <PostVideoResponseUploaded
           isMuted={isMuted}
           isEditingStories={isEditingStories}
@@ -462,12 +482,13 @@ const SContainer = styled.div`
   height: 100%;
 `;
 
+// TODO: Needs to be responsive to accommodate for different languages
 const SUploadVideoButton = styled.button`
   position: absolute;
   top: 16px;
-  left: calc(50% - 60px);
+  left: calc(50% - 65px);
 
-  width: 120px;
+  width: 130px;
 
   color: ${({ theme }) => theme.colors.dark};
   background: #ffffff;
@@ -567,7 +588,7 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0;
+  padding: 0 10px;
 
   background: transparent;
 

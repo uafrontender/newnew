@@ -20,6 +20,7 @@ import PostShareEllipseModal from './PostShareEllipseModal';
 import ShareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { MarkPostAsFavoriteOnSignUp } from '../../../../contexts/onSignUpWrapper';
 
 interface IPostSuccessOrWaitingControls {}
 
@@ -103,9 +104,19 @@ const PostSuccessOrWaitingControls: React.FunctionComponent<
       });
 
       if (!userLoggedIn) {
+        const onSignUp: MarkPostAsFavoriteOnSignUp = {
+          type: 'favorite-post',
+          postUuid,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-            window.location.href
+            `${path}?${queryWithOnSignUp}`
           )}`
         );
         return;

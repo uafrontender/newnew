@@ -119,6 +119,7 @@
     "button": {
       "backToProfile": "Edit profile",
       "backToImage": "Edit Profile Image",
+      "backToCover": "Change Cover Image",
       "save": "Save changes",
       "cancel": "Cancel"
     },
@@ -171,6 +172,9 @@
           "inappropriate": "Offensive words are forbidden",
           "linksForbidden": "No links allowed in bio"
         }
+      },
+      "avatar": {
+        "inappropriate": "Uploaded image cannot be used"
       }
     }
   },
@@ -298,7 +302,8 @@
           "title": "Blocked users",
           "noBlockedUsers": "No blocked users",
           "button": {
-            "unblock": "Unblock"
+            "unblock": "Unblock",
+            "loadMoreButton": "Load more"
           }
         },
         "closeAccount": {

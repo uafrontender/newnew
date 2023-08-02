@@ -107,10 +107,10 @@ export const RenderMonthCard = (props: any) => {
 
 const SMonth = styled.section`
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 
   &:first-child {
-    padding-top: 24px;
+    padding-top: 20px;
   }
 
   :before,
@@ -121,6 +121,14 @@ const SMonth = styled.section`
 
   :after {
     clear: both;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 16px;
+
+    &:first-child {
+      padding-top: 24px;
+    }
   }
 `;
 
@@ -185,7 +193,7 @@ interface ISDay {
 }
 
 const SDay = styled(Text)<ISDay>`
-  width: 44px;
+  width: 40px;
   color: ${(props) =>
     props.isActive
       ? props.theme.colors.white
@@ -196,13 +204,13 @@ const SDay = styled(Text)<ISDay>`
         }`};
   cursor: ${(props) =>
     props.isDisabled || props.isActive ? 'not-allowed' : 'pointer'};
-  height: 44px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: ${(props) =>
     props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent'};
-  line-height: 46px !important;
+  line-height: 40px !important;
   border-radius: 22px;
   pointer-events: ${(props) =>
     props.isDisabled || props.isActive ? 'none' : 'unset'};
@@ -212,6 +220,13 @@ const SDay = styled(Text)<ISDay>`
       props.isActive
         ? props.theme.colorsThemed.accent.blue
         : props.theme.colorsThemed.background.quaternary};
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    width: 44px;
+    height: 44px;
+
+    line-height: 46px !important;
   }
 `;
 

@@ -171,9 +171,12 @@ const SModalTitleFullScreen = styled.strong`
   font-size: 14px;
   margin: 0;
   font-weight: 600;
+  overflow: hidden;
 `;
 
 const SModalTitle = styled.strong`
-  font-size: 20px;
+  max-width: 100%;
   margin-bottom: 16px;
+
+  font-size: 20px;
 `;

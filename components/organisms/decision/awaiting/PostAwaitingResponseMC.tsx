@@ -264,12 +264,15 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                   <SCreatorInfoDiv>
                     <SCreator>
                       <Link href={`/${post.creator?.username}`}>
-                        <a href={`/${post.creator?.username}`}>
+                        <SLinkElement href={`/${post.creator?.username}`}>
                           <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
-                        </a>
+                        </SLinkElement>
                       </Link>
                       <Link href={`/${post.creator?.username}`}>
-                        <a href={`/${post.creator?.username}`}>
+                        <SLinkElement
+                          shrinkable
+                          href={`/${post.creator?.username}`}
+                        >
                           <SWantsToKnow>
                             <Trans
                               t={t}
@@ -277,7 +280,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
                               components={[<DisplayName user={post.creator} />]}
                             />
                           </SWantsToKnow>
-                        </a>
+                        </SLinkElement>
                       </Link>
                     </SCreator>
                     {post.totalVotes && post.totalVotes > 0 ? (
@@ -364,7 +367,6 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
             <CommentsBottomSection
               postUuid={post.postUuid}
               postShortId={post.postShortId ?? ''}
-              commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>
         )}
@@ -472,7 +474,7 @@ const SCreatorInfoDiv = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
 
   margin-top: 32px;
 
@@ -486,9 +488,23 @@ const SCreatorInfoDiv = styled.div`
 `;
 
 const SCreator = styled.div`
-  line-height: 24px;
+  display: flex;
+  flex-shrink: 1;
+  flex-direction: row;
+  align-items: center;
 
-  vertical-align: middle;
+  max-width: 100%;
+  line-height: 24px;
+  gap: 6px;
+
+  overflow: hidden;
+  white-space: nowrap;
+`;
+
+const SLinkElement = styled.a<{ shrinkable?: boolean }>`
+  display: flex;
+  flex-shrink: ${({ shrinkable }) => (shrinkable ? 1 : 0)};
+  overflow: hidden;
 `;
 
 const SCreatorImage = styled.img`
@@ -503,11 +519,10 @@ const SCreatorImage = styled.img`
 `;
 
 const SWantsToKnow = styled.span`
-  position: relative;
   display: inline-flex;
   align-items: center;
   white-space: pre;
-  top: -6px;
+  max-width: 100%;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;
@@ -523,7 +538,7 @@ const SWantsToKnow = styled.span`
 
 const STotal = styled.div`
   position: relative;
-  top: -6px;
+  flex-shrink: 0;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-weight: 600;
@@ -536,10 +551,8 @@ const STotal = styled.div`
     font-size: 12px;
     line-height: 16px;
   }
-  ${({ theme }) => theme.media.laptop} {
-    position: relative;
-    top: -3px;
 
+  ${({ theme }) => theme.media.laptop} {
     font-weight: 600;
     font-size: 18px;
     line-height: 20px;

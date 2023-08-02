@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import Text from '../atoms/Text';
@@ -24,9 +24,7 @@ import SeeBundlesButton from '../molecules/profile/SeeBundlesButton';
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
 import BlockUserModalProfile from '../molecules/profile/BlockUserModalProfile';
-import ReportModal, {
-  ReportData,
-} from '../molecules/direct-messages/ReportModal';
+import ReportModal, { ReportData } from '../molecules/ReportModal';
 // import { SubscriptionToCreator } from '../molecules/profile/SmsNotificationModal';
 
 // Icons
@@ -46,6 +44,7 @@ import DisplayName from '../atoms/DisplayName';
 import { useAppState } from '../../contexts/appStateContext';
 import BuyBundleModal from '../molecules/bundles/BuyBundleModal';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
+import { ReportUserOnSignUp } from '../../contexts/onSignUpWrapper';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -56,7 +55,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
   children,
 }) => {
-  const router = useRouter();
   const { goBackOrRedirect } = useGoBackOrRedirect();
   const theme = useTheme();
   const { t } = useTranslation('page-Profile');
@@ -70,7 +68,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
-  const { bundles } = useBundles();
+  const { bundles, isBundleDataLoaded } = useBundles();
   const creatorsBundle = useMemo(
     () => bundles?.find((bundle) => bundle.creator?.uuid === user.uuid),
     [bundles, user.uuid]
@@ -158,43 +156,65 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );  */
 
   const handleClickReport = useCallback(() => {
-    if (!userLoggedIn) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-
     setConfirmReportUser(true);
-  }, [userLoggedIn, router]);
+  }, []);
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportUser(user.uuid, reasons, message).catch((e) =>
-        console.error(e)
-      );
+      if (!userLoggedIn) {
+        const onSignUp: ReportUserOnSignUp = {
+          type: 'report-user',
+          userId: user.uuid ?? undefined,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
+        );
+
+        return false;
+      }
+
+      await reportUser(user.uuid, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [user.uuid]
+    [userLoggedIn, user.uuid]
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
   // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch('/sign-up?reason=follow-creator');
-    router.prefetch(`/${user.username}/subscribe`);
-    router.prefetch(`/${user.username}/activity`);
-    router.prefetch(`/${user.username}`);
+  useEffect(
+    () => {
+      Router.prefetch('/sign-up?reason=follow-creator');
+      Router.prefetch(`/${user.username}/subscribe`);
+      Router.prefetch(`/${user.username}/activity`);
+      Router.prefetch(`/${user.username}`);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // user.username - only initial value needed, rework
+    ]
+  );
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (userLoggedIn && userUuid?.toString() === user.uuid.toString()) {
-      router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
+      Router.replace(userIsCreator ? '/profile/my-posts' : '/profile');
     }
-  }, [userLoggedIn, userIsCreator, userUuid, router, user.uuid]);
+  }, [userLoggedIn, userIsCreator, userUuid, user.uuid]);
 
   const moreButtonRef = useRef() as any;
 
@@ -240,7 +260,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               /* ) */
             }
             <RightSideButtons>
-              {!isMobile && !isUserBlocked && (
+              {!isMobile && !isUserBlocked && isBundleDataLoaded && (
                 <SSeeBundleButton user={user} creatorBundle={creatorsBundle} />
               )}
               <SIconButton
@@ -383,7 +403,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               ) : null
             }
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
-            {isMobile && !isUserBlocked && (
+            {isMobile && !isUserBlocked && isBundleDataLoaded && (
               <SMobileSeeBundleButton
                 user={user}
                 creatorBundle={creatorsBundle}

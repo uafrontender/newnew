@@ -11,21 +11,28 @@ interface IProfileImageZoomSlider {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ProfileImageZoomSlider: React.FunctionComponent<IProfileImageZoomSlider> =
-  ({ value, min, max, step, ariaLabel, disabled, onChange }) => (
-    <SSlider
-      type='range'
-      value={value}
-      min={min}
-      max={max}
-      step={step}
-      disabled={disabled}
-      aria-labelledby={ariaLabel}
-      onChange={onChange}
-    />
-  );
+const ImageZoomSlider: React.FunctionComponent<IProfileImageZoomSlider> = ({
+  value,
+  min,
+  max,
+  step,
+  ariaLabel,
+  disabled,
+  onChange,
+}) => (
+  <SSlider
+    type='range'
+    value={value}
+    min={min}
+    max={max}
+    step={step}
+    disabled={disabled}
+    aria-labelledby={ariaLabel}
+    onChange={onChange}
+  />
+);
 
-export default ProfileImageZoomSlider;
+export default ImageZoomSlider;
 
 const SSlider = styled.input.attrs({ type: 'range' })`
   -webkit-appearance: none;

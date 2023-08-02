@@ -136,6 +136,18 @@ const SCropperWrapper = styled.div<{
   height: 500px;
   width: 100%;
 
+  .cropper-container {
+    &:before {
+      content: '';
+      position: absolute;
+
+      width: ${({ pseudoElementWidth }) => `${pseudoElementWidth}px`};
+      height: 100%;
+
+      z-index: 12;
+    }
+  }
+
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
     z-index: 0;

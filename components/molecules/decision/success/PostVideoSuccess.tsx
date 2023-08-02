@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -12,6 +12,7 @@ import { markPost } from '../../../../api/endpoints/post';
 import PostVideoResponsesSlider from '../moderation/PostVideoResponsesSlider';
 import PostVideoSoundButton from '../../../atoms/decision/PostVideoSoundButton';
 import { useAppState } from '../../../../contexts/appStateContext';
+import { useResponseUuidFromUrl } from '../../../../contexts/responseUuidFromUrlContext';
 
 const PostVideojsPlayer = dynamic(() => import('../common/PostVideojsPlayer'), {
   ssr: false,
@@ -52,34 +53,53 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
     'tablet',
   ].includes(resizeMode);
 
+  const { responseFromUrl } = useResponseUuidFromUrl();
+
+  const responseWithAdditionalVideos = useMemo(() => {
+    if (additionalResponses && Array.isArray(additionalResponses)) {
+      return [response, ...additionalResponses] as newnewapi.IVideoUrls[];
+    }
+
+    return [response] as newnewapi.IVideoUrls[];
+  }, [additionalResponses, response]);
+
   // Show controls on shorter screens
   const [uiOffset, setUiOffset] = useState<number | undefined>(undefined);
 
-  useEffect(() => {
-    async function markResponseAsViewed() {
-      try {
-        const payload = new newnewapi.MarkPostRequest({
-          postUuid,
-          markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
-        });
+  useEffect(
+    () => {
+      async function markResponseAsViewed() {
+        try {
+          const payload = new newnewapi.MarkPostRequest({
+            postUuid,
+            markAs: newnewapi.MarkPostRequest.Kind.RESPONSE_VIDEO_VIEWED,
+          });
 
-        const res = await markPost(payload);
+          const res = await markPost(payload);
 
-        if (!res.error) {
-          handleSetResponseViewed(true);
+          if (!res.error) {
+            handleSetResponseViewed(true);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
-    }
 
-    if (openedTab === 'response' && userLoggedIn && !responseViewed) {
-      markResponseAsViewed();
-    } else if (openedTab === 'response' && !userLoggedIn && !responseViewed) {
-      handleSetResponseViewed(true);
-    }
+      if (openedTab === 'response' && userLoggedIn && !responseViewed) {
+        markResponseAsViewed();
+      } else if (openedTab === 'response' && !userLoggedIn && !responseViewed) {
+        handleSetResponseViewed(true);
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedTab, postUuid, userLoggedIn, responseViewed]);
+    [
+      openedTab,
+      postUuid,
+      userLoggedIn,
+      responseViewed,
+      // handleSetResponseViewed, - reason unknown
+    ]
+  );
 
   // Adjust sound button if needed
   useEffect(() => {
@@ -133,6 +153,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
         }
       }
 
+      handleScroll();
       document?.addEventListener('scroll', handleScroll);
     }
 
@@ -161,11 +182,12 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           ) : (
             <PostVideoResponsesSlider
               isDeletingAdditionalResponse={false}
-              videos={[response, ...additionalResponses]}
+              videos={responseWithAdditionalVideos}
               isMuted={isMuted}
               uiOffset={uiOffset}
               videoDurationWithTime
               autoscroll
+              initialVideoFromUrl={responseFromUrl || undefined}
             />
           )}
           <PostVideoSoundButton

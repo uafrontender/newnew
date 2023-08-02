@@ -119,6 +119,7 @@
     "button": {
       "backToProfile": "Editar perfil",
       "backToImage": "Editar imagen de perfil",
+      "backToCover": "Editar imagen de portada",
       "save": "Guardar cambios",
       "cancel": "Cancelar"
     },
@@ -171,6 +172,9 @@
           "inappropriate": "Las palabras ofensivas no están permitidas",
           "linksForbidden": "Los enlaces no están permitidos en la biografía"
         }
+      },
+      "avatar": {
+        "inappropriate": "No se puede utilizar la imagen cargada"
       }
     }
   },
@@ -298,7 +302,8 @@
           "title": "Usuarios bloqueados",
           "noBlockedUsers": "No hay usuarios bloqueados",
           "button": {
-            "unblock": "Desbloquear"
+            "unblock": "Desbloquear",
+            "loadMoreButton": "Cargar más"
           }
         },
         "closeAccount": {

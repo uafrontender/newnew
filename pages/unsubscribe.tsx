@@ -70,10 +70,15 @@ const Unsubscribe: NextPage<IBundlesPage> = ({ token }) => {
     }
   }, [unsubscribed, token, t]);
 
-  useEffect(() => {
-    authLayoutContext.setShouldHeroUnmount(false);
+  useEffect(
+    () => {
+      authLayoutContext.setShouldHeroUnmount(false);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // authLayoutContext, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     handleUnsubscribe();

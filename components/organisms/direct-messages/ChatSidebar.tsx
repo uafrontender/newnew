@@ -1,10 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import { FocusOn } from 'react-focus-on';
 
 import { useGetChats } from '../../../contexts/chatContext';
 import { useBundles } from '../../../contexts/bundlesContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const ChatListTabs = dynamic(
   () => import('../../molecules/direct-messages/ChatListTabs')
@@ -21,14 +29,24 @@ interface IChatSidebar {
   hidden: boolean;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
   withTabs?: boolean;
+  className?: string;
 }
 
 const ChatSidebar: React.FC<IChatSidebar> = ({
   initialTab,
   hidden,
   withTabs,
+  className,
   onChatRoomSelect,
 }) => {
+  const { resizeMode } = useAppState();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   const { searchChatroom } = useGetChats();
 
   const { bundles, isSellingBundles, hasSoldBundles } = useBundles();
@@ -70,14 +88,32 @@ const ChatSidebar: React.FC<IChatSidebar> = ({
     [setActiveTab]
   );
 
-  // TODO: move hidden to parent, just pass className here
+  const isTabs = useMemo(
+    () => withTabs && !searchChatroom && tabsVisible && !!activeTab,
+    [activeTab, searchChatroom, tabsVisible, withTabs]
+  );
+
+  const chatListRef = useRef<HTMLDivElement | null>(null);
+
   return (
-    <SSidebar hidden={hidden}>
-      <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
-      {withTabs && !searchChatroom && tabsVisible && activeTab && (
-        <ChatListTabs activeTab={activeTab} changeActiveTab={changeActiveTab} />
-      )}
-      <ChatList onChatRoomSelect={onChatRoomSelect} myRole={activeTab} />
+    <SSidebar hidden={hidden} className={className}>
+      <FocusOn
+        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        enabled={!hidden && isMobileOrTablet}
+      >
+        <ChatToolbar onChatRoomSelect={onChatRoomSelect} />
+        {isTabs && (
+          <ChatListTabs
+            activeTab={activeTab!!}
+            changeActiveTab={changeActiveTab}
+          />
+        )}
+        <ChatList
+          onChatRoomSelect={onChatRoomSelect}
+          myRole={activeTab}
+          forwardRef={chatListRef}
+        />
+      </FocusOn>
     </SSidebar>
   );
 };
@@ -92,6 +128,8 @@ const SSidebar = styled.div<{
   width: 100%;
   overflow: hidden;
   flex-direction: column;
+  height: 100%;
+  padding: 0 10px;
 
   ${(props) => props.theme.media.laptop} {
     background: none;

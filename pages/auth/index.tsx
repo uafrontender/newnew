@@ -52,6 +52,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
     setMounted(true);
   }, []);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     if (userLoggedIn) {
       router?.push('/');
@@ -59,6 +60,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
+  // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
       if (isLoading || userLoggedIn) {
@@ -75,7 +77,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         if (provider === 'google') {
           const { code, state } = router.query;
 
-          if (!code || Array.isArray(code)) throw new Error('No code');
+          if (!code || Array.isArray(code)) {
+            throw new Error('No code');
+          }
 
           const requestPayload = new newnewapi.GoogleSignInRequest({
             code,
@@ -95,12 +99,19 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
 
           res = await signInWithFacebook(requestPayload);
         } else if (provider === 'apple') {
-          if (!body) throw new Error('No body receieved');
+          if (!body) {
+            throw new Error('No body receieved');
+          }
 
           const { id_token, sub, state } = body;
 
-          if (!id_token || Array.isArray(id_token)) throw new Error('No code');
-          if (!sub || Array.isArray(sub)) throw new Error('No user id');
+          if (!id_token || Array.isArray(id_token)) {
+            throw new Error('No code');
+          }
+
+          if (!sub || Array.isArray(sub)) {
+            throw new Error('No user id');
+          }
 
           const requestPayload = new newnewapi.AppleSignInRequest({
             identityToken: id_token,
@@ -160,6 +171,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
           maxAge: 10 * 365 * 24 * 60 * 60,
           path: '/',
         });
+
         handleUserLoggedIn(data.me?.options?.isCreator ?? false);
         resumePushNotification();
 

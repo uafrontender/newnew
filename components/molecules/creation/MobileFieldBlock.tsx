@@ -280,16 +280,18 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               <SCustomDays>{DAYS.map(renderDay)}</SCustomDays>
               <SSeparator />
               <SCalendarWrapper>
-                <SCalendarTopGrad />
-                <SCalendarContent>
-                  <CalendarScrollableVertically
-                    minDate={moment()}
-                    maxDate={maxDate}
-                    onSelect={handleDateChange}
-                    selectedDate={moment(value?.date).startOf('D')}
-                  />
-                </SCalendarContent>
-                <SCalendarBottomGrad />
+                <SCalendarContainer>
+                  <SCalendarTopGrad />
+                  <SCalendarContent>
+                    <CalendarScrollableVertically
+                      minDate={moment()}
+                      maxDate={maxDate}
+                      onSelect={handleDateChange}
+                      selectedDate={moment(value?.date).startOf('D')}
+                    />
+                  </SCalendarContent>
+                  <SCalendarBottomGrad />
+                </SCalendarContainer>
               </SCalendarWrapper>
               <SSeparator />
               <SModalToggleWrapper hidden={value?.type !== 'schedule'}>
@@ -542,8 +544,13 @@ const SMobileDateContent = styled.div`
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   z-index: 3;
+  height: 100%;
 
-  overflow-y: auto;
+  overflow-y: hidden;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 80%;
+  }
 `;
 
 const SMobileList = styled.div`
@@ -584,7 +591,7 @@ const SCancelButton = styled(Button)`
 
 const SScheduleButton = styled(Button)`
   padding: 16px 32px;
-  margin-top: 12px;
+  margin-top: auto;
   margin-bottom: 8px;
   height: 56px;
   flex-shrink: 0;
@@ -603,9 +610,13 @@ const SItemTitle = styled(Text)`
 const SModalTopLine = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+
   flex-direction: row;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 8px;
+  }
 `;
 
 const SModalTitle = styled(Headline)``;
@@ -619,7 +630,7 @@ const SInlineSVG = styled(InlineSVG)``;
 
 const SModalToggleWrapper = styled.div<{ hidden?: boolean }>`
   width: 100%;
-  margin: 12px 0;
+  margin: 10px 0;
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
@@ -628,6 +639,10 @@ const SModalToggleWrapper = styled.div<{ hidden?: boolean }>`
   height: ${({ hidden }) => (hidden ? '0px' : '44px')};
   transition: height 0.2s ease;
   overflow: hidden;
+
+  ${(props) => props.theme.media.tablet} {
+    margin: 12px 0;
+  }
 `;
 
 const SSeparator = styled.div`
@@ -641,10 +656,14 @@ const SSeparator = styled.div`
 
 const SCustomDays = styled.div`
   display: flex;
-  padding: 18px 0;
+  padding: 12px 0;
   align-items: center;
   flex-direction: row;
   justify-content: space-around;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 18px 0;
+  }
 `;
 
 const SDay = styled(Text)`
@@ -653,16 +672,24 @@ const SDay = styled(Text)`
 
 const SCalendarWrapper = styled.div`
   position: relative;
-`;
 
-const SCalendarContent = styled.div`
-  height: 325px;
-  overflow-y: auto;
+  flex: 1;
+  max-height: 335px;
+  overflow-y: scroll;
 
+  /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
+
+const SCalendarContainer = styled.div`
+  position: absolute;
+`;
+
+const SCalendarContent = styled.div``;
 
 const SCalendarTopGrad = styled.div`
   top: 0;

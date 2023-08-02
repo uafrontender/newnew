@@ -8,6 +8,7 @@ import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 interface ITextArea {
   id?: string;
+  className?: string;
   value: string;
   error?: string;
   maxlength?: number;
@@ -21,6 +22,7 @@ interface ITextArea {
 export const TextArea: React.FC<ITextArea> = (props) => {
   const {
     id = '',
+    className,
     maxlength,
     value,
     error,
@@ -61,7 +63,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
 
   return (
     <SWrapper>
-      <SContent error={!!error} variant={variant}>
+      <SContent className={className} error={!!error} variant={variant}>
         <STextArea
           maxRows={8}
           value={value}
@@ -70,6 +72,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           maxLength={maxlength}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
+          data-new-message-textarea
         />
       </SContent>
       {error ? (

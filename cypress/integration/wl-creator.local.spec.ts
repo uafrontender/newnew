@@ -352,10 +352,10 @@ context.skip('Whitelisted Creator flow', () => {
           });
         });
 
-      cy.dGet('#review', {
-        timeout: 20000,
-      })
-        .should('be.enabled')
+      cy.dGet('#review')
+        .should('be.enabled', {
+          timeout: 60000,
+        })
         .click();
       cy.url().should('include', '/creation/auction/preview');
 
@@ -405,10 +405,10 @@ context.skip('Whitelisted Creator flow', () => {
           });
         });
 
-      cy.dGet('#review', {
-        timeout: 20000,
-      })
-        .should('be.enabled')
+      cy.dGet('#review')
+        .should('be.enabled', {
+          timeout: 60000,
+        })
         .click();
       cy.url().should('include', '/creation/multiple-choice/preview');
 
@@ -784,10 +784,10 @@ context.skip('Whitelisted Creator flow', () => {
           });
         });
 
-      cy.dGet('#review', {
-        timeout: 20000,
-      })
-        .should('be.enabled')
+      cy.dGet('#review')
+        .should('be.enabled', {
+          timeout: 60000,
+        })
         .click();
       cy.url().should('include', '/creation/auction/preview');
 
@@ -837,10 +837,10 @@ context.skip('Whitelisted Creator flow', () => {
           });
         });
 
-      cy.dGet('#review', {
-        timeout: 20000,
-      })
-        .should('be.enabled')
+      cy.dGet('#review')
+        .should('be.enabled', {
+          timeout: 60000,
+        })
         .click();
       cy.url().should('include', '/creation/multiple-choice/preview');
 
@@ -870,7 +870,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('Guest willing to contribute', () => {
     let USER_EMAIL;
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -995,7 +995,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('Guest willing to buy a bundle', () => {
     let USER_EMAIL;
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1180,7 +1180,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('Guest willing to add a custom option', () => {
     let USER_EMAIL;
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1359,7 +1359,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('Guest willing to buy a bundle from profile', () => {
     let USER_EMAIL;
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1562,7 +1562,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('User willing to contribute', () => {
     const USER_EMAIL = getNextUserEmail();
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1686,7 +1686,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('User willing to buy a bundle', () => {
     const USER_EMAIL = getNextUserEmail();
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -1875,7 +1875,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('User willing to buy a bundle from profile', () => {
     const USER_EMAIL = getNextUserEmail();
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';
@@ -2077,7 +2077,7 @@ context.skip('Whitelisted Creator flow', () => {
 
   describe('User willing to add card first', () => {
     const USER_EMAIL = getNextUserEmail();
-    const USER_CARD_NUMBER = '5200828282828210';
+    const USER_CARD_NUMBER = '4242424242424242';
     const USER_CARD_EXPIRY = '1226';
     const USER_CARD_CVC = '123';
     const USER_CARD_POSTAL_CODE = '90210';

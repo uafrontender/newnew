@@ -9,9 +9,8 @@ import React, {
 import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { createGlobalStyle, useTheme } from 'styled-components';
 import { useQueryClient } from 'react-query';
-import { useMeasure } from 'react-use';
 
 /* Contexts */
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -38,18 +37,18 @@ import { useAppState } from '../../../contexts/appStateContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
+import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
+import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
+import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
+import { ReportData } from '../../molecules/ReportModal';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
-const ReportModal = dynamic(
-  () => import('../../molecules/direct-messages/ReportModal')
-);
+const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const BlockedUser = dynamic(
   () => import('../../molecules/direct-messages/BlockedUser')
 );
 const AccountDeleted = dynamic(
   () => import('../../molecules/direct-messages/AccountDeleted')
-);
-const ChatAreaCenter = dynamic(
-  () => import('../../molecules/direct-messages/ChatAreaCenter')
 );
 
 const MessagingDisabled = dynamic(
@@ -67,6 +66,7 @@ interface IFuncProps {
   withHeaderAvatar?: boolean;
   className?: string;
   variant?: 'primary' | 'secondary';
+  isHidden?: boolean;
   onBackButtonClick?: () => void;
 }
 
@@ -78,17 +78,22 @@ const ChatContent: React.FC<IFuncProps> = ({
   withHeaderAvatar,
   className,
   variant,
+  isHidden,
   onBackButtonClick,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Chat');
   const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
+
+  const chatContentRef = useRef<HTMLDivElement | null>(null);
 
   const { data, refetch: refetchChatRoom } = useMyChatRoom(
     initialChatRoom.id as number,
     {
       initialData: initialChatRoom,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -114,15 +119,30 @@ const ChatContent: React.FC<IFuncProps> = ({
 
   const [messageText, setMessageText] = useState<string>('');
   const [messageTextValid, setMessageTextValid] = useState(false);
+  const [messageTextError, setMessageTextError] = useState(false);
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
     useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [textareaFocused, setTextareaFocused] = useState<boolean>(false);
 
-  const [bottomPartRef, { height: bottomPartHeight }] =
-    useMeasure<HTMLDivElement>();
+  const handleReportSubmit = useCallback(
+    async ({ reasons, message }: ReportData) => {
+      if (!chatRoom.visavis?.user?.uuid) {
+        return false;
+      }
+
+      await reportUser(chatRoom.visavis.user?.uuid, reasons, message).catch(
+        (e) => {
+          console.error(e);
+          return false;
+        }
+      );
+
+      return true;
+    },
+    [chatRoom.visavis?.user?.uuid]
+  );
 
   const handleCloseConfirmBlockUserModal = useCallback(() => {
     Mixpanel.track('Close Block User Modal', {
@@ -131,21 +151,29 @@ const ChatContent: React.FC<IFuncProps> = ({
     setIsConfirmBlockUserModalOpen(false);
   }, []);
 
-  useEffect(() => {
-    if (chatRoom.id && isSocketConnected) {
-      addChannel(`chat_${chatRoom.id.toString()}`, {
-        chatRoomUpdates: {
-          chatRoomId: chatRoom.id,
-        },
-      });
-    }
-    return () => {
-      if (chatRoom.id) {
-        removeChannel(`chat_${chatRoom.id.toString()}`);
+  useEffect(
+    () => {
+      if (chatRoom.id && isSocketConnected) {
+        addChannel(`chat_${chatRoom.id.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: chatRoom.id,
+          },
+        });
       }
-    };
+      return () => {
+        if (chatRoom.id) {
+          removeChannel(`chat_${chatRoom.id.toString()}`);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRoom, isSocketConnected]);
+    [
+      chatRoom,
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel, - reason unknown
+    ]
+  );
 
   const prevChatRoomId = useRef(chatRoom.id);
 
@@ -156,6 +184,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
       setMessageText('');
       setMessageTextValid(false);
+      setMessageTextError(false);
       setSendingMessage(false);
 
       prevChatRoomId.current = chatRoom.id;
@@ -199,6 +228,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
       const isValid = validateInputText(draft.text);
       setMessageTextValid(isValid);
+      setMessageTextError(false);
       setMessageText(draft.text);
     }
   }, [chatRoom.id, chatsDraft]);
@@ -265,6 +295,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           const res = await sendMessage(payload);
 
           if (!res?.data || res.error) {
+            // 400 Error: Invalid message at purifyChatMessage
             throw new Error(res?.error?.message ?? 'Request failed');
           }
 
@@ -275,14 +306,27 @@ const ChatContent: React.FC<IFuncProps> = ({
           });
 
           // Update Chat
-          refetchChatRoom();
+          await refetchChatRoom();
           setSendingMessage(false);
+
+          if (chatContentRef.current) {
+            chatContentRef.current.scrollTo(
+              0,
+              chatContentRef.current.scrollHeight
+            );
+          }
 
           if (chatRoom.id) {
             removeInputValueFromChatsDraft(chatRoom.id);
           }
         } catch (err) {
           console.error(err);
+          // 400 Error: Invalid message at purifyChatMessage
+          if ((err as Error).message.includes('Invalid message')) {
+            setMessageTextError(true);
+            setMessageTextValid(false);
+          }
+
           setMessageText(tmpMsgText);
           setSendingMessage(false);
         }
@@ -320,6 +364,7 @@ const ChatContent: React.FC<IFuncProps> = ({
       const isValid = validateInputText(value);
       setMessageTextValid(isValid);
       setMessageText(value);
+      setMessageTextError(false);
     },
     [isMobileOrTablet, handleSubmit]
   );
@@ -382,6 +427,7 @@ const ChatContent: React.FC<IFuncProps> = ({
         />
       );
     }
+
     return null;
   }, [
     isVisavisBlocked,
@@ -393,9 +439,20 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
-  const handleTextareaFocused = useCallback(() => {
-    setTextareaFocused(true);
-  }, []);
+  // FocusOn cannot be use because of column reverse
+  useEffect(() => {
+    enableOverlayMode();
+
+    return () => {
+      disableOverlayMode();
+    };
+  }, [enableOverlayMode, disableOverlayMode]);
+
+  // react-focus-on cannot be used here because of column-reverse
+  useDisableTouchMoveSafari(chatContentRef, isHidden);
+
+  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
+  usePreventLayoutMoveOnInputFocusSafari('data-new-message-textarea');
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
@@ -414,76 +471,71 @@ const ChatContent: React.FC<IFuncProps> = ({
         withAvatar={withHeaderAvatar}
       />
 
-      <SChatAreaCenter
-        chatRoom={chatRoom}
-        isAnnouncement={isAnnouncement}
-        textareaFocused={textareaFocused}
-        withAvatars={withChatMessageAvatars}
-        variant={variant}
-        bottomOffset={isBottomPartElementVisible ? bottomPartHeight : 0}
-        isAnnouncementLabel={!isMyAnnouncement && isAnnouncement}
-      />
+      <SContent>
+        <ChatAreaCenter
+          forwardRef={chatContentRef}
+          chatRoom={chatRoom}
+          isAnnouncement={isAnnouncement}
+          withAvatars={withChatMessageAvatars}
+          variant={variant}
+        />
 
-      {isBottomPartElementVisible && (
-        <SBottomPart ref={bottomPartRef}>
-          <SBottomPartContentWrapper>
-            {isTextareaHidden ? (
-              whatComponentToDisplay()
-            ) : (
-              <SBottomTextarea>
-                <STextArea>
-                  <TextArea
-                    maxlength={500}
-                    value={messageText}
-                    onChange={handleChange}
-                    placeholder={t('chat.placeholder')}
-                    gotMaxLength={handleSubmit}
-                    setTextareaFocused={handleTextareaFocused}
-                    variant={variant}
-                  />
-                </STextArea>
-                <SButton
-                  withShadow
-                  view={messageTextValid ? 'primaryGrad' : 'secondary'}
-                  onClick={handleSubmit}
-                  loading={sendingMessage}
-                  loadingAnimationColor='blue'
-                  disabled={
-                    sendingMessage ||
-                    !messageTextValid ||
-                    messageText.length < 1
-                  }
-                >
-                  <SInlineSVG
-                    svg={!sendingMessage ? sendIcon : ''}
-                    fill={
-                      messageTextValid && messageText.length > 0
-                        ? theme.colors.white
-                        : theme.colorsThemed.text.primary
+        {isBottomPartElementVisible && (
+          <SBottomPart>
+            <SBottomPartContentWrapper>
+              {isTextareaHidden ? (
+                whatComponentToDisplay()
+              ) : (
+                <SBottomTextarea>
+                  <STextAreaContainer>
+                    <STextArea
+                      maxlength={500}
+                      value={messageText}
+                      onChange={handleChange}
+                      placeholder={t('chat.placeholder')}
+                      gotMaxLength={handleSubmit}
+                      variant={variant}
+                      withError={messageTextError}
+                    />
+                  </STextAreaContainer>
+                  <SButton
+                    withShadow
+                    view={messageTextValid ? 'primaryGrad' : 'secondary'}
+                    onClick={handleSubmit}
+                    loading={sendingMessage}
+                    loadingAnimationColor='blue'
+                    disabled={
+                      sendingMessage ||
+                      !messageTextValid ||
+                      messageText.length < 1
                     }
-                    width='24px'
-                    height='24px'
-                  />
-                </SButton>
-              </SBottomTextarea>
-            )}
-          </SBottomPartContentWrapper>
-        </SBottomPart>
-      )}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <SInlineSVG
+                      svg={!sendingMessage ? sendIcon : ''}
+                      fill={
+                        messageTextValid && messageText.length > 0
+                          ? theme.colors.white
+                          : theme.colorsThemed.text.primary
+                      }
+                      width='24px'
+                      height='24px'
+                    />
+                  </SButton>
+                </SBottomTextarea>
+              )}
+            </SBottomPartContentWrapper>
+          </SBottomPart>
+        )}
+      </SContent>
       {chatRoom.visavis && (
         <ReportModal
           show={confirmReportUser}
           reportedUser={chatRoom.visavis?.user!!}
           onClose={() => setConfirmReportUser(false)}
-          onSubmit={async ({ reasons, message }) => {
-            if (chatRoom.visavis?.user?.uuid) {
-              await reportUser(
-                chatRoom.visavis.user?.uuid,
-                reasons,
-                message
-              ).catch((e) => console.error(e));
-            }
-          }}
+          onSubmit={handleReportSubmit}
         />
       )}
       {chatRoom.visavis ? (
@@ -495,6 +547,8 @@ const ChatContent: React.FC<IFuncProps> = ({
           isAnnouncement={isAnnouncement}
         />
       ) : null}
+
+      <GlobalStyles />
     </SContainer>
   );
 };
@@ -506,7 +560,7 @@ const SContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 80px 0 82px;
+  height: calc(var(--window-inner-height, 1vh) * 100);
 
   flex-shrink: 0;
 
@@ -514,22 +568,43 @@ const SContainer = styled.div`
     padding: 0;
     flex-shrink: unset;
   }
+
+  ${(props) => props.theme.media.laptop} {
+    height: 100%;
+  }
+`;
+
+const GlobalStyles = createGlobalStyle`
+  body {
+    background: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
+`;
+
+const SContent = styled.div`
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  height: calc(var(--window-inner-height, 1vh) * 100 - 80px);
+
+  ${(props) => props.theme.media.laptop} {
+    height: 100%;
+  }
 `;
 
 const SBottomPart = styled.div`
   display: flex;
   flex-direction: column;
-  position: fixed;
+  /* position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0; */
+
   background: ${(props) => props.theme.colorsThemed.background.secondary};
 
   ${(props) => props.theme.media.tablet} {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
     background: none;
     min-height: 80px;
   }
@@ -549,8 +624,16 @@ const SBottomTextarea = styled.div`
   flex-direction: row;
 `;
 
-const STextArea = styled.div`
+const STextAreaContainer = styled.div`
   flex: 1;
+`;
+
+const STextArea = styled(TextArea)<{ withError: boolean }>`
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme, withError }) =>
+    withError ? theme.colorsThemed.accent.error : 'transparent'};
+  margin: -1px;
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -568,31 +651,4 @@ const SButton = styled(Button)`
         ? props.theme.colors.white
         : props.theme.colorsThemed.button.background.secondary};
   }
-`;
-
-const SChatAreaCenter = styled(ChatAreaCenter)<{
-  bottomOffset: number;
-  isAnnouncementLabel: boolean;
-}>`
-  ${({ bottomOffset, theme, isAnnouncementLabel }) =>
-    bottomOffset !== undefined
-      ? css`
-          && {
-            bottom: ${`${bottomOffset}px`};
-          }
-
-          && {
-            // 80px chat area header height
-            ${theme.media.tablet} {
-              bottom: 0;
-              min-height: ${`calc(100% - ${
-                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
-              }px)`};
-              height: ${`calc(100vh - ${
-                bottomOffset + 80 + (isAnnouncementLabel ? 75 : 0)
-              }px)`};
-            }
-          }
-        `
-      : null}
 `;

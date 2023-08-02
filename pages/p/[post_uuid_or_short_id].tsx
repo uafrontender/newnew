@@ -14,7 +14,7 @@ import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 // import { useInView } from 'react-intersection-observer';
 import { validate as validateUuid } from 'uuid';
@@ -35,9 +35,8 @@ import switchPostStatus, {
 } from '../../utils/switchPostStatus';
 import useLeavePageConfirm from '../../utils/hooks/useLeavePageConfirm';
 import { Mixpanel } from '../../utils/mixpanel';
-import CommentFromUrlContextProvider, {
-  CommentFromUrlContext,
-} from '../../contexts/commentFromUrlContext';
+import CommentFromUrlContextProvider from '../../contexts/commentFromUrlContext';
+import ResponseUuidFromUrlContextProvider from '../../contexts/responseUuidFromUrlContext';
 import PostInnerContextProvider from '../../contexts/postInnerContext';
 import { usePushNotifications } from '../../contexts/pushNotificationsContext';
 
@@ -56,6 +55,7 @@ import useCuratedList, {
   useCuratedListSubscription,
 } from '../../utils/hooks/useCuratedList';
 import useGoBackOrRedirect from '../../utils/useGoBackOrRedirect';
+import { MarkPostAsFavoriteOnSignUp } from '../../contexts/onSignUpWrapper';
 
 interface IPostPage {
   postUuidOrShortId: string;
@@ -66,6 +66,7 @@ interface IPostPage {
   comment_content?: string;
   custom_option_text?: string;
   save_card?: boolean;
+  response_uuid_from_url?: string;
   isServerSide?: boolean;
 }
 
@@ -78,6 +79,7 @@ const PostPage: NextPage<IPostPage> = ({
   comment_id,
   comment_content,
   save_card,
+  response_uuid_from_url,
   isServerSide,
 }) => {
   const router = useRouter();
@@ -113,6 +115,11 @@ const PostPage: NextPage<IPostPage> = ({
   const commentContentFromUrl = useMemo(
     () => comment_content,
     [comment_content]
+  );
+
+  const responseNumberFromUrl = useMemo(
+    () => response_uuid_from_url,
+    [response_uuid_from_url]
   );
 
   const [isConfirmToClosePost, setIsConfirmToClosePost] = useState(false);
@@ -257,8 +264,20 @@ const PostPage: NextPage<IPostPage> = ({
       });
 
       if (!userLoggedIn) {
+        const onSignUp: MarkPostAsFavoriteOnSignUp = {
+          type: 'favorite-post',
+          postUuid: postParsed?.postUuid,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
         router.push(
-          `/sign-up?reason=follow-decision&redirect=${window.location.href}`
+          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
         );
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
@@ -311,9 +330,6 @@ const PostPage: NextPage<IPostPage> = ({
     () => saveCardFromRedirect ?? undefined
   );
 
-  const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
-    useContext(CommentFromUrlContext);
-
   const [deletePostOpen, setDeletePostOpen] = useState(false);
 
   const handleOpenDeletePostModal = useCallback(
@@ -346,10 +362,12 @@ const PostPage: NextPage<IPostPage> = ({
         });
         setIsDeletingPost(false);
         handleCloseDeletePostModal();
+
         if (document?.documentElement) {
           setTimeout(() => {
+            // top: 5 instead of top: 0 because of issues on iOS
             document?.documentElement?.scrollTo({
-              top: 0,
+              top: 5,
             });
           }, 100);
         }
@@ -512,31 +530,46 @@ const PostPage: NextPage<IPostPage> = ({
   // );
 
   // Refetch Post if user authenticated
-  useEffect(() => {
-    if (userLoggedIn) {
-      refetchPost();
-    }
+  useEffect(
+    () => {
+      if (userLoggedIn) {
+        refetchPost();
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+    [
+      userLoggedIn,
+      // refetchPost, - reason unknown, probably safe
+    ]
+  );
 
   useEffect(() => {
     setIsFollowingDecision(!!postParsed?.isFavoritedByMe);
   }, [postParsed?.isFavoritedByMe]);
 
   // Comment ID from URL
-  useEffect(() => {
-    if (commentIdFromUrl) {
-      handleSetCommentIdFromUrl?.(commentIdFromUrl);
-    }
-    if (commentContentFromUrl) {
-      handleSetNewCommentContentFromUrl?.(commentContentFromUrl);
+  useEffect(
+    () => {
+      const shouldReplace =
+        !!commentIdFromUrl ||
+        !!commentContentFromUrl ||
+        !!responseNumberFromUrl;
 
-      router.replace(`/p/${postUuidOrShortId}`, undefined, {
-        shallow: true,
-      });
-    }
+      if (shouldReplace) {
+        router.replace(`/p/${postUuidOrShortId}`, undefined, {
+          shallow: true,
+        });
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, commentContentFromUrl]);
+    [
+      commentIdFromUrl,
+      commentContentFromUrl,
+      // responseNumberFromUrl, - reason unknown
+      // router, - reason unknown
+      // postUuidOrShortId, - reason unknown
+    ]
+  );
 
   // Mark post as viewed if logged in and not own post
   useEffect(() => {
@@ -601,92 +634,109 @@ const PostPage: NextPage<IPostPage> = ({
 
   // Increment channel subs after mounting
   // Decrement when unmounting
-  useEffect(() => {
-    if (postParsed?.postUuid && isSocketConnected) {
-      addChannel(postParsed.postUuid, {
-        postUpdates: {
-          postUuid: postParsed.postUuid,
-        },
-      });
-    }
-
-    return () => {
-      if (postParsed?.postUuid) {
-        removeChannel(postParsed.postUuid);
+  useEffect(
+    () => {
+      if (postParsed?.postUuid && isSocketConnected) {
+        addChannel(postParsed.postUuid, {
+          postUpdates: {
+            postUuid: postParsed.postUuid,
+          },
+        });
       }
-    };
+
+      return () => {
+        if (postParsed?.postUuid) {
+          removeChannel(postParsed.postUuid);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postParsed?.postUuid, isSocketConnected]);
+    [
+      postParsed?.postUuid,
+      isSocketConnected,
+      // addChannel, - reason unknown
+      // removeChannel, - reason unknown
+    ]
+  );
 
   // Listen for Post status updates
-  useEffect(() => {
-    const socketHandlerPostStatus = async (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+  useEffect(
+    () => {
+      const socketHandlerPostStatus = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-      if (!decoded) {
-        return;
-      }
-      if (decoded.postUuid === postParsed?.postUuid) {
-        if (decoded.auction) {
-          const parsedStatus = switchPostStatus(
-            'ac',
-            decoded.auction as newnewapi.Auction.Status
-          );
-
-          if (
-            parsedStatus === 'deleted_by_admin' ||
-            parsedStatus === 'deleted_by_creator'
-          ) {
-            updatePostStatusMutation.mutate({
-              postUuid: postParsed?.postUuid,
-              postType: 'ac',
-              status: decoded.auction as newnewapi.Auction.Status,
-            });
-          } else {
-            await refetchPost();
-          }
-        } else if (decoded.multipleChoice) {
-          const parsedStatus = switchPostStatus(
-            'mc',
-            decoded.multipleChoice as newnewapi.MultipleChoice.Status
-          );
-
-          if (
-            parsedStatus === 'deleted_by_admin' ||
-            parsedStatus === 'deleted_by_creator'
-          ) {
-            updatePostStatusMutation.mutate({
-              postUuid: postParsed?.postUuid,
-              postType: 'mc',
-              status: decoded.multipleChoice as newnewapi.MultipleChoice.Status,
-            });
-          } else {
-            await refetchPost();
-          }
-        } else {
-          await refetchPost();
+        if (!decoded) {
+          return;
         }
-      }
-    };
+        if (decoded.postUuid === postParsed?.postUuid) {
+          if (decoded.auction) {
+            const parsedStatus = switchPostStatus(
+              'ac',
+              decoded.auction as newnewapi.Auction.Status
+            );
 
-    if (socketConnection) {
-      socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
-    }
+            if (
+              parsedStatus === 'deleted_by_admin' ||
+              parsedStatus === 'deleted_by_creator'
+            ) {
+              updatePostStatusMutation.mutate({
+                postUuid: postParsed?.postUuid,
+                postType: 'ac',
+                status: decoded.auction as newnewapi.Auction.Status,
+              });
+            } else {
+              await refetchPost();
+            }
+          } else if (decoded.multipleChoice) {
+            const parsedStatus = switchPostStatus(
+              'mc',
+              decoded.multipleChoice as newnewapi.MultipleChoice.Status
+            );
 
-    return () => {
-      if (socketConnection && socketConnection?.connected) {
-        socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+            if (
+              parsedStatus === 'deleted_by_admin' ||
+              parsedStatus === 'deleted_by_creator'
+            ) {
+              updatePostStatusMutation.mutate({
+                postUuid: postParsed?.postUuid,
+                postType: 'mc',
+                status:
+                  decoded.multipleChoice as newnewapi.MultipleChoice.Status,
+              });
+            } else {
+              await refetchPost();
+            }
+          } else {
+            await refetchPost();
+          }
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on('PostStatusUpdated', socketHandlerPostStatus);
       }
-    };
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off('PostStatusUpdated', socketHandlerPostStatus);
+        }
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, postParsed, userUuid]);
+    [
+      socketConnection,
+      postParsed,
+      userUuid,
+      // refetchPost, - reason unknown, probably safe
+      // updatePostStatusMutation, - reason unknown
+    ]
+  );
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch('/sign-up');
-    router.prefetch('/creation');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Router.prefetch('/sign-up');
+    Router.prefetch('/creation');
   }, []);
 
   const description = useMemo(() => {
@@ -872,16 +922,29 @@ const PostPage: NextPage<IPostPage> = ({
     </motion.div>
   );
 };
+
 export default PostPage;
 
 (PostPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
   <GeneralLayout noMobileNavigation noPaddingMobile>
-    <CommentFromUrlContextProvider>
-      <AnimatePresence>
-        <React.Fragment key={page.props.postUuidOrShortId}>
-          {page}
-        </React.Fragment>
-      </AnimatePresence>
+    <CommentFromUrlContextProvider
+      commentIdFromUrl={page?.props?.comment_id || undefined}
+      commentContentFromUrl={page?.props?.comment_content || undefined}
+    >
+      <ResponseUuidFromUrlContextProvider
+        responseFromUrlInitial={
+          page?.props?.response_uuid_from_url &&
+          validateUuid(page?.props?.response_uuid_from_url)
+            ? page?.props?.response_uuid_from_url
+            : undefined
+        }
+      >
+        <AnimatePresence>
+          <React.Fragment key={page.props.postUuidOrShortId}>
+            {page}
+          </React.Fragment>
+        </AnimatePresence>
+      </ResponseUuidFromUrlContextProvider>
     </CommentFromUrlContextProvider>
   </GeneralLayout>
 );
@@ -898,6 +961,7 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
       save_card,
       bundle,
       custom_option_text,
+      response_uuid,
     } = context.query;
     const translationContext = await serverSideTranslations(
       context.locale!!,
@@ -977,6 +1041,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
+          ...(response_uuid && !Array.isArray(response_uuid)
+            ? { response_uuid_from_url: response_uuid }
+            : {}),
         };
 
         if (Object.keys(queryObject).length !== 0) {
@@ -1037,6 +1104,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           ...(custom_option_text && !Array.isArray(custom_option_text)
             ? { custom_option_text }
             : {}),
+          ...(response_uuid && !Array.isArray(response_uuid)
+            ? { response_uuid_from_url: response_uuid }
+            : {}),
           ...translationContext,
         },
       };
@@ -1073,6 +1143,9 @@ export const getServerSideProps: GetServerSideProps<IPostPage> = async (
           : {}),
         ...(custom_option_text && !Array.isArray(custom_option_text)
           ? { custom_option_text }
+          : {}),
+        ...(response_uuid && !Array.isArray(response_uuid)
+          ? { response_uuid_from_url: response_uuid }
           : {}),
         ...translationContext,
       },

@@ -203,6 +203,7 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
+  overflow-y: auto;
   background-color: ${(props) =>
     props.theme.colorsThemed.background.backgroundDD};
 `;
@@ -215,6 +216,7 @@ const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 16px;
   margin-bottom: 4px;
+  flex-shrink: 0;
 
   &:last-child {
     margin-bottom: 0;

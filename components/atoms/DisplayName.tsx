@@ -20,7 +20,6 @@ export interface IDisplayName {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-// TODO: go through the uses and clear external wrappers as this component has own wrapper now
 const DisplayName: React.FC<IDisplayName> = ({
   className,
   user,
@@ -148,7 +147,9 @@ export default DisplayName;
 const Wrapper = styled.div`
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
   overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SName = styled.div`

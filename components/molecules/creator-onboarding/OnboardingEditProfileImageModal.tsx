@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { motion } from 'framer-motion';
 import { Area, Point } from 'react-easy-crop/types';
 
 import getCroppedImg from '../../../utils/cropImage';
@@ -14,7 +13,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
 import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import Button from '../../atoms/Button';
-import ProfileImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
+import ImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface IOnboardingEditProfileImageModal {
@@ -96,11 +95,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
 
   return (
     <Modal show={isOpen} onClose={onClose}>
-      <SEditPictureMenu
-        initial={MInitial}
-        animate={MAnimation}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <SEditPictureMenu onClick={(e) => e.stopPropagation()}>
         {isMobile ? (
           <SGoBackButtonMobile onClick={() => onClose()}>
             {t('detailsSection.editProfileImageModal.button.back')}
@@ -143,7 +138,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
               height='24px'
             />
           </Button>
-          <ProfileImageZoomSlider
+          <ImageZoomSlider
             value={zoomProfileImage}
             min={minZoom}
             max={minZoom + 2}
@@ -191,7 +186,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
 
 export default OnboardingEditProfileImageModal;
 
-const SEditPictureMenu = styled(motion.div)`
+const SEditPictureMenu = styled.div`
   position: relative;
   overflow-y: auto;
 
@@ -222,28 +217,6 @@ const SEditPictureMenu = styled(motion.div)`
     width: 480px;
   }
 `;
-
-const MInitial = {
-  opacity: 0,
-  y: 1000,
-};
-
-const MAnimation = {
-  opacity: 1,
-  y: 0,
-  transition: {
-    opacity: {
-      duration: 0.1,
-      delay: 0.1,
-    },
-    y: {
-      type: 'spring',
-      stiffness: 50,
-      delay: 0.2,
-    },
-    default: { duration: 2 },
-  },
-};
 
 const SGoBackButtonMobile = styled(GoBackButton)`
   width: 100%;

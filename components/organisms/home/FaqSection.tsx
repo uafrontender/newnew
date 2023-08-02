@@ -52,7 +52,7 @@ const FaqSection = () => {
   const { t } = useTranslation('page-Home');
   const theme = useTheme();
   const { userData } = useUserData();
-  const { userLoggedIn, userIsCreator } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth } = useAppState();
   const { appConstants } = useGetAppConstants();
 
   return (
@@ -66,7 +66,7 @@ const FaqSection = () => {
             userLoggedIn &&
             !userIsCreator &&
             !canBecomeCreator(
-              userData?.dateOfBirth,
+              userDateOfBirth ?? userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
             )
           ) {
@@ -184,9 +184,11 @@ const SContainer = styled.section`
   align-items: center;
   position: relative;
   padding: 20px 0;
+  overflow-x: hidden;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 20px;
+    overflow-x: visible;
   }
 
   ${(props) => props.theme.media.laptop} {

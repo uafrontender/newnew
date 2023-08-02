@@ -54,15 +54,16 @@ export const General: React.FC<IGeneral> = (props) => {
   } = props;
   const { userData } = useUserData();
   const { appConstants } = useGetAppConstants();
-  const { userLoggedIn, userIsCreator, resizeMode } = useAppState();
+  const { userLoggedIn, userIsCreator, userDateOfBirth, resizeMode } =
+    useAppState();
   const { globalSearchActive, banner } = useUiState();
   const theme = useTheme();
   const [cookies] = useCookies();
   const router = useRouter();
+
   const { unreadNotificationCount } = useNotifications();
   const { bundles, directMessagesAvailable } = useBundles();
   const { unreadCount } = useChatsUnreadMessages();
-
   const hasMounted = useHasMounted();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
@@ -124,7 +125,7 @@ export const General: React.FC<IGeneral> = (props) => {
         )
           .concat(
             canBecomeCreator(
-              userData?.dateOfBirth,
+              userDateOfBirth ?? userData?.dateOfBirth,
               appConstants.minCreatorAgeYears
             )
               ? [
@@ -157,6 +158,7 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [
     userLoggedIn,
     unreadNotificationCount,
+    userDateOfBirth,
     userData?.dateOfBirth,
     appConstants.minCreatorAgeYears,
     userIsCreator,
@@ -200,86 +202,105 @@ export const General: React.FC<IGeneral> = (props) => {
     [isMobile, scrollDirection, noMobileNavigation]
   );
 
+  const containerParams = useMemo(
+    () =>
+      restrictMaxWidth
+        ? {}
+        : {
+            wideContainer: true,
+          },
+    [restrictMaxWidth]
+  );
+
+  const isBottomNavigationVisible =
+    mobileNavigationVisible && !globalSearchActive;
+
+  const isNoMobileNavigation = noMobileNavigation && isMobile;
+
   return (
-    <SBaseLayout
-      id='generalContainer'
-      className={className}
-      containerRef={wrapperRef}
-      withBanner={!!banner?.show}
-      noPaddingTop={!!noMobileNavigation}
-    >
-      <SkeletonTheme
-        baseColor={theme.colorsThemed.background.secondary}
-        highlightColor={theme.colorsThemed.background.tertiary}
+    <>
+      {/* header is sticky for Safari on mobile devices so padding isn't needed */}
+      <SBaseLayout
+        id='generalContainer'
+        className={className}
+        containerRef={wrapperRef}
+        withBanner={!!banner?.show}
       >
-        <Header
-          visible={!isMobile || mobileNavigationVisible || globalSearchActive}
-        />
-        <SContent noPaddingTop={!!noMobileNavigation}>
-          <Container
-            {...(restrictMaxWidth
-              ? {}
-              : {
-                  wideContainer: true,
-                })}
-          >
-            <Row noPaddingMobile={noPaddingMobile}>
-              <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
-            </Row>
-          </Container>
-        </SContent>
-        <Footer />
-        <BottomNavigation
-          collection={bottomNavigation}
-          moreMenuMobileOpen={moreMenuMobileOpen}
-          handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-          visible={mobileNavigationVisible && !globalSearchActive}
-        />
-        {hasMounted ? (
-          <>
-            <SortingContainer
-              id='sorting-container'
-              withCookie={cookies.accepted !== 'true'}
-              bottomNavigationVisible={mobileNavigationVisible}
-            />
-            <CookieContainer
-              bottomNavigationVisible={mobileNavigationVisible}
-              zIndex={moreMenuMobileOpen ? 9 : 10}
-            >
-              <Cookie />
-            </CookieContainer>
-          </>
-        ) : null}
-        {chatButtonVisible && (
-          <SChatContainer
-            bottomNavigationVisible={mobileNavigationVisible}
-            zIndex={mobileChatOpen ? 11 : moreMenuMobileOpen ? 9 : 10}
-          >
-            {!mobileChatOpen ? (
-              <FloatingMessages withCounter openChat={openChat} />
-            ) : (
-              <ChatsProvider>
-                <MobileChat myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
-              </ChatsProvider>
+        <SkeletonTheme
+          baseColor={theme.colorsThemed.background.secondary}
+          highlightColor={theme.colorsThemed.background.tertiary}
+        >
+          <TopContainer>
+            {!isNoMobileNavigation && (
+              <Header
+                visible={
+                  !isMobile || mobileNavigationVisible || globalSearchActive
+                }
+              />
             )}
-          </SChatContainer>
-        )}
-        {!isMobileOrTablet && !router.route.includes('direct-messages') && (
-          <ReportBugButton
-            bottom={
-              (isMobile ? 24 : 16) +
-              (isMobile && mobileNavigationVisible && !mobileChatOpen
-                ? 56
-                : 0) +
-              (chatButtonVisible && !mobileChatOpen ? 72 : 0)
-            }
-            right={4}
-            zIndex={moreMenuMobileOpen ? 9 : undefined}
-          />
-        )}
-        <ModalNotifications />
-      </SkeletonTheme>
-    </SBaseLayout>
+            <SContent noPaddingTop={!!noMobileNavigation}>
+              <Container {...containerParams}>
+                <Row noPaddingMobile={noPaddingMobile}>
+                  <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
+                </Row>
+              </Container>
+            </SContent>
+          </TopContainer>
+          <Footer />
+          {!isNoMobileNavigation && (
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={isBottomNavigationVisible}
+            />
+          )}
+          {hasMounted ? (
+            <>
+              <SortingContainer
+                id='sorting-container'
+                withCookie={cookies.accepted !== 'true'}
+                bottomNavigationVisible={mobileNavigationVisible}
+              />
+              <CookieContainer
+                bottomNavigationVisible={mobileNavigationVisible}
+                zIndex={moreMenuMobileOpen ? 9 : 10}
+              >
+                <Cookie />
+              </CookieContainer>
+            </>
+          ) : null}
+          {chatButtonVisible && (
+            <SChatContainer
+              bottomNavigationVisible={mobileNavigationVisible}
+              zIndex={mobileChatOpen ? 11 : moreMenuMobileOpen ? 9 : 10}
+            >
+              {!mobileChatOpen ? (
+                <FloatingMessages withCounter openChat={openChat} />
+              ) : (
+                <ChatsProvider>
+                  <MobileChat myRole={newnewapi.ChatRoom.MyRole.CREATOR} />
+                </ChatsProvider>
+              )}
+            </SChatContainer>
+          )}
+          {!isMobileOrTablet && !router.route.includes('direct-messages') && (
+            <ReportBugButton
+              bottom={
+                (isMobile ? 24 : 16) +
+                (isMobile && mobileNavigationVisible && !mobileChatOpen
+                  ? 56
+                  : 0) +
+                (chatButtonVisible && !mobileChatOpen ? 72 : 0)
+              }
+              right={4}
+              zIndex={moreMenuMobileOpen ? 9 : undefined}
+            />
+          )}
+          <ModalNotifications />
+        </SkeletonTheme>
+      </SBaseLayout>
+    </>
   );
 };
 
@@ -292,19 +313,15 @@ General.defaultProps = {
 
 interface ISWrapper {
   withBanner: boolean;
-  noPaddingTop: boolean;
 }
 
 const SBaseLayout = styled(BaseLayout)<ISWrapper>`
   display: flex;
   transition: padding ease 0.5s;
-  padding-top: ${(props) =>
-    !props.noPaddingTop ? (props.withBanner ? 96 : 56) : 0}px;
   flex-direction: column;
   justify-content: space-between;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-top: ${(props) => (props.withBanner ? 112 : 72)}px;
     padding-bottom: 0;
 
     /* Hide scrollbar */
@@ -313,10 +330,12 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
     }
     scrollbar-width: none;
   }
+`;
 
-  ${({ theme }) => theme.media.laptop} {
-    padding-top: ${(props) => (props.withBanner ? 120 : 80)}px;
-  }
+const TopContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 `;
 
 const SContent = styled.main<{

@@ -162,15 +162,32 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 
       const { data, error } = await sendVerificationNewEmail(payload);
 
+      // TODO: Add translations
+      if (!data || error) {
+        throw new Error('Request failed');
+      }
+
       if (
-        error ||
-        !data ||
-        (data.status !==
-          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
-          data.status !==
-            newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER)
+        data.status ===
+        newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
       ) {
-        throw new Error(error?.message ?? 'Request failed');
+        throw new Error(t('error.invalidEmail'));
+      }
+
+      if (
+        data.status ===
+        newnewapi.SendVerificationEmailResponse.Status.EMAIL_TAKEN
+      ) {
+        throw new Error(t('error.emailTaken'));
+      }
+
+      if (
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SUCCESS &&
+        data.status !==
+          newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
+      ) {
+        throw new Error('Request failed');
       }
 
       setIsResendCodeLoading(false);
@@ -237,6 +254,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         submitError &&
         !isSuccess ? (
           <AnimatedPresence animateWhenInView={false} animation='t-09'>
+            {/* TODO: error text should probably be changed */}
             <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
         ) : null}

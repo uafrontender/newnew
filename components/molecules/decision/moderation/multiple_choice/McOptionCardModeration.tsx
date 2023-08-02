@@ -22,7 +22,7 @@ import McConfirmDeleteOptionModal from './McConfirmDeleteOptionModal';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 import BlockUserModalPost from '../../common/BlockUserModalPost';
-import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
+import ReportModal, { ReportData } from '../../../ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
@@ -192,7 +192,13 @@ const McOptionCardModeration: React.FunctionComponent<
         _optionId: option?.id,
         _component: 'McOptionCardModeration',
       });
-      await reportSuperpollOption(option.id, reasons, message);
+
+      await reportSuperpollOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
     [option.id]
   );
@@ -493,10 +499,15 @@ const SOptionInfo = styled(Text)<{
 
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  max-width: 100%;
 
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  white-space: pre;
 
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;

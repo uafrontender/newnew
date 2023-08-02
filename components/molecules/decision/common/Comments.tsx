@@ -6,27 +6,29 @@ import React, {
   useState,
 } from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { newnewapi } from 'newnew-api';
+import { useInView } from 'react-intersection-observer';
+import ResizeObserver from 'resize-observer-polyfill';
 
 import GradientMask from '../../../atoms/GradientMask';
-import Comment from '../../../atoms/decision/Comment';
 
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import { CommentFromUrlContext } from '../../../../contexts/commentFromUrlContext';
 
-import Button from '../../../atoms/Button';
 import { Mixpanel } from '../../../../utils/mixpanel';
 import useComponentScrollRestoration from '../../../../utils/hooks/useComponentScrollRestoration';
 import { useAppState } from '../../../../contexts/appStateContext';
 import NoComments from './NoComments';
 import Loader from '../../../atoms/Loader';
 import { APIResponse } from '../../../../api/apiConfigs';
+import CommentParent from '../../../atoms/decision/CommentParent';
+import isFirefox from '../../../../utils/isFirefox';
+import LoadingModal from '../../LoadingModal';
 
 interface IComments {
   postUuid: string;
+  postShortId: string;
   comments: TCommentWithReplies[];
   canDeleteComments?: boolean;
   isLoading: boolean;
@@ -34,16 +36,18 @@ interface IComments {
   handleAddComment: (
     text: string,
     parentId: number
-  ) => Promise<APIResponse<newnewapi.IChatMessage>>;
+  ) => Promise<APIResponse<newnewapi.ICommentMessage>>;
   openCommentProgrammatically: (parentIdx: number) => void;
   fetchNextPage: () => void;
   onCommentDelete: (comment: TCommentWithReplies) => void;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
+  handleToggleCommentRepliesById: (idToOpen: number, newState: boolean) => void;
 }
 
 const Comments: React.FunctionComponent<IComments> = ({
   postUuid,
+  postShortId,
   comments,
   canDeleteComments,
   isLoading,
@@ -54,17 +58,20 @@ const Comments: React.FunctionComponent<IComments> = ({
   onFormFocus,
   onFormBlur,
   openCommentProgrammatically,
+  handleToggleCommentRepliesById,
 }) => {
-  const { t } = useTranslation('page-Post');
   const { resizeMode } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
   // Comment from URL
-  const { commentIdFromUrl, handleResetCommentIdFromUrl } = useContext(
-    CommentFromUrlContext
-  );
+  const {
+    commentIdFromUrl,
+    newCommentContentFromUrl,
+    handleResetCommentIdFromUrl,
+  } = useContext(CommentFromUrlContext);
+  const [isSearchingForComment, setIsSearchingForComment] = useState(false);
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -118,29 +125,6 @@ const Comments: React.FunctionComponent<IComments> = ({
     'comments-scrolling-container'
   );
 
-  // Virtualization
-  const commentsVirtualizer = useVirtualizer({
-    count: hasNextPage && !isMobile ? comments.length + 1 : comments.length,
-    getScrollElement: () => scrollRef.current,
-    estimateSize: () => (!isMobile ? 160 : 190),
-    overscan: !isMobile ? 5 : 0,
-  });
-
-  const commentItems = commentsVirtualizer.getVirtualItems();
-
-  useEffect(() => {
-    const [lastItem] = [...commentItems].reverse();
-
-    if (!lastItem || isMobile) {
-      return;
-    }
-
-    if (lastItem.index >= comments.length - 1 && hasNextPage && !isLoading) {
-      fetchNextPage();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasNextPage, fetchNextPage, comments.length, isLoading, commentItems]);
-
   const [commentsReplies, setCommentsReplies] = useState<
     Record<number, { isOpen: boolean; text: string }>
   >({});
@@ -160,94 +144,104 @@ const Comments: React.FunctionComponent<IComments> = ({
     []
   );
 
-  const flashCommentOnScroll = useCallback(
-    (commentId: string, timeOffset?: number) => {
-      setTimeout(() => {
-        document?.getElementById(commentId)?.classList.add('opened-flash');
-      }, 100 + (timeOffset || 0));
+  // Commented out for now
+  // const flashCommentOnScroll = useCallback(
+  //   (commentId: string, timeOffset?: number) => {
+  //     setTimeout(() => {
+  //       document?.getElementById(commentId)?.classList.add('opened-flash');
+  //     }, 100 + (timeOffset || 0));
 
-      setTimeout(() => {
-        document?.getElementById(commentId)?.classList.remove('opened-flash');
-      }, 1600 + (timeOffset || 0));
-    },
-    []
-  );
+  //     setTimeout(() => {
+  //       document?.getElementById(commentId)?.classList.remove('opened-flash');
+  //     }, 1600 + (timeOffset || 0));
+  //   },
+  //   []
+  // );
 
   // Scroll to comment
+
   useEffect(() => {
-    async function findComment() {
-      const flat: TCommentWithReplies[] = [];
-      for (let i = 0; i < comments.length; i++) {
-        if (
-          comments[i].replies &&
-          Array.isArray(comments[i].replies) &&
-          comments[i].replies!!.length > 0
-        ) {
-          flat.push(
-            ...[
-              { ...comments[i], index: i } as TCommentWithReplies,
-              ...comments[i].replies!!,
-            ]
-          );
-        }
-        flat.push({ ...comments[i], index: i } as TCommentWithReplies);
-      }
+    async function findComment(commentId: string) {
+      if (commentId) {
+        setIsSearchingForComment(true);
 
-      const idx = flat.findIndex(
-        (comment) => comment.id === parseInt(commentIdFromUrl as string)
-      );
+        const idx = comments.findIndex(
+          (comment) => comment.id === parseInt(commentId as string)
+        );
 
-      if (idx === -1) {
-        scrollRef.current?.scrollIntoView();
+        if (idx === -1 && hasNextPage) {
+          scrollRef.current?.scrollIntoView();
 
-        if (isMobile && hasNextPage && !isLoading) {
           await fetchNextPage();
-        } else {
           scrollRef.current?.scrollBy({
             top: scrollRef.current.scrollHeight,
           });
-        }
-      } else {
-        if (!flat[idx].parentId || flat[idx].parentId === 0) {
-          commentsVirtualizer.scrollToIndex(flat[idx].index!!, {
-            align: 'center',
-          });
-
-          flashCommentOnScroll(`comment_id_${flat[idx].id}`);
-        } else if (flat[idx].parentId) {
-          const parentIdx = comments.findIndex(
-            (c) => c.id === flat[idx].parentId
-          );
-
-          if (parentIdx !== -1) {
-            commentsVirtualizer.scrollToIndex(flat[parentIdx].index!!, {
-              align: 'center',
+        } else if (idx === -1 && !hasNextPage) {
+          // TODO: some notification on the non-existing comment
+          // e.g. toast?
+          // console.log('Comment unavailable');
+          setIsSearchingForComment(false);
+        } else {
+          document
+            ?.getElementById(`comment_id_${comments[idx].id}`)
+            ?.scrollIntoView({
+              block: 'center',
             });
 
-            openCommentProgrammatically(parentIdx);
+          setIsSearchingForComment(false);
 
-            setTimeout(() => {
-              document
-                ?.getElementById(`comment_id_${flat[idx].id}`)
-                ?.scrollIntoView({
-                  block: 'end',
-                  inline: 'nearest',
-                });
-            }, 200);
+          openCommentProgrammatically(idx);
 
-            flashCommentOnScroll(`comment_id_${flat[idx].id}`, 300);
+          // flashCommentOnScroll(`comment_id_${comments[idx].id}`);
+
+          if (!newCommentContentFromUrl) {
+            handleResetCommentIdFromUrl?.();
           }
         }
-
-        handleResetCommentIdFromUrl?.();
       }
     }
 
     if (commentIdFromUrl) {
-      findComment();
+      findComment(commentIdFromUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentIdFromUrl, comments, isMobile, isLoading]);
+  }, [
+    commentIdFromUrl,
+    newCommentContentFromUrl,
+    comments,
+    // fetchNextPage, - will be updated with comments, do not need to depend
+    // openCommentProgrammatically, - will be updated with comments, do not need to depend
+    // flashCommentOnScroll, - doesn't change
+    // handleResetCommentIdFromUrl, - doesn't change
+  ]);
+
+  // Infinite load
+  const { ref: loadingRef, inView } = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage]);
+
+  const [shouldMountGradients, setShouldMountGradients] = useState(false);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      const shouldShow =
+        !!scrollRef?.current?.getBoundingClientRect()?.height &&
+        scrollRef?.current?.getBoundingClientRect()?.height >= 500;
+      setShouldMountGradients(shouldShow);
+    });
+
+    if (scrollRef?.current) {
+      resizeObserver.observe(scrollRef?.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   return (
     <>
@@ -255,35 +249,33 @@ const Comments: React.FunctionComponent<IComments> = ({
         {comments.length === 0 && !isLoading && <NoComments />}
 
         {comments && comments.length > 0 && (
-          <SCommentsContainer height={commentsVirtualizer.getTotalSize()}>
-            <SCommentsVisible translateY={commentItems[0].start}>
-              {commentItems.map((virtualItem) => {
-                const isLoaderRow = virtualItem.index > comments.length - 1;
+          <SCommentsContainer>
+            <SCommentsVisible>
+              {comments.map((comment, idx) => {
+                const isLoaderRow = idx > comments.length - 1;
 
                 return (
-                  <div key={virtualItem.index}>
+                  <div key={comment.id.toString()}>
                     {isLoaderRow && hasNextPage ? (
                       <SLoaderDiv>
                         <Loader size='sm' isStatic />
                       </SLoaderDiv>
                     ) : (
-                      <Comment
+                      <CommentParent
+                        postUuid={postUuid}
+                        postShortId={postShortId}
                         canDeleteComment={canDeleteComments}
-                        lastChild={virtualItem.index === comments.length - 1}
-                        comment={comments[virtualItem.index]}
+                        lastChild={idx === comments.length - 1}
+                        comment={comment}
                         isDeletingComment={isDeletingComment}
                         handleAddComment={handleAddComment}
                         handleDeleteComment={handleDeleteComment}
-                        index={virtualItem.index}
-                        ref={commentsVirtualizer.measureElement}
+                        index={idx}
                         onFormBlur={onFormBlur ?? undefined}
                         onFormFocus={onFormFocus ?? undefined}
+                        commentReply={commentsReplies[comment.id as number]}
                         updateCommentReplies={updateCommentReplies}
-                        commentReply={
-                          commentsReplies[
-                            comments[virtualItem.index].id as number
-                          ]
-                        }
+                        handleToggleReplies={handleToggleCommentRepliesById}
                       />
                     )}
                   </div>
@@ -292,46 +284,44 @@ const Comments: React.FunctionComponent<IComments> = ({
             </SCommentsVisible>
           </SCommentsContainer>
         )}
-        <SLoaderDiv
-          style={{
-            ...(isLoading || isMobile
-              ? {
-                  display: 'none',
-                }
-              : {}),
-          }}
-        />
-        {isMobile && hasNextPage && (
-          <SLoadMoreButton
-            view='secondary'
-            disabled={isLoading}
-            onClick={() => {
-              Mixpanel.track('Click Load More Comments', {
-                _stage: 'Post',
-                _postUuid: postUuid,
-              });
-              fetchNextPage();
+        {isLoading ? (
+          <SLoaderDiv>
+            <Loader size='sm' isStatic />
+          </SLoaderDiv>
+        ) : null}
+        {hasNextPage ? (
+          <SLoaderDiv
+            ref={loadingRef}
+            style={{
+              ...(isLoading || isMobile
+                ? {
+                    display: 'none',
+                  }
+                : {}),
             }}
-          >
-            {t('comments.seeMore')}
-          </SLoadMoreButton>
-        )}
+          />
+        ) : null}
       </SScrollContainer>
-      <GradientMask
-        gradientType='blended'
-        positionTop={heightDelta}
-        active={showTopGradient}
-        width='calc(100% - 4px)'
-        height='100px'
-        animateOpacity
-      />
-      <GradientMask
-        gradientType='blended'
-        active={showBottomGradient}
-        width='calc(100% - 4px)'
-        height='100px'
-        animateOpacity
-      />
+      {shouldMountGradients ? (
+        <>
+          <GradientMask
+            gradientType='blended'
+            positionTop={heightDelta}
+            active={showTopGradient}
+            width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
+            height='100px'
+            animateOpacity
+          />
+          <GradientMask
+            gradientType='blended'
+            active={showBottomGradient}
+            width={isFirefox() ? 'calc(100% - 12px)' : 'calc(100% - 4px)'}
+            height='100px'
+            animateOpacity
+          />
+        </>
+      ) : null}
+      <LoadingModal isOpen={isSearchingForComment} zIndex={20} />
     </>
   );
 };
@@ -345,28 +335,19 @@ Comments.defaultProps = {
 export default Comments;
 
 export const SScrollContainer = styled.div`
-  max-height: 600px;
   height: 100%;
+  max-height: 500px;
 
   overflow-y: auto;
 
-  /* Hide scrollbar */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    max-height: 500px;
-
-    // Scrollbar
+  // Scrollbar
+  // Firefox
+  scrollbar-width: thin;
+  // Other browsers
+  @supports not (-moz-appearance: none) {
     &::-webkit-scrollbar {
       width: 4px;
-      display: initial;
     }
-    -ms-overflow-style: initial;
-    scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
@@ -377,21 +358,30 @@ export const SScrollContainer = styled.div`
       border-radius: 4px;
       transition: 0.2s linear;
     }
+    &:hover {
+      &::-webkit-scrollbar-track {
+        cursor: grab;
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
+    }
   }
 `;
 
-const SCommentsContainer = styled.div<{ height: number }>`
+const SCommentsContainer = styled.div`
   width: 100%;
+  height: 100%;
   position: relative;
-  height: ${({ height }) => `${height}px`};
 `;
 
-const SCommentsVisible = styled.div<{ translateY: number }>`
-  position: absolute;
+const SCommentsVisible = styled.div`
+  /* position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  transform: ${({ translateY }) => `translateY(${translateY}px)`};
+  width: 100%; */
 
   ${({ theme }) => theme.media.tablet} {
     padding: 0 16px 0 32px;
@@ -404,10 +394,4 @@ const SCommentsVisible = styled.div<{ translateY: number }>`
 
 const SLoaderDiv = styled.div`
   position: relative;
-`;
-
-const SLoadMoreButton = styled(Button)`
-  width: 100%;
-  margin-bottom: 12px;
-  margin-top: 40px;
 `;

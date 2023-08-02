@@ -44,7 +44,10 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
     async (uuid: string | null | undefined, block: boolean) => {
       setIsChangingUserBlockedStatus(true);
       try {
-        if (!uuid) throw new Error('No uuid provided');
+        if (!uuid) {
+          throw new Error('No uuid provided');
+        }
+
         const payload = new newnewapi.MarkUserRequest({
           markAs: block
             ? newnewapi.MarkUserRequest.MarkAs.BLOCKED
@@ -125,7 +128,6 @@ export const BlockedUsersProvider: React.FC<IBlockedUsersProvider> = ({
         socketHandlerUserBlockStatusChanged
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   const contextValue = useMemo(

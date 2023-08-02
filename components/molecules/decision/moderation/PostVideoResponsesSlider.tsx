@@ -20,6 +20,7 @@ import { Mixpanel } from '../../../../utils/mixpanel';
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import SimplifiedSlider from '../../../atoms/SimplifiedSlider';
+import { useResponseUuidFromUrl } from '../../../../contexts/responseUuidFromUrlContext';
 
 interface IPostVideoResponsesSlider {
   videos: newnewapi.IVideoUrls[];
@@ -28,6 +29,7 @@ interface IPostVideoResponsesSlider {
   isEditingStories?: boolean;
   isDeletingAdditionalResponse: boolean;
   videoDurationWithTime?: boolean;
+  initialVideoFromUrl?: string;
   handleDeleteAdditionalVideo?: (videoUuid: string) => void;
   handleDeleteUnUploadedAdditionalResponse?: () => void;
   autoscroll?: boolean;
@@ -42,6 +44,7 @@ const PostVideoResponsesSlider: React.FunctionComponent<
   isEditingStories,
   isDeletingAdditionalResponse,
   videoDurationWithTime,
+  initialVideoFromUrl,
   handleDeleteAdditionalVideo,
   handleDeleteUnUploadedAdditionalResponse,
   autoscroll,
@@ -57,6 +60,8 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     'mobileL',
     'tablet',
   ].includes(resizeMode);
+
+  const { handleResetResponseFromUrl } = useResponseUuidFromUrl();
 
   const wrapperRef = useRef<HTMLDivElement>();
 
@@ -160,12 +165,35 @@ const PostVideoResponsesSlider: React.FunctionComponent<
     ]
   );
 
+  useEffect(
+    () => {
+      if (uploadedFile?.hlsStreamUrl) {
+        scrollSliderTo(videosLength - 1);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      uploadedFile,
+      // scrollSliderTo, - reason unknown
+      // videosLength, - reason unknown
+    ]
+  );
+
   useEffect(() => {
-    if (uploadedFile?.hlsStreamUrl) {
-      scrollSliderTo(videosLength - 1);
+    if (initialVideoFromUrl) {
+      const idx = videos.findIndex((v) => v.uuid === initialVideoFromUrl);
+      if (idx !== -1) {
+        setCurrentVideo(idx);
+      } else {
+        setCurrentVideo(videos.length - 1);
+      }
+      handleResetResponseFromUrl?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedFile]);
+  }, [
+    initialVideoFromUrl,
+    // handleResetResponseFromUrl, - reason: Not needed because simply sets state to `undefined`
+  ]);
 
   return (
     <SWrapper

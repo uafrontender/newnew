@@ -83,8 +83,7 @@ export const Bundles: React.FC = React.memo(() => {
         nextPageToken: res.data.paging?.nextPageToken,
       };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, userUuid]
+    [searchValue, userUuid, showErrorToastPredefined]
   );
 
   const paginatedCreators = usePagination(loadCreatorsData, 10);

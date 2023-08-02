@@ -164,12 +164,18 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   }, [post.expiresAt]);
 
   // Redirect if post state is empty
-  useEffect(() => {
-    if (!post.title) {
-      router.push('/profile/my-posts');
-    }
+  useEffect(
+    () => {
+      if (!post.title) {
+        router.push('/profile/my-posts');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // post.title, - reason unknown
+      // router, - probably can be replaced with Router
+    ]
+  );
 
   // Clear creation on unmount
   // eslint-disable-next-line arrow-body-style
@@ -231,7 +237,15 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [videoProcessing, fileProcessing]
+    [
+      videoProcessing,
+      fileProcessing,
+      showErrorToastPredefined,
+      // setCreationFileProcessingETA, - reason unknown
+      // setCreationFileProcessingLoading, - reason unknown
+      // setCreationFileProcessingProgress, - reason unknown
+      // setCreationFileUploadError, - reason unknown
+    ]
   );
 
   useEffect(() => {

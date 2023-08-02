@@ -193,6 +193,7 @@ const SMessage = styled.div<ISMessage>`
   display: flex;
   flex-direction: row;
   margin-bottom: 8px;
+  flex-shrink: 0;
 `;
 
 interface ISMessageContent {

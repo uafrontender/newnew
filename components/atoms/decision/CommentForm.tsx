@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from 'react';
@@ -53,18 +54,23 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
 };
 
 interface ICommentForm {
-  postUuidOrShortId?: string;
+  postUuidOrShortId: string;
   position?: string;
   zIndex?: number;
   isRoot?: boolean;
+  commentId?: number;
   value?: string;
   onBlur?: () => void;
   onFocus?: () => void;
-  onSubmit: (text: string) => Promise<APIResponse<newnewapi.IChatMessage>>;
+  onSubmit: (text: string) => Promise<APIResponse<newnewapi.ICommentMessage>>;
   onChange?: (text: string) => void;
 }
 
-const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
+export type TCommentFormAreaHandle = {
+  handleFocusFormTextArea: () => void;
+};
+
+const CommentForm = React.forwardRef<TCommentFormAreaHandle, ICommentForm>(
   (
     {
       value: initialValue,
@@ -72,6 +78,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       position,
       zIndex,
       isRoot,
+      commentId,
       onBlur,
       onFocus,
       onSubmit,
@@ -95,11 +102,17 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
       'tablet',
     ].includes(resizeMode);
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Comment content from URL
-    const { newCommentContentFromUrl, handleResetNewCommentContentFromUrl } =
-      useContext(CommentFromUrlContext);
+    const {
+      newCommentContentFromUrl,
+      commentIdFromUrl,
+      handleResetNewCommentContentFromUrl,
+      handleResetCommentIdFromUrl,
+    } = useContext(CommentFromUrlContext);
 
     const [focusedInput, setFocusedInput] = useState<boolean>(false);
 
@@ -108,6 +121,12 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
     const debouncedCommentText = useDebouncedValue(commentText, 500);
+
+    useImperativeHandle(ref, () => ({
+      handleFocusFormTextArea() {
+        textareaRef?.current?.focus();
+      },
+    }));
 
     useEffect(() => {
       if (onChange) {
@@ -179,11 +198,14 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         try {
           const isValid = await validateTextViaAPI(commentText);
           if (isValid) {
+            // Redirect only after the persist data is pulled
             if (!userLoggedIn) {
-              if (!isRoot) {
+              if (!isRoot && commentId) {
                 router.push(
                   `/sign-up?reason=comment&redirect=${encodeURIComponent(
-                    window.location.href
+                    `${process.env.NEXT_PUBLIC_APP_URL}/${
+                      router.locale !== 'en-US' ? `${router.locale}/` : ''
+                    }p/${postUuidOrShortId}?comment_content=${commentText}&comment_id=${commentId}#comments`
                   )}`
                 );
               } else {
@@ -220,6 +242,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         userLoggedIn,
         onSubmit,
         isRoot,
+        commentId,
         router,
         postUuidOrShortId,
         showErrorToastPredefined,
@@ -265,26 +288,50 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     }, [onBlur]);
 
     useEffect(() => {
-      if (!isRoot || !newCommentContentFromUrl) {
+      if (!newCommentContentFromUrl) {
+        return;
+      }
+
+      if (isRoot && commentIdFromUrl) {
+        return;
+      }
+
+      if (
+        !isRoot &&
+        !newCommentContentFromUrl &&
+        commentIdFromUrl !== commentId?.toString()
+      ) {
         return;
       }
 
       if (newCommentContentFromUrl) {
         setCommentText(newCommentContentFromUrl);
         handleResetNewCommentContentFromUrl?.();
+        handleResetCommentIdFromUrl?.();
+
+        if (isRoot) {
+          const scrollTo = document
+            ?.getElementById('comments')
+            ?.getBoundingClientRect()?.y;
+          if (scrollTo) {
+            document.documentElement?.scrollBy({
+              top: scrollTo,
+              behavior: 'smooth',
+            });
+          }
+        }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [newCommentContentFromUrl]);
+    }, [
+      newCommentContentFromUrl,
+      commentIdFromUrl,
+      isRoot,
+      commentId,
+      handleResetNewCommentContentFromUrl,
+      handleResetCommentIdFromUrl,
+    ]);
 
     return (
       <SCommentsForm
-        {...{
-          ...(ref
-            ? {
-                ref,
-              }
-            : {}),
-        }}
         position={position}
         zIndex={zIndex}
         onKeyDown={handleKeyDown}
@@ -292,6 +339,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         <SInputWrapper>
           <CommentTextArea
             id='title'
+            ref={textareaRef}
             maxlength={500}
             value={commentText}
             focus={focusedInput}
@@ -313,30 +361,29 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
             placeholder={t('comments.placeholder')}
           />
         </SInputWrapper>
-        {(focusedInput || commentText) && (
-          <SButton
-            withShadow
-            view={commentText ? 'primaryGrad' : 'quaternary'}
-            onClick={handleSubmit}
-            disabled={!commentText || !!commentTextError || isSubmitting}
-            style={{
-              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-            }}
-            loading={isSubmitting}
-            loadingAnimationColor='blue'
-          >
-            <SInlineSVG
-              svg={!isSubmitting ? sendIcon : ''}
-              fill={
-                commentText
-                  ? theme.colors.white
-                  : theme.colorsThemed.text.primary
-              }
-              width={isMobile ? '20px' : '24px'}
-              height={isMobile ? '20px' : '24px'}
-            />
-          </SButton>
-        )}
+        <SButton
+          withShadow
+          view={commentText ? 'primaryGrad' : 'quaternary'}
+          onClick={handleSubmit}
+          disabled={!commentText || !!commentTextError || isSubmitting}
+          style={{
+            ...(focusedInput || commentText
+              ? {}
+              : { transform: 'scale(0)', width: 0, padding: 0 }),
+            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+          }}
+          loading={isSubmitting}
+          loadingAnimationColor='blue'
+        >
+          <SInlineSVG
+            svg={!isSubmitting ? sendIcon : ''}
+            fill={
+              commentText ? theme.colors.white : theme.colorsThemed.text.primary
+            }
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+          />
+        </SButton>
       </SCommentsForm>
     );
   }
@@ -350,6 +397,7 @@ CommentForm.defaultProps = {
   zIndex: undefined,
   position: undefined,
   isRoot: false,
+  commentId: undefined,
   postUuidOrShortId: '',
 };
 
@@ -394,8 +442,9 @@ const SCommentsForm = styled.form<{
   }
 `;
 
-interface ISInputWrapper {}
-const SInputWrapper = styled.div<ISInputWrapper>`
+const SInputWrapper = styled.div`
   width: 100%;
   border-radius: 16px;
+
+  transition: 0.2s ease-in-out;
 `;

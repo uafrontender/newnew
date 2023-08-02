@@ -5,27 +5,38 @@ import React, {
   useMemo,
   useState,
   useRef,
+  useContext,
 } from 'react';
 import styled, { keyframes, useTheme, css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
-import CommentForm from './CommentForm';
+import CommentForm, { TCommentFormAreaHandle } from './CommentForm';
 
 import { useAppState } from '../../../contexts/appStateContext';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
+import { APIResponse } from '../../../api/apiConfigs';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import DisplayName from '../DisplayName';
-import { APIResponse } from '../../../api/apiConfigs';
+import CommentChild from './CommentChild';
+import usePostComments from '../../../utils/hooks/usePostComments';
+import { Mixpanel } from '../../../utils/mixpanel';
+import { deleteComment, sendComment } from '../../../api/endpoints/comments';
+import { SocketContext } from '../../../contexts/socketContext';
+import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import Loader from '../Loader';
+import { useUserData } from '../../../contexts/userDataContext';
+import { ReportData } from '../../molecules/ReportModal';
+import { ReportMessageOnSignUp } from '../../../contexts/onSignUpWrapper';
 
 const CommentEllipseMenu = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseMenu')
@@ -33,14 +44,14 @@ const CommentEllipseMenu = dynamic(
 const CommentEllipseModal = dynamic(
   () => import('../../molecules/decision/common/CommentEllipseModal')
 );
-const ReportModal = dynamic(
-  () => import('../../molecules/direct-messages/ReportModal')
-);
+const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const DeleteCommentModal = dynamic(
   () => import('../../molecules/decision/common/DeleteCommentModal')
 );
 
-interface IComment {
+interface ICommentParent {
+  postUuid: string;
+  postShortId: string;
   lastChild?: boolean;
   comment: TCommentWithReplies;
   isDeletingComment: boolean;
@@ -53,46 +64,54 @@ interface IComment {
   handleAddComment: (
     text: string,
     parentId: number
-  ) => Promise<APIResponse<newnewapi.IChatMessage>>;
+  ) => Promise<APIResponse<newnewapi.ICommentMessage>>;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
   onFormFocus?: () => void;
   onFormBlur?: () => void;
   setCommentHeight?: (index: number, height: number) => void;
-  updateCommentReplies?: ({
+  updateCommentReplies: ({
     id,
     isOpen,
     text,
   }: {
     id: number;
-    isOpen?: boolean;
-    text?: string;
+    isOpen?: boolean | undefined;
+    text?: string | undefined;
   }) => void;
+  handleToggleReplies: (idToOpen: number, newState: boolean) => void;
 }
 
-const Comment = React.forwardRef<HTMLDivElement, IComment>(
+const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
   (
     {
+      postUuid,
+      postShortId,
       comment,
       lastChild,
       canDeleteComment,
       isDeletingComment,
       index,
       commentReply,
-      handleAddComment,
       handleDeleteComment,
       onFormFocus,
       onFormBlur,
       updateCommentReplies,
+      handleToggleReplies,
     },
     ref: any
   ) => {
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('page-Post');
-    const { resizeMode, userUuid, userLoggedIn, userIsCreator } = useAppState();
+    const { userData } = useUserData();
+    const { resizeMode, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const { socketConnection } = useContext(SocketContext);
+
+    const { showErrorToastPredefined } = useErrorToasts();
 
     const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
@@ -100,21 +119,141 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     const [confirmDeleteComment, setConfirmDeleteComment] =
       useState<boolean>(false);
 
-    const [isReplyFormOpen, setIsReplyFormOpen] = useState(
-      commentReply?.isOpen || false
-    );
+    const isReplyFormOpen = useMemo(() => !!comment?.isOpen, [comment?.isOpen]);
 
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
     const isMyComment = useMemo(
-      () => userLoggedIn && userUuid === comment.sender?.uuid,
-      [userLoggedIn, userUuid, comment.sender?.uuid]
+      () => userLoggedIn && userData?.userUuid === comment.sender?.uuid,
+      [userLoggedIn, userData?.userUuid, comment.sender?.uuid]
     );
 
-    const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
+    const {
+      processedComments: replies,
+      addCommentMutation,
+      removeCommentMutation,
+      fetchNextPage,
+      isLoading,
+      isFetchingNextPage,
+      hasNextPage,
+    } = usePostComments(
+      {
+        loggedInUser: userLoggedIn,
+        postUuid,
+        parentCommentId: comment.id as number,
+      },
+      {
+        enabled: isReplyFormOpen,
+      }
+    );
+
+    const onSubmitReport = useCallback(
+      async (reportData: ReportData) => {
+        if (!userLoggedIn) {
+          const onSignUp: ReportMessageOnSignUp = {
+            type: 'report-message',
+            messageId: comment.id,
+            message: reportData.message,
+            reasons: reportData.reasons,
+          };
+
+          const [path, query] = window.location.href.split('?');
+          const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+          const queryWithOnSignUp = query
+            ? `${query}&${onSignUpQuery}`
+            : onSignUpQuery;
+
+          Router.push(
+            `/sign-up?reason=report&redirect=${encodeURIComponent(
+              `${path}?${queryWithOnSignUp}`
+            )}`
+          );
+
+          return false;
+        }
+
+        // TODO: Need error handling
+        await reportMessage(
+          comment.id,
+          reportData.reasons,
+          reportData.message
+        ).catch((e) => {
+          console.error(e);
+          return false;
+        });
+
+        return true;
+      },
+      [userLoggedIn, comment.id]
+    );
+
+    const handleAddComment = useCallback(
+      async (
+        content: string,
+        parentMsgId?: number
+      ): Promise<APIResponse<newnewapi.ICommentMessage>> => {
+        Mixpanel.track('Add Comment', {
+          _stage: 'Post',
+          _postUuid: postUuid,
+        });
+        const payload = new newnewapi.SendCommentRequest({
+          postUuid,
+          content: {
+            text: content,
+          },
+          parentCommentId: comment.id,
+        });
+
+        const res = await sendComment(payload);
+
+        if (res.data?.comment) {
+          addCommentMutation?.mutate(res.data.comment);
+        }
+
+        setTimeout(() => {
+          document
+            ?.getElementById(`comment_id_${res.data?.comment?.id}`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+        }, 100);
+
+        if (res.data?.comment && !res.error) {
+          return {
+            data: res.data.comment,
+          };
+        }
+        return {
+          error: res?.error || new Error('Could not add comment'),
+        };
+      },
+      [addCommentMutation, comment.id, postUuid]
+    );
+
+    const handleDeleteChildComment = useCallback(
+      async (commentToDelete: TCommentWithReplies) => {
+        try {
+          const payload = new newnewapi.DeleteCommentRequest({
+            commentId: commentToDelete.id,
+          });
+
+          const res = await deleteComment(payload);
+
+          if (!res.error) {
+            removeCommentMutation?.mutate(commentToDelete);
+          }
+        } catch (err) {
+          console.error(err);
+          showErrorToastPredefined(undefined);
+        }
+      },
+      [removeCommentMutation, showErrorToastPredefined]
+    );
 
     const onUserReport = useCallback(() => {
+      // Redirect only after the persist data is pulled
       if (!userLoggedIn) {
         router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
@@ -131,11 +270,18 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
       setConfirmDeleteComment(true);
     };
 
-    const commentFormRef = useRef<HTMLFormElement | null>(null);
+    const commentFormRef = useRef<TCommentFormAreaHandle>(null);
 
-    const replyHandler = () => {
-      setIsReplyFormOpen((prevState) => !prevState);
-    };
+    const replyHandler = useCallback(() => {
+      handleToggleReplies(comment.id as number, !comment?.isOpen);
+      setTimeout(() => {
+        commentFormRef.current?.handleFocusFormTextArea();
+      }, 100);
+    }, [comment.id, comment?.isOpen, handleToggleReplies]);
+
+    const toggleRepliesHandler = useCallback(() => {
+      handleToggleReplies(comment.id as number, !comment?.isOpen);
+    }, [comment.id, comment?.isOpen, handleToggleReplies]);
 
     const isReplyFormOpenRef = useRef(isReplyFormOpen);
 
@@ -155,11 +301,6 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
         !isReplyFormOpenRef.current &&
         commentFormRef.current
       ) {
-        commentFormRef.current.scrollIntoView({
-          block: 'center',
-          inline: 'end',
-          behavior: 'smooth',
-        });
         isReplyFormOpenRef.current = true;
       }
 
@@ -181,10 +322,56 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
     );
 
     useEffect(() => {
-      if (comment.isOpen) {
-        setIsReplyFormOpen(true);
+      const socketHandlerMessageCreated = async (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.CommentMessageCreated.decode(arr);
+        if (
+          decoded?.newComment &&
+          decoded.newComment!!.sender?.uuid !== userData?.userUuid &&
+          decoded.newComment?.parentCommentId &&
+          decoded.newComment.parentCommentId === comment.id
+        ) {
+          addCommentMutation?.mutate(decoded.newComment);
+        }
+      };
+
+      const socketHandlerMessageDeleted = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.CommentMessageDeleted.decode(arr);
+        if (
+          decoded.deletedComment &&
+          decoded.deletedComment?.parentCommentId &&
+          decoded.deletedComment.parentCommentId === comment.id
+        ) {
+          removeCommentMutation?.mutate(decoded.deletedComment);
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection?.on(
+          'CommentMessageCreated',
+          socketHandlerMessageCreated
+        );
+        socketConnection?.on(
+          'CommentMessageDeleted',
+          socketHandlerMessageDeleted
+        );
       }
-    }, [comment.isOpen]);
+
+      return () => {
+        if (socketConnection && socketConnection?.connected) {
+          socketConnection?.off(
+            'CommentMessageCreated',
+            socketHandlerMessageCreated
+          );
+          socketConnection?.off(
+            'CommentMessageDeleted',
+            socketHandlerMessageDeleted
+          );
+        }
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection, comment?.id, userData?.userUuid]);
 
     const moreButtonRef: any = useRef<HTMLButtonElement>();
 
@@ -200,50 +387,51 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
           ref={ref}
           data-index={index}
         >
-          {
-            // eslint-disable-next-line no-nested-ternary
-            !comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
-              comment.sender?.options?.isVerified ||
-              comment.sender?.uuid === userUuid ? (
-                <Link
-                  href={
-                    comment.sender?.uuid === userUuid
-                      ? userIsCreator
-                        ? '/profile/my-posts'
-                        : '/profile'
-                      : `/${comment.sender?.username}`
-                  }
+          {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
+            comment.sender?.options?.isVerified ||
+            comment.sender?.uuid === userData?.userUuid ? (
+              <Link
+                href={
+                  comment.sender?.uuid === userData?.userUuid
+                    ? userData?.options?.isCreator
+                      ? '/profile/my-posts'
+                      : '/profile'
+                    : `/${comment.sender?.username}`
+                }
+              >
+                <SUserAvatarAnchor
+                  style={{
+                    height: 'fit-content',
+                  }}
                 >
-                  <a>
-                    <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
-                  </a>
-                </Link>
-              ) : (
-                <SUserAvatar
-                  noHover
-                  avatarUrl={comment.sender?.avatarUrl ?? ''}
-                />
-              )
+                  <SUserAvatar avatarUrl={comment.sender?.avatarUrl ?? ''} />
+                </SUserAvatarAnchor>
+              </Link>
             ) : (
-              <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
+              <SUserAvatar
+                noHover
+                avatarUrl={comment.sender?.avatarUrl ?? ''}
+              />
             )
-          }
+          ) : (
+            <SUserAvatar noHover avatarUrl='' onClick={() => {}} />
+          )}
           <SCommentContent>
             <SCommentHeader>
               {!comment.isDeleted ? (
                 <>
                   {comment.sender?.options?.isVerified ||
-                  comment.sender?.uuid === userUuid ? (
+                  comment.sender?.uuid === userData?.userUuid ? (
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === userUuid
+                        comment.sender?.uuid === userData?.userUuid
                           ? t('comments.me')
                           : undefined
                       }
                       href={
-                        comment.sender?.uuid === userUuid
-                          ? userIsCreator
+                        comment.sender?.uuid === userData?.userUuid
+                          ? userData?.options?.isCreator
                             ? '/profile/my-posts'
                             : '/profile'
                           : `/${comment.sender?.username}`
@@ -253,7 +441,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === userUuid
+                        comment.sender?.uuid === userData?.userUuid
                           ? t('comments.me')
                           : undefined
                       }
@@ -313,20 +501,21 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
             </SCommentHeader>
             {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
             {/* TODO: SReply is not clickable element */}
-            {!comment.parentId &&
-              !comment.isDeleted &&
+            {!comment.isDeleted &&
               (!isReplyFormOpen ? (
                 <SReply onClick={replyHandler}>
                   {t('comments.sendReply')}
                 </SReply>
               ) : (
                 <>
-                  {replies.length === 0 ? (
-                    <SReply onClick={replyHandler}>
+                  {comment.numberOfReplies === 0 ? (
+                    <SReply onClick={toggleRepliesHandler}>
                       {t('comments.hideReplies')}
                     </SReply>
                   ) : null}
                   <CommentForm
+                    commentId={comment.id as number}
+                    postUuidOrShortId={postShortId || postUuid}
                     onSubmit={(newMsg: string) =>
                       handleAddComment(newMsg, comment.id as number)
                     }
@@ -338,35 +527,48 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
                   />
                 </>
               ))}
-            {!comment.parentId &&
-              !comment.isDeleted &&
-              replies &&
-              replies.length > 0 && (
-                <SReply onClick={replyHandler}>
-                  {isReplyFormOpen
-                    ? t('comments.hideReplies')
-                    : t('comments.viewReplies')}{' '}
-                  {replies.length}{' '}
-                  {replies.length > 1
-                    ? t('comments.replies')
-                    : t('comments.reply')}
-                </SReply>
-              )}
+            {!comment.isDeleted &&
+            comment.numberOfReplies &&
+            (comment.numberOfReplies as number) > 0 ? (
+              <SReply onClick={toggleRepliesHandler}>
+                {isReplyFormOpen
+                  ? t('comments.hideReplies')
+                  : t('comments.viewReplies')}{' '}
+                {comment.numberOfReplies?.toString()}{' '}
+                {(comment.numberOfReplies as number) > 1
+                  ? t('comments.replies')
+                  : t('comments.reply')}
+              </SReply>
+            ) : null}
             {isReplyFormOpen &&
               replies &&
               replies.map((item, i) => (
-                <Comment
+                <CommentChild
                   key={item.id.toString()}
                   isDeletingComment={isDeletingComment}
                   canDeleteComment={canDeleteComment}
                   lastChild={i === replies.length - 1}
                   comment={item}
-                  handleAddComment={(newMsg: string) =>
-                    handleAddComment(newMsg, item.id as number)
-                  }
-                  handleDeleteComment={handleDeleteComment}
+                  handleDeleteComment={handleDeleteChildComment}
                 />
               ))}
+            {/* TEMP */}
+            {isReplyFormOpen &&
+              hasNextPage &&
+              !isFetchingNextPage &&
+              !isLoading && (
+                <SReply onClick={() => fetchNextPage()}>
+                  {t('comments.loadReplies')}
+                </SReply>
+              )}
+            {(comment.numberOfReplies &&
+              (comment.numberOfReplies as number) > 0 &&
+              isLoading) ||
+            isFetchingNextPage ? (
+              <SLoaderDiv>
+                <Loader size='sm' isStatic />
+              </SLoaderDiv>
+            ) : null}
           </SCommentContent>
           <DeleteCommentModal
             isVisible={confirmDeleteComment}
@@ -395,9 +597,7 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
             show={confirmReportUser}
             reportedUser={comment.sender}
             onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reasons, message }) => {
-              await reportMessage(comment.id as number, reasons, message);
-            }}
+            onSubmit={onSubmitReport}
           />
         )}
       </>
@@ -405,9 +605,9 @@ const Comment = React.forwardRef<HTMLDivElement, IComment>(
   }
 );
 
-export default Comment;
+export default CommentParent;
 
-Comment.defaultProps = {
+CommentParent.defaultProps = {
   lastChild: false,
   canDeleteComment: false,
   onFormFocus: () => {},
@@ -471,7 +671,7 @@ const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
   padding-top: 12px;
 
   // For scrollIntoView when comment_id is provided in URL
-  scroll-margin-top: -320px;
+  scroll-margin-top: 100px;
 
   &.opened-flash {
     &::before {
@@ -482,12 +682,17 @@ const SComment = styled.div<{ isMoreMenuOpened: boolean }>`
       width: 100%;
       height: 100%;
 
+      z-index: 1;
+
       background: ${({ theme }) =>
         theme.name === 'dark'
           ? 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)'
           : 'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)'};
-      box-shadow: 4px 4px 100px 75px rgba(34, 60, 80, 0.2);
-      animation: ${OpenedFlash} 1.5s forwards linear;
+      box-shadow: ${({ theme }) =>
+        theme.name === 'dark'
+          ? '4px 4px 100px 75px rgba(34, 60, 80, 0.2)'
+          : '4px 4px 100px 75px rgba(34, 60, 80, 0.8) inset'};
+      animation: ${OpenedFlash} 1.5s infinite linear;
     }
   }
 
@@ -533,7 +738,7 @@ const SActionsDiv = styled.div`
 const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
-  flex-shrink: 0;
+  flex-shrink: 1;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
@@ -604,4 +809,13 @@ const SSeparator = styled.div`
       ? props.theme.colorsThemed.background.outlines1
       : props.theme.colorsThemed.background.tertiary};
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+`;
+
+const SLoaderDiv = styled.div`
+  position: relative;
+  height: 50px;
+`;
+
+const SUserAvatarAnchor = styled.a`
+  height: fit-content;
 `;

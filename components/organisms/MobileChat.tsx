@@ -3,6 +3,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { InfiniteData, useQueryClient } from 'react-query';
+import { FocusOn } from 'react-focus-on';
 
 import { useAppState } from '../../contexts/appStateContext';
 import { useGetChats } from '../../contexts/chatContext';
@@ -18,6 +19,7 @@ interface IChatContainer {
 export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+
   const { setSearchChatroom } = useGetChats();
   const { resizeMode } = useAppState();
   const isMobileOrTablet = [
@@ -39,6 +41,12 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
 
     return parseInt(router.query.roomID);
   }, [router.query.roomID]);
+
+  useEffect(() => {
+    if (!selectedChatRoomId) {
+      setActiveChatRoom(null);
+    }
+  }, [selectedChatRoomId]);
 
   const handleCloseChatRoom = useCallback(() => {
     router.replace(`${router.pathname}?tab=chat`, undefined, { shallow: true });
@@ -120,44 +128,53 @@ export const MobileChat: React.FC<IChatContainer> = ({ myRole }) => {
   ]);
 
   return (
-    <SContainer>
-      <ChatSidebar
-        initialTab={myRole}
-        hidden={isMobileOrTablet && !!selectedChatRoomId}
-        onChatRoomSelect={handleChatRoomSelect}
-      />
-
-      <SContent hidden={isMobileOrTablet && !selectedChatRoomId}>
-        {activeChatRoom && (
-          <ChatContent
-            chatRoom={activeChatRoom}
-            isBackButton={isMobileOrTablet}
-            onBackButtonClick={handleCloseChatRoom}
-            isMoreButton
-            withChatMessageAvatars
+    <SWrapper>
+      <SContainer>
+        <FocusOn enabled={!isMobileOrTablet || !selectedChatRoomId}>
+          <SChatSidebar
+            initialTab={myRole}
+            hidden={isMobileOrTablet && !!selectedChatRoomId}
+            onChatRoomSelect={handleChatRoomSelect}
           />
-        )}
-        {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
-      </SContent>
-    </SContainer>
+        </FocusOn>
+
+        <SContent hidden={isMobileOrTablet && !selectedChatRoomId}>
+          {activeChatRoom && (
+            <ChatContent
+              chatRoom={activeChatRoom}
+              isBackButton={isMobileOrTablet}
+              onBackButtonClick={handleCloseChatRoom}
+              isMoreButton
+              withChatMessageAvatars
+              isHidden={isMobileOrTablet && !selectedChatRoomId}
+            />
+          )}
+          {!activeChatRoom && isLoading && <Loader size='md' isStatic />}
+        </SContent>
+      </SContainer>
+    </SWrapper>
   );
 };
 
 export default MobileChat;
 
-const SContainer = styled.div`
+const SWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 0 15px;
+  overflow: hidden;
+
   background: ${({ theme }) =>
     theme.name === 'light' ? theme.colors.white : theme.colors.black};
-
-  padding: 0 10px;
-  overflow: hidden;
   height: 100vh;
+`;
+
+const SContainer = styled.div`
+  padding: 0 10px;
+
+  max-height: calc(var(--window-inner-height, 1vh) * 100);
 
   ${(props) => props.theme.media.laptop} {
     position: relative;
@@ -173,7 +190,6 @@ const SContent = styled.div<{
 }>`
   display: ${({ hidden }) => (hidden ? 'none' : 'block')};
 
-  position: relative;
   height: 100%;
   background: ${({ theme }) => theme.colorsThemed.background.secondary};
   margin: 0 -15px;
@@ -185,4 +201,8 @@ const SContent = styled.div<{
     margin: 0 0 0 auto;
     border-radius: ${({ theme }) => theme.borderRadius.large};
   }
+`;
+
+const SChatSidebar = styled(ChatSidebar)`
+  height: calc(var(--window-inner-height, 1vh) * 100);
 `;

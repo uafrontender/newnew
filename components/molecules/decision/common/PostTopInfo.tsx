@@ -42,6 +42,7 @@ import { usePostInnerState } from '../../../../contexts/postInnerContext';
 import { usePushNotifications } from '../../../../contexts/pushNotificationsContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
+import { MarkPostAsFavoriteOnSignUp } from '../../../../contexts/onSignUpWrapper';
 /* import getGuestId from '../../../../utils/getGuestId';
  import {
   getGuestSmsNotificationsSubscriptionStatus,
@@ -50,10 +51,10 @@ import DisplayName from '../../../atoms/DisplayName';
   subscribeToSmsNotifications,
   unsubscribeFromSmsNotifications,
   unsubscribeGuestFromSmsNotifications,
-} from '../../../../api/endpoints/phone'; 
+} from '../../../../api/endpoints/phone';
 import SmsNotificationModal, {
   SubscriptionToPost,
-} from '../../profile/SmsNotificationModal'; 
+} from '../../profile/SmsNotificationModal';
 import { SocketContext } from '../../../../contexts/socketContext';
 import useErrorToasts from '../../../../utils/hooks/useErrorToasts';
 import Tooltip from '../../../atoms/Tooltip';
@@ -234,9 +235,19 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       });
 
       if (!userLoggedIn) {
+        const onSignUp: MarkPostAsFavoriteOnSignUp = {
+          type: 'favorite-post',
+          postUuid,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
         router.push(
           `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
-            window.location.href
+            `${path}?${queryWithOnSignUp}`
           )}`
         );
         return;
@@ -352,7 +363,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       }
     },
     [userLoggedIn, showErrorToastCustom, subscription.postUuid, t]
-  ); 
+  );
 
   const handleSmsNotificationButtonClicked = useCallback(async () => {
     Mixpanel.track('Open SMS Notification Menu', {
@@ -510,7 +521,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.SmsNotificationsUnsubscribed.decode(arr);
 
-      if (!decoded){ 
+      if (!decoded){
         return;
       }
 
@@ -544,7 +555,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         );
       }
     };
-  }, [userLoggedIn, subscription.postUuid, socketConnection]); 
+  }, [userLoggedIn, subscription.postUuid, socketConnection]);
 
   const notificationButtonRef: any = useRef(); */
   const moreButtonRef: any = useRef();
@@ -588,7 +599,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             </a>
           </Link>
           <Link href={`/${creator.username}`}>
-            <a
+            <SLink
               href={`/${creator.username}`}
               onClickCapture={() => {
                 Mixpanel.track('Click on creator username', {
@@ -601,7 +612,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               <SUserInfo>
                 <SDisplayName user={creator} />
               </SUserInfo>
-            </a>
+            </SLink>
           </Link>
         </SCreatorCard>
         <SActionsDiv>
@@ -796,7 +807,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: max-content 1fr max-content;
+    grid-template-columns: max-content auto auto;
     align-items: center;
 
     margin-bottom: 0px;
@@ -873,6 +884,10 @@ const SAvatarArea = styled.div`
     width: 24px;
     height: 24px;
   }
+`;
+
+const SLink = styled.a`
+  overflow: hidden;
 `;
 
 const SUserInfo = styled.div`

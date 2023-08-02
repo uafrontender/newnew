@@ -148,13 +148,12 @@ export async function fetchProtobuf<
   const encoded = payload ? reqT.encode(payload).finish() : undefined;
 
   // Dedicated lane for VIP users
-  const accessToken =
-    cookiesInstance.get('accessToken');
+  const accessToken = cookiesInstance.get('accessToken');
   let decodedToken: {
     dedicated_lane: string | undefined;
   } = {
     dedicated_lane: undefined,
-  }
+  };
 
   if (accessToken) {
     decodedToken = jwtDecode(accessToken);
@@ -171,9 +170,11 @@ export async function fetchProtobuf<
               'x-from': 'web',
             }
           : {}),
-        ...(decodedToken?.dedicated_lane ? {
-          'x-dedicated-lane': decodedToken.dedicated_lane,
-          } : {}),
+        ...(decodedToken?.dedicated_lane
+          ? {
+              'x-dedicated-lane': decodedToken.dedicated_lane,
+            }
+          : {}),
         ...headers,
       },
       mode,
@@ -347,6 +348,7 @@ export async function fetchProtobufProtectedIntercepted<
         const refreshPayload = new newnewapi.RefreshCredentialRequest({
           refreshToken,
         });
+        // TODO: Call once, block if already called by other request failing
         const resRefresh = await refreshCredentials(refreshPayload);
 
         // Refresh failed, session "expired"
@@ -411,6 +413,13 @@ export async function fetchProtobufProtectedIntercepted<
         );
         return res;
       } catch (errSecondAttempt) {
+        cookiesInstance.remove('accessToken', {
+          path: '/',
+        });
+        cookiesInstance.remove('refreshToken', {
+          path: '/',
+        });
+
         // If error is auth-related - throw
         if ((errSecondAttempt as Error).message === 'Refresh token invalid') {
           throw new Error((errSecondAttempt as Error).message);
@@ -424,6 +433,12 @@ export async function fetchProtobufProtectedIntercepted<
 
     // If error is auth-related - throw
     if ((errFirstAttempt as Error).message === 'No token') {
+      cookiesInstance.remove('accessToken', {
+        path: '/',
+      });
+      cookiesInstance.remove('refreshToken', {
+        path: '/',
+      });
       throw new Error((errFirstAttempt as Error).message);
     }
 

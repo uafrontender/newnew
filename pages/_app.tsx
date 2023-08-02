@@ -71,6 +71,7 @@ import PostCreationContextProvider from '../contexts/postCreationContext';
 import { TutorialProgressContextProvider } from '../contexts/tutorialProgressContext';
 import UiStateContextProvider, { TColorMode } from '../contexts/uiStateContext';
 import { SignUpContextProvider } from '../contexts/signUpContext';
+import OnSignUpWrapper from '../contexts/onSignUpWrapper';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -83,6 +84,7 @@ interface IMyApp extends AppProps {
   uaString: string;
   colorMode: string;
   mutedMode: string;
+  onSignUp?: string;
   themeFromCookie?: 'light' | 'dark';
 }
 
@@ -125,6 +127,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     uaString,
     colorMode,
     mutedMode,
+    onSignUp,
     themeFromCookie,
   } = props;
   const { userLoggedIn, userIsCreator } = useAppState();
@@ -142,12 +145,17 @@ const MyApp = (props: IMyApp): ReactElement => {
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
   const PRE_FETCHING_DELAY = 2500;
-  useEffect(() => {
-    setTimeout(() => {
-      setPreFetchImages(themeFromCookie || 'light');
-    }, PRE_FETCHING_DELAY);
+  useEffect(
+    () => {
+      setTimeout(() => {
+        setPreFetchImages(themeFromCookie || 'light');
+      }, PRE_FETCHING_DELAY);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [
+      // themeFromCookie, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     // Imported one by one not to break import\no-dynamic-require rule
@@ -193,30 +201,37 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, []);
 
-  useEffect(() => {
-    // Requires user data to be loaded
-    if (!userData) {
-      return;
-    }
+  useEffect(
+    () => {
+      // Requires user data to be loaded
+      if (!userData) {
+        return;
+      }
 
-    if (userLoggedIn && userData.username) {
-      Mixpanel.identify(userData.userUuid);
-      Mixpanel.people.set({
-        $name: userData.username,
-        $email: userData.email,
-        newnewId: userData.userUuid,
-        isCreator: userIsCreator,
-      });
-      Mixpanel.register({
-        isCreator: userIsCreator,
-        username: userData.username,
-      });
-      Mixpanel.track('Session started!');
-    } else {
-      Mixpanel.track('Guest Session started!');
-    }
+      if (userLoggedIn && userData.username) {
+        Mixpanel.identify(userData.userUuid);
+        Mixpanel.people.set({
+          $name: userData.username,
+          $email: userData.email,
+          newnewId: userData.userUuid,
+          isCreator: userIsCreator,
+        });
+        Mixpanel.register({
+          isCreator: userIsCreator,
+          username: userData.username,
+        });
+        Mixpanel.track('Session started!');
+      } else {
+        Mixpanel.track('Guest Session started!');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoggedIn]);
+    [
+      userLoggedIn,
+      // userData, - reason unknown
+      // userIsCreator, - reason unknown
+    ]
+  );
 
   // TODO: move to the store logic
   useEffect(() => {
@@ -224,6 +239,38 @@ const MyApp = (props: IMyApp): ReactElement => {
       Sentry.setUser({ username: userData.username });
     }
   }, [userData?.username]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--window-inner-height',
+      `${(window.visualViewport?.height || window.innerHeight) / 100}px`
+    );
+  }, []);
+
+  useEffect(() => {
+    const handleUpdateWindowInnerHeightValue = (event: Event) => {
+      document.documentElement.style.setProperty(
+        '--window-inner-height',
+        `${
+          ((event.target as VisualViewport)?.height || window.innerHeight) / 100
+        }px`
+      );
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        'resize',
+        handleUpdateWindowInnerHeightValue
+      );
+    }
+
+    return () => {
+      window.visualViewport?.removeEventListener(
+        'resize',
+        handleUpdateWindowInnerHeightValue
+      );
+    };
+  }, []);
 
   return (
     <>
@@ -254,63 +301,65 @@ const MyApp = (props: IMyApp): ReactElement => {
                   themeFromCookie={themeFromCookie}
                 >
                   <LanguageWrapper>
-                    <TutorialProgressContextProvider>
-                      <AppConstantsContextProvider>
-                        <SocketContextProvider>
-                          <ChannelsContextProvider>
-                            <ModalNotificationsContextProvider>
-                              <PushNotificationContextProvider>
-                                <BlockedUsersProvider>
-                                  <BundlesContextProvider>
-                                    <ChatsUnreadMessagesProvider>
-                                      <OverlayModeProvider>
-                                        <MultipleBeforePopStateContextProvider>
-                                          <PostCreationContextProvider>
-                                            <UserDataContextProvider>
-                                              <SignUpContextProvider>
-                                                <NotificationsProvider>
-                                                  <FollowingsContextProvider>
-                                                    <>
-                                                      <ToastContainer containerId='toast-container' />
-                                                      <VideoProcessingWrapper>
-                                                        {!pageProps.error ? (
-                                                          getLayout(
-                                                            <Component
-                                                              {...pageProps}
+                    <OnSignUpWrapper onSignUp={onSignUp}>
+                      <TutorialProgressContextProvider>
+                        <AppConstantsContextProvider>
+                          <SocketContextProvider>
+                            <ChannelsContextProvider>
+                              <ModalNotificationsContextProvider>
+                                <PushNotificationContextProvider>
+                                  <BlockedUsersProvider>
+                                    <BundlesContextProvider>
+                                      <ChatsUnreadMessagesProvider>
+                                        <OverlayModeProvider>
+                                          <MultipleBeforePopStateContextProvider>
+                                            <PostCreationContextProvider>
+                                              <UserDataContextProvider>
+                                                <SignUpContextProvider>
+                                                  <NotificationsProvider>
+                                                    <FollowingsContextProvider>
+                                                      <>
+                                                        <ToastContainer containerId='toast-container' />
+                                                        <VideoProcessingWrapper>
+                                                          {!pageProps.error ? (
+                                                            getLayout(
+                                                              <Component
+                                                                {...pageProps}
+                                                              />
+                                                            )
+                                                          ) : (
+                                                            <Error
+                                                              title={
+                                                                pageProps.error
+                                                                  ?.message
+                                                              }
+                                                              statusCode={
+                                                                pageProps.error
+                                                                  ?.statusCode ??
+                                                                500
+                                                              }
                                                             />
-                                                          )
-                                                        ) : (
-                                                          <Error
-                                                            title={
-                                                              pageProps.error
-                                                                ?.message
-                                                            }
-                                                            statusCode={
-                                                              pageProps.error
-                                                                ?.statusCode ??
-                                                              500
-                                                            }
-                                                          />
-                                                        )}
-                                                        <PushNotificationModalContainer />
-                                                      </VideoProcessingWrapper>
-                                                    </>
-                                                  </FollowingsContextProvider>
-                                                </NotificationsProvider>
-                                              </SignUpContextProvider>
-                                            </UserDataContextProvider>
-                                          </PostCreationContextProvider>
-                                        </MultipleBeforePopStateContextProvider>
-                                      </OverlayModeProvider>
-                                    </ChatsUnreadMessagesProvider>
-                                  </BundlesContextProvider>
-                                </BlockedUsersProvider>
-                              </PushNotificationContextProvider>
-                            </ModalNotificationsContextProvider>
-                          </ChannelsContextProvider>
-                        </SocketContextProvider>
-                      </AppConstantsContextProvider>
-                    </TutorialProgressContextProvider>
+                                                          )}
+                                                          <PushNotificationModalContainer />
+                                                        </VideoProcessingWrapper>
+                                                      </>
+                                                    </FollowingsContextProvider>
+                                                  </NotificationsProvider>
+                                                </SignUpContextProvider>
+                                              </UserDataContextProvider>
+                                            </PostCreationContextProvider>
+                                          </MultipleBeforePopStateContextProvider>
+                                        </OverlayModeProvider>
+                                      </ChatsUnreadMessagesProvider>
+                                    </BundlesContextProvider>
+                                  </BlockedUsersProvider>
+                                </PushNotificationContextProvider>
+                              </ModalNotificationsContextProvider>
+                            </ChannelsContextProvider>
+                          </SocketContextProvider>
+                        </AppConstantsContextProvider>
+                      </TutorialProgressContextProvider>
+                    </OnSignUpWrapper>
                   </LanguageWrapper>
                 </GlobalTheme>
               </UiStateContextProvider>
@@ -347,9 +396,10 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
     return {
       ...appProps,
       accessToken: accessToken || undefined,
+      uaString: appContext.ctx?.req?.headers?.['user-agent'],
       colorMode: appContext.ctx?.req.cookies?.colorMode || 'auto',
       mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-      uaString: appContext.ctx?.req?.headers?.['user-agent'],
+      onSignUp: appContext.ctx.query.onSignUp,
       themeFromCookie: isDayTime ? 'light' : 'dark',
     };
   }
@@ -357,9 +407,10 @@ const MyAppWithTranslationAndRecaptchaProvider = withRecaptchaProvider(
   return {
     ...appProps,
     accessToken: accessToken || undefined,
+    uaString: appContext.ctx?.req?.headers?.['user-agent'],
     colorMode: appContext.ctx?.req.cookies?.colorMode || 'light',
     mutedMode: appContext.ctx?.req.cookies?.mutedMode || true,
-    uaString: appContext.ctx?.req?.headers?.['user-agent'],
+    onSignUp: appContext.ctx.query.onSignUp,
   };
 };
 

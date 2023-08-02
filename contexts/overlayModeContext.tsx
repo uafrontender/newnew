@@ -2,6 +2,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  // useEffect,
   useMemo,
   useRef,
   useState,
@@ -27,18 +28,29 @@ export const OverlayModeProvider: React.FC<IOverlayModeProvider> = ({
 }) => {
   const [requests, setRequests] = useState<string[]>([]);
 
-  const enableOverlayMode = useCallback((id: string) => {
-    setRequests((curr) => {
-      if (curr.includes(id)) {
-        return curr;
-      }
-      return [...curr, id];
-    });
-  }, []);
+  const enableOverlayMode = useCallback(
+    (id: string, elementContainer?: HTMLElement | null) => {
+      setRequests((curr) => {
+        if (curr.includes(id)) {
+          return curr;
+        }
 
-  const disableOverlayMode = useCallback((id: string) => {
-    setRequests((curr) => curr.filter((request) => request !== id));
-  }, []);
+        return [...curr, id];
+      });
+    },
+    []
+  );
+
+  const disableOverlayMode = useCallback(
+    (id: string, elementContainer?: HTMLElement | null) => {
+      setRequests((curr) => {
+        const newRequests = curr.filter((request) => request !== id);
+
+        return newRequests;
+      });
+    },
+    []
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -66,13 +78,21 @@ export function useOverlayMode() {
     );
   }
 
-  // Adding context to deps results in infinite loop
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const enable = useCallback(() => context.enableOverlayMode(id.current), []);
+  const enable = useCallback(
+    () => context.enableOverlayMode(id.current),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      // context, - causes infinite loop
+    ]
+  );
 
-  // Adding context to deps results in infinite loop
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const disable = useCallback(() => context.disableOverlayMode(id.current), []);
+  const disable = useCallback(
+    () => context.disableOverlayMode(id.current),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      // context, - causes infinite loop
+    ]
+  );
 
   return {
     overlayModeEnabled: context.overlayModeEnabled,

@@ -17,7 +17,6 @@ import {
 } from '../../atoms/direct-messages/styles';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import GradientMask from '../../atoms/GradientMask';
-import { useUserData } from '../../../contexts/userDataContext';
 import InlineSVG from '../../atoms/InlineSVG';
 import SearchInput from '../../atoms/direct-messages/SearchInput';
 import Modal from '../../organisms/Modal';
@@ -34,6 +33,7 @@ import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
 import Loader from '../../atoms/Loader';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
+import { useBundles } from '../../../contexts/bundlesContext';
 
 const CloseModalButton = dynamic(
   () => import('../../atoms/direct-messages/CloseModalButton')
@@ -62,13 +62,15 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
   const theme = useTheme();
-  const scrollRef: any = useRef();
   const { resizeMode } = useAppState();
-  const { userData } = useUserData();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
   const { showErrorToastCustom } = useErrorToasts();
+
+  const scrollRef: any = useRef();
+
+  const { isSellingBundles } = useBundles();
 
   const [searchValue, setSearchValue] = useState('');
 
@@ -245,7 +247,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
           <SWrapper>
             {!isLoading && (
               <SSectionContent ref={scrollRef}>
-                {userData?.options?.isOfferingBundles && !searchValue && (
+                {isSellingBundles && !searchValue && (
                   <NewAnnouncement handleClick={openMyAnnouncement} />
                 )}
                 {chatsInAlphabetOrder.length > 0 &&
@@ -276,8 +278,9 @@ export default NewMessageModal;
 
 const SWrapper = styled.div`
   position: relative;
-  height: 100%;
-  overflow-y: auto;
+  height: calc(var(--window-inner-height, 1vh) * 100 - 130px);
+  overflow-y: hidden;
+
   ${(props) => props.theme.media.tablet} {
     overflow: hidden;
   }
@@ -295,6 +298,14 @@ const SSectionContent = styled.div`
   display: flex;
   overflow-y: auto;
   flex-direction: column;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   ${(props) => props.theme.media.tablet} {
     padding: 0 24px;
     margin: 0 -24px;

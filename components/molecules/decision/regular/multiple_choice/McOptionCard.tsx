@@ -4,7 +4,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { Trans, useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import {
@@ -36,7 +36,7 @@ import TutorialTooltip, {
 } from '../../../../atoms/decision/TutorialTooltip';
 import Headline from '../../../../atoms/Headline';
 import OptionEllipseMenu from '../../common/OptionEllipseMenu';
-import ReportModal, { ReportData } from '../../../direct-messages/ReportModal';
+import ReportModal, { ReportData } from '../../../ReportModal';
 import OptionEllipseModal from '../../common/OptionEllipseModal';
 import McConfirmDeleteOptionModal from '../../moderation/multiple_choice/McConfirmDeleteOptionModal';
 import PostTitleContent from '../../../../atoms/PostTitleContent';
@@ -50,6 +50,7 @@ import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.p
 import { useAppState } from '../../../../../contexts/appStateContext';
 import DisplayName from '../../../../atoms/DisplayName';
 import { useTutorialProgress } from '../../../../../contexts/tutorialProgressContext';
+import { ReportSuperpollOptionOnSignUp } from '../../../../../contexts/onSignUpWrapper';
 
 const getPayWithCardErrorMessage = (
   status?: newnewapi.VoteOnPostResponse.Status
@@ -187,26 +188,45 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   // Report modal
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
+  const handleOpenReportForm = useCallback(() => {
+    setIsReportModalOpen(true);
+  }, []);
+
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      await reportSuperpollOption(option.id, reasons, message);
-      setIsReportModalOpen(false);
+      if (!userLoggedIn) {
+        const onSignUp: ReportSuperpollOptionOnSignUp = {
+          type: 'report-superpoll-option',
+          optionId: option.id,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
+        Router.push(
+          `/sign-up?reason=report&redirect=${encodeURIComponent(
+            `${path}?${queryWithOnSignUp}`
+          )}`
+        );
+
+        return false;
+      }
+
+      // TODO: Need error handling
+      await reportSuperpollOption(option.id, reasons, message).catch((e) => {
+        console.error(e);
+        return false;
+      });
+
+      return true;
     },
-    [option.id]
+    [userLoggedIn, option.id]
   );
-
-  const handleOpenReportForm = useCallback(() => {
-    if (!userLoggedIn) {
-      router.push(
-        `/sign-up?reason=report&redirect=${encodeURIComponent(
-          window.location.href
-        )}`
-      );
-      return;
-    }
-
-    setIsReportModalOpen(true);
-  }, [userLoggedIn, router]);
 
   const handleReportClose = useCallback(() => {
     setIsReportModalOpen(false);
@@ -1023,8 +1043,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   ? t('mcPost.optionsTab.optionCard.others')
                   : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
-            ) : null}{' '}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
+              {' '}
               {t('mcPost.optionsTab.optionCard.voted')}
             </SSpanBiddersRegular>
           </>
@@ -1052,8 +1073,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                   ? t('mcPost.optionsTab.optionCard.others')
                   : t('mcPost.optionsTab.optionCard.other')}
               </SSpanBiddersHighlighted>
-            ) : null}{' '}
+            ) : null}
             <SSpanBiddersRegular className='spanRegular'>
+              {' '}
               {t('mcPost.optionsTab.optionCard.voted')}
             </SSpanBiddersRegular>
           </>
@@ -1081,8 +1103,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
-        ) : null}{' '}
+        ) : null}
         <SSpanBiddersRegular className='spanRegular'>
+          {' '}
           {t('mcPost.optionsTab.optionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -1110,8 +1133,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
-        ) : null}{' '}
+        ) : null}
         <SSpanBiddersRegular className='spanRegular'>
+          {' '}
           {t('mcPost.optionsTab.optionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -1137,8 +1161,9 @@ export const RenderSupportersInfo: React.FunctionComponent<{
                 : t('mcPost.optionsTab.optionCard.other')}
             </SSpanBiddersHighlighted>
           </>
-        ) : null}{' '}
+        ) : null}
         <SSpanBiddersRegular className='spanRegular'>
+          {' '}
           {t('mcPost.optionsTab.optionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -1279,10 +1304,15 @@ const SOptionInfo = styled(Text)`
 
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  max-width: 100%;
 
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  white-space: pre;
 
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
@@ -1437,6 +1467,7 @@ const SPaymentModalHeadingPostSymbol = styled.div`
   background: ${({ theme }) => theme.colorsThemed.background.quaternary};
 
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
 
@@ -1451,6 +1482,8 @@ const SPaymentModalHeadingPostSymbolImg = styled.img`
 
 const SPaymentModalHeadingPostCreator = styled(Text)`
   display: flex;
+  flex-shrink: 1;
+  overflow: hidden;
   flex-direction: row;
   align-items: center;
   white-space: pre;

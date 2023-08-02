@@ -24,10 +24,12 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
 
   async function deleteUser() {
     try {
+      // TODO: stop sending any more requests here.
       const payload = new newnewapi.EmptyRequest({});
 
       const res = await deleteMyAccount(payload);
 
+      // Possible race condition with requests that use auth token
       if (!res.error) {
         logoutAndRedirect();
       }

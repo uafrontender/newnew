@@ -60,9 +60,10 @@ interface IPostModerationResponsesContext {
   responseFileProcessingProgress: number;
   responseFileProcessingLoading: boolean;
   responseFileProcessingError: boolean;
-  handleItemChange: (
+  handleResponseItemChange: (
     id: string,
-    value: File | null | undefined
+    value: File | null | undefined,
+    type: 'initial' | 'additional'
   ) => Promise<void>;
   handleResetVideoUploadAndProcessingState: () => void;
   handleCancelVideoUpload: () => void | undefined;
@@ -105,10 +106,11 @@ const PostModerationResponsesContext =
     responseFileProcessingProgress: 0,
     responseFileProcessingLoading: false,
     responseFileProcessingError: false,
-    handleItemChange: ((id: string, value: File | null | undefined) => {}) as (
+    handleResponseItemChange: ((
       id: string,
-      value: File | null | undefined
-    ) => Promise<void>,
+      value: File | null | undefined,
+      type: 'initial' | 'additional'
+    ) => {}) as (id: string, value: File | null | undefined) => Promise<void>,
     handleResetVideoUploadAndProcessingState: () => {},
     handleCancelVideoUpload: () => {},
     handleVideoDelete: (() => {}) as () => Promise<void>,
@@ -186,7 +188,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
   const [isDeletingAdditionalResponse, setIsDeletingAdditionalResponse] =
     useState(false);
 
-  const handleAddAdditonalResponse = useCallback(
+  const handleAddAdditionalResponse = useCallback(
     (newVideo: newnewapi.IVideoUrls) => {
       setAdditionalResponses((curr) => [...curr, newVideo]);
     },
@@ -275,112 +277,180 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     responseFileUploadLoading,
   ]);
 
-  const handleVideoUpload = useCallback(async (value: File) => {
-    try {
-      setResponseFileUploadETA(100);
-      setResponseFileUploadProgress(1);
-      setResponseFileUploadLoading(true);
-      setResponseFileUploadError(false);
+  const handleResponseVideoUpload = useCallback(
+    async (value: File, type: 'initial' | 'additional') => {
+      try {
+        setResponseFileUploadETA(100);
+        setResponseFileUploadProgress(1);
+        setResponseFileUploadLoading(true);
+        setResponseFileUploadError(false);
 
-      const payload = new newnewapi.GetVideoUploadUrlRequest({
-        filename: value.name,
-      });
+        const payload = new newnewapi.GetVideoUploadUrlRequest({
+          filename: value.name,
+        });
 
-      const res = await getVideoUploadUrl(payload);
+        const res = await getVideoUploadUrl(payload);
 
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'An error occurred');
-      }
+        if (!res?.data || res.error) {
+          throw new Error(res?.error?.message ?? 'An error occurred');
+        }
 
-      const xhr = new XMLHttpRequest();
-      xhrRef.current = xhr;
-      let uploadStartTimestamp: number;
-      const uploadResponse = await new Promise((resolve, reject) => {
-        xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable) {
-            const uploadProgress = Math.round(
-              (event.loaded / event.total) * 100
+        const xhr = new XMLHttpRequest();
+        xhrRef.current = xhr;
+        let uploadStartTimestamp: number;
+        const uploadResponse = await new Promise((resolve, reject) => {
+          xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+              const uploadProgress = Math.round(
+                (event.loaded / event.total) * 100
+              );
+              const percentageLeft = 100 - uploadProgress;
+              const secondsPassed = Math.round(
+                (event.timeStamp - uploadStartTimestamp) / 1000
+              );
+              const factor = secondsPassed / uploadProgress;
+              const eta = Math.round(factor * percentageLeft);
+              setResponseFileUploadProgress(uploadProgress);
+              setResponseFileUploadETA(eta);
+            }
+          });
+          xhr.addEventListener('loadstart', (event) => {
+            uploadStartTimestamp = event.timeStamp;
+          });
+          xhr.addEventListener('loadend', () => {
+            setResponseFileUploadProgress(100);
+            resolve(xhr.readyState === 4 && xhr.status === 200);
+          });
+          xhr.addEventListener('error', () => {
+            setResponseFileUploadProgress(0);
+            reject(new Error('Upload failed'));
+          });
+          xhr.addEventListener('abort', () => {
+            setResponseFileUploadProgress(0);
+            reject(new Error('Upload aborted'));
+          });
+          xhr.open('PUT', res.data!.uploadUrl, true);
+          xhr.setRequestHeader('Content-Type', value.type);
+          xhr.send(value);
+        });
+
+        if (!uploadResponse) {
+          throw new Error('Upload failed');
+        }
+
+        const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
+          publicUrl: res.data.publicUrl,
+          videoUsageIntent:
+            type === 'initial'
+              ? newnewapi.StartVideoProcessingRequest.VideoUsageIntent.RESPONSE
+              : newnewapi.StartVideoProcessingRequest.VideoUsageIntent
+                  .ADDITIONAL_RESPONSE,
+        });
+
+        const resProcessing = await startVideoProcessing(payloadProcessing);
+
+        if (!resProcessing?.data || resProcessing.error) {
+          throw new Error(resProcessing?.error?.message ?? 'An error occurred');
+        }
+
+        setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
+        setVideoProcessing({
+          taskUuid: resProcessing.data.taskUuid,
+          targetUrls: {
+            thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+            hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+            dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
+            originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
+            thumbnailImageUrl:
+              resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+          },
+        });
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_TOO_SHORT
+        ) {
+          throw new Error('VideoTooShort');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_TOO_LONG
+        ) {
+          throw new Error('VideoTooLong');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_QUOTA_REACHED
+        ) {
+          throw new Error('Processing limit reached');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_FORMAT_ERROR
+        ) {
+          throw new Error('VideoFormatError');
+        }
+
+        if (resProcessing.data.videoUploadError) {
+          throw new Error('An error occurred');
+        }
+
+        setResponseFileUploadLoading(false);
+
+        setResponseFileProcessingProgress(10);
+        setResponseFileProcessingETA(80);
+        setResponseFileProcessingLoading(true);
+        setResponseFileProcessingError(false);
+        xhrRef.current = undefined;
+      } catch (error: any) {
+        // TODO: Change this overcomplicated approach
+        if (error.message === 'Upload failed') {
+          setResponseFileUploadError(true);
+          showErrorToastCustom(error?.message);
+        } else if (error.message === 'VideoTooShort') {
+          setResponseFileUploadError(true);
+          if (type === 'initial') {
+            showErrorToastPredefined(
+              ErrorToastPredefinedMessage.InitialResponseTooShort
             );
-            const percentageLeft = 100 - uploadProgress;
-            const secondsPassed = Math.round(
-              (event.timeStamp - uploadStartTimestamp) / 1000
+          } else {
+            showErrorToastPredefined(
+              ErrorToastPredefinedMessage.AdditionalResponseTooShort
             );
-            const factor = secondsPassed / uploadProgress;
-            const eta = Math.round(factor * percentageLeft);
-            setResponseFileUploadProgress(uploadProgress);
-            setResponseFileUploadETA(eta);
           }
-        });
-        xhr.addEventListener('loadstart', (event) => {
-          uploadStartTimestamp = event.timeStamp;
-        });
-        xhr.addEventListener('loadend', () => {
-          setResponseFileUploadProgress(100);
-          resolve(xhr.readyState === 4 && xhr.status === 200);
-        });
-        xhr.addEventListener('error', () => {
-          setResponseFileUploadProgress(0);
-          reject(new Error('Upload failed'));
-        });
-        xhr.addEventListener('abort', () => {
-          setResponseFileUploadProgress(0);
-          reject(new Error('Upload aborted'));
-        });
-        xhr.open('PUT', res.data!.uploadUrl, true);
-        xhr.setRequestHeader('Content-Type', value.type);
-        xhr.send(value);
-      });
-
-      if (!uploadResponse) {
-        throw new Error('Upload failed');
+        } else if (error.message === 'VideoTooLong') {
+          setResponseFileUploadError(true);
+          if (type === 'initial') {
+            showErrorToastPredefined(
+              ErrorToastPredefinedMessage.InitialResponseTooLong
+            );
+          } else {
+            showErrorToastPredefined(
+              ErrorToastPredefinedMessage.AdditionalResponseTooLong
+            );
+          }
+        } else if (error.message === 'Processing limit reached') {
+          setResponseFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.ProcessingLimitReachedError
+          );
+        } else if (error.message === 'VideoFormatError') {
+          setResponseFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.VideoFormatError
+          );
+        } else {
+          console.log('Upload aborted');
+        }
+        xhrRef.current = undefined;
+        setResponseFileUploadLoading(false);
       }
-
-      const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
-        publicUrl: res.data.publicUrl,
-      });
-
-      const resProcessing = await startVideoProcessing(payloadProcessing);
-
-      if (!resProcessing?.data || resProcessing.error) {
-        throw new Error(resProcessing?.error?.message ?? 'An error occurred');
-      }
-
-      setVideoProcessing({
-        taskUuid: resProcessing.data.taskUuid,
-        targetUrls: {
-          thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-          hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-          dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-          originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
-          thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-        },
-      });
-
-      setResponseFileUploadLoading(false);
-
-      setResponseFileProcessingProgress(10);
-      setResponseFileProcessingETA(80);
-      setResponseFileProcessingLoading(true);
-      setResponseFileProcessingError(false);
-      setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
-      xhrRef.current = undefined;
-    } catch (error: any) {
-      if (error.message === 'Upload failed') {
-        setResponseFileUploadError(true);
-        showErrorToastCustom(error?.message);
-      } else if (error.message === 'Processing limit reached') {
-        setResponseFileUploadError(true);
-        showErrorToastPredefined(
-          ErrorToastPredefinedMessage.ProcessingLimitReachedError
-        );
-      } else {
-        console.log('Upload aborted');
-      }
-      xhrRef.current = undefined;
-      setResponseFileUploadLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    [showErrorToastCustom, showErrorToastPredefined]
+  );
 
   const handleVideoDelete = useCallback(async () => {
     try {
@@ -422,18 +492,25 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     } catch (error: any) {
       showErrorToastCustom(error?.message);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedResponseVideoUrl, videoProcessing?.taskUuid]);
+  }, [
+    uploadedResponseVideoUrl,
+    videoProcessing?.taskUuid,
+    showErrorToastCustom,
+  ]);
 
-  const handleItemChange = useCallback(
-    async (id: string, value: File | null | undefined) => {
+  const handleResponseItemChange = useCallback(
+    async (
+      id: string,
+      value: File | null | undefined,
+      type: 'initial' | 'additional'
+    ) => {
       if (value) {
-        await handleVideoUpload(value);
+        await handleResponseVideoUpload(value, type);
       } else {
         await handleVideoDelete();
       }
     },
-    [handleVideoDelete, handleVideoUpload]
+    [handleVideoDelete, handleResponseVideoUpload]
   );
 
   const handleUploadCustomCoverImage = useCallback(async () => {
@@ -604,7 +681,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         const videoUrlsToAdd =
           additionalResponsesFromBe[additionalResponsesFromBe.length - 1];
 
-        handleAddAdditonalResponse(videoUrlsToAdd);
+        handleAddAdditionalResponse(videoUrlsToAdd);
         setUploadedResponseVideoUrl('');
 
         setResponseFileUploadError(false);
@@ -629,7 +706,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       setUploadingAdditionalResponse(false);
     }
   }, [
-    handleAddAdditonalResponse,
+    handleAddAdditionalResponse,
     postUuid,
     showErrorToastPredefined,
     uploadedResponseVideoUrl,
@@ -719,7 +796,6 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
         socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
   // Video processing fallback
@@ -745,16 +821,15 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
     ) {
       videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     responseFileProcessingLoading,
     videoProcessing?.targetUrls?.hlsStreamUrl,
+    showErrorToastPredefined,
   ]);
 
   useEffect(() => {
     handleSetIsConfirmToClosePost(cannotLeavePage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cannotLeavePage]);
+  }, [cannotLeavePage, handleSetIsConfirmToClosePost]);
 
   const contextValue = useMemo<IPostModerationResponsesContext>(
     () => ({
@@ -783,7 +858,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       responseFileProcessingProgress,
       responseFileProcessingLoading,
       responseFileProcessingError,
-      handleItemChange,
+      handleResponseItemChange,
       handleUploadVideoProcessed,
       handleUploadAdditionalVideoProcessed,
       handleResetVideoUploadAndProcessingState,
@@ -817,7 +892,7 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
       responseFileProcessingProgress,
       responseFileProcessingLoading,
       responseFileProcessingError,
-      handleItemChange,
+      handleResponseItemChange,
       handleUploadVideoProcessed,
       handleUploadAdditionalVideoProcessed,
       handleResetVideoUploadAndProcessingState,

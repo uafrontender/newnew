@@ -24,6 +24,7 @@ import PostSuccessOrWaitingControls from '../../../molecules/decision/common/Pos
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useUiState } from '../../../../contexts/uiStateContext';
+import { useResponseUuidFromUrl } from '../../../../contexts/responseUuidFromUrlContext';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -51,6 +52,8 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
 
     const { refetchPost, handleGoBackInsidePost } = usePostInnerState();
 
+    const { responseFromUrl } = useResponseUuidFromUrl();
+
     // Winninfg option
     const [winningOption, setWinningOption] = useState<
       newnewapi.Auction.Option | undefined
@@ -59,7 +62,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     // Video
     // Open video tab
     const [videoTab, setVideoTab] = useState<'announcement' | 'response'>(
-      'announcement'
+      responseFromUrl ? 'response' : 'announcement'
     );
 
     // Response viewed
@@ -67,22 +70,27 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       post.isResponseViewedByMe ?? false
     );
 
-    const fetchPostLatestData = useCallback(async () => {
-      try {
-        const res = await refetchPost();
+    const fetchPostLatestData = useCallback(
+      async () => {
+        try {
+          const res = await refetchPost();
 
-        if (!res?.data || res.error) {
-          throw new Error(res?.error?.message ?? 'Request failed');
-        }
+          if (!res?.data || res.error) {
+            throw new Error(res?.error?.message ?? 'Request failed');
+          }
 
-        if (res.data.auction?.isResponseViewedByMe) {
-          setResponseViewed(true);
+          if (res.data.auction?.isResponseViewedByMe) {
+            setResponseViewed(true);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      [
+        // refetchPost, - reason unknown, probably safe
+      ]
+    );
 
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
@@ -114,8 +122,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     // Check if the response has been viewed
     useEffect(() => {
       fetchPostLatestData();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [fetchPostLatestData]);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -308,7 +315,6 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
             <CommentsBottomSection
               postUuid={post.postUuid}
               postShortId={post.postShortId ?? ''}
-              commentsRoomId={post.commentsRoomId as number}
             />
           </SCommentsSection>
         )}

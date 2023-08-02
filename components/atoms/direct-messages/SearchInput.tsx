@@ -33,12 +33,19 @@ const SearchInput: React.FC<ISearchInput> = ({
     resizeMode
   );
 
-  useEffect(() => {
-    if (searchValue.length > 0) {
-      setSearchValue('');
-    }
+  // TODO: rework into some on navigation callback?
+  useEffect(
+    () => {
+      if (searchValue.length > 0) {
+        setSearchValue('');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+    [
+      router, // - We want value to clear on navigation
+      // searchValue.length, - ...and not on value length changing
+    ]
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
@@ -76,6 +83,7 @@ const SearchInput: React.FC<ISearchInput> = ({
           value={searchValue}
           onChange={handleInputChange}
           placeholder={placeholderText}
+          data-chat-list-search
         />
         {searchValue.length > 0 && (
           <SRightInlineSVG

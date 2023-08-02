@@ -453,7 +453,7 @@ export const CreationSecondStepContent: React.FC<
     videoProcessing?.taskUuid,
   ]);
 
-  const handleVideoUpload = useCallback(
+  const handleAnnouncementVideoUpload = useCallback(
     async (value: File) => {
       Mixpanel.track('Video Uploading', {
         _stage: 'Creation',
@@ -521,6 +521,8 @@ export const CreationSecondStepContent: React.FC<
 
         const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
           publicUrl: res.data.publicUrl,
+          videoUsageIntent:
+            newnewapi.StartVideoProcessingRequest.VideoUsageIntent.ANNOUNCEMENT,
         });
 
         const resProcessing = await startVideoProcessing(payloadProcessing);
@@ -529,6 +531,7 @@ export const CreationSecondStepContent: React.FC<
           throw new Error(resProcessing?.error?.message ?? 'An error occurred');
         }
 
+        setCreationVideo(res.data.publicUrl ?? '');
         setCreationVideoProcessing({
           taskUuid: resProcessing.data.taskUuid,
           targetUrls: {
@@ -541,22 +544,69 @@ export const CreationSecondStepContent: React.FC<
           },
         });
 
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_TOO_SHORT
+        ) {
+          throw new Error('VideoTooShort');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_TOO_LONG
+        ) {
+          throw new Error('VideoTooLong');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_QUOTA_REACHED
+        ) {
+          throw new Error('Processing limit reached');
+        }
+
+        if (
+          resProcessing.data.videoUploadError ===
+          newnewapi.VideoUploadError.VIDEO_FORMAT_ERROR
+        ) {
+          throw new Error('VideoFormatError');
+        }
+
+        if (resProcessing.data.videoUploadError) {
+          throw new Error('An error occurred');
+        }
+
         setCreationFileUploadLoading(false);
 
         setCreationFileProcessingProgress(10);
         setCreationFileProcessingETA(80);
         setCreationFileProcessingLoading(true);
         setCreationFileProcessingError(false);
-        setCreationVideo(res.data.publicUrl ?? '');
         xhrRef.current = undefined;
       } catch (error: any) {
+        // TODO: Change this overcomplicated approach
         if (error.message === 'Upload failed') {
           setCreationFileUploadError(true);
           showErrorToastPredefined(undefined);
+        } else if (error.message === 'VideoTooShort') {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.AnnouncementTooShort
+          );
+        } else if (error.message === 'VideoTooLong') {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.AnnouncementTooLong
+          );
         } else if (error.message === 'Processing limit reached') {
           setCreationFileUploadError(true);
           showErrorToastPredefined(
             ErrorToastPredefinedMessage.ProcessingLimitReachedError
+          );
+        } else if (error.message === 'VideoFormatError') {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(
+            ErrorToastPredefinedMessage.VideoFormatError
           );
         } else {
           console.log('Upload aborted');
@@ -606,7 +656,7 @@ export const CreationSecondStepContent: React.FC<
     [validateT]
   );
 
-  const handleItemChange = useCallback(
+  const handleAnnouncementItemChange = useCallback(
     async (key: string, value: any) => {
       if (key === 'title') {
         // Mixpanel.track('Post Title Change', {
@@ -652,7 +702,7 @@ export const CreationSecondStepContent: React.FC<
         setCreationChoices(value);
       } else if (key === 'video') {
         if (value) {
-          await handleVideoUpload(value);
+          await handleAnnouncementVideoUpload(value);
         } else {
           await handleVideoDelete();
         }
@@ -668,7 +718,7 @@ export const CreationSecondStepContent: React.FC<
       setCreationStartDate,
       setCreationTargetBackerCount,
       setCreationChoices,
-      handleVideoUpload,
+      handleAnnouncementVideoUpload,
       handleVideoDelete,
       setCreationVideoThumbnails,
     ]
@@ -733,7 +783,6 @@ export const CreationSecondStepContent: React.FC<
     () => (
       <>
         <SItemWrapper>
-          {/* TODO: move to locales */}
           <SInputLabel htmlFor='title'>
             {t('secondStep.input.label')}
           </SInputLabel>
@@ -743,7 +792,7 @@ export const CreationSecondStepContent: React.FC<
             error={titleError}
             onBlur={handleItemBlur}
             onFocus={handleItemFocus}
-            onChange={handleItemChange}
+            onChange={handleAnnouncementItemChange}
             placeholder={t('secondStep.input.placeholder')}
           />
         </SItemWrapper>
@@ -754,7 +803,7 @@ export const CreationSecondStepContent: React.FC<
               id='choices'
               min={2}
               options={multiplechoice.choices}
-              onChange={handleItemChange}
+              onChange={handleAnnouncementItemChange}
               validation={validateMcOption}
             />
             {isMobile && <SSeparator margin='16px 0' />}
@@ -768,7 +817,7 @@ export const CreationSecondStepContent: React.FC<
                 id='targetBackerCount'
                 type='input'
                 value={crowdfunding.targetBackerCount}
-                onChange={handleItemChange}
+                onChange={handleAnnouncementItemChange}
                 formattedDescription={cfFormattedDescription}
                 inputProps={{
                   min: 1,
@@ -787,7 +836,7 @@ export const CreationSecondStepContent: React.FC<
       titleError,
       handleItemBlur,
       handleItemFocus,
-      handleItemChange,
+      handleAnnouncementItemChange,
       t,
       tab,
       multiplechoice.choices,
@@ -809,7 +858,7 @@ export const CreationSecondStepContent: React.FC<
                     id='targetBackerCount'
                     type='input'
                     value={crowdfunding.targetBackerCount}
-                    onChange={handleItemChange}
+                    onChange={handleAnnouncementItemChange}
                     formattedDescription={cfFormattedDescription}
                     inputProps={{
                       min: 1,
@@ -825,7 +874,7 @@ export const CreationSecondStepContent: React.FC<
                   type='select'
                   value={post.expiresAt}
                   options={expireOptions}
-                  onChange={handleItemChange}
+                  onChange={handleAnnouncementItemChange}
                   formattedValue={t(
                     `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                   )}
@@ -839,7 +888,7 @@ export const CreationSecondStepContent: React.FC<
                   id='startsAt'
                   type='date'
                   value={post.startsAt}
-                  onChange={handleItemChange}
+                  onChange={handleAnnouncementItemChange}
                   formattedValue={t(
                     `secondStep.field.startsAt.modal.type.${post.startsAt?.type}` as any
                   )}
@@ -860,7 +909,7 @@ export const CreationSecondStepContent: React.FC<
                 value={post.expiresAt}
                 options={expireOptions}
                 maxItems={5}
-                onChange={handleItemChange}
+                onChange={handleAnnouncementItemChange}
                 formattedValue={t(
                   `secondStep.field.expiresAt.options.${post.expiresAt}` as any
                 )}
@@ -872,7 +921,7 @@ export const CreationSecondStepContent: React.FC<
             <TabletStartDate
               id='startsAt'
               value={post.startsAt}
-              onChange={handleItemChange}
+              onChange={handleAnnouncementItemChange}
             />
             <SSeparator margin='16px 0' />
           </>
@@ -881,14 +930,14 @@ export const CreationSecondStepContent: React.FC<
           id='comments'
           type='toggle'
           value={post.options.commentsEnabled}
-          onChange={handleItemChange}
+          onChange={handleAnnouncementItemChange}
         />
       </>
     ),
     [
       isMobile,
       tab,
-      handleItemChange,
+      handleAnnouncementItemChange,
       crowdfunding.targetBackerCount,
       cfFormattedDescription,
       post.expiresAt,
@@ -954,44 +1003,63 @@ export const CreationSecondStepContent: React.FC<
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [videoProcessing, fileProcessing]
+    [
+      videoProcessing,
+      fileProcessing,
+      showErrorToastPredefined,
+      // setCreationFileProcessingETA, - reason unknown
+      // setCreationFileProcessingLoading, - reason unknown
+      // setCreationFileProcessingProgress, - reason unknown
+      // setCreationFileUploadError, - reason unknown
+    ]
   );
 
   const videoProcessingFallbackAbortControllerRef = useRef<
     AbortController | undefined
   >();
   // Video processing fallback
-  useEffect(() => {
-    async function videoProcessingFallback(hlsUrl: string) {
-      videoProcessingFallbackAbortControllerRef.current = new AbortController();
+  useEffect(
+    () => {
+      async function videoProcessingFallback(hlsUrl: string) {
+        videoProcessingFallbackAbortControllerRef.current =
+          new AbortController();
 
-      const available = await waitResourceIsAvailable(
-        hlsUrl,
-        {
-          maxAttempts: 720,
-          retryTimeMs: 5000,
-        },
-        videoProcessingFallbackAbortControllerRef?.current.signal
-      );
+        const available = await waitResourceIsAvailable(
+          hlsUrl,
+          {
+            maxAttempts: 720,
+            retryTimeMs: 5000,
+          },
+          videoProcessingFallbackAbortControllerRef?.current.signal
+        );
 
-      if (available) {
-        setCreationFileProcessingLoading(false);
-        setCreationFileProcessingProgress(100);
-      } else {
-        setCreationFileUploadError(true);
-        showErrorToastPredefined(undefined);
+        if (available) {
+          setCreationFileProcessingLoading(false);
+          setCreationFileProcessingProgress(100);
+        } else {
+          setCreationFileUploadError(true);
+          showErrorToastPredefined(undefined);
+        }
       }
-    }
 
-    if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
-      videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
-    }
+      if (fileProcessing.loading && videoProcessing?.targetUrls?.hlsStreamUrl) {
+        videoProcessingFallback(videoProcessing?.targetUrls?.hlsStreamUrl);
+      }
 
-    return () => {
-      videoProcessingFallbackAbortControllerRef?.current?.abort();
-    };
+      return () => {
+        videoProcessingFallbackAbortControllerRef?.current?.abort();
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileProcessing.loading, videoProcessing?.targetUrls?.hlsStreamUrl]);
+    [
+      fileProcessing.loading,
+      videoProcessing?.targetUrls?.hlsStreamUrl,
+      showErrorToastPredefined,
+      // setCreationFileProcessingLoading, - reason unknown
+      // setCreationFileProcessingProgress, - reason unknown
+      // setCreationFileUploadError, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     if (socketConnection) {
@@ -1003,7 +1071,6 @@ export const CreationSecondStepContent: React.FC<
         socketConnection?.off('VideoProcessingProgress', handlerSocketUpdated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
   useEffect(() => {
@@ -1016,28 +1083,34 @@ export const CreationSecondStepContent: React.FC<
     }
   }, [overlayModeEnabled, isDesktop]);
 
-  useEffect(() => {
-    switch (activeTabIndex) {
-      case 1: {
-        if (tutorialType !== 'MC') {
-          setTutorialType('MC');
+  useEffect(
+    () => {
+      switch (activeTabIndex) {
+        case 1: {
+          if (tutorialType !== 'MC') {
+            setTutorialType('MC');
+          }
+          break;
         }
-        break;
-      }
-      case 2: {
-        if (tutorialType !== 'CF') {
-          setTutorialType('CF');
+        case 2: {
+          if (tutorialType !== 'CF') {
+            setTutorialType('CF');
+          }
+          break;
         }
-        break;
-      }
-      default: {
-        if (tutorialType !== 'AC') {
-          setTutorialType('AC');
+        default: {
+          if (tutorialType !== 'AC') {
+            setTutorialType('AC');
+          }
         }
       }
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabIndex]);
+    [
+      activeTabIndex,
+      // tutorialType, - reason unknown
+    ]
+  );
 
   useEffect(() => {
     if (userTutorialsProgressSynced) {
@@ -1075,9 +1148,13 @@ export const CreationSecondStepContent: React.FC<
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutorialType, userTutorialsProgressSynced]);
-
+  }, [
+    tutorialType,
+    userTutorialsProgressSynced,
+    userTutorialsProgress?.remainingAcCrCurrentStep,
+    userTutorialsProgress?.remainingCfCrCurrentStep,
+    userTutorialsProgress?.remainingMcCrCurrentStep,
+  ]);
   const goToNextStep = () => {
     let payload = null;
     switch (tutorialType) {
@@ -1225,7 +1302,7 @@ export const CreationSecondStepContent: React.FC<
                 errorProcessing={fileProcessing.error}
                 loadingProcessing={fileProcessing.loading}
                 progressProcessing={fileProcessing.progress}
-                onChange={handleItemChange}
+                onChange={handleAnnouncementItemChange}
                 handleCancelVideoUpload={() => xhrRef.current?.abort()}
               />
             </SItemWrapper>

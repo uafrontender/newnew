@@ -60,10 +60,6 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
 
   const [isPaused, setIsPaused] = useState(false);
 
-  const handleSetIsPaused = useCallback((stateValue: boolean) => {
-    setIsPaused(stateValue);
-  }, []);
-
   const [videoOrientation, setVideoOrientation] = useState<
     'vertical' | 'horizontal'
   >('vertical');
@@ -73,8 +69,17 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
   const playerScrubberRef = useRef<TPlayerScrubber>(null);
   const [isScrubberTimeChanging, setIsScrubberTimeChanging] = useState(false);
 
+  const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasVideoPlayingBeforeScrubberChangeTimeRef = useRef(false);
+
   const handlePlayerScrubberChangeTime = useCallback(
     (newValue: number) => {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      } else {
+        wasVideoPlayingBeforeScrubberChangeTimeRef.current = !isPaused;
+      }
+
       if (!isPaused) {
         // Pause the player when scrubbing
         // to avoid double playback start
@@ -82,19 +87,27 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
         playerRef.current?.pause();
         playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
-
-        setTimeout(() => {
-          setIsScrubberTimeChanging(false);
-          playerRef.current?.play()?.catch(() => {
-            handleSetIsPaused(true);
-          });
-        }, 100);
       } else {
         playerScrubberRef?.current?.changeCurrentTime(newValue);
         playerRef.current?.currentTime(newValue);
       }
+
+      if (wasVideoPlayingBeforeScrubberChangeTimeRef.current) {
+        timeoutIdRef.current = setTimeout(() => {
+          playerRef.current
+            ?.play()
+            ?.then(() => {
+              timeoutIdRef.current = null;
+              // setTimeout is needed to prevent the play button from flashing
+              setTimeout(() => setIsScrubberTimeChanging(false), 100);
+            })
+            .catch(() => {
+              setIsPaused(true);
+            });
+        }, 100);
+      }
     },
-    [handleSetIsPaused, isPaused]
+    [isPaused]
   );
 
   const options: videojs.PlayerOptions = useMemo(
@@ -154,16 +167,16 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       // Autoplay
       p?.on('ready', (e) => {
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       });
 
       // Paused state
       p?.on('play', () => {
-        handleSetIsPaused(false);
+        setIsPaused(false);
       });
       p?.on('pause', () => {
-        handleSetIsPaused(true);
+        setIsPaused(true);
       });
 
       p?.on('timeupdate', (e) => {
@@ -174,7 +187,7 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       p?.on('loadstart', (e) => {
         setIsLoading(true);
         playerRef.current?.play()?.catch(() => {
-          handleSetIsPaused(true);
+          setIsPaused(true);
         });
       });
       p?.on('canplay', (e) => {
@@ -182,7 +195,10 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleSetIsPaused, innerRef]
+    [
+      // resources, - reason unknown
+      innerRef,
+    ]
   );
 
   useEffect(() => {
@@ -219,13 +235,18 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
     }
   }, [isMuted]);
 
+  const shouldShowPlayPseudoButton = useMemo(
+    () => showPlayButton && isPaused && !isScrubberTimeChanging,
+    [showPlayButton, isPaused, isScrubberTimeChanging]
+  );
+
   return (
     <SContent
       borderRadius={borderRadius}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      bg={resources.thumbnailImageUrl ?? ''}
     >
-      <SImageBG src={resources.thumbnailImageUrl} />
       <SVideoWrapper borderRadius={borderRadius}>
         <SWrapper
           id={id}
@@ -236,32 +257,26 @@ export const VideojsPlayer: React.FC<IVideojsPlayer> = (props) => {
               playerRef.current?.pause();
             } else {
               playerRef.current?.play()?.catch(() => {
-                handleSetIsPaused(true);
+                setIsPaused(true);
               });
             }
           }}
         />
-        {showPlayButton && isPaused && !isScrubberTimeChanging && (
-          <SPlayPseudoButton
-            onClick={() => {
-              if (!playerRef.current?.paused()) {
-                playerRef.current?.pause();
-              } else {
-                playerRef.current?.play()?.catch(() => {
-                  handleSetIsPaused(true);
-                });
-              }
-            }}
-            size={playButtonSize}
-          >
-            <InlineSVG
-              svg={PlayIcon}
-              width='32px'
-              height='32px'
-              fill='#FFFFFF'
-            />
-          </SPlayPseudoButton>
-        )}
+        <SPlayPseudoButton
+          show={shouldShowPlayPseudoButton}
+          size={playButtonSize}
+          onClick={() => {
+            if (!playerRef.current?.paused()) {
+              playerRef.current?.pause();
+            } else {
+              playerRef.current?.play()?.catch(() => {
+                setIsPaused(true);
+              });
+            }
+          }}
+        >
+          <InlineSVG svg={PlayIcon} width='32px' height='32px' fill='#FFFFFF' />
+        </SPlayPseudoButton>
       </SVideoWrapper>
       {isLoading && (
         <SLoader>
@@ -321,6 +336,7 @@ VideojsPlayer.defaultProps = {
 
 interface ISContent {
   borderRadius?: string;
+  bg: string;
 }
 
 const SContent = styled.div<ISContent>`
@@ -329,6 +345,24 @@ const SContent = styled.div<ISContent>`
   position: relative;
   overflow: hidden;
   border-radius: ${(props) => props.borderRadius};
+
+  &::before {
+    content: '';
+    margin: -10%; // to prevent gaps
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    filter: blur(32px);
+    background-image: ${({ bg }) => `url(${bg})`};
+    background-position: center;
+    background-size: cover;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    border-radius: 16px;
+  }
 `;
 
 interface ISVideoWrapper {
@@ -346,8 +380,6 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
   min-height: 100%;
   background: transparent;
   border-radius: ${(props) => props.borderRadius};
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
 `;
 
 const SWrapper = styled.div<{
@@ -360,6 +392,14 @@ const SWrapper = styled.div<{
   min-width: 100% !important;
   min-height: 100% !important;
   background: transparent !important;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   &:before {
     display: none !important;
@@ -401,17 +441,6 @@ const SWrapper = styled.div<{
   }
 `;
 
-const SImageBG = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.1);
-
-  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-    filter: blur(32px);
-  }
-`;
-
 interface ISModalSoundIcon {
   position?: string;
 }
@@ -435,7 +464,10 @@ const SModalSoundIcon = styled.div<ISModalSoundIcon>`
   }
 `;
 
-const SPlayPseudoButton = styled.button<{ size?: 'default' | 'small' }>`
+const SPlayPseudoButton = styled.button<{
+  show?: boolean;
+  size?: 'default' | 'small';
+}>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -452,6 +484,12 @@ const SPlayPseudoButton = styled.button<{ size?: 'default' | 'small' }>`
   border: transparent;
 
   cursor: pointer;
+  pointer-events: ${({ show }) => (show ? 'all' : 'none')};
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transition-property: opacity;
+  transition-timing-function: ease-in;
+  transition-duration: ${({ show }) => (show ? '100ms' : '0ms')};
+  transition-delay: ${({ show }) => (show ? '100ms' : '0ms')};
 
   &:focus,
   &:active {

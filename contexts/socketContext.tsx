@@ -47,32 +47,38 @@ const SocketContextProvider: React.FC<ISocketContextProvider> = ({
   }, [socket]);
 
   // Will use access token if it is available to connect to socket.io
-  useEffect(() => {
-    let socketConnected = {} as Socket;
+  useEffect(
+    () => {
+      let socketConnected = {} as Socket;
 
-    if (fetchInitialized) {
-      socketConnected = io(ENDPOINT, {
-        ...(cookies.accessToken
-          ? {
-              query: {
-                token: cookies.accessToken,
-              },
-            }
-          : {}),
-        withCredentials: true,
-        // transports: ['websocket', 'polling'],
-      });
+      if (fetchInitialized) {
+        socketConnected = io(ENDPOINT, {
+          ...(cookies.accessToken
+            ? {
+                query: {
+                  token: cookies.accessToken,
+                },
+              }
+            : {}),
+          withCredentials: true,
+          // transports: ['websocket', 'polling'],
+        });
 
-      setSocket(socketConnected);
-    }
+        setSocket(socketConnected);
+      }
 
-    function cleanup() {
-      socketConnected?.disconnect?.();
-    }
+      function cleanup() {
+        socketConnected?.disconnect?.();
+      }
 
-    return cleanup;
+      return cleanup;
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cookies?.accessToken, fetchInitialized]);
+    [
+      cookies?.accessToken,
+      fetchInitialized, // - is just a flag
+    ]
+  );
 
   const value = useMemo(
     () => ({

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { RefObject, useEffect, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
@@ -12,7 +12,6 @@ import { SChatSeparator } from '../../atoms/direct-messages/styles';
 import { useGetChats } from '../../../contexts/chatContext';
 import Loader from '../../atoms/Loader';
 import EmptyInbox from '../../atoms/direct-messages/EmptyInbox';
-import { useAppState } from '../../../contexts/appStateContext';
 import { useChatsUnreadMessages } from '../../../contexts/chatsUnreadMessagesContext';
 
 const NoResults = dynamic(
@@ -23,24 +22,20 @@ const ChatListItem = dynamic(() => import('./ChatListItem'));
 interface IChatList {
   hidden?: boolean;
   myRole: newnewapi.ChatRoom.MyRole | undefined;
+  className?: string;
+  forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
 }
 
 const ChatList: React.FC<IChatList> = ({
   myRole,
   hidden,
+  className,
+  forwardRef,
   onChatRoomSelect: onChatRoomSelected,
 }) => {
   const { t } = useTranslation('page-Chat');
   const { ref: scrollRef, inView } = useInView();
-  const { resizeMode } = useAppState();
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
 
   const router = useRouter();
 
@@ -93,70 +88,74 @@ const ChatList: React.FC<IChatList> = ({
   }, [myRole, unreadCountForUser, refetch]);
 
   return (
-    <SChatList
-      style={
-        hidden
-          ? {
-              display: 'none',
-            }
-          : {}
-      }
-    >
-      {/* Loading state */}
-      {isLoading && <Loader size='md' isStatic />}
+    <SChatListWrapper ref={forwardRef}>
+      <SChatList
+        style={
+          hidden
+            ? {
+                display: 'none',
+              }
+            : {}
+        }
+        className={className}
+      >
+        {/* Loading state */}
+        {isLoading && <Loader size='md' isStatic />}
 
-      {/* Chats */}
-      {!isLoading && (
-        <>
-          {chatRooms.length > 0 && (
-            <>
-              {chatRooms.map((chatroom, index) => (
-                <React.Fragment key={chatroom.id as number}>
-                  {hasNextPage && index === chatRooms.length - 1 && (
-                    <SRef ref={scrollRef}>Loading...</SRef>
-                  )}
-                  <ChatListItem
-                    chatRoom={chatroom}
-                    onChatRoomSelected={onChatRoomSelected}
-                    isActive={
-                      !!selectedChatRoomId && chatroom.id === selectedChatRoomId
-                    }
-                  />
-                  {index < chatRooms.length - 1 && <SChatSeparator />}
-                </React.Fragment>
-              ))}
-              {/* TODO: Remove this for dynamic section */}
-              {isMobileOrTablet && (
-                <>
-                  <SChatItemFakeContainer />
-                  <SChatItemFakeContainer />
-                </>
-              )}
-            </>
-          )}
+        {/* Chats */}
+        {!isLoading && (
+          <>
+            {chatRooms.length > 0 && (
+              <>
+                {chatRooms.map((chatroom, index) => (
+                  <React.Fragment key={chatroom.id as number}>
+                    {hasNextPage && index === chatRooms.length - 1 && (
+                      <SRef ref={scrollRef}>Loading...</SRef>
+                    )}
+                    <ChatListItem
+                      chatRoom={chatroom}
+                      onChatRoomSelected={onChatRoomSelected}
+                      isActive={
+                        !!selectedChatRoomId &&
+                        chatroom.id === selectedChatRoomId
+                      }
+                    />
+                    {index < chatRooms.length - 1 && <SChatSeparator />}
+                  </React.Fragment>
+                ))}
+              </>
+            )}
 
-          {/* Empty inbox */}
-          {chatRooms.length === 0 && !searchChatroom && <EmptyInbox />}
+            {/* Empty inbox */}
+            {chatRooms.length === 0 && !searchChatroom && <EmptyInbox />}
 
-          {/* No Search Results */}
-          {chatRooms.length === 0 && searchChatroom && (
-            <NoResults text={searchChatroom} />
-          )}
-        </>
-      )}
-    </SChatList>
+            {/* No Search Results */}
+            {chatRooms.length === 0 && searchChatroom && (
+              <NoResults text={searchChatroom} />
+            )}
+          </>
+        )}
+      </SChatList>
+    </SChatListWrapper>
   );
 };
 
 export default ChatList;
 
-const SChatList = styled.div`
+const SChatListWrapper = styled.div`
+  flex: 1;
+
   display: flex;
   position: relative;
-  overflow-y: auto;
   flex-direction: column;
+  overflow-y: scroll;
   overscroll-behavior: contain;
-  height: calc(100vh - 124px);
+`;
+
+const SChatList = styled.div`
+  height: 100%;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
 
   /* Hide scrollbar */
   ::-webkit-scrollbar {
@@ -170,9 +169,4 @@ const SRef = styled.span`
   text-indent: -9999px;
   height: 0;
   overflow: hidden;
-`;
-
-const SChatItemFakeContainer = styled.div`
-  min-height: 72px;
-  flex: 1;
 `;

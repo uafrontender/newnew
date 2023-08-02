@@ -104,7 +104,7 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
     ),
     #1d6aff;
 
-  span {
+  * {
     z-index: 1;
   }
 

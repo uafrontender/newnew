@@ -120,8 +120,9 @@ const SCreator = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  line-height: 24px;
+  max-width: 100%;
 
+  line-height: 24px;
   vertical-align: middle;
 `;
 
@@ -158,6 +159,7 @@ const SWinningBidCreatorText = styled.div`
   flex-direction: row;
   align-items: center;
   white-space: pre;
+  overflow: hidden;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-weight: 700;

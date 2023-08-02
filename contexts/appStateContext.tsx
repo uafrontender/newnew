@@ -8,7 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { parse } from 'next-useragent';
 import styled from 'styled-components';
 import jwtDecode from 'jwt-decode';
@@ -24,6 +24,9 @@ export const AppStateContext = createContext<{
   userUuid: string | undefined;
   userLoggedIn: boolean;
   userIsCreator: boolean;
+  // Must be optional until 30 days since token change is merged to BE prod
+  // IDEA: we can replace it with "canBEcomeCreator" from BE (DoB + appConstants needed)
+  userDateOfBirth: newnewapi.IDateComponents | undefined;
   handleUserLoggedIn: (isCreator: boolean) => void;
   handleBecameCreator: () => void;
   logoutAndRedirect: (redirectUrl?: string) => void;
@@ -33,6 +36,7 @@ export const AppStateContext = createContext<{
   userUuid: undefined,
   userLoggedIn: false,
   userIsCreator: false,
+  userDateOfBirth: undefined,
   handleUserLoggedIn: () => {},
   handleBecameCreator: () => {},
   logoutAndRedirect: () => {},
@@ -61,40 +65,39 @@ function getResizeMode(uaString: string): TResizeMode {
   return 'mobile';
 }
 
-function getIsCreator(accessToken: string | undefined): boolean {
-  if (accessToken) {
-    const decodedToken: {
-      account_id: string;
-      account_type: string;
-      date: string;
-      is_creator: boolean;
-      iat: number;
-      exp: number;
-      aud: string;
-      iss: string;
-      uuid: string;
-    } = jwtDecode(accessToken);
-
-    return decodedToken.is_creator || false;
-  }
-  return false;
+interface IDecodedToken {
+  account_id: string;
+  account_type: string;
+  date: string;
+  is_creator: boolean;
+  iat: number;
+  dob: string;
+  exp: number;
+  aud: string;
+  iss: string;
+  uuid: string;
 }
 
-function getUserUuid(accessToken: string | undefined): string | undefined {
+function getDecodedToken(accessToken?: string): IDecodedToken | undefined {
   if (accessToken) {
-    const decodedToken: {
-      account_id: string;
-      account_type: string;
-      date: string;
-      is_creator: boolean;
-      iat: number;
-      exp: number;
-      aud: string;
-      iss: string;
-      uuid: string;
-    } = jwtDecode(accessToken);
+    const decodedToken: IDecodedToken = jwtDecode(accessToken);
+    return decodedToken;
+  }
 
-    return decodedToken.uuid || undefined;
+  return undefined;
+}
+
+function getUserDateOfBirth(
+  decodedToken: IDecodedToken | undefined
+): newnewapi.IDateComponents | undefined {
+  if (decodedToken?.dob) {
+    const date = new Date(decodedToken.dob);
+
+    return new newnewapi.DateComponents({
+      day: date.getDay(),
+      month: date.getMonth() + 1,
+      year: date.getFullYear(),
+    });
   }
 
   return undefined;
@@ -105,11 +108,16 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   uaString,
   children,
 }) => {
-  const router = useRouter();
   // Should we check that token is valid or just it's presence here?
-  const [userUuid, setUserUuid] = useState(getUserUuid(accessToken));
+  const decodedToken = useRef(getDecodedToken(accessToken));
+  const [userUuid, setUserUuid] = useState(
+    decodedToken.current?.uuid || undefined
+  );
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
-  const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
+  const [userIsCreator, setUserIsCreator] = useState(
+    decodedToken.current?.is_creator || false
+  );
+  const [userDateOfBirth] = useState(getUserDateOfBirth(decodedToken.current));
   const [resizeMode, setResizeMode] = useState<TResizeMode>(
     getResizeMode(uaString)
   );
@@ -164,7 +172,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       setUserLoggedIn(true);
       setUserIsCreator(isCreator);
     },
-    [setUserLoggedIn, setUserIsCreator]
+    [setUserLoggedIn]
   );
 
   const handleBecameCreator = useCallback(() => {
@@ -175,19 +183,20 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       }
       return true;
     });
-  }, [setUserIsCreator, refreshTokens]);
+  }, [refreshTokens]);
 
-  const logoutAndRedirect = useCallback(
-    (redirectUrl?: string) => {
-      setUserUuid(undefined);
-      setUserLoggedIn(false);
-      setUserIsCreator(false);
-      cookiesInstance.remove('accessToken');
-      cookiesInstance.remove('refreshToken');
-      router.push(redirectUrl ?? '/');
-    },
-    [router, setUserIsCreator]
-  );
+  const logoutAndRedirect = useCallback((redirectUrl?: string) => {
+    setUserUuid(undefined);
+    setUserLoggedIn(false);
+    setUserIsCreator(false);
+    cookiesInstance.remove('accessToken', {
+      path: '/',
+    });
+    cookiesInstance.remove('refreshToken', {
+      path: '/',
+    });
+    Router.push(redirectUrl ?? '/');
+  }, []);
 
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: TResizeMode | undefined;
@@ -204,24 +213,32 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   }, []);
 
   useEffect(() => {
+    const cookiesListener = (options: { name: string; value?: string }) => {
+      if (options.name === 'accessToken' && !options.value) {
+        setUserLoggedIn(false);
+        setUserIsCreator(false);
+      }
+    };
+
+    cookiesInstance.addChangeListener(cookiesListener);
+
+    return () => {
+      cookiesInstance.removeChangeListener(cookiesListener);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!accessToken) {
       return;
     }
 
-    const decodedToken: {
-      account_id: string;
-      account_type: string;
-      date: string;
-      is_creator: boolean;
-      iat: number;
-      exp: number;
-      aud: string;
-      iss: string;
-      uuid: string;
-    } = jwtDecode(accessToken);
+    const newDecodedToken = getDecodedToken(accessToken);
 
-    setUserIsCreator(decodedToken.is_creator);
-    setUserUuid(decodedToken.uuid);
+    if (newDecodedToken) {
+      decodedToken.current = newDecodedToken;
+      setUserIsCreator(newDecodedToken.is_creator);
+      setUserUuid(newDecodedToken.uuid);
+    }
   }, [accessToken]);
 
   useEffect(() => {
@@ -243,6 +260,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       userUuid,
       userLoggedIn,
       userIsCreator,
+      userDateOfBirth,
       handleUserLoggedIn,
       handleBecameCreator,
       logoutAndRedirect,
@@ -252,6 +270,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       userUuid,
       userLoggedIn,
       userIsCreator,
+      userDateOfBirth,
       handleUserLoggedIn,
       handleBecameCreator,
       logoutAndRedirect,
@@ -282,5 +301,5 @@ const SContainer = styled.div`
   max-width: 100%;
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 `;

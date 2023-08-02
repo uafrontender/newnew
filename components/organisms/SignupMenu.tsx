@@ -123,8 +123,16 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
     const { data, error } = await sendVerificationEmail(payload);
 
+    // TODO: Add translations
     if (!data || error) {
       throw new Error(error?.message ?? 'Request failed');
+    }
+
+    if (
+      data.status ===
+      newnewapi.SendVerificationEmailResponse.Status.EMAIL_INVALID
+    ) {
+      throw new Error('Incorrect email');
     }
 
     if (
@@ -227,6 +235,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   Mixpanel.track('Sign In With Google Clicked', {
                     _stage: 'Sign Up',
                   });
+
+                  if (!appConstants?.availableAuthProviders) {
+                    return;
+                  }
+
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/google${redirectUrlParam}`
                   );
@@ -250,6 +263,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   Mixpanel.track('Sign In With Apple Clicked', {
                     _stage: 'Sign Up',
                   });
+
+                  if (!appConstants?.availableAuthProviders) {
+                    return;
+                  }
+
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/apple${redirectUrlParam}`
                   );
@@ -273,6 +291,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   Mixpanel.track('Sign In With Facebook Clicked', {
                     _stage: 'Sign Up',
                   });
+
+                  if (!appConstants?.availableAuthProviders) {
+                    return;
+                  }
+
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/fb${redirectUrlParam}`
                   );
@@ -295,6 +318,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                   Mixpanel.track('Sign In With Twitter Clicked', {
                     _stage: 'Sign Up',
                   });
+
+                  if (!appConstants?.availableAuthProviders) {
+                    return;
+                  }
+
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
                   );
