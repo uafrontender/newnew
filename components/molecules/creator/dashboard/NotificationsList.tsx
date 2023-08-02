@@ -21,7 +21,6 @@ import Indicator from '../../../atoms/Indicator';
 import NoResults from './notifications/NoResults';
 import { useUserData } from '../../../../contexts/userDataContext';
 import {
-  getMyNotifications,
   markAllAsRead,
   markAsRead,
 } from '../../../../api/endpoints/notification';
@@ -29,14 +28,11 @@ import loadingAnimation from '../../../../public/animations/logo-loading-blue.js
 import mobileLogo from '../../../../public/images/svg/MobileLogo.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import VerificationCheckmark from '../../../../public/images/svg/icons/filled/Verification.svg';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../../utils/hooks/usePagination';
 import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import Loader from '../../../atoms/Loader';
 import { SocketContext } from '../../../../contexts/socketContext';
+import useMyNotifications from '../../../../utils/hooks/useMyNotifications';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -64,50 +60,30 @@ export const NotificationsList: React.FC<IFunction> = ({
   // Used to update notification timers
   const [currentTime, setCurrentTime] = useState(Date.now());
 
-  // TODO: return a list of new notifications once WS message can be used
-  // const [newNotifications, setNewNotifications] = useState<
-  //   newnewapi.INotification[]
-  // >([]);
+  const { data, isLoading, hasNextPage, isFetched, fetchNextPage } =
+    useMyNotifications({
+      limit: 10,
+    });
 
-  const loadData = useCallback(
-    async (
-      paging: Paging
-    ): Promise<PaginatedResponse<newnewapi.INotification>> => {
-      const payload = new newnewapi.GetMyNotificationsRequest({
-        paging,
+  const notifications = useMemo(() => {
+    if (data) {
+      return data.pages.map((page) => page.notifications).flat();
+    }
+
+    return [];
+  }, [data]);
+
+  useEffect(() => {
+    setUnreadNotifications((curr) => {
+      const arr = curr ? [...curr] : [];
+      notifications.forEach((item) => {
+        if (!item.isRead) {
+          arr.push(item.id as number);
+        }
       });
-
-      const res = await getMyNotifications(payload);
-
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
-      }
-
-      setUnreadNotifications((curr) => {
-        const arr = curr ? [...curr] : [];
-        res.data?.notifications.forEach((item) => {
-          if (!item.isRead) {
-            arr.push(item.id as number);
-          }
-        });
-        return arr;
-      });
-
-      return {
-        nextData: res.data.notifications,
-        nextPageToken: res.data.paging?.nextPageToken,
-      };
-    },
-    []
-  );
-
-  const {
-    data: notifications,
-    loading,
-    hasMore,
-    initialLoadDone,
-    loadMore,
-  } = usePagination(loadData, 6);
+      return arr;
+    });
+  }, [notifications]);
 
   const markAllNotifications = useCallback(async () => {
     try {
@@ -156,10 +132,10 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [markReadNotifications, markAllNotifications]);
 
   useEffect(() => {
-    if (inView && !loading && hasMore) {
-      loadMore().catch((e) => console.error(e));
+    if (inView && !isLoading && hasNextPage) {
+      fetchNextPage();
     }
-  }, [inView, loading, hasMore, loadMore]);
+  }, [inView, isLoading, hasNextPage, fetchNextPage]);
 
   useEffect(() => {
     const updateTimeInterval = setInterval(() => {
@@ -179,8 +155,8 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [notificationsDataLoaded, unreadNotificationCount]);
 
   useEffect(() => {
-    const handleNotificationCreated = async (data: any) => {
-      const arr = new Uint8Array(data);
+    const handleNotificationCreated = async (newData: any) => {
+      const arr = new Uint8Array(newData);
       const decoded = newnewapi.NotificationCreated.decode(arr);
 
       if (!decoded) {
@@ -360,7 +336,7 @@ export const NotificationsList: React.FC<IFunction> = ({
     <div ref={scrollRef}>
       {
         // eslint-disable-next-line no-nested-ternary
-        !displayedNotifications?.length && (loading || !initialLoadDone) ? (
+        !displayedNotifications?.length && (isLoading || !isFetched) ? (
           <Loader size='md' isStatic />
         ) : displayedNotifications && displayedNotifications.length < 1 ? (
           <NoResults />
@@ -371,7 +347,7 @@ export const NotificationsList: React.FC<IFunction> = ({
           )
         )
       }
-      {hasMore && !loading && initialLoadDone && (
+      {hasNextPage && !isLoading && isFetched && (
         <SRef ref={scrollRefNotifications}>
           <Lottie
             width={64}

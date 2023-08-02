@@ -68,8 +68,7 @@ interface ISContainer {
 
 // NOTE: -1px needed to fix mobile Safari issue with transparent line under navigation bar
 const SContainer = styled.nav<ISContainer>`
-  position: sticky;
-  position: -webkit-sticky; /* Safari */
+  position: fixed;
   left: 0;
   width: 100vw;
   bottom: -1px;
