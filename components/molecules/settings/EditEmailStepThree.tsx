@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -41,6 +41,7 @@ const EditEmailStepThreeModal = ({
   const [errorMessage, setErrorMessage] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const codeLoading = useRef(false);
   const [isCodeLoading, setIsCodeLoading] = useState(false);
 
   const [canResendAt, setCanResendAt] = useState<number>(
@@ -58,7 +59,7 @@ const EditEmailStepThreeModal = ({
   }, []);
 
   const resendVerificationCode = useCallback(async () => {
-    if (isCodeLoading) {
+    if (codeLoading.current) {
       return;
     }
 
@@ -69,6 +70,7 @@ const EditEmailStepThreeModal = ({
       });
 
       setIsCodeLoading(true);
+      codeLoading.current = true;
       const sendVerificationCodePayload =
         new newnewapi.SendVerificationEmailRequest({
           emailAddress: newEmail,
@@ -101,15 +103,16 @@ const EditEmailStepThreeModal = ({
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);
-
-      setIsCodeLoading(false);
       setCode(new Array(6).join('.').split('.'));
     } catch (err) {
       // TODO: We should probably have an error message below input here
-      setIsCodeLoading(false);
+
       console.error(err);
+    } finally {
+      setIsCodeLoading(false);
+      codeLoading.current = false;
     }
-  }, [isCodeLoading, newEmail, tVerifyEmail]);
+  }, [newEmail, tVerifyEmail]);
 
   const handleSetMyEmail = useCallback(
     async (verificationCode: string) => {

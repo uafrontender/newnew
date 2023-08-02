@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'react-cookie';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -43,6 +43,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   const [, setCookie] = useCookies();
   const { userLoggedIn, handleUserLoggedIn } = useAppState();
   const { updateUserData } = useUserData();
+  const loading = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -63,14 +64,17 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
   // TODO: review these useUpdateEffect
   useUpdateEffect(() => {
     async function handleAuth() {
-      if (isLoading || userLoggedIn) {
+      if (loading.current || userLoggedIn) {
         return;
       }
 
       try {
         setIsLoading(true);
+        loading.current = true;
 
-        if (!provider) throw new Error('No provider');
+        if (!provider) {
+          throw new Error('No provider');
+        }
 
         let res: APIResponse<newnewapi.SignInResponse>;
 
@@ -176,6 +180,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         resumePushNotification();
 
         setIsLoading(false);
+        loading.current = false;
         if (data.redirectUrl) {
           router?.replace(data.redirectUrl);
         } else if (data.me?.options?.isCreator) {
@@ -187,6 +192,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         // NB! Might need an error toast
         console.error(err);
         setIsLoading(false);
+        loading.current = false;
         router?.replace('/');
       }
     }

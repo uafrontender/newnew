@@ -52,7 +52,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
     useState<Area>();
   const [zoomProfileImage, setZoomProfileImage] = useState(minZoom);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSetStageToEditingGeneralUnsetPicture = () => {
     onClose();
@@ -77,7 +77,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
 
   const completeProfileImageCropAndUpdateImageToSave = useCallback(async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const croppedImage = await getCroppedImg(
         avatarUrlInEdit,
         croppedAreaProfileImage!!,
@@ -85,11 +85,11 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
         'avatarImage.jpeg'
       );
       handleSetImageToSave(croppedImage);
-      setLoading(false);
+      setIsLoading(false);
       onClose();
     } catch (err) {
       console.error(err);
-      setLoading(false);
+      setIsLoading(false);
     }
   }, [avatarUrlInEdit, croppedAreaProfileImage, handleSetImageToSave, onClose]);
 
@@ -118,7 +118,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
           maxZoom={minZoom + 2}
           avatarUrlInEdit={avatarUrlInEdit}
           originalImageWidth={originalProfileImageWidth}
-          disabled={loading}
+          disabled={isLoading}
           onCropChange={setCropProfileImage}
           onCropComplete={onCropCompleteProfileImage}
           onZoomChange={setZoomProfileImage}
@@ -128,7 +128,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
             iconOnly
             size='sm'
             view='transparent'
-            disabled={zoomProfileImage <= minZoom || loading}
+            disabled={zoomProfileImage <= minZoom || isLoading}
             onClick={handleZoomOutProfileImage}
           >
             <InlineSvg
@@ -144,14 +144,14 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
             max={minZoom + 2}
             step={0.1}
             ariaLabel='Zoom'
-            disabled={loading}
+            disabled={isLoading}
             onChange={(e) => setZoomProfileImage(Number(e.target.value))}
           />
           <Button
             iconOnly
             size='sm'
             view='transparent'
-            disabled={zoomProfileImage >= minZoom + 2 || loading}
+            disabled={zoomProfileImage >= minZoom + 2 || isLoading}
             onClick={handleZoomInProfileImage}
           >
             <InlineSvg
@@ -165,7 +165,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
         <SControlsWrapperPicture>
           <Button
             view='secondary'
-            disabled={loading}
+            disabled={isLoading}
             onClick={handleSetStageToEditingGeneralUnsetPicture}
           >
             {t('detailsSection.editProfileImageModal.button.cancel')}
@@ -173,7 +173,7 @@ const OnboardingEditProfileImageModal: React.FunctionComponent<
           <Button
             id='save-image'
             withShadow
-            disabled={loading}
+            disabled={isLoading}
             onClick={completeProfileImageCropAndUpdateImageToSave}
           >
             {t('detailsSection.editProfileImageModal.button.save')}
