@@ -1,7 +1,6 @@
 import React, {
   useCallback,
   useRef,
-  useState,
   useEffect,
   useMemo,
   useContext,
@@ -28,15 +27,13 @@ import findName from '../../../../utils/findName';
 import { useNotifications } from '../../../../contexts/notificationsContext';
 import Loader from '../../../atoms/Loader';
 import { SocketContext } from '../../../../contexts/socketContext';
-import useMyNotifications from '../../../../utils/hooks/useMyNotifications';
+import useMyNotifications, {
+  useMyNotificationsActions,
+} from '../../../../utils/hooks/useMyNotifications';
 
-interface IFunction {
-  markReadNotifications: boolean;
-}
+interface IFunction {}
 
-export const NotificationsList: React.FC<IFunction> = ({
-  markReadNotifications,
-}) => {
+export const NotificationsList: React.FC<IFunction> = () => {
   const scrollRef: any = useRef();
   const { socketConnection } = useContext(SocketContext);
   const { ref: scrollRefNotifications, inView } = useInView();
@@ -45,22 +42,16 @@ export const NotificationsList: React.FC<IFunction> = ({
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
 
-  // Used to update notification timers
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const { data, isLoading, hasNextPage, isFetched, fetchNextPage } =
+    useMyNotifications({
+      limit: 10,
+    });
 
-  const {
-    data,
-    isLoading,
-    hasNextPage,
-    isFetched,
-    fetchNextPage,
-    markAsReadMutation,
-    markAllAsReadMutation,
-    markAllAsRead,
-    addNewNotificationMutation,
-  } = useMyNotifications({
-    limit: 10,
-  });
+  const { markAsReadMutation, markAllAsRead, addNewNotificationMutation } =
+    useMyNotificationsActions();
+
+  const { mutate: markNotificationAsRead } = markAsReadMutation;
+  const { mutate: addNewNotification } = addNewNotificationMutation;
 
   const notifications = useMemo(() => {
     if (data) {
@@ -70,39 +61,11 @@ export const NotificationsList: React.FC<IFunction> = ({
     return [];
   }, [data]);
 
-  const markNotificationAsRead = useCallback(
-    async (notification: newnewapi.INotification) => {
-      markAsReadMutation?.mutate(notification);
-    },
-    [markAsReadMutation]
-  );
-
-  useEffect(() => {
-    if (markReadNotifications) {
-      markAllAsReadMutation.mutate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    markReadNotifications,
-    markAllAsReadMutation.mutate,
-    // markAllAsReadMutation - no needed here
-  ]);
-
   useEffect(() => {
     if (inView && !isLoading && hasNextPage) {
       fetchNextPage();
     }
   }, [inView, isLoading, hasNextPage, fetchNextPage]);
-
-  useEffect(() => {
-    const updateTimeInterval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000);
-
-    return () => {
-      clearInterval(updateTimeInterval);
-    };
-  }, []);
 
   useEffect(() => {
     // If all notifications read in other tabs/apps
@@ -121,7 +84,7 @@ export const NotificationsList: React.FC<IFunction> = ({
       }
 
       if (decoded.notification) {
-        addNewNotificationMutation.mutate(decoded.notification);
+        addNewNotification(decoded.notification);
       }
     };
 
@@ -134,12 +97,7 @@ export const NotificationsList: React.FC<IFunction> = ({
         socketConnection?.off('NotificationCreated', handleNotificationCreated);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    socketConnection,
-    addNewNotificationMutation.mutate,
-    // addNewNotificationMutation - no needed here
-  ]);
+  }, [socketConnection, addNewNotification]);
 
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
   const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
@@ -221,7 +179,7 @@ export const NotificationsList: React.FC<IFunction> = ({
   );
 
   const renderNotificationItem = useCallback(
-    (item: newnewapi.INotification, itemCurrentTime: number) => {
+    (item: newnewapi.INotification) => {
       const message = getEnrichedNotificationMessage(item);
 
       return (
@@ -291,7 +249,7 @@ export const NotificationsList: React.FC<IFunction> = ({
         ) : (
           notifications &&
           notifications.map((notification) =>
-            renderNotificationItem(notification, currentTime)
+            renderNotificationItem(notification)
           )
         )
       }

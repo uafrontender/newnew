@@ -28,9 +28,6 @@ const useMyNotifications = (
     'queryKey' | 'queryFn'
   >
 ) => {
-  const queryClient = useQueryClient();
-  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
-
   const query = useInfiniteQuery(
     ['private', 'getMyNotifications', params],
     async ({ pageParam, signal }) => {
@@ -68,6 +65,13 @@ const useMyNotifications = (
     >
   );
 
+  return query;
+};
+
+export const useMyNotificationsActions = () => {
+  const queryClient = useQueryClient();
+  const { showErrorToastPredefined, showErrorToastCustom } = useErrorToasts();
+
   const markAsReadMutation = useMutation({
     mutationFn: async (notification: newnewapi.INotification) => {
       if (notification.isRead) {
@@ -96,37 +100,27 @@ const useMyNotifications = (
             paging: newnewapi.IPagingResponse | null | undefined;
           }>
         | undefined
-      >(
-        { queryKey: ['private', 'getMyNotifications'] },
-        (
-          oldData:
-            | InfiniteData<{
-                notifications: newnewapi.INotification[];
-                paging: newnewapi.IPagingResponse | null | undefined;
-              }>
-            | undefined
-        ) => {
-          if (oldData) {
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page) => ({
-                paging: page.paging,
-                notifications: page.notifications.map((notification) => {
-                  if (notification.id === notificationId) {
-                    return {
-                      ...notification,
-                      isRead: true,
-                    };
-                  }
-                  return notification;
-                }),
-              })),
-            };
-          }
-
-          return oldData;
+      >({ queryKey: ['private', 'getMyNotifications'] }, (oldData) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              paging: page.paging,
+              notifications: page.notifications.map((notification) => {
+                if (notification.id === notificationId) {
+                  return {
+                    ...notification,
+                    isRead: true,
+                  };
+                }
+                return notification;
+              }),
+            })),
+          };
         }
-      );
+
+        return oldData;
+      });
     },
   });
 
@@ -137,45 +131,22 @@ const useMyNotifications = (
           paging: newnewapi.IPagingResponse | null | undefined;
         }>
       | undefined
-    >(
-      { queryKey: ['private', 'getMyNotifications'] },
-      (
-        oldData:
-          | InfiniteData<{
-              notifications: newnewapi.INotification[];
-              paging: newnewapi.IPagingResponse | null | undefined;
-            }>
-          | undefined
-      ) => {
-        if (oldData) {
-          console.log(
-            {
-              ...oldData,
-              pages: oldData.pages.map((page) => ({
-                paging: page.paging,
-                notifications: page.notifications.map((notification) => ({
-                  ...notification,
-                  isRead: true,
-                })),
-              })),
-            },
-            'newData'
-          );
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              paging: page.paging,
-              notifications: page.notifications.map((notification) => ({
-                ...notification,
-                isRead: true,
-              })),
+    >({ queryKey: ['private', 'getMyNotifications'] }, (oldData) => {
+      if (oldData) {
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            paging: page.paging,
+            notifications: page.notifications.map((notification) => ({
+              ...notification,
+              isRead: true,
             })),
-          };
-        }
-
-        return oldData;
+          })),
+        };
       }
-    );
+
+      return oldData;
+    });
   }, [queryClient]);
 
   const markAllAsReadMutation = useMutation({
@@ -191,12 +162,13 @@ const useMyNotifications = (
       markAllAsRead();
     },
     onError: (err: any) => {
-      console.error(err);
       if (err?.message) {
         showErrorToastCustom(err?.message);
       } else {
         showErrorToastPredefined();
       }
+
+      console.error(err);
     },
   });
 
@@ -216,40 +188,29 @@ const useMyNotifications = (
             paging: newnewapi.IPagingResponse | null | undefined;
           }>
         | undefined
-      >(
-        { queryKey: ['private', 'getMyNotifications'] },
-        (
-          oldData:
-            | InfiniteData<{
-                notifications: newnewapi.INotification[];
-                paging: newnewapi.IPagingResponse | null | undefined;
-              }>
-            | undefined
-        ) => {
-          if (oldData) {
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page, i) => {
-                if (i === 0) {
-                  return {
-                    paging: page.paging,
-                    notifications: [notification, ...page.notifications],
-                  };
-                }
+      >({ queryKey: ['private', 'getMyNotifications'] }, (oldData) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page, i) => {
+              if (i === 0) {
+                return {
+                  paging: page.paging,
+                  notifications: [notification, ...page.notifications],
+                };
+              }
 
-                return page;
-              }),
-            };
-          }
-
-          return oldData;
+              return page;
+            }),
+          };
         }
-      );
+
+        return oldData;
+      });
     },
   });
 
   return {
-    ...query,
     markAsReadMutation,
     markAllAsReadMutation,
     markAllAsRead,
