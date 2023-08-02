@@ -50,7 +50,7 @@ const Notification: React.FC<INotification> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const [url, setUrl] = useState('/direct-messages');
+  const [url, setUrl] = useState<string | undefined>(undefined);
 
   const [isUnread, setIsUnread] = useState(!isRead);
   const { ref, inView } = useInView();
@@ -73,7 +73,7 @@ const Notification: React.FC<INotification> = ({
   }, [id]);
 
   useEffect(() => {
-    if (url === '/direct-messages' && target) {
+    if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
         setUrl('/creator/subscribers');
       }
@@ -157,73 +157,78 @@ const Notification: React.FC<INotification> = ({
     return <STitleText>{t('title.newMessage')}</STitleText>;
   }, [content, userUuid, t]);
 
+  // Do we need optimization here?
+  const NotificationItem = (
+    <SWrapper
+      onClick={() => {
+        Mixpanel.track('Notification Clicked', {
+          _stage: 'Notifications',
+          _target: url,
+          _component: 'Notification',
+        });
+        markNotificationAsRead();
+      }}
+    >
+      {content?.relatedUser?.uuid !== userUuid ? (
+        <SAvatarHolder>
+          <SUserAvatar
+            avatarUrl={
+              content?.relatedUser?.thumbnailAvatarUrl
+                ? content?.relatedUser?.thumbnailAvatarUrl
+                : ''
+            }
+          />
+          {target && (
+            <SIcon>
+              <SInlineSVG
+                svg={getNotificationIcon(target)}
+                fill={theme.colors.white}
+                width='14px'
+                height='14px'
+              />
+            </SIcon>
+          )}
+        </SAvatarHolder>
+      ) : (
+        <SAvatarHolder>
+          <SIconHolder>
+            <InlineSvg
+              clickable
+              svg={mobileLogo}
+              fill={theme.colors.white}
+              width={isMobile ? '24px' : '48px'}
+              height={isMobile ? '24px' : '48px'}
+            />
+          </SIconHolder>
+        </SAvatarHolder>
+      )}
+      <SInfo ref={ref}>
+        <STitle>{getNotificationTitle()}</STitle>
+        <SContent>{content?.message}</SContent>
+        <SDate>
+          {moment((createdAt?.seconds as number) * 1000)
+            .locale(locale || 'en-US')
+            .fromNow()}
+        </SDate>
+      </SInfo>
+      {content?.relatedPost &&
+        content?.relatedPost.thumbnailImageUrl &&
+        !isMobile && (
+          <SPostThumbnail avatarUrl={content?.relatedPost.thumbnailImageUrl} />
+        )}
+      <SStatus>
+        <SBullet visible={isUnread} />
+      </SStatus>
+    </SWrapper>
+  );
+
+  if (!url) {
+    return NotificationItem;
+  }
+
   return (
     <Link href={url}>
-      <a>
-        <SWrapper
-          onClick={() => {
-            Mixpanel.track('Notification Clicked', {
-              _stage: 'Notifications',
-              _target: url,
-              _component: 'Notification',
-            });
-            markNotificationAsRead();
-          }}
-        >
-          {content?.relatedUser?.uuid !== userUuid ? (
-            <SAvatarHolder>
-              <SUserAvatar
-                avatarUrl={
-                  content?.relatedUser?.thumbnailAvatarUrl
-                    ? content?.relatedUser?.thumbnailAvatarUrl
-                    : ''
-                }
-              />
-              {target && (
-                <SIcon>
-                  <SInlineSVG
-                    svg={getNotificationIcon(target)}
-                    fill={theme.colors.white}
-                    width='14px'
-                    height='14px'
-                  />
-                </SIcon>
-              )}
-            </SAvatarHolder>
-          ) : (
-            <SAvatarHolder>
-              <SIconHolder>
-                <InlineSvg
-                  clickable
-                  svg={mobileLogo}
-                  fill={theme.colors.white}
-                  width={isMobile ? '24px' : '48px'}
-                  height={isMobile ? '24px' : '48px'}
-                />
-              </SIconHolder>
-            </SAvatarHolder>
-          )}
-          <SInfo ref={ref}>
-            <STitle>{getNotificationTitle()}</STitle>
-            <SContent>{content?.message}</SContent>
-            <SDate>
-              {moment((createdAt?.seconds as number) * 1000)
-                .locale(locale || 'en-US')
-                .fromNow()}
-            </SDate>
-          </SInfo>
-          {content?.relatedPost &&
-            content?.relatedPost.thumbnailImageUrl &&
-            !isMobile && (
-              <SPostThumbnail
-                avatarUrl={content?.relatedPost.thumbnailImageUrl}
-              />
-            )}
-          <SStatus>
-            <SBullet visible={isUnread} />
-          </SStatus>
-        </SWrapper>
-      </a>
+      <a>{NotificationItem}</a>
     </Link>
   );
 };
