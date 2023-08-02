@@ -114,7 +114,9 @@ export const NotificationsList: React.FC<IFunction> = () => {
   }, [socketConnection, addNewNotification]);
 
   // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
-  const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
+  const getUrl = (
+    target: newnewapi.IRoutingTarget | null | undefined
+  ): string | undefined => {
     if (target) {
       if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
         return '/direct-messages';
@@ -146,7 +148,8 @@ export const NotificationsList: React.FC<IFunction> = () => {
         }`;
       }
     }
-    return '/direct-messages';
+
+    return undefined;
   };
 
   const getEnrichedNotificationMessage = useCallback(
@@ -195,52 +198,57 @@ export const NotificationsList: React.FC<IFunction> = () => {
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification, itemCurrentTime: number) => {
       const message = getEnrichedNotificationMessage(item);
+      const url = getUrl(item.target);
+
+      const NotificationsItem = (
+        <SNotificationItem
+          key={`notification-item-${item.id}`}
+          onClick={() => {
+            markNotificationAsRead(item);
+          }}
+          onContextMenu={() => {
+            markNotificationAsRead(item);
+          }}
+        >
+          {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
+            <SNotificationItemAvatar
+              withClick
+              avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
+            />
+          ) : (
+            <SIconHolder>
+              <InlineSvg
+                clickable
+                svg={mobileLogo}
+                fill='#fff'
+                width='24px'
+                height='24px'
+              />
+            </SIconHolder>
+          )}
+          <SNotificationItemCenter>
+            {message && (
+              <SNotificationItemText variant={3} weight={600}>
+                {message}
+              </SNotificationItemText>
+            )}
+            <SNotificationItemTime variant={2} weight={600}>
+              {moment((item.createdAt?.seconds as number) * 1000)
+                .locale(locale || 'en-US')
+                .fromNow()}
+            </SNotificationItemTime>
+          </SNotificationItemCenter>
+          {!item.isRead && <SNotificationItemIndicator minified />}
+        </SNotificationItem>
+      );
+
+      if (!url) {
+        return NotificationsItem;
+      }
 
       return (
-        <Link href={getUrl(item.target)} key={item.id as number}>
-          <a>
-            <SNotificationItem
-              key={`notification-item-${item.id}`}
-              onClick={() => {
-                markNotificationAsRead(item);
-              }}
-              onContextMenu={() => {
-                markNotificationAsRead(item);
-              }}
-            >
-              {item.content?.relatedUser?.uuid !== userData?.userUuid ? (
-                <SNotificationItemAvatar
-                  withClick
-                  avatarUrl={
-                    item.content?.relatedUser?.thumbnailAvatarUrl ?? ''
-                  }
-                />
-              ) : (
-                <SIconHolder>
-                  <InlineSvg
-                    clickable
-                    svg={mobileLogo}
-                    fill='#fff'
-                    width='24px'
-                    height='24px'
-                  />
-                </SIconHolder>
-              )}
-              <SNotificationItemCenter>
-                {message && (
-                  <SNotificationItemText variant={3} weight={600}>
-                    {message}
-                  </SNotificationItemText>
-                )}
-                <SNotificationItemTime variant={2} weight={600}>
-                  {moment((item.createdAt?.seconds as number) * 1000)
-                    .locale(locale || 'en-US')
-                    .fromNow()}
-                </SNotificationItemTime>
-              </SNotificationItemCenter>
-              {!item.isRead && <SNotificationItemIndicator minified />}
-            </SNotificationItem>
-          </a>
+        <Link href={url} key={item.id as number}>
+          <a>{NotificationsItem}</a>
         </Link>
       );
     },
