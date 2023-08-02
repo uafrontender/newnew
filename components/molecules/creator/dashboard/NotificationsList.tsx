@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useContext,
+  useState,
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -42,6 +43,9 @@ export const NotificationsList: React.FC<IFunction> = () => {
   const { unreadNotificationCount, notificationsDataLoaded } =
     useNotifications();
 
+  // Used to update notification timers
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
   const { data, isLoading, hasNextPage, isFetched, fetchNextPage } =
     useMyNotifications({
       limit: 10,
@@ -66,6 +70,16 @@ export const NotificationsList: React.FC<IFunction> = () => {
       fetchNextPage();
     }
   }, [inView, isLoading, hasNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const updateTimeInterval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000);
+
+    return () => {
+      clearInterval(updateTimeInterval);
+    };
+  }, []);
 
   useEffect(() => {
     // If all notifications read in other tabs/apps
@@ -179,7 +193,7 @@ export const NotificationsList: React.FC<IFunction> = () => {
   );
 
   const renderNotificationItem = useCallback(
-    (item: newnewapi.INotification) => {
+    (item: newnewapi.INotification, itemCurrentTime: number) => {
       const message = getEnrichedNotificationMessage(item);
 
       return (
@@ -249,7 +263,7 @@ export const NotificationsList: React.FC<IFunction> = () => {
         ) : (
           notifications &&
           notifications.map((notification) =>
-            renderNotificationItem(notification)
+            renderNotificationItem(notification, currentTime)
           )
         )
       }
