@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import CreatorCard from '../../molecules/search/CreatorCard';
-import { useUserData } from '../../../contexts/userDataContext';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -29,12 +29,12 @@ export const CreatorsList: React.FC<IList> = ({
   withEllipseMenu = false,
   onBuyBundleClicked,
 }) => {
-  const { userData } = useUserData();
+  const { userUuid } = useAppState();
 
   const renderItem = (creator: newnewapi.IUser) => {
     const handleItemClick = () => {
       if (creator) {
-        if (creator.uuid === userData?.userUuid) {
+        if (creator.uuid === userUuid) {
           router.push('/profile/my-posts');
         } else {
           router.push(`/${creator.username}`);
@@ -43,7 +43,7 @@ export const CreatorsList: React.FC<IList> = ({
     };
 
     const isCardWithEllipseMenu =
-      creator.uuid !== userData?.userUuid ? withEllipseMenu : false;
+      creator.uuid !== userUuid ? withEllipseMenu : false;
 
     return (
       <SItemWrapper key={creator.uuid} onClick={handleItemClick}>

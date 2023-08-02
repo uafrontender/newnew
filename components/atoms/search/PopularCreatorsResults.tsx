@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 import { Mixpanel } from '../../../utils/mixpanel';
 import DisplayName from '../DisplayName';
-import { useUserData } from '../../../contexts/userDataContext';
 import { useAppState } from '../../../contexts/appStateContext';
 
 interface IFunction {
@@ -20,8 +19,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({
   onSelect,
 }) => {
   const { t } = useTranslation('common');
-  const { userIsCreator } = useAppState();
-  const { userData } = useUserData();
+  const { userUuid, userIsCreator } = useAppState();
 
   return (
     <SContainer>
@@ -29,7 +27,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({
       {creators.map((creator) => (
         <Link
           href={
-            creator.uuid === userData?.userUuid
+            creator.uuid === userUuid
               ? userIsCreator
                 ? '/profile/my-posts'
                 : '/profile'
