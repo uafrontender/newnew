@@ -21,6 +21,7 @@ import { cookiesInstance, refreshCredentials } from '../api/apiConfigs';
 // TODO: Add info after user being White Listed
 export const AppStateContext = createContext<{
   resizeMode: TResizeMode;
+  userUuid: string | undefined;
   userLoggedIn: boolean;
   userIsCreator: boolean;
   // Must be optional until 30 days since token change is merged to BE prod
@@ -32,6 +33,7 @@ export const AppStateContext = createContext<{
 }>({
   // Default values are irrelevant as state gets it on init
   resizeMode: 'mobile',
+  userUuid: undefined,
   userLoggedIn: false,
   userIsCreator: false,
   userDateOfBirth: undefined,
@@ -63,50 +65,39 @@ function getResizeMode(uaString: string): TResizeMode {
   return 'mobile';
 }
 
-function getIsCreator(accessToken: string | undefined): boolean {
-  if (accessToken) {
-    const decodedToken: {
-      account_id: string;
-      account_type: string;
-      date: string;
-      is_creator: boolean;
-      iat: number;
-      dob: string;
-      exp: number;
-      aud: string;
-      iss: string;
-    } = jwtDecode(accessToken);
+interface IDecodedToken {
+  account_id: string;
+  account_type: string;
+  date: string;
+  is_creator: boolean;
+  iat: number;
+  dob: string;
+  exp: number;
+  aud: string;
+  iss: string;
+  uuid: string;
+}
 
-    return decodedToken.is_creator || false;
+function getDecodedToken(accessToken?: string): IDecodedToken | undefined {
+  if (accessToken) {
+    const decodedToken: IDecodedToken = jwtDecode(accessToken);
+    return decodedToken;
   }
-  return false;
+
+  return undefined;
 }
 
 function getUserDateOfBirth(
-  accessToken: string | undefined
+  decodedToken: IDecodedToken | undefined
 ): newnewapi.IDateComponents | undefined {
-  if (accessToken) {
-    const decodedToken: {
-      account_id: string;
-      account_type: string;
-      date: string;
-      is_creator: boolean;
-      iat: number;
-      dob: string;
-      exp: number;
-      aud: string;
-      iss: string;
-    } = jwtDecode(accessToken);
+  if (decodedToken?.dob) {
+    const date = new Date(decodedToken.dob);
 
-    if (decodedToken.dob) {
-      const date = new Date(decodedToken.dob);
-
-      return new newnewapi.DateComponents({
-        day: date.getDay(),
-        month: date.getMonth() + 1,
-        year: date.getFullYear(),
-      });
-    }
+    return new newnewapi.DateComponents({
+      day: date.getDay(),
+      month: date.getMonth() + 1,
+      year: date.getFullYear(),
+    });
   }
 
   return undefined;
@@ -118,9 +109,15 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   children,
 }) => {
   // Should we check that token is valid or just it's presence here?
+  const decodedToken = useRef(getDecodedToken(accessToken));
+  const [userUuid, setUserUuid] = useState(
+    decodedToken.current?.uuid || undefined
+  );
   const [userLoggedIn, setUserLoggedIn] = useState(!!accessToken);
-  const [userIsCreator, setUserIsCreator] = useState(getIsCreator(accessToken));
-  const [userDateOfBirth] = useState(getUserDateOfBirth(accessToken));
+  const [userIsCreator, setUserIsCreator] = useState(
+    decodedToken.current?.is_creator || false
+  );
+  const [userDateOfBirth] = useState(getUserDateOfBirth(decodedToken.current));
   const [resizeMode, setResizeMode] = useState<TResizeMode>(
     getResizeMode(uaString)
   );
@@ -189,6 +186,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
   }, [refreshTokens]);
 
   const logoutAndRedirect = useCallback((redirectUrl?: string) => {
+    setUserUuid(undefined);
     setUserLoggedIn(false);
     setUserIsCreator(false);
     cookiesInstance.remove('accessToken', {
@@ -219,6 +217,7 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       if (options.name === 'accessToken' && !options.value) {
         setUserLoggedIn(false);
         setUserIsCreator(false);
+        setUserUuid(undefined);
       }
     };
 
@@ -228,6 +227,20 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
       cookiesInstance.removeChangeListener(cookiesListener);
     };
   }, []);
+
+  useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+
+    const newDecodedToken = getDecodedToken(accessToken);
+
+    if (newDecodedToken) {
+      decodedToken.current = newDecodedToken;
+      setUserIsCreator(newDecodedToken.is_creator);
+      setUserUuid(newDecodedToken.uuid);
+    }
+  }, [accessToken]);
 
   useEffect(() => {
     if (!ref.current) {
@@ -244,19 +257,21 @@ const AppStateContextProvider: React.FC<IAppStateContextProvider> = ({
 
   const contextValue = useMemo(
     () => ({
+      resizeMode,
+      userUuid,
       userLoggedIn,
       userIsCreator,
       userDateOfBirth,
-      resizeMode,
       handleUserLoggedIn,
       handleBecameCreator,
       logoutAndRedirect,
     }),
     [
+      resizeMode,
+      userUuid,
       userLoggedIn,
       userIsCreator,
       userDateOfBirth,
-      resizeMode,
       handleUserLoggedIn,
       handleBecameCreator,
       logoutAndRedirect,

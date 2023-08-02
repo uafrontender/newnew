@@ -12,7 +12,6 @@ import { InlineSvg } from '../../atoms/InlineSVG';
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
 import NotificationsIcon from '../../../public/images/svg/icons/filled/Notifications.svg';
-import { useUserData } from '../../../contexts/userDataContext';
 import mobileLogo from '../../../public/images/svg/MobileLogo.svg';
 import { markAsRead } from '../../../api/endpoints/notification';
 import PostTitleContent from '../../atoms/PostTitleContent';
@@ -47,11 +46,10 @@ const Notification: React.FC<INotification> = ({
   const { t } = useTranslation('page-Notifications');
   const { locale } = useRouter();
   const theme = useTheme();
-  const { resizeMode } = useAppState();
+  const { resizeMode, userUuid } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const { userData } = useUserData();
   const [url, setUrl] = useState<string | undefined>(undefined);
 
   const [isUnread, setIsUnread] = useState(!isRead);
@@ -140,10 +138,7 @@ const Notification: React.FC<INotification> = ({
       return null;
     }
 
-    if (
-      content.relatedUser &&
-      content.relatedUser.uuid !== userData?.userUuid
-    ) {
+    if (content.relatedUser && content.relatedUser.uuid !== userUuid) {
       return (
         <STitleText>
           <DisplayName user={content.relatedUser} />
@@ -160,7 +155,7 @@ const Notification: React.FC<INotification> = ({
     }
 
     return <STitleText>{t('title.newMessage')}</STitleText>;
-  }, [content, userData?.userUuid, t]);
+  }, [content, userUuid, t]);
 
   // Do we need optimization here?
   const NotificationItem = (
@@ -174,7 +169,7 @@ const Notification: React.FC<INotification> = ({
         markNotificationAsRead();
       }}
     >
-      {content?.relatedUser?.uuid !== userData?.userUuid ? (
+      {content?.relatedUser?.uuid !== userUuid ? (
         <SAvatarHolder>
           <SUserAvatar
             avatarUrl={

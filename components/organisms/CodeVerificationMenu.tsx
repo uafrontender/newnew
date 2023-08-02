@@ -75,6 +75,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const [codeInitial, setCodeInitial] = useState(
     new Array(6).join('.').split('.')
   );
+  const resentLoading = useRef(false);
   const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
   // Timer
@@ -202,12 +203,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     }
   }, [recaptchaErrorMessage, showErrorToastPredefined]);
 
-  const handleResendCode = async () => {
-    if (isResendCodeLoading) {
+  const handleResendCode = useCallback(async () => {
+    if (resentLoading.current) {
       return;
     }
 
     setIsResendCodeLoading(true);
+    resentLoading.current = true;
     setSubmitError('');
 
     try {
@@ -245,13 +247,14 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);
-      setIsResendCodeLoading(false);
       setCodeInitial(new Array(6).join('.').split('.'));
     } catch (err: any) {
-      setIsResendCodeLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
+    } finally {
+      setIsResendCodeLoading(false);
+      resentLoading.current = false;
     }
-  };
+  }, [signupEmailInput, t]);
 
   const handleTryAgain = () => {
     setSubmitError('');

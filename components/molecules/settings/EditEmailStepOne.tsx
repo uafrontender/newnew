@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -35,6 +35,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const codeLoading = useRef(false);
   const [isCodeLoading, setIsCodeLoading] = useState(false);
   const [canResendAt, setCanResendAt] = useState<number>(0);
 
@@ -51,11 +52,12 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const [isCodeSent, setIsCodeSent] = useState(false);
 
   const requestVerificationCode = useCallback(async () => {
-    if (isCodeLoading) {
+    if (codeLoading.current) {
       return;
     }
 
     setIsCodeLoading(true);
+    codeLoading.current = true;
 
     try {
       const sendVerificationCodePayload =
@@ -93,12 +95,13 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
       setCanResendAt(Date.now() + data.retryAfter * 1000);
       setCode(new Array(6).join('.').split('.'));
       setIsCodeSent(true);
-      setIsCodeLoading(false);
     } catch (err: any) {
-      setIsCodeLoading(false);
       console.error(err);
+    } finally {
+      setIsCodeLoading(false);
+      codeLoading.current = false;
     }
-  }, [isCodeLoading, userData?.email, t]);
+  }, [userData?.email, t]);
 
   const resendVerificationCode = async () => {
     Mixpanel.track('Resend Verification Code', {

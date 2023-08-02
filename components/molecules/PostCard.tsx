@@ -20,7 +20,6 @@ import UserAvatar from './UserAvatar';
 import Loader from '../atoms/Loader';
 
 import { formatNumber } from '../../utils/format';
-import { useUserData } from '../../contexts/userDataContext';
 
 import iconLight1 from '../../public/images/svg/numbers/1_light.svg';
 import iconLight2 from '../../public/images/svg/numbers/2_light.svg';
@@ -115,8 +114,7 @@ export const PostCard: React.FC<ICard> = React.memo(
     const { t } = useTranslation('component-PostCard');
     const { t: tCommon } = useTranslation('common');
     const theme = useTheme();
-    const { userData } = useUserData();
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode, userUuid, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -952,7 +950,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 ) : (
                   <SButtonFirst withShrink onClick={handleBidClick}>
                     {postStatus === 'voting' &&
-                    postParsed.creator?.uuid !== userData?.userUuid
+                    postParsed.creator?.uuid !== userUuid
                       ? t(`button.withoutActivity.${typeOfPost}`)
                       : t(`button.seeResults.${typeOfPost}`)}
                   </SButtonFirst>

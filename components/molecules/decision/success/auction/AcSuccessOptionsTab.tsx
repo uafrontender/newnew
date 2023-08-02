@@ -5,7 +5,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useUserData } from '../../../../../contexts/userDataContext';
 import GoBackButton from '../../../GoBackButton';
 import useAcOptions, {
   TAcOptionWithHighestField,
@@ -31,8 +30,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
-  const { userData } = useUserData();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -46,7 +44,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   } = useAcOptions(
     {
       postUuid: post.postUuid,
-      userUuid: userData?.userUuid,
+      userUuid,
       loggedInUser: userLoggedIn,
     },
     {

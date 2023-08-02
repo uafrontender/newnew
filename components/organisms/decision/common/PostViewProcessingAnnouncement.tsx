@@ -5,8 +5,6 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { usePostInnerState } from '../../../../contexts/postInnerContext';
-import { useUserData } from '../../../../contexts/userDataContext';
-
 import Text from '../../../atoms/Text';
 import PostTopInfo from '../../../molecules/decision/common/PostTopInfo';
 import PostTopInfoModeration from '../../../molecules/decision/moderation/PostTopInfoModeration';
@@ -43,8 +41,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
 > = ({ variant }) => {
   const { t } = useTranslation('page-Post');
   const theme = useTheme();
-  const { userData } = useUserData();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -83,9 +80,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<
       )}
       <PostVideoProcessingHolder
         holderText={
-          userLoggedIn && userData?.userUuid === post.postUuid
-            ? 'moderation'
-            : 'decision'
+          userLoggedIn && userUuid === post.postUuid ? 'moderation' : 'decision'
         }
       />
       {isMobile &&

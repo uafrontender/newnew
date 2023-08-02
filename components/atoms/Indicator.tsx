@@ -2,20 +2,25 @@ import React from 'react';
 import styled from 'styled-components';
 
 export interface IIndicator {
+  className?: string;
   counter?: number;
   minified?: boolean;
 }
 
-const Indicator: React.FC<IIndicator> = ({ counter = 0, minified }) => {
+const Indicator: React.FC<IIndicator> = ({
+  className,
+  counter = 0,
+  minified,
+}) => {
   const bigCounter = counter >= 100;
   const valueToDisplay = bigCounter ? 99 : counter;
 
   if (minified) {
-    return <SMinifiedIndicator />;
+    return <SMinifiedIndicator className={className} />;
   }
 
   return (
-    <SIndicator bigCounter={bigCounter}>
+    <SIndicator className={className} bigCounter={bigCounter}>
       {valueToDisplay}
       {bigCounter ? '+' : ''}
     </SIndicator>

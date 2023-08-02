@@ -15,7 +15,8 @@ export const FloatingMessages: React.FC<IFloatingMessages> = ({
   withCounter,
   openChat,
 }) => {
-  const { unreadCountForCreator } = useChatsUnreadMessages();
+  let { unreadCountForCreator } = useChatsUnreadMessages();
+  unreadCountForCreator = 1;
   return (
     <SContainer onClick={openChat}>
       <InlineSVG svg={chatIcon} width='24px' height='24px' />

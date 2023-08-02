@@ -15,7 +15,6 @@ import { useRouter } from 'next/dist/client/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
 import { fetchAcOptionById } from '../../../../api/endpoints/auction';
-import { useUserData } from '../../../../contexts/userDataContext';
 
 import Headline from '../../../atoms/Headline';
 import PostVotingTab from '../../../molecules/decision/common/PostVotingTab';
@@ -60,9 +59,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     const { t } = useTranslation('page-Post');
     const { locale } = useRouter();
     const { showErrorToastCustom } = useErrorToasts();
-    const { userData } = useUserData();
     const { mutedMode, toggleMutedMode } = useUiState();
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode, userUuid, userLoggedIn } = useAppState();
     const {
       userTutorialsProgress,
       userTutorialsProgressSynced,
@@ -170,7 +168,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     } = useAcOptions(
       {
         postUuid: post.postUuid,
-        userUuid: userData?.userUuid,
+        userUuid,
         loggedInUser: userLoggedIn,
       },
       {
@@ -306,7 +304,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         socketConnection,
         post,
         postStatus,
-        userData?.userUuid,
+        userUuid,
         // addOrUpdateAcOptionMutation, - reason unknown
         // handleUpdatePostData, - reason unknown
         // removeAcOptionMutation, - reason unknown
