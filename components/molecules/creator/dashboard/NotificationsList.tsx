@@ -118,11 +118,19 @@ export const NotificationsList: React.FC<IFunction> = () => {
     target: newnewapi.IRoutingTarget | null | undefined
   ): string | undefined => {
     if (target) {
-      if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
+      if (
+        target.creatorDashboard &&
+        target?.creatorDashboard.section ===
+          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.CHATS
+      ) {
         return '/direct-messages';
       }
 
-      if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
+      if (
+        target.creatorDashboard &&
+        target?.creatorDashboard.section ===
+          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.SUBSCRIBERS
+      ) {
         return '/creator/subscribers';
       }
 
