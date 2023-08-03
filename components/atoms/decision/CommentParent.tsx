@@ -148,6 +148,10 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       }
     );
 
+    const onOpenReportModal = useCallback(() => {
+      setConfirmReportUser(true);
+    }, []);
+
     const onSubmitReport = useCallback(
       async (reportData: ReportData) => {
         if (!userLoggedIn) {
@@ -251,20 +255,6 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       },
       [removeCommentMutation, showErrorToastPredefined]
     );
-
-    const onUserReport = useCallback(() => {
-      // Redirect only after the persist data is pulled
-      if (!userLoggedIn) {
-        router.push(
-          `/sign-up?reason=report&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-        return;
-      }
-
-      setConfirmReportUser(true);
-    }, [userLoggedIn, router]);
 
     const onDeleteComment = () => {
       setConfirmDeleteComment(true);
@@ -502,7 +492,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                     }
                     handleClose={handleCloseEllipseMenu}
                     onDeleteComment={onDeleteComment}
-                    onUserReport={onUserReport}
+                    onUserReport={onOpenReportModal}
                     anchorElement={moreButtonRef.current}
                   />
                 )}
@@ -597,7 +587,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
             isMyComment={isMyComment}
             canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
             onClose={handleCloseEllipseMenu}
-            onUserReport={onUserReport}
+            onUserReport={onOpenReportModal}
             onDeleteComment={onDeleteComment}
           />
         ) : null}
