@@ -477,9 +477,13 @@ const SCreatorInfoDiv = styled.div`
   gap: 12px;
 
   margin-top: 32px;
+  padding-left: 8px;
+  padding-right: 8px;
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
+    padding-left: 0;
+    padding-right: 0;
 
     flex-direction: row;
     justify-content: space-between;
