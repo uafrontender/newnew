@@ -775,7 +775,7 @@ const SBid = styled.span`
 `;
 
 const SDate = styled.span`
-  flex-shrink: 1;
+  flex-shrink: 0;
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
