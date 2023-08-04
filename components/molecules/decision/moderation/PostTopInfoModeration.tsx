@@ -515,7 +515,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: min-content 1fr 108px;
+    grid-template-columns: min-content auto min-content;
     align-items: center;
 
     margin-top: initial;
@@ -678,7 +678,7 @@ const SUsername = styled.div`
   align-items: center;
   font-weight: bold;
   font-size: 14px;
-  line-height: 20px;
+  line-height: 24px;
   transition: 0.2s linear;
 `;
 
