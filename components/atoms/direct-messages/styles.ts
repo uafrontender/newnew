@@ -250,6 +250,7 @@ export const SUserAvatar = styled(UserAvatar)`
   flex-shrink: 0;
 `;
 
+// Appearance is delayed to give data time to update, request to finish
 export const SUnreadCount = styled.span<{ show: boolean }>`
   background: ${({ theme }) => theme.colorsThemed.accent.pink};
   border-radius: 50%;
