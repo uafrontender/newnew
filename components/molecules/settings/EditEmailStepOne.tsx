@@ -42,7 +42,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   useEffect(() => {
     const setTimeoutId = setTimeout(() => {
       setIsInputFocused(true);
-    }, 1400);
+    }, 400);
 
     return () => {
       clearTimeout(setTimeoutId);

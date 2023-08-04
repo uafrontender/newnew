@@ -96,6 +96,10 @@ const VerificationCodeInput: React.FunctionComponent<IVerificationInput> = ({
     }
   }, [code, length, onComplete]);
 
+  useEffect(() => {
+    inputs.current[0]?.focus();
+  }, []);
+
   return (
     <>
       {/* Allows tabbing to the input */}
