@@ -515,7 +515,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: min-content auto min-content;
+    grid-template-columns: auto 1fr min-content;
     align-items: center;
 
     margin-top: initial;
@@ -534,6 +534,7 @@ const SBidsAmount = styled.div`
   justify-self: flex-start !important;
   align-self: center;
 
+  white-space: nowrap;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
