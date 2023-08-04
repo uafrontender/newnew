@@ -67,6 +67,11 @@ const ChatListItem: React.FC<IFunctionProps> = ({
     return textTrim(t('chat.noMessagesFirstLine'));
   }, [chatRoom.lastMessage?.content?.text, chatRoom.kind, t]);
 
+  const showUnreadCount = useMemo(
+    () => !isActive && (chatRoom.unreadMessageCount as number) > 0,
+    [isActive, chatRoom.unreadMessageCount]
+  );
+
   return (
     <SChatItem
       onClick={handleItemClick}
@@ -92,9 +97,9 @@ const ChatListItem: React.FC<IFunctionProps> = ({
             {textTrim(lastMsg, 28)}
           </SChatItemLastMessage>
           <SUnreadCountWrapper>
-            {(chatRoom.unreadMessageCount as number) > 0 && !isActive && (
-              <SUnreadCount>{chatRoom.unreadMessageCount}</SUnreadCount>
-            )}
+            <SUnreadCount show={showUnreadCount}>
+              {chatRoom.unreadMessageCount}
+            </SUnreadCount>
           </SUnreadCountWrapper>
         </SChatItemContentWrapper>
       </SChatItemContent>

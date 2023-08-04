@@ -74,7 +74,19 @@ const Notification: React.FC<INotification> = ({
 
   useEffect(() => {
     if (target) {
-      if (target.creatorDashboard && target?.creatorDashboard.section === 1) {
+      if (
+        target.creatorDashboard &&
+        target?.creatorDashboard.section ===
+          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.CHATS
+      ) {
+        setUrl('/direct-messages');
+      }
+
+      if (
+        target.creatorDashboard &&
+        target?.creatorDashboard.section ===
+          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.SUBSCRIBERS
+      ) {
         setUrl('/creator/subscribers');
       }
 

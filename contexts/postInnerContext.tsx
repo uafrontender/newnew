@@ -19,6 +19,7 @@ import { TUpdatePostCoverImageMutation } from '../utils/hooks/usePost';
 import { TPostStatusStringified } from '../utils/switchPostStatus';
 import { TPostType } from '../utils/switchPostType';
 import { useAppState } from './appStateContext';
+import { ReportPostOnSignUp } from './onSignUpWrapper';
 
 const PostInnerContext = createContext<{
   modalContainerRef: MutableRefObject<HTMLDivElement | undefined>;
@@ -217,9 +218,22 @@ const PostContextProvider: React.FunctionComponent<IPostContextProvider> = ({
       }
 
       if (!userLoggedIn) {
+        const onSignUp: ReportPostOnSignUp = {
+          type: 'report-post',
+          postUuid: postParsed.postUuid,
+          message,
+          reasons,
+        };
+
+        const [path, query] = window.location.href.split('?');
+        const onSignUpQuery = `onSignUp=${JSON.stringify(onSignUp)}`;
+        const queryWithOnSignUp = query
+          ? `${query}&${onSignUpQuery}`
+          : onSignUpQuery;
+
         Router.push(
           `/sign-up?reason=report&redirect=${encodeURIComponent(
-            window.location.href
+            `${path}?${queryWithOnSignUp}`
           )}`
         );
 
