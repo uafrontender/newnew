@@ -150,12 +150,6 @@ const SChatListWrapper = styled.div`
   flex-direction: column;
   overflow-y: scroll;
   overscroll-behavior: contain;
-`;
-
-const SChatList = styled.div`
-  height: 100%;
-  overflow-y: scroll;
-  overscroll-behavior: contain;
 
   /* Hide scrollbar */
   ::-webkit-scrollbar {
@@ -163,6 +157,10 @@ const SChatList = styled.div`
   }
   scrollbar-width: none;
   -ms-overflow-style: none;
+`;
+
+const SChatList = styled.div`
+  height: 100%;
 `;
 
 const SRef = styled.span`

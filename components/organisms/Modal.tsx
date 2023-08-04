@@ -155,13 +155,15 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
       : 'blur(16px)'};
 
   overscroll-behavior: 'none';
+
+  // -1px to fix gap in Safari on mobile
   ::before {
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    bottom: 0;
-    height: 100vh;
+    bottom: -1px;
+    height: calc(100vh + 1px);
     content: '';
     z-index: -1;
     position: absolute;
