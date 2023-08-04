@@ -515,7 +515,7 @@ const SWrapper = styled.div<{
               'title title title';
           `}
     grid-template-rows: 40px;
-    grid-template-columns: min-content 1fr 108px;
+    grid-template-columns: auto 1fr min-content;
     align-items: center;
 
     margin-top: initial;
@@ -534,6 +534,7 @@ const SBidsAmount = styled.div`
   justify-self: flex-start !important;
   align-self: center;
 
+  white-space: nowrap;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -678,7 +679,7 @@ const SUsername = styled.div`
   align-items: center;
   font-weight: bold;
   font-size: 14px;
-  line-height: 20px;
+  line-height: 24px;
   transition: 0.2s linear;
 `;
 
