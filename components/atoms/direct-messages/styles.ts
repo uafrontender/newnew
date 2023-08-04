@@ -250,7 +250,8 @@ export const SUserAvatar = styled(UserAvatar)`
   flex-shrink: 0;
 `;
 
-export const SUnreadCount = styled.span`
+// Appearance is delayed to give data time to update, request to finish
+export const SUnreadCount = styled.span<{ show: boolean }>`
   background: ${({ theme }) => theme.colorsThemed.accent.pink};
   border-radius: 50%;
   color: ${({ theme }) => theme.colors.white};
@@ -261,4 +262,10 @@ export const SUnreadCount = styled.span`
   font-weight: 700;
   font-size: 10px;
   margin-left: 6px;
+
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transition-property: opacity;
+  transition-timing-function: ease-in;
+  transition-duration: ${({ show }) => (show ? '200ms' : '0ms')};
+  transition-delay: ${({ show }) => (show ? '1000ms' : '0ms')};
 `;
