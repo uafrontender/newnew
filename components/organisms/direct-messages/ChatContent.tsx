@@ -440,12 +440,14 @@ const ChatContent: React.FC<IFuncProps> = ({
 
   // FocusOn cannot be use because of column reverse
   useEffect(() => {
-    enableOverlayMode();
+    if (isMobileOrTablet) {
+      enableOverlayMode();
+    }
 
     return () => {
       disableOverlayMode();
     };
-  }, [enableOverlayMode, disableOverlayMode]);
+  }, [isMobileOrTablet, enableOverlayMode, disableOverlayMode]);
 
   // react-focus-on cannot be used here because of column-reverse
   useDisableTouchMoveIOS(chatContentRef, isHidden);
