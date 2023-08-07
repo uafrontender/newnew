@@ -67,7 +67,9 @@ const Notification: React.FC<INotification> = ({
 
     const res = await markAsRead(payload);
 
-    if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+    if (res.error) {
+      throw new Error(res.error?.message ?? 'Request failed');
+    }
 
     setIsUnread(false);
   }, [id]);

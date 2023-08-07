@@ -94,7 +94,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         } else if (provider === 'fb') {
           const { code, state } = router.query;
 
-          if (!code || Array.isArray(code)) throw new Error('No code');
+          if (!code || Array.isArray(code)) {
+            throw new Error('No code');
+          }
 
           const requestPayload = new newnewapi.FacebookSignInRequest({
             code,

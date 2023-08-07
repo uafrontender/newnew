@@ -13,6 +13,7 @@ import AnimatedPresence from '../AnimatedPresence';
 import InlineSvg from '../InlineSVG';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import getChunks from '../../../utils/getChunks/getChunks';
+import assertNever from '../../../utils/assertNever';
 
 interface IEditPostTitleTextArea {
   id?: string;
@@ -137,8 +138,7 @@ const EditPostTitleTextArea: React.FunctionComponent<
               return <Hashtag key={index}>#{chunk.text}</Hashtag>;
             }
 
-            // TODO: Add assertNever
-            throw new Error('Unexpected chunk');
+            return assertNever(chunk);
           })}
         </SInputRenderer>
       </SInputContainer>

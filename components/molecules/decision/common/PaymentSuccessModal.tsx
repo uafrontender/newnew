@@ -12,6 +12,7 @@ import AnimatedBackground from '../../../atoms/AnimationBackground';
 import TicketSet from '../../../atoms/bundles/TicketSet';
 import { formatNumber } from '../../../../utils/format';
 import { Mixpanel } from '../../../../utils/mixpanel';
+import assertNever from '../../../../utils/assertNever';
 
 interface IPaymentSuccessModal {
   postType: TPostType;
@@ -75,7 +76,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
           </SImageWrapper>
         );
       default:
-        throw new Error(`unknown post type ${typeOfPost}`);
+        return assertNever(typeOfPost);
     }
   }
 
@@ -88,7 +89,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
       case 'cf':
         return `$${formatNumber(valueToFormat / 100, true)}`;
       default:
-        throw new Error(`unknown post type ${typeOfPost}`);
+        return assertNever(typeOfPost);
     }
   }
 

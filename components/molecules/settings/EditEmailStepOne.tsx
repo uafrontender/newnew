@@ -89,7 +89,7 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         data.status !==
           newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
       ) {
-        throw new Error('Request failed');
+        throw new Error(t('error.requestFailed'));
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);

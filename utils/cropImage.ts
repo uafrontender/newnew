@@ -68,7 +68,10 @@ export default async function getCroppedImg(
   return new Promise((resolve) => {
     canvas.toBlob(
       (blob) => {
-        if (!blob) throw new Error('Error saving image as file');
+        if (!blob) {
+          throw new Error('Error saving image as file');
+        }
+
         const file = new File([blob], filename, {
           type: 'image/jpeg',
         });
