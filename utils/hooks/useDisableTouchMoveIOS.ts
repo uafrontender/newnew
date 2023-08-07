@@ -1,8 +1,7 @@
 import { useEffect, RefObject } from 'react';
 import isIOS from '../isIOS';
-import isSafari from '../isSafari';
 
-const useDisableTouchMoveSafari = (
+const useDisableTouchMoveIOS = (
   containerRef: RefObject<HTMLElement>,
   disabled?: boolean
 ) => {
@@ -14,12 +13,23 @@ const useDisableTouchMoveSafari = (
         '[data-ignore-touch-move-lock="true"]'
       );
 
-      if (
-        targetEl.getAttribute('data-ignore-touch-move-lock') ||
-        [...elementsIgnoredTouchMoveLock].some((childEl) =>
-          childEl.contains(targetEl)
-        )
-      ) {
+      const parentNode = [...elementsIgnoredTouchMoveLock].filter(
+        (elIgnoredTouchMove) => {
+          if (elIgnoredTouchMove.contains(targetEl)) {
+            return true;
+          }
+
+          return false;
+        }
+      )[0];
+
+      if (targetEl.getAttribute('data-ignore-touch-move-lock') || parentNode) {
+        if (parentNode && parentNode.scrollHeight === parentNode.clientHeight) {
+          e.preventDefault();
+
+          return false;
+        }
+
         return true;
       }
       e.preventDefault();
@@ -27,18 +37,18 @@ const useDisableTouchMoveSafari = (
       return false;
     };
 
-    if (isIOS() && isSafari() && !disabled) {
+    if (isIOS() && !disabled) {
       document.addEventListener('touchmove', handleTouchMove, {
         passive: false,
       });
     }
 
     return () => {
-      if (isIOS() && isSafari()) {
+      if (isIOS()) {
         document.removeEventListener('touchmove', handleTouchMove);
       }
     };
   }, [disabled, containerRef]);
 };
 
-export default useDisableTouchMoveSafari;
+export default useDisableTouchMoveIOS;

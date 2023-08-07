@@ -38,9 +38,9 @@ import { SocketContext } from '../../../contexts/socketContext';
 import useMyChatRoom from '../../../utils/hooks/useMyChatRoom';
 import BlockUserModal from '../../molecules/direct-messages/BlockUserModal';
 import ChatAreaCenter from '../../molecules/direct-messages/ChatAreaCenter';
-import usePreventLayoutMoveOnInputFocusSafari from '../../../utils/hooks/usePreventLayoutMoveOnInputFocusSafari';
-import useDisableTouchMoveSafari from '../../../utils/hooks/useDisableTouchMoveSafari';
+import useDisableTouchMoveIOS from '../../../utils/hooks/useDisableTouchMoveIOS';
 import { ReportData } from '../../molecules/ReportModal';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 const ReportModal = dynamic(() => import('../../molecules/ReportModal'));
 const BlockedUser = dynamic(
@@ -84,6 +84,7 @@ const ChatContent: React.FC<IFuncProps> = ({
   const { t } = useTranslation('page-Chat');
   const { isSocketConnected } = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+  const { enableOverlayMode, disableOverlayMode } = useOverlayMode();
 
   const chatContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -91,6 +92,7 @@ const ChatContent: React.FC<IFuncProps> = ({
     initialChatRoom.id as number,
     {
       initialData: initialChatRoom,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -116,6 +118,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
   const [messageText, setMessageText] = useState<string>('');
   const [messageTextValid, setMessageTextValid] = useState(false);
+  const [messageTextError, setMessageTextError] = useState(false);
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [isConfirmBlockUserModalOpen, setIsConfirmBlockUserModalOpen] =
@@ -180,6 +183,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
       setMessageText('');
       setMessageTextValid(false);
+      setMessageTextError(false);
       setSendingMessage(false);
 
       prevChatRoomId.current = chatRoom.id;
@@ -223,6 +227,7 @@ const ChatContent: React.FC<IFuncProps> = ({
 
       const isValid = validateInputText(draft.text);
       setMessageTextValid(isValid);
+      setMessageTextError(false);
       setMessageText(draft.text);
     }
   }, [chatRoom.id, chatsDraft]);
@@ -289,6 +294,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           const res = await sendMessage(payload);
 
           if (!res?.data || res.error) {
+            // 400 Error: Invalid message at purifyChatMessage
             throw new Error(res?.error?.message ?? 'Request failed');
           }
 
@@ -299,7 +305,7 @@ const ChatContent: React.FC<IFuncProps> = ({
           });
 
           // Update Chat
-          refetchChatRoom();
+          await refetchChatRoom();
           setSendingMessage(false);
 
           if (chatContentRef.current) {
@@ -314,6 +320,12 @@ const ChatContent: React.FC<IFuncProps> = ({
           }
         } catch (err) {
           console.error(err);
+          // 400 Error: Invalid message at purifyChatMessage
+          if ((err as Error).message.includes('Invalid message')) {
+            setMessageTextError(true);
+            setMessageTextValid(false);
+          }
+
           setMessageText(tmpMsgText);
           setSendingMessage(false);
         }
@@ -351,6 +363,7 @@ const ChatContent: React.FC<IFuncProps> = ({
       const isValid = validateInputText(value);
       setMessageTextValid(isValid);
       setMessageText(value);
+      setMessageTextError(false);
     },
     [isMobileOrTablet, handleSubmit]
   );
@@ -425,11 +438,19 @@ const ChatContent: React.FC<IFuncProps> = ({
     renewSubscription,
   ]);
 
-  // react-focus-on cannot be used here because of column-reverse
-  useDisableTouchMoveSafari(chatContentRef, isHidden);
+  // FocusOn cannot be use because of column reverse
+  useEffect(() => {
+    if (isMobileOrTablet) {
+      enableOverlayMode();
+    }
 
-  // Needed to prevent soft keyboard from pushing layout up on mobile Safari
-  usePreventLayoutMoveOnInputFocusSafari('data-new-message-textarea');
+    return () => {
+      disableOverlayMode();
+    };
+  }, [isMobileOrTablet, enableOverlayMode, disableOverlayMode]);
+
+  // react-focus-on cannot be used here because of column-reverse
+  useDisableTouchMoveIOS(chatContentRef, isHidden);
 
   const isBottomPartElementVisible =
     !isAnnouncement || isMyAnnouncement || !!whatComponentToDisplay();
@@ -464,16 +485,17 @@ const ChatContent: React.FC<IFuncProps> = ({
                 whatComponentToDisplay()
               ) : (
                 <SBottomTextarea>
-                  <STextArea>
-                    <TextArea
+                  <STextAreaContainer>
+                    <STextArea
                       maxlength={500}
                       value={messageText}
                       onChange={handleChange}
                       placeholder={t('chat.placeholder')}
                       gotMaxLength={handleSubmit}
                       variant={variant}
+                      withError={messageTextError}
                     />
-                  </STextArea>
+                  </STextAreaContainer>
                   <SButton
                     withShadow
                     view={messageTextValid ? 'primaryGrad' : 'secondary'}
@@ -485,6 +507,9 @@ const ChatContent: React.FC<IFuncProps> = ({
                       !messageTextValid ||
                       messageText.length < 1
                     }
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                    }}
                   >
                     <SInlineSVG
                       svg={!sendingMessage ? sendIcon : ''}
@@ -596,8 +621,16 @@ const SBottomTextarea = styled.div`
   flex-direction: row;
 `;
 
-const STextArea = styled.div`
+const STextAreaContainer = styled.div`
   flex: 1;
+`;
+
+const STextArea = styled(TextArea)<{ withError: boolean }>`
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme, withError }) =>
+    withError ? theme.colorsThemed.accent.error : 'transparent'};
+  margin: -1px;
 `;
 
 const SInlineSVG = styled(InlineSVG)`

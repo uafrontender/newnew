@@ -295,3 +295,18 @@ export const setMyTimeZone = (
     payload,
     ...(signal ? { signal } : {}),
   });
+
+export const getTinyUsersBlockedByMe = (
+  payload: newnewapi.GetTinyUsersBlockedByMeRequest,
+  signal?: RequestInit['signal']
+) =>
+  fetchProtobuf<
+    newnewapi.GetTinyUsersBlockedByMeRequest,
+    newnewapi.GetTinyUsersBlockedByMeResponse
+  >({
+    reqT: newnewapi.GetTinyUsersBlockedByMeRequest,
+    resT: newnewapi.GetTinyUsersBlockedByMeResponse,
+    url: `${BASE_URL_USER}/get_tiny_users_i_blocked`,
+    payload,
+    ...(signal ? { signal } : {}),
+  });

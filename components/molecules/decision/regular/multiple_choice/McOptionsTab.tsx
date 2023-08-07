@@ -14,7 +14,6 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FetchNextPageOptions, InfiniteQueryObserverResult } from 'react-query';
 
-import { useUserData } from '../../../../../contexts/userDataContext';
 import { validateText } from '../../../../../api/endpoints/infrastructure';
 import { createCustomOption } from '../../../../../api/endpoints/multiple_choice';
 
@@ -103,8 +102,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const theme = useTheme();
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { userData } = useUserData();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const { userTutorialsProgress, setUserTutorialsProgress } =
     useTutorialProgress();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -188,8 +186,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   );
 
   const optionCreatedByMe = useMemo(
-    () => options.find((option) => option.creator?.uuid === userData?.userUuid),
-    [options, userData?.userUuid]
+    () => options.find((option) => option.creator?.uuid === userUuid),
+    [options, userUuid]
   );
 
   const mainContainer = useRef<HTMLDivElement>();
@@ -680,7 +678,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <Trans
           t={t}
           i18nKey='paymentSuccessModal.mc'
-          components={[<SDisplayName user={postCreator} />]}
+          components={[<DisplayName user={postCreator} />]}
         />
       </PaymentSuccessModal>
       {/* Mobile floating button */}
@@ -959,8 +957,4 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
-`;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
 `;

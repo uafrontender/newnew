@@ -104,7 +104,8 @@ const FaqSection = () => {
           );
         })}
       </SList>
-      <SHint variant={3} weight={600}>
+      {/* Commented out due to service subscription cancellation */}
+      {/* <SHint variant={3} weight={600}>
         <Trans
           i18nKey='faq.learMore'
           t={t}
@@ -115,7 +116,7 @@ const FaqSection = () => {
             />,
           ]}
         />
-      </SHint>
+      </SHint> */}
 
       {/* Left side floating icons */}
       <SSubImageLeftTop
@@ -254,18 +255,19 @@ const SText = styled(Text)`
   }
 `;
 
-const SHint = styled(Text)`
-  margin-top: 24px;
-  color: ${({ theme }) =>
-    theme.name === 'dark'
-      ? theme.colorsThemed.background.outlines2
-      : theme.colorsThemed.text.secondary};
+// Commented out due to service subscription cancellation
+// const SHint = styled(Text)`
+//   margin-top: 24px;
+//   color: ${({ theme }) =>
+//     theme.name === 'dark'
+//       ? theme.colorsThemed.background.outlines2
+//       : theme.colorsThemed.text.secondary};
 
-  ${({ theme }) => theme.media.tablet} {
-    line-height: 20px;
-    font-weight: 500;
-  }
-`;
+//   ${({ theme }) => theme.media.tablet} {
+//     line-height: 20px;
+//     font-weight: 500;
+//   }
+// `;
 
 const SLink = styled.a`
   color: ${({ theme }) => theme.colorsThemed.accent.blue};

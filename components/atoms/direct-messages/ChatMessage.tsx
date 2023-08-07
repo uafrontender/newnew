@@ -7,6 +7,7 @@ import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useUserData } from '../../../contexts/userDataContext';
 import Text from '../Text';
+import { useAppState } from '../../../contexts/appStateContext';
 
 const UserAvatar = dynamic(() => import('../../molecules/UserAvatar'));
 
@@ -29,13 +30,14 @@ const ChatMessage: React.FC<IChatMessage> = ({
 }) => {
   const { t } = useTranslation('page-Chat');
   const { userData } = useUserData();
+  const { userUuid } = useAppState();
 
   const nextElDate = (nextElement?.createdAt?.seconds as number) * 1000;
   const prevElDate = (prevElement?.createdAt?.seconds as number) * 1000;
   const itemElDate = (item.createdAt?.seconds as number) * 1000;
   const prevSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
   const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
-  const isMine = item.sender?.uuid === userData?.userUuid;
+  const isMine = item.sender?.uuid === userUuid;
 
   const prevSameDay =
     !!prevElement?.createdAt &&

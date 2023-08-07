@@ -164,7 +164,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
       if ((err.type && err.type === 'card_error') || !err.type) {
         showErrorToastCustom(err.message);
       }
-      console.error(err, 'err');
+      console.error(err);
     }
   };
 

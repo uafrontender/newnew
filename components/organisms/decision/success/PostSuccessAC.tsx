@@ -24,7 +24,7 @@ import PostSuccessOrWaitingControls from '../../../molecules/decision/common/Pos
 import { useAppState } from '../../../../contexts/appStateContext';
 import DisplayName from '../../../atoms/DisplayName';
 import { useUiState } from '../../../../contexts/uiStateContext';
-import { useResponseNumberFromUrl } from '../../../../contexts/responseNumberFromUrlContext';
+import { useResponseUuidFromUrl } from '../../../../contexts/responseUuidFromUrlContext';
 
 const AcSuccessOptionsTab = dynamic(
   () =>
@@ -52,7 +52,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
 
     const { refetchPost, handleGoBackInsidePost } = usePostInnerState();
 
-    const { responseFromUrl } = useResponseNumberFromUrl();
+    const { responseFromUrl } = useResponseUuidFromUrl();
 
     // Winninfg option
     const [winningOption, setWinningOption] = useState<

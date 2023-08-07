@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, {
   ReactElement,
   useState,
@@ -18,30 +17,21 @@ import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { NextPageWithLayout } from './_app';
-import Lottie from '../components/atoms/Lottie';
 import General from '../components/templates/General';
-import {
-  getMyNotifications,
-  markAllAsRead,
-} from '../api/endpoints/notification';
-import loadingAnimation from '../public/animations/logo-loading-blue.json';
+import Notification from '../components/molecules/notifications/Notification';
+import { markAllAsRead } from '../api/endpoints/notification';
 import { useNotifications } from '../contexts/notificationsContext';
 import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../utils/hooks/usePagination';
 import { SUPPORTED_LANGUAGES } from '../constants/general';
 import { Mixpanel } from '../utils/mixpanel';
 import { useAppState } from '../contexts/appStateContext';
 import { SocketContext } from '../contexts/socketContext';
+import useMyNotifications from '../utils/hooks/useMyNotifications';
+import Loader from '../components/atoms/Loader';
 
 const NoResults = dynamic(
   () => import('../components/molecules/notifications/NoResults')
-);
-const Notification = dynamic(
-  () => import('../components/molecules/notifications/Notification')
 );
 
 export const Notifications = () => {
@@ -65,35 +55,18 @@ export const Notifications = () => {
     fetchNotificationCount,
   } = useNotifications();
 
-  const loadData = useCallback(
-    async (
-      paging: Paging
-    ): Promise<PaginatedResponse<newnewapi.INotification>> => {
-      const payload = new newnewapi.GetMyNotificationsRequest({
-        paging,
-      });
+  const { data, isLoading, hasNextPage, isFetched, fetchNextPage } =
+    useMyNotifications({
+      limit: 6,
+    });
 
-      const res = await getMyNotifications(payload);
+  const notifications = useMemo(() => {
+    if (data) {
+      return data.pages.map((page) => page.notifications).flat();
+    }
 
-      if (!res?.data || res.error) {
-        throw new Error(res?.error?.message ?? 'Request failed');
-      }
-
-      return {
-        nextData: res.data.notifications,
-        nextPageToken: res.data.paging?.nextPageToken,
-      };
-    },
-    []
-  );
-
-  const {
-    data: notifications,
-    loading,
-    hasMore,
-    initialLoadDone,
-    loadMore,
-  } = usePagination(loadData, 6);
+    return [];
+  }, [data]);
 
   const handleMarkAllAsRead = useCallback(async () => {
     try {
@@ -128,10 +101,10 @@ export const Notifications = () => {
   }, [unreadNotificationCount, notificationsDataLoaded]);
 
   useEffect(() => {
-    if (inView && !loading && hasMore) {
-      loadMore().catch((e) => console.error(e));
+    if (inView && !isLoading && hasNextPage) {
+      fetchNextPage();
     }
-  }, [inView, loading, hasMore, loadMore]);
+  }, [inView, isLoading, hasNextPage, fetchNextPage]);
 
   useEffect(() => {
     if (!userLoggedIn) {
@@ -149,15 +122,13 @@ export const Notifications = () => {
   }, []);
 
   useEffect(() => {
-    const handleNotificationCreated = async (data: any) => {
-      const arr = new Uint8Array(data);
+    const handleNotificationCreated = async (newData: any) => {
+      const arr = new Uint8Array(newData);
       const decoded = newnewapi.NotificationCreated.decode(arr);
 
       if (!decoded) {
         return;
       }
-
-      console.log(decoded);
 
       setNewNotifications((curr) => {
         if (!decoded.notification) {
@@ -233,37 +204,25 @@ export const Notifications = () => {
             </SButton>
           )}
         </SHeadingWrapper>
-        {displayedNotifications.length > 0 ? (
-          displayedNotifications?.map((notification) =>
-            renderNotification(notification, currentTime)
-          )
-        ) : !hasMore ? (
-          <NoResults />
-        ) : !initialLoadDone ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        ) : null}
+        {/* Loading */}
+        {!isFetched && <SLoader size='md' />}
 
-        {initialLoadDone && hasMore && !loading && (
-          <SRef ref={scrollRef}>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
-              }}
-            />
-          </SRef>
+        {/* Notifications */}
+        {displayedNotifications.length > 0 && (
+          <>
+            {displayedNotifications?.map((notification) =>
+              renderNotification(notification, currentTime)
+            )}
+            {isFetched && hasNextPage && !isLoading && (
+              <SRef ref={scrollRef}>
+                <SLoader size='md' />
+              </SRef>
+            )}
+          </>
         )}
+
+        {/* No notifications */}
+        {isFetched && displayedNotifications.length === 0 && <NoResults />}
       </SContent>
     </>
   );
@@ -321,6 +280,8 @@ const SHeadingWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 14px;
+  min-height: 60px;
+
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 20px;
   }
@@ -329,9 +290,11 @@ const SHeadingWrapper = styled.div`
 const SHeading = styled.h2`
   font-weight: 600;
   font-size: 22px;
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 28px;
   }
+
   ${({ theme }) => theme.media.desktop} {
     font-size: 32px;
     line-height: 40px;
@@ -345,4 +308,11 @@ const SButton = styled(Button)`
 const SRef = styled.span`
   overflow: hidden;
   text-align: center;
+`;
+
+const SLoader = styled(Loader)`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

@@ -528,8 +528,12 @@ export async function fetchProtobuf<
         });
         return res;
       } catch (errSecondAttempt) {
-        cookiesInstance.remove('accessToken');
-        cookiesInstance.remove('refreshToken');
+        cookiesInstance.remove('accessToken', {
+          path: '/',
+        });
+        cookiesInstance.remove('refreshToken', {
+          path: '/',
+        });
 
         // If error is auth-related - throw
         if ((errSecondAttempt as Error).message === 'Refresh token invalid') {
@@ -544,8 +548,12 @@ export async function fetchProtobuf<
 
     // If error is auth-related - throw
     if ((errFirstAttempt as Error).message === 'No token') {
-      cookiesInstance.remove('accessToken');
-      cookiesInstance.remove('refreshToken');
+      cookiesInstance.remove('accessToken', {
+        path: '/',
+      });
+      cookiesInstance.remove('refreshToken', {
+        path: '/',
+      });
       throw new Error((errFirstAttempt as Error).message);
     }
 

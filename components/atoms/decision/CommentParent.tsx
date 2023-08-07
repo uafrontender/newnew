@@ -104,7 +104,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
     const router = useRouter();
     const { t } = useTranslation('page-Post');
     const { userData } = useUserData();
-    const { resizeMode, userLoggedIn } = useAppState();
+    const { resizeMode, userUuid, userLoggedIn } = useAppState();
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
@@ -125,8 +125,8 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
     const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
     const isMyComment = useMemo(
-      () => userLoggedIn && userData?.userUuid === comment.sender?.uuid,
-      [userLoggedIn, userData?.userUuid, comment.sender?.uuid]
+      () => userLoggedIn && userUuid === comment.sender?.uuid,
+      [userLoggedIn, userUuid, comment.sender?.uuid]
     );
 
     const {
@@ -147,6 +147,10 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         enabled: isReplyFormOpen,
       }
     );
+
+    const onOpenReportModal = useCallback(() => {
+      setConfirmReportUser(true);
+    }, []);
 
     const onSubmitReport = useCallback(
       async (reportData: ReportData) => {
@@ -211,6 +215,15 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
           addCommentMutation?.mutate(res.data.comment);
         }
 
+        setTimeout(() => {
+          document
+            ?.getElementById(`comment_id_${res.data?.comment?.id}`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+        }, 100);
+
         if (res.data?.comment && !res.error) {
           return {
             data: res.data.comment,
@@ -242,20 +255,6 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       },
       [removeCommentMutation, showErrorToastPredefined]
     );
-
-    const onUserReport = useCallback(() => {
-      // Redirect only after the persist data is pulled
-      if (!userLoggedIn) {
-        router.push(
-          `/sign-up?reason=report&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-        return;
-      }
-
-      setConfirmReportUser(true);
-    }, [userLoggedIn, router]);
 
     const onDeleteComment = () => {
       setConfirmDeleteComment(true);
@@ -312,57 +311,66 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
       [comment.id, updateCommentReplies]
     );
 
-    useEffect(() => {
-      const socketHandlerMessageCreated = async (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.CommentMessageCreated.decode(arr);
-        if (
-          decoded?.newComment &&
-          decoded.newComment!!.sender?.uuid !== userData?.userUuid &&
-          decoded.newComment?.parentCommentId &&
-          decoded.newComment.parentCommentId === comment.id
-        ) {
-          addCommentMutation?.mutate(decoded.newComment);
-        }
-      };
+    useEffect(
+      () => {
+        const socketHandlerMessageCreated = async (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.CommentMessageCreated.decode(arr);
+          if (
+            decoded?.newComment &&
+            decoded.newComment!!.sender?.uuid !== userUuid &&
+            decoded.newComment?.parentCommentId &&
+            decoded.newComment.parentCommentId === comment.id
+          ) {
+            addCommentMutation?.mutate(decoded.newComment);
+          }
+        };
 
-      const socketHandlerMessageDeleted = (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.CommentMessageDeleted.decode(arr);
-        if (
-          decoded.deletedComment &&
-          decoded.deletedComment?.parentCommentId &&
-          decoded.deletedComment.parentCommentId === comment.id
-        ) {
-          removeCommentMutation?.mutate(decoded.deletedComment);
-        }
-      };
+        const socketHandlerMessageDeleted = (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.CommentMessageDeleted.decode(arr);
+          if (
+            decoded.deletedComment &&
+            decoded.deletedComment?.parentCommentId &&
+            decoded.deletedComment.parentCommentId === comment.id
+          ) {
+            removeCommentMutation?.mutate(decoded.deletedComment);
+          }
+        };
 
-      if (socketConnection) {
-        socketConnection?.on(
-          'CommentMessageCreated',
-          socketHandlerMessageCreated
-        );
-        socketConnection?.on(
-          'CommentMessageDeleted',
-          socketHandlerMessageDeleted
-        );
-      }
-
-      return () => {
-        if (socketConnection && socketConnection?.connected) {
-          socketConnection?.off(
+        if (socketConnection) {
+          socketConnection?.on(
             'CommentMessageCreated',
             socketHandlerMessageCreated
           );
-          socketConnection?.off(
+          socketConnection?.on(
             'CommentMessageDeleted',
             socketHandlerMessageDeleted
           );
         }
-      };
+
+        return () => {
+          if (socketConnection && socketConnection?.connected) {
+            socketConnection?.off(
+              'CommentMessageCreated',
+              socketHandlerMessageCreated
+            );
+            socketConnection?.off(
+              'CommentMessageDeleted',
+              socketHandlerMessageDeleted
+            );
+          }
+        };
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, comment?.id, userData?.userUuid]);
+      [
+        socketConnection,
+        comment?.id,
+        userUuid,
+        // addCommentMutation, - reason unknown
+        // removeCommentMutation, - reason unknown
+      ]
+    );
 
     const moreButtonRef: any = useRef<HTMLButtonElement>();
 
@@ -380,10 +388,10 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
         >
           {!comment.isDeleted && !comment?.sender?.options?.isTombstone ? (
             comment.sender?.options?.isVerified ||
-            comment.sender?.uuid === userData?.userUuid ? (
+            comment.sender?.uuid === userUuid ? (
               <Link
                 href={
-                  comment.sender?.uuid === userData?.userUuid
+                  comment.sender?.uuid === userUuid
                     ? userData?.options?.isCreator
                       ? '/profile/my-posts'
                       : '/profile'
@@ -412,16 +420,16 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               {!comment.isDeleted ? (
                 <>
                   {comment.sender?.options?.isVerified ||
-                  comment.sender?.uuid === userData?.userUuid ? (
+                  comment.sender?.uuid === userUuid ? (
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === userData?.userUuid
+                        comment.sender?.uuid === userUuid
                           ? t('comments.me')
                           : undefined
                       }
                       href={
-                        comment.sender?.uuid === userData?.userUuid
+                        comment.sender?.uuid === userUuid
                           ? userData?.options?.isCreator
                             ? '/profile/my-posts'
                             : '/profile'
@@ -432,7 +440,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                     <SDisplayName
                       user={comment.sender}
                       altName={
-                        comment.sender?.uuid === userData?.userUuid
+                        comment.sender?.uuid === userUuid
                           ? t('comments.me')
                           : undefined
                       }
@@ -484,7 +492,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
                     }
                     handleClose={handleCloseEllipseMenu}
                     onDeleteComment={onDeleteComment}
-                    onUserReport={onUserReport}
+                    onUserReport={onOpenReportModal}
                     anchorElement={moreButtonRef.current}
                   />
                 )}
@@ -579,7 +587,7 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
             isMyComment={isMyComment}
             canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
             onClose={handleCloseEllipseMenu}
-            onUserReport={onUserReport}
+            onUserReport={onOpenReportModal}
             onDeleteComment={onDeleteComment}
           />
         ) : null}
@@ -729,7 +737,7 @@ const SActionsDiv = styled.div`
 const SDisplayName = styled(DisplayName)<{
   noHover?: boolean;
 }>`
-  flex-shrink: 0;
+  flex-shrink: 1;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: ${({ noHover }) => (!noHover ? 'pointer' : 'default')};
 
@@ -757,7 +765,7 @@ const SBid = styled.span`
 `;
 
 const SDate = styled.span`
-  flex-shrink: 1;
+  flex-shrink: 0;
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;

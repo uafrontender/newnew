@@ -7,7 +7,6 @@ import React, {
   useCallback,
 } from 'react';
 import { newnewapi } from 'newnew-api';
-import { useUserData } from './userDataContext';
 import { getUnreadNotificationCount } from '../api/endpoints/notification';
 import { SocketContext } from './socketContext';
 import { useAppState } from './appStateContext';
@@ -25,9 +24,7 @@ interface INotificationsProvider {
 export const NotificationsProvider: React.FC<INotificationsProvider> = ({
   children,
 }) => {
-  // TODO: add user uuid to the token, parse in AppStateContext, use instead of Context
-  const { userData } = useUserData();
-  const { userLoggedIn } = useAppState();
+  const { userUuid, userLoggedIn } = useAppState();
   const [unreadNotificationCount, setUnreadNotificationCount] =
     useState<number>(0);
   const [notificationsDataLoaded, setNotificationsDataLoaded] = useState(false);
@@ -62,7 +59,7 @@ export const NotificationsProvider: React.FC<INotificationsProvider> = ({
 
   useEffect(() => {
     fetchNotificationCount();
-  }, [fetchNotificationCount, userData?.userUuid]);
+  }, [fetchNotificationCount, userUuid]);
 
   useEffect(() => {
     const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {

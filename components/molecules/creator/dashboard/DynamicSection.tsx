@@ -32,6 +32,7 @@ import { useBundles } from '../../../../contexts/bundlesContext';
 import { useAppState } from '../../../../contexts/appStateContext';
 import Loader from '../../../atoms/Loader';
 import { useChatsUnreadMessages } from '../../../../contexts/chatsUnreadMessagesContext';
+import { useMyNotificationsActions } from '../../../../utils/hooks/useMyNotifications';
 
 const SearchInput = dynamic(() => import('./SearchInput'));
 const ChatContent = dynamic(
@@ -74,9 +75,12 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState<TElementAnimations>('o-12');
   const [isLoading, setIsLoading] = useState(false);
-  const [markReadNotifications, setMarkReadNotifications] = useState(false);
   const [activeChatRoom, setActiveChatRoom] =
     useState<newnewapi.IChatRoom | null>(null);
+
+  const { markAllAsReadMutation } = useMyNotificationsActions();
+
+  const { mutate: markAllAsRead } = markAllAsReadMutation;
 
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
@@ -175,11 +179,8 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
       _component: 'DynamicSection',
     });
 
-    setMarkReadNotifications(true);
-    setTimeout(() => {
-      setMarkReadNotifications(false);
-    }, 1500);
-  }, [baseUrl]);
+    markAllAsRead();
+  }, [baseUrl, markAllAsRead]);
 
   const handleBulkMessageClick = useCallback(() => {
     setShowNewMessageModal(true);
@@ -427,11 +428,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
               </SSectionTopLineButtons>
             </SSectionTopLine>
             <SSectionContent isSmallPadding={tab === 'chat'}>
-              {tab === 'notifications' && (
-                <NotificationsList
-                  markReadNotifications={markReadNotifications}
-                />
-              )}
+              {tab === 'notifications' && <NotificationsList />}
               {(tab === 'chat' || tab === 'direct-messages') && (
                 <ChatList
                   myRole={newnewapi.ChatRoom.MyRole.CREATOR}

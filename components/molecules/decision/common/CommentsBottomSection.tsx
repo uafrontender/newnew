@@ -13,7 +13,6 @@ import CommentForm, {
   TCommentFormAreaHandle,
 } from '../../../atoms/decision/CommentForm';
 
-import { useUserData } from '../../../../contexts/userDataContext';
 import { TCommentWithReplies } from '../../../interfaces/tcomment';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
@@ -38,8 +37,7 @@ interface ICommentsBottomSection {
 const CommentsBottomSection: React.FunctionComponent<
   ICommentsBottomSection
 > = ({ postUuid, postShortId, canDeleteComments, onFormFocus, onFormBlur }) => {
-  const { userData } = useUserData();
-  const { userLoggedIn } = useAppState();
+  const { userUuid, userLoggedIn } = useAppState();
   const { showErrorToastPredefined } = useErrorToasts();
   const { resizeMode } = useAppState();
 
@@ -95,6 +93,29 @@ const CommentsBottomSection: React.FunctionComponent<
 
       if (res.data?.comment) {
         addCommentMutation?.mutate(res.data.comment);
+
+        const scrollingContainer = document?.getElementById(
+          'comments-scrolling-container'
+        );
+
+        if (scrollingContainer) {
+          if (!isMobile) {
+            scrollingContainer.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          } else {
+            const scrollTo = document
+              ?.getElementById('comments')
+              ?.getBoundingClientRect()?.y;
+            if (scrollTo) {
+              document.documentElement?.scrollBy({
+                top: scrollTo,
+                behavior: 'smooth',
+              });
+            }
+          }
+        }
       }
 
       if (res.data?.comment && !res.error) {
@@ -106,7 +127,7 @@ const CommentsBottomSection: React.FunctionComponent<
         error: res?.error || new Error('Could not add comment'),
       };
     },
-    [addCommentMutation, postUuid]
+    [addCommentMutation, isMobile, postUuid]
   );
 
   const handleDeleteComment = useCallback(
@@ -147,7 +168,7 @@ const CommentsBottomSection: React.FunctionComponent<
 
       if (
         decoded?.newComment &&
-        decoded.newComment!!.sender?.uuid !== userData?.userUuid &&
+        decoded.newComment!!.sender?.uuid !== userUuid &&
         !decoded.newComment?.parentCommentId
       ) {
         addCommentMutation?.mutate(decoded.newComment);
@@ -202,7 +223,7 @@ const CommentsBottomSection: React.FunctionComponent<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, userData?.userUuid]);
+  }, [socketConnection, userUuid]);
 
   // Cleanup
   useEffect(

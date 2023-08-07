@@ -66,23 +66,23 @@ interface ISContainer {
   isCreator: boolean;
 }
 
-// NOTE: 'transform: translateZ(0);' and '-1px' needed to fix mobile Safari issue with transparent line under navigation bar
+// NOTE: -1px needed to fix mobile Safari issue with transparent line under navigation bar
 const SContainer = styled.nav<ISContainer>`
-  position: sticky;
-  position: -webkit-sticky; /* Safari */
+  position: fixed;
   left: 0;
   width: 100vw;
-  bottom: ${(props) => (props.visible ? '-1px' : '-60px')};
+  bottom: -1px;
   z-index: 10;
   padding: 0 2px;
   display: flex;
-  transition: bottom ease 0.5s;
+  transition: transform ease 0.5s;
   align-items: center;
   justify-content: ${({ isCreator }) =>
     isCreator ? 'space-around' : 'center'};
   background-color: ${(props) => props.theme.colorsThemed.background.primary};
 
-  transform: translateZ(0);
+  transform: ${(props) =>
+    props.visible ? 'translate3d(0, -1px, 0)' : 'translate3d(0, 60px, 0)'};
 
   ${({ theme }) => theme.media.tablet} {
     display: none;

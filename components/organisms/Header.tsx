@@ -67,12 +67,14 @@ const SWrapper = styled.header<ISWrapper>`
   position: sticky;
   position: -webkit-sticky; /* Safari */
 
-  top: ${(props) =>
-    props.visible ? `${props.withBanner ? 0 : '-41px'}` : '-96px'};
+  top: 0;
+  transform: ${(props) =>
+    props.visible
+      ? `${props.withBanner ? 0 : 'translate3d(0, -41px, 0)'}`
+      : 'translate3d(0, -96px, 0)'};
   margin-top: ${({ withBanner }) => `${withBanner ? 0 : '-41px'}`};
 
   left: 0;
-  transform: translateZ(0);
   width: 100vw;
   z-index: 11;
 

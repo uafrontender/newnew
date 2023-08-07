@@ -14,7 +14,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useUserData } from '../../../../contexts/userDataContext';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
 import PostTimer from '../../../molecules/decision/common/PostTimer';
@@ -57,9 +56,8 @@ interface IPostViewAC {}
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { userData } = useUserData();
   const { mutedMode, toggleMutedMode } = useUiState();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const {
     userTutorialsProgress,
     userTutorialsProgressSynced,
@@ -137,7 +135,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
   } = useAcOptions(
     {
       postUuid: post.postUuid,
-      userUuid: userData?.userUuid,
+      userUuid,
       loggedInUser: userLoggedIn,
     },
     {
@@ -261,7 +259,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
     [
       socketConnection,
       post,
-      userData?.userUuid,
+      userUuid,
       // addOrUpdateAcOptionMutation, - reason unknown
       // fetchPostLatestData, - reason unknown
       // handleUpdatePostData, - reason unknown
@@ -542,7 +540,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.ac'
-              components={[<SDisplayName user={post.creator} />]}
+              components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}
@@ -670,7 +668,3 @@ const SCommentsHeadline = styled(Headline)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
-`;

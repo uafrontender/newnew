@@ -1,11 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  useDeferredValue,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { css, useTheme } from 'styled-components';
@@ -218,9 +212,10 @@ export const General: React.FC<IGeneral> = (props) => {
     [restrictMaxWidth]
   );
 
-  const isBottomNavigationVisible = useDeferredValue(
-    mobileNavigationVisible && !globalSearchActive
-  );
+  const isBottomNavigationVisible =
+    mobileNavigationVisible && !globalSearchActive;
+
+  const isNoMobileNavigation = noMobileNavigation && isMobile;
 
   return (
     <>
@@ -235,23 +230,31 @@ export const General: React.FC<IGeneral> = (props) => {
           baseColor={theme.colorsThemed.background.secondary}
           highlightColor={theme.colorsThemed.background.tertiary}
         >
-          <Header
-            visible={!isMobile || mobileNavigationVisible || globalSearchActive}
-          />
-          <SContent noPaddingTop={!!noMobileNavigation}>
-            <Container {...containerParams}>
-              <Row noPaddingMobile={noPaddingMobile}>
-                <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
-              </Row>
-            </Container>
-          </SContent>
+          <TopContainer>
+            {!isNoMobileNavigation && (
+              <Header
+                visible={
+                  !isMobile || mobileNavigationVisible || globalSearchActive
+                }
+              />
+            )}
+            <SContent noPaddingTop={!!noMobileNavigation}>
+              <Container {...containerParams}>
+                <Row noPaddingMobile={noPaddingMobile}>
+                  <Col noPaddingMobile={noPaddingMobile}>{children}</Col>
+                </Row>
+              </Container>
+            </SContent>
+          </TopContainer>
           <Footer />
-          <BottomNavigation
-            collection={bottomNavigation}
-            moreMenuMobileOpen={moreMenuMobileOpen}
-            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
-            visible={isBottomNavigationVisible}
-          />
+          {!isNoMobileNavigation && (
+            <BottomNavigation
+              collection={bottomNavigation}
+              moreMenuMobileOpen={moreMenuMobileOpen}
+              handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+              visible={isBottomNavigationVisible}
+            />
+          )}
           {hasMounted ? (
             <>
               <SortingContainer
@@ -327,6 +330,12 @@ const SBaseLayout = styled(BaseLayout)<ISWrapper>`
     }
     scrollbar-width: none;
   }
+`;
+
+const TopContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 `;
 
 const SContent = styled.main<{

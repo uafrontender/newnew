@@ -59,7 +59,7 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
     isFetchingNextPage,
     isFetched,
   } = useChatRoomMessages({
-    limit: isIOS() ? 8 : 20,
+    limit: isIOS() ? 12 : 20,
     roomId: chatRoom?.id,
   });
 
@@ -73,7 +73,9 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       const payload = new newnewapi.MarkRoomAsReadRequest({
         roomId: chatRoom.id as number,
       });
+
       const res = await markRoomAsRead(payload);
+
       if (!res?.data || res.error) {
         throw new Error(res?.error?.message ?? 'Request failed');
       }

@@ -14,7 +14,6 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useUserData } from '../../../../contexts/userDataContext';
 import { canCreateCustomOption } from '../../../../api/endpoints/multiple_choice';
 
 import PostVideo from '../../../molecules/decision/common/PostVideo';
@@ -62,9 +61,8 @@ interface IPostViewMC {}
 const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
   const { t } = useTranslation('page-Post');
   const { showErrorToastCustom } = useErrorToasts();
-  const { userData } = useUserData();
   const { mutedMode, toggleMutedMode } = useUiState();
-  const { resizeMode, userLoggedIn } = useAppState();
+  const { resizeMode, userUuid, userLoggedIn } = useAppState();
   const {
     userTutorialsProgress,
     userTutorialsProgressSynced,
@@ -170,7 +168,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     {
       postUuid: post.postUuid,
       loggedInUser: userLoggedIn,
-      userUuid: userData?.userUuid,
+      userUuid,
     },
     {
       onError: (err) => {
@@ -312,7 +310,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
     [
       socketConnection,
       post,
-      userData?.userUuid,
+      userUuid,
       // addOrUpdateAcOptionMutation, - reason unknown
       // fetchPostLatestData, - reason unknown
       // handleUpdatePostData, - reason unknown
@@ -571,7 +569,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(() => {
             <Trans
               t={t}
               i18nKey='paymentSuccessModal.mc'
-              components={[<SDisplayName user={post.creator} />]}
+              components={[<DisplayName user={post.creator} />]}
             />
           </PaymentSuccessModal>
         )}
@@ -794,7 +792,3 @@ const SHighlightedButton = styled(HighlightedButton)`
 `;
 
 const SCommentsSection = styled.div``;
-
-const SDisplayName = styled(DisplayName)`
-  max-width: 100%;
-`;
