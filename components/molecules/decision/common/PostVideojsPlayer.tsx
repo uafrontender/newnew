@@ -130,6 +130,8 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const wasVideoPlayingBeforeScrubberChangeTimeRef = useRef(false);
 
+    const isVideoShouldBeResumeOnPageFocus = useRef(false);
+
     const handlePlayerScrubberChangeTime = useCallback(
       (newValue: number) => {
         if (timeoutIdRef.current) {
@@ -177,6 +179,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     const handleToggleVideoPaused = useCallback(() => {
       if (!playerRef.current?.paused()) {
         playerRef.current?.pause();
+        isVideoShouldBeResumeOnPageFocus.current = false;
       } else {
         playerRef.current?.play()?.catch(() => {
           setIsPaused(true);
@@ -270,6 +273,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
           // Paused state
           p?.on('play', () => {
+            isVideoShouldBeResumeOnPageFocus.current = true;
             setIsPaused(false);
           });
           p?.on('pause', () => {
@@ -291,6 +295,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
           p?.on('loadstart', (e) => {
             setIsLoading(true);
           });
+
           p?.on('canplay', (e) => {
             setCurrentVolume(p?.volume());
             setIsLoading(false);
@@ -365,6 +370,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     const handlePlayPseudoButtonClick = useCallback(() => {
       if (!playerRef.current?.paused()) {
         playerRef.current?.pause();
+        isVideoShouldBeResumeOnPageFocus.current = false;
       } else {
         playerRef.current?.play()?.catch(() => {
           setIsPaused(true);
@@ -587,6 +593,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
       if (!playerRef.current?.paused()) {
         playerRef.current?.pause();
+        isVideoShouldBeResumeOnPageFocus.current = false;
       } else {
         playerRef.current?.play()?.catch(() => {
           setIsPaused(true);
@@ -724,6 +731,7 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
 
           if (!playerRef.current?.paused()) {
             playerRef.current?.pause();
+            isVideoShouldBeResumeOnPageFocus.current = false;
           } else {
             playerRef.current?.play()?.catch(() => {
               setIsPaused(true);
@@ -771,6 +779,53 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
         !isScrubberTimeChanging,
       [isActive, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]
     );
+
+
+    useEffect(() => {
+      let time = playerRef.current.currentTime();
+
+      const handleBlue = () => {
+        try {
+          console.log('BLUR');
+
+          playerRef.current.pause();
+
+          time = playerRef.current.currentTime();
+
+          playerRef.current.one('play', () => {
+            if (!playerRef.current) {
+              return;
+            }
+
+            playerRef.current?.play();
+            playerRef.current.currentTime(time);
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      const handleFocus = () => {
+        try {
+          if (isVideoShouldBeResumeOnPageFocus.current) {
+            console.log('SHOULD BE PLAYED');
+            playerRef.current?.play();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      window.addEventListener('focus', handleFocus);
+
+      window.addEventListener('blur', handleBlue);
+
+      return () => {
+        window.removeEventListener('focus', handleFocus);
+
+        window.removeEventListener('blur', handleBlue);
+      };
+    }, []);
 
     return (
       <SContent

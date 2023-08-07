@@ -87,7 +87,7 @@
     "styled-components": "5.3.3",
     "uuidv4": "6.2.13",
     "validator": "13.7.0",
-    "video.js": "7.21.3",
+    "video.js": "^8.3.0",
     "videojs-contrib-quality-levels": "3.0.0"
   },
   "devDependencies": {
