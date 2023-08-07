@@ -71,9 +71,8 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
         sendVerificationCodePayload
       );
 
-      // TODO: Add translations
       if (!data || error) {
-        throw new Error('Request failed');
+        throw new Error(t('error.requestFailed'));
       }
 
       if (

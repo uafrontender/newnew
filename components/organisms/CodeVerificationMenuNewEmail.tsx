@@ -166,9 +166,8 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
 
       const { data, error } = await sendVerificationNewEmail(payload);
 
-      // TODO: Add translations
       if (!data || error) {
-        throw new Error('Request failed');
+        throw new Error(t('error.requestFailed'));
       }
 
       if (
@@ -191,7 +190,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         data.status !==
           newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
       ) {
-        throw new Error('Request failed');
+        throw new Error(t('error.requestFailed'));
       }
 
       setIsResendCodeLoading(false);

@@ -314,9 +314,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Email
   const [emailInEdit, setEmailInEdit] = useState(userData?.email ?? '');
-  const [emailError, setEmailError] = useState('');
+  const [emailError, setEmailError] = useState<
+    'invalidEmail' | 'emailTaken' | 'requestFailed' | undefined
+  >(undefined);
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (emailError) setEmailError('');
+    if (emailError) {
+      setEmailError(undefined);
+    }
     setEmailInEdit(e.target.value);
   };
 
@@ -531,7 +535,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
-        // TODO: Add translations
         if (!res?.data || res.error) {
           throw new Error('Request failed');
         }
@@ -601,8 +604,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
       console.error(err);
       setLoadingModalOpen(false);
 
-      if ((err as Error).message && (err as Error).message === 'Email taken') {
+      if (
+        (err as Error).message &&
+        (err as Error).message === 'Incorrect email'
+      ) {
+        setEmailError('invalidEmail');
+      } else if (
+        (err as Error).message &&
+        (err as Error).message === 'Email already taken'
+      ) {
         setEmailError('emailTaken');
+      }
+      if (
+        (err as Error).message &&
+        (err as Error).message === 'Request failed'
+      ) {
+        setEmailError('requestFailed');
       } else if (
         (err as Error).message &&
         (err as Error).message.includes('Uploaded image')
@@ -902,8 +919,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               )}
               errorCaption={
                 emailError
-                  ? t('detailsSection.form.email.errors.emailTaken')
-                  : t('detailsSection.form.email.errors.invalidEmail')
+                  ? t(`detailsSection.form.email.errors.${emailError}`)
+                  : undefined
               }
               onChange={handleEmailInput}
               readOnly={!!userData?.email}

@@ -225,9 +225,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
       const { data, error } = await sendVerificationEmail(payload);
 
-      // TODO: Add translations
       if (!data || error) {
-        throw new Error('Request failed');
+        throw new Error(t('error.requestFailed'));
       }
 
       if (
@@ -243,7 +242,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         data.status !==
           newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
       ) {
-        throw new Error('Request failed');
+        throw new Error(t('error.requestFailed'));
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);
