@@ -46,18 +46,12 @@ const ChatList: React.FC<IChatList> = ({
 
   const { searchChatroom } = useGetChats();
 
-  const { data, isLoading, hasNextPage, isFetched, fetchNextPage, refetch } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useMyChatRooms({
       myRole: searchChatroom ? undefined : myRole,
       searchQuery: searchChatroom,
       announcementsName: t('announcement.announcements'),
     });
-
-  useEffect(() => {
-    if (onChatListFetched) {
-      onChatListFetched(isFetched);
-    }
-  }, [isFetched, onChatListFetched]);
 
   const chatRooms: newnewapi.IChatRoom[] = useMemo(() => {
     if (data) {
@@ -106,7 +100,6 @@ const ChatList: React.FC<IChatList> = ({
             : {}
         }
         className={className}
-        data-body-scroll-lock-ignore
       >
         {/* Loading state */}
         {isLoading && <Loader size='md' isStatic />}
