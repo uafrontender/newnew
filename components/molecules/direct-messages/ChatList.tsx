@@ -25,7 +25,6 @@ interface IChatList {
   className?: string;
   forwardRef?: RefObject<HTMLDivElement>;
   onChatRoomSelect: (chatRoom: newnewapi.IChatRoom) => void;
-  onChatListFetched?: (value: boolean) => void;
 }
 
 const ChatList: React.FC<IChatList> = ({
@@ -34,7 +33,6 @@ const ChatList: React.FC<IChatList> = ({
   className,
   forwardRef,
   onChatRoomSelect: onChatRoomSelected,
-  onChatListFetched,
 }) => {
   const { t } = useTranslation('page-Chat');
   const { ref: scrollRef, inView } = useInView();
