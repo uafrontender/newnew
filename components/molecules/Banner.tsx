@@ -50,17 +50,19 @@ const Banner: React.FC<IBanner> = React.memo(() => {
           </AnimatedPresence>
         </SIconHolder>
       )}
-      <SCloseIconHolder>
-        <InlineSVG
-          clickable
-          scaleOnClick
-          svg={closeIcon}
-          fill={theme.colors.white}
-          width='24px'
-          height='24px'
-          onClick={onClose}
-        />
-      </SCloseIconHolder>
+      {banner.show && (
+        <SCloseIconHolder>
+          <InlineSVG
+            clickable
+            scaleOnClick
+            svg={closeIcon}
+            fill={theme.colors.white}
+            width='24px'
+            height='24px'
+            onClick={onClose}
+          />
+        </SCloseIconHolder>
+      )}
     </SContainer>
   );
 });
