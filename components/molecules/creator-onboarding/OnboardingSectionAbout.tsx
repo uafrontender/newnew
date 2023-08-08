@@ -19,31 +19,18 @@ import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
 import { useUserData } from '../../../contexts/userDataContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
-  let errorMsg = 'generic';
-
   switch (status) {
-    case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
-      errorMsg = 'tooLong';
-      break;
-    }
-    case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
-      errorMsg = 'tooShort';
-      break;
-    }
-    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'inappropriate';
-      break;
-    }
-    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
-      errorMsg = 'linksForbidden';
-      break;
-    }
-    default: {
-      break;
-    }
+    case newnewapi.ValidateTextResponse.Status.TOO_LONG:
+      return 'tooLong';
+    case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
+      return 'tooShort';
+    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE:
+      return 'inappropriate';
+    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION:
+      return 'linksForbidden';
+    default:
+      return 'generic';
   }
-
-  return errorMsg;
 };
 
 interface IOnboardingSectionAbout {}
@@ -92,7 +79,9 @@ const OnboardingSectionAbout: React.FunctionComponent<
           validateTextAbortControllerRef?.current?.signal
         );
 
-        if (!res.data?.status) throw new Error('An error occurred');
+        if (!res.data?.status) {
+          throw new Error('An error occurred');
+        }
 
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setBioError(errorSwitch(res.data?.status));
@@ -145,7 +134,9 @@ const OnboardingSectionAbout: React.FunctionComponent<
         validateTextAbortControllerRef?.current?.signal
       );
 
-      if (!res.data?.status) throw new Error('An error occurred');
+      if (!res.data?.status) {
+        throw new Error('An error occurred');
+      }
 
       if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
         setBioError(errorSwitch(res.data?.status));

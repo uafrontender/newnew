@@ -205,7 +205,9 @@ const PostModerationResponsesContextProvider: React.FunctionComponent<
 
         const res = await deleteAdditionalPostResponse(req);
 
-        if (res.error) throw new Error('Failed to delete video');
+        if (res.error) {
+          throw new Error('Failed to delete video');
+        }
 
         setAdditionalResponses((curr) => {
           const workingArray = curr.filter(

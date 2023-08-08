@@ -35,7 +35,7 @@ export const Mobile: React.FC = () => {
           <SearchInput />
         ) : (
           <StaticSearchInput
-            // TODO: remove nested ternary
+            // TODO: Remove nested ternary
             width={
               isMobileL && userLoggedIn
                 ? '40vw'

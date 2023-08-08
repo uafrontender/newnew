@@ -187,7 +187,9 @@ export const getServerSideProps: GetServerSideProps<
 
     const countriesRes = await getSupportedCreatorCountries(countriesPayload);
 
-    if (!countriesRes.data) throw new Error('Countries API not working');
+    if (!countriesRes.data) {
+      throw new Error('Countries API not working');
+    }
 
     return {
       props: {

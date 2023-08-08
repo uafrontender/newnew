@@ -29,23 +29,18 @@ const getStripeButtonTextKey = (
     | null
 ) => {
   switch (stripeConnectStatus) {
-    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
-      .PROCESSING: {
+    case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus.PROCESSING:
       return 'stripe.button.stripeConnecting';
-    }
     case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
-      .CONNECTED_ALL_GOOD: {
+      .CONNECTED_ALL_GOOD:
       return 'stripe.button.stripeConnectedLink';
-    }
     case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
-      .CONNECTED_NEEDS_ATTENTION: {
+      .CONNECTED_NEEDS_ATTENTION:
       return 'stripe.button.requireInformation';
-    }
     case newnewapi.GetMyOnboardingStateResponse.StripeConnectStatus
       .NOT_CONNECTED:
-    default: {
+    default:
       return 'stripe.button.requestSetupLink';
-    }
   }
 };
 

@@ -15,7 +15,7 @@ interface IModal {
   show: boolean;
   // Modal type is used to remove dimming for Modals that were 'covered' by another modal
   // and remove animation for modals which are 'following' the previous modal (case where dimming already faded in)
-  // TODO: how to add smooth transition on close when all modals are closed?
+  // TODO: Рow to add smooth transition on close when all modals are closed?
   modalType?: ModalType;
   transitionspeed?: number;
   additionalz?: number;

@@ -140,9 +140,9 @@ const ChatAreaCenter: React.FC<IChatAreaCenter> = ({
       const arr = new Uint8Array(dataSocket);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (selectedChatRoomId && decoded.roomId === selectedChatRoomId) {
-        // TODO: think how to avoid it
+        // TODO: Think how to avoid it
         refetch();
-        // TODO: not the best solution but there is no alternative in current implementation
+        // TODO: Not the best solution but there is no alternative in current implementation
         markAsRead();
       }
     };

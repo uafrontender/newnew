@@ -80,7 +80,6 @@ const ChatContentHeader: React.FC<IFunctionProps> = ({
     setEllipseMenuOpen(false);
   }, []);
 
-  // TODO: rework routing, pushing state on back button clicked is wrong
   const goBackHandler = useCallback(async () => {
     Mixpanel.track('Navigation Item Clicked', {
       _stage: 'Chat',

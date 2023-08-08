@@ -90,7 +90,9 @@ const EditPostTitleModal: React.FC<IEditPostTitleModal> = ({
           validateUsernameAbortControllerRef.current?.signal
         );
 
-        if (!res?.data?.status) throw new Error('An error occurred');
+        if (!res?.data?.status) {
+          throw new Error('An error occurred');
+        }
 
         switch (res.data.status) {
           case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {

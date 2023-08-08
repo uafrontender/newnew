@@ -17,7 +17,8 @@
     "emailTaken": "Este correo electrónico ya está en uso",
     "notConfirmedEmail": "Este correo electrónico no fue confirmado o el tiempo expiró",
     "noToken": "No hay ningún token",
-    "invalidToken": "El token no es válido"
+    "invalidToken": "El token no es válido",
+    "requestFailed": "La solicitud ha fallado"
   },
   "leaveAlert": "¿Estás seguro que quieres salir de esta página?",
   "verifying": "Verificando tu correo electrónico...",
