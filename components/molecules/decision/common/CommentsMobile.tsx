@@ -143,7 +143,7 @@ const CommentsMobile: React.FunctionComponent<ICommentsMobile> = ({
             top: scrollRef.current.scrollHeight,
           });
         } else if (idx === -1 && !hasNextPage) {
-          // TODO: some notification on the non-existing comment
+          // TODO: Some notification on the non-existing comment
           // e.g. toast?
           // console.log('Comment unavailable');
           setIsSearchingForComment(false);

@@ -32,6 +32,7 @@
   "error": {
     "emailInvalid": "無效的地址",
     "genericError": "發生錯誤",
+    "requestFailed": "請求失敗",
     "Failed to fetch": "提交失敗",
     "An error occurred": "發生錯誤"
   },

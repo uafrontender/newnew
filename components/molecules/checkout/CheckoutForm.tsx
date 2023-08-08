@@ -48,7 +48,7 @@ interface ICheckoutForm {
   }) => void;
 }
 
-// TODO: refactoring
+// TODO: Refactor
 const CheckoutForm: React.FC<ICheckoutForm> = ({
   setupIntent,
   redirectUrl,
@@ -318,7 +318,7 @@ const CheckoutForm: React.FC<ICheckoutForm> = ({
           </STocApply>
         )}
         {
-          // TODO: re-enable / move / make final decision
+          // TODO: Re-enable / move / make final decision
           /* <STocApplyReCaptcha>
               {t('reCaptchaTos.siteProtectedBy')}{' '}
               <a target='_blank' href='https://policies.google.com/privacy'>

@@ -32,6 +32,7 @@
   "error": {
     "emailInvalid": "Invalid address",
     "genericError": "An error occurred",
+    "requestFailed": "Request failed",
     "Failed to fetch": "Failed to submit",
     "An error occurred": "An error occurred"
   },

@@ -32,6 +32,7 @@
   "error": {
     "emailInvalid": "Correo electrónico inválido",
     "genericError": "Se ha producido un error",
+    "requestFailed": "La solicitud ha fallado",
     "Failed to fetch": "No se ha podido enviar",
     "An error occurred": "Se ha producido un error"
   },

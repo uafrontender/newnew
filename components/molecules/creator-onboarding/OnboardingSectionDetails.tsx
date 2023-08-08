@@ -55,65 +55,37 @@ const TermsOfServiceModal = dynamic(() => import('./TermsOfServiceModal'));
 const maxDate = new Date();
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
-  let errorMsg = 'generic';
-
   switch (status) {
-    case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
-      errorMsg = 'tooLong';
-      break;
-    }
-    case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
-      errorMsg = 'tooShort';
-      break;
-    }
-    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'inappropriate';
-      break;
-    }
-    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
-      errorMsg = 'linksForbidden';
-      break;
-    }
-    default: {
-      break;
-    }
+    case newnewapi.ValidateTextResponse.Status.TOO_LONG:
+      return 'tooLong';
+    case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
+      return 'tooShort';
+    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE:
+      return 'inappropriate';
+    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION:
+      return 'linksForbidden';
+    default:
+      return 'generic';
   }
-
-  return errorMsg;
 };
 
 const errorSwitchUsername = (
   status: newnewapi.ValidateUsernameResponse.Status
 ) => {
-  let errorMsg = 'generic';
-
   switch (status) {
-    case newnewapi.ValidateUsernameResponse.Status.TOO_LONG: {
-      errorMsg = 'tooLong';
-      break;
-    }
-    case newnewapi.ValidateUsernameResponse.Status.TOO_SHORT: {
-      errorMsg = 'tooShort';
-      break;
-    }
-    case newnewapi.ValidateUsernameResponse.Status.INVALID_CHARACTER: {
-      errorMsg = 'invalidChar';
-      break;
-    }
-    case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
-      errorMsg = 'inappropriate';
-      break;
-    }
-    case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
-      errorMsg = 'taken';
-      break;
-    }
-    default: {
-      break;
-    }
+    case newnewapi.ValidateUsernameResponse.Status.TOO_LONG:
+      return 'tooLong';
+    case newnewapi.ValidateUsernameResponse.Status.TOO_SHORT:
+      return 'tooShort';
+    case newnewapi.ValidateUsernameResponse.Status.INVALID_CHARACTER:
+      return 'invalidChar';
+    case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE:
+      return 'inappropriate';
+    case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN:
+      return 'taken';
+    default:
+      return 'generic';
   }
-
-  return errorMsg;
 };
 
 type TFieldsToBeUpdated = {
@@ -342,9 +314,13 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
   // Email
   const [emailInEdit, setEmailInEdit] = useState(userData?.email ?? '');
-  const [emailError, setEmailError] = useState('');
+  const [emailError, setEmailError] = useState<
+    'invalidEmail' | 'emailTaken' | 'requestFailed' | undefined
+  >(undefined);
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (emailError) setEmailError('');
+    if (emailError) {
+      setEmailError(undefined);
+    }
     setEmailInEdit(e.target.value);
   };
 
@@ -559,7 +535,6 @@ const OnboardingSectionDetails: React.FunctionComponent<
 
         const res = await sendVerificationNewEmail(sendVerificationCodePayload);
 
-        // TODO: Add translations
         if (!res?.data || res.error) {
           throw new Error('Request failed');
         }
@@ -629,8 +604,22 @@ const OnboardingSectionDetails: React.FunctionComponent<
       console.error(err);
       setLoadingModalOpen(false);
 
-      if ((err as Error).message && (err as Error).message === 'Email taken') {
+      if (
+        (err as Error).message &&
+        (err as Error).message === 'Incorrect email'
+      ) {
+        setEmailError('invalidEmail');
+      } else if (
+        (err as Error).message &&
+        (err as Error).message === 'Email already taken'
+      ) {
         setEmailError('emailTaken');
+      }
+      if (
+        (err as Error).message &&
+        (err as Error).message === 'Request failed'
+      ) {
+        setEmailError('requestFailed');
       } else if (
         (err as Error).message &&
         (err as Error).message.includes('Uploaded image')
@@ -930,8 +919,8 @@ const OnboardingSectionDetails: React.FunctionComponent<
               )}
               errorCaption={
                 emailError
-                  ? t('detailsSection.form.email.errors.emailTaken')
-                  : t('detailsSection.form.email.errors.invalidEmail')
+                  ? t(`detailsSection.form.email.errors.${emailError}`)
+                  : undefined
               }
               onChange={handleEmailInput}
               readOnly={!!userData?.email}
