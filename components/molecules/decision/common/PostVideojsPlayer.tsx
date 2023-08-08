@@ -780,14 +780,11 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       [isActive, isInSlider, isPaused, isScrubberTimeChanging, showPlayButton]
     );
 
-
     useEffect(() => {
       let time = playerRef.current.currentTime();
 
       const handleBlue = () => {
         try {
-          console.log('BLUR');
-
           playerRef.current.pause();
 
           time = playerRef.current.currentTime();
@@ -808,7 +805,6 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
       const handleFocus = () => {
         try {
           if (isVideoShouldBeResumeOnPageFocus.current) {
-            console.log('SHOULD BE PLAYED');
             playerRef.current?.play();
           }
         } catch (err) {
