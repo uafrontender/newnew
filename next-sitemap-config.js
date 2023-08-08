@@ -58,18 +58,18 @@ module.exports = {
   robotsTxtOptions: {
     policies:
       // If staging, disallow all
-      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ? [
-        { userAgent: '*', disallow: '/' },
-      ] : [
-        {
-          userAgent: '*',
-          disallow: disallow,
-        },
-        { userAgent: '*', allow: '/' },
-      ],
-    additionalSitemaps: process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ? [] : [
-      `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
-      `${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`,
-    ],
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? [{ userAgent: '*', disallow: '/' }]
+        : [
+            {
+              userAgent: '*',
+              disallow: disallow,
+            },
+            { userAgent: '*', allow: '/' },
+          ],
+    additionalSitemaps:
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? []
+        : [`${process.env.NEXT_PUBLIC_APP_URL}/server-sitemap.xml`],
   },
 };
