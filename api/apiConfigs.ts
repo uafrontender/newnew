@@ -361,7 +361,7 @@ interface IFetchProtobuf<
 }
 
 /**
- * This function is wrapper around `fetchProtobuf` function,
+ * This function is wrapper around `_fetchProtobuf` function,
  * but is aimed at the requests to protected routes. It can
  * a) Try to get credential tokens from react-cookie instance
  * b) Use the credentials tokens passed to it, if the request
