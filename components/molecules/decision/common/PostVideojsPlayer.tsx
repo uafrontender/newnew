@@ -781,21 +781,21 @@ export const PostVideojsPlayer: React.FC<IPostVideojsPlayer> = React.memo(
     );
 
     useEffect(() => {
-      let time = playerRef.current.currentTime();
+      let time = playerRef.current?.currentTime();
 
       const handleBlue = () => {
         try {
-          playerRef.current.pause();
+          playerRef.current?.pause();
 
-          time = playerRef.current.currentTime();
+          time = playerRef.current?.currentTime();
 
-          playerRef.current.one('play', () => {
+          playerRef.current?.one('play', () => {
             if (!playerRef.current) {
               return;
             }
 
             playerRef.current?.play();
-            playerRef.current.currentTime(time);
+            playerRef.current.currentTime(time || 0);
           });
         } catch (err) {
           console.error(err);
