@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 // TODO: use react query (but it requires a server side sorting)
 interface IMobileBundleCreatorsList {
@@ -29,12 +30,19 @@ const MobileBundleCreatorsList: React.FC<IMobileBundleCreatorsList> = ({
   onBundleClicked,
 }) => {
   const { ref: loadingRef, inView } = useInView();
+  const { overlayModeEnabled } = useOverlayMode();
 
   useEffect(() => {
-    if (inView && !loading && hasMore && initialLoadDone) {
+    if (
+      inView &&
+      !loading &&
+      hasMore &&
+      initialLoadDone &&
+      !overlayModeEnabled
+    ) {
       loadMore();
     }
-  }, [inView, loading, hasMore, initialLoadDone, loadMore]);
+  }, [inView, loading, hasMore, initialLoadDone, overlayModeEnabled, loadMore]);
 
   return (
     <SContainer className={className}>

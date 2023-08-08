@@ -40,6 +40,7 @@ interface IButton {
   withProgress?: boolean;
   customDebounce?: number;
   loadingAnimationColor?: 'white' | 'blue';
+  component?: 'button' | 'div' | 'span';
 }
 
 // Arguable optimization, depends on unstable onClick, but works according to profiling (1.8% => 0%)
@@ -55,6 +56,7 @@ const Button = React.memo(
         customDebounce,
         loadingAnimationColor,
         onClick,
+        component = 'button',
         ...rest
       } = props;
 
@@ -160,6 +162,7 @@ const Button = React.memo(
           onMouseUpCapture={handleRestoreRippling}
           onKeyDownCapture={handleOnKeyDownCapture}
           onTouchEndCapture={handleRestoreRippling}
+          as={component}
           {...rest}
         >
           <span
@@ -369,12 +372,12 @@ const SButton = styled.button<ISButton>`
     }
   }
 
-  &:hover:enabled {
+  &:hover {
     outline: none;
   }
 
   @media (hover: hover) {
-    &:hover:enabled {
+    &:hover {
       ${(props) => {
         switch (props.view) {
           case 'primaryGrad': {
