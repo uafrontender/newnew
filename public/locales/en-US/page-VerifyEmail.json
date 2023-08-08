@@ -17,7 +17,8 @@
     "emailTaken": "Email already taken",
     "notConfirmedEmail": "Current email wasn't confirmed or time expired",
     "noToken": "No token",
-    "invalidToken": "Invalid token"
+    "invalidToken": "Invalid token",
+    "requestFailed": "Request failed"
   },
   "leaveAlert": "Are you sure you want to leave the page?",
   "verifying": "Verifying your email...",

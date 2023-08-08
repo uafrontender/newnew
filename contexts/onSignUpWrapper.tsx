@@ -11,6 +11,7 @@ import {
   reportUser,
 } from '../api/endpoints/report';
 import ReportSuccessModal from '../components/molecules/ReportSuccessModal';
+import assertNever from '../utils/assertNever';
 
 interface BaseActionOnSignUp {
   type: string;
@@ -180,7 +181,7 @@ const OnSignUpWrapper: React.FC<IBundleContextProvider> = ({
       }
 
       default:
-        console.warn(`Unknown action type ${(action as any).type}`);
+        assertNever(action);
     }
 
     setOnSignUpJsonString('');

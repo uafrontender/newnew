@@ -11,6 +11,7 @@ import PhoneNumberInput from './PhoneNumberInput';
 import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import CheckMark from '../CheckMark';
 import { I18nNamespaces } from '../../../@types/i18next';
+import assertNever from '../../../utils/assertNever';
 
 export interface SubscriptionToCreator {
   type: 'creator';
@@ -35,7 +36,7 @@ function getSubscriptionSubject(subscription: Subscription): string {
     return subscription.postTitle;
   }
 
-  throw new Error(`Unexpected subscription type ${(subscription as any).type}`);
+  return assertNever(subscription);
 }
 
 interface ISmsNotificationModal {

@@ -69,7 +69,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         const { data } = res;
 
-        // TODO: Add translations
+        // TODO: Do we need translations here?
         if (!data) {
           throw new Error('Request failed');
         }
@@ -102,6 +102,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           return;
         }
 
+        // TODO: Should we show more informative errors here?
         showErrorToastPredefined(undefined);
         console.error(err.message, 'error');
         goBackOrRedirect('/');

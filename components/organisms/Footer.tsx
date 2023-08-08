@@ -43,7 +43,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const { resizeMode } = useAppState();
 
   const topItems: TItem[] = [
-    // TODO: return about link later when we have a page for it
+    // TODO: Return about link later when we have a page for it
     /* {
       key: 'about',
       url: 'https://about.newnew.co',
@@ -67,7 +67,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     },
   ];
   const centerItems: TItem[] = [
-    // TODO: return twitter link later
+    // TODO: Return twitter link later
     /* {
       key: 'twitter',
       url: 'https://twitter.com/newnewhq',

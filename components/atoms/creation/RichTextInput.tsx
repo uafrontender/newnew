@@ -7,6 +7,7 @@ import getChunks from '../../../utils/getChunks/getChunks';
 import AnimatedPresence from '../AnimatedPresence';
 import InlineSvg from '../InlineSVG';
 import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import assertNever from '../../../utils/assertNever';
 
 interface IRichTextInput {
   id?: string;
@@ -93,8 +94,7 @@ const RichTextInput: React.FC<IRichTextInput> = ({
               return <Hashtag key={index}>#{chunk.text}</Hashtag>;
             }
 
-            // TODO: Add assertNever
-            throw new Error('Unexpected chunk');
+            return assertNever(chunk);
           })}
         </SInputRenderer>
       </SInputContainer>
