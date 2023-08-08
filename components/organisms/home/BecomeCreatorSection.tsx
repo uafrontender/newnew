@@ -15,15 +15,15 @@ const BecomeCreatorSection = () => {
   const { t: tCommon } = useTranslation('common');
   const router = useRouter();
 
-  const { userIsCreator } = useAppState();
+  const { userLoggedIn } = useAppState();
 
   const handleClickCreateNow = () => {
     Mixpanel.track('Navigation Item Clicked', {
       _stage: 'Homepage',
       _button: 'Create now',
-      _target: userIsCreator ? '/creator-onboarding' : '/sign-up?to=create',
+      _target: userLoggedIn ? '/creator-onboarding' : '/sign-up?to=create',
     });
-    router.push(userIsCreator ? '/creator-onboarding' : '/sign-up?to=create');
+    router.push(userLoggedIn ? '/creator-onboarding' : '/sign-up?to=create');
   };
 
   return (

@@ -36,6 +36,7 @@ const NoCashOut: React.FC = () => {
                 _target: 'https://creatorpayouts.newnew.co/',
               });
             }}
+            component='div'
           >
             {t('dashboard.earnings.cashOut.submit')}
           </SButton>

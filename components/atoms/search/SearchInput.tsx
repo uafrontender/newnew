@@ -4,6 +4,7 @@ import styled, { css, useTheme } from 'styled-components';
 import Router, { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { FocusOn } from 'react-focus-on';
 
 import InlineSVG from '../InlineSVG';
 
@@ -29,6 +30,7 @@ import useDebouncedValue from '../../../utils/hooks/useDebouncedValue';
 import { useAppState } from '../../../contexts/appStateContext';
 import { useUiState } from '../../../contexts/uiStateContext';
 import isStringEmpty from '../../../utils/isStringEmpty';
+import isIOS from '../../../utils/isIOS';
 
 const SearchInput: React.FC = React.memo(() => {
   const { t } = useTranslation('common');
@@ -178,6 +180,16 @@ const SearchInput: React.FC = React.memo(() => {
     handleClickOutside
   );
 
+  // Exit global search on scroll for iOS to prevent issues with header
+  const handleCloseSearch = useCallback(() => {
+    if (globalSearchActive && isIOS() && !isResultsDropVisible) {
+      inputRef.current?.blur();
+      setGlobalSearchActive(false);
+    }
+  }, [globalSearchActive, setGlobalSearchActive, isResultsDropVisible]);
+
+  useOnClickOutside(inputContainerRef, handleCloseSearch, 'touchstart');
+
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
@@ -300,8 +312,14 @@ const SearchInput: React.FC = React.memo(() => {
     disableOverlayMode,
   ]);
 
+  const handleInputBlur = () => {
+    if (!isResultsDropVisible) {
+      setGlobalSearchActive(false);
+    }
+  };
+
   return (
-    <>
+    <FocusOn enabled={isResultsDropVisible}>
       {isMobileOrTablet && globalSearchActive ? (
         <SCloseButtonMobile
           view='tertiary'
@@ -345,6 +363,7 @@ const SearchInput: React.FC = React.memo(() => {
                 ? t('search.placeholderLong')
                 : t('search.placeholder')
             }
+            onBlur={handleInputBlur}
           />
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
@@ -404,61 +423,63 @@ const SearchInput: React.FC = React.memo(() => {
         )}
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
-        <SResultsDropMobile ref={resultsContainerRef}>
-          {
-            // eslint-disable-next-line no-nested-ternary
-            resultsPosts.length === 0 &&
-            resultsCreators.length === 0 &&
-            resultsHashtags.length === 0 ? (
-              !isLoading ? (
-                <SNoResults>
-                  <NoResults closeDrop={handleCloseIconClick} />
-                </SNoResults>
+        <SResultsDropMobile>
+          <SResultsDropMobileContentWrapper ref={resultsContainerRef}>
+            {
+              // eslint-disable-next-line no-nested-ternary
+              resultsPosts.length === 0 &&
+              resultsCreators.length === 0 &&
+              resultsHashtags.length === 0 ? (
+                !isLoading ? (
+                  <SNoResults>
+                    <NoResults closeDrop={handleCloseIconClick} />
+                  </SNoResults>
+                ) : (
+                  <SBlock>
+                    <Lottie
+                      width={64}
+                      height={64}
+                      options={{
+                        loop: true,
+                        autoplay: true,
+                        animationData: loadingAnimation,
+                      }}
+                    />
+                  </SBlock>
+                )
               ) : (
-                <SBlock>
-                  <Lottie
-                    width={64}
-                    height={64}
-                    options={{
-                      loop: true,
-                      autoplay: true,
-                      animationData: loadingAnimation,
+                <div>
+                  {resultsCreators.length > 0 && (
+                    <PopularCreatorsResults
+                      creators={resultsCreators}
+                      onSelect={closeSearch}
+                    />
+                  )}
+                  {resultsHashtags.length > 0 && (
+                    <PopularTagsResults
+                      hashtags={resultsHashtags}
+                      onSelect={closeSearch}
+                    />
+                  )}
+                  <SButton
+                    onClick={() => {
+                      const clearedSearchValue =
+                        getClearedSearchQuery(searchValue);
+                      if (clearedSearchValue) {
+                        handleSeeResults(clearedSearchValue);
+                      }
                     }}
-                  />
-                </SBlock>
+                    view='quaternary'
+                  >
+                    {t('search.allResults')}
+                  </SButton>
+                </div>
               )
-            ) : (
-              <div>
-                {resultsCreators.length > 0 && (
-                  <PopularCreatorsResults
-                    creators={resultsCreators}
-                    onSelect={closeSearch}
-                  />
-                )}
-                {resultsHashtags.length > 0 && (
-                  <PopularTagsResults
-                    hashtags={resultsHashtags}
-                    onSelect={closeSearch}
-                  />
-                )}
-                <SButton
-                  onClick={() => {
-                    const clearedSearchValue =
-                      getClearedSearchQuery(searchValue);
-                    if (clearedSearchValue) {
-                      handleSeeResults(clearedSearchValue);
-                    }
-                  }}
-                  view='quaternary'
-                >
-                  {t('search.allResults')}
-                </SButton>
-              </div>
-            )
-          }
+            }
+          </SResultsDropMobileContentWrapper>
         </SResultsDropMobile>
       )}
-    </>
+    </FocusOn>
   );
 });
 
@@ -550,21 +571,28 @@ const SResultsDropMobile = styled.div`
   position: fixed;
   border-radius: 0;
   width: 100vw;
-  height: fill-available;
+  height: 100vh;
   top: 96px;
   left: 0;
-  overflow: auto;
-  padding: 16px;
-
-  @supports (-webkit-touch-callout: none) {
-    /* CSS specific to iOS devices */
-    padding-bottom: 32px;
-  }
 
   ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
+    top: 112px;
+  }
+`;
+
+const SResultsDropMobileContentWrapper = styled.div`
+  padding: 16px;
+
+  // 50px needs for ios
+  max-height: calc(var(--window-inner-height, 1vh) * 100 - 50px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+
+  transition: max-height 0.2s ease-out;
+
+  ${({ theme }) => theme.media.tablet} {
     padding: 16px 48px;
-    top: 64px;
   }
 `;
 
