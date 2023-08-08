@@ -257,7 +257,7 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<
         submitError &&
         !isSuccess ? (
           <AnimatedPresence animateWhenInView={false} animation='t-09'>
-            {/* TODO: error text should probably be changed */}
+            {/* TODO: Error text should probably be changed */}
             <SErrorDiv>{t('error.invalidCode')}</SErrorDiv>
           </AnimatedPresence>
         ) : null}

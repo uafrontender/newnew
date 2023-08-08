@@ -24,7 +24,7 @@ const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
 
   async function deleteUser() {
     try {
-      // TODO: stop sending any more requests here.
+      // TODO: Find a way to cut sending any requests to BE at this point
       const payload = new newnewapi.EmptyRequest({});
 
       const res = await deleteMyAccount(payload);

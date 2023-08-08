@@ -32,7 +32,7 @@ const TicketSet: React.FC<ITicketSet> = ({
           src={
             // eslint-disable-next-line no-nested-ternary
             size > 36
-              ? // TODO: add theme specific assets
+              ? // TODO: Add theme specific assets
                 VoteIconBig.src
               : theme.name === 'light'
               ? VoteIconLight.src

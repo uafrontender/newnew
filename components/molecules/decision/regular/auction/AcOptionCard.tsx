@@ -512,7 +512,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
-            {/* TODO: add logic that accepts option and returns users (me) to show */}
+            {/* TODO: Add logic that accepts option and returns users (me) to show */}
             {!option.whitelistSupporter ||
             option.whitelistSupporter?.uuid === userUuid ? (
               isMyBid ? (

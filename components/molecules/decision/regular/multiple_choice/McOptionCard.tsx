@@ -994,8 +994,8 @@ McOptionCard.defaultProps = {
 
 export default McOptionCard;
 
-// TODO: just use option and useMemo instead of individual option fields
-// TODO: add logic that accepts option and returns users (me) to show  (not a component)
+// TODO: Just use option and useMemo instead of individual option fields
+// TODO: Add logic that accepts option and returns users (me) to show  (not a component)
 export const RenderSupportersInfo: React.FunctionComponent<{
   isBlue: boolean;
   isCreatorsBid: boolean;
@@ -1031,7 +1031,7 @@ export const RenderSupportersInfo: React.FunctionComponent<{
               />
             ) : firstVoter ? (
               <OptionCardUsernameSpan user={firstVoter} isBlue={isBlue} />
-            ) : /* TODO: if user is deleted, only 'voted' is shown */
+            ) : /* TODO: If user is deleted, only 'voted' is shown */
             null}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubtracted > 0 ? ` & ` : ''}

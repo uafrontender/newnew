@@ -17,7 +17,7 @@ import assertNever from '../../../../utils/assertNever';
 interface IPaymentSuccessModal {
   postType: TPostType;
   show: boolean;
-  // TODO: add information about value for guest buying stuff related cases (no data now). Make field mandatory.
+  // TODO: Add information about value for guest buying stuff related cases (no data now). Make field mandatory.
   value?: number;
   modalType?: ModalType;
   children: React.ReactNode;
