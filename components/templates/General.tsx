@@ -365,12 +365,16 @@ interface ICookieContainer {
 }
 
 const CookieContainer = styled.div<ICookieContainer>`
-  left: 50%;
-  bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
-  z-index: ${(props) => props.zIndex};
   position: fixed;
-  transform: translateX(-50%);
-  transition: bottom ease 0.5s;
+  left: 50%;
+  bottom: 6px;
+
+  transform: ${(props) =>
+    props.bottomNavigationVisible
+      ? `translate(-50%, -56px)`
+      : `translate(-50%, 0)`};
+  transition: transform ease 0.5s;
+  z-index: ${(props) => props.zIndex};
   pointer-events: none;
 
   ${(props) => props.theme.media.tablet} {
