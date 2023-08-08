@@ -41,9 +41,9 @@ interface IMobileFieldBlock {
 }
 
 // This component is overloaded and produces unnecessary hook instances
-// TODO: rework, separate 'input' | 'select' | 'date' into own components.
+// TODO: Rework, separate 'input' | 'select' | 'date' into own components.
 // Provide type safety for all properties
-// TODO: this component sets Moment object to value.date, causing an error in the console
+// TODO: This component sets Moment object to value.date, causing an error in the console
 // 'A non-serializable value was detected in the state'
 const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const {

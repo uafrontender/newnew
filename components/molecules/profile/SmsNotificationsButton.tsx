@@ -97,7 +97,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
             );
           }
 
-          // TODO: set on phone number confirmed (on polling returns a confirmed number)
+          // TODO: Set on phone number confirmed (on polling returns a confirmed number)
           localStorage.setItem(
             SAVED_PHONE_COUNTRY_CODE_KEY,
             phoneNumber.countryCode
@@ -379,7 +379,7 @@ const SmsNotificationsButton: React.FC<ISmsNotificationsButton> = ({
 
 export default SmsNotificationsButton;
 
-// TODO: add hover/active effects
+// TODO: Add hover/active effects
 const SIconButton = styled.div<{
   active: boolean;
 }>`

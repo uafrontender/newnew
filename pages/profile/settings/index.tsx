@@ -131,7 +131,9 @@ const MyProfileSettingsIndex = () => {
 
       const { data, error } = res;
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+      if (!data || error) {
+        throw new Error(error?.message ?? 'Request failed');
+      }
 
       // CHANGE TO CONTEXT
       dispatch(
@@ -165,9 +167,17 @@ const MyProfileSettingsIndex = () => {
       const res = await getMyTransactions(payload);
       const { data, error } = res;
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
-      if (data.paging?.total) setMyTransactionsTotal(data.paging?.total);
-      if (data.transactions) setMyTransactions(data.transactions);
+      if (!data || error) {
+        throw new Error(error?.message ?? 'Request failed');
+      }
+
+      if (data.paging?.total) {
+        setMyTransactionsTotal(data.paging?.total);
+      }
+
+      if (data.transactions) {
+        setMyTransactions(data.transactions);
+      }
     } catch (err) {
       console.error(err);
     }

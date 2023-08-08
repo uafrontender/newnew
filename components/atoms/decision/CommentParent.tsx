@@ -499,7 +499,6 @@ const CommentParent = React.forwardRef<HTMLDivElement, ICommentParent>(
               </SActionsDiv>
             </SCommentHeader>
             {!comment.isDeleted && <SText>{comment.content?.text}</SText>}
-            {/* TODO: SReply is not clickable element */}
             {!comment.isDeleted &&
               (!isReplyFormOpen ? (
                 <SReply onClick={replyHandler}>

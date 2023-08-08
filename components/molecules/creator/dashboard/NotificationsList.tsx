@@ -31,6 +31,7 @@ import { SocketContext } from '../../../../contexts/socketContext';
 import useMyNotifications, {
   useMyNotificationsActions,
 } from '../../../../utils/hooks/useMyNotifications';
+import getNotificationTargetUrl from '../../../../utils/getNotificationTargetUrl';
 
 interface IFunction {}
 
@@ -113,53 +114,6 @@ export const NotificationsList: React.FC<IFunction> = () => {
     };
   }, [socketConnection, addNewNotification]);
 
-  // TODO: make changes to `newnewapi.IRoutingTarget` to support postShortId
-  const getUrl = (
-    target: newnewapi.IRoutingTarget | null | undefined
-  ): string | undefined => {
-    if (target) {
-      if (
-        target.creatorDashboard &&
-        target?.creatorDashboard.section ===
-          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.CHATS
-      ) {
-        return '/direct-messages';
-      }
-
-      if (
-        target.creatorDashboard &&
-        target?.creatorDashboard.section ===
-          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.SUBSCRIBERS
-      ) {
-        return '/creator/subscribers';
-      }
-
-      if (target.userProfile && target?.userProfile.userUsername) {
-        return `/direct-messages/${target.userProfile.userUsername}`;
-      }
-
-      if (
-        target.postResponse &&
-        (target?.postResponse.postShortId || target?.postResponse.postUuid)
-      ) {
-        return `/p/${
-          target?.postResponse.postShortId || target?.postResponse.postUuid
-        }`;
-      }
-
-      if (
-        target.postAnnounce &&
-        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
-      ) {
-        return `/p/${
-          target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
-        }`;
-      }
-    }
-
-    return undefined;
-  };
-
   const getEnrichedNotificationMessage = useCallback(
     (notification: newnewapi.INotification) => {
       if (!notification.content?.message) {
@@ -206,7 +160,7 @@ export const NotificationsList: React.FC<IFunction> = () => {
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification, itemCurrentTime: number) => {
       const message = getEnrichedNotificationMessage(item);
-      const url = getUrl(item.target);
+      const url = getNotificationTargetUrl(item.target);
 
       const NotificationsItem = (
         <SNotificationItem

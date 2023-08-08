@@ -181,7 +181,9 @@ export const CreationSecondStepContent: React.FC<
 
         const res = await validateText(payload);
 
-        if (!res?.data?.status) throw new Error('An error occurred');
+        if (!res?.data?.status) {
+          throw new Error('An error occurred');
+        }
 
         switch (res.data.status) {
           case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
@@ -1206,7 +1208,10 @@ export const CreationSecondStepContent: React.FC<
           });
         }
     }
-    if (payload) markTutorialStepAsCompleted(payload);
+
+    if (payload) {
+      markTutorialStepAsCompleted(payload);
+    }
     setIsTutorialVisible(false);
   };
 

@@ -124,6 +124,7 @@ const DropdownSelect = <T,>({
         />
       </SLabelButton>
       <AnimatePresence>
+        {/* TODO: Needs to ignore outer containers borders, Portal? */}
         {isOpen ? (
           <SOptionsContainer
             id={`${id}-options`}

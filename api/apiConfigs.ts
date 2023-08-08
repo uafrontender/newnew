@@ -166,7 +166,7 @@ export async function fetchProtobuf<
         'Content-type': 'application/x-protobuf',
         ...(!isBrowser() || process.env.NEXT_PUBLIC_ENVIRONMENT === 'test'
           ? {
-              // TODO: should it come from env var and be a secret?
+              // TODO: Should it come from env var and be a secret?
               'x-from': 'web',
             }
           : {}),

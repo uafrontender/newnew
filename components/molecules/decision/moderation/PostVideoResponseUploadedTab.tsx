@@ -120,7 +120,9 @@ const PostVideoResponseUploadedTab: React.FunctionComponent<
 
         const res = await removeUploadedFile(payload);
 
-        if (res.error) throw new Error('An error occurred');
+        if (res.error) {
+          throw new Error('An error occurred');
+        }
       }
 
       setLocalFile(null);

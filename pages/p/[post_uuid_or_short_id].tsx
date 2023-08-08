@@ -554,7 +554,7 @@ const PostPage: NextPage<IPostPage> = ({
         !!commentIdFromUrl || !!commentContentFromUrl || !!responseUuidFromUrl;
 
       if (shouldReplace) {
-        router.replace(`/p/${postUuidOrShortId}`, undefined, {
+        Router.replace(`/p/${postUuidOrShortId}`, undefined, {
           shallow: true,
         });
       }
@@ -564,7 +564,6 @@ const PostPage: NextPage<IPostPage> = ({
       commentIdFromUrl,
       commentContentFromUrl,
       // responseNumberFromUrl, - reason unknown
-      // router, - reason unknown
       // postUuidOrShortId, - reason unknown
     ]
   );
@@ -590,7 +589,9 @@ const PostPage: NextPage<IPostPage> = ({
 
         const res = await markPost(markAsViewedPayload, controller.signal);
 
-        if (res.error) throw new Error('Failed to mark post as viewed');
+        if (res.error) {
+          throw new Error('Failed to mark post as viewed');
+        }
       } catch (err) {
         console.error(err);
       }

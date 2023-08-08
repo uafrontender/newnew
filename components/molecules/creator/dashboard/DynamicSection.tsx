@@ -211,7 +211,7 @@ export const DynamicSection: React.FC<IDynamicSection> = ({ baseUrl }) => {
     };
   }, [tab, isDesktop, enableOverlayMode, disableOverlayMode]);
 
-  // TODO: rework this part lead to bugs
+  // TODO: Rework, this part leads to bugs
   useEffect(() => {
     const findChatRoom = async () => {
       try {

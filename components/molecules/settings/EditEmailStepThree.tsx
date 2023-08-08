@@ -81,9 +81,8 @@ const EditEmailStepThreeModal = ({
         sendVerificationCodePayload
       );
 
-      // TODO: Add translations
       if (!data || error) {
-        throw new Error('Request failed');
+        throw new Error(tVerifyEmail('error.requestFailed'));
       }
 
       if (
@@ -99,7 +98,7 @@ const EditEmailStepThreeModal = ({
         data.status !==
           newnewapi.SendVerificationEmailResponse.Status.SHOULD_RETRY_AFTER
       ) {
-        throw new Error('Request failed');
+        throw new Error(tVerifyEmail('error.requestFailed'));
       }
 
       setCanResendAt(Date.now() + data.retryAfter * 1000);
