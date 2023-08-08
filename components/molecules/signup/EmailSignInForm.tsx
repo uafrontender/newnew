@@ -47,7 +47,7 @@ const EmailSignInForm: React.FunctionComponent<IEmailSignInForm> = ({
       setIsSubmitLoading(false);
       // TODO: Process error. Don't show the one from BE.
       // TODO: If email with this account was deleted, show modal
-      setSubmitError(err?.message ?? 'genericError');
+      setSubmitError(err?.message ?? t('error.genericError'));
     }
   };
 

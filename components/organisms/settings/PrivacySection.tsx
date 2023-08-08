@@ -73,11 +73,20 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         });
         await changeUserBlockedStatus(userUuidToRemove, false);
         removeTinyUserMutation.mutate(userUuidToRemove);
+
+        if (hasNextPage) {
+          fetchNextPage();
+        }
       } catch (error) {
         console.error(error);
       }
     },
-    [changeUserBlockedStatus, removeTinyUserMutation]
+    [
+      hasNextPage,
+      removeTinyUserMutation,
+      changeUserBlockedStatus,
+      fetchNextPage,
+    ]
   );
 
   return (

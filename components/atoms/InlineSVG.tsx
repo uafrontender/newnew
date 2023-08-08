@@ -22,19 +22,13 @@ export const InlineSvg: React.FC<IInlineSvg> = (props) => {
       <SSvgHolderSpan
         {...rest}
         dangerouslySetInnerHTML={{ __html: svg }}
-        {...props}
+        svg={svg}
       />
     );
   }
 
   return (
-    // TODO: div contains svg attributes because of {...props}.
-    // TODO: no need both {...rest} and  {...props}
-    <SSvgHolder
-      {...rest}
-      dangerouslySetInnerHTML={{ __html: svg }}
-      {...props}
-    />
+    <SSvgHolder {...rest} dangerouslySetInnerHTML={{ __html: svg }} svg={svg} />
   );
 };
 

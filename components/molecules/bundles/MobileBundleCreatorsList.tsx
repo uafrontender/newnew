@@ -5,7 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
 
-// TODO: use react query (but it requires a server side sorting)
+// TODO: Use react query (but it requires a server side sorting)
 interface IMobileBundleCreatorsList {
   className?: string;
   creators: newnewapi.IUser[];

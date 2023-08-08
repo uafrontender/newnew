@@ -75,7 +75,8 @@
         "cantChangeInfoCaption": "您可以稍後在設置中編輯您的電郵地址",
         "errors": {
           "invalidEmail": "請輸入一個有效的電子郵件地址",
-          "emailTaken": "該電子郵件已經被佔用。請換一個試試"
+          "emailTaken": "該電子郵件已經被佔用。請換一個試試",
+          "requestFailed": "請求失敗"
         }
       },
       "dateOfBirth": {

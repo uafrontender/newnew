@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import getChunks from '../../utils/getChunks/getChunks';
+import assertNever from '../../utils/assertNever';
 
 interface PostTitleContentI {
   children: string;
@@ -47,8 +48,7 @@ const PostTitleContent: React.FC<PostTitleContentI> = ({
           );
         }
 
-        // TODO: Add assertNever
-        throw new Error('Unexpected chunk');
+        return assertNever(chunk);
       })}
     </>
   );

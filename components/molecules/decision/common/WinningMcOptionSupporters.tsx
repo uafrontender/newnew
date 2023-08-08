@@ -36,7 +36,7 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
       }
 
       // If the option created by post creator then return first voter
-      // TODO: if user is deleted, only 'voted' is shown
+      // TODO: If user is deleted, only 'voted' is shown
       if (winningOption.creator?.uuid === postCreator?.uuid) {
         return winningOption.firstVoter;
       }

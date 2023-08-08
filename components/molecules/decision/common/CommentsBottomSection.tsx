@@ -232,9 +232,10 @@ const CommentsBottomSection: React.FunctionComponent<
         removeChannel(`comments_${postUuid.toString()}`);
       }
     },
-    // TODO: should it depend on commentsRoomId? Why not?
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [
+      // postUuid, - reason unknown. Why not?
+    ]
   );
 
   return (

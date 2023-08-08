@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import Lottie from '../components/atoms/Lottie';
@@ -21,7 +21,6 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
   email_address,
   token,
 }) => {
-  const router = useRouter();
   const { userIsCreator } = useAppState();
   const { updateUserData } = useUserData();
   const [isLoading, setIsLoading] = useState(false);
@@ -60,13 +59,13 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
             });
           }
 
-          router.push('/');
+          Router.push('/');
         } catch (err) {
           // NB! Might need an error toast
           console.log(err);
           setIsLoading(false);
           setSignInError(true);
-          // router.push('/');
+          // Router.push('/');
         }
       }
 
@@ -75,7 +74,6 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       // email_address, - reason unknown
-      // router, - reason unknown
       // token, - reason unknown
       // updateUserData, - reason unknown
       // userIsCreator, - reason unknown
