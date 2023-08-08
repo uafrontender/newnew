@@ -18,6 +18,7 @@ import { useUserData } from '../../../contexts/userDataContext';
 
 import Logo from '../../../public/images/svg/MobileLogo.svg';
 import { Mixpanel } from '../../../utils/mixpanel';
+import { useAppState } from '../../../contexts/appStateContext';
 
 interface IEditEmailStepOneModal {
   onComplete: () => void;
@@ -26,6 +27,12 @@ interface IEditEmailStepOneModal {
 const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
   const theme = useTheme();
   const { t } = useTranslation('page-VerifyEmail');
+
+  const { resizeMode } = useAppState();
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const { userData } = useUserData();
 
@@ -41,13 +48,15 @@ const EditEmailStepOneModal = ({ onComplete }: IEditEmailStepOneModal) => {
 
   useEffect(() => {
     const setTimeoutId = setTimeout(() => {
-      setIsInputFocused(true);
+      if (!isMobile) {
+        setIsInputFocused(true);
+      }
     }, 400);
 
     return () => {
       clearTimeout(setTimeoutId);
     };
-  }, []);
+  }, [isMobile]);
 
   const [isCodeSent, setIsCodeSent] = useState(false);
 
