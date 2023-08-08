@@ -378,7 +378,12 @@ const CookieContainer = styled.div<ICookieContainer>`
   pointer-events: none;
 
   ${(props) => props.theme.media.tablet} {
-    bottom: ${(props) => (props.bottomNavigationVisible ? 80 : 24)}px;
+    bottom: 24px;
+
+    transform: ${(props) =>
+      props.bottomNavigationVisible
+        ? `translate(-50%, -56px)`
+        : `translate(-50%, 0)`};
   }
 `;
 
