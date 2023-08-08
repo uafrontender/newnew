@@ -18,6 +18,7 @@ import PostTitleContent from '../../atoms/PostTitleContent';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
 import DisplayName from '../../atoms/DisplayName';
+import getNotificationTargetUrl from '../../../utils/getNotificationTargetUrl';
 
 const getNotificationIcon = (target: newnewapi.IRoutingTarget) => {
   if (target.creatorDashboard && target?.creatorDashboard.section === 2) {
@@ -75,50 +76,11 @@ const Notification: React.FC<INotification> = ({
   }, [id]);
 
   useEffect(() => {
-    if (target) {
-      if (
-        target.creatorDashboard &&
-        target?.creatorDashboard.section ===
-          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.CHATS
-      ) {
-        setUrl('/direct-messages');
-      }
-
-      if (
-        target.creatorDashboard &&
-        target?.creatorDashboard.section ===
-          newnewapi.RoutingTarget.CreatorDashboardTarget.Section.SUBSCRIBERS
-      ) {
-        setUrl('/creator/subscribers');
-      }
-
-      if (target.userProfile && target?.userProfile.userUsername) {
-        setUrl(`/direct-messages/${target.userProfile.userUsername}`);
-      }
-
-      if (
-        target.postResponse &&
-        (target?.postResponse.postShortId || target?.postResponse.postUuid)
-      ) {
-        setUrl(
-          `/p/${
-            target?.postResponse.postShortId || target?.postResponse.postUuid
-          }`
-        );
-      }
-
-      if (
-        target.postAnnounce &&
-        (target?.postAnnounce.postShortId || target?.postAnnounce.postUuid)
-      ) {
-        setUrl(
-          `/p/${
-            target?.postAnnounce.postShortId || target?.postAnnounce.postUuid
-          }`
-        );
-      }
+    const targetUrl = getNotificationTargetUrl(target);
+    if (targetUrl) {
+      setUrl(targetUrl);
     }
-  }, [url, target]);
+  }, [target]);
 
   useEffect(() => {
     if (isRead) {
