@@ -172,6 +172,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // Scroll block
   const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const { promptUserWithPushNotificationsPermissionModal } =
     usePushNotifications();
@@ -403,6 +404,24 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     [newOptionText, newOptionTextValid, post.postShortId]
   );
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      const scrollable =
+        containerRef?.current &&
+        containerRef?.current?.scrollHeight >
+          containerRef?.current?.clientHeight;
+      setIsScrollable(!!scrollable);
+    });
+
+    if (containerRef?.current) {
+      resizeObserver.observe(containerRef?.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <>
       <STabContainer
@@ -436,10 +455,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             ...(isScrollBlocked
               ? {
                   overflow: 'hidden',
-                  width:
-                    options.length >= 4
-                      ? 'calc(100% + 10px)'
-                      : 'calc(100% + 14px)',
+                  width: isScrollable
+                    ? 'calc(100% + 10px)'
+                    : 'calc(100% + 14px)',
                 }
               : {}),
           }}
