@@ -186,6 +186,7 @@ const SUserInfo = styled.div`
   flex-direction: row;
   align-items: center;
   margin-bottom: 12px;
+  max-width: 100%;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -207,6 +208,7 @@ const SUsername = styled.div`
   line-height: 24px;
 
   white-space: pre;
+  overflow: hidden;
 `;
 
 const SDisplayName = styled(DisplayName)`
