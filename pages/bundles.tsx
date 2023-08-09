@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 
@@ -25,9 +25,8 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
   stripeSetupIntentClientSecretFromRedirect,
   saveCardFromRedirect,
 }) => {
-  const router = useRouter();
   const { bundles } = useBundles();
-  const { userIsCreator } = useAppState();
+  const { userIsCreator, userLoggedIn } = useAppState();
   // Can't really be reached at the moment (no redirect to this page)
   useBuyBundleAfterStripeRedirect(
     stripeSetupIntentClientSecretFromRedirect,
@@ -36,14 +35,15 @@ export const BundlesPage: NextPage<IBundlesPage> = ({
 
   useEffect(() => {
     if (bundles?.length === 0 && !stripeSetupIntentClientSecretFromRedirect) {
-      router.replace('/');
+      Router.replace('/');
     }
-  }, [
-    stripeSetupIntentClientSecretFromRedirect,
-    userIsCreator,
-    bundles,
-    router,
-  ]);
+  }, [stripeSetupIntentClientSecretFromRedirect, userIsCreator, bundles]);
+
+  useEffect(() => {
+    if (!userLoggedIn) {
+      Router.replace('/');
+    }
+  }, [userLoggedIn]);
 
   return <Bundles />;
 };
@@ -72,6 +72,19 @@ export const getServerSideProps: GetServerSideProps<IBundlesPage> = async (
     null,
     SUPPORTED_LANGUAGES
   );
+
+  const { req } = context;
+
+  const accessToken = req.cookies?.accessToken;
+
+  if (!accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   // eslint-disable-next-line camelcase
   const { setup_intent_client_secret, save_card } = context.query;
