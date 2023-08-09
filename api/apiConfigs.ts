@@ -1,13 +1,13 @@
 /* eslint-disable no-async-promise-executor */
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
-import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuidv4 } from 'uuid';
 
 import isBrowser from '../utils/isBrowser';
 import sleep from '../utils/sleep';
+import { EncDec, NewnewapiType, logRequest, logRequestError } from './utils';
 
 const logsOn = process.env.NEXT_PUBLIC_PROTOBUF_LOGS === 'true';
 
@@ -59,28 +59,6 @@ export interface APIResponse<T> {
   error?: Error;
 }
 
-type NewnewapiType = typeof newnewapi;
-
-/**
- * All the protobufjs-generated class **instances** conform to this interface.
- */
-interface JsonConvertible {
-  toJSON(): { [k: string]: any };
-}
-
-/**
- * All the protobufjs-generated class **objects** conform to this interface.
- */
-interface EncDec<T = keyof NewnewapiType> {
-  name: string;
-  encode(message: T, writer?: $protobuf.Writer): $protobuf.Writer;
-  decode(
-    reader: $protobuf.Reader | Uint8Array,
-    length?: number
-  ): T & JsonConvertible;
-  fromObject(object: { [k: string]: any }): T & JsonConvertible;
-}
-
 /**
  * Handles checking if the response is ok and if it is a protobuf message,
  * returns an Array Buffer that can be decoded in the outer function.
@@ -117,78 +95,6 @@ const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
   });
 };
 
-/**
- * Log request
- */
-const logRequest = <
-  RequestType = keyof NewnewapiType,
-  ResponseType = keyof NewnewapiType
->(
-  reqT: EncDec<RequestType>,
-  resT: EncDec<ResponseType>,
-  payload: RequestType | undefined,
-  data: ResponseType & JsonConvertible
-) => {
-  console.groupCollapsed(`Success: ${reqT?.name} -> ${resT?.name}`);
-  console.debug(
-    `
-    %c Payload Type: %c ${reqT?.name}
-    %c Payload: %c ${JSON.stringify(payload, null, 2)}
-    `,
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;',
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;'
-  );
-  console.debug(
-    `
-    %c Response Type: %c ${resT?.name}
-    %c Response: %c ${JSON.stringify(data, null, 2)}
-    `,
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;',
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;'
-  );
-  console.groupEnd();
-};
-
-/**
- * Log request error
- */
-const logRequestError = <
-  RequestType = keyof NewnewapiType,
-  ResponseType = keyof NewnewapiType
->(
-  reqT: EncDec<RequestType>,
-  resT: EncDec<ResponseType>,
-  payload: RequestType | undefined,
-  err: unknown
-) => {
-  console.groupCollapsed(`Error: ${reqT?.name} -> ${resT?.name}`);
-  console.debug(
-    `
-    %c Payload Type: %c ${reqT?.name}
-    %c Payload: %c ${JSON.stringify(payload, null, 2)}
-    `,
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;',
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;'
-  );
-  console.debug(
-    `
-    %c Response Type: %c ${resT?.name}
-    %c Error: %c ${err}
-    `,
-    'font-size: 14px; color: blue;',
-    'font-size: 12px; color: black;',
-    'font-size: 14px; color: red;',
-    'font-size: 12px; color: black;'
-  );
-  console.groupEnd();
-};
-
 interface IFetchProtobufInner<
   RequestType = keyof NewnewapiType,
   ResponseType = keyof NewnewapiType
@@ -207,8 +113,6 @@ interface IFetchProtobufInner<
 /**
  * This function is a typed wrapper around the browser `fetch` method,
  * aimed at sending and receiving protobuf messages, defined in `newnew-api`.
- * Not for standalone use, its purpose is to construct functions for concrete
- * endpoints in the `/endpoints` folder.
  * @template RequestType request type defined in `newnew-api`
  * @template ResponseType response type defined in `newnew-api`
  * @param reqT the request protobuf message
@@ -362,10 +266,12 @@ interface IFetchProtobuf<
 
 /**
  * This function is wrapper around `_fetchProtobuf` function,
- * but is aimed at the requests to protected routes. It can
+ * that tries to send access token header, if available. It can either
  * a) Try to get credential tokens from react-cookie instance
  * b) Use the credentials tokens passed to it, if the request
- * happens server-side, it will then update cookies using callback
+ * happens server-side, it will then update cookies using callback.
+ * Not for standalone use, its purpose is to construct functions for concrete
+ * endpoints in the `/endpoints` folder.
  * @template RequestType request type defined in `newnew-api`
  * @template ResponseType response type defined in `newnew-api`
  * @param reqT the request protobuf message
