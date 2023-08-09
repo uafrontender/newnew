@@ -197,7 +197,7 @@ export const Bundles: React.FC = React.memo(() => {
             fill={theme.colorsThemed.text.secondary}
             width={isMobile ? '20px' : '24px'}
             height={isMobile ? '20px' : '24px'}
-            visible={searchValue !== ''}
+            isVisible={searchValue !== ''}
             onClick={() => {
               setSearchValue('');
             }}
@@ -452,8 +452,8 @@ const SInput = styled.input`
   }
 `;
 
-const SRightInlineSVG = styled(InlineSvg)<{ visible: boolean }>`
-  opacity: ${({ visible }) => (visible ? 1 : 0)};
+const SRightInlineSVG = styled(InlineSvg)<{ isVisible: boolean }>`
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
   min-width: 20px;
   min-height: 20px;
 

@@ -174,7 +174,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({
         <SImage
           src={creator.coverUrl ?? ''}
           layout='fill'
-          visible={backgroundLoaded}
+          isVisible={backgroundLoaded}
           onLoad={() => {
             setBackgroundLoaded(true);
           }}
@@ -265,9 +265,9 @@ const SBackground = styled.div`
   overflow: hidden;
 `;
 
-const SImage = styled(Image)<{ visible: boolean }>`
+const SImage = styled(Image)<{ isVisible: boolean }>`
   object-fit: cover;
-  opacity: ${({ visible }) => (visible ? 1 : 0)};
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
 `;
 
 const SUserAvatarContainer = styled.div`
