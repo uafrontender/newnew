@@ -73,6 +73,5 @@ const SHighlightedDisplayName = styled(DisplayName)<{
 
 const SRegularDisplayName = styled(DisplayName)`
   max-width: 100%;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  color: #909aad;
 `;
