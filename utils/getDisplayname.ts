@@ -5,6 +5,7 @@ const getDisplayname = (
   user: newnewapi.IUser | newnewapi.ITinyUser | TUserData | null | undefined
 ) => {
   if (!user) {
+    // Still Loading?
     return '';
   }
 

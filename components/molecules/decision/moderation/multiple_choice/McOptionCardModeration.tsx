@@ -24,11 +24,11 @@ import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseM
 import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
-import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import { useAppState } from '../../../../../contexts/appStateContext';
+import SupportersInfo from '../../regular/multiple_choice/SupportersInfo';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -270,7 +270,7 @@ const McOptionCardModeration: React.FunctionComponent<
               {option.text}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              <RenderSupportersInfo
+              <SupportersInfo
                 isBlue={!!isWinner}
                 isCreatorsBid
                 isSuggestedByMe={false}

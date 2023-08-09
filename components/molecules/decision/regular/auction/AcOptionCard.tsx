@@ -855,7 +855,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         />
       )}
       {/* Report modal */}
-      {option.creator && (
+      {option.creator && !isMyBid && (
         <ReportModal
           show={isReportModalOpen}
           reportedUser={option.creator}

@@ -19,6 +19,18 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
   const { userData } = useUserData();
   const { userIsCreator } = useAppState();
 
+  // If there in no user in option, then it was deleted
+  if (!user) {
+    return (
+      <SRegularDisplayName
+        user={{ options: { isTombstone: true } }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      />
+    );
+  }
+
   if (typeof user === 'string') {
     return (
       // TODO: Should it have hover effect?
@@ -49,6 +61,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
       />
     );
   }
+
   // No navigation for non verified other users
   return (
     <SRegularDisplayName
