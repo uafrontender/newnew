@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
+import Loader from '../../atoms/Loader';
 
 // TODO: Use react query (but it requires a server side sorting)
 interface IBundleCreatorsList {
@@ -56,7 +58,7 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
 
   return (
     <SContainer className={className}>
-      {creators.length === 0 && !hasMore ? (
+      {creators.length === 0 && !hasMore && initialLoadDone ? (
         <NoResults />
       ) : (
         <SContent
@@ -79,6 +81,7 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
             collection={creators}
             onBuyBundleClicked={onBundleClicked}
           />
+          {loading && !initialLoadDone && <Loader size='md' isStatic />}
         </SContent>
       )}
       <SBottomShade visible={shadeVisible} />

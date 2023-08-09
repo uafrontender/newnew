@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
 import { useOverlayMode } from '../../../contexts/overlayModeContext';
+import Loader from '../../atoms/Loader';
 
 // TODO: Use react query (but it requires a server side sorting)
 interface IMobileBundleCreatorsList {
@@ -46,7 +47,7 @@ const MobileBundleCreatorsList: React.FC<IMobileBundleCreatorsList> = ({
 
   return (
     <SContainer className={className}>
-      {creators.length === 0 && !hasMore ? (
+      {creators.length === 0 && !hasMore && initialLoadDone ? (
         <SNoResults />
       ) : (
         <>
@@ -56,6 +57,7 @@ const MobileBundleCreatorsList: React.FC<IMobileBundleCreatorsList> = ({
             onBuyBundleClicked={onBundleClicked}
           />
           {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
+          {loading && <SLoader />}
         </>
       )}
     </SContainer>
@@ -83,4 +85,8 @@ const SRef = styled.div`
   width: 100%;
   height: 1px;
   overflow: hidden;
+`;
+
+const SLoader = styled(Loader)`
+  margin: 0 auto;
 `;
