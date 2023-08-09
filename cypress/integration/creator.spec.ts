@@ -1,9 +1,9 @@
+import { newnewapi } from 'newnew-api';
 import createStorage from './utils/createStorage';
 import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 import { fetchProtobuf } from '../../api/apiConfigs';
-import { newnewapi } from 'newnew-api';
 import getShortPostIdFromUrl from './utils/getShortPostIdFromUrl';
 
 const VERIFICATION_CODE = '111111';
@@ -2243,35 +2243,28 @@ context('Creator flow', () => {
       // Wait for cookies
       cy.wait(2000);
       cy.getCookie('accessToken').then((cookie) => {
-        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse,
-          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${eventShortId}`,
-          'post',
-          new newnewapi.EmptyRequest(),
-          {
-            'x-auth-token': cookie.value,
-            'x-from': 'web',
-          },
-          'cors',
-          'same-origin',
-          undefined
-        );
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+          reqT: newnewapi.EmptyRequest,
+          resT: newnewapi.EmptyResponse,
+          url: `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${eventShortId}`,
 
-        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse,
-          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${superpollShortId}`,
-          'post',
-          new newnewapi.EmptyRequest(),
-          {
-            'x-auth-token': cookie.value,
-            'x-from': 'web',
+          payload: new newnewapi.EmptyRequest(),
+          serverSideTokens: {
+            accessToken: cookie.value,
+            refreshToken: '',
           },
-          'cors',
-          'same-origin',
-          undefined
-        );
+        });
+
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+          reqT: newnewapi.EmptyRequest,
+          resT: newnewapi.EmptyResponse,
+          url: `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${superpollShortId}`,
+          payload: new newnewapi.EmptyRequest(),
+          serverSideTokens: {
+            accessToken: cookie.value,
+            refreshToken: '',
+          },
+        });
       });
 
       // Wait for dev BE to finish with post

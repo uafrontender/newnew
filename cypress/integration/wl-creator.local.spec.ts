@@ -1,9 +1,9 @@
+import { newnewapi } from 'newnew-api';
 import createStorage from './utils/createStorage';
 import enterCardInfo from './utils/enterCardInfo';
 import enterVerificationCode from './utils/enterVerificationCode';
 
 import { fetchProtobuf } from '../../api/apiConfigs';
-import { newnewapi } from 'newnew-api';
 import getShortPostIdFromUrl from './utils/getShortPostIdFromUrl';
 
 const VERIFICATION_CODE = '111111';
@@ -2364,37 +2364,30 @@ context.skip('Whitelisted Creator flow', () => {
       // Wait for cookies
       cy.wait(2000);
       cy.getCookie('accessToken').then((cookie) => {
-        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse,
-          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${firstEventShortId}`,
-          'post',
-          new newnewapi.EmptyRequest(),
-          {
-            'x-auth-token': cookie.value,
-            'x-from': 'web',
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+          reqT: newnewapi.EmptyRequest,
+          resT: newnewapi.EmptyResponse,
+          url: `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${firstEventShortId}`,
+
+          payload: new newnewapi.EmptyRequest(),
+          serverSideTokens: {
+            accessToken: cookie.value,
+            refreshToken: '',
           },
-          'cors',
-          'same-origin',
-          undefined
-        );
+        });
       });
 
       cy.getCookie('accessToken').then((cookie) => {
-        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse,
-          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${firstSuperpollShortId}`,
-          'post',
-          new newnewapi.EmptyRequest(),
-          {
-            'x-auth-token': cookie.value,
-            'x-from': 'web',
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+          reqT: newnewapi.EmptyRequest,
+          resT: newnewapi.EmptyResponse,
+          url: `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${firstSuperpollShortId}`,
+          payload: new newnewapi.EmptyRequest(),
+          serverSideTokens: {
+            accessToken: cookie.value,
+            refreshToken: '',
           },
-          'cors',
-          'same-origin',
-          undefined
-        );
+        });
       });
 
       // Wait for dev BE to finish with post
@@ -2593,37 +2586,31 @@ context.skip('Whitelisted Creator flow', () => {
       // Wait for cookies
       cy.wait(2000);
       cy.getCookie('accessToken').then((cookie) => {
-        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse,
-          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${secondEventShortId}`,
-          'post',
-          new newnewapi.EmptyRequest(),
-          {
-            'x-auth-token': cookie.value,
-            'x-from': 'web',
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+          reqT: newnewapi.EmptyRequest,
+          resT: newnewapi.EmptyResponse,
+          url: `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${secondEventShortId}`,
+
+          payload: new newnewapi.EmptyRequest(),
+          serverSideTokens: {
+            accessToken: cookie.value,
+            refreshToken: '',
           },
-          'cors',
-          'same-origin',
-          undefined
-        );
+        });
       });
 
       cy.getCookie('accessToken').then((cookie) => {
-        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
-          newnewapi.EmptyRequest,
-          newnewapi.EmptyResponse,
-          `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${secondSuperpollShortId}`,
-          'post',
-          new newnewapi.EmptyRequest(),
-          {
-            'x-auth-token': cookie.value,
-            'x-from': 'web',
+        fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>({
+          reqT: newnewapi.EmptyRequest,
+          resT: newnewapi.EmptyResponse,
+          url: `https://api-dev.newnew.co/v1/dev/update_post_internal_fields?post_uuid=${secondSuperpollShortId}`,
+
+          payload: new newnewapi.EmptyRequest(),
+          serverSideTokens: {
+            accessToken: cookie.value,
+            refreshToken: '',
           },
-          'cors',
-          'same-origin',
-          undefined
-        );
+        });
       });
 
       // Wait for dev BE to finish with post
