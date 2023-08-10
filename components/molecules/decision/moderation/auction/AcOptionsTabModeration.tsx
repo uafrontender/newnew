@@ -70,6 +70,7 @@ const AcOptionsTabModeration: React.FunctionComponent<
 
   // Scroll block
   const [isScrollBlocked, setIsScrollBlocked] = useState(false);
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(
@@ -106,6 +107,24 @@ const AcOptionsTabModeration: React.FunctionComponent<
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      const scrollable =
+        containerRef?.current &&
+        containerRef?.current?.scrollHeight >
+          containerRef?.current?.clientHeight;
+      setIsScrollable(!!scrollable);
+    });
+
+    if (containerRef?.current) {
+      resizeObserver.observe(containerRef?.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   return (
     <>
@@ -151,10 +170,9 @@ const AcOptionsTabModeration: React.FunctionComponent<
               ...(isScrollBlocked
                 ? {
                     overflow: 'hidden',
-                    width:
-                      options.length > 4
-                        ? 'calc(100% + 10px)'
-                        : 'calc(100% + 14px)',
+                    width: isScrollable
+                      ? 'calc(100% + 10px)'
+                      : 'calc(100% + 14px)',
                   }
                 : {}),
             }}
