@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { formatNumber } from '../../../../../utils/format';
 import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
+import { SSpanBiddersHighlighted, SSpanBiddersRegular } from './common';
+import SupportersInfoBasic from './SupportersInfoBasic';
 
 // TODO: Just use option and useMemo instead of individual option fields
 // TODO: Add logic that accepts option and returns users (me) to show  (not a component)
@@ -81,27 +82,12 @@ const SupportersInfo: React.FunctionComponent<{
     }
 
     return (
-      <>
-        <OptionCardUsernameSpan
-          user={whiteListedSupporter ?? firstVoter}
-          isBlue={isBlue}
-        />
-        <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubtracted > 0 ? ` & ` : ''}
-        </SSpanBiddersRegular>
-        {supporterCountSubtracted > 0 ? (
-          <SSpanBiddersHighlighted className='spanHighlighted'>
-            {formatNumber(supporterCountSubtracted, true)}{' '}
-            {supporterCountSubtracted > 1
-              ? t('mcPost.optionsTab.optionCard.others')
-              : t('mcPost.optionsTab.optionCard.other')}
-          </SSpanBiddersHighlighted>
-        ) : null}
-        <SSpanBiddersRegular className='spanRegular'>
-          {' '}
-          {t('mcPost.optionsTab.optionCard.voted')}
-        </SSpanBiddersRegular>
-      </>
+      <SupportersInfoBasic
+        isBlue={isBlue}
+        supporterCount={supporterCount}
+        firstVoter={firstVoter}
+        whiteListedSupporter={whiteListedSupporter}
+      />
     );
   }
 
@@ -191,15 +177,3 @@ const SupportersInfo: React.FunctionComponent<{
 };
 
 export default SupportersInfo;
-
-const SSpanBiddersHighlighted = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  a {
-    color: inherit !important;
-  }
-`;
-
-const SSpanBiddersRegular = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;

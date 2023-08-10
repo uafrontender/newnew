@@ -28,7 +28,7 @@ import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import { useAppState } from '../../../../../contexts/appStateContext';
-import SupportersInfo from '../../regular/multiple_choice/SupportersInfo';
+import SupportersInfoBasic from '../../regular/multiple_choice/SupportersInfoBasic';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -263,16 +263,11 @@ const McOptionCardModeration: React.FunctionComponent<
               {option.text}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              <SupportersInfo
+              <SupportersInfoBasic
                 isBlue={!!isWinner}
-                // TODO: Why is it always Creators Bid?
-                isCreatorsBid
-                isSuggestedByMe={false}
-                isSupportedByMe={false}
-                optionCreator={option.creator || undefined}
+                supporterCount={option.supporterCount}
                 firstVoter={option.firstVoter || undefined}
                 whiteListedSupporter={option.whitelistSupporter || undefined}
-                supporterCount={option.supporterCount}
               />
             </SBiddersInfo>
           </SBidDetails>
