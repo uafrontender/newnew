@@ -68,13 +68,6 @@ const McOptionCardModeration: React.FunctionComponent<
     [option.creator?.uuid, usersIBlocked]
   );
 
-  const supporterCountSubstracted = useMemo(() => {
-    if (option.supporterCount === 0) {
-      return 0;
-    }
-    return option.supporterCount - 1;
-  }, [option.supporterCount]);
-
   // Ellipse menu
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
@@ -272,6 +265,7 @@ const McOptionCardModeration: React.FunctionComponent<
             <SBiddersInfo variant={3}>
               <SupportersInfo
                 isBlue={!!isWinner}
+                // TODO: Why is it always Creators Bid?
                 isCreatorsBid
                 isSuggestedByMe={false}
                 isSupportedByMe={false}
@@ -279,7 +273,6 @@ const McOptionCardModeration: React.FunctionComponent<
                 firstVoter={option.firstVoter || undefined}
                 whiteListedSupporter={option.whitelistSupporter || undefined}
                 supporterCount={option.supporterCount}
-                supporterCountSubtracted={supporterCountSubstracted}
               />
             </SBiddersInfo>
           </SBidDetails>

@@ -140,13 +140,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     [option.isSupportedByMe, isSuggestedByMe]
   );
 
-  const supporterCountSubtracted = useMemo(() => {
-    if (option.supporterCount > 0) {
-      return option.supporterCount - 1;
-    }
-    return option.supporterCount;
-  }, [option.supporterCount]);
-
   // Ellipse menu
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
   const [optionMenuX, setOptionMenuXY] = useState({
@@ -662,7 +655,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 firstVoter={option.firstVoter || undefined}
                 whiteListedSupporter={option.whitelistSupporter || undefined}
                 supporterCount={option.supporterCount}
-                supporterCountSubtracted={supporterCountSubtracted}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -913,7 +905,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   firstVoter={option.firstVoter || undefined}
                   whiteListedSupporter={option.whitelistSupporter || undefined}
                   supporterCount={option.supporterCount}
-                  supporterCountSubtracted={supporterCountSubtracted}
                 />
               </SBiddersInfo>
             </SBidDetails>

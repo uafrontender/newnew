@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -14,7 +14,6 @@ const SupportersInfo: React.FunctionComponent<{
   isSuggestedByMe: boolean;
   isSupportedByMe: boolean;
   supporterCount: number;
-  supporterCountSubtracted: number;
   optionCreator?: newnewapi.IUser;
   firstVoter?: newnewapi.IUser;
   whiteListedSupporter?: newnewapi.IUser;
@@ -24,80 +23,81 @@ const SupportersInfo: React.FunctionComponent<{
   isSupportedByMe,
   isSuggestedByMe,
   supporterCount,
-  supporterCountSubtracted,
   optionCreator,
   firstVoter,
   whiteListedSupporter,
 }) => {
   const { t } = useTranslation('page-Post');
 
-  if (isCreatorsBid && !isSupportedByMe) {
-    console.log('1');
-    console.log(firstVoter);
-    return (
-      <>
-        {supporterCount > 0 ? (
-          <>
-            <OptionCardUsernameSpan
-              user={whiteListedSupporter ?? firstVoter}
-              isBlue={isBlue}
-            />
-            <SSpanBiddersRegular className='spanRegular'>
-              {supporterCountSubtracted > 0 ? ` & ` : ''}
-            </SSpanBiddersRegular>
-            {supporterCountSubtracted > 0 ? (
-              <SSpanBiddersHighlighted className='spanHighlighted'>
-                {formatNumber(supporterCountSubtracted, true)}{' '}
-                {supporterCountSubtracted > 1
-                  ? t('mcPost.optionsTab.optionCard.others')
-                  : t('mcPost.optionsTab.optionCard.other')}
-              </SSpanBiddersHighlighted>
-            ) : null}
-            <SSpanBiddersRegular className='spanRegular'>
-              {' '}
-              {t('mcPost.optionsTab.optionCard.voted')}
-            </SSpanBiddersRegular>
-          </>
-        ) : null}
-      </>
-    );
-  }
+  const supporterCountSubtracted = useMemo(() => {
+    if (supporterCount > 0) {
+      return supporterCount - 1;
+    }
+    return supporterCount;
+  }, [supporterCount]);
 
-  if (isCreatorsBid && isSupportedByMe) {
-    return (
-      <>
-        {supporterCount > 0 ? (
-          <>
-            <OptionCardUsernameSpan
-              user={supporterCountSubtracted > 0 ? t('me') : t('I')}
-              isBlue={isBlue}
-            />
-            <SSpanBiddersRegular className='spanRegular'>
-              {supporterCountSubtracted > 0 ? ` & ` : ''}
-            </SSpanBiddersRegular>
-            {supporterCountSubtracted > 0 ? (
-              <SSpanBiddersHighlighted className='spanHighlighted'>
-                {formatNumber(supporterCountSubtracted, true)}{' '}
-                {supporterCountSubtracted > 1
-                  ? t('mcPost.optionsTab.optionCard.others')
-                  : t('mcPost.optionsTab.optionCard.other')}
-              </SSpanBiddersHighlighted>
-            ) : null}
-            <SSpanBiddersRegular className='spanRegular'>
-              {' '}
-              {t('mcPost.optionsTab.optionCard.voted')}
-            </SSpanBiddersRegular>
-          </>
-        ) : null}
-      </>
-    );
-  }
+  if (isCreatorsBid) {
+    // TODO: Why do we check it?
+    if (supporterCount < 1) {
+      return null;
+    }
 
-  if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
+    if (isSupportedByMe) {
+      return (
+        <>
+          <OptionCardUsernameSpan
+            user={supporterCountSubtracted > 0 ? t('me') : t('I')}
+            isBlue={isBlue}
+          />
+          <SSpanBiddersRegular className='spanRegular'>
+            {supporterCountSubtracted > 0 ? ` & ` : ''}
+          </SSpanBiddersRegular>
+          {supporterCountSubtracted > 0 ? (
+            <SSpanBiddersHighlighted className='spanHighlighted'>
+              {formatNumber(supporterCountSubtracted, true)}{' '}
+              {supporterCountSubtracted > 1
+                ? t('mcPost.optionsTab.optionCard.others')
+                : t('mcPost.optionsTab.optionCard.other')}
+            </SSpanBiddersHighlighted>
+          ) : null}
+          <SSpanBiddersRegular className='spanRegular'>
+            {' '}
+            {t('mcPost.optionsTab.optionCard.voted')}
+          </SSpanBiddersRegular>
+        </>
+      );
+    }
+
     return (
       <>
         <OptionCardUsernameSpan
-          user={whiteListedSupporter ?? optionCreator}
+          user={whiteListedSupporter ?? firstVoter}
+          isBlue={isBlue}
+        />
+        <SSpanBiddersRegular className='spanRegular'>
+          {supporterCountSubtracted > 0 ? ` & ` : ''}
+        </SSpanBiddersRegular>
+        {supporterCountSubtracted > 0 ? (
+          <SSpanBiddersHighlighted className='spanHighlighted'>
+            {formatNumber(supporterCountSubtracted, true)}{' '}
+            {supporterCountSubtracted > 1
+              ? t('mcPost.optionsTab.optionCard.others')
+              : t('mcPost.optionsTab.optionCard.other')}
+          </SSpanBiddersHighlighted>
+        ) : null}
+        <SSpanBiddersRegular className='spanRegular'>
+          {' '}
+          {t('mcPost.optionsTab.optionCard.voted')}
+        </SSpanBiddersRegular>
+      </>
+    );
+  }
+
+  if (isSuggestedByMe) {
+    return (
+      <>
+        <OptionCardUsernameSpan
+          user={supporterCount > 1 ? t('me') : t('I')}
           isBlue={isBlue}
         />
         <SSpanBiddersRegular className='spanRegular'>
@@ -121,7 +121,7 @@ const SupportersInfo: React.FunctionComponent<{
     );
   }
 
-  if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
+  if (isSupportedByMe) {
     return (
       <>
         <OptionCardUsernameSpan
@@ -151,35 +151,31 @@ const SupportersInfo: React.FunctionComponent<{
     );
   }
 
-  if (!isCreatorsBid && isSuggestedByMe) {
-    return (
-      <>
-        <OptionCardUsernameSpan
-          user={supporterCount > 1 ? t('me') : t('I')}
-          isBlue={isBlue}
-        />
-        <SSpanBiddersRegular className='spanRegular'>
-          {supporterCountSubtracted > 0 ? ` & ` : ''}
-        </SSpanBiddersRegular>
-        {supporterCountSubtracted > 0 ? (
-          <>
-            <SSpanBiddersHighlighted className='spanHighlighted'>
-              {formatNumber(supporterCountSubtracted, true)}{' '}
-              {supporterCountSubtracted > 1
-                ? t('mcPost.optionsTab.optionCard.others')
-                : t('mcPost.optionsTab.optionCard.other')}
-            </SSpanBiddersHighlighted>
-          </>
-        ) : null}
-        <SSpanBiddersRegular className='spanRegular'>
-          {' '}
-          {t('mcPost.optionsTab.optionCard.voted')}
-        </SSpanBiddersRegular>
-      </>
-    );
-  }
-
-  return null;
+  return (
+    <>
+      <OptionCardUsernameSpan
+        user={whiteListedSupporter ?? optionCreator}
+        isBlue={isBlue}
+      />
+      <SSpanBiddersRegular className='spanRegular'>
+        {supporterCountSubtracted > 0 ? ` & ` : ''}
+      </SSpanBiddersRegular>
+      {supporterCountSubtracted > 0 ? (
+        <>
+          <SSpanBiddersHighlighted className='spanHighlighted'>
+            {formatNumber(supporterCountSubtracted, true)}{' '}
+            {supporterCountSubtracted > 1
+              ? t('mcPost.optionsTab.optionCard.others')
+              : t('mcPost.optionsTab.optionCard.other')}
+          </SSpanBiddersHighlighted>
+        </>
+      ) : null}
+      <SSpanBiddersRegular className='spanRegular'>
+        {' '}
+        {t('mcPost.optionsTab.optionCard.voted')}
+      </SSpanBiddersRegular>
+    </>
+  );
 };
 
 export default SupportersInfo;
