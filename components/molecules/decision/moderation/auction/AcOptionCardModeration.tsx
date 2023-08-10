@@ -165,7 +165,7 @@ const AcOptionCardModeration: React.FunctionComponent<
             </SOptionInfo>
             <SBiddersInfo variant={3}>
               <OptionCardUsernameSpan
-                user={option.whitelistSupporter ?? option.creator!!}
+                user={option.whitelistSupporter ?? option.creator}
                 isBlue={!!isWinner}
               />
               {option.supporterCount > 1 ? (
@@ -266,7 +266,9 @@ const AcOptionCardModeration: React.FunctionComponent<
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
               canDeleteOptionInitial={!isWinner}
-              canBlockUser={!!option.creator}
+              canBlockUser={
+                !!option.creator && !option.creator.options?.isTombstone
+              }
               handleClose={() => {
                 setIsEllipseMenuOpen(false);
                 handleUnsetScrollBlocked?.();
@@ -355,7 +357,7 @@ const AcOptionCardModeration: React.FunctionComponent<
           }
         />
       )}
-      {option.creator && (
+      {option.creator && !option.creator.options?.isTombstone && (
         <>
           {/* Confirm block user modal */}
           <BlockUserModalPost

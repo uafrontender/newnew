@@ -41,7 +41,16 @@ const WinningMcOptionSupporters: React.FC<IWinningMcOptionCreator> = React.memo(
         return winningOption.firstVoter;
       }
 
-      // For custom options show it's creator
+      if (
+        winningOption.creator &&
+        !winningOption.creator.options?.isTombstone &&
+        winningOption.firstVoter
+      ) {
+        // If option creator is deleted, return first voter if available
+        return winningOption.firstVoter;
+      }
+
+      // For custom options show it's creator, deleted or not
       return winningOption.creator;
     }, [
       winningOption.whitelistSupporter,

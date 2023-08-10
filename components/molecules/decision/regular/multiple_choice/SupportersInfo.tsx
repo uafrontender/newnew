@@ -36,6 +36,18 @@ const SupportersInfo: React.FunctionComponent<{
     return supporterCount;
   }, [supporterCount]);
 
+  const userToShowForCustomOption = useMemo(() => {
+    if (whiteListedSupporter) {
+      return whiteListedSupporter;
+    }
+
+    if (optionCreator?.options?.isTombstone && firstVoter) {
+      return firstVoter;
+    }
+
+    return optionCreator;
+  }, [whiteListedSupporter, optionCreator, firstVoter]);
+
   if (isCreatorsBid) {
     // TODO: Why do we check it?
     if (supporterCount < 1) {
@@ -125,7 +137,7 @@ const SupportersInfo: React.FunctionComponent<{
     return (
       <>
         <OptionCardUsernameSpan
-          user={whiteListedSupporter ?? optionCreator}
+          user={userToShowForCustomOption}
           isBlue={isBlue}
         />
         {', '}
@@ -154,7 +166,7 @@ const SupportersInfo: React.FunctionComponent<{
   return (
     <>
       <OptionCardUsernameSpan
-        user={whiteListedSupporter ?? optionCreator}
+        user={userToShowForCustomOption}
         isBlue={isBlue}
       />
       <SSpanBiddersRegular className='spanRegular'>
