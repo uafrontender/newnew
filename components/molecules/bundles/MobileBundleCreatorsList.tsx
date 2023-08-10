@@ -57,7 +57,7 @@ const MobileBundleCreatorsList: React.FC<IMobileBundleCreatorsList> = ({
             onBuyBundleClicked={onBundleClicked}
           />
           {hasMore && !loading && <SRef ref={loadingRef}>Loading...</SRef>}
-          {loading && <SLoader />}
+          {loading && initialLoadDone && <SLoader />}
         </>
       )}
     </SContainer>

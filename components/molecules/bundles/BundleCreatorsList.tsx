@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
 import Loader from '../../atoms/Loader';
+import useComponentScrollRestoration from '../../../utils/hooks/useComponentScrollRestoration';
 
 // TODO: Use react query (but it requires a server side sorting)
 interface IBundleCreatorsList {
@@ -32,6 +33,11 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
   const searchContainerRef = useRef<HTMLDivElement | undefined>();
   const [scrolledToBottom, setScrolledToBottom] = useState<boolean>(false);
   const [shadeVisible, setShadeVisible] = useState<boolean>(true);
+
+  useComponentScrollRestoration(
+    searchContainerRef.current || undefined,
+    'search-container'
+  );
 
   useEffect(() => {
     if (scrolledToBottom) {
@@ -75,6 +81,7 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
             setScrolledToBottom(!scrollable || scrolledToTheBottom);
             setShadeVisible(scrollable && (!scrolledToTheBottom || hasMore));
           }}
+          id='search-container'
         >
           <CreatorsList
             loading={loading && initialLoadDone}
