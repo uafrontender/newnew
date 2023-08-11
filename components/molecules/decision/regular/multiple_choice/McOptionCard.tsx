@@ -949,9 +949,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
           isMyOption={isSuggestedByMe}
+          canReportOption={
+            !!option.creator && !option.creator?.options?.isTombstone
+          }
           optionType='mc'
           optionId={option.id as number}
-          optionCreatorUuid={option.creator?.uuid ?? ''}
           handleClose={() => {
             setIsEllipseMenuOpen(false);
             handleUnsetScrollBlocked?.();
@@ -961,14 +963,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         />
       )}
       {/* Report modal */}
-      {option.creator && !isSuggestedByMe && (
-        <ReportModal
-          show={isReportModalOpen}
-          reportedUser={option.creator}
-          onSubmit={handleReportSubmit}
-          onClose={handleReportClose}
-        />
-      )}
+      {option.creator &&
+        !option.creator?.options?.isTombstone &&
+        !isSuggestedByMe && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedUser={option.creator}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
       {/* Remove modal */}
       <McConfirmDeleteOptionModal
         isVisible={isRemoveModalOpen}

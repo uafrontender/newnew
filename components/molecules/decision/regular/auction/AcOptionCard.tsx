@@ -843,9 +843,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           xy={optionMenuX}
           isVisible={isEllipseMenuOpen}
           isMyOption={isMyBid}
+          canReportOption={
+            !!option.creator && !option.creator?.options?.isTombstone
+          }
           optionType='ac'
           optionId={option.id as number}
-          optionCreatorUuid={option.creator?.uuid ?? ''}
           handleClose={() => {
             setIsEllipseMenuOpen(false);
             handleUnsetScrollBlocked?.();
@@ -855,7 +857,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         />
       )}
       {/* Report modal */}
-      {option.creator && !isMyBid && (
+      {option.creator && !option.creator?.options?.isTombstone && !isMyBid && (
         <ReportModal
           show={isReportModalOpen}
           reportedUser={option.creator}

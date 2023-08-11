@@ -297,7 +297,9 @@ const McOptionCardModeration: React.FunctionComponent<
               isVisible={isEllipseMenuOpen}
               isBySubscriber={!isCreatorsOption}
               canDeleteOptionInitial={canBeDeleted && !isWinner}
-              canBlockUser={!!option.creator}
+              canBlockUser={
+                !!option.creator && !option.creator?.options?.isTombstone
+              }
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
               handleClose={handleCloseEllipseMenuUnblockScroll}
@@ -346,14 +348,16 @@ const McOptionCardModeration: React.FunctionComponent<
         />
       )}
       {/* Report modal */}
-      {!isCreatorsOption && option.creator && (
-        <ReportModal
-          show={isReportModalOpen}
-          reportedUser={option.creator}
-          onSubmit={handleReportSubmit}
-          onClose={handleReportClose}
-        />
-      )}
+      {!isCreatorsOption &&
+        option.creator &&
+        !option.creator?.options?.isTombstone && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedUser={option.creator}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
     </>
   );
 };
