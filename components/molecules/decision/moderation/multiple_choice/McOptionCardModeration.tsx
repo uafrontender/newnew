@@ -24,11 +24,11 @@ import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseM
 import BlockUserModalPost from '../../common/BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
-import { RenderSupportersInfo } from '../../regular/multiple_choice/McOptionCard';
 import useErrorToasts from '../../../../../utils/hooks/useErrorToasts';
 import { useGetBlockedUsers } from '../../../../../contexts/blockedUsersContext';
 import { Mixpanel } from '../../../../../utils/mixpanel';
 import { useAppState } from '../../../../../contexts/appStateContext';
+import SupportersInfoBasic from '../../regular/multiple_choice/SupportersInfoBasic';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -67,13 +67,6 @@ const McOptionCardModeration: React.FunctionComponent<
     () => usersIBlocked.includes(option.creator?.uuid ?? ''),
     [option.creator?.uuid, usersIBlocked]
   );
-
-  const supporterCountSubstracted = useMemo(() => {
-    if (option.supporterCount === 0) {
-      return 0;
-    }
-    return option.supporterCount - 1;
-  }, [option.supporterCount]);
 
   // Ellipse menu
   const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
@@ -270,16 +263,11 @@ const McOptionCardModeration: React.FunctionComponent<
               {option.text}
             </SOptionInfo>
             <SBiddersInfo variant={3}>
-              <RenderSupportersInfo
+              <SupportersInfoBasic
                 isBlue={!!isWinner}
-                isCreatorsBid
-                isSuggestedByMe={false}
-                isSupportedByMe={false}
-                optionCreator={option.creator || undefined}
+                supporterCount={option.supporterCount}
                 firstVoter={option.firstVoter || undefined}
                 whiteListedSupporter={option.whitelistSupporter || undefined}
-                supporterCount={option.supporterCount}
-                supporterCountSubtracted={supporterCountSubstracted}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -307,9 +295,11 @@ const McOptionCardModeration: React.FunctionComponent<
           {!isMobile && (
             <McOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
-              isBySubscriber={!isCreatorsOption}
+              isCreatorsOption={isCreatorsOption}
               canDeleteOptionInitial={canBeDeleted && !isWinner}
-              canBlockUser={!!option.creator}
+              canBlockOrReportUser={
+                !!option.creator && !option.creator?.options?.isTombstone
+              }
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
               handleClose={handleCloseEllipseMenuUnblockScroll}
@@ -358,14 +348,16 @@ const McOptionCardModeration: React.FunctionComponent<
         />
       )}
       {/* Report modal */}
-      {!isCreatorsOption && option.creator && (
-        <ReportModal
-          show={isReportModalOpen}
-          reportedUser={option.creator}
-          onSubmit={handleReportSubmit}
-          onClose={handleReportClose}
-        />
-      )}
+      {!isCreatorsOption &&
+        option.creator &&
+        !option.creator?.options?.isTombstone && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedUser={option.creator}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
     </>
   );
 };

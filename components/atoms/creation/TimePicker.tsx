@@ -359,8 +359,9 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
             scrollContainerRefHours.current.scrollTo({
               top:
                 element.offsetTop -
-                scrollContainerRefHours.current.offsetHeight / 2 +
-                element.offsetHeight,
+                (scrollContainerRefHours.current.clientHeight -
+                  element.clientHeight) /
+                  2,
               behavior: 'smooth',
             });
           }
@@ -368,19 +369,19 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       }
 
       if (scrollContainerRefMinutes.current) {
-        const selectedMinuteIndex = parseInt(minute) - 1;
+        const selectedMinuteIndex = parseInt(minute);
         if (selectedMinuteIndex > -1) {
           const element = scrollContainerRefMinutes.current.children[
             selectedMinuteIndex
           ] as HTMLDivElement | undefined;
 
           if (element) {
-            console.log(scrollContainerRefMinutes.current.offsetHeight / 2);
             scrollContainerRefMinutes.current.scrollTo({
               top:
                 element.offsetTop -
-                scrollContainerRefMinutes.current.offsetHeight / 2 +
-                element.offsetHeight,
+                (scrollContainerRefMinutes.current.clientHeight -
+                  element.clientHeight) /
+                  2,
               behavior: 'smooth',
             });
           }
