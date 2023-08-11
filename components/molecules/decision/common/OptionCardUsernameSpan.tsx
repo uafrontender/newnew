@@ -19,16 +19,8 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
   const { userData } = useUserData();
   const { userIsCreator } = useAppState();
 
-  // If there in no user in option, then it was deleted
   if (!user) {
-    return (
-      <SRegularDisplayName
-        user={{ options: { isTombstone: true } }}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      />
-    );
+    return null;
   }
 
   if (typeof user === 'string') {

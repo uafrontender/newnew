@@ -266,7 +266,7 @@ const AcOptionCardModeration: React.FunctionComponent<
               optionId={option.id as number}
               isUserBlocked={isUserBlocked}
               canDeleteOptionInitial={!isWinner}
-              canBlockUser={
+              canBlockOrReportUser={
                 !!option.creator && !option.creator.options?.isTombstone
               }
               handleClose={() => {

@@ -15,7 +15,7 @@ const getDisplayname = (
     'isTombstone' in user.options &&
     user.options?.isTombstone
   ) {
-    // Only visible when BE fails to provide a user (which is a bug)
+    // Shown when user is deleted and there is no other user to show
     // Can't translate without passing translations as prop
     return 'Private user';
   }

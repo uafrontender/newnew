@@ -13,7 +13,7 @@ interface IMcOptionCardModerationEllipseMenu {
   optionId: number;
   isUserBlocked: boolean;
   canDeleteOptionInitial: boolean;
-  canBlockUser: boolean;
+  canBlockOrReportUser: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
@@ -31,7 +31,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
   optionId,
   isUserBlocked,
   canDeleteOptionInitial,
-  canBlockUser,
+  canBlockOrReportUser,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
@@ -86,32 +86,34 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<
     >
       {isBySubscriber ? (
         <>
-          <EllipseMenuButton
-            variant={3}
-            tone='error'
-            onClick={() => {
-              handleOpenReportOptionModal();
-              handleClose();
-            }}
-          >
-            {t('ellipse.reportOption')}
-          </EllipseMenuButton>
-          {canBlockUser && (
-            <EllipseMenuButton
-              variant={3}
-              onClick={async () => {
-                if (isUserBlocked) {
-                  await handleUnblockUser();
-                  return;
-                }
-                handleOpenBlockUserModal();
-                handleClose();
-              }}
-            >
-              {!isUserBlocked
-                ? t('ellipse.blockUser')
-                : t('ellipse.unblockUser')}
-            </EllipseMenuButton>
+          {canBlockOrReportUser && (
+            <>
+              <EllipseMenuButton
+                variant={3}
+                tone='error'
+                onClick={() => {
+                  handleOpenReportOptionModal();
+                  handleClose();
+                }}
+              >
+                {t('ellipse.reportOption')}
+              </EllipseMenuButton>
+              <EllipseMenuButton
+                variant={3}
+                onClick={async () => {
+                  if (isUserBlocked) {
+                    await handleUnblockUser();
+                    return;
+                  }
+                  handleOpenBlockUserModal();
+                  handleClose();
+                }}
+              >
+                {!isUserBlocked
+                  ? t('ellipse.blockUser')
+                  : t('ellipse.unblockUser')}
+              </EllipseMenuButton>
+            </>
           )}
         </>
       ) : null}
