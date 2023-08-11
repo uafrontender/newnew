@@ -6,6 +6,7 @@ import { formatNumber } from '../../../../../utils/format';
 import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 import { SSpanBiddersHighlighted, SSpanBiddersRegular } from './common';
 import SupportersInfoBasic from './SupportersInfoBasic';
+import { useAppState } from '../../../../../contexts/appStateContext';
 
 // TODO: Just use option and useMemo instead of individual option fields
 // TODO: Add logic that accepts option and returns users (me) to show  (not a component)
@@ -29,6 +30,7 @@ const SupportersInfo: React.FunctionComponent<{
   whiteListedSupporter,
 }) => {
   const { t } = useTranslation('page-Post');
+  const { userUuid } = useAppState();
 
   const supporterCountSubtracted = useMemo(() => {
     if (supporterCount > 0) {
@@ -91,7 +93,7 @@ const SupportersInfo: React.FunctionComponent<{
     );
   }
 
-  if (isSuggestedByMe) {
+  if (isSuggestedByMe || userToShowForCustomOption?.uuid === userUuid) {
     return (
       <>
         <OptionCardUsernameSpan

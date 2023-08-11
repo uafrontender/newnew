@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import OptionCardUsernameSpan from '../../common/OptionCardUsernameSpan';
 import { formatNumber } from '../../../../../utils/format';
 import { SSpanBiddersHighlighted, SSpanBiddersRegular } from './common';
+import getDeletedUserPlaceholder from '../../../../../utils/getDeletedUserPlaceholder';
 
 const SupportersInfoBasic: React.FC<{
   isBlue: boolean;
@@ -23,7 +24,7 @@ const SupportersInfoBasic: React.FC<{
   return (
     <>
       <OptionCardUsernameSpan
-        user={whiteListedSupporter ?? firstVoter}
+        user={whiteListedSupporter ?? firstVoter ?? getDeletedUserPlaceholder()}
         isBlue={isBlue}
       />
       <SSpanBiddersRegular className='spanRegular'>
