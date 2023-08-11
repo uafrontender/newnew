@@ -14,10 +14,10 @@ interface IOptionMenu {
     y: number;
   };
   isVisible: boolean;
-  optionId?: number;
-  optionCreatorUuid?: string;
-  optionType?: 'ac' | 'mc';
-  isMyOption?: boolean;
+  optionId: number;
+  optionType: 'ac' | 'mc';
+  isMyOption: boolean;
+  canReportOption: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenRemoveOptionModal?: () => void;
@@ -27,9 +27,9 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
   xy,
   isVisible,
   isMyOption,
+  canReportOption,
   optionType,
   optionId,
-  optionCreatorUuid,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenRemoveOptionModal,
@@ -92,12 +92,16 @@ const OptionEllipseMenu: React.FunctionComponent<IOptionMenu> = ({
       isMyOption,
       optionType,
       optionId,
-      optionCreatorUuid,
+
       // handleClose, - not needed here, can be wrapped into useCallback in parent component
     ]
   );
 
-  if (!isVisible || (isMyOption && isCanDeleteOptionLoading)) {
+  if (
+    !isVisible ||
+    (isMyOption && isCanDeleteOptionLoading) ||
+    (!isMyOption && !canReportOption)
+  ) {
     return null;
   }
 

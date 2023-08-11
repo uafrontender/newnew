@@ -49,6 +49,7 @@ const OptionCardUsernameSpan: React.FC<IOptionCardUsernameSpan> = ({
       />
     );
   }
+
   // No navigation for non verified other users
   return (
     <SRegularDisplayName
@@ -73,6 +74,5 @@ const SHighlightedDisplayName = styled(DisplayName)<{
 
 const SRegularDisplayName = styled(DisplayName)`
   max-width: 100%;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  color: #909aad;
 `;
