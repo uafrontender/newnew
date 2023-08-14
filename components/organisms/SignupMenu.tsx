@@ -229,15 +229,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 hoverBgColor={theme.colorsThemed.social.google.hover}
                 pressedBgColor={theme.colorsThemed.social.google.pressed}
                 textWidth={textWidth}
+                loading={!appConstants?.availableAuthProviders}
                 setTextWidth={handleTextWidthChange}
                 onClick={() => {
                   Mixpanel.track('Sign In With Google Clicked', {
                     _stage: 'Sign Up',
                   });
-
-                  if (!appConstants?.availableAuthProviders) {
-                    return;
-                  }
 
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/google${redirectUrlParam}`
@@ -257,15 +254,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 hoverContentColor='#FFF'
                 pressedBgColor={theme.colorsThemed.social.apple.pressed}
                 textWidth={textWidth}
+                loading={!appConstants?.availableAuthProviders}
                 setTextWidth={handleTextWidthChange}
                 onClick={() => {
                   Mixpanel.track('Sign In With Apple Clicked', {
                     _stage: 'Sign Up',
                   });
-
-                  if (!appConstants?.availableAuthProviders) {
-                    return;
-                  }
 
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/apple${redirectUrlParam}`
@@ -285,15 +279,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 hoverBgColor={theme.colorsThemed.social.facebook.hover}
                 pressedBgColor={theme.colorsThemed.social.facebook.pressed}
                 textWidth={textWidth}
+                loading={!appConstants?.availableAuthProviders}
                 setTextWidth={handleTextWidthChange}
                 onClick={() => {
                   Mixpanel.track('Sign In With Facebook Clicked', {
                     _stage: 'Sign Up',
                   });
-
-                  if (!appConstants?.availableAuthProviders) {
-                    return;
-                  }
 
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/fb${redirectUrlParam}`
@@ -312,15 +303,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 hoverBgColor={theme.colorsThemed.social.twitter.hover}
                 pressedBgColor={theme.colorsThemed.social.twitter.pressed}
                 textWidth={textWidth}
+                loading={!appConstants?.availableAuthProviders}
                 setTextWidth={handleTextWidthChange}
                 onClick={() => {
                   Mixpanel.track('Sign In With Twitter Clicked', {
                     _stage: 'Sign Up',
                   });
-
-                  if (!appConstants?.availableAuthProviders) {
-                    return;
-                  }
 
                   handleSignupRedirect(
                     `${BASE_URL_AUTH}/twitter${redirectUrlParam}`

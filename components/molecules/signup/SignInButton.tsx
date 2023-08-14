@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useIsomorphicLayoutEffect } from 'react-use';
+import Skeleton from 'react-loading-skeleton';
 
 import InlineSvg from '../../atoms/InlineSVG';
 import RippleAnimation from '../../atoms/RippleAnimation';
@@ -15,6 +16,7 @@ type TSignInButton = React.ComponentPropsWithoutRef<'button'> & {
   hoverContentColor?: string;
   pressedBgColor: string;
   textWidth?: number;
+  loading?: boolean;
   setTextWidth: (width: number) => void;
 };
 
@@ -25,11 +27,14 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   noRipple,
   children,
   textWidth,
+  loading,
   setTextWidth,
   onClick,
   disabled,
   ...rest
 }) => {
+  const theme = useTheme();
+
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
 
@@ -122,43 +127,56 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   });
 
   return (
-    <SSignInButton
-      disabled={disabled}
-      ref={(el) => {
-        ref.current = el!!;
-      }}
-      elementWidth={ref.current?.getBoundingClientRect().width ?? 800}
-      textWidth={textWidth}
-      rippleOrigin={rippleOrigin}
-      isRippling={noRipple ? false : isRippling}
-      noRipple={noRipple ?? false}
-      onMouseOver={handleEnableHovered}
-      onTouchStartCapture={handleEnableHovered}
-      onFocusCapture={handleFocusCapture}
-      onBlurCapture={handleBlurCapture}
-      onMouseDown={handleSetRippleOnMouseDown}
-      onTouchStart={handleSetRippleOnTouchStart}
-      onKeyDownCapture={handleSetRippleOnKeyDown}
-      onMouseLeave={handleMouseLeave}
-      onMouseUpCapture={handleRestoreRippling}
-      onTouchEndCapture={handleRestoreRippling}
-      onKeyUpCapture={handleRestoreRippling}
-      onClick={handleClick}
-      {...rest}
-    >
-      <InlineSvg
-        svg={!hovered ? svg : hoverSvg ?? svg}
-        height='20px'
-        width='20px'
-      />
-      <span
+    <SContainer>
+      <SSignInButton
+        disabled={disabled || loading}
         ref={(el) => {
-          spanRef.current = el!!;
+          ref.current = el!!;
         }}
+        elementWidth={ref.current?.getBoundingClientRect().width ?? 800}
+        textWidth={textWidth}
+        rippleOrigin={rippleOrigin}
+        isRippling={noRipple ? false : isRippling}
+        noRipple={noRipple ?? false}
+        onMouseOver={handleEnableHovered}
+        onTouchStartCapture={handleEnableHovered}
+        onFocusCapture={handleFocusCapture}
+        onBlurCapture={handleBlurCapture}
+        onMouseDown={handleSetRippleOnMouseDown}
+        onTouchStart={handleSetRippleOnTouchStart}
+        onKeyDownCapture={handleSetRippleOnKeyDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUpCapture={handleRestoreRippling}
+        onTouchEndCapture={handleRestoreRippling}
+        onKeyUpCapture={handleRestoreRippling}
+        onClick={handleClick}
+        {...rest}
       >
-        {title ?? children}
-      </span>
-    </SSignInButton>
+        <InlineSvg
+          svg={!hovered ? svg : hoverSvg ?? svg}
+          height='20px'
+          width='20px'
+        />
+        <span
+          ref={(el) => {
+            spanRef.current = el!!;
+          }}
+        >
+          {title ?? children}
+        </span>
+      </SSignInButton>
+      {loading && (
+        <SSkeleton
+          count={1}
+          borderRadius={16}
+          duration={2}
+          className='expiresSkeleton'
+          containerClassName='expiresSkeletonContainer'
+          baseColor={theme.colorsThemed.background.secondary}
+          highlightColor={theme.colorsThemed.background.quaternary}
+        />
+      )}
+    </SContainer>
   );
 };
 
@@ -186,6 +204,11 @@ interface SISignInButton {
     y: string;
   };
 }
+
+const SContainer = styled.div`
+  display: flex;
+  position: relative;
+`;
 
 const SSignInButton = styled.button<SISignInButton>`
   position: relative;
@@ -361,3 +384,12 @@ SSignInButton.defaultProps = {
   hoverBgColor: undefined,
   hoverContentColor: undefined,
 };
+
+const SSkeleton = styled(Skeleton)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  zindex: 1;
+`;
