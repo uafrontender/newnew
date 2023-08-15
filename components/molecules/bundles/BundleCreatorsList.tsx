@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+
 import CreatorsList from '../../organisms/search/CreatorsList';
 import NoResults from '../../atoms/search/NoResults';
+import Loader from '../../atoms/Loader';
+import useComponentScrollRestoration from '../../../utils/hooks/useComponentScrollRestoration';
 
 // TODO: Use react query (but it requires a server side sorting)
 interface IBundleCreatorsList {
@@ -31,6 +34,11 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
   const [scrolledToBottom, setScrolledToBottom] = useState<boolean>(false);
   const [shadeVisible, setShadeVisible] = useState<boolean>(true);
 
+  useComponentScrollRestoration(
+    searchContainerRef.current || undefined,
+    'search-container'
+  );
+
   useEffect(() => {
     if (scrolledToBottom) {
       loadMore();
@@ -56,7 +64,7 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
 
   return (
     <SContainer className={className}>
-      {creators.length === 0 && !hasMore ? (
+      {creators.length === 0 && !hasMore && initialLoadDone ? (
         <NoResults />
       ) : (
         <SContent
@@ -73,12 +81,14 @@ const BundleCreatorsList: React.FC<IBundleCreatorsList> = ({
             setScrolledToBottom(!scrollable || scrolledToTheBottom);
             setShadeVisible(scrollable && (!scrolledToTheBottom || hasMore));
           }}
+          id='search-container'
         >
           <CreatorsList
             loading={loading && initialLoadDone}
             collection={creators}
             onBuyBundleClicked={onBundleClicked}
           />
+          {loading && !initialLoadDone && <Loader size='md' isStatic />}
         </SContent>
       )}
       <SBottomShade visible={shadeVisible} />
