@@ -10,10 +10,9 @@ import Modal, { ModalType } from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 import CheckoutForm from './CheckoutForm';
-import Lottie from '../../atoms/Lottie';
+import Loader from '../../atoms/Loader';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import logoAnimation from '../../../public/animations/mobile_logo.json';
 import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import { Mixpanel } from '../../../utils/mixpanel';
 import { useAppState } from '../../../contexts/appStateContext';
@@ -56,24 +55,25 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     resizeMode
   );
 
-  const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
+  const [isInitializationError, setIsInitializationError] = useState(false);
   const { isCardsLoading } = useCards();
 
   useEffect(
     () => {
       const getSetupIntent = async () => {
-        setIsLoadingSetupIntent(true);
-
         const { errorKey } = await setupIntent.init();
 
         if (errorKey) {
           showErrorToastCustom(t(errorKey as any));
+          setIsInitializationError(true);
         }
-
-        setIsLoadingSetupIntent(false);
       };
 
-      if (!setupIntent.setupIntentClientSecret && setupIntent) {
+      if (
+        !setupIntent.setupIntentClientSecret &&
+        setupIntent &&
+        !isInitializationError
+      ) {
         getSetupIntent();
       }
     },
@@ -124,16 +124,12 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          {(isLoadingSetupIntent || isCardsLoading) && (
-            <Lottie
-              width={55}
-              height={55}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: logoAnimation,
-              }}
-            />
+          {(isCardsLoading ||
+            (!setupIntent?.setupIntentClientSecret &&
+              !isInitializationError)) && (
+            <SLoaderWrapper>
+              <Loader size='md' />
+            </SLoaderWrapper>
           )}
           <StripeElements
             stipeSecret={setupIntent?.setupIntentClientSecret || undefined}
@@ -256,4 +252,11 @@ const SHeaderContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
   }
+`;
+
+const SLoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 25px;
 `;

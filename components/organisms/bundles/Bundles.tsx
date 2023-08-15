@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import styled, { useTheme } from 'styled-components';
@@ -9,11 +9,6 @@ import GoBackButton from '../../molecules/GoBackButton';
 import InlineSvg from '../../atoms/InlineSVG';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import usePagination, {
-  PaginatedResponse,
-  Paging,
-} from '../../../utils/hooks/usePagination';
-import { searchCreators } from '../../../api/endpoints/search';
 import BuyBundleModal from '../../molecules/bundles/BuyBundleModal';
 import BundleCard from '../../molecules/bundles/BundleCard';
 import BackButton from '../../molecules/profile/BackButton';
@@ -21,12 +16,13 @@ import AllBundlesModal from '../../molecules/bundles/AllBundlesModal';
 import { useBundles } from '../../../contexts/bundlesContext';
 import CreatorsBundleModal from '../../molecules/bundles/CreatorsBundleModal';
 import AnimatedBackground from '../../atoms/AnimationBackground';
-import useErrorToasts from '../../../utils/hooks/useErrorToasts';
 import BundleCreatorsList from '../../molecules/bundles/BundleCreatorsList';
 import { useAppState } from '../../../contexts/appStateContext';
 import MobileBundleCreatorsList from '../../molecules/bundles/MobileBundleCreatorsList';
 import { Mixpanel } from '../../../utils/mixpanel';
 import useGoBackOrRedirect from '../../../utils/useGoBackOrRedirect';
+import useSearchCreators from '../../../utils/hooks/useSearchCreators';
+import { useOverlayMode } from '../../../contexts/overlayModeContext';
 
 export const Bundles: React.FC = React.memo(() => {
   const { goBackOrRedirect } = useGoBackOrRedirect();
@@ -38,7 +34,7 @@ export const Bundles: React.FC = React.memo(() => {
   );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const { showErrorToastPredefined } = useErrorToasts();
+  const { overlayModeEnabled } = useOverlayMode();
 
   const [allBundlesModalOpen, setAllBundlesModalOpen] = useState(false);
   const [shownCreatorBundle, setShownCreatorBundle] = useState<
@@ -51,48 +47,34 @@ export const Bundles: React.FC = React.memo(() => {
 
   const [searchValue, setSearchValue] = useState('');
 
-  const loadCreatorsData = useCallback(
-    async (paging: Paging): Promise<PaginatedResponse<newnewapi.IUser>> => {
-      if (!userUuid) {
-        return {
-          nextData: [],
-          nextPageToken: undefined,
-        };
-      }
-
-      const payload = new newnewapi.SearchCreatorsRequest({
+  const { data, isFetching, hasNextPage, isFetched, fetchNextPage } =
+    useSearchCreators(
+      {
+        loggedInUser: true,
         query: searchValue,
-        paging,
         filter: newnewapi.SearchCreatorsRequest.Filter.OFFERS_BUNDLES,
-      });
-
-      const res = await searchCreators(payload);
-
-      if (!res?.data || res.error) {
-        showErrorToastPredefined(undefined);
-        throw new Error(res?.error?.message ?? 'Request failed');
+      },
+      {
+        enabled: !overlayModeEnabled,
       }
+    );
 
-      // Do not pass data about creator themselves to pagination controller
-      const filteredData = res.data.creators.filter(
-        (creator) => creator.uuid !== userUuid
-      );
-
-      return {
-        nextData: filteredData,
-        nextPageToken: res.data.paging?.nextPageToken,
-      };
-    },
-    [searchValue, userUuid, showErrorToastPredefined]
+  const creatorsWithBundles = useMemo(
+    () =>
+      data?.pages
+        ? data?.pages
+            .map((page) => page.creators)
+            .flat()
+            .filter((creator) => creator.uuid !== userUuid)
+        : [],
+    [data?.pages, userUuid]
   );
-
-  const paginatedCreators = usePagination(loadCreatorsData, 10);
 
   // Quick fix for sorting creators with bundles
   // TODO: add sorting and filtering options on BE
   const sortedCreators = useMemo(
     () =>
-      paginatedCreators.data.sort((a, b) => {
+      creatorsWithBundles.sort((a, b) => {
         const aBundle = bundles?.find(
           (bundle) => bundle.creator?.uuid === a.uuid
         );
@@ -108,7 +90,7 @@ export const Bundles: React.FC = React.memo(() => {
         }
         return 0;
       }),
-    [paginatedCreators, bundles]
+    [creatorsWithBundles, bundles]
   );
 
   const visibleBundlesNumber = isMobile || isTablet ? 3 : 4;
@@ -215,7 +197,7 @@ export const Bundles: React.FC = React.memo(() => {
             fill={theme.colorsThemed.text.secondary}
             width={isMobile ? '20px' : '24px'}
             height={isMobile ? '20px' : '24px'}
-            visible={searchValue !== ''}
+            isVisible={searchValue !== ''}
             onClick={() => {
               setSearchValue('');
             }}
@@ -230,12 +212,10 @@ export const Bundles: React.FC = React.memo(() => {
         {isMobile ? (
           <MobileBundleCreatorsList
             creators={sortedCreators}
-            loading={paginatedCreators.loading}
-            hasMore={paginatedCreators.hasMore}
-            initialLoadDone={paginatedCreators.initialLoadDone}
-            loadMore={() => {
-              paginatedCreators.loadMore().catch((e) => console.error(e));
-            }}
+            loading={isFetching}
+            hasMore={!!hasNextPage}
+            initialLoadDone={isFetched}
+            loadMore={fetchNextPage}
             onBundleClicked={(creator) => {
               const creatorsBundle = bundles?.find(
                 (bundle) => bundle.creator?.uuid === creator.uuid
@@ -251,12 +231,10 @@ export const Bundles: React.FC = React.memo(() => {
         ) : (
           <SBundleCreatorsList
             creators={sortedCreators}
-            loading={paginatedCreators.loading}
-            hasMore={paginatedCreators.hasMore}
-            initialLoadDone={paginatedCreators.initialLoadDone}
-            loadMore={() => {
-              paginatedCreators.loadMore().catch((e) => console.error(e));
-            }}
+            loading={isFetching}
+            hasMore={!!hasNextPage}
+            initialLoadDone={isFetched}
+            loadMore={fetchNextPage}
             onBundleClicked={(creator) => {
               const creatorsBundle = bundles?.find(
                 (bundle) => bundle.creator?.uuid === creator.uuid
@@ -474,8 +452,8 @@ const SInput = styled.input`
   }
 `;
 
-const SRightInlineSVG = styled(InlineSvg)<{ visible: boolean }>`
-  opacity: ${({ visible }) => (visible ? 1 : 0)};
+const SRightInlineSVG = styled(InlineSvg)<{ isVisible: boolean }>`
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
   min-width: 20px;
   min-height: 20px;
 

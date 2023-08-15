@@ -2,6 +2,7 @@ import { newnewapi } from 'newnew-api';
 import { useInfiniteQuery, UseInfiniteQueryOptions } from 'react-query';
 
 import { searchCreators } from '../../api/endpoints/search';
+import useErrorToasts from './useErrorToasts';
 
 interface IUseSearchCreators {
   loggedInUser: boolean;
@@ -20,6 +21,8 @@ const useSearchCreators = (
     'queryKey' | 'queryFn'
   >
 ) => {
+  const { showErrorToastPredefined } = useErrorToasts();
+
   const query = useInfiniteQuery(
     [params.loggedInUser ? 'private' : 'public', 'getSearchCreators', params],
     async ({ pageParam, signal }) => {
@@ -35,7 +38,7 @@ const useSearchCreators = (
       const creatorsResponse = await searchCreators(payload, signal);
 
       if (!creatorsResponse?.data || creatorsResponse.error) {
-        throw new Error('Request failed');
+        throw new Error(creatorsResponse.error?.message ?? 'Request failed');
       }
 
       return {
@@ -47,6 +50,7 @@ const useSearchCreators = (
       getNextPageParam: (lastPage) => lastPage?.paging?.nextPageToken,
       onError: (error) => {
         console.error(error);
+        showErrorToastPredefined();
       },
       refetchOnWindowFocus: false,
       ...(options || {}),
